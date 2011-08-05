@@ -8,20 +8,6 @@
 		<maven>3.0</maven>
 	</prerequisites>
 
-	<groupId>org.eclipse.tcf</groupId>
-	<artifactId>tcf-parent</artifactId>
-	<version>0.4.1-SNAPSHOT</version> 
-	<packaging>pom</packaging>
-	<name>TCF Parent</name>
-
-	<properties>
-		<tycho-version>0.12.0</tycho-version>
-		<platform-version>3.7</platform-version>
-		<platform-site>http://download.eclipse.org/eclipse/updates/${platform-version}</platform-site>
-		<eclipse-version>indigo</eclipse-version>
-		<eclipse-site>http://download.eclipse.org/releases/${eclipse-version}</eclipse-site>
-	</properties>
-
 	<licenses>
 		<license>
 			<name>Eclipse Public License v1.0</name>
@@ -32,9 +18,24 @@
        available under the terms of the Eclipse Public License v1.0
        which accompanies this distribution, and is available at
        http://www.eclipse.org/legal/epl-v10.htm
-      </comments>
+			</comments>
 		</license>
 	</licenses>
+
+	<groupId>org.eclipse.tcf</groupId>
+	<artifactId>tcf-parent</artifactId>
+	<version>0.4.1-SNAPSHOT</version> 
+	<packaging>pom</packaging>
+	<name>TCF Parent</name>
+
+	<properties>
+		<tycho-version>0.12.0</tycho-version>
+		<platform-version>3.7</platform-version>
+		<platform-site>http://download.eclipse.org/eclipse/updates/${platform-version}</platform-site>
+		<cdt-site>https://hudson.eclipse.org/hudson/job/cdt-nightly/ws/releng/org.eclipse.cdt.repo/target/repository/</cdt-site>
+		<tm-version>3.3</tm-version>
+		<tm-site>http://download.eclipse.org/tm/updates/${tm-version}</tm-site>
+	</properties>
 
 	<modules>
 	  <module>plugins/org.eclipse.tm.tcf</module>
@@ -47,6 +48,21 @@
 	  <module>features/org.eclipse.tm.tcf.feature</module>
 	  <module>features/org.eclipse.tm.tcf.cdt.feature</module>
 	  <module>features/org.eclipse.tm.tcf.rse.feature</module>
+	  
+	  <module>target_explorer/plugins/org.eclipse.tm.te.core</module>
+	  <module>target_explorer/plugins/org.eclipse.tm.te.tcf.core</module>
+	  <module>target_explorer/plugins/org.eclipse.tm.te.tcf.filesystem</module>
+	  <module>target_explorer/plugins/org.eclipse.tm.te.tcf.locator</module>
+	  <module>target_explorer/plugins/org.eclipse.tm.te.tcf.ui</module>
+	  <module>target_explorer/plugins/org.eclipse.tm.te.ui</module>
+	  <module>target_explorer/plugins/org.eclipse.tm.te.ui.views</module>
+
+	  <module>target_explorer/features/org.eclipse.tm.te.feature</module>
+	  <module>target_explorer/features/org.eclipse.tm.te.tcf.feature</module>
+	  
+<!--	  
+	  <module>target_explorer/plugins/org.eclipse.tm.te.tests</module>
+-->
 
 	  <module>features/org.eclipse.tm.tcf.repo</module>
 	</modules>
@@ -58,8 +74,13 @@
 			<layout>p2</layout>
 		</repository>
 		<repository>
-			<id>eclipse-${eclipse-version}</id>
-			<url>${eclipse-site}</url>
+			<id>cdt</id>
+			<url>${cdt-site}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>tm-${tm-version}</id>
+			<url>${tm-site}</url>
 			<layout>p2</layout>
 		</repository>
 	</repositories>
