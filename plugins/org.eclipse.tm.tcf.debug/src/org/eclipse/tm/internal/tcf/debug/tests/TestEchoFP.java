@@ -35,7 +35,7 @@ class TestEchoFP implements ITCFTest, IDiagnostics.DoneEchoFP {
 
     public void start() {
         if (diag == null) {
-            test_suite.done(this, null);
+            exit(null);
         }
         else {
             start_time = System.currentTimeMillis();
@@ -58,10 +58,10 @@ class TestEchoFP implements ITCFTest, IDiagnostics.DoneEchoFP {
         BigDecimal s = msgs.removeFirst();
         if (!test_suite.isActive(this)) return;
         if (error != null) {
-            test_suite.done(this, error);
+            exit(error);
         }
         else if (!cmp(s.doubleValue(), b.doubleValue())) {
-            test_suite.done(this, new Exception("EchoFP test failed: " + s + " != " + b));
+            exit(new Exception("EchoFP test failed: " + s + " != " + b));
         }
         else if (count < 0x800) {
             sendMessage();
@@ -71,8 +71,13 @@ class TestEchoFP implements ITCFTest, IDiagnostics.DoneEchoFP {
             }
         }
         else if (msgs.isEmpty()){
-            test_suite.done(this, null);
+            exit(null);
         }
+    }
+
+    private void exit(Throwable x) {
+        if (!test_suite.isActive(this)) return;
+        test_suite.done(this, x);
     }
 
     public boolean canResume(String id) {

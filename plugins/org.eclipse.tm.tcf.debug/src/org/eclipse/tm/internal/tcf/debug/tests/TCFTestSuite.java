@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +44,9 @@ public class TCFTestSuite {
 
     private int count_total;
     private int count_done;
+
+    private boolean continue_on_error;
+    private boolean done;
 
     boolean cancel;
     boolean canceled;
@@ -184,11 +186,15 @@ public class TCFTestSuite {
                     errors.add(x);
                     int cnt = 0;
                     for (int i = 0; i < channels.length; i++) {
-                        if (channels[i] == null) continue;
-                        if (channels[i].getState() != IChannel.STATE_CLOSED) channels[i].close();
-                        cnt++;
+                        if (channels[i].getState() != IChannel.STATE_CLOSED) {
+                            channels[i].close();
+                            cnt++;
+                        }
                     }
-                    if (cnt == 0) listener.done(errors);
+                    if (cnt == 0 && !done) {
+                        done = true;
+                        listener.done(errors);
+                    }
                 }
             }
         });
@@ -202,7 +208,6 @@ public class TCFTestSuite {
 
                 public void onChannelOpened() {
                     for (int i = 0; i < channels.length; i++) {
-                        if (channels[i] == null) return;
                         if (channels[i].getState() != IChannel.STATE_OPEN) return;
                     }
                     for (int i = 0; i < channels.length; i++) {
@@ -222,18 +227,18 @@ public class TCFTestSuite {
                     int cnt = 0;
                     for (int i = 0; i < channels.length; i++) {
                         if (channels[i] == channel) {
-                            channels[i] = null;
-                            if (error != null && errors.isEmpty()) errors.add(error);
-                            for (Iterator<ITCFTest> n = active_tests.keySet().iterator(); n.hasNext();) {
-                                if (active_tests.get(n.next()) == channel) n.remove();
+                            for (ITCFTest t : active_tests.keySet().toArray(new ITCFTest[active_tests.size()])) {
+                                if (active_tests.get(t) == channel) done(t, error);
                             }
                         }
-                        if (channels[i] == null) continue;
-                        if ((error != null || active_tests.isEmpty() && pending_tests.isEmpty()) &&
+                        if ((!continue_on_error && error != null || active_tests.isEmpty() && pending_tests.isEmpty()) &&
                                 channels[i].getState() != IChannel.STATE_CLOSED) channels[i].close();
-                        cnt++;
+                        if (channels[i].getState() != IChannel.STATE_CLOSED) cnt++;
                     }
-                    if (cnt == 0) listener.done(errors);
+                    if (cnt == 0 && !done) {
+                        done = true;
+                        listener.done(errors);
+                    }
                 }
             });
         }
@@ -261,6 +266,14 @@ public class TCFTestSuite {
 
     public boolean isCanceled() {
         return canceled;
+    }
+
+    public IChannel[] getChannels() {
+        return channels;
+    }
+
+    public void setContinueOnError(boolean b) {
+        continue_on_error = b;
     }
 
     boolean isActive(ITCFTest test) {
@@ -294,9 +307,9 @@ public class TCFTestSuite {
 
     private void runNextTest() {
         while (active_tests.isEmpty()) {
-            if (cancel || errors.size() > 0 || pending_tests.size() == 0) {
+            if (cancel || !continue_on_error && errors.size() > 0 || pending_tests.size() == 0) {
                 for (IChannel channel : channels) {
-                    if (channel != null && channel.getState() != IChannel.STATE_CLOSED) {
+                    if (channel.getState() != IChannel.STATE_CLOSED) {
                         if (errors.size() > 0) channel.terminate(new Exception("Test failed"));
                         else channel.close();
                     }

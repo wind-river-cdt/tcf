@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Random;
 
 import org.eclipse.tm.tcf.core.TransientPeer;
 import org.eclipse.tm.tcf.protocol.IChannel;
@@ -26,6 +27,10 @@ import org.eclipse.tm.tcf.protocol.Protocol;
  * This class is user to run TCF test suite from command line.
  */
 public class Main {
+
+    private static boolean flag_t = false;
+
+    private static final Random rnd = new Random();
 
     private static class EventQueue extends Thread implements IEventQueue {
 
@@ -89,6 +94,10 @@ public class Main {
     private static IPeer getPeer(String[] arr) {
         ArrayList<Map<String,String>> l = new ArrayList<Map<String,String>>();
         for (String s : arr) {
+            if (s.equals("-t")) {
+                flag_t = true;
+                continue;
+            }
             Map<String,String> map = new HashMap<String,String>();
             int len = s.length();
             int i = 0;
@@ -110,18 +119,19 @@ public class Main {
         return new RemotePeer(l);
     }
 
-    private static void runTestSuite(IPeer peer) {
+    private static void runTestSuite(final IPeer peer) {
         TCFTestSuite.TestListener listener = new TCFTestSuite.TestListener() {
 
             public void done(Collection<Throwable> errors) {
-                if (errors == null || errors.isEmpty()) {
+                if (!flag_t && (errors == null || errors.isEmpty())) {
                     System.out.println("No errors detected.");
                     System.exit(0);
                 }
                 for (Throwable x : errors) {
                     x.printStackTrace(System.out);
                 }
-                System.exit(3);
+                if (!flag_t) System.exit(3);
+                runTestSuite(peer);
             }
 
             public void progress(String label, int done, int total) {
@@ -130,7 +140,22 @@ public class Main {
 
         };
         try {
-            new TCFTestSuite(peer, listener, null, null);
+            final TCFTestSuite test = new TCFTestSuite(peer, listener, null, null);
+            if (flag_t) {
+                test.setContinueOnError(true);
+                Protocol.invokeLater(rnd.nextInt(2000), new Runnable() {
+                    public void run() {
+                        IChannel[] arr = test.getChannels();
+                        for (IChannel c : arr) {
+                            if (c.getState() == IChannel.STATE_OPEN) {
+                                c.terminate(new Exception("Channel termination test"));
+                                Protocol.invokeLater(rnd.nextInt(2000), this);
+                                return;
+                            }
+                        }
+                    }
+                });
+            }
         }
         catch (Throwable x) {
             System.err.println("Cannot start test suite:");
@@ -152,12 +177,13 @@ public class Main {
         Protocol.invokeLater(new Runnable() {
             public void run() {
                 runTestSuite(getPeer(args));
-            }
-        });
-        Protocol.invokeLater(10 * 60 * 1000, new Runnable() {
-            public void run() {
-                System.err.println("Error: timeout - test's not finished in 10 min");
-                System.exit(5);
+                if (flag_t) return;
+                Protocol.invokeLater(10 * 60 * 1000, new Runnable() {
+                    public void run() {
+                        System.err.println("Error: timeout - test's not finished in 10 min");
+                        System.exit(5);
+                    }
+                });
             }
         });
     }

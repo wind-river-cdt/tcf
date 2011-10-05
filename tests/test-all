@@ -209,6 +209,7 @@ function build_and_start_server()
     if [ $OPSYS = Windows ] ; then
       local SERVER_LFILE=`$SSH "cygpath -m $SERVER_LFILE"`
     fi
+    echo "$AGENT/server/obj/$OPSYS/$MACHINE/$CONF/server -s TCP::1535 -L$SERVER_LFILE -l0x800" >>logs/$LOGFILE
     $SSH "$AGENT/server/obj/$OPSYS/$MACHINE/$CONF/server -s TCP::1535 -L$SERVER_LFILE -l0x800" >>logs/$LOGFILE 2>&1 &
   else
     echo "<img src=\"../icons/cross.png\" title=\"Server build failed\"/>" >>$HTML

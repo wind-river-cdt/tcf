@@ -32,7 +32,7 @@ class TestEcho implements ITCFTest, IDiagnostics.DoneEcho {
 
     public void start() {
         if (diag == null) {
-            test_suite.done(this, null);
+            exit(null);
         }
         else {
             diag.not_implemented_command(new IDiagnostics.DoneNotImplementedCommand() {
@@ -40,11 +40,11 @@ class TestEcho implements ITCFTest, IDiagnostics.DoneEcho {
                 public void doneNotImplementedCommand(IToken token, Throwable error) {
                     if (!(error instanceof IErrorReport)) {
                         Throwable x = new Exception("Invalid responce to unimplemented command", error);
-                        test_suite.done(TestEcho.this, x);
+                        exit(x);
                         return;
                     }
                     if (((IErrorReport)error).getErrorCode() != IErrorReport.TCF_ERROR_INV_COMMAND) {
-                        test_suite.done(TestEcho.this, new Exception("Invalid error code in responce to unimplemented command"));
+                        exit(new Exception("Invalid error code in responce to unimplemented command"));
                         return;
                     }
                     start_time = System.currentTimeMillis();
@@ -71,10 +71,10 @@ class TestEcho implements ITCFTest, IDiagnostics.DoneEcho {
         String s = msgs.removeFirst();
         if (!test_suite.isActive(this)) return;
         if (error != null) {
-            test_suite.done(this, error);
+            exit(error);
         }
         else if (!s.equals(b)) {
-            test_suite.done(this, new Exception("Echo test failed: " + s + " != " + b));
+            exit(new Exception("Echo test failed: " + s + " != " + b));
         }
         else if (count < 0x400) {
             sendMessage();
@@ -84,8 +84,13 @@ class TestEcho implements ITCFTest, IDiagnostics.DoneEcho {
             }
         }
         else if (msgs.isEmpty()){
-            test_suite.done(this, null);
+            exit(null);
         }
+    }
+
+    private void exit(Throwable x) {
+        if (!test_suite.isActive(this)) return;
+        test_suite.done(this, x);
     }
 
     public boolean canResume(String id) {

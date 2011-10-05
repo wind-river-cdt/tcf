@@ -208,6 +208,7 @@ class RunControl {
     }
 
     boolean canResume(String id) {
+        if (channel.getState() == IChannel.STATE_CLOSED) return true;
         if (sync_pending) return false;
         if (get_state_cmds.size() > 0) return false;
         if (resume_cmds.get(id) != null) return false;
@@ -226,6 +227,7 @@ class RunControl {
     }
 
     void resume(final String id, final int mode) {
+        if (channel.getState() == IChannel.STATE_CLOSED) return;
         if (!test_suite.canResume(id)) return;
         assert !sync_pending;
         sync_pending = true;
