@@ -193,7 +193,6 @@ public abstract class TCFNode extends PlatformObject implements Comparable<TCFNo
      * @return parent node or null if the node is a root
      */
     public final TCFNode getParent() {
-        assert Protocol.isDispatchThread();
         return parent;
     }
 
@@ -310,7 +309,7 @@ public abstract class TCFNode extends PlatformObject implements Comparable<TCFNo
                             if (!getData(update, this)) return;
                         }
                         else {
-                            update.setInputElement(update.getElement());
+                            update.setInputElement(TCFNode.this);
                         }
                         update.setStatus(Status.OK_STATUS);
                     }
@@ -381,7 +380,7 @@ public abstract class TCFNode extends PlatformObject implements Comparable<TCFNo
      * @return false if waiting data retrieval, true if all done.
      */
     protected boolean getData(IViewerInputUpdate update, Runnable done) {
-        update.setInputElement(update.getElement());
+        update.setInputElement(this);
         return true;
     }
 
