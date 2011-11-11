@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.eclipse.tm.tcf">
+<schema targetNamespace="org.eclipse.tcf">
 <annotation>
    <appInfo>
-      <meta.schema plugin="org.eclipse.tm.tcf.debug.ui" id="launch_context" name="TCF Launch Context"/>
+      <meta.schema plugin="org.eclipse.tcf.debug.ui" id="launch_context" name="TCF Launch Context"/>
    </appInfo>
    <documentation>
       This extension point is used to register plugins

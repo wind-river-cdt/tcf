@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.eclipse.tm.tcf" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="org.eclipse.tcf" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.eclipse.tm.tcf" id="serviceProviders" name="TCF Service Providers"/>
+         <meta.schema plugin="org.eclipse.tcf" id="serviceProviders" name="TCF Service Providers"/>
       </appInfo>
       <documentation>
          This extension point is used to allow the contribution of new TCF service providers.
@@ -64,10 +64,10 @@
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  The fully qualified name of the service provider class. Must implement &lt;samp&gt;org.eclipse.tm.tcf.protocol.IServiceProvider&lt;/samp&gt;
+                  The fully qualified name of the service provider class. Must implement &lt;samp&gt;org.eclipse.tcf.protocol.IServiceProvider&lt;/samp&gt;
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.tm.tcf.protocol.IServiceProvider"/>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.tcf.protocol.IServiceProvider"/>
                </appInfo>
             </annotation>
          </attribute>
@@ -89,7 +89,7 @@
          <meta.section type="apiinfo"/>
       </appInfo>
       <documentation>
-         Plug-ins that want to extend this extension point, the referenced class must implement the  &lt;samp&gt;org.eclipse.tm.tcf.protocol.IServiceProvider&lt;/samp&gt; interface.
+         Plug-ins that want to extend this extension point, the referenced class must implement the  &lt;samp&gt;org.eclipse.tcf.protocol.IServiceProvider&lt;/samp&gt; interface.
       </documentation>
    </annotation>
 

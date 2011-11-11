@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.eclipse.tm.tcf">
+<schema targetNamespace="org.eclipse.tcf">
 <annotation>
    <appInfo>
-      <meta.schema plugin="org.eclipse.tm.tcf" id="startup" name="TCF Startup"/>
+      <meta.schema plugin="org.eclipse.tcf" id="startup" name="TCF Startup"/>
    </appInfo>
    <documentation>
       This extension point is used to register plugins

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>org.eclipse.tm.tcf.headless.build</name>
+	<name>org.eclipse.tcf.headless.build</name>
 	<comment></comment>
 	<projects>
 	</projects>
