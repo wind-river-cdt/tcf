@@ -20,7 +20,7 @@ import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.protocol.JSON;
 import org.eclipse.tcf.services.IExpressions;
-import org.eclipse.tcf.services.ISymbols.TypeClass;;
+import org.eclipse.tcf.services.ISymbols.TypeClass;
 
 public class ExpressionsProxy implements IExpressions {
 

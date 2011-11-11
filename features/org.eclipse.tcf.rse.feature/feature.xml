@@ -28,7 +28,7 @@
    </license>
 
    <url>
-      <update label="%updateSiteName" url="http://dev.eclipse.org/svnroot/dsdp/org.eclipse.tcf/releases/1.0.0"/>
+      <update label="%updateSiteName" url="http://download.eclipse.org/tools/cdt/releases/juno"/>
    </url>
 
    <includes

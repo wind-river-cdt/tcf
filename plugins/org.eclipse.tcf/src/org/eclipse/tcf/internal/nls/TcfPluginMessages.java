@@ -18,7 +18,7 @@ import org.eclipse.osgi.util.NLS;
 public class TcfPluginMessages extends NLS {
 
     // The plug-in resouce bundle name
-    private static final String BUNDLE_NAME = "org.eclipse.tcf.internal.tcf.TcfPluginMessages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "org.eclipse.tcf.internal.TcfPluginMessages"; //$NON-NLS-1$
 
     /**
      * Static constructor.
