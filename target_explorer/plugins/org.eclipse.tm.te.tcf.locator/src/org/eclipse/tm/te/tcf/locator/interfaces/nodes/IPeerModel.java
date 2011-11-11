@@ -9,7 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tm.te.tcf.locator.interfaces.nodes;
 
-import org.eclipse.tm.tcf.protocol.IPeer;
+import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tm.te.runtime.interfaces.properties.IPropertiesContainer;
 
 /**

@@ -8,12 +8,12 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui.model;
+package org.eclipse.tcf.internal.debug.ui.model;
 
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.ISymbols;
-import org.eclipse.tm.tcf.util.TCFDataCache;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.ISymbols;
+import org.eclipse.tcf.util.TCFDataCache;
 
 public class TCFNodeSymbol extends TCFNode {
 

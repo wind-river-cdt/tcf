@@ -8,22 +8,22 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.actions;
+package org.eclipse.tcf.internal.debug.actions;
 
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.tm.internal.tcf.debug.model.TCFContextState;
-import org.eclipse.tm.internal.tcf.debug.model.TCFLaunch;
-import org.eclipse.tm.internal.tcf.debug.model.TCFSourceRef;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.protocol.JSON;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.ILineNumbers;
-import org.eclipse.tm.tcf.services.IRunControl;
-import org.eclipse.tm.tcf.services.IRunControl.RunControlContext;
-import org.eclipse.tm.tcf.util.TCFDataCache;
+import org.eclipse.tcf.internal.debug.model.TCFContextState;
+import org.eclipse.tcf.internal.debug.model.TCFLaunch;
+import org.eclipse.tcf.internal.debug.model.TCFSourceRef;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.JSON;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.ILineNumbers;
+import org.eclipse.tcf.services.IRunControl;
+import org.eclipse.tcf.services.IRunControl.RunControlContext;
+import org.eclipse.tcf.util.TCFDataCache;
 
 public abstract class TCFActionStepInto extends TCFAction implements IRunControl.RunControlListener {
 

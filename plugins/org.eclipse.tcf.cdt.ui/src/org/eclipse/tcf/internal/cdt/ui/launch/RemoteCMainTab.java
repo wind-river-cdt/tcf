@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.cdt.ui.launch;
+package org.eclipse.tcf.internal.cdt.ui.launch;
 
 import org.eclipse.cdt.launch.ui.CMainTab;
 import org.eclipse.core.resources.IProject;
@@ -37,13 +37,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.tm.internal.tcf.cdt.ui.launch.PeerListControl.PeerInfo;
-import org.eclipse.tm.internal.tcf.debug.launch.TCFLaunchDelegate;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IChannel.IChannelListener;
-import org.eclipse.tm.tcf.services.IFileSystem;
-import org.eclipse.tm.tcf.services.IProcesses;
-import org.eclipse.tm.tcf.util.TCFTask;
+import org.eclipse.tcf.internal.cdt.ui.launch.PeerListControl.PeerInfo;
+import org.eclipse.tcf.internal.debug.launch.TCFLaunchDelegate;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IChannel.IChannelListener;
+import org.eclipse.tcf.services.IFileSystem;
+import org.eclipse.tcf.services.IProcesses;
+import org.eclipse.tcf.util.TCFTask;
 import org.eclipse.ui.PlatformUI;
 
 public class RemoteCMainTab extends CMainTab implements IShellProvider {
@@ -101,7 +101,7 @@ public class RemoteCMainTab extends CMainTab implements IShellProvider {
                 .getWorkbench()
                 .getHelpSystem()
                 .setHelp(getControl(),
-                        "org.eclipse.tm.tcf.cdt.ui.remoteApplicationLaunchGroup"); //$NON-NLS-1$
+                        "org.eclipse.tcf.cdt.ui.remoteApplicationLaunchGroup"); //$NON-NLS-1$
     }
 
     private void createPeerListGroup(Composite comp) {

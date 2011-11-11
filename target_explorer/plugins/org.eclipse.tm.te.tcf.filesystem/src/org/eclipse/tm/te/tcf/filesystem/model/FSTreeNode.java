@@ -23,8 +23,8 @@ import java.util.UUID;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.PlatformObject;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.IFileSystem;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tm.te.tcf.filesystem.interfaces.IWindowsFileAttributes;
 import org.eclipse.tm.te.tcf.filesystem.internal.UserAccount;
 import org.eclipse.tm.te.tcf.filesystem.internal.handlers.UserManager;

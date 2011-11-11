@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui.commands;
+package org.eclipse.tcf.internal.debug.ui.commands;
 
 import java.util.ArrayList;
 
@@ -16,13 +16,13 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IMemoryBlockRetrievalExtension;
 import org.eclipse.debug.ui.IDebugUIConstants;
-import org.eclipse.tm.internal.tcf.debug.ui.Activator;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNode;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNodeExpression;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNumberFormat;
-import org.eclipse.tm.tcf.services.IExpressions;
-import org.eclipse.tm.tcf.util.TCFDataCache;
-import org.eclipse.tm.tcf.util.TCFTask;
+import org.eclipse.tcf.internal.debug.ui.Activator;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNode;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExpression;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNumberFormat;
+import org.eclipse.tcf.services.IExpressions;
+import org.eclipse.tcf.util.TCFDataCache;
+import org.eclipse.tcf.util.TCFTask;
 import org.eclipse.ui.IWorkbenchPage;
 
 public class ViewMemoryCommand extends AbstractActionDelegate {

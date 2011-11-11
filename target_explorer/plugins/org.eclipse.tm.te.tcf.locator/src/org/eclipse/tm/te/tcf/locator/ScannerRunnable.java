@@ -15,11 +15,11 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.tm.tcf.core.ChannelTCP;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IPeer;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.ILocator;
+import org.eclipse.tcf.core.ChannelTCP;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IPeer;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.ILocator;
 import org.eclipse.tm.te.tcf.locator.interfaces.IScanner;
 import org.eclipse.tm.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tm.te.tcf.locator.interfaces.nodes.IPeerModel;
@@ -90,7 +90,7 @@ public class ScannerRunnable implements Runnable, IChannel.IChannelListener {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tm.tcf.protocol.IChannel.IChannelListener#onChannelOpened()
+	 * @see org.eclipse.tcf.protocol.IChannel.IChannelListener#onChannelOpened()
 	 */
 	@Override
 	public void onChannelOpened() {
@@ -155,7 +155,7 @@ public class ScannerRunnable implements Runnable, IChannel.IChannelListener {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tm.tcf.protocol.IChannel.IChannelListener#onChannelClosed(java.lang.Throwable)
+	 * @see org.eclipse.tcf.protocol.IChannel.IChannelListener#onChannelClosed(java.lang.Throwable)
 	 */
 	@Override
 	public void onChannelClosed(Throwable error) {
@@ -177,7 +177,7 @@ public class ScannerRunnable implements Runnable, IChannel.IChannelListener {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tm.tcf.protocol.IChannel.IChannelListener#congestionLevel(int)
+	 * @see org.eclipse.tcf.protocol.IChannel.IChannelListener#congestionLevel(int)
 	 */
 	@Override
 	public void congestionLevel(int level) {

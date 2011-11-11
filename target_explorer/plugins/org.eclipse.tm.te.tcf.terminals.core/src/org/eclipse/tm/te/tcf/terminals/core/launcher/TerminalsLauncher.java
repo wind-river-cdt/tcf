@@ -31,14 +31,14 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IChannel.IChannelListener;
-import org.eclipse.tm.tcf.protocol.IPeer;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.IStreams;
-import org.eclipse.tm.tcf.services.ITerminals;
-import org.eclipse.tm.tcf.services.ITerminals.TerminalContext;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IChannel.IChannelListener;
+import org.eclipse.tcf.protocol.IPeer;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.IStreams;
+import org.eclipse.tcf.services.ITerminals;
+import org.eclipse.tcf.services.ITerminals.TerminalContext;
 import org.eclipse.tm.te.core.async.AsyncCallbackCollector;
 import org.eclipse.tm.te.runtime.callback.Callback;
 import org.eclipse.tm.te.runtime.events.DisposedEvent;
@@ -227,7 +227,7 @@ public class TerminalsLauncher extends PlatformObject implements ITerminalsLaunc
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tm.te.tcf.terminals.core.interfaces.launcher.ITerminalsLauncher#launch(org.eclipse.tm.tcf.protocol.IPeer, org.eclipse.tm.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.tm.te.runtime.interfaces.callback.ICallback)
+	 * @see org.eclipse.tm.te.tcf.terminals.core.interfaces.launcher.ITerminalsLauncher#launch(org.eclipse.tcf.protocol.IPeer, org.eclipse.tm.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.tm.te.runtime.interfaces.callback.ICallback)
 	 */
 	@Override
 	public void launch(final IPeer peer, final IPropertiesContainer properties, final ICallback callback) {
@@ -255,7 +255,7 @@ public class TerminalsLauncher extends PlatformObject implements ITerminalsLaunc
 		// Open a channel to the given peer
 		Tcf.getChannelManager().openChannel(peer, new IChannelManager.DoneOpenChannel() {
 			/* (non-Javadoc)
-			 * @see org.eclipse.tm.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel#doneOpenChannel(java.lang.Throwable, org.eclipse.tm.tcf.protocol.IChannel)
+			 * @see org.eclipse.tm.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel#doneOpenChannel(java.lang.Throwable, org.eclipse.tcf.protocol.IChannel)
 			 */
 			@Override
 			public void doneOpenChannel(Throwable error, IChannel channel) {
@@ -266,13 +266,13 @@ public class TerminalsLauncher extends PlatformObject implements ITerminalsLaunc
 					// is closed from the remote side.
 					channel.addChannelListener(new IChannelListener() {
 						/* (non-Javadoc)
-						 * @see org.eclipse.tm.tcf.protocol.IChannel.IChannelListener#onChannelOpened()
+						 * @see org.eclipse.tcf.protocol.IChannel.IChannelListener#onChannelOpened()
 						 */
 						@Override
 						public void onChannelOpened() {
 						}
 						/* (non-Javadoc)
-						 * @see org.eclipse.tm.tcf.protocol.IChannel.IChannelListener#onChannelClosed(java.lang.Throwable)
+						 * @see org.eclipse.tcf.protocol.IChannel.IChannelListener#onChannelClosed(java.lang.Throwable)
 						 */
 						@Override
 						public void onChannelClosed(Throwable error) {
@@ -284,7 +284,7 @@ public class TerminalsLauncher extends PlatformObject implements ITerminalsLaunc
 							}
 						}
 						/* (non-Javadoc)
-						 * @see org.eclipse.tm.tcf.protocol.IChannel.IChannelListener#congestionLevel(int)
+						 * @see org.eclipse.tcf.protocol.IChannel.IChannelListener#congestionLevel(int)
 						 */
 						@Override
 						public void congestionLevel(int level) {
@@ -381,7 +381,7 @@ public class TerminalsLauncher extends PlatformObject implements ITerminalsLaunc
 	/**
 	 * Initialize and attach the output console and/or the output file.
 	 * <p>
-	 * Called from {@link IStreams#subscribe(String, org.eclipse.tm.tcf.services.IStreams.StreamsListener, org.eclipse.tm.tcf.services.IStreams.DoneSubscribe)}.
+	 * Called from {@link IStreams#subscribe(String, org.eclipse.tcf.services.IStreams.StreamsListener, org.eclipse.tcf.services.IStreams.DoneSubscribe)}.
 	 */
 	protected void onSubscribeStreamsDone() {
 		// Get the properties container

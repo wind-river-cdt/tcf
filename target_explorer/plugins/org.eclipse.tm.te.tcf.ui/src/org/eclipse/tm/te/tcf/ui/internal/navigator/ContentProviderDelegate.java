@@ -11,7 +11,7 @@ package org.eclipse.tm.te.tcf.ui.internal.navigator;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.tm.tcf.protocol.Protocol;
+import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tm.te.tcf.locator.interfaces.IModelListener;
 import org.eclipse.tm.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tm.te.tcf.locator.interfaces.nodes.IPeerModel;

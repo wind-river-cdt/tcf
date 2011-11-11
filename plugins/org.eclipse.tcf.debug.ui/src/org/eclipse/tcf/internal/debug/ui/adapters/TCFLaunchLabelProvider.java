@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui.adapters;
+package org.eclipse.tcf.internal.debug.ui.adapters;
 
 import java.util.Collection;
 import java.util.Map;
@@ -19,10 +19,10 @@ import org.eclipse.debug.internal.ui.viewers.model.provisional.ILabelUpdate;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.tm.internal.tcf.debug.model.TCFLaunch;
-import org.eclipse.tm.internal.tcf.debug.ui.ImageCache;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFModel;
-import org.eclipse.tm.tcf.services.IProcesses;
+import org.eclipse.tcf.internal.debug.model.TCFLaunch;
+import org.eclipse.tcf.internal.debug.ui.ImageCache;
+import org.eclipse.tcf.internal.debug.ui.model.TCFModel;
+import org.eclipse.tcf.services.IProcesses;
 
 class TCFLaunchLabelProvider implements IElementLabelProvider {
 

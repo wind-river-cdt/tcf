@@ -8,11 +8,11 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.tcf.services;
+package org.eclipse.tcf.services;
 
 import java.util.Map;
 
-import org.eclipse.tm.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.IToken;
 
 /**
  * Extension of Processes service.

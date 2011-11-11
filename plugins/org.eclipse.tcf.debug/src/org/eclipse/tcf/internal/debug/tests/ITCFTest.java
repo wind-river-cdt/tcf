@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.tests;
+package org.eclipse.tcf.internal.debug.tests;
 
 /**
  * Each (sub)test in TCF Test Suite should implement this interface.

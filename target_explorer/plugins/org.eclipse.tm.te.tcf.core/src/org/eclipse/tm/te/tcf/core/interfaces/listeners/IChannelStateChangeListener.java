@@ -9,7 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tm.te.tcf.core.interfaces.listeners;
 
-import org.eclipse.tm.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IChannel;
 
 /**
  * Interface for clients to implement that wishes to listen

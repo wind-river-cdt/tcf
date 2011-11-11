@@ -8,17 +8,17 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.services.local;
+package org.eclipse.tcf.internal.services.local;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.tm.internal.tcf.core.ChannelLoop;
-import org.eclipse.tm.tcf.core.AbstractChannel;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IService;
-import org.eclipse.tm.tcf.protocol.IToken;
+import org.eclipse.tcf.internal.core.ChannelLoop;
+import org.eclipse.tcf.core.AbstractChannel;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IService;
+import org.eclipse.tcf.protocol.IToken;
 
 /**
  * ChannelProxy implements forwarding of TCF messages between two channels.

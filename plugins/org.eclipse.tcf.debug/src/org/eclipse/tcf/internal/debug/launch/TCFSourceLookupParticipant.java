@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.launch;
+package org.eclipse.tcf.internal.debug.launch;
 
 import java.io.File;
 import java.net.InetAddress;
@@ -27,8 +27,8 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.sourcelookup.AbstractSourceLookupParticipant;
 import org.eclipse.debug.core.sourcelookup.ISourceLookupDirector;
 import org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage;
-import org.eclipse.tm.internal.tcf.debug.launch.TCFLaunchDelegate.PathMapRule;
-import org.eclipse.tm.tcf.services.ILineNumbers;
+import org.eclipse.tcf.internal.debug.launch.TCFLaunchDelegate.PathMapRule;
+import org.eclipse.tcf.services.ILineNumbers;
 
 /**
  * The TCF source lookup participant knows how to translate a ILineNumbers.CodeArea

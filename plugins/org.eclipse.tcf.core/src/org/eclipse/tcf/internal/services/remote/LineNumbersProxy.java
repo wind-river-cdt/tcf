@@ -8,15 +8,15 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.services.remote;
+package org.eclipse.tcf.internal.services.remote;
 
 import java.util.Collection;
 import java.util.Map;
 
-import org.eclipse.tm.tcf.core.Command;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.services.ILineNumbers;
+import org.eclipse.tcf.core.Command;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.services.ILineNumbers;
 
 
 public class LineNumbersProxy implements ILineNumbers {

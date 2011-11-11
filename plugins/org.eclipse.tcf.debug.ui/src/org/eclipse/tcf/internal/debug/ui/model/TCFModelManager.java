@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui.model;
+package org.eclipse.tcf.internal.debug.ui.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,9 +19,9 @@ import java.util.Map;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchesListener;
-import org.eclipse.tm.internal.tcf.debug.model.TCFLaunch;
-import org.eclipse.tm.internal.tcf.debug.ui.Activator;
-import org.eclipse.tm.tcf.protocol.Protocol;
+import org.eclipse.tcf.internal.debug.model.TCFLaunch;
+import org.eclipse.tcf.internal.debug.ui.Activator;
+import org.eclipse.tcf.protocol.Protocol;
 
 
 public class TCFModelManager {

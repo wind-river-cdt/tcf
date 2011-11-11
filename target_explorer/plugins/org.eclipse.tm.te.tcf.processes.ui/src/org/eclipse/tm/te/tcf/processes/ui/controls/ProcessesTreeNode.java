@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.eclipse.core.runtime.PlatformObject;
-import org.eclipse.tm.tcf.services.ISysMonitor;
+import org.eclipse.tcf.services.ISysMonitor;
 
 /**
  * Representation of a file system tree node.

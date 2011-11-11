@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
-Bundle-SymbolicName: org.eclipse.tm.tcf.debug.ui;singleton:=true
+Bundle-SymbolicName: org.eclipse.tcf.debug.ui;singleton:=true
 Bundle-Version: 0.5.0.qualifier
-Bundle-Activator: org.eclipse.tm.internal.tcf.debug.ui.Activator
+Bundle-Activator: org.eclipse.tcf.internal.debug.ui.Activator
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
@@ -15,21 +15,21 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jface.text,
  org.eclipse.debug.core,
  org.eclipse.debug.ui,
- org.eclipse.tm.tcf.debug,
+ org.eclipse.tcf.debug,
  com.jcraft.jsch;bundle-version="0.1.37",
  org.eclipse.jsch.core;bundle-version="1.1.100",
  org.eclipse.jsch.ui;bundle-version="1.1.100",
  org.eclipse.core.filesystem;bundle-version="1.3.0"
 Import-Package: org.eclipse.core.expressions,
- org.eclipse.tm.tcf.core;version="0.4.0",
- org.eclipse.tm.tcf.protocol;version="0.5.0",
- org.eclipse.tm.tcf.services;version="0.5.0",
- org.eclipse.tm.tcf.ssl;version="0.4.0",
- org.eclipse.tm.tcf.util;version="0.4.0"
+ org.eclipse.tcf.core;version="0.4.0",
+ org.eclipse.tcf.protocol;version="0.5.0",
+ org.eclipse.tcf.services;version="0.5.0",
+ org.eclipse.tcf.ssl;version="0.4.0",
+ org.eclipse.tcf.util;version="0.4.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Eclipse-LazyStart: true
-Export-Package: org.eclipse.tm.internal.tcf.debug.ui.adapters,
- org.eclipse.tm.internal.tcf.debug.ui.commands;x-friends:="org.eclipse.tm.tcf.cdt.ui",
- org.eclipse.tm.internal.tcf.debug.ui.launch,
- org.eclipse.tm.internal.tcf.debug.ui.model;x-friends:="org.eclipse.tm.tcf.cdt.ui"
+Export-Package: org.eclipse.tcf.internal.debug.ui.adapters,
+ org.eclipse.tcf.internal.debug.ui.commands;x-friends:="org.eclipse.tcf.cdt.ui",
+ org.eclipse.tcf.internal.debug.ui.launch,
+ org.eclipse.tcf.internal.debug.ui.model;x-friends:="org.eclipse.tcf.cdt.ui"

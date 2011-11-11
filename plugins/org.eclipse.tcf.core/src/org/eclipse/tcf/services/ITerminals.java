@@ -9,12 +9,12 @@
  *     Intel - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tm.tcf.services;
+package org.eclipse.tcf.services;
 
 import java.util.Map;
 
-import org.eclipse.tm.tcf.protocol.IService;
-import org.eclipse.tm.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.IService;
+import org.eclipse.tcf.protocol.IToken;
 
 /**
  * ITerminalsService allows to launch a new terminal on the remote target system.

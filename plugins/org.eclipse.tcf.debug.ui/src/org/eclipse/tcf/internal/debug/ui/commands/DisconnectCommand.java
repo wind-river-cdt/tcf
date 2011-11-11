@@ -8,15 +8,15 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui.commands;
+package org.eclipse.tcf.internal.debug.ui.commands;
 
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.commands.IDebugCommandRequest;
 import org.eclipse.debug.core.commands.IDisconnectHandler;
 import org.eclipse.debug.core.commands.IEnabledStateRequest;
-import org.eclipse.tm.internal.tcf.debug.model.TCFError;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFModel;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFRunnable;
+import org.eclipse.tcf.internal.debug.model.TCFError;
+import org.eclipse.tcf.internal.debug.ui.model.TCFModel;
+import org.eclipse.tcf.internal.debug.ui.model.TCFRunnable;
 
 
 public class DisconnectCommand implements IDisconnectHandler {

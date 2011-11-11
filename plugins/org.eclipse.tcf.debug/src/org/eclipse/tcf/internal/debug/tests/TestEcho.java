@@ -8,14 +8,14 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.tests;
+package org.eclipse.tcf.internal.debug.tests;
 
 import java.util.LinkedList;
 
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IErrorReport;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.services.IDiagnostics;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IErrorReport;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.services.IDiagnostics;
 
 class TestEcho implements ITCFTest, IDiagnostics.DoneEcho {
 

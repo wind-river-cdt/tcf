@@ -9,7 +9,7 @@
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tm.internal.tcf.cdt.ui.commands;
+package org.eclipse.tcf.internal.cdt.ui.commands;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -24,13 +24,13 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFModel;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNode;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNodeExecContext;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNodeStackFrame;
-import org.eclipse.tm.tcf.services.IRunControl;
-import org.eclipse.tm.tcf.util.TCFDataCache;
-import org.eclipse.tm.tcf.util.TCFTask;
+import org.eclipse.tcf.internal.debug.ui.model.TCFModel;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNode;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExecContext;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeStackFrame;
+import org.eclipse.tcf.services.IRunControl;
+import org.eclipse.tcf.util.TCFDataCache;
+import org.eclipse.tcf.util.TCFTask;
 import org.eclipse.ui.IWorkbenchPart;
 
 @SuppressWarnings("restriction")

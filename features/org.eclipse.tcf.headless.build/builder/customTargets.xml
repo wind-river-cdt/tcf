@@ -77,34 +77,34 @@
 		<delete dir="${buildDirectory}/plugins"/>
 		<exec dir="${buildDirectory}" executable="svn">
 		    <arg value="co"/>
-		    <arg value="http://dev.eclipse.org/svnroot/dsdp/org.eclipse.tm.tcf/trunk/plugins/org.eclipse.tm.tcf"/>
-		    <arg value="plugins/org.eclipse.tm.tcf"/>
+		    <arg value="http://dev.eclipse.org/svnroot/dsdp/org.eclipse.tcf/trunk/plugins/org.eclipse.tcf"/>
+		    <arg value="plugins/org.eclipse.tcf"/>
 	  	</exec>
 		<exec dir="${buildDirectory}" executable="svn">
 		    <arg value="co"/>
-		    <arg value="http://dev.eclipse.org/svnroot/dsdp/org.eclipse.tm.tcf/trunk/plugins/org.eclipse.tm.tcf.core"/>
-		    <arg value="plugins/org.eclipse.tm.tcf.core"/>
+		    <arg value="http://dev.eclipse.org/svnroot/dsdp/org.eclipse.tcf/trunk/plugins/org.eclipse.tcf.core"/>
+		    <arg value="plugins/org.eclipse.tcf.core"/>
 	  	</exec>
 		<exec dir="${buildDirectory}" executable="svn">
 		    <arg value="co"/>
-		    <arg value="http://dev.eclipse.org/svnroot/dsdp/org.eclipse.tm.tcf/trunk/plugins/org.eclipse.tm.tcf.debug"/>
-		    <arg value="plugins/org.eclipse.tm.tcf.debug"/>
+		    <arg value="http://dev.eclipse.org/svnroot/dsdp/org.eclipse.tcf/trunk/plugins/org.eclipse.tcf.debug"/>
+		    <arg value="plugins/org.eclipse.tcf.debug"/>
 		</exec>
 		<exec dir="${buildDirectory}" executable="svn">
 		    <arg value="co"/>
-		    <arg value="http://dev.eclipse.org/svnroot/dsdp/org.eclipse.tm.tcf/trunk/plugins/org.eclipse.tm.tcf.debug.ui"/>
-		    <arg value="plugins/org.eclipse.tm.tcf.debug.ui"/>
+		    <arg value="http://dev.eclipse.org/svnroot/dsdp/org.eclipse.tcf/trunk/plugins/org.eclipse.tcf.debug.ui"/>
+		    <arg value="plugins/org.eclipse.tcf.debug.ui"/>
 		</exec>
 		<exec dir="${buildDirectory}" executable="svn">
 		    <arg value="co"/>
-		    <arg value="http://dev.eclipse.org/svnroot/dsdp/org.eclipse.tm.tcf/trunk/plugins/org.eclipse.tm.tcf.rse"/>
-		    <arg value="plugins/org.eclipse.tm.tcf.rse"/>
+		    <arg value="http://dev.eclipse.org/svnroot/dsdp/org.eclipse.tcf/trunk/plugins/org.eclipse.tcf.rse"/>
+		    <arg value="plugins/org.eclipse.tcf.rse"/>
 		</exec>
 		<delete dir="${buildDirectory}/features"/>
 		<exec dir="${buildDirectory}" executable="svn">
 		    <arg value="co"/>
-		    <arg value="http://dev.eclipse.org/svnroot/dsdp/org.eclipse.tm.tcf/trunk/features/org.eclipse.tm.tcf.feature"/>
-		    <arg value="features/org.eclipse.tm.tcf.feature"/>
+		    <arg value="http://dev.eclipse.org/svnroot/dsdp/org.eclipse.tcf/trunk/features/org.eclipse.tcf.feature"/>
+		    <arg value="features/org.eclipse.tcf.feature"/>
 	  	</exec>
 	</target>
 

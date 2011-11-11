@@ -8,13 +8,13 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui.model;
+package org.eclipse.tcf.internal.debug.ui.model;
 
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IChildrenCountUpdate;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IChildrenUpdate;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IHasChildrenUpdate;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.ILabelUpdate;
-import org.eclipse.tm.internal.tcf.debug.ui.ImageCache;
+import org.eclipse.tcf.internal.debug.ui.ImageCache;
 
 public class TCFNodeArrayPartition extends TCFNode {
 

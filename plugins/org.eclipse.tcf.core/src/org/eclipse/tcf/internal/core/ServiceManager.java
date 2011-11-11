@@ -8,19 +8,19 @@
  * Contributors:
  *     Anyware Technologies  - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.core;
+package org.eclipse.tcf.internal.core;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-import org.eclipse.tm.internal.tcf.services.local.DiagnosticsService;
-import org.eclipse.tm.internal.tcf.services.remote.GenericProxy;
-import org.eclipse.tm.internal.tcf.services.remote.LocatorProxy;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IService;
-import org.eclipse.tm.tcf.protocol.IServiceProvider;
-import org.eclipse.tm.tcf.protocol.Protocol;
+import org.eclipse.tcf.internal.services.local.DiagnosticsService;
+import org.eclipse.tcf.internal.services.remote.GenericProxy;
+import org.eclipse.tcf.internal.services.remote.LocatorProxy;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IService;
+import org.eclipse.tcf.protocol.IServiceProvider;
+import org.eclipse.tcf.protocol.Protocol;
 
 public class ServiceManager {
 

@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.cdt.ui;
+package org.eclipse.tcf.internal.cdt.ui;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,16 +38,16 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IBreakpoint;
-import org.eclipse.tm.internal.tcf.debug.model.ITCFBreakpointListener;
-import org.eclipse.tm.internal.tcf.debug.model.ITCFConstants;
-import org.eclipse.tm.internal.tcf.debug.model.TCFBreakpoint;
-import org.eclipse.tm.internal.tcf.debug.model.TCFBreakpointsModel;
-import org.eclipse.tm.internal.tcf.debug.model.TCFBreakpointsStatus;
-import org.eclipse.tm.internal.tcf.debug.model.TCFLaunch;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFModel;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFModelManager;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.IBreakpoints;
+import org.eclipse.tcf.internal.debug.model.ITCFBreakpointListener;
+import org.eclipse.tcf.internal.debug.model.ITCFConstants;
+import org.eclipse.tcf.internal.debug.model.TCFBreakpoint;
+import org.eclipse.tcf.internal.debug.model.TCFBreakpointsModel;
+import org.eclipse.tcf.internal.debug.model.TCFBreakpointsStatus;
+import org.eclipse.tcf.internal.debug.model.TCFLaunch;
+import org.eclipse.tcf.internal.debug.ui.model.TCFModel;
+import org.eclipse.tcf.internal.debug.ui.model.TCFModelManager;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.IBreakpoints;
 
 /**
  * This class monitors breakpoints status on TCF debug targets and calls ICBreakpoint.incrementInstallCount() or
@@ -57,7 +57,7 @@ import org.eclipse.tm.tcf.services.IBreakpoints;
 class TCFBreakpointStatusListener {
 
     /** Ref count attribute for foreign breakpoints */
-    private static final String ATTR_REFCOUNT = "org.eclipse.tm.tcf.cdt.refcount";
+    private static final String ATTR_REFCOUNT = "org.eclipse.tcf.cdt.refcount";
     /** TCF breakpoint ID attribute */
     private static final String ATTR_TCF_ID = ITCFConstants.ID_TCF_DEBUG_MODEL + '.' + IBreakpoints.PROP_ID;
 

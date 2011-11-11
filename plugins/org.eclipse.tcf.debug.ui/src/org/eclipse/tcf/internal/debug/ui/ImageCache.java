@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui;
+package org.eclipse.tcf.internal.debug.ui;
 
 import java.net.URL;
 import java.util.HashMap;

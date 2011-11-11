@@ -7,9 +7,9 @@
  *
  * Contributors:
  *     Wind River Systems - initial API and implementation
- *     Uwe Stieber (Wind River) - [271227] Fix compiler warnings in org.eclipse.tm.tcf.rse
+ *     Uwe Stieber (Wind River) - [271227] Fix compiler warnings in org.eclipse.tcf.rse
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.rse.processes;
+package org.eclipse.tcf.internal.rse.processes;
 
 import java.math.BigInteger;
 import java.text.NumberFormat;
@@ -45,9 +45,9 @@ import org.eclipse.rse.ui.view.ISystemRemoteElementAdapter;
 import org.eclipse.rse.ui.view.ISystemViewElementAdapter;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.tm.internal.tcf.rse.Activator;
-import org.eclipse.tm.internal.tcf.rse.Messages;
-import org.eclipse.tm.tcf.services.ISysMonitor;
+import org.eclipse.tcf.internal.rse.Activator;
+import org.eclipse.tcf.internal.rse.Messages;
+import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 
 

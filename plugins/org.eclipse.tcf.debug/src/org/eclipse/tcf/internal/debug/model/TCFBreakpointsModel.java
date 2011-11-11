@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.model;
+package org.eclipse.tcf.internal.debug.model;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,11 +34,11 @@ import org.eclipse.debug.core.IBreakpointManagerListener;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IBreakpoint;
-import org.eclipse.tm.internal.tcf.debug.Activator;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.IBreakpoints;
+import org.eclipse.tcf.internal.debug.Activator;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.IBreakpoints;
 
 /**
  * TCFBreakpointsModel class handles breakpoints for all active TCF launches.

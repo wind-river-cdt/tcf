@@ -8,14 +8,14 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui.model;
+package org.eclipse.tcf.internal.debug.ui.model;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.tm.tcf.services.IExpressions;
-import org.eclipse.tm.tcf.services.ISymbols;
-import org.eclipse.tm.tcf.util.TCFDataCache;
+import org.eclipse.tcf.services.IExpressions;
+import org.eclipse.tcf.services.ISymbols;
+import org.eclipse.tcf.util.TCFDataCache;
 
 public class TCFChildrenSubExpressions extends TCFChildren {
 

@@ -21,11 +21,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.IProcesses;
-import org.eclipse.tm.tcf.services.IStreams;
-import org.eclipse.tm.tcf.util.TCFTask;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.IProcesses;
+import org.eclipse.tcf.services.IStreams;
+import org.eclipse.tcf.util.TCFTask;
 import org.eclipse.tm.te.core.async.AsyncCallbackCollector;
 import org.eclipse.tm.te.runtime.callback.Callback;
 import org.eclipse.tm.te.runtime.interfaces.callback.ICallback;
@@ -352,7 +352,7 @@ public class ProcessStreamsListener implements IStreams.StreamsListener, IProces
                 public void run() {
 					service.read(streamId, size, new IStreams.DoneRead() {
 						/* (non-Javadoc)
-						 * @see org.eclipse.tm.tcf.services.IStreams.DoneRead#doneRead(org.eclipse.tm.tcf.protocol.IToken, java.lang.Exception, int, byte[], boolean)
+						 * @see org.eclipse.tcf.services.IStreams.DoneRead#doneRead(org.eclipse.tcf.protocol.IToken, java.lang.Exception, int, byte[], boolean)
 						 */
 						@Override
                         public void doneRead(IToken token, Exception error, int lostSize, byte[] data, boolean eos) {
@@ -591,7 +591,7 @@ public class ProcessStreamsListener implements IStreams.StreamsListener, IProces
                 public void run() {
 					service.write(streamId, data, 0, size, new IStreams.DoneWrite() {
 						/* (non-Javadoc)
-						 * @see org.eclipse.tm.tcf.services.IStreams.DoneWrite#doneWrite(org.eclipse.tm.tcf.protocol.IToken, java.lang.Exception)
+						 * @see org.eclipse.tcf.services.IStreams.DoneWrite#doneWrite(org.eclipse.tcf.protocol.IToken, java.lang.Exception)
 						 */
 						@Override
                         public void doneWrite(IToken token, Exception error) {
@@ -725,7 +725,7 @@ public class ProcessStreamsListener implements IStreams.StreamsListener, IProces
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tm.te.tcf.processes.core.interfaces.launcher.IProcessContextAwareListener#setProcessContext(org.eclipse.tm.tcf.services.IProcesses.ProcessContext)
+	 * @see org.eclipse.tm.te.tcf.processes.core.interfaces.launcher.IProcessContextAwareListener#setProcessContext(org.eclipse.tcf.services.IProcesses.ProcessContext)
 	 */
 	@Override
     public void setProcessContext(IProcesses.ProcessContext context) {
@@ -762,7 +762,7 @@ public class ProcessStreamsListener implements IStreams.StreamsListener, IProces
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tm.tcf.services.IStreams.StreamsListener#created(java.lang.String, java.lang.String, java.lang.String)
+	 * @see org.eclipse.tcf.services.IStreams.StreamsListener#created(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
     public void created(String streamType, String streamId, String contextId) {
@@ -833,7 +833,7 @@ public class ProcessStreamsListener implements IStreams.StreamsListener, IProces
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tm.tcf.services.IStreams.StreamsListener#disposed(java.lang.String, java.lang.String)
+	 * @see org.eclipse.tcf.services.IStreams.StreamsListener#disposed(java.lang.String, java.lang.String)
 	 */
 	@Override
     public void disposed(String streamType, String streamId) {

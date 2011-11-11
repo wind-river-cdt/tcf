@@ -8,17 +8,17 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.tcf.internal.extensions;
+package org.eclipse.tcf.internal.extensions;
 
 import java.util.Map;
 
-import org.eclipse.tm.tcf.extensions.TcfAbstractExtensionPointManager;
-import org.eclipse.tm.tcf.extensions.TcfExtensionProxy;
-import org.eclipse.tm.tcf.protocol.IServiceProvider;
-import org.eclipse.tm.tcf.protocol.Protocol;
+import org.eclipse.tcf.extensions.TcfAbstractExtensionPointManager;
+import org.eclipse.tcf.extensions.TcfExtensionProxy;
+import org.eclipse.tcf.protocol.IServiceProvider;
+import org.eclipse.tcf.protocol.Protocol;
 
 /**
- * Extension point manager implementation for "org.eclipse.tm.tcf.serviceProviders".
+ * Extension point manager implementation for "org.eclipse.tcf.serviceProviders".
  */
 public class TcfServiceProvidersExtensionPointManager extends TcfAbstractExtensionPointManager<IServiceProvider> {
     /*
@@ -36,15 +36,15 @@ public class TcfServiceProvidersExtensionPointManager extends TcfAbstractExtensi
     }
 
     /* (non-Javadoc)
-     * @see org.eclipse.tm.tcf.extensions.TcfAbstractExtensionPointManager#getExtensionPointId()
+     * @see org.eclipse.tcf.extensions.TcfAbstractExtensionPointManager#getExtensionPointId()
      */
     @Override
     protected String getExtensionPointId() {
-        return "org.eclipse.tm.tcf.serviceProviders"; //$NON-NLS-1$
+        return "org.eclipse.tcf.serviceProviders"; //$NON-NLS-1$
     }
 
     /* (non-Javadoc)
-     * @see org.eclipse.tm.tcf.extensions.TcfAbstractExtensionPointManager#getConfigurationElementName()
+     * @see org.eclipse.tcf.extensions.TcfAbstractExtensionPointManager#getConfigurationElementName()
      */
     @Override
     protected String getConfigurationElementName() {

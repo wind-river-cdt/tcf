@@ -8,13 +8,13 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.model;
+package org.eclipse.tcf.internal.debug.model;
 
 public interface ITCFConstants {
 
     /**
      * Unique identifier for the TCF debug model
      */
-    public static final String ID_TCF_DEBUG_MODEL = "org.eclipse.tm.tcf.debug";
+    public static final String ID_TCF_DEBUG_MODEL = "org.eclipse.tcf.debug";
 
 }

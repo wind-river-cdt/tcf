@@ -7,10 +7,10 @@
  *
  * Contributors:
  *     Wind River Systems       - initial API and implementation
- *     Uwe Stieber (Wind River) - [271227] Fix compiler warnings in org.eclipse.tm.tcf.rse
+ *     Uwe Stieber (Wind River) - [271227] Fix compiler warnings in org.eclipse.tcf.rse
  *     Intel Corporation        - [329654] Make all sub services operate against TCF connector service
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.rse.processes;
+package org.eclipse.tcf.internal.rse.processes;
 
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.subsystems.IConnectorService;
@@ -19,9 +19,9 @@ import org.eclipse.rse.services.processes.IProcessService;
 import org.eclipse.rse.subsystems.processes.core.subsystem.IHostProcessToRemoteProcessAdapter;
 import org.eclipse.rse.subsystems.processes.servicesubsystem.ProcessServiceSubSystem;
 import org.eclipse.rse.subsystems.processes.servicesubsystem.ProcessServiceSubSystemConfiguration;
-import org.eclipse.tm.internal.tcf.rse.ITCFService;
-import org.eclipse.tm.internal.tcf.rse.TCFConnectorService;
-import org.eclipse.tm.internal.tcf.rse.TCFConnectorServiceManager;
+import org.eclipse.tcf.internal.rse.ITCFService;
+import org.eclipse.tcf.internal.rse.TCFConnectorService;
+import org.eclipse.tcf.internal.rse.TCFConnectorServiceManager;
 
 public class TCFProcessSubSystemConfiguration extends ProcessServiceSubSystemConfiguration {
 

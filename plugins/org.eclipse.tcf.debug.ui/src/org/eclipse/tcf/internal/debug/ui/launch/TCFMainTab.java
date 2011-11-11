@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui.launch;
+package org.eclipse.tcf.internal.debug.ui.launch;
 
 import java.io.File;
 
@@ -38,9 +38,9 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.tm.internal.tcf.debug.launch.TCFLaunchDelegate;
-import org.eclipse.tm.internal.tcf.debug.ui.Activator;
-import org.eclipse.tm.internal.tcf.debug.ui.ImageCache;
+import org.eclipse.tcf.internal.debug.launch.TCFLaunchDelegate;
+import org.eclipse.tcf.internal.debug.ui.Activator;
+import org.eclipse.tcf.internal.debug.ui.ImageCache;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 
 public class TCFMainTab extends AbstractLaunchConfigurationTab {

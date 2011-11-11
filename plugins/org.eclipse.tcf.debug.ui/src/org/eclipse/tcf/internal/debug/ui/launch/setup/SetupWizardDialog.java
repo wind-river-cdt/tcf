@@ -8,14 +8,14 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui.launch.setup;
+package org.eclipse.tcf.internal.debug.ui.launch.setup;
 
 import java.util.Map;
 
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.tm.internal.tcf.debug.ui.ImageCache;
+import org.eclipse.tcf.internal.debug.ui.ImageCache;
 
 public class SetupWizardDialog extends Wizard {
 

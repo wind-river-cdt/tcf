@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.cdt.ui;
+package org.eclipse.tcf.internal.cdt.ui;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -29,21 +29,21 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IBreakpoint;
-import org.eclipse.tm.internal.tcf.debug.actions.TCFAction;
-import org.eclipse.tm.internal.tcf.debug.model.TCFBreakpointsModel;
-import org.eclipse.tm.internal.tcf.debug.model.TCFContextState;
-import org.eclipse.tm.internal.tcf.debug.model.TCFLaunch;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFChildrenLogExpressions;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFModel;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFModelManager;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNodeExecContext;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNodeExpression;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.IRunControl;
-import org.eclipse.tm.tcf.services.IRunControl.RunControlContext;
-import org.eclipse.tm.tcf.util.TCFDataCache;
-import org.eclipse.tm.tcf.util.TCFTask;
+import org.eclipse.tcf.internal.debug.actions.TCFAction;
+import org.eclipse.tcf.internal.debug.model.TCFBreakpointsModel;
+import org.eclipse.tcf.internal.debug.model.TCFContextState;
+import org.eclipse.tcf.internal.debug.model.TCFLaunch;
+import org.eclipse.tcf.internal.debug.ui.model.TCFChildrenLogExpressions;
+import org.eclipse.tcf.internal.debug.ui.model.TCFModel;
+import org.eclipse.tcf.internal.debug.ui.model.TCFModelManager;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExecContext;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExpression;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.IRunControl;
+import org.eclipse.tcf.services.IRunControl.RunControlContext;
+import org.eclipse.tcf.util.TCFDataCache;
+import org.eclipse.tcf.util.TCFTask;
 
 public class TCFBreakpointActions {
 

@@ -17,7 +17,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.tm.tcf.protocol.IPeer;
+import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tm.te.runtime.persistence.interfaces.IPersistable;
 import org.eclipse.tm.te.tcf.locator.activator.CoreBundleActivator;
 

@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.tcf.protocol;
+package org.eclipse.tcf.protocol;
 
 /**
  * IToken is created by the framework for each command sent to a remote peer.

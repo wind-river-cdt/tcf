@@ -8,15 +8,15 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui.model;
+package org.eclipse.tcf.internal.debug.ui.model;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.services.IMemory;
-import org.eclipse.tm.tcf.services.IRunControl;
-import org.eclipse.tm.tcf.util.TCFDataCache;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.services.IMemory;
+import org.eclipse.tcf.services.IRunControl;
+import org.eclipse.tcf.util.TCFDataCache;
 
 
 /**

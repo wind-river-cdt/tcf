@@ -8,15 +8,15 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.tcf.extensions;
+package org.eclipse.tcf.extensions;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.tm.tcf.Activator;
-import org.eclipse.tm.tcf.internal.nls.TcfPluginMessages;
+import org.eclipse.tcf.Activator;
+import org.eclipse.tcf.internal.nls.TcfPluginMessages;
 
 /**
  * TCF extension proxy implementation. The use of the proxy asures the

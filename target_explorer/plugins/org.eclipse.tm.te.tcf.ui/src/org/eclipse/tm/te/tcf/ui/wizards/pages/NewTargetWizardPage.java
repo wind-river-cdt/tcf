@@ -22,7 +22,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tm.tcf.protocol.IPeer;
+import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tm.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tm.te.runtime.properties.PropertiesContainer;
 import org.eclipse.tm.te.tcf.core.interfaces.ITransportTypes;

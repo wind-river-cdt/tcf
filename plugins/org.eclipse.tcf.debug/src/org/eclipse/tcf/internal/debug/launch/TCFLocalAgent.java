@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.launch;
+package org.eclipse.tcf.internal.debug.launch;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -24,11 +24,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.tm.internal.tcf.debug.Activator;
-import org.eclipse.tm.tcf.protocol.IPeer;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.ILocator;
-import org.eclipse.tm.tcf.util.TCFTask;
+import org.eclipse.tcf.internal.debug.Activator;
+import org.eclipse.tcf.protocol.IPeer;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.ILocator;
+import org.eclipse.tcf.util.TCFTask;
 import org.osgi.framework.Bundle;
 
 /**

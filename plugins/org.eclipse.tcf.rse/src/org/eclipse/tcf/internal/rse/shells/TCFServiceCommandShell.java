@@ -20,7 +20,7 @@
  * Liping Ke        (Intel Corp.)- Adapted from org.eclipse.rse.internal.subsystems.shells.ssh.SshServiceCommandShell
  * Liping Ke        (Intel Corp.)- [246987] Implement TCF Shell/terminal services
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.rse.shells;
+package org.eclipse.tcf.internal.rse.shells;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 

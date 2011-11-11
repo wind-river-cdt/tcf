@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui.model;
+package org.eclipse.tcf.internal.debug.ui.model;
 
 import java.math.BigInteger;
 
@@ -21,17 +21,17 @@ import org.eclipse.debug.internal.ui.viewers.model.provisional.IPresentationCont
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IViewerInputUpdate;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.tm.internal.tcf.debug.model.TCFContextState;
-import org.eclipse.tm.internal.tcf.debug.model.TCFFunctionRef;
-import org.eclipse.tm.internal.tcf.debug.model.TCFSourceRef;
-import org.eclipse.tm.internal.tcf.debug.ui.ImageCache;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.protocol.JSON;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.IExpressions;
-import org.eclipse.tm.tcf.services.IStackTrace;
-import org.eclipse.tm.tcf.services.ISymbols;
-import org.eclipse.tm.tcf.util.TCFDataCache;
+import org.eclipse.tcf.internal.debug.model.TCFContextState;
+import org.eclipse.tcf.internal.debug.model.TCFFunctionRef;
+import org.eclipse.tcf.internal.debug.model.TCFSourceRef;
+import org.eclipse.tcf.internal.debug.ui.ImageCache;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.JSON;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.IExpressions;
+import org.eclipse.tcf.services.IStackTrace;
+import org.eclipse.tcf.services.ISymbols;
+import org.eclipse.tcf.util.TCFDataCache;
 
 public class TCFNodeStackFrame extends TCFNode {
 

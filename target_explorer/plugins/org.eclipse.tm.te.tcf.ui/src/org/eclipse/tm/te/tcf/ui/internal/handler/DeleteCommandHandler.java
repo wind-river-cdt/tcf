@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.tm.tcf.protocol.Protocol;
+import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tm.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tm.te.runtime.persistence.interfaces.IPersistenceService;
 import org.eclipse.tm.te.runtime.properties.PropertiesContainer;

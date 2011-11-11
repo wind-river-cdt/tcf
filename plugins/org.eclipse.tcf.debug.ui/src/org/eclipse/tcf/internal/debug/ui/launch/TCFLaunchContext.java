@@ -8,13 +8,13 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui.launch;
+package org.eclipse.tcf.internal.debug.ui.launch;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.tm.internal.tcf.debug.ui.Activator;
+import org.eclipse.tcf.internal.debug.ui.Activator;
 import org.osgi.framework.Bundle;
 
 /**

@@ -8,15 +8,15 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui.model;
+package org.eclipse.tcf.internal.debug.ui.model;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugException;
-import org.eclipse.tm.internal.tcf.debug.ui.Activator;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.util.TCFTask;
+import org.eclipse.tcf.internal.debug.ui.Activator;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.util.TCFTask;
 
 /**
  * An extension of TCFTask class that adds support for throwing DebugException.

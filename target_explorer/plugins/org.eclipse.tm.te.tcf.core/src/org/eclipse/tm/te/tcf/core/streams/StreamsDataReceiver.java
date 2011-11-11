@@ -16,7 +16,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.PlatformObject;
-import org.eclipse.tm.tcf.services.IProcesses;
+import org.eclipse.tcf.services.IProcesses;
 
 /**
  * Remote context streams data receiver implementation.

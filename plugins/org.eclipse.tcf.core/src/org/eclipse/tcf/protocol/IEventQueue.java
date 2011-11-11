@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.tcf.protocol;
+package org.eclipse.tcf.protocol;
 
 /**
  * Clients of stand-alone version the framework should implement this interface and call Protocol.setEventQueue.

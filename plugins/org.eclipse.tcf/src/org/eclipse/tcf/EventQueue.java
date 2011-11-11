@@ -8,15 +8,15 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.tcf;
+package org.eclipse.tcf;
 
 import java.util.LinkedList;
 
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.tm.tcf.protocol.IEventQueue;
-import org.eclipse.tm.tcf.protocol.Protocol;
+import org.eclipse.tcf.protocol.IEventQueue;
+import org.eclipse.tcf.protocol.Protocol;
 
 
 /**

@@ -12,8 +12,8 @@ package org.eclipse.tm.te.tcf.processes.core.launcher;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.tm.tcf.services.IProcesses;
-import org.eclipse.tm.tcf.services.IProcesses.ProcessesListener;
+import org.eclipse.tcf.services.IProcesses;
+import org.eclipse.tcf.services.IProcesses.ProcessesListener;
 import org.eclipse.tm.te.runtime.events.EventManager;
 import org.eclipse.tm.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tm.te.tcf.processes.core.activator.CoreBundleActivator;
@@ -69,7 +69,7 @@ public class ProcessProcessesListener implements ProcessesListener, IProcessCont
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tm.te.tcf.processes.core.interfaces.launcher.IProcessContextAwareListener#setProcessContext(org.eclipse.tm.tcf.services.IProcesses.ProcessContext)
+	 * @see org.eclipse.tm.te.tcf.processes.core.interfaces.launcher.IProcessContextAwareListener#setProcessContext(org.eclipse.tcf.services.IProcesses.ProcessContext)
 	 */
 	@Override
     public void setProcessContext(IProcesses.ProcessContext context) {
@@ -92,7 +92,7 @@ public class ProcessProcessesListener implements ProcessesListener, IProcessCont
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tm.tcf.services.IProcesses.ProcessesListener#exited(java.lang.String, int)
+	 * @see org.eclipse.tcf.services.IProcesses.ProcessesListener#exited(java.lang.String, int)
 	 */
 	@Override
     public void exited(String processId, int exitCode) {

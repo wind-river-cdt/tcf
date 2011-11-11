@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.services.local;
+package org.eclipse.tcf.internal.services.local;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -34,20 +34,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.tm.internal.tcf.core.LocalPeer;
-import org.eclipse.tm.internal.tcf.core.LoggingUtil;
-import org.eclipse.tm.internal.tcf.core.RemotePeer;
-import org.eclipse.tm.internal.tcf.core.ServiceManager;
-import org.eclipse.tm.tcf.core.AbstractChannel;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IErrorReport;
-import org.eclipse.tm.tcf.protocol.IPeer;
-import org.eclipse.tm.tcf.protocol.IService;
-import org.eclipse.tm.tcf.protocol.IServiceProvider;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.protocol.JSON;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.ILocator;
+import org.eclipse.tcf.internal.core.LocalPeer;
+import org.eclipse.tcf.internal.core.LoggingUtil;
+import org.eclipse.tcf.internal.core.RemotePeer;
+import org.eclipse.tcf.internal.core.ServiceManager;
+import org.eclipse.tcf.core.AbstractChannel;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IErrorReport;
+import org.eclipse.tcf.protocol.IPeer;
+import org.eclipse.tcf.protocol.IService;
+import org.eclipse.tcf.protocol.IServiceProvider;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.JSON;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.ILocator;
 
 
 /**
@@ -77,7 +77,7 @@ public class LocatorService implements ILocator {
     /**
      * Flag indicating whether tracing of the discovery activity is enabled.
      */
-    private static boolean TRACE_DISCOVERY = System.getProperty("org.eclipse.tm.tcf.core.tracing.discovery") != null;
+    private static boolean TRACE_DISCOVERY = System.getProperty("org.eclipse.tcf.core.tracing.discovery") != null;
 
     private static class SubNet {
         final int prefix_length;

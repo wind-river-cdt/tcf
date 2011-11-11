@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.tcf.ssl;
+package org.eclipse.tcf.ssl;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -33,9 +33,9 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509ExtendedKeyManager;
 import javax.net.ssl.X509TrustManager;
 
-import org.eclipse.tm.tcf.Activator;
-import org.eclipse.tm.tcf.core.Base64;
-import org.eclipse.tm.tcf.protocol.Protocol;
+import org.eclipse.tcf.Activator;
+import org.eclipse.tcf.core.Base64;
+import org.eclipse.tcf.protocol.Protocol;
 
 
 /**

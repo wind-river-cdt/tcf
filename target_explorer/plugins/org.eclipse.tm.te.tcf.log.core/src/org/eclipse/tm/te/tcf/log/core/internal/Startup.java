@@ -9,7 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tm.te.tcf.log.core.internal;
 
-import org.eclipse.tm.tcf.protocol.Protocol;
+import org.eclipse.tcf.protocol.Protocol;
 
 
 /**

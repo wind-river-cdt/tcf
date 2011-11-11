@@ -24,7 +24,7 @@
 #ifndef D_config
 #define D_config
 
-#include <framework/mdep.h>
+#include <tcf/framework/mdep.h>
 
 #if defined(WIN32) || defined(__CYGWIN__)
 #  define TARGET_UNIX       0

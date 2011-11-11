@@ -9,8 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tm.te.tcf.core.internal.interfaces;
 
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.Protocol.ChannelOpenListener;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.Protocol.ChannelOpenListener;
 
 /**
  * Enhanced channel open listener interface for internal use.

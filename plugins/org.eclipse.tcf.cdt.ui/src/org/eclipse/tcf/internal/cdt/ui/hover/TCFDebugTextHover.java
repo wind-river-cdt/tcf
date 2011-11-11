@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.cdt.ui.hover;
+package org.eclipse.tcf.internal.cdt.ui.hover;
 
 import java.math.BigInteger;
 import java.util.Map;
@@ -22,22 +22,22 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextHoverExtension2;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFChildren;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFChildrenStackTrace;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNode;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNodeExecContext;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNodeExpression;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNodeStackFrame;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.services.IExpressions;
-import org.eclipse.tm.tcf.services.IExpressions.DoneCreate;
-import org.eclipse.tm.tcf.services.IExpressions.DoneDispose;
-import org.eclipse.tm.tcf.services.IExpressions.DoneEvaluate;
-import org.eclipse.tm.tcf.services.IExpressions.Expression;
-import org.eclipse.tm.tcf.services.IExpressions.Value;
-import org.eclipse.tm.tcf.util.TCFDataCache;
-import org.eclipse.tm.tcf.util.TCFTask;
+import org.eclipse.tcf.internal.debug.ui.model.TCFChildren;
+import org.eclipse.tcf.internal.debug.ui.model.TCFChildrenStackTrace;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNode;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExecContext;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExpression;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeStackFrame;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.services.IExpressions;
+import org.eclipse.tcf.services.IExpressions.DoneCreate;
+import org.eclipse.tcf.services.IExpressions.DoneDispose;
+import org.eclipse.tcf.services.IExpressions.DoneEvaluate;
+import org.eclipse.tcf.services.IExpressions.Expression;
+import org.eclipse.tcf.services.IExpressions.Value;
+import org.eclipse.tcf.util.TCFDataCache;
+import org.eclipse.tcf.util.TCFTask;
 
 /**
  * TCF implementation of debug expression hover for the C/C++ Editor.

@@ -8,10 +8,10 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.actions;
+package org.eclipse.tcf.internal.debug.actions;
 
-import org.eclipse.tm.internal.tcf.debug.model.TCFLaunch;
-import org.eclipse.tm.tcf.protocol.Protocol;
+import org.eclipse.tcf.internal.debug.model.TCFLaunch;
+import org.eclipse.tcf.protocol.Protocol;
 
 /**
  * TCFAction class represents user request to perform some action(s) on

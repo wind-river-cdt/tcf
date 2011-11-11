@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui.commands;
+package org.eclipse.tcf.internal.debug.ui.commands;
 
 import java.math.BigInteger;
 import java.util.Map;
@@ -33,9 +33,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFModel;
-import org.eclipse.tm.tcf.protocol.JSON;
-import org.eclipse.tm.tcf.services.IMemoryMap;
+import org.eclipse.tcf.internal.debug.ui.model.TCFModel;
+import org.eclipse.tcf.protocol.JSON;
+import org.eclipse.tcf.services.IMemoryMap;
 
 class MemoryMapItemDialog extends Dialog {
 

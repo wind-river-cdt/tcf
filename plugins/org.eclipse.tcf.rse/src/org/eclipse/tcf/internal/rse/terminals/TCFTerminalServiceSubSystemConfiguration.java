@@ -11,7 +11,7 @@
  * Liping Ke      (Intel Corp.) - Adapted from TerminalServiceSubSystemConfiguration
  * Liping Ke      (Intel Corp.) - TCF terminal services subsystem implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.rse.terminals;
+package org.eclipse.tcf.internal.rse.terminals;
 
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.subsystems.IConnectorService;
@@ -19,9 +19,9 @@ import org.eclipse.rse.core.subsystems.ISubSystem;
 import org.eclipse.rse.services.terminals.ITerminalService;
 import org.eclipse.rse.subsystems.terminals.core.TerminalServiceSubSystem;
 import org.eclipse.rse.subsystems.terminals.core.TerminalServiceSubSystemConfiguration;
-import org.eclipse.tm.internal.tcf.rse.ITCFService;
-import org.eclipse.tm.internal.tcf.rse.TCFConnectorService;
-import org.eclipse.tm.internal.tcf.rse.TCFConnectorServiceManager;
+import org.eclipse.tcf.internal.rse.ITCFService;
+import org.eclipse.tcf.internal.rse.TCFConnectorService;
+import org.eclipse.tcf.internal.rse.TCFConnectorServiceManager;
 
 public class TCFTerminalServiceSubSystemConfiguration extends
         TerminalServiceSubSystemConfiguration {

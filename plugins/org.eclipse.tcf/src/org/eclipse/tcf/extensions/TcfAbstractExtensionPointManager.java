@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.tcf.extensions;
+package org.eclipse.tcf.extensions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,8 +26,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.tm.tcf.Activator;
-import org.eclipse.tm.tcf.internal.nls.TcfPluginMessages;
+import org.eclipse.tcf.Activator;
+import org.eclipse.tcf.internal.nls.TcfPluginMessages;
 
 
 /**

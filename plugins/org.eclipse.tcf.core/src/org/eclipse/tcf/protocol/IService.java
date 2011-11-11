@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.tcf.protocol;
+package org.eclipse.tcf.protocol;
 
 /**
  * Base interface for all service interfaces. A client can get list of available services

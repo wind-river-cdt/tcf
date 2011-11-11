@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui.model;
+package org.eclipse.tcf.internal.debug.ui.model;
 
 import java.math.BigInteger;
 import java.util.LinkedList;
@@ -32,20 +32,20 @@ import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tm.internal.tcf.debug.model.TCFContextState;
-import org.eclipse.tm.internal.tcf.debug.ui.Activator;
-import org.eclipse.tm.internal.tcf.debug.ui.ImageCache;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.protocol.JSON;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.IExpressions;
-import org.eclipse.tm.tcf.services.IMemory;
-import org.eclipse.tm.tcf.services.IMemory.MemoryError;
-import org.eclipse.tm.tcf.services.IRegisters;
-import org.eclipse.tm.tcf.services.ISymbols;
-import org.eclipse.tm.tcf.util.TCFDataCache;
-import org.eclipse.tm.tcf.util.TCFTask;
+import org.eclipse.tcf.internal.debug.model.TCFContextState;
+import org.eclipse.tcf.internal.debug.ui.Activator;
+import org.eclipse.tcf.internal.debug.ui.ImageCache;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.JSON;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.IExpressions;
+import org.eclipse.tcf.services.IMemory;
+import org.eclipse.tcf.services.IMemory.MemoryError;
+import org.eclipse.tcf.services.IRegisters;
+import org.eclipse.tcf.services.ISymbols;
+import org.eclipse.tcf.util.TCFDataCache;
+import org.eclipse.tcf.util.TCFTask;
 
 public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastToType, IWatchInExpressions, IDetailsProvider {
 

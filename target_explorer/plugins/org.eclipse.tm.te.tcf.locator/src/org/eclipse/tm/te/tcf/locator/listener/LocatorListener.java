@@ -10,9 +10,9 @@
 package org.eclipse.tm.te.tcf.locator.listener;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.tm.tcf.protocol.IPeer;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.ILocator;
+import org.eclipse.tcf.protocol.IPeer;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.ILocator;
 import org.eclipse.tm.te.tcf.locator.ScannerRunnable;
 import org.eclipse.tm.te.tcf.locator.activator.CoreBundleActivator;
 import org.eclipse.tm.te.tcf.locator.interfaces.ITracing;
@@ -44,7 +44,7 @@ public class LocatorListener implements ILocator.LocatorListener {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tm.tcf.services.ILocator.LocatorListener#peerAdded(org.eclipse.tm.tcf.protocol.IPeer)
+	 * @see org.eclipse.tcf.services.ILocator.LocatorListener#peerAdded(org.eclipse.tcf.protocol.IPeer)
 	 */
 	@Override
 	public void peerAdded(IPeer peer) {
@@ -75,7 +75,7 @@ public class LocatorListener implements ILocator.LocatorListener {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tm.tcf.services.ILocator.LocatorListener#peerChanged(org.eclipse.tm.tcf.protocol.IPeer)
+	 * @see org.eclipse.tcf.services.ILocator.LocatorListener#peerChanged(org.eclipse.tcf.protocol.IPeer)
 	 */
 	@Override
 	public void peerChanged(IPeer peer) {
@@ -92,7 +92,7 @@ public class LocatorListener implements ILocator.LocatorListener {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tm.tcf.services.ILocator.LocatorListener#peerRemoved(java.lang.String)
+	 * @see org.eclipse.tcf.services.ILocator.LocatorListener#peerRemoved(java.lang.String)
 	 */
 	@Override
 	public void peerRemoved(String id) {
@@ -111,7 +111,7 @@ public class LocatorListener implements ILocator.LocatorListener {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tm.tcf.services.ILocator.LocatorListener#peerHeartBeat(java.lang.String)
+	 * @see org.eclipse.tcf.services.ILocator.LocatorListener#peerHeartBeat(java.lang.String)
 	 */
 	@Override
 	public void peerHeartBeat(String id) {

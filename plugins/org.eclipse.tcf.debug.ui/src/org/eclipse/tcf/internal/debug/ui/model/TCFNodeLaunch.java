@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui.model;
+package org.eclipse.tcf.internal.debug.ui.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,8 +19,8 @@ import org.eclipse.debug.internal.ui.viewers.model.provisional.IChildrenCountUpd
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IChildrenUpdate;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IHasChildrenUpdate;
 import org.eclipse.debug.ui.IDebugUIConstants;
-import org.eclipse.tm.tcf.services.IMemory;
-import org.eclipse.tm.tcf.services.IRunControl;
+import org.eclipse.tcf.services.IMemory;
+import org.eclipse.tcf.services.IRunControl;
 
 
 public class TCFNodeLaunch extends TCFNode implements ISymbolOwner {

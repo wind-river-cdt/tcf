@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.rse.processes;
+package org.eclipse.tcf.internal.rse.processes;
 
 import java.util.ArrayList;
 import java.util.List;

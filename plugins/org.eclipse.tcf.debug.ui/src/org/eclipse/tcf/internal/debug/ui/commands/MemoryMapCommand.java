@@ -8,23 +8,23 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui.commands;
+package org.eclipse.tcf.internal.debug.ui.commands;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFModel;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNode;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNodeArrayPartition;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNodeExecContext;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNodeExpression;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNodeLaunch;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNodeModule;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNodeRegister;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNodeStackFrame;
-import org.eclipse.tm.tcf.services.IMemory;
-import org.eclipse.tm.tcf.util.TCFDataCache;
-import org.eclipse.tm.tcf.util.TCFTask;
+import org.eclipse.tcf.internal.debug.ui.model.TCFModel;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNode;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeArrayPartition;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExecContext;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExpression;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeLaunch;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeModule;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeRegister;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeStackFrame;
+import org.eclipse.tcf.services.IMemory;
+import org.eclipse.tcf.util.TCFDataCache;
+import org.eclipse.tcf.util.TCFTask;
 
 public class MemoryMapCommand extends AbstractActionDelegate {
 

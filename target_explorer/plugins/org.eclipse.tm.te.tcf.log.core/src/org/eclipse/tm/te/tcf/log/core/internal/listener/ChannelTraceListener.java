@@ -20,8 +20,8 @@ import java.util.Date;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.tm.tcf.core.AbstractChannel.TraceListener;
-import org.eclipse.tm.tcf.protocol.IChannel;
+import org.eclipse.tcf.core.AbstractChannel.TraceListener;
+import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tm.te.tcf.log.core.activator.CoreBundleActivator;
 import org.eclipse.tm.te.tcf.log.core.interfaces.IPreferenceKeys;
 import org.eclipse.tm.te.tcf.log.core.interfaces.ITracing;
@@ -65,7 +65,7 @@ public class ChannelTraceListener implements TraceListener {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tm.tcf.core.AbstractChannel.TraceListener#onChannelClosed(java.lang.Throwable)
+	 * @see org.eclipse.tcf.core.AbstractChannel.TraceListener#onChannelClosed(java.lang.Throwable)
 	 */
 	@Override
 	public void onChannelClosed(Throwable error) {
@@ -88,7 +88,7 @@ public class ChannelTraceListener implements TraceListener {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tm.tcf.core.AbstractChannel.TraceListener#onMessageReceived(char, java.lang.String, java.lang.String, java.lang.String, byte[])
+	 * @see org.eclipse.tcf.core.AbstractChannel.TraceListener#onMessageReceived(char, java.lang.String, java.lang.String, java.lang.String, byte[])
 	 */
 	@Override
 	public void onMessageReceived(char type, String token, String service, String name, byte[] data) {
@@ -102,7 +102,7 @@ public class ChannelTraceListener implements TraceListener {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tm.tcf.core.AbstractChannel.TraceListener#onMessageSent(char, java.lang.String, java.lang.String, java.lang.String, byte[])
+	 * @see org.eclipse.tcf.core.AbstractChannel.TraceListener#onMessageSent(char, java.lang.String, java.lang.String, java.lang.String, byte[])
 	 */
 	@Override
 	public void onMessageSent(final char type, String token, String service, String name, byte[] data) {

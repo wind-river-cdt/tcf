@@ -8,18 +8,18 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.tcf.util;
+package org.eclipse.tcf.util;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.IFileSystem;
-import org.eclipse.tm.tcf.services.IFileSystem.FileSystemException;
-import org.eclipse.tm.tcf.services.IFileSystem.IFileHandle;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.IFileSystem;
+import org.eclipse.tcf.services.IFileSystem.FileSystemException;
+import org.eclipse.tcf.services.IFileSystem.IFileHandle;
 
 /**
  * TCFFileInputStream is high performance InputStream implementation over TCF FileSystem service.

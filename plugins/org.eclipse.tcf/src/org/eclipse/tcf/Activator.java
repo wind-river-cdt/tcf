@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.tcf;
+package org.eclipse.tcf;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -17,11 +17,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.tm.tcf.internal.extensions.TcfServiceProvidersExtensionPointManager;
-import org.eclipse.tm.tcf.core.ChannelTCP;
-import org.eclipse.tm.tcf.protocol.ILogger;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.ssl.TCFSecurityManager;
+import org.eclipse.tcf.internal.extensions.TcfServiceProvidersExtensionPointManager;
+import org.eclipse.tcf.core.ChannelTCP;
+import org.eclipse.tcf.protocol.ILogger;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.ssl.TCFSecurityManager;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -33,7 +33,7 @@ import org.osgi.framework.BundleListener;
  */
 public class Activator extends Plugin {
 
-    public static final String PLUGIN_ID = "org.eclipse.tm.tcf"; //$NON-NLS-1$
+    public static final String PLUGIN_ID = "org.eclipse.tcf"; //$NON-NLS-1$
 
     private static Activator plugin;
     private static boolean debug;
@@ -77,9 +77,9 @@ public class Activator extends Plugin {
         super.start(context);
         debug = Platform.inDebugMode();
 
-        TRACE = "true".equals(Platform.getDebugOption("org.eclipse.tm.tcf/debug")); //$NON-NLS-1$
-        if (TRACE && "true".equals(Platform.getDebugOption("org.eclipse.tm.tcf/debug/discovery"))) {
-            System.setProperty("org.eclipse.tm.tcf.core.tracing.discovery", "true");
+        TRACE = "true".equals(Platform.getDebugOption("org.eclipse.tcf/debug")); //$NON-NLS-1$
+        if (TRACE && "true".equals(Platform.getDebugOption("org.eclipse.tcf/debug/discovery"))) {
+            System.setProperty("org.eclipse.tcf.core.tracing.discovery", "true");
         }
 
         ChannelTCP.setSSLContext(TCFSecurityManager.createSSLContext());

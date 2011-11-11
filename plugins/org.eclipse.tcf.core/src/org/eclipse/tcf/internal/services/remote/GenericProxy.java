@@ -8,10 +8,10 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.services.remote;
+package org.eclipse.tcf.internal.services.remote;
 
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IService;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IService;
 
 /**
  * Objects of GenericProxy class represent remote services, which don't

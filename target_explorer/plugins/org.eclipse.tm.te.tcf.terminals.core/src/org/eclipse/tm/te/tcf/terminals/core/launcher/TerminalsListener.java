@@ -12,8 +12,8 @@ package org.eclipse.tm.te.tcf.terminals.core.launcher;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.tm.tcf.services.ITerminals;
-import org.eclipse.tm.tcf.services.ITerminals.TerminalContext;
+import org.eclipse.tcf.services.ITerminals;
+import org.eclipse.tcf.services.ITerminals.TerminalContext;
 import org.eclipse.tm.te.runtime.events.EventManager;
 import org.eclipse.tm.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tm.te.tcf.terminals.core.activator.CoreBundleActivator;
@@ -69,7 +69,7 @@ public class TerminalsListener implements ITerminals.TerminalsListener, ITermina
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tm.te.tcf.terminals.core.interfaces.launcher.ITerminalsContextAwareListener#setTerminalsContext(org.eclipse.tm.tcf.services.ITerminals.TerminalContext)
+	 * @see org.eclipse.tm.te.tcf.terminals.core.interfaces.launcher.ITerminalsContextAwareListener#setTerminalsContext(org.eclipse.tcf.services.ITerminals.TerminalContext)
 	 */
 	@Override
 	public void setTerminalsContext(TerminalContext context) {
@@ -92,7 +92,7 @@ public class TerminalsListener implements ITerminals.TerminalsListener, ITermina
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tm.tcf.services.ITerminals.TerminalsListener#exited(java.lang.String, int)
+	 * @see org.eclipse.tcf.services.ITerminals.TerminalsListener#exited(java.lang.String, int)
 	 */
 	@Override
     public void exited(String terminalId, int exitCode) {
@@ -128,7 +128,7 @@ public class TerminalsListener implements ITerminals.TerminalsListener, ITermina
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tm.tcf.services.ITerminals.TerminalsListener#winSizeChanged(java.lang.String, int, int)
+	 * @see org.eclipse.tcf.services.ITerminals.TerminalsListener#winSizeChanged(java.lang.String, int, int)
 	 */
 	@Override
 	public void winSizeChanged(String terminalId, int newWidth, int newHeight) {

@@ -8,14 +8,14 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.core;
+package org.eclipse.tcf.internal.core;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.tm.tcf.core.TransientPeer;
-import org.eclipse.tm.tcf.protocol.IPeer;
-import org.eclipse.tm.tcf.protocol.Protocol;
+import org.eclipse.tcf.core.TransientPeer;
+import org.eclipse.tcf.protocol.IPeer;
+import org.eclipse.tcf.protocol.Protocol;
 
 /**
  * LocalPeer object represents local end-point of TCF communication channel.

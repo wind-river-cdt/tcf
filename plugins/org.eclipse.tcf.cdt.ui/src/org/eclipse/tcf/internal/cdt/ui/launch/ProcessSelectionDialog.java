@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.cdt.ui.launch;
+package org.eclipse.tcf.internal.cdt.ui.launch;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -25,9 +25,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TreeItem;
-import org.eclipse.tm.internal.tcf.cdt.launch.ContextSelection;
-import org.eclipse.tm.internal.tcf.cdt.ui.launch.PeerListControl.PeerInfo;
-import org.eclipse.tm.internal.tcf.cdt.ui.launch.ProcessListControl.ProcessInfo;
+import org.eclipse.tcf.internal.cdt.launch.ContextSelection;
+import org.eclipse.tcf.internal.cdt.ui.launch.PeerListControl.PeerInfo;
+import org.eclipse.tcf.internal.cdt.ui.launch.ProcessListControl.ProcessInfo;
 
 /**
  * Dialog to select a peer and context.

@@ -8,10 +8,10 @@
  * Contributors:
  *     Wind River Systems            - initial API and implementation
  *     Martin Oberhuber (Wind River) - [238564] Adopt TM 3.0 APIs
- *     Uwe Stieber (Wind River)      - [271227] Fix compiler warnings in org.eclipse.tm.tcf.rse
+ *     Uwe Stieber (Wind River)      - [271227] Fix compiler warnings in org.eclipse.tcf.rse
  *     Intel Corporation             - [329654] Make all sub services operate against TCF connector service
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.rse.processes;
+package org.eclipse.tcf.internal.rse.processes;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,12 +31,12 @@ import org.eclipse.rse.services.clientserver.processes.IHostProcessFilter;
 import org.eclipse.rse.services.clientserver.processes.ISystemProcessRemoteConstants;
 import org.eclipse.rse.services.processes.AbstractProcessService;
 import org.eclipse.rse.services.processes.IProcessService;
-import org.eclipse.tm.internal.tcf.rse.ITCFService;
-import org.eclipse.tm.internal.tcf.rse.TCFConnectorService;
-import org.eclipse.tm.internal.tcf.rse.TCFConnectorServiceManager;
-import org.eclipse.tm.internal.tcf.rse.TCFRSETask;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.services.IProcesses;
+import org.eclipse.tcf.internal.rse.ITCFService;
+import org.eclipse.tcf.internal.rse.TCFConnectorService;
+import org.eclipse.tcf.internal.rse.TCFConnectorServiceManager;
+import org.eclipse.tcf.internal.rse.TCFRSETask;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.services.IProcesses;
 
 
 public class TCFProcessService extends AbstractProcessService implements IProcessService {

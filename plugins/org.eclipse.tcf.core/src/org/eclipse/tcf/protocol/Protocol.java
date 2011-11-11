@@ -8,16 +8,16 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.tcf.protocol;
+package org.eclipse.tcf.protocol;
 
 import java.util.ArrayList;
 import java.util.TreeSet;
 import java.util.UUID;
 
-import org.eclipse.tm.internal.tcf.core.ServiceManager;
-import org.eclipse.tm.internal.tcf.core.TransportManager;
-import org.eclipse.tm.internal.tcf.services.local.LocatorService;
-import org.eclipse.tm.tcf.services.ILocator;
+import org.eclipse.tcf.internal.core.ServiceManager;
+import org.eclipse.tcf.internal.core.TransportManager;
+import org.eclipse.tcf.internal.services.local.LocatorService;
+import org.eclipse.tcf.services.ILocator;
 
 
 /**

@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.cdt.launch;
+package org.eclipse.tcf.internal.cdt.launch;
 
 import org.eclipse.cdt.debug.core.ICDTLaunchConfigurationConstants;
 import org.eclipse.core.runtime.CoreException;
@@ -20,9 +20,9 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.IStatusHandler;
-import org.eclipse.tm.internal.tcf.debug.launch.TCFLaunchDelegate;
-import org.eclipse.tm.internal.tcf.debug.model.TCFLaunch;
-import org.eclipse.tm.tcf.protocol.Protocol;
+import org.eclipse.tcf.internal.debug.launch.TCFLaunchDelegate;
+import org.eclipse.tcf.internal.debug.model.TCFLaunch;
+import org.eclipse.tcf.protocol.Protocol;
 
 /**
  * TCF launch delegate for CDT based launch configuration types.
@@ -83,7 +83,7 @@ public class TCFCDTLaunchDelegate extends TCFLaunchDelegate {
 
     private ContextSelection promptForContext(ILaunchConfiguration config) throws CoreException {
         IStatus promptStatus = new Status(IStatus.INFO, "org.eclipse.debug.ui", 200, "", null); //$NON-NLS-1$//$NON-NLS-2$
-        IStatus contextPrompt = new Status(IStatus.INFO, "org.eclipse.tm.tcf.cdt.core", 100, "", null); //$NON-NLS-1$//$NON-NLS-2$
+        IStatus contextPrompt = new Status(IStatus.INFO, "org.eclipse.tcf.cdt.core", 100, "", null); //$NON-NLS-1$//$NON-NLS-2$
         // consult a status handler
         IStatusHandler prompter = DebugPlugin.getDefault().getStatusHandler(promptStatus);
         if (prompter != null) {

@@ -8,11 +8,11 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.cdt.ui.disassembly;
+package org.eclipse.tcf.internal.cdt.ui.disassembly;
 
 import org.eclipse.cdt.debug.internal.ui.disassembly.dsf.IDisassemblyBackend;
 import org.eclipse.core.runtime.IAdapterFactory;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNode;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNode;
 
 @SuppressWarnings({"restriction", "rawtypes"})
 public class TCFDisassemblyBackendFactory implements IAdapterFactory {

@@ -12,8 +12,8 @@ package org.eclipse.tm.te.tcf.core.interfaces;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IPeer;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IPeer;
 
 /**
  * TCF channel manager public API declaration.

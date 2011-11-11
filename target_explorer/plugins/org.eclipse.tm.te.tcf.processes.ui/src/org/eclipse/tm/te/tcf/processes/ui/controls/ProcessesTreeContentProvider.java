@@ -13,11 +13,11 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IPeer;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.ISysMonitor;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IPeer;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tm.te.tcf.core.Tcf;
 import org.eclipse.tm.te.tcf.core.interfaces.IChannelManager;
 import org.eclipse.tm.te.tcf.locator.interfaces.nodes.IPeerModel;
@@ -172,7 +172,7 @@ public class ProcessesTreeContentProvider implements ITreeContentProvider {
                                         public void run() {
 											service.getChildren(null, new ISysMonitor.DoneGetChildren() {
 												/* (non-Javadoc)
-												 * @see org.eclipse.tm.tcf.services.ISysMonitor.DoneGetChildren#doneGetChildren(org.eclipse.tm.tcf.protocol.IToken, java.lang.Exception, java.lang.String[])
+												 * @see org.eclipse.tcf.services.ISysMonitor.DoneGetChildren#doneGetChildren(org.eclipse.tcf.protocol.IToken, java.lang.Exception, java.lang.String[])
 												 */
 												@Override
                                                 public void doneGetChildren(IToken token, Exception error, String[] context_ids) {
@@ -181,7 +181,7 @@ public class ProcessesTreeContentProvider implements ITreeContentProvider {
 															for (String contextId : context_ids) {
 																service.getContext(contextId, new ISysMonitor.DoneGetContext() {
 																	/* (non-Javadoc)
-																	 * @see org.eclipse.tm.tcf.services.ISysMonitor.DoneGetContext#doneGetContext(org.eclipse.tm.tcf.protocol.IToken, java.lang.Exception, org.eclipse.tm.tcf.services.ISysMonitor.SysMonitorContext)
+																	 * @see org.eclipse.tcf.services.ISysMonitor.DoneGetContext#doneGetContext(org.eclipse.tcf.protocol.IToken, java.lang.Exception, org.eclipse.tcf.services.ISysMonitor.SysMonitorContext)
 																	 */
 																	@Override
                                                                     public void doneGetContext(IToken token, Exception error, ISysMonitor.SysMonitorContext context) {
@@ -269,7 +269,7 @@ public class ProcessesTreeContentProvider implements ITreeContentProvider {
 					public void run() {
 						service.getChildren(parentId, new ISysMonitor.DoneGetChildren() {
 							/* (non-Javadoc)
-							 * @see org.eclipse.tm.tcf.services.IProcesses.DoneGetChildren#doneGetChildren(org.eclipse.tm.tcf.protocol.IToken, java.lang.Exception, java.lang.String[])
+							 * @see org.eclipse.tcf.services.IProcesses.DoneGetChildren#doneGetChildren(org.eclipse.tcf.protocol.IToken, java.lang.Exception, java.lang.String[])
 							 */
 							@Override
                             public void doneGetChildren(IToken token, Exception error, String[] context_ids) {
@@ -277,7 +277,7 @@ public class ProcessesTreeContentProvider implements ITreeContentProvider {
 									for (String contextId : context_ids) {
 										service.getContext(contextId, new ISysMonitor.DoneGetContext() {
 											/* (non-Javadoc)
-											 * @see org.eclipse.tm.tcf.services.ISysMonitor.DoneGetContext#doneGetContext(org.eclipse.tm.tcf.protocol.IToken, java.lang.Exception, org.eclipse.tm.tcf.services.ISysMonitor.SysMonitorContext)
+											 * @see org.eclipse.tcf.services.ISysMonitor.DoneGetContext#doneGetContext(org.eclipse.tcf.protocol.IToken, java.lang.Exception, org.eclipse.tcf.services.ISysMonitor.SysMonitorContext)
 											 */
 											@Override
                                             public void doneGetContext(IToken token, Exception error, ISysMonitor.SysMonitorContext context) {

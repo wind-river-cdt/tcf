@@ -3,7 +3,7 @@
 <plugin>
 
 <!-- TCF framework startup participant -->   
-   <extension point="org.eclipse.tm.tcf.startup">
+   <extension point="org.eclipse.tcf.startup">
       <class name="org.eclipse.tm.te.tcf.log.core.internal.Startup"/>
    </extension>
 

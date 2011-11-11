@@ -8,13 +8,13 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui.adapters;
+package org.eclipse.tcf.internal.debug.ui.adapters;
 
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.debug.ui.actions.IToggleBreakpointsTarget;
 import org.eclipse.debug.ui.actions.IToggleBreakpointsTargetExtension;
-import org.eclipse.tm.internal.tcf.debug.ui.commands.BreakpointCommand;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNode;
+import org.eclipse.tcf.internal.debug.ui.commands.BreakpointCommand;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNode;
 import org.eclipse.ui.views.properties.IPropertySource;
 
 

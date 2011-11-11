@@ -9,10 +9,10 @@
  *    Intel Corporation - initial API and implementation
  ******************************************************************************/
 
-package org.eclipse.tm.internal.tcf.rse;
+package org.eclipse.tcf.internal.rse;
 
 import org.eclipse.rse.services.files.RemoteFileException;
-import org.eclipse.tm.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IChannel;
 
 public interface ITCFSessionProvider {
     public static final int ERROR_CODE = 100; // filed error code

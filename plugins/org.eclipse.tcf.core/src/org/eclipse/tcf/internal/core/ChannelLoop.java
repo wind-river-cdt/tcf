@@ -8,13 +8,13 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.core;
+package org.eclipse.tcf.internal.core;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
 
-import org.eclipse.tm.tcf.core.StreamChannel;
-import org.eclipse.tm.tcf.protocol.IPeer;
+import org.eclipse.tcf.core.StreamChannel;
+import org.eclipse.tcf.protocol.IPeer;
 
 
 public class ChannelLoop extends StreamChannel {

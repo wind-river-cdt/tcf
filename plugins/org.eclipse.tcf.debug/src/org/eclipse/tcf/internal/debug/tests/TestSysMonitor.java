@@ -8,16 +8,16 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.tests;
+package org.eclipse.tcf.internal.debug.tests;
 
 import java.util.HashMap;
 import java.util.HashSet;
 
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IErrorReport;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.services.ISysMonitor;
-import org.eclipse.tm.tcf.services.ISysMonitor.SysMonitorContext;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IErrorReport;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.services.ISysMonitor;
+import org.eclipse.tcf.services.ISysMonitor.SysMonitorContext;
 
 class TestSysMonitor implements ITCFTest {
 

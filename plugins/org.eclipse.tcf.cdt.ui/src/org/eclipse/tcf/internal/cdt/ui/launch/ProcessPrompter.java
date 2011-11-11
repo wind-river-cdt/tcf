@@ -8,15 +8,15 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.cdt.ui.launch;
+package org.eclipse.tcf.internal.cdt.ui.launch;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.IStatusHandler;
 import org.eclipse.jface.window.Window;
-import org.eclipse.tm.internal.tcf.cdt.launch.ContextSelection;
-import org.eclipse.tm.internal.tcf.debug.launch.TCFLaunchDelegate;
+import org.eclipse.tcf.internal.cdt.launch.ContextSelection;
+import org.eclipse.tcf.internal.debug.launch.TCFLaunchDelegate;
 import org.eclipse.ui.PlatformUI;
 
 public class ProcessPrompter implements IStatusHandler {

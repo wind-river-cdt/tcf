@@ -7,9 +7,9 @@
  *
  * Contributors:
  *     Wind River Systems - initial API and implementation
- *     Uwe Stieber (Wind River) - [271227] Fix compiler warnings in org.eclipse.tm.tcf.rse
+ *     Uwe Stieber (Wind River) - [271227] Fix compiler warnings in org.eclipse.tcf.rse
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.rse.processes;
+package org.eclipse.tcf.internal.rse.processes;
 
 import java.util.Map;
 

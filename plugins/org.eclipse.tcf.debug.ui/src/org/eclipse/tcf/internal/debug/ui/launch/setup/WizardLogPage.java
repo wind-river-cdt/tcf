@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui.launch.setup;
+package org.eclipse.tcf.internal.debug.ui.launch.setup;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -40,9 +40,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.tm.internal.tcf.debug.ui.Activator;
-import org.eclipse.tm.tcf.core.Base64;
-import org.eclipse.tm.tcf.ssl.TCFSecurityManager;
+import org.eclipse.tcf.internal.debug.ui.Activator;
+import org.eclipse.tcf.core.Base64;
+import org.eclipse.tcf.ssl.TCFSecurityManager;
 import org.osgi.framework.Bundle;
 
 class WizardLogPage extends WizardPage implements Runnable {

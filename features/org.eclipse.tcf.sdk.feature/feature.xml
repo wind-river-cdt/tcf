@@ -10,7 +10,7 @@
         Wind River Systems - initial API and implementation
  -->
 <feature
-      id="org.eclipse.tm.tcf.sdk.feature"
+      id="org.eclipse.tcf.sdk.feature"
       label="%featureName"
       version="0.5.0.qualifier"
       provider-name="%featureProvider">
@@ -28,36 +28,36 @@
    </license>
 
    <url>
-      <update label="%updateSiteName" url="http://dev.eclipse.org/svnroot/dsdp/org.eclipse.tm.tcf/releases/0.5.0"/>
+      <update label="%updateSiteName" url="http://dev.eclipse.org/svnroot/dsdp/org.eclipse.tcf/releases/0.5.0"/>
    </url>
 
    <requires>
-      <import feature="org.eclipse.tm.tcf.feature" version="0.5.0.qualifier"/>
+      <import feature="org.eclipse.tcf.feature" version="0.5.0.qualifier"/>
    </requires>
 
    <plugin
-         id="org.eclipse.tm.tcf.core.source"
+         id="org.eclipse.tcf.core.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.tm.tcf.debug.source"
+         id="org.eclipse.tcf.debug.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.tm.tcf.debug.ui.source"
+         id="org.eclipse.tcf.debug.ui.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.tm.tcf.source"
+         id="org.eclipse.tcf.source"
          download-size="0"
          install-size="0"
          version="0.0.0"

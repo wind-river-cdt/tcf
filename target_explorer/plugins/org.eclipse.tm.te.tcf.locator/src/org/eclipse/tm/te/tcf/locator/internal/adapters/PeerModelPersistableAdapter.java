@@ -15,7 +15,7 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.tm.tcf.protocol.Protocol;
+import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tm.te.runtime.persistence.interfaces.IPersistable;
 import org.eclipse.tm.te.tcf.locator.interfaces.nodes.IPeerModel;
 

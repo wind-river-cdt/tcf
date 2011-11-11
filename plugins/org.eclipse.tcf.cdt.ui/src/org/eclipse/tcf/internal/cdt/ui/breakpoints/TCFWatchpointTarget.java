@@ -8,14 +8,14 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.cdt.ui.breakpoints;
+package org.eclipse.tcf.internal.cdt.ui.breakpoints;
 
 import org.eclipse.cdt.debug.internal.core.ICWatchpointTarget;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNodeExpression;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.ISymbols;
-import org.eclipse.tm.tcf.util.TCFDataCache;
-import org.eclipse.tm.tcf.util.TCFTask;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExpression;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.ISymbols;
+import org.eclipse.tcf.util.TCFDataCache;
+import org.eclipse.tcf.util.TCFTask;
 
 /**
  * TCF "Add Watchpoint" target implementation.

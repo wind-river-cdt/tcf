@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.tcf.util;
+package org.eclipse.tcf.util;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
@@ -18,8 +18,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.Protocol;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.Protocol;
 
 /**
  * A <tt>TCFTask</tt> is an utility class that represents the result of an asynchronous

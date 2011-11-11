@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.tcf.protocol;
+package org.eclipse.tcf.protocol;
 
 import java.util.Collection;
 import java.util.Map;

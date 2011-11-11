@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui.launch;
+package org.eclipse.tcf.internal.debug.ui.launch;
 
 import java.util.Map;
 
@@ -19,7 +19,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.tm.internal.tcf.debug.ui.launch.setup.PeerPropsControl;
+import org.eclipse.tcf.internal.debug.ui.launch.setup.PeerPropsControl;
 
 class PeerPropsDialog extends Dialog {
 

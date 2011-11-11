@@ -11,7 +11,7 @@
  *     Nokia                - Made generic to DSF
  *     Wind River Systems   - Adapted to TCF Debug
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.cdt.ui;
+package org.eclipse.tcf.internal.cdt.ui;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,9 +24,9 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNode;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNodeExecContext;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNodeStackFrame;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNode;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExecContext;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeStackFrame;
 import org.eclipse.ui.IPageListener;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;

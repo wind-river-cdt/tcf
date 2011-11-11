@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.launch;
+package org.eclipse.tcf.internal.debug.launch;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -21,10 +21,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.tm.internal.tcf.debug.Activator;
-import org.eclipse.tm.tcf.core.AbstractPeer;
-import org.eclipse.tm.tcf.protocol.IPeer;
-import org.eclipse.tm.tcf.protocol.Protocol;
+import org.eclipse.tcf.internal.debug.Activator;
+import org.eclipse.tcf.core.AbstractPeer;
+import org.eclipse.tcf.protocol.IPeer;
+import org.eclipse.tcf.protocol.Protocol;
 
 /**
  * The class represents manually configured (user defined) TCF peers (targets).

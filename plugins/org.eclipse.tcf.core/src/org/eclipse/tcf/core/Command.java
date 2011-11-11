@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.tcf.core;
+package org.eclipse.tcf.core;
 
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -17,13 +17,13 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
-import org.eclipse.tm.internal.tcf.core.Token;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IErrorReport;
-import org.eclipse.tm.tcf.protocol.IService;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.protocol.JSON;
-import org.eclipse.tm.tcf.protocol.Protocol;
+import org.eclipse.tcf.internal.core.Token;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IErrorReport;
+import org.eclipse.tcf.protocol.IService;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.JSON;
+import org.eclipse.tcf.protocol.Protocol;
 
 
 /**

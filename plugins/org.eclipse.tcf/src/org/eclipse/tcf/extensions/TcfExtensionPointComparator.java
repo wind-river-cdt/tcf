@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.tcf.extensions;
+package org.eclipse.tcf.extensions;
 
 import java.util.Comparator;
 
@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.IExtension;
  * always read in the same order.
  * <p>
  * The order of the extensions is defined as following:<br>
- * <ul><li>Extensions contributed by the TCF core plug-ins (<code>org.eclipse.tm.tcf.*</code>)
+ * <ul><li>Extensions contributed by the TCF core plug-ins (<code>org.eclipse.tcf.*</code>)
  *         in ascending alphabetic order and</li>
  *     <li>Extensions contributed by any other plug-in in ascending alphabetic order.</li>
  *     <li>Extensions contributed by the same plug-in in ascending alphabetic order by the
@@ -27,7 +27,7 @@ import org.eclipse.core.runtime.IExtension;
  * </ul>
  */
 public class TcfExtensionPointComparator implements Comparator<IExtension> {
-    private final static String TCF_PLUGIN_PATTERN = "org.eclipse.tm.tcf.*"; //$NON-NLS-1$
+    private final static String TCF_PLUGIN_PATTERN = "org.eclipse.tcf.*"; //$NON-NLS-1$
 
     /* (non-Javadoc)
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)

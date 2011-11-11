@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.tcf.core;
+package org.eclipse.tcf.core;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,19 +17,19 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.eclipse.tm.internal.tcf.core.ServiceManager;
-import org.eclipse.tm.internal.tcf.core.Token;
-import org.eclipse.tm.internal.tcf.core.TransportManager;
-import org.eclipse.tm.internal.tcf.services.local.LocatorService;
-import org.eclipse.tm.internal.tcf.services.remote.GenericProxy;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IErrorReport;
-import org.eclipse.tm.tcf.protocol.IPeer;
-import org.eclipse.tm.tcf.protocol.IService;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.protocol.JSON;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.ILocator;
+import org.eclipse.tcf.internal.core.ServiceManager;
+import org.eclipse.tcf.internal.core.Token;
+import org.eclipse.tcf.internal.core.TransportManager;
+import org.eclipse.tcf.internal.services.local.LocatorService;
+import org.eclipse.tcf.internal.services.remote.GenericProxy;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IErrorReport;
+import org.eclipse.tcf.protocol.IPeer;
+import org.eclipse.tcf.protocol.IService;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.JSON;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.ILocator;
 
 /**
  * Abstract implementation of IChannel interface.

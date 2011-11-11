@@ -9,7 +9,7 @@
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tm.internal.tcf.examples.daytime;
+package org.eclipse.tcf.internal.examples.daytime;
 
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
@@ -20,7 +20,7 @@ import org.osgi.framework.BundleContext;
 public class Activator extends Plugin {
 
     // The plug-in ID
-    public static final String PLUGIN_ID = "org.eclipse.tm.tcf.examples.daytime";
+    public static final String PLUGIN_ID = "org.eclipse.tcf.examples.daytime";
 
     // The shared instance
     private static Activator plugin;

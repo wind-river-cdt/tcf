@@ -8,15 +8,15 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.tests;
+package org.eclipse.tcf.internal.debug.tests;
 
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.Random;
 
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.services.IDiagnostics;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.services.IDiagnostics;
 
 class TestEchoFP implements ITCFTest, IDiagnostics.DoneEchoFP {
 

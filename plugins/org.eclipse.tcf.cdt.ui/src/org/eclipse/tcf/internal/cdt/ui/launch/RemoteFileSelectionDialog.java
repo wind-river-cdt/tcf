@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.cdt.ui.launch;
+package org.eclipse.tcf.internal.cdt.ui.launch;
 
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.Dialog;
@@ -27,8 +27,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.TreeItem;
-import org.eclipse.tm.internal.tcf.cdt.ui.launch.FileSystemBrowserControl.FileInfo;
-import org.eclipse.tm.tcf.protocol.IPeer;
+import org.eclipse.tcf.internal.cdt.ui.launch.FileSystemBrowserControl.FileInfo;
+import org.eclipse.tcf.protocol.IPeer;
 
 /**
  * Dialog to select a remote file.

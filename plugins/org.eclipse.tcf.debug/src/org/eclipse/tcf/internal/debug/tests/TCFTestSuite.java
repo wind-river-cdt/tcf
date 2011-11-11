@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.tests;
+package org.eclipse.tcf.internal.debug.tests;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,11 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IPeer;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.IMemoryMap;
-import org.eclipse.tm.tcf.services.IPathMap;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IPeer;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.IMemoryMap;
+import org.eclipse.tcf.services.IPathMap;
 
 /**
  * TCF Test Suite implements stress testing of communication channels and capabilities of remote peer.

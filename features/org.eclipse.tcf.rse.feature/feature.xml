@@ -10,7 +10,7 @@
         Wind River Systems - initial API and implementation
  -->
 <feature
-      id="org.eclipse.tm.tcf.rse.feature"
+      id="org.eclipse.tcf.rse.feature"
       label="%featureName"
       version="0.5.0.qualifier"
       provider-name="%providerName">
@@ -28,11 +28,11 @@
    </license>
 
    <url>
-      <update label="%updateSiteName" url="http://dev.eclipse.org/svnroot/dsdp/org.eclipse.tm.tcf/releases/0.5.0"/>
+      <update label="%updateSiteName" url="http://dev.eclipse.org/svnroot/dsdp/org.eclipse.tcf/releases/0.5.0"/>
    </url>
 
    <includes
-         id="org.eclipse.tm.tcf.feature"
+         id="org.eclipse.tcf.feature"
          version="0.0.0"/>
 
    <requires>
@@ -47,14 +47,14 @@
       <import plugin="org.eclipse.rse.subsystems.processes.core"/>
       <import plugin="org.eclipse.rse.processes.ui"/>
       <import plugin="org.eclipse.rse.subsystems.terminals.core"/>
-      <import plugin="org.eclipse.tm.tcf" version="0.5.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.tcf" version="0.5.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.rse.subsystems.shells.core" version="3.1.100" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.resources" version="3.6.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.tm.tcf.core" version="0.5.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.tcf.core" version="0.5.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
-         id="org.eclipse.tm.tcf.rse"
+         id="org.eclipse.tcf.rse"
          download-size="0"
          install-size="0"
          version="0.0.0"

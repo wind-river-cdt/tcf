@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.cdt.launch;
+package org.eclipse.tcf.internal.cdt.launch;
 
 public class ContextSelection {
     public String fPeerId;

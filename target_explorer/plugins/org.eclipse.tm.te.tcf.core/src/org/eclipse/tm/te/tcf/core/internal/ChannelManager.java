@@ -13,11 +13,11 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.PlatformObject;
-import org.eclipse.tm.tcf.core.AbstractPeer;
-import org.eclipse.tm.tcf.core.TransientPeer;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IPeer;
-import org.eclipse.tm.tcf.protocol.Protocol;
+import org.eclipse.tcf.core.AbstractPeer;
+import org.eclipse.tcf.core.TransientPeer;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IPeer;
+import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tm.te.tcf.core.interfaces.IChannelManager;
 
 
@@ -34,7 +34,7 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tm.te.tcf.core.interfaces.IChannelManager#openChannel(org.eclipse.tm.tcf.protocol.IPeer, org.eclipse.tm.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel)
+	 * @see org.eclipse.tm.te.tcf.core.interfaces.IChannelManager#openChannel(org.eclipse.tcf.protocol.IPeer, org.eclipse.tm.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel)
 	 */
 	@Override
 	public void openChannel(final IPeer peer, final DoneOpenChannel done) {

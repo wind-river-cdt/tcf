@@ -8,10 +8,10 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.tcf.services;
+package org.eclipse.tcf.services;
 
-import org.eclipse.tm.tcf.protocol.IService;
-import org.eclipse.tm.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.IService;
+import org.eclipse.tcf.protocol.IToken;
 
 /**
  * Streams service is a generic interface to support streaming of data between host and remote agents.

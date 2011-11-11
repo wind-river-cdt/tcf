@@ -11,7 +11,7 @@
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>org.eclipse.tm.tcf.cdt.sdk.feature</artifactId>
+	<artifactId>org.eclipse.tcf.cdt.sdk.feature</artifactId>
 	<packaging>eclipse-feature</packaging>
 	<version>0.5.0.qualifier</version>
 </project>

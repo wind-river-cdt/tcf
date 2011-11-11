@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.rse;
+package org.eclipse.tcf.internal.rse;
 
 import org.eclipse.rse.core.subsystems.ISubSystem;
 

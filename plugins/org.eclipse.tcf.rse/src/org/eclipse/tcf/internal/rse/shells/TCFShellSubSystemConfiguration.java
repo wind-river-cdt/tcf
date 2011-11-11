@@ -17,7 +17,7 @@
  *  Liping Ke        (Intel Corp.)- Adapted from org.eclipse.rse.subsystems.shells.ssh.SshShellSubSystemConfiguration
  *  Liping Ke        (Intel Corp.)- [246987] Implement TCF Shell/terminal services
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.rse.shells;
+package org.eclipse.tcf.internal.rse.shells;
 
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.subsystems.IConnectorService;
@@ -28,8 +28,8 @@ import org.eclipse.rse.subsystems.shells.core.subsystems.IRemoteCmdSubSystem;
 import org.eclipse.rse.subsystems.shells.core.subsystems.servicesubsystem.IServiceCommandShell;
 import org.eclipse.rse.subsystems.shells.core.subsystems.servicesubsystem.ShellServiceSubSystem;
 import org.eclipse.rse.subsystems.shells.core.subsystems.servicesubsystem.ShellServiceSubSystemConfiguration;
-import org.eclipse.tm.internal.tcf.rse.*;
-import org.eclipse.tm.internal.tcf.rse.terminals.TCFTerminalService;
+import org.eclipse.tcf.internal.rse.*;
+import org.eclipse.tcf.internal.rse.terminals.TCFTerminalService;
 
 
 public class TCFShellSubSystemConfiguration extends

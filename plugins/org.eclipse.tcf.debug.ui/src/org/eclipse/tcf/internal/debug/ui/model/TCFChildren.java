@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui.model;
+package org.eclipse.tcf.internal.debug.ui.model;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,8 +17,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IChildrenUpdate;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.util.TCFDataCache;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.util.TCFDataCache;
 
 /**
  * TCFChildren is a concrete type of TCF data cache that is used to cache a list of children.

@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.tcf.util;
+package org.eclipse.tcf.util;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
@@ -17,10 +17,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.services.IFileSystem;
-import org.eclipse.tm.tcf.services.IFileSystem.FileSystemException;
-import org.eclipse.tm.tcf.services.IFileSystem.IFileHandle;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.services.IFileSystem;
+import org.eclipse.tcf.services.IFileSystem.FileSystemException;
+import org.eclipse.tcf.services.IFileSystem.IFileHandle;
 
 /**
  * TCFFileOutputStream is high performance OutputStream implementation over TCF FileSystem service.

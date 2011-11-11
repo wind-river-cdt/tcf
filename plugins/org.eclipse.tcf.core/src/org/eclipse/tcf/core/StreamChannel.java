@@ -8,11 +8,11 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.tcf.core;
+package org.eclipse.tcf.core;
 
 import java.io.IOException;
 
-import org.eclipse.tm.tcf.protocol.IPeer;
+import org.eclipse.tcf.protocol.IPeer;
 
 /**
  * Abstract implementation of IChannel interface for stream oriented transport protocols.

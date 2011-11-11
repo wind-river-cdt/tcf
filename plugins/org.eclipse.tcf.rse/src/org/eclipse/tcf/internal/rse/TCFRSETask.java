@@ -8,10 +8,10 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *     Martin Oberhuber (Wind River) - [238564] Adopt TM 3.0 APIs
- *     Uwe Stieber (Wind River) - [271227] Fix compiler warnings in org.eclipse.tm.tcf.rse
+ *     Uwe Stieber (Wind River) - [271227] Fix compiler warnings in org.eclipse.tcf.rse
  *     Uwe Stieber (Wind River) - [273572] SystemMessage contains exception class name instead of error message
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.rse;
+package org.eclipse.tcf.internal.rse;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ExecutionException;
@@ -19,7 +19,7 @@ import java.util.concurrent.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.rse.services.clientserver.messages.SystemMessage;
 import org.eclipse.rse.services.clientserver.messages.SystemMessageException;
-import org.eclipse.tm.tcf.util.TCFTask;
+import org.eclipse.tcf.util.TCFTask;
 
 public abstract class TCFRSETask<V> extends TCFTask<V> {
 

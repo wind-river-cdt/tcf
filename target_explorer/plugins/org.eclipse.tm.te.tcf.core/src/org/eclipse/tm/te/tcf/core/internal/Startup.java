@@ -11,7 +11,7 @@ package org.eclipse.tm.te.tcf.core.internal;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.eclipse.tm.tcf.protocol.Protocol;
+import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tm.te.tcf.core.Tcf;
 import org.eclipse.tm.te.tcf.core.activator.CoreBundleActivator;
 

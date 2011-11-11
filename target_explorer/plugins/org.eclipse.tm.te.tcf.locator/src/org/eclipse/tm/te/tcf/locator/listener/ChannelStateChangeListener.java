@@ -10,9 +10,9 @@
 package org.eclipse.tm.te.tcf.locator.listener;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IPeer;
-import org.eclipse.tm.tcf.protocol.Protocol;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IPeer;
+import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tm.te.tcf.core.interfaces.listeners.IChannelStateChangeListener;
 import org.eclipse.tm.te.tcf.locator.activator.CoreBundleActivator;
 import org.eclipse.tm.te.tcf.locator.interfaces.ITracing;
@@ -40,7 +40,7 @@ public class ChannelStateChangeListener implements IChannelStateChangeListener {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tm.te.tcf.tcf.core.interfaces.listeners.IChannelStateChangeListener#stateChanged(org.eclipse.tm.tcf.protocol.IChannel, int)
+	 * @see org.eclipse.tm.te.tcf.tcf.core.interfaces.listeners.IChannelStateChangeListener#stateChanged(org.eclipse.tcf.protocol.IChannel, int)
 	 */
 	@Override
 	public void stateChanged(IChannel channel, int state) {

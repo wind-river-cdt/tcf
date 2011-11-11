@@ -13,9 +13,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IChannel.IChannelListener;
-import org.eclipse.tm.tcf.protocol.Protocol;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IChannel.IChannelListener;
+import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tm.te.tcf.core.Tcf;
 import org.eclipse.tm.te.tcf.core.internal.interfaces.IChannelOpenListener;
 import org.eclipse.tm.te.tcf.core.internal.nls.Messages;
@@ -31,7 +31,7 @@ public class InternalChannelOpenListener implements IChannelOpenListener {
 	private final Map<IChannel, IChannel.IChannelListener> channelListeners = new HashMap<IChannel, IChannel.IChannelListener>();
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tm.tcf.protocol.Protocol.ChannelOpenListener#onChannelOpen(org.eclipse.tm.tcf.protocol.IChannel)
+	 * @see org.eclipse.tcf.protocol.Protocol.ChannelOpenListener#onChannelOpen(org.eclipse.tcf.protocol.IChannel)
 	 */
 	@Override
 	public void onChannelOpen(IChannel channel) {
@@ -56,7 +56,7 @@ public class InternalChannelOpenListener implements IChannelOpenListener {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tm.te.tcf.core.internal.interfaces.IChannelOpenListener#setChannelListener(org.eclipse.tm.tcf.protocol.IChannel, org.eclipse.tm.tcf.protocol.IChannel.IChannelListener)
+	 * @see org.eclipse.tm.te.tcf.core.internal.interfaces.IChannelOpenListener#setChannelListener(org.eclipse.tcf.protocol.IChannel, org.eclipse.tcf.protocol.IChannel.IChannelListener)
 	 */
 	@Override
 	public void setChannelListener(IChannel channel, IChannelListener listener) {

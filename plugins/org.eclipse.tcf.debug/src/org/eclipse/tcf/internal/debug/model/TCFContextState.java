@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.model;
+package org.eclipse.tcf.internal.debug.model;
 
 import java.util.Map;
 

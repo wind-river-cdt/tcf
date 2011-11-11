@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.tests;
+package org.eclipse.tcf.internal.debug.tests;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,13 +18,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.IProcesses;
-import org.eclipse.tm.tcf.services.IStreams;
-import org.eclipse.tm.tcf.services.ITerminals;
-import org.eclipse.tm.tcf.services.ITerminals.TerminalContext;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.IProcesses;
+import org.eclipse.tcf.services.IStreams;
+import org.eclipse.tcf.services.ITerminals;
+import org.eclipse.tcf.services.ITerminals.TerminalContext;
 
 class TestTerminals implements ITCFTest {
 

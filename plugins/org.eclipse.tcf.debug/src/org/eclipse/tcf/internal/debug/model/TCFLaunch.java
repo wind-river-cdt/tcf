@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.model;
+package org.eclipse.tcf.internal.debug.model;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -29,28 +29,28 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.Launch;
-import org.eclipse.tm.internal.tcf.debug.Activator;
-import org.eclipse.tm.internal.tcf.debug.actions.TCFAction;
-import org.eclipse.tm.internal.tcf.debug.launch.TCFLaunchDelegate;
-import org.eclipse.tm.internal.tcf.debug.launch.TCFLaunchDelegate.PathMapRule;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IPeer;
-import org.eclipse.tm.tcf.protocol.IService;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.IFileSystem;
-import org.eclipse.tm.tcf.services.IFileSystem.FileSystemException;
-import org.eclipse.tm.tcf.services.IFileSystem.IFileHandle;
-import org.eclipse.tm.tcf.services.IMemory;
-import org.eclipse.tm.tcf.services.IMemory.MemoryContext;
-import org.eclipse.tm.tcf.services.IMemoryMap;
-import org.eclipse.tm.tcf.services.IPathMap;
-import org.eclipse.tm.tcf.services.IProcesses;
-import org.eclipse.tm.tcf.services.IProcesses.ProcessContext;
-import org.eclipse.tm.tcf.services.IProcessesV1;
-import org.eclipse.tm.tcf.services.IRunControl;
-import org.eclipse.tm.tcf.services.IStreams;
-import org.eclipse.tm.tcf.util.TCFTask;
+import org.eclipse.tcf.internal.debug.Activator;
+import org.eclipse.tcf.internal.debug.actions.TCFAction;
+import org.eclipse.tcf.internal.debug.launch.TCFLaunchDelegate;
+import org.eclipse.tcf.internal.debug.launch.TCFLaunchDelegate.PathMapRule;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IPeer;
+import org.eclipse.tcf.protocol.IService;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.IFileSystem;
+import org.eclipse.tcf.services.IFileSystem.FileSystemException;
+import org.eclipse.tcf.services.IFileSystem.IFileHandle;
+import org.eclipse.tcf.services.IMemory;
+import org.eclipse.tcf.services.IMemory.MemoryContext;
+import org.eclipse.tcf.services.IMemoryMap;
+import org.eclipse.tcf.services.IPathMap;
+import org.eclipse.tcf.services.IProcesses;
+import org.eclipse.tcf.services.IProcesses.ProcessContext;
+import org.eclipse.tcf.services.IProcessesV1;
+import org.eclipse.tcf.services.IRunControl;
+import org.eclipse.tcf.services.IStreams;
+import org.eclipse.tcf.util.TCFTask;
 
 public class TCFLaunch extends Launch {
 

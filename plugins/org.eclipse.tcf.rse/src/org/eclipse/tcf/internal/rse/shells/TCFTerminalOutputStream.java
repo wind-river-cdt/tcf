@@ -8,15 +8,15 @@
  * Contributors:
  *    Liping Ke (Intel Corp.) - initial API and implementation
  ******************************************************************************/
-package org.eclipse.tm.internal.tcf.rse.shells;
+package org.eclipse.tcf.internal.rse.shells;
 
 import java.io.IOException;
 
 import java.io.OutputStream;
 
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.services.IStreams;
-import org.eclipse.tm.tcf.util.TCFTask;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.services.IStreams;
+import org.eclipse.tcf.util.TCFTask;
 
 public class TCFTerminalOutputStream extends OutputStream {
 

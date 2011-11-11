@@ -8,16 +8,16 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.cdt.ui.sourcelookup;
+package org.eclipse.tcf.internal.cdt.ui.sourcelookup;
 
 import org.eclipse.cdt.debug.core.model.ISteppingModeTarget;
 import org.eclipse.cdt.debug.internal.ui.sourcelookup.CSourceNotFoundEditor;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchesListener2;
-import org.eclipse.tm.internal.tcf.cdt.ui.sourcelookup.TCFSourceNotFoundPresentation.TCFCSourceNotFoundEditorInput;
-import org.eclipse.tm.internal.tcf.cdt.ui.sourcelookup.TCFSourceNotFoundPresentation.TCFCSourceNotFoundElement;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFModel;
+import org.eclipse.tcf.internal.cdt.ui.sourcelookup.TCFSourceNotFoundPresentation.TCFCSourceNotFoundEditorInput;
+import org.eclipse.tcf.internal.cdt.ui.sourcelookup.TCFSourceNotFoundPresentation.TCFCSourceNotFoundElement;
+import org.eclipse.tcf.internal.debug.ui.model.TCFModel;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
@@ -28,7 +28,7 @@ import org.eclipse.ui.IWorkbenchPage;
 @SuppressWarnings("restriction")
 public class TCFCSourceNotFoundEditor extends CSourceNotFoundEditor {
 
-    static final String ID = "org.eclipse.tm.tcf.cdt.ui.source_not_found_editor";
+    static final String ID = "org.eclipse.tcf.cdt.ui.source_not_found_editor";
 
     private class LaunchListener implements ILaunchesListener2 {
         public void launchesRemoved(ILaunch[] launches) {

@@ -8,9 +8,9 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *     Anna Dushistova (MontaVista) - [246996] [tcf] NullPointerException when trying to copy the process
- *     Uwe Stieber (Wind River) - [271227] Fix compiler warnings in org.eclipse.tm.tcf.rse
+ *     Uwe Stieber (Wind River) - [271227] Fix compiler warnings in org.eclipse.tcf.rse
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.rse.processes;
+package org.eclipse.tcf.internal.rse.processes;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -24,10 +24,10 @@ import org.eclipse.rse.core.subsystems.AbstractResource;
 import org.eclipse.rse.services.clientserver.IServiceConstants;
 import org.eclipse.rse.services.clientserver.processes.IHostProcess;
 import org.eclipse.rse.services.clientserver.processes.ISystemProcessRemoteConstants;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.ISysMonitor;
-import org.eclipse.tm.tcf.services.ISysMonitor.SysMonitorContext;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.ISysMonitor;
+import org.eclipse.tcf.services.ISysMonitor.SysMonitorContext;
 
 public class TCFProcessResource extends AbstractResource implements IHostProcess {
 

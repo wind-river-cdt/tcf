@@ -8,13 +8,13 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui;
+package org.eclipse.tcf.internal.debug.ui;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFAnnotationManager;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFModelManager;
-import org.eclipse.tm.tcf.protocol.Protocol;
+import org.eclipse.tcf.internal.debug.ui.model.TCFAnnotationManager;
+import org.eclipse.tcf.internal.debug.ui.model.TCFModelManager;
+import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -23,7 +23,7 @@ import org.osgi.framework.BundleContext;
  */
 public class Activator extends AbstractUIPlugin {
 
-    public static final String PLUGIN_ID = "org.eclipse.tm.tcf.debug.ui";
+    public static final String PLUGIN_ID = "org.eclipse.tcf.debug.ui";
 
     private static final Object lock = new Object();
 

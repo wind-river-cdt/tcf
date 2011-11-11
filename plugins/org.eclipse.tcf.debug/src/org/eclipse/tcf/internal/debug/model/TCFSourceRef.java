@@ -8,11 +8,11 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.model;
+package org.eclipse.tcf.internal.debug.model;
 
 import java.math.BigInteger;
 
-import org.eclipse.tm.tcf.services.ILineNumbers;
+import org.eclipse.tcf.services.ILineNumbers;
 
 /**
  * Objects of this class represent a mapping between an address and source code area.

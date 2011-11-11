@@ -8,11 +8,11 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.core;
+package org.eclipse.tcf.internal.core;
 
 import java.util.Map;
 
-import org.eclipse.tm.tcf.core.AbstractPeer;
+import org.eclipse.tcf.core.AbstractPeer;
 
 /**
  * RemotePeer objects represent TCF agents that Locator service discovered on local network.

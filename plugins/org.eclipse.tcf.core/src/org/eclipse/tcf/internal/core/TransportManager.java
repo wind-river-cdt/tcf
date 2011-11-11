@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.core;
+package org.eclipse.tcf.internal.core;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,16 +17,16 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.tm.tcf.core.AbstractChannel;
-import org.eclipse.tm.tcf.core.ChannelPIPE;
-import org.eclipse.tm.tcf.core.ChannelTCP;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IPeer;
-import org.eclipse.tm.tcf.protocol.IService;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.protocol.ITransportProvider;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.ILocator;
+import org.eclipse.tcf.core.AbstractChannel;
+import org.eclipse.tcf.core.ChannelPIPE;
+import org.eclipse.tcf.core.ChannelTCP;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IPeer;
+import org.eclipse.tcf.protocol.IService;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.ITransportProvider;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.ILocator;
 
 
 public class TransportManager {
@@ -175,7 +175,7 @@ public class TransportManager {
      * Transmit TCF event message.
      * The message is sent to all open communication channels – broadcasted.
      *
-     * This is internal API, TCF clients should use {@code org.eclipse.tm.tcf.protocol.Protocol}.
+     * This is internal API, TCF clients should use {@code org.eclipse.tcf.protocol.Protocol}.
      */
     public static void sendEvent(String service_name, String event_name, byte[] data) {
         for (AbstractChannel c : channels) {
@@ -198,7 +198,7 @@ public class TransportManager {
      * @param done will be executed by dispatch thread after communication
      * messages are delivered to corresponding targets.
      *
-     * This is internal API, TCF clients should use {@code org.eclipse.tm.tcf.protocol.Protocol}.
+     * This is internal API, TCF clients should use {@code org.eclipse.tcf.protocol.Protocol}.
      */
     public static void sync(final Runnable done) {
         final Set<IToken> set = new HashSet<IToken>();

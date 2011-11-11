@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.tests;
+package org.eclipse.tcf.internal.debug.tests;
 
 import java.math.BigInteger;
 import java.util.Collection;
@@ -18,16 +18,16 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.protocol.JSON;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.IBreakpoints;
-import org.eclipse.tm.tcf.services.IDiagnostics;
-import org.eclipse.tm.tcf.services.IExpressions;
-import org.eclipse.tm.tcf.services.IRunControl;
-import org.eclipse.tm.tcf.services.IStackTrace;
-import org.eclipse.tm.tcf.services.ISymbols;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.JSON;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.IBreakpoints;
+import org.eclipse.tcf.services.IDiagnostics;
+import org.eclipse.tcf.services.IExpressions;
+import org.eclipse.tcf.services.IRunControl;
+import org.eclipse.tcf.services.IStackTrace;
+import org.eclipse.tcf.services.ISymbols;
 
 class TestExpressions implements ITCFTest,
     IRunControl.RunControlListener, IExpressions.ExpressionsListener, IBreakpoints.BreakpointsListener {

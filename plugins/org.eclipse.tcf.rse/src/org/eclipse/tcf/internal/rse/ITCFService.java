@@ -11,7 +11,7 @@
  * Martin Oberhuber (Wind River) - [170910] Adopt RSE ITerminalService API for SSH
  * Intel Corporation             - [329654] Make all sub services operate against TCF connector service
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.rse;
+package org.eclipse.tcf.internal.rse;
 
 /**
  * Markup Interface for services using the TCFConnectorService.

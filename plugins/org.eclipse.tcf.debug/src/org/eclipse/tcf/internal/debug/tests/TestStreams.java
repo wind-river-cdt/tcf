@@ -8,15 +8,15 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.tests;
+package org.eclipse.tcf.internal.debug.tests;
 
 import java.util.HashSet;
 import java.util.Random;
 
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.services.IDiagnostics;
-import org.eclipse.tm.tcf.services.IStreams;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.services.IDiagnostics;
+import org.eclipse.tcf.services.IStreams;
 
 class TestStreams implements ITCFTest, IStreams.StreamsListener {
 

@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.tests;
+package org.eclipse.tcf.internal.debug.tests;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -16,12 +16,12 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.eclipse.tm.tcf.core.Command;
-import org.eclipse.tm.tcf.core.ErrorReport;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IErrorReport;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.services.IDiagnostics;
+import org.eclipse.tcf.core.Command;
+import org.eclipse.tcf.core.ErrorReport;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IErrorReport;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.services.IDiagnostics;
 
 class TestEchoERR implements ITCFTest, IDiagnostics.DoneEchoERR {
 

@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.model;
+package org.eclipse.tcf.internal.debug.model;
 
 import java.util.Map;
 
@@ -24,14 +24,14 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.model.Breakpoint;
-import org.eclipse.tm.internal.tcf.debug.Activator;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.IBreakpoints;
+import org.eclipse.tcf.internal.debug.Activator;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.IBreakpoints;
 
 
 public class TCFBreakpoint extends Breakpoint {
 
-    public static final String MARKER_TYPE = "org.eclipse.tm.tcf.debug.breakpoint.marker";
+    public static final String MARKER_TYPE = "org.eclipse.tcf.debug.breakpoint.marker";
 
     private static final String[] attr_names = {
         TCFBreakpointsModel.ATTR_ADDRESS, "address",

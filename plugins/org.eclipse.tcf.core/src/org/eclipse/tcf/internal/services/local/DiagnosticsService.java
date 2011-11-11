@@ -8,19 +8,19 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.services.local;
+package org.eclipse.tcf.internal.services.local;
 
 import java.math.BigDecimal;
 import java.util.Map;
 
-import org.eclipse.tm.internal.tcf.core.Token;
-import org.eclipse.tm.tcf.core.Command;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IErrorReport;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.protocol.JSON;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.IDiagnostics;
+import org.eclipse.tcf.internal.core.Token;
+import org.eclipse.tcf.core.Command;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IErrorReport;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.JSON;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.IDiagnostics;
 
 
 public class DiagnosticsService implements IDiagnostics {

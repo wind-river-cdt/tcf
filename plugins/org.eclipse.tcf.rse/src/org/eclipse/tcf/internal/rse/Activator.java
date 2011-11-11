@@ -7,9 +7,9 @@
  *
  * Contributors:
  *     Wind River Systems - initial API and implementation
- *     Uwe Stieber (Wind River) - [271227] Fix compiler warnings in org.eclipse.tm.tcf.rse
+ *     Uwe Stieber (Wind River) - [271227] Fix compiler warnings in org.eclipse.tcf.rse
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.rse;
+package org.eclipse.tcf.internal.rse;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -21,7 +21,7 @@ import org.osgi.framework.BundleContext;
 public class Activator extends AbstractUIPlugin {
 
     // The plug-in ID
-    public static final String PLUGIN_ID = "org.eclipse.tm.tcf.rse"; //$NON-NLS-1$
+    public static final String PLUGIN_ID = "org.eclipse.tcf.rse"; //$NON-NLS-1$
 
     // The shared instance
     private static Activator plugin;

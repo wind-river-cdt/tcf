@@ -10,7 +10,7 @@
  *     Wind River Systems - adapted for DSF
  *     Wind River Systems - adapted for TCF
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.cdt.ui.hover;
+package org.eclipse.tcf.internal.cdt.ui.hover;
 
 import org.eclipse.debug.internal.ui.SWTFactory;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IPresentationContext;
@@ -47,8 +47,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.tm.internal.tcf.cdt.ui.Activator;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFModel;
+import org.eclipse.tcf.internal.cdt.ui.Activator;
+import org.eclipse.tcf.internal.debug.ui.model.TCFModel;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartSite;
 

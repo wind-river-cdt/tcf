@@ -12,10 +12,10 @@ package org.eclipse.tm.te.tcf.filesystem.internal.url;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.services.IFileSystem;
-import org.eclipse.tm.tcf.services.IFileSystem.DoneRead;
-import org.eclipse.tm.tcf.services.IFileSystem.FileSystemException;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.services.IFileSystem;
+import org.eclipse.tcf.services.IFileSystem.DoneRead;
+import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tm.te.tcf.filesystem.internal.nls.Messages;
 
 /**

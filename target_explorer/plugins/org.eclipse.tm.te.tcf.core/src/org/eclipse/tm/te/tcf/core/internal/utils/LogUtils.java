@@ -13,7 +13,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.tm.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tm.te.tcf.core.activator.CoreBundleActivator;
 
 

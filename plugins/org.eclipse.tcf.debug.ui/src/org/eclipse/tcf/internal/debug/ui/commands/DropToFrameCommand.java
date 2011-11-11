@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui.commands;
+package org.eclipse.tcf.internal.debug.ui.commands;
 
 import java.util.Map;
 
@@ -17,20 +17,20 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.commands.IDebugCommandRequest;
 import org.eclipse.debug.core.commands.IDropToFrameHandler;
 import org.eclipse.debug.core.commands.IEnabledStateRequest;
-import org.eclipse.tm.internal.tcf.debug.actions.TCFActionStepOut;
-import org.eclipse.tm.internal.tcf.debug.model.TCFContextState;
-import org.eclipse.tm.internal.tcf.debug.ui.Activator;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFModel;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNode;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNodeExecContext;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNodeStackFrame;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFRunnable;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.services.IBreakpoints;
-import org.eclipse.tm.tcf.services.IRunControl;
-import org.eclipse.tm.tcf.services.IRunControl.RunControlContext;
-import org.eclipse.tm.tcf.services.IStackTrace.StackTraceContext;
-import org.eclipse.tm.tcf.util.TCFDataCache;
+import org.eclipse.tcf.internal.debug.actions.TCFActionStepOut;
+import org.eclipse.tcf.internal.debug.model.TCFContextState;
+import org.eclipse.tcf.internal.debug.ui.Activator;
+import org.eclipse.tcf.internal.debug.ui.model.TCFModel;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNode;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExecContext;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeStackFrame;
+import org.eclipse.tcf.internal.debug.ui.model.TCFRunnable;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.services.IBreakpoints;
+import org.eclipse.tcf.services.IRunControl;
+import org.eclipse.tcf.services.IRunControl.RunControlContext;
+import org.eclipse.tcf.services.IStackTrace.StackTraceContext;
+import org.eclipse.tcf.util.TCFDataCache;
 
 /**
  * Drop-to-frame command handler for TCF.

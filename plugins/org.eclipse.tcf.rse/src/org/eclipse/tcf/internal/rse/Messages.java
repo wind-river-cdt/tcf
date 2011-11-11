@@ -10,7 +10,7 @@
  *     Intel Corp.            - Add TCF Connection Descriptions and File System Style
  *     Liping Ke(Intel Corp.) - Add TCF Terminal/Shell Services Descriptions
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.rse;
+package org.eclipse.tcf.internal.rse;
 
 import org.eclipse.osgi.util.NLS;
 

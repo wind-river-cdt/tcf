@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.launch;
+package org.eclipse.tcf.internal.debug.launch;
 
 import java.net.URI;
 import java.util.ArrayList;

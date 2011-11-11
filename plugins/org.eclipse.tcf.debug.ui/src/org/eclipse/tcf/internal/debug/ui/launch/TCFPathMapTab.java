@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui.launch;
+package org.eclipse.tcf.internal.debug.ui.launch;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,11 +44,11 @@ import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.tm.internal.tcf.debug.launch.TCFLaunchDelegate;
-import org.eclipse.tm.internal.tcf.debug.launch.TCFLaunchDelegate.PathMapRule;
-import org.eclipse.tm.internal.tcf.debug.ui.Activator;
-import org.eclipse.tm.internal.tcf.debug.ui.ImageCache;
-import org.eclipse.tm.tcf.services.IPathMap;
+import org.eclipse.tcf.internal.debug.launch.TCFLaunchDelegate;
+import org.eclipse.tcf.internal.debug.launch.TCFLaunchDelegate.PathMapRule;
+import org.eclipse.tcf.internal.debug.ui.Activator;
+import org.eclipse.tcf.internal.debug.ui.ImageCache;
+import org.eclipse.tcf.services.IPathMap;
 
 // TODO: add source lookup container that represents ATTR_PATH_MAP
 public class TCFPathMapTab extends AbstractLaunchConfigurationTab {
@@ -69,7 +69,7 @@ public class TCFPathMapTab extends AbstractLaunchConfigurationTab {
         50,
     };
 
-    private static final String TAB_ID = "org.eclipse.tm.tcf.launch.pathMapTab";
+    private static final String TAB_ID = "org.eclipse.tcf.launch.pathMapTab";
 
     private ArrayList<PathMapRule> map;
 

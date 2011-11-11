@@ -8,14 +8,14 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.cdt.ui.sourcelookup;
+package org.eclipse.tcf.internal.cdt.ui.sourcelookup;
 
 import org.eclipse.cdt.debug.internal.core.sourcelookup.CSourceNotFoundElement;
 import org.eclipse.cdt.debug.internal.ui.sourcelookup.CSourceNotFoundEditorInput;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.tm.internal.tcf.debug.ui.model.ISourceNotFoundPresentation;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFModel;
+import org.eclipse.tcf.internal.debug.ui.model.ISourceNotFoundPresentation;
+import org.eclipse.tcf.internal.debug.ui.model.TCFModel;
 import org.eclipse.ui.IEditorInput;
 
 /**

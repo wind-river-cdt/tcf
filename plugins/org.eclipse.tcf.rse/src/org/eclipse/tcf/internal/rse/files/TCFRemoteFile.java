@@ -8,9 +8,9 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *     Anna Dushistova (MontaVista) - [247164][tcf] a lot of file/directory properties are not supported
- *     Uwe Stieber (Wind River) - [271227] Fix compiler warnings in org.eclipse.tm.tcf.rse
+ *     Uwe Stieber (Wind River) - [271227] Fix compiler warnings in org.eclipse.tcf.rse
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.rse.files;
+package org.eclipse.tcf.internal.rse.files;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;

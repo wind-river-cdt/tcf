@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.tm.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tm.te.runtime.callback.Callback;
 import org.eclipse.tm.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tm.te.runtime.properties.PropertiesContainer;
@@ -40,7 +40,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 public class LaunchProcessesCommandHandler extends AbstractChannelCommandHandler {
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tm.te.tcf.processes.ui.internal.handler.AbstractChannelCommandHandler#execute(org.eclipse.core.commands.ExecutionEvent, org.eclipse.tm.tcf.protocol.IChannel, org.eclipse.tm.te.tcf.locator.interfaces.nodes.IPeerModel, org.eclipse.tm.te.tcf.processes.ui.internal.handler.AbstractChannelCommandHandler.DoneExecute)
+	 * @see org.eclipse.tm.te.tcf.processes.ui.internal.handler.AbstractChannelCommandHandler#execute(org.eclipse.core.commands.ExecutionEvent, org.eclipse.tcf.protocol.IChannel, org.eclipse.tm.te.tcf.locator.interfaces.nodes.IPeerModel, org.eclipse.tm.te.tcf.processes.ui.internal.handler.AbstractChannelCommandHandler.DoneExecute)
 	 */
 	@Override
 	protected void execute(final ExecutionEvent event, final IChannel channel, final IPeerModel node, final DoneExecute callback) {

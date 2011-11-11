@@ -8,14 +8,14 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.model;
+package org.eclipse.tcf.internal.debug.model;
 
 import java.math.BigInteger;
 import java.util.Map;
 
-import org.eclipse.tm.tcf.protocol.JSON;
-import org.eclipse.tm.tcf.services.IMemoryMap;
-import org.eclipse.tm.tcf.services.IMemoryMap.MemoryRegion;
+import org.eclipse.tcf.protocol.JSON;
+import org.eclipse.tcf.services.IMemoryMap;
+import org.eclipse.tcf.services.IMemoryMap.MemoryRegion;
 
 public class TCFMemoryRegion implements MemoryRegion, Comparable<TCFMemoryRegion> {
 

@@ -10,7 +10,7 @@
 package org.eclipse.tm.te.tcf.locator.interfaces.nodes;
 
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.tm.tcf.services.ILocator;
+import org.eclipse.tcf.services.ILocator;
 import org.eclipse.tm.te.tcf.locator.interfaces.IModelListener;
 import org.eclipse.tm.te.tcf.locator.interfaces.IScanner;
 import org.eclipse.tm.te.tcf.locator.interfaces.services.ILocatorModelService;

@@ -10,7 +10,7 @@
         Wind River Systems - initial API and implementation
  -->
 <feature
-      id="org.eclipse.tm.tcf.feature"
+      id="org.eclipse.tcf.feature"
       label="%featureName"
       version="0.5.0.qualifier"
       provider-name="%providerName">
@@ -28,7 +28,7 @@
    </license>
 
    <url>
-      <update label="%updateSiteName" url="http://dev.eclipse.org/svnroot/dsdp/org.eclipse.tm.tcf/releases/0.5.0"/>
+      <update label="%updateSiteName" url="http://dev.eclipse.org/svnroot/dsdp/org.eclipse.tcf/releases/0.5.0"/>
    </url>
 
    <requires>
@@ -51,28 +51,28 @@
    </requires>
 
    <plugin
-         id="org.eclipse.tm.tcf.core"
+         id="org.eclipse.tcf.core"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.tm.tcf"
+         id="org.eclipse.tcf"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.tm.tcf.debug"
+         id="org.eclipse.tcf.debug"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.tm.tcf.debug.ui"
+         id="org.eclipse.tcf.debug.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"

@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.tests;
+package org.eclipse.tcf.internal.debug.tests;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -16,16 +16,16 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
 
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.IFileSystem;
-import org.eclipse.tm.tcf.services.IFileSystem.DirEntry;
-import org.eclipse.tm.tcf.services.IFileSystem.FileAttrs;
-import org.eclipse.tm.tcf.services.IFileSystem.FileSystemException;
-import org.eclipse.tm.tcf.services.IFileSystem.IFileHandle;
-import org.eclipse.tm.tcf.util.TCFFileInputStream;
-import org.eclipse.tm.tcf.util.TCFFileOutputStream;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.IFileSystem;
+import org.eclipse.tcf.services.IFileSystem.DirEntry;
+import org.eclipse.tcf.services.IFileSystem.FileAttrs;
+import org.eclipse.tcf.services.IFileSystem.FileSystemException;
+import org.eclipse.tcf.services.IFileSystem.IFileHandle;
+import org.eclipse.tcf.util.TCFFileInputStream;
+import org.eclipse.tcf.util.TCFFileOutputStream;
 
 class TestFileSystem implements ITCFTest, IFileSystem.DoneStat,
         IFileSystem.DoneOpen, IFileSystem.DoneClose,

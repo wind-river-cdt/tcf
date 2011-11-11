@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.tests;
+package org.eclipse.tcf.internal.debug.tests;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -20,31 +20,31 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IErrorReport;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.protocol.JSON;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.IBreakpoints;
-import org.eclipse.tm.tcf.services.IDiagnostics;
-import org.eclipse.tm.tcf.services.IDisassembly;
-import org.eclipse.tm.tcf.services.ILineNumbers;
-import org.eclipse.tm.tcf.services.IMemory;
-import org.eclipse.tm.tcf.services.IMemoryMap;
-import org.eclipse.tm.tcf.services.IPathMap;
-import org.eclipse.tm.tcf.services.IRegisters;
-import org.eclipse.tm.tcf.services.IRunControl;
-import org.eclipse.tm.tcf.services.ISymbols;
-import org.eclipse.tm.tcf.services.IDiagnostics.ISymbol;
-import org.eclipse.tm.tcf.services.IDisassembly.IDisassemblyLine;
-import org.eclipse.tm.tcf.services.ILineNumbers.CodeArea;
-import org.eclipse.tm.tcf.services.IMemory.MemoryContext;
-import org.eclipse.tm.tcf.services.IMemory.MemoryError;
-import org.eclipse.tm.tcf.services.IMemoryMap.MemoryRegion;
-import org.eclipse.tm.tcf.services.IPathMap.PathMapRule;
-import org.eclipse.tm.tcf.services.IRegisters.RegistersContext;
-import org.eclipse.tm.tcf.services.IRunControl.RunControlContext;
-import org.eclipse.tm.tcf.services.ISymbols.Symbol;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IErrorReport;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.JSON;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.IBreakpoints;
+import org.eclipse.tcf.services.IDiagnostics;
+import org.eclipse.tcf.services.IDisassembly;
+import org.eclipse.tcf.services.ILineNumbers;
+import org.eclipse.tcf.services.IMemory;
+import org.eclipse.tcf.services.IMemoryMap;
+import org.eclipse.tcf.services.IPathMap;
+import org.eclipse.tcf.services.IRegisters;
+import org.eclipse.tcf.services.IRunControl;
+import org.eclipse.tcf.services.ISymbols;
+import org.eclipse.tcf.services.IDiagnostics.ISymbol;
+import org.eclipse.tcf.services.IDisassembly.IDisassemblyLine;
+import org.eclipse.tcf.services.ILineNumbers.CodeArea;
+import org.eclipse.tcf.services.IMemory.MemoryContext;
+import org.eclipse.tcf.services.IMemory.MemoryError;
+import org.eclipse.tcf.services.IMemoryMap.MemoryRegion;
+import org.eclipse.tcf.services.IPathMap.PathMapRule;
+import org.eclipse.tcf.services.IRegisters.RegistersContext;
+import org.eclipse.tcf.services.IRunControl.RunControlContext;
+import org.eclipse.tcf.services.ISymbols.Symbol;
 
 class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
 

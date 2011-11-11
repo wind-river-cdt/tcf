@@ -15,15 +15,15 @@
    <extension
          point="org.eclipse.debug.core.breakpoints">
       <breakpoint
-            markerType="org.eclipse.tm.tcf.debug.breakpoint.marker"
-            class="org.eclipse.tm.internal.tcf.debug.model.TCFBreakpoint"
-            id="org.eclipse.tm.tcf.debug.breakpoint"
+            markerType="org.eclipse.tcf.debug.breakpoint.marker"
+            class="org.eclipse.tcf.internal.debug.model.TCFBreakpoint"
+            id="org.eclipse.tcf.debug.breakpoint"
             name="TCF Breakpoint">
       </breakpoint>
    </extension>
 
    <extension
-         id="org.eclipse.tm.tcf.debug.breakpoint.marker"
+         id="org.eclipse.tcf.debug.breakpoint.marker"
          point="org.eclipse.core.resources.markers">
       <super type="org.eclipse.debug.core.breakpointMarker"/>
       <persistent value="true"/>
@@ -32,12 +32,12 @@
    <extension
          point="org.eclipse.debug.core.launchConfigurationTypes">
       <launchConfigurationType
-            sourceLocatorId="org.eclipse.tm.tcf.debug.SourceLocator"
+            sourceLocatorId="org.eclipse.tcf.debug.SourceLocator"
             name="Target Communication Framework"
-            sourcePathComputerId="org.eclipse.tm.tcf.debug.SourcePathComputer"
-            delegate="org.eclipse.tm.internal.tcf.debug.launch.TCFLaunchDelegate"
+            sourcePathComputerId="org.eclipse.tcf.debug.SourcePathComputer"
+            delegate="org.eclipse.tcf.internal.debug.launch.TCFLaunchDelegate"
             modes="run, debug"
-            id="org.eclipse.tm.tcf.debug.LaunchConfigurationType">
+            id="org.eclipse.tcf.debug.LaunchConfigurationType">
       </launchConfigurationType>
    </extension>
 
@@ -45,16 +45,16 @@
          point="org.eclipse.debug.core.sourceLocators">
       <sourceLocator
             name="TCF Source Lookup Director"
-            class="org.eclipse.tm.internal.tcf.debug.launch.TCFSourceLookupDirector"
-            id="org.eclipse.tm.tcf.debug.SourceLocator">
+            class="org.eclipse.tcf.internal.debug.launch.TCFSourceLookupDirector"
+            id="org.eclipse.tcf.debug.SourceLocator">
       </sourceLocator>
    </extension>
 
    <extension
          point="org.eclipse.debug.core.sourcePathComputers">
       <sourcePathComputer
-            class="org.eclipse.tm.internal.tcf.debug.launch.TCFSourcePathComputerDelegate"
-            id="org.eclipse.tm.tcf.debug.SourcePathComputer">
+            class="org.eclipse.tcf.internal.debug.launch.TCFSourcePathComputerDelegate"
+            id="org.eclipse.tcf.debug.SourcePathComputer">
       </sourcePathComputer>
    </extension>
 </plugin>

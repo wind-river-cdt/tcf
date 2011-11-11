@@ -10,7 +10,7 @@
         Wind River Systems - initial API and implementation
  -->
 <feature
-      id="org.eclipse.tm.tcf.cdt.feature"
+      id="org.eclipse.tcf.cdt.feature"
       label="%featureName"
       version="0.5.0.qualifier"
       provider-name="%providerName">
@@ -28,11 +28,11 @@
    </license>
 
    <url>
-      <update label="%updateSiteName" url="http://dev.eclipse.org/svnroot/dsdp/org.eclipse.tm.tcf/releases/0.5.0"/>
+      <update label="%updateSiteName" url="http://dev.eclipse.org/svnroot/dsdp/org.eclipse.tcf/releases/0.5.0"/>
    </url>
 
    <includes
-         id="org.eclipse.tm.tcf.feature"
+         id="org.eclipse.tcf.feature"
          version="0.0.0"/>
 
    <requires>
@@ -48,15 +48,15 @@
       <import feature="org.eclipse.cdt" version="8.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.text" version="3.5.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.cdt.debug.ui"/>
-      <import plugin="org.eclipse.tm.tcf.core"/>
-      <import plugin="org.eclipse.tm.tcf.debug"/>
-      <import plugin="org.eclipse.tm.tcf.debug.ui"/>
+      <import plugin="org.eclipse.tcf.core"/>
+      <import plugin="org.eclipse.tcf.debug"/>
+      <import plugin="org.eclipse.tcf.debug.ui"/>
       <import plugin="org.eclipse.jface.text" version="3.5.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.cdt.launch" version="7.0.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
-         id="org.eclipse.tm.tcf.cdt.ui"
+         id="org.eclipse.tcf.cdt.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"

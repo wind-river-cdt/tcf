@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf;
+package org.eclipse.tcf.internal;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
@@ -18,11 +18,11 @@ import org.osgi.util.tracker.ServiceTracker;
 
 public class Activator implements  BundleActivator {
 
-    private static final String TCF_INTEGRATION_BUNDLE_ID = "org.eclipse.tm.tcf";
+    private static final String TCF_INTEGRATION_BUNDLE_ID = "org.eclipse.tcf";
 
     public void start(BundleContext context) throws Exception {
         /*
-         * Activate TCF Eclipse integration bundle "org.eclipse.tm.tcf".
+         * Activate TCF Eclipse integration bundle "org.eclipse.tcf".
          * It must be activated explicitly, because default activation through
          * class loading may never happen - most client don't need classes from that bundle.
          */

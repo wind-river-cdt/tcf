@@ -8,19 +8,19 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.tcf.core;
+package org.eclipse.tcf.core;
 
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.eclipse.tm.internal.tcf.core.RemotePeer;
-import org.eclipse.tm.internal.tcf.services.local.LocatorService;
-import org.eclipse.tm.tcf.protocol.IPeer;
-import org.eclipse.tm.tcf.protocol.JSON;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.ILocator;
-import org.eclipse.tm.tcf.services.ILocator.LocatorListener;
+import org.eclipse.tcf.internal.core.RemotePeer;
+import org.eclipse.tcf.internal.services.local.LocatorService;
+import org.eclipse.tcf.protocol.IPeer;
+import org.eclipse.tcf.protocol.JSON;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.ILocator;
+import org.eclipse.tcf.services.ILocator.LocatorListener;
 
 /**
  * Abstract implementation of IPeer interface.

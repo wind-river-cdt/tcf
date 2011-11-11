@@ -12,7 +12,7 @@ package org.eclipse.tm.te.tcf.core.utils;
 import java.util.concurrent.ExecutionException;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.tm.tcf.util.TCFTask;
+import org.eclipse.tcf.util.TCFTask;
 
 /**
  * Exception utilities helper implementations.

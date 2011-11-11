@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.cdt.ui.disassembly;
+package org.eclipse.tcf.internal.cdt.ui.disassembly;
 
 import static org.eclipse.cdt.debug.internal.ui.disassembly.dsf.DisassemblyUtils.DEBUG;
 
@@ -35,39 +35,39 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocumentExtension4;
 import org.eclipse.jface.text.Position;
-import org.eclipse.tm.internal.tcf.cdt.ui.Activator;
-import org.eclipse.tm.internal.tcf.debug.launch.TCFSourceLookupDirector;
-import org.eclipse.tm.internal.tcf.debug.model.TCFContextState;
-import org.eclipse.tm.internal.tcf.debug.model.TCFSourceRef;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFChildrenStackTrace;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFModel;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNode;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNodeExecContext;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNodeStackFrame;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IChannel.IChannelListener;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.protocol.JSON;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.IDisassembly;
-import org.eclipse.tm.tcf.services.IDisassembly.DoneDisassemble;
-import org.eclipse.tm.tcf.services.IDisassembly.IDisassemblyLine;
-import org.eclipse.tm.tcf.services.IExpressions;
-import org.eclipse.tm.tcf.services.IExpressions.DoneCreate;
-import org.eclipse.tm.tcf.services.IExpressions.DoneDispose;
-import org.eclipse.tm.tcf.services.IExpressions.DoneEvaluate;
-import org.eclipse.tm.tcf.services.IExpressions.Expression;
-import org.eclipse.tm.tcf.services.IExpressions.Value;
-import org.eclipse.tm.tcf.services.ILineNumbers;
-import org.eclipse.tm.tcf.services.ILineNumbers.CodeArea;
-import org.eclipse.tm.tcf.services.ILineNumbers.DoneMapToSource;
-import org.eclipse.tm.tcf.services.IMemory;
-import org.eclipse.tm.tcf.services.IRunControl;
-import org.eclipse.tm.tcf.services.IRunControl.RunControlContext;
-import org.eclipse.tm.tcf.services.IRunControl.RunControlListener;
-import org.eclipse.tm.tcf.services.ISymbols;
-import org.eclipse.tm.tcf.util.TCFDataCache;
-import org.eclipse.tm.tcf.util.TCFTask;
+import org.eclipse.tcf.internal.cdt.ui.Activator;
+import org.eclipse.tcf.internal.debug.launch.TCFSourceLookupDirector;
+import org.eclipse.tcf.internal.debug.model.TCFContextState;
+import org.eclipse.tcf.internal.debug.model.TCFSourceRef;
+import org.eclipse.tcf.internal.debug.ui.model.TCFChildrenStackTrace;
+import org.eclipse.tcf.internal.debug.ui.model.TCFModel;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNode;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExecContext;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeStackFrame;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IChannel.IChannelListener;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.JSON;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.IDisassembly;
+import org.eclipse.tcf.services.IDisassembly.DoneDisassemble;
+import org.eclipse.tcf.services.IDisassembly.IDisassemblyLine;
+import org.eclipse.tcf.services.IExpressions;
+import org.eclipse.tcf.services.IExpressions.DoneCreate;
+import org.eclipse.tcf.services.IExpressions.DoneDispose;
+import org.eclipse.tcf.services.IExpressions.DoneEvaluate;
+import org.eclipse.tcf.services.IExpressions.Expression;
+import org.eclipse.tcf.services.IExpressions.Value;
+import org.eclipse.tcf.services.ILineNumbers;
+import org.eclipse.tcf.services.ILineNumbers.CodeArea;
+import org.eclipse.tcf.services.ILineNumbers.DoneMapToSource;
+import org.eclipse.tcf.services.IMemory;
+import org.eclipse.tcf.services.IRunControl;
+import org.eclipse.tcf.services.IRunControl.RunControlContext;
+import org.eclipse.tcf.services.IRunControl.RunControlListener;
+import org.eclipse.tcf.services.ISymbols;
+import org.eclipse.tcf.util.TCFDataCache;
+import org.eclipse.tcf.util.TCFTask;
 import org.eclipse.ui.PlatformUI;
 
 @SuppressWarnings("restriction")

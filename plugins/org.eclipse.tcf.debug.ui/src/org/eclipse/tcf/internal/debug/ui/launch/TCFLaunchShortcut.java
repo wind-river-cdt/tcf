@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui.launch;
+package org.eclipse.tcf.internal.debug.ui.launch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,8 +29,8 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.tm.internal.tcf.debug.launch.TCFLaunchDelegate;
-import org.eclipse.tm.internal.tcf.debug.ui.Activator;
+import org.eclipse.tcf.internal.debug.launch.TCFLaunchDelegate;
+import org.eclipse.tcf.internal.debug.ui.Activator;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
@@ -42,7 +42,7 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
  */
 public class TCFLaunchShortcut implements ILaunchShortcut {
 
-    private static final String LAUNCH_CONFIGURATION_TYPE_ID = "org.eclipse.tm.tcf.debug.LaunchConfigurationType"; //$NON-NLS-1$
+    private static final String LAUNCH_CONFIGURATION_TYPE_ID = "org.eclipse.tcf.debug.LaunchConfigurationType"; //$NON-NLS-1$
 
     public void launch(ISelection selection, String mode) {
         if (selection instanceof IStructuredSelection) {

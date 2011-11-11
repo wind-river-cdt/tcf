@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui.model;
+package org.eclipse.tcf.internal.debug.ui.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,7 +29,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.tm.tcf.protocol.Protocol;
+import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.ui.IWorkbenchPartSite;
 
 /**
@@ -38,7 +38,7 @@ import org.eclipse.ui.IWorkbenchPartSite;
  */
 public class TCFDetailPane implements IDetailPane {
 
-    public static final String ID = "org.eclipse.tm.tcf.debug.DetailPaneFactory";
+    public static final String ID = "org.eclipse.tcf.debug.DetailPaneFactory";
     public static final String NAME = "TCF Detail Pane";
     public static final String DESC = "TCF Detail Pane";
 

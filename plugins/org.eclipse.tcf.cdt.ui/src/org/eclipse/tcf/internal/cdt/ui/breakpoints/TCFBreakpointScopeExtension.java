@@ -8,15 +8,15 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.cdt.ui.breakpoints;
+package org.eclipse.tcf.internal.cdt.ui.breakpoints;
 
 import org.eclipse.cdt.debug.core.model.ICBreakpoint;
 import org.eclipse.cdt.debug.core.model.ICBreakpointExtension;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.tm.internal.tcf.cdt.ui.Activator;
-import org.eclipse.tm.internal.tcf.debug.model.ITCFConstants;
-import org.eclipse.tm.tcf.services.IBreakpoints;
+import org.eclipse.tcf.internal.cdt.ui.Activator;
+import org.eclipse.tcf.internal.debug.model.ITCFConstants;
+import org.eclipse.tcf.services.IBreakpoints;
 
 public class TCFBreakpointScopeExtension implements ICBreakpointExtension {
 

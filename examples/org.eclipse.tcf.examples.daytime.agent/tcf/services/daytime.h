@@ -20,8 +20,8 @@
 #ifndef DAYTIME_H_
 #define DAYTIME_H_
 
-#include <config.h>
-#include <framework/protocol.h>
+#include <tcf/config.h>
+#include <tcf/framework/protocol.h>
 
 extern void ini_daytime_service(Protocol * proto);
 

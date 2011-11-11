@@ -9,7 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tm.te.tcf.terminals.core.interfaces.launcher;
 
-import org.eclipse.tm.tcf.services.ITerminals;
+import org.eclipse.tcf.services.ITerminals;
 
 /**
  * Remote terminal context aware listener.

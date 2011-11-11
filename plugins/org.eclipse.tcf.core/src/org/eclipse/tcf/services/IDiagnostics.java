@@ -8,12 +8,12 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.tcf.services;
+package org.eclipse.tcf.services;
 
 import java.math.BigDecimal;
 
-import org.eclipse.tm.tcf.protocol.IService;
-import org.eclipse.tm.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.IService;
+import org.eclipse.tcf.protocol.IToken;
 
 /**
  * This is optional service that can be implemented by a peer.

@@ -9,7 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tm.te.tcf.processes.core.interfaces.launcher;
 
-import org.eclipse.tm.tcf.services.IProcesses;
+import org.eclipse.tcf.services.IProcesses;
 
 /**
  * Remote process context aware listener.

@@ -8,7 +8,7 @@
  * Contributors:
  *     Anyware Technologies  - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.tcf.protocol;
+package org.eclipse.tcf.protocol;
 
 /**
  * Clients can implement this interface if they want to provide implementation of a local service or

@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.cdt.ui;
+package org.eclipse.tcf.internal.cdt.ui;
 
 import org.eclipse.cdt.debug.core.model.IReverseResumeHandler;
 import org.eclipse.cdt.debug.core.model.IReverseStepIntoHandler;
@@ -22,22 +22,22 @@ import org.eclipse.cdt.debug.ui.IPinProvider;
 import org.eclipse.cdt.ui.text.c.hover.ICEditorTextHover;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.debug.core.model.ISuspendResume;
-import org.eclipse.tm.internal.tcf.cdt.ui.breakpoints.TCFWatchpointTarget;
-import org.eclipse.tm.internal.tcf.cdt.ui.commands.TCFPinViewCommand;
-import org.eclipse.tm.internal.tcf.cdt.ui.commands.TCFReverseResumeCommand;
-import org.eclipse.tm.internal.tcf.cdt.ui.commands.TCFReverseStepIntoCommand;
-import org.eclipse.tm.internal.tcf.cdt.ui.commands.TCFReverseStepOverCommand;
-import org.eclipse.tm.internal.tcf.cdt.ui.commands.TCFReverseStepReturnCommand;
-import org.eclipse.tm.internal.tcf.cdt.ui.commands.TCFReverseToggleCommand;
-import org.eclipse.tm.internal.tcf.cdt.ui.disassembly.TCFDisassemblyBackend;
-import org.eclipse.tm.internal.tcf.cdt.ui.hover.TCFDebugTextHover;
-import org.eclipse.tm.internal.tcf.cdt.ui.sourcelookup.TCFSourceNotFoundPresentation;
-import org.eclipse.tm.internal.tcf.debug.ui.model.ISourceNotFoundPresentation;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFModel;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNode;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNodeExecContext;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNodeExpression;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNodeStackFrame;
+import org.eclipse.tcf.internal.cdt.ui.breakpoints.TCFWatchpointTarget;
+import org.eclipse.tcf.internal.cdt.ui.commands.TCFPinViewCommand;
+import org.eclipse.tcf.internal.cdt.ui.commands.TCFReverseResumeCommand;
+import org.eclipse.tcf.internal.cdt.ui.commands.TCFReverseStepIntoCommand;
+import org.eclipse.tcf.internal.cdt.ui.commands.TCFReverseStepOverCommand;
+import org.eclipse.tcf.internal.cdt.ui.commands.TCFReverseStepReturnCommand;
+import org.eclipse.tcf.internal.cdt.ui.commands.TCFReverseToggleCommand;
+import org.eclipse.tcf.internal.cdt.ui.disassembly.TCFDisassemblyBackend;
+import org.eclipse.tcf.internal.cdt.ui.hover.TCFDebugTextHover;
+import org.eclipse.tcf.internal.cdt.ui.sourcelookup.TCFSourceNotFoundPresentation;
+import org.eclipse.tcf.internal.debug.ui.model.ISourceNotFoundPresentation;
+import org.eclipse.tcf.internal.debug.ui.model.TCFModel;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNode;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExecContext;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExpression;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeStackFrame;
 
 @SuppressWarnings({ "rawtypes", "restriction" })
 public class TCFNodeAdapterFactory implements IAdapterFactory {

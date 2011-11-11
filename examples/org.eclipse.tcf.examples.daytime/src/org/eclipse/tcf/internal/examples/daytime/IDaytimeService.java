@@ -9,10 +9,10 @@
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tm.internal.tcf.examples.daytime;
+package org.eclipse.tcf.internal.examples.daytime;
 
-import org.eclipse.tm.tcf.protocol.IService;
-import org.eclipse.tm.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.IService;
+import org.eclipse.tcf.protocol.IToken;
 
 /**
  * IDaytimeService allows retrieving the time of day from a remote system.

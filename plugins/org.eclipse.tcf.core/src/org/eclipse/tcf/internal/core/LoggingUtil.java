@@ -8,11 +8,11 @@
  * Contributors:
  *     Freescale Semiconductor - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.core;
+package org.eclipse.tcf.internal.core;
 
 import java.text.DecimalFormatSymbols;
 
-import org.eclipse.tm.tcf.protocol.Protocol;
+import org.eclipse.tcf.protocol.Protocol;
 
 /**
  * Internal utility methods used for logging/tracing.

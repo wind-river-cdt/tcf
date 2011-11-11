@@ -11,7 +11,7 @@
  *    Sheldon D'souza  (Celunite)    - LoginThread and readUntil implementation
  *    Liping Ke        (Intel Corp.) - For non-login mode, we don't need detect command prompt
  ******************************************************************************/
-package org.eclipse.tm.internal.tcf.rse.shells;
+package org.eclipse.tcf.internal.rse.shells;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -32,14 +32,14 @@ import org.eclipse.rse.services.clientserver.messages.SystemMessageException;
 import org.eclipse.rse.services.terminals.AbstractTerminalShell;
 import org.eclipse.rse.services.terminals.ITerminalService;
 import org.eclipse.rse.ui.SystemBasePlugin;
-import org.eclipse.tm.internal.tcf.rse.ITCFSessionProvider;
-import org.eclipse.tm.internal.tcf.rse.Messages;
-import org.eclipse.tm.internal.tcf.rse.TCFConnectorService;
-import org.eclipse.tm.internal.tcf.rse.TCFRSETask;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.services.IStreams;
-import org.eclipse.tm.tcf.services.ITerminals;
+import org.eclipse.tcf.internal.rse.ITCFSessionProvider;
+import org.eclipse.tcf.internal.rse.Messages;
+import org.eclipse.tcf.internal.rse.TCFConnectorService;
+import org.eclipse.tcf.internal.rse.TCFRSETask;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.services.IStreams;
+import org.eclipse.tcf.services.ITerminals;
 
 
 public class TCFTerminalShell extends AbstractTerminalShell {
@@ -312,7 +312,7 @@ public class TCFTerminalShell extends AbstractTerminalShell {
                 SystemMessage msg;
 
                 if (nestedException!=null) {
-                    msg = new SimpleSystemMessage(org.eclipse.tm.internal.tcf.rse.Activator.PLUGIN_ID,
+                    msg = new SimpleSystemMessage(org.eclipse.tcf.internal.rse.Activator.PLUGIN_ID,
                             ICommonMessageIds.MSG_EXCEPTION_OCCURRED,
                             IStatus.ERROR,
                             CommonMessages.MSG_EXCEPTION_OCCURRED, nestedException);
@@ -325,7 +325,7 @@ public class TCFTerminalShell extends AbstractTerminalShell {
                     else
                         strErr = "Not identified Errors";//$NON-NLS-1$
 
-                    msg = new SimpleSystemMessage(org.eclipse.tm.internal.tcf.rse.Activator.PLUGIN_ID,
+                    msg = new SimpleSystemMessage(org.eclipse.tcf.internal.rse.Activator.PLUGIN_ID,
                             ICommonMessageIds.MSG_COMM_AUTH_FAILED,
                             IStatus.ERROR,
                             strErr,

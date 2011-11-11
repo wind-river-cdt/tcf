@@ -8,15 +8,15 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug;
+package org.eclipse.tcf.internal.debug;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.tm.internal.tcf.debug.launch.TCFLocalAgent;
-import org.eclipse.tm.internal.tcf.debug.launch.TCFUserDefPeer;
-import org.eclipse.tm.internal.tcf.debug.model.TCFBreakpointsModel;
-import org.eclipse.tm.tcf.protocol.Protocol;
+import org.eclipse.tcf.internal.debug.launch.TCFLocalAgent;
+import org.eclipse.tcf.internal.debug.launch.TCFUserDefPeer;
+import org.eclipse.tcf.internal.debug.model.TCFBreakpointsModel;
+import org.eclipse.tcf.protocol.Protocol;
 import org.osgi.framework.BundleContext;
 
 
@@ -26,7 +26,7 @@ import org.osgi.framework.BundleContext;
 public class Activator extends Plugin {
 
     // The plug-in ID
-    public static final String PLUGIN_ID = "org.eclipse.tm.tcf.debug";
+    public static final String PLUGIN_ID = "org.eclipse.tcf.debug";
 
     // The shared instance
     private static Activator plugin;

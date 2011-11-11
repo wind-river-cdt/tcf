@@ -17,12 +17,12 @@
  * Sample TCF service implementation.
  */
 
-#include <config.h>
+#include <tcf/config.h>
 #include <time.h>
-#include <framework/json.h>
-#include <framework/errors.h>
-#include <framework/exceptions.h>
-#include <daytime.h>
+#include <tcf/framework/json.h>
+#include <tcf/framework/errors.h>
+#include <tcf/framework/exceptions.h>
+#include <tcf/services/daytime.h>
 
 static const char * DAYTIME = "Daytime";
 

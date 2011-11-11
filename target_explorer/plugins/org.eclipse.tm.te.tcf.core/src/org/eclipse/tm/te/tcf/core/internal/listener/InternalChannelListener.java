@@ -11,8 +11,8 @@ package org.eclipse.tm.te.tcf.core.internal.listener;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.Protocol;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tm.te.tcf.core.Tcf;
 import org.eclipse.tm.te.tcf.core.internal.interfaces.IChannelOpenListener;
 import org.eclipse.tm.te.tcf.core.internal.nls.Messages;
@@ -46,14 +46,14 @@ public class InternalChannelListener implements IChannel.IChannelListener {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tm.tcf.protocol.IChannel.IChannelListener#congestionLevel(int)
+	 * @see org.eclipse.tcf.protocol.IChannel.IChannelListener#congestionLevel(int)
 	 */
 	@Override
 	public void congestionLevel(int level) {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tm.tcf.protocol.IChannel.IChannelListener#onChannelClosed(java.lang.Throwable)
+	 * @see org.eclipse.tcf.protocol.IChannel.IChannelListener#onChannelClosed(java.lang.Throwable)
 	 */
 	@Override
 	public void onChannelClosed(Throwable error) {
@@ -92,7 +92,7 @@ public class InternalChannelListener implements IChannel.IChannelListener {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tm.tcf.protocol.IChannel.IChannelListener#onChannelOpened()
+	 * @see org.eclipse.tcf.protocol.IChannel.IChannelListener#onChannelOpened()
 	 */
 	@Override
 	public void onChannelOpened() {

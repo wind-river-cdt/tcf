@@ -9,7 +9,7 @@
  *     Wind River Systems - initial API and implementation
  * Martin Oberhuber (Wind River) - [238564] Adopt TM 3.0 APIs
  ******************************************************************************/
-package org.eclipse.tm.internal.tcf.rse.files;
+package org.eclipse.tcf.internal.rse.files;
 
 import org.eclipse.rse.services.files.IHostFile;
 import org.eclipse.rse.subsystems.files.core.servicesubsystem.AbstractRemoteFile;

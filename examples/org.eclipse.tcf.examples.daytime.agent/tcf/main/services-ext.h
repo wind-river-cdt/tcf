@@ -19,7 +19,7 @@
  * a customized version of services-ext.h file can be added to compiler headers search paths.
  */
 
-#include "daytime.h"
+#include <tcf/services/daytime.h>
 
 static void ini_ext_services(Protocol * proto, TCFBroadcastGroup * bcg) {
     ini_daytime_service(proto);

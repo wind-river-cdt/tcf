@@ -9,12 +9,12 @@
  *     Wind River Systems - initial API and implementation
  *     Martin Oberhuber (Wind River) - [238564] Adopt TM 3.0 APIs
  *     Uwe Stieber (Wind River) - [271224] NPE in TCFFileService#download
- *     Uwe Stieber (Wind River) - [271227] Fix compiler warnings in org.eclipse.tm.tcf.rse
+ *     Uwe Stieber (Wind River) - [271227] Fix compiler warnings in org.eclipse.tcf.rse
  *     Uwe Stieber (Wind River) - [274277] The TCF file service subsystem implementation is not updating the progress monitor
  *     Intel Corporation        - [326489] Make recursive copy/delete available (delete/copy a folder contains files)
  *     Intel Corporation        - [329654] Make all sub services operate against TCF connector service
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.rse.files;
+package org.eclipse.tcf.internal.rse.files;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -44,21 +44,21 @@ import org.eclipse.rse.services.clientserver.messages.SystemMessageException;
 import org.eclipse.rse.services.clientserver.messages.SystemOperationFailedException;
 import org.eclipse.rse.services.files.AbstractFileService;
 import org.eclipse.rse.services.files.IHostFile;
-import org.eclipse.tm.internal.tcf.rse.Activator;
-import org.eclipse.tm.internal.tcf.rse.ITCFService;
-import org.eclipse.tm.internal.tcf.rse.Messages;
-import org.eclipse.tm.internal.tcf.rse.TCFConnectorService;
-import org.eclipse.tm.internal.tcf.rse.TCFConnectorServiceManager;
-import org.eclipse.tm.internal.tcf.rse.TCFRSETask;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.IFileSystem;
-import org.eclipse.tm.tcf.services.IFileSystem.DirEntry;
-import org.eclipse.tm.tcf.services.IFileSystem.FileAttrs;
-import org.eclipse.tm.tcf.services.IFileSystem.FileSystemException;
-import org.eclipse.tm.tcf.services.IFileSystem.IFileHandle;
-import org.eclipse.tm.tcf.util.TCFFileInputStream;
-import org.eclipse.tm.tcf.util.TCFFileOutputStream;
+import org.eclipse.tcf.internal.rse.Activator;
+import org.eclipse.tcf.internal.rse.ITCFService;
+import org.eclipse.tcf.internal.rse.Messages;
+import org.eclipse.tcf.internal.rse.TCFConnectorService;
+import org.eclipse.tcf.internal.rse.TCFConnectorServiceManager;
+import org.eclipse.tcf.internal.rse.TCFRSETask;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.IFileSystem;
+import org.eclipse.tcf.services.IFileSystem.DirEntry;
+import org.eclipse.tcf.services.IFileSystem.FileAttrs;
+import org.eclipse.tcf.services.IFileSystem.FileSystemException;
+import org.eclipse.tcf.services.IFileSystem.IFileHandle;
+import org.eclipse.tcf.util.TCFFileInputStream;
+import org.eclipse.tcf.util.TCFFileOutputStream;
 
 
 public class TCFFileService extends AbstractFileService {

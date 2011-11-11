@@ -8,12 +8,12 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *     Martin Oberhuber (Wind River) - [269682] Get port from RSE Property
- *     Uwe Stieber      (Wind River) - [271227] Fix compiler warnings in org.eclipse.tm.tcf.rse
+ *     Uwe Stieber      (Wind River) - [271227] Fix compiler warnings in org.eclipse.tcf.rse
  *     Anna Dushistova  (MontaVista) - [285373] TCFConnectorService should send CommunicationsEvent.BEFORE_CONNECT and CommunicationsEvent.BEFORE_DISCONNECT
  *     Liping Ke        (Intel Corp.)- [326490] Add authentication to the TCF Connector Service and attach stream subs/unsubs method
  *     Jeff Johnston    (RedHat)     - [350752] TCFConnectorService doesn't recognize connections with SSL transport
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.rse;
+package org.eclipse.tcf.internal.rse;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,18 +29,18 @@ import org.eclipse.rse.core.model.SystemSignonInformation;
 import org.eclipse.rse.core.subsystems.CommunicationsEvent;
 import org.eclipse.rse.services.files.RemoteFileException;
 import org.eclipse.rse.ui.subsystems.StandardConnectorService;
-import org.eclipse.tm.tcf.core.AbstractPeer;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IPeer;
-import org.eclipse.tm.tcf.protocol.IService;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.IFileSystem;
-import org.eclipse.tm.tcf.services.ILocator;
-import org.eclipse.tm.tcf.services.IStreams;
-import org.eclipse.tm.tcf.services.ISysMonitor;
-import org.eclipse.tm.tcf.services.ITerminals;
-import org.eclipse.tm.tcf.util.TCFTask;
+import org.eclipse.tcf.core.AbstractPeer;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IPeer;
+import org.eclipse.tcf.protocol.IService;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.IFileSystem;
+import org.eclipse.tcf.services.ILocator;
+import org.eclipse.tcf.services.IStreams;
+import org.eclipse.tcf.services.ISysMonitor;
+import org.eclipse.tcf.services.ITerminals;
+import org.eclipse.tcf.util.TCFTask;
 
 
 public class TCFConnectorService extends StandardConnectorService implements ITCFSessionProvider{

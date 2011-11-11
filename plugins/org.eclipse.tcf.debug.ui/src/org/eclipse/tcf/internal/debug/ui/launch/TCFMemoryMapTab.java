@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui.launch;
+package org.eclipse.tcf.internal.debug.ui.launch;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -20,13 +20,13 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tm.internal.tcf.debug.ui.ImageCache;
-import org.eclipse.tm.internal.tcf.debug.ui.commands.MemoryMapWidget;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFNode;
+import org.eclipse.tcf.internal.debug.ui.ImageCache;
+import org.eclipse.tcf.internal.debug.ui.commands.MemoryMapWidget;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNode;
 
 public class TCFMemoryMapTab extends AbstractLaunchConfigurationTab {
 
-    private static final String TAB_ID = "org.eclipse.tm.tcf.launch.memoryMapTab";
+    private static final String TAB_ID = "org.eclipse.tcf.launch.memoryMapTab";
 
     private MemoryMapWidget widget;
 

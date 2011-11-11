@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui.model;
+package org.eclipse.tcf.internal.debug.ui.model;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -43,21 +43,21 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.tm.internal.tcf.debug.launch.TCFSourceLookupDirector;
-import org.eclipse.tm.internal.tcf.debug.model.ITCFBreakpointListener;
-import org.eclipse.tm.internal.tcf.debug.model.TCFBreakpointsStatus;
-import org.eclipse.tm.internal.tcf.debug.model.TCFContextState;
-import org.eclipse.tm.internal.tcf.debug.model.TCFLaunch;
-import org.eclipse.tm.internal.tcf.debug.model.TCFSourceRef;
-import org.eclipse.tm.internal.tcf.debug.ui.Activator;
-import org.eclipse.tm.internal.tcf.debug.ui.ImageCache;
-import org.eclipse.tm.tcf.protocol.JSON;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.IBreakpoints;
-import org.eclipse.tm.tcf.services.ILineNumbers;
-import org.eclipse.tm.tcf.services.IRunControl;
-import org.eclipse.tm.tcf.util.TCFDataCache;
-import org.eclipse.tm.tcf.util.TCFTask;
+import org.eclipse.tcf.internal.debug.launch.TCFSourceLookupDirector;
+import org.eclipse.tcf.internal.debug.model.ITCFBreakpointListener;
+import org.eclipse.tcf.internal.debug.model.TCFBreakpointsStatus;
+import org.eclipse.tcf.internal.debug.model.TCFContextState;
+import org.eclipse.tcf.internal.debug.model.TCFLaunch;
+import org.eclipse.tcf.internal.debug.model.TCFSourceRef;
+import org.eclipse.tcf.internal.debug.ui.Activator;
+import org.eclipse.tcf.internal.debug.ui.ImageCache;
+import org.eclipse.tcf.protocol.JSON;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.IBreakpoints;
+import org.eclipse.tcf.services.ILineNumbers;
+import org.eclipse.tcf.services.IRunControl;
+import org.eclipse.tcf.util.TCFDataCache;
+import org.eclipse.tcf.util.TCFTask;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
@@ -72,9 +72,9 @@ import org.eclipse.ui.texteditor.ITextEditor;
 public class TCFAnnotationManager {
 
     private static final String
-        TYPE_BP_INSTANCE = "org.eclipse.tm.tcf.debug.breakpoint_instance",
-        TYPE_TOP_FRAME = "org.eclipse.tm.tcf.debug.top_frame",
-        TYPE_STACK_FRAME = "org.eclipse.tm.tcf.debug.stack_frame";
+        TYPE_BP_INSTANCE = "org.eclipse.tcf.debug.breakpoint_instance",
+        TYPE_TOP_FRAME = "org.eclipse.tcf.debug.top_frame",
+        TYPE_STACK_FRAME = "org.eclipse.tcf.debug.stack_frame";
 
     class TCFAnnotation extends Annotation {
 

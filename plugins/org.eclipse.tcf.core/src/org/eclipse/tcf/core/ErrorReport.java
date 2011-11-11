@@ -8,12 +8,12 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.tcf.core;
+package org.eclipse.tcf.core;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.tm.tcf.protocol.IErrorReport;
+import org.eclipse.tcf.protocol.IErrorReport;
 
 public class ErrorReport extends Exception implements IErrorReport {
 

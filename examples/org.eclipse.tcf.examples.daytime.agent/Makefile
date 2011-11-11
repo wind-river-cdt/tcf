@@ -1,4 +1,4 @@
-TCF_AGENT_DIR=../../../org.eclipse.tcf.agent
+TCF_AGENT_DIR=../../../org.eclipse.tcf.agent/agent
 
 include $(TCF_AGENT_DIR)/Makefile.inc
 
@@ -15,8 +15,8 @@ $(BINDIR)/libtcf$(EXTLIB) : $(OFILES)
 	$(AR) -rc $@ $^
 	$(RANLIB)
 
-$(BINDIR)/agent$(EXTEXE): $(BINDIR)/main/main$(EXTOBJ) $(BINDIR)/libtcf$(EXTLIB)
-	$(CC) $(CFLAGS) -o $@ $(BINDIR)/main/main$(EXTOBJ) $(BINDIR)/libtcf$(EXTLIB) $(LIBS)
+$(BINDIR)/agent$(EXTEXE): $(BINDIR)/tcf/main/main$(EXTOBJ) $(BINDIR)/libtcf$(EXTLIB)
+	$(CC) $(CFLAGS) -o $@ $(BINDIR)/tcf/main/main$(EXTOBJ) $(BINDIR)/libtcf$(EXTLIB) $(LIBS)
 
 $(BINDIR)/%$(EXTOBJ): %.c $(HFILES) Makefile
 	@$(call MKDIR,$(dir $@))

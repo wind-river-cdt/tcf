@@ -9,12 +9,12 @@
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tm.internal.tcf.examples.daytime;
+package org.eclipse.tcf.internal.examples.daytime;
 
-import org.eclipse.tm.tcf.core.Command;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.protocol.Protocol;
+import org.eclipse.tcf.core.Command;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.Protocol;
 
 
 public class DaytimeServiceProxy implements IDaytimeService {
@@ -58,7 +58,7 @@ public class DaytimeServiceProxy implements IDaytimeService {
         /*
          * Make Daytime Service proxy available to all potential clients by creating
          * the proxy object every time a TCF communication channel is opened.
-         * Note: extension point "org.eclipse.tm.tcf.startup" is used to load this class
+         * Note: extension point "org.eclipse.tcf.startup" is used to load this class
          * at TCF startup time, so proxy factory is properly activated even if nobody
          * import directly from this plugin.
          */

@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.tests;
+package org.eclipse.tcf.internal.debug.tests;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,12 +17,12 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.IDiagnostics;
-import org.eclipse.tm.tcf.services.IRunControl;
-import org.eclipse.tm.tcf.services.IRunControl.RunControlContext;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.IDiagnostics;
+import org.eclipse.tcf.services.IRunControl;
+import org.eclipse.tcf.services.IRunControl.RunControlContext;
 
 class RunControl {
 
@@ -123,7 +123,7 @@ class RunControl {
             getState();
             startTimer();
         }
-        enable_trace = System.getProperty("org.eclipse.tm.tcf.debug.tracing.tests.runcontrol") != null;
+        enable_trace = System.getProperty("org.eclipse.tcf.debug.tracing.tests.runcontrol") != null;
     }
 
     private void getState() {

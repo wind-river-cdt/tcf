@@ -8,11 +8,11 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.cdt.ui.commands;
+package org.eclipse.tcf.internal.cdt.ui.commands;
 
 import org.eclipse.cdt.debug.core.model.IReverseResumeHandler;
-import org.eclipse.tm.internal.tcf.debug.ui.commands.BackResumeCommand;
-import org.eclipse.tm.internal.tcf.debug.ui.model.TCFModel;
+import org.eclipse.tcf.internal.debug.ui.commands.BackResumeCommand;
+import org.eclipse.tcf.internal.debug.ui.model.TCFModel;
 
 /**
  * Debug command handler for reverse resume.

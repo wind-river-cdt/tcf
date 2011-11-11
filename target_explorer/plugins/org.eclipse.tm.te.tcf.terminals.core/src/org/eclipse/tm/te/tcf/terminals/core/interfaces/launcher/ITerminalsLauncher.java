@@ -12,7 +12,7 @@ package org.eclipse.tm.te.tcf.terminals.core.interfaces.launcher;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.tm.tcf.protocol.IPeer;
+import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tm.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tm.te.runtime.interfaces.properties.IPropertiesContainer;
 

@@ -8,13 +8,13 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui.model;
+package org.eclipse.tcf.internal.debug.ui.model;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.services.IRegisters;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.services.IRegisters;
 
 
 public class TCFChildrenRegisters extends TCFChildren {

@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.cdt.ui;
+package org.eclipse.tcf.internal.cdt.ui;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -33,7 +33,7 @@ public class ImageCache {
         if (name == null) return null;
         ImageDescriptor descriptor = desc_cache.get(name);
         if (descriptor == null) {
-            Bundle bundle = Platform.getBundle("org.eclipse.tm.tcf.debug.ui");
+            Bundle bundle = Platform.getBundle("org.eclipse.tcf.debug.ui");
             if (bundle != null){
                 URL url = FileLocator.find(bundle, new Path(name), null);
                 if (url != null) descriptor = ImageDescriptor.createFromURL(url);

@@ -8,7 +8,7 @@
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tm.internal.tcf.debug.ui.launch;
+package org.eclipse.tcf.internal.debug.ui.launch;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -51,20 +51,20 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
-import org.eclipse.tm.internal.tcf.debug.launch.TCFLaunchDelegate;
-import org.eclipse.tm.internal.tcf.debug.launch.TCFLocalAgent;
-import org.eclipse.tm.internal.tcf.debug.launch.TCFUserDefPeer;
-import org.eclipse.tm.internal.tcf.debug.tests.TCFTestSuite;
-import org.eclipse.tm.internal.tcf.debug.ui.Activator;
-import org.eclipse.tm.internal.tcf.debug.ui.ImageCache;
-import org.eclipse.tm.internal.tcf.debug.ui.launch.setup.SetupWizardDialog;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IPeer;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.ILocator;
-import org.eclipse.tm.tcf.services.IMemoryMap;
-import org.eclipse.tm.tcf.services.IPathMap;
-import org.eclipse.tm.tcf.util.TCFTask;
+import org.eclipse.tcf.internal.debug.launch.TCFLaunchDelegate;
+import org.eclipse.tcf.internal.debug.launch.TCFLocalAgent;
+import org.eclipse.tcf.internal.debug.launch.TCFUserDefPeer;
+import org.eclipse.tcf.internal.debug.tests.TCFTestSuite;
+import org.eclipse.tcf.internal.debug.ui.Activator;
+import org.eclipse.tcf.internal.debug.ui.ImageCache;
+import org.eclipse.tcf.internal.debug.ui.launch.setup.SetupWizardDialog;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IPeer;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.ILocator;
+import org.eclipse.tcf.services.IMemoryMap;
+import org.eclipse.tcf.services.IPathMap;
+import org.eclipse.tcf.util.TCFTask;
 
 
 /**
@@ -73,7 +73,7 @@ import org.eclipse.tm.tcf.util.TCFTask;
  */
 public class TCFTargetTab extends AbstractLaunchConfigurationTab {
 
-    private static final String TAB_ID = "org.eclipse.tm.tcf.launch.targetTab";
+    private static final String TAB_ID = "org.eclipse.tcf.launch.targetTab";
 
     private Button run_local_agent_button;
     private Button use_local_agent_button;
@@ -1003,9 +1003,9 @@ public class TCFTargetTab extends AbstractLaunchConfigurationTab {
                         TCFLaunchDelegate.parseMemMapsAttribute(mem_map, mem_map_cfg);
                     }
                     boolean enable_tracing =
-                            "true".equals(Platform.getDebugOption("org.eclipse.tm.tcf.debug/debug")) &&
-                            "true".equals(Platform.getDebugOption("org.eclipse.tm.tcf.debug/debug/tests/runcontrol"));
-                    if (enable_tracing) System.setProperty("org.eclipse.tm.tcf.debug.tracing.tests.runcontrol", "true");
+                            "true".equals(Platform.getDebugOption("org.eclipse.tcf.debug/debug")) &&
+                            "true".equals(Platform.getDebugOption("org.eclipse.tcf.debug/debug/tests/runcontrol"));
+                    if (enable_tracing) System.setProperty("org.eclipse.tcf.debug.tracing.tests.runcontrol", "true");
                     test[0] = new TCFTestSuite(peer, done, path_map, mem_map);
                 }
                 catch (Throwable x) {
