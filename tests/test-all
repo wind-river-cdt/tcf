@@ -30,17 +30,17 @@ DSTPATH=$BUILD/java-bin
 javac -g -nowarn \
   -sourcepath $SRCPATH.core/src:$SRCPATH.debug/src \
   -d $DSTPATH \
-  "$SRCPATH.debug/src/org/eclipse/tm/internal/tcf/debug/tests/Main.java" \
+  "$SRCPATH.debug/src/org/eclipse/tcf/internal/debug/tests/Main.java" \
   || exit 1
 
-pushd "$SRCPATH.core/src/org/eclipse/tm/internal/tcf/services/remote" >/dev/null || exit 1
+pushd "$SRCPATH.core/src/org/eclipse/tcf/internal/services/remote" >/dev/null || exit 1
 for FILE in `ls *.java`
 do
   javac -g -nowarn \
     -classpath $DSTPATH \
     -sourcepath "$SRCPATH.core/src" \
     -d $DSTPATH \
-    "$SRCPATH.core/src/org/eclipse/tm/internal/tcf/services/remote/$FILE" \
+    "$SRCPATH.core/src/org/eclipse/tcf/internal/services/remote/$FILE" \
     || exit 1
 done
 popd >/dev/null
