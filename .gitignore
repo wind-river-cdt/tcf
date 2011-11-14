@@ -5,13 +5,9 @@
 # .
 workspace
 debug-workspace
-sync
 
 # examples/org.eclipse.tcf.examples.daytime/
 examples/org.eclipse.tcf.examples.daytime/bin
-
-# examples/org.eclipse.tcf.examples.daytime.agent/
-examples/org.eclipse.tcf.examples.daytime.agent/obj
 
 # features/
 features/build-directory
