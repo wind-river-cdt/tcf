@@ -59,20 +59,6 @@ plugins/org.eclipse.tcf.debug.ui/bin
 plugins/org.eclipse.tcf.rse/target
 plugins/org.eclipse.tcf.rse/bin
 
-# tests/mem-leaks/
-tests/mem-leaks/obj
-tests/mem-leaks/*.ncb
-tests/mem-leaks/*.suo
-tests/mem-leaks/*.user
-tests/mem-leaks/enc_temp_folder
-
-# tests/test-dwarf/
-tests/test-dwarf/obj
-tests/test-dwarf/files
-tests/test-dwarf/*.user
-tests/test-dwarf/*.suo
-tests/test-dwarf/*.ncb
-
 # target explorer
 /target_explorer/plugins/org.eclipse.tm.te.core/target
 /target_explorer/plugins/org.eclipse.tm.te.core/bin
