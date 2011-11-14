@@ -25,7 +25,7 @@ VBOXHOST=192.168.155.1
 
 rm -rf java-bin || exit 1
 mkdir java-bin || exit 1
-SRCPATH=$REPOS/org.eclipse.tcf/plugins/org.eclipse.tm.tcf
+SRCPATH=$REPOS/org.eclipse.tcf/plugins/org.eclipse.tcf
 DSTPATH=$BUILD/java-bin
 javac -g -nowarn \
   -sourcepath $SRCPATH.core/src:$SRCPATH.debug/src \
@@ -259,7 +259,7 @@ function build_and_test_agent()
     echo "Starting tests, target: $TESTURL1" >>logs/$LOGFILE
     if time -p java -ea \
       -classpath java-bin \
-      org.eclipse.tm.internal.tcf.debug.tests.Main \
+      org.eclipse.tcf.internal.debug.tests.Main \
       $TESTURL1 \
       >>logs/$LOGFILE 2>&1
     then
@@ -318,7 +318,7 @@ function build_and_test_agent()
         echo "Starting tests, target: $TESTURL2 $TESTURL1" >>logs/$LOGFILE
         if time -p java -ea \
           -classpath java-bin \
-          org.eclipse.tm.internal.tcf.debug.tests.Main \
+          org.eclipse.tcf.internal.debug.tests.Main \
           $TESTURL2 $TESTURL1 \
           >>logs/$LOGFILE 2>&1
         then
