@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2010 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2011 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -144,5 +144,28 @@ public interface IPathMap extends IService {
          * @param map – memory map data.
          */
         void doneSet(IToken token, Exception error);
+    }
+
+    /**
+     * Add path map event listener.
+     * @param listener - path map event listener to add.
+     */
+    void addListener(PathMapListener listener);
+
+    /**
+     * Remove path map event listener.
+     * @param listener - path map event listener to remove.
+     */
+    void removeListener(PathMapListener listener);
+
+    /**
+     * Service events listener interface.
+     */
+    interface PathMapListener {
+
+        /**
+         * Called when path map changes.
+         */
+        void changed();
     }
 }
