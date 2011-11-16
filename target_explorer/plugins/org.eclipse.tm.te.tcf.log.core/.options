@@ -1,3 +1,0 @@
-org.eclipse.tm.te.tcf.log.core/debugmode = 0
-
-org.eclipse.tm.te.tcf.log.core/trace/channelTraceListener = false

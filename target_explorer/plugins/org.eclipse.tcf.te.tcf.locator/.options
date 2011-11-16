@@ -1,0 +1,5 @@
+org.eclipse.tcf.te.tcf.locator/debugmode = 0
+
+org.eclipse.tcf.te.tcf.locator/trace/locatorModel = false
+org.eclipse.tcf.te.tcf.locator/trace/locatorListener = false
+org.eclipse.tcf.te.tcf.locator/trace/channelStateChangeListener = false
