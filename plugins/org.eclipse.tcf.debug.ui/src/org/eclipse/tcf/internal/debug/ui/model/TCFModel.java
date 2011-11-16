@@ -37,7 +37,6 @@ import org.eclipse.debug.core.model.IDebugModelProvider;
 import org.eclipse.debug.core.model.IExpression;
 import org.eclipse.debug.core.model.IMemoryBlockRetrieval;
 import org.eclipse.debug.core.model.IMemoryBlockRetrievalExtension;
-import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.debug.internal.ui.viewers.model.ITreeModelViewer;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IChildrenCountUpdate;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IChildrenUpdate;
@@ -1522,8 +1521,7 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
                     IEditorInput editor_input = null;
                     int line = 0;
                     if (area != null) {
-                        ISourceLocator locator = getLaunch().getSourceLocator();
-                        Object source_element = TCFSourceLookupDirector.lookup(locator, area);
+                        Object source_element = TCFSourceLookupDirector.lookup(launch, area);
                         if (source_element != null) {
                             ISourcePresentation presentation = TCFModelPresentation.getDefault();
                             editor_input = presentation.getEditorInput(source_element);
@@ -1533,7 +1531,7 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
                     }
                     if (area != null && !instruction_stepping_enabled && (editor_input == null || editor_id == null)) {
                         ILaunchConfiguration cfg = launch.getLaunchConfiguration();
-                        ISourceNotFoundPresentation presentation = (ISourceNotFoundPresentation) DebugPlugin.getAdapter(element, ISourceNotFoundPresentation.class);
+                        ISourceNotFoundPresentation presentation = (ISourceNotFoundPresentation)DebugPlugin.getAdapter(element, ISourceNotFoundPresentation.class);
                         if (presentation != null) {
                             String filename = TCFSourceLookupParticipant.toFileName(area);
                             editor_input = presentation.getEditorInput(element, cfg, filename);

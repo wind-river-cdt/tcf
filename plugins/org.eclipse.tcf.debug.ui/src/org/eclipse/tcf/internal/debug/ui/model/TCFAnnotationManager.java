@@ -28,7 +28,6 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationListener;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IBreakpoint;
-import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.ISourcePresentation;
@@ -536,10 +535,9 @@ public class TCFAnnotationManager {
             ITextEditor editor = (ITextEditor)part;
             editors.put(editor.getEditorInput(), editor);
         }
-        ISourceLocator locator = node.launch.getSourceLocator();
         ISourcePresentation presentation = TCFModelPresentation.getDefault();
         for (TCFAnnotation a : set) {
-            Object source_element = TCFSourceLookupDirector.lookup(locator, a.area);
+            Object source_element = TCFSourceLookupDirector.lookup(node.launch, a.area);
             if (source_element == null) continue;
             IEditorInput editor_input = presentation.getEditorInput(source_element);
             ITextEditor editor = editors.get(editor_input);

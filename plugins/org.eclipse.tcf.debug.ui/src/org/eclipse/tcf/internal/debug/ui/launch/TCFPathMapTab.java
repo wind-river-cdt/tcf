@@ -206,7 +206,6 @@ public class TCFPathMapTab extends AbstractLaunchConfigurationTab {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 PathMapRule a = new PathMapRule(new HashMap<String,Object>());
-                a.getProperties().put(IPathMap.PROP_ID, "PR" + System.currentTimeMillis());
                 map.add(a);
                 viewer.add(a);
                 viewer.setSelection(new StructuredSelection(a), true);
@@ -254,6 +253,7 @@ public class TCFPathMapTab extends AbstractLaunchConfigurationTab {
     }
 
     public void performApply(ILaunchConfigurationWorkingCopy config) {
+        for (PathMapRule m : map) m.getProperties().remove(IPathMap.PROP_ID);
         StringBuffer bf = new StringBuffer();
         for (PathMapRule m : map) bf.append(m.toString());
         if (bf.length() == 0) config.removeAttribute(TCFLaunchDelegate.ATTR_PATH_MAP);

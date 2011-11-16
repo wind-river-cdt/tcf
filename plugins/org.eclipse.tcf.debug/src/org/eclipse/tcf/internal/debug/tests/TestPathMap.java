@@ -10,10 +10,12 @@
  *******************************************************************************/
 package org.eclipse.tcf.internal.debug.tests;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
@@ -27,6 +29,7 @@ class TestPathMap implements ITCFTest {
     private final IPathMap service;
 
     private final Random rnd = new Random();
+    private final String test_id = UUID.randomUUID().toString();
 
     private static final String[] prop_names = {
         IPathMap.PROP_SOURCE,
@@ -107,7 +110,7 @@ class TestPathMap implements ITCFTest {
             final IPathMap.PathMapRule[] map_out = new IPathMap.PathMapRule[rnd.nextInt(12)];
             for (int i = 0; i < map_out.length; i++) {
                 Map<String,Object> props = new HashMap<String,Object>();
-                props.put(IPathMap.PROP_ID, "PM" + i);
+                props.put(IPathMap.PROP_ID, test_id + "-" + i);
                 for (int l = 0; l < 2; l++) {
                     String nm = prop_names[rnd.nextInt(prop_names.length)];
                     StringBuffer bf = new StringBuffer();
@@ -129,6 +132,7 @@ class TestPathMap implements ITCFTest {
                     else {
                         service.get(new IPathMap.DoneGet() {
                             public void doneGet(IToken token, Exception error, PathMapRule[] map_inp) {
+                                map_inp = filterMap(map_inp);
                                 if (error != null) {
                                     exit(error);
                                 }
@@ -152,6 +156,14 @@ class TestPathMap implements ITCFTest {
                 }
             });
         }
+    }
+
+    private PathMapRule[] filterMap(PathMapRule[] map) {
+        ArrayList<PathMapRule> res = new ArrayList<PathMapRule>();
+        for (PathMapRule r : map) {
+            if (r.getID().startsWith(test_id)) res.add(r);
+        }
+        return res.toArray(new PathMapRule[res.size()]);
     }
 
     private boolean map_equ(Map<String,Object> x, Map<String,Object> y) {

@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.internal.debug;
 
+import java.util.UUID;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
@@ -31,6 +33,7 @@ public class Activator extends Plugin {
     // The shared instance
     private static Activator plugin;
     private static TCFBreakpointsModel bp_model;
+    private static final String client_id = UUID.randomUUID().toString();
 
     public Activator() {
         plugin = this;
@@ -68,6 +71,10 @@ public class Activator extends Plugin {
 
     public static TCFBreakpointsModel getBreakpointsModel() {
         return bp_model;
+    }
+
+    public static String getClientID() {
+        return client_id;
     }
 
     /**

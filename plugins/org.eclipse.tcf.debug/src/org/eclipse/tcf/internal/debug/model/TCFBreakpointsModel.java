@@ -19,7 +19,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IMarkerDelta;
@@ -74,7 +73,6 @@ public class TCFBreakpointsModel {
     private final IBreakpointManager bp_manager = DebugPlugin.getDefault().getBreakpointManager();
     private final HashMap<IChannel,Map<String,Object>> channels = new HashMap<IChannel,Map<String,Object>>();
     private final HashMap<String,IBreakpoint> id2bp = new HashMap<String,IBreakpoint>();
-    private final String client_id = UUID.randomUUID().toString();
 
     private abstract class BreakpointUpdate implements Runnable {
 
@@ -336,7 +334,7 @@ public class TCFBreakpointsModel {
         Map<String,Object> client_data = (Map<String,Object>)properties.get(IBreakpoints.PROP_CLIENT_DATA);
         if (client_data == null) return false;
         String id = (String)client_data.get(TCFBreakpointsModel.CDATA_CLIENT_ID);
-        return client_id.equals(id);
+        return Activator.getClientID().equals(id);
     }
 
     /**
@@ -556,7 +554,7 @@ public class TCFBreakpointsModel {
         m.put(IBreakpoints.PROP_ID, id);
         if (client_data != null) {
             m.put(IBreakpoints.PROP_CLIENT_DATA, client_data);
-            client_data.put(CDATA_CLIENT_ID, client_id);
+            client_data.put(CDATA_CLIENT_ID, Activator.getClientID());
             if (type != null) client_data.put(CDATA_TYPE, type);
             if (file != null) client_data.put(CDATA_FILE, file);
             client_data.put(CDATA_MARKER, p);

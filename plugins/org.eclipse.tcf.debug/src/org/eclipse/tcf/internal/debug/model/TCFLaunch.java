@@ -23,6 +23,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
@@ -50,6 +51,7 @@ import org.eclipse.tcf.services.IProcesses.ProcessContext;
 import org.eclipse.tcf.services.IProcessesV1;
 import org.eclipse.tcf.services.IRunControl;
 import org.eclipse.tcf.services.IStreams;
+import org.eclipse.tcf.util.TCFDataCache;
 import org.eclipse.tcf.util.TCFTask;
 
 public class TCFLaunch extends Launch {
@@ -139,7 +141,10 @@ public class TCFLaunch extends Launch {
     private final LinkedList<LaunchStep> launch_steps = new LinkedList<LaunchStep>();
     private final LinkedList<String> redirection_path = new LinkedList<String>();
 
-    private ArrayList<PathMapRule> filepath_map;
+    private ArrayList<PathMapRule> host_path_map;
+    private TCFDataCache<IPathMap.PathMapRule[]> target_path_map;
+
+    private HashMap<String,IStorage> target_path_maaping_cache = new HashMap<String,IStorage>();
 
     private Set<String> context_filter;
 
@@ -180,6 +185,25 @@ public class TCFLaunch extends Launch {
 
     private void onConnected() throws Exception {
         // The method is called when TCF channel is successfully connected.
+
+        final IPathMap path_map_service = getService(IPathMap.class);
+        target_path_map = new TCFDataCache<IPathMap.PathMapRule[]>(channel) {
+            @Override
+            protected boolean startDataRetrieval() {
+                command = path_map_service.get(new IPathMap.DoneGet() {
+                    public void doneGet(IToken token, Exception error, IPathMap.PathMapRule[] map) {
+                        set(token, error, map);
+                    }
+                });
+                return false;
+            }
+        };
+        path_map_service.addListener(new IPathMap.PathMapListener() {
+            public void changed() {
+                target_path_map.reset();
+                target_path_maaping_cache = new HashMap<String,IStorage>();
+            }
+        });
 
         final ILaunchConfiguration cfg = getLaunchConfiguration();
         if (cfg != null) {
@@ -494,15 +518,18 @@ public class TCFLaunch extends Launch {
 
     private void readPathMapConfiguration(ILaunchConfiguration cfg) throws CoreException {
         String s = cfg.getAttribute(TCFLaunchDelegate.ATTR_PATH_MAP, "");
-        filepath_map = TCFLaunchDelegate.parsePathMapAttribute(s);
+        host_path_map = TCFLaunchDelegate.parsePathMapAttribute(s);
         s = cfg.getAttribute(ILaunchConfiguration.ATTR_SOURCE_LOCATOR_MEMENTO, "");
-        filepath_map.addAll(TCFLaunchDelegate.parseSourceLocatorMemento(s));
+        host_path_map.addAll(TCFLaunchDelegate.parseSourceLocatorMemento(s));
+        int cnt = 0;
+        String id = Activator.getClientID();
+        for (PathMapRule r : host_path_map) r.getProperties().put(IPathMap.PROP_ID, id + "/" + cnt++);
     }
 
     private void downloadPathMaps(ILaunchConfiguration cfg, final Runnable done) throws Exception {
         readPathMapConfiguration(cfg);
         final IPathMap path_map_service = getService(IPathMap.class);
-        path_map_service.set(filepath_map.toArray(new IPathMap.PathMapRule[filepath_map.size()]), new IPathMap.DoneSet() {
+        path_map_service.set(host_path_map.toArray(new IPathMap.PathMapRule[host_path_map.size()]), new IPathMap.DoneSet() {
             public void doneSet(IToken token, Exception error) {
                 if (error != null) channel.terminate(error);
                 else done.run();
@@ -926,10 +953,10 @@ public class TCFLaunch extends Launch {
                 public void run() {
                     try {
                         if (update_memory_maps != null) update_memory_maps.run();
-                        if (filepath_map != null) {
+                        if (host_path_map != null) {
                             readPathMapConfiguration(cfg);
                             final IPathMap path_map_service = getService(IPathMap.class);
-                            path_map_service.set(filepath_map.toArray(new IPathMap.PathMapRule[filepath_map.size()]), new IPathMap.DoneSet() {
+                            path_map_service.set(host_path_map.toArray(new IPathMap.PathMapRule[host_path_map.size()]), new IPathMap.DoneSet() {
                                 public void doneSet(IToken token, Exception error) {
                                     if (error != null) channel.terminate(error);
                                     done(false);
@@ -1090,9 +1117,18 @@ public class TCFLaunch extends Launch {
         return process_signals;
     }
 
-    public ArrayList<PathMapRule> getFilePathMap() {
+    public ArrayList<PathMapRule> getHostPathMap() {
         assert Protocol.isDispatchThread();
-        return filepath_map;
+        return host_path_map;
+    }
+
+    public TCFDataCache<IPathMap.PathMapRule[]> getTargetPathMap() {
+        assert Protocol.isDispatchThread();
+        return target_path_map;
+    }
+
+    public Map<String,IStorage> getTargetPathMappingCache() {
+        return target_path_maaping_cache;
     }
 
     /**

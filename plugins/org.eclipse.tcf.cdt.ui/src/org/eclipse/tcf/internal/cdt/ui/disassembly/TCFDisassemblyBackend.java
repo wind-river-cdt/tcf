@@ -942,7 +942,7 @@ public class TCFDisassemblyBackend extends AbstractDisassemblyBackend {
     public Object insertSource(Position pos, BigInteger address, String file, int lineNumber) {
         TCFNodeExecContext execContext = fExecContext;
         if (execContext == null) return null;
-        return TCFSourceLookupDirector.lookup(execContext.getModel().getLaunch().getSourceLocator(), file);
+        return TCFSourceLookupDirector.lookup(execContext.getModel().getLaunch(), file);
     }
 
     private static BigInteger toBigInteger(byte[] data, boolean big_endian, boolean sign_extension) {

@@ -29,6 +29,7 @@ import org.eclipse.debug.core.sourcelookup.ISourceLookupDirector;
 import org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage;
 import org.eclipse.tcf.internal.debug.launch.TCFLaunchDelegate.PathMapRule;
 import org.eclipse.tcf.services.ILineNumbers;
+import org.eclipse.tcf.services.IPathMap;
 
 /**
  * The TCF source lookup participant knows how to translate a ILineNumbers.CodeArea
@@ -68,6 +69,26 @@ public class TCFSourceLookupParticipant extends AbstractSourceLookupParticipant 
         return area.file;
     }
 
+    public static String toFileName(IPathMap.PathMapRule r, String fnm) {
+        try {
+            String src = r.getSource();
+            if (src == null) return null;
+            if (!fnm.startsWith(src)) return null;
+            String host = r.getHost();
+            if (host != null && host.length() > 0) {
+                if (!InetAddress.getLocalHost().equals(InetAddress.getByName(host))) return null;
+            }
+            String dst = r.getDestination();
+            if (dst == null || dst.length() == 0) return null;
+            int l = src.length();
+            if (dst.endsWith("/") && l < fnm.length() && fnm.charAt(l) == '/') l++;
+            return dst + fnm.substring(l);
+        }
+        catch (Exception x) {
+            return null;
+        }
+    }
+
     private static boolean isAbsolutePath(String fnm) {
         if (fnm.length() == 0) return false;
         char ch = fnm.charAt(0);
@@ -87,17 +108,8 @@ public class TCFSourceLookupParticipant extends AbstractSourceLookupParticipant 
             if (path_map.length() == 0) return fnm;
             ArrayList<PathMapRule> map = TCFLaunchDelegate.parsePathMapAttribute(path_map);
             for (PathMapRule r : map) {
-                String src = r.getSource();
-                if (!fnm.startsWith(src)) continue;
-                String host = r.getHost();
-                if (host != null && host.length() > 0) {
-                    if (!InetAddress.getLocalHost().equals(InetAddress.getByName(host))) continue;
-                }
-                String dst = r.getDestination();
-                if (dst == null || dst.length() == 0) continue;
-                int l = src.length();
-                if (dst.endsWith("/") && l < fnm.length() && fnm.charAt(l) == '/') l++;
-                return dst + fnm.substring(l);
+                String res = toFileName(r, fnm);
+                if (res != null) return res;
             }
             if (fnm.startsWith("/cygdrive/")) {
                 fnm = fnm.substring(10, 11) + ":" + fnm.substring(11);
@@ -127,9 +139,9 @@ public class TCFSourceLookupParticipant extends AbstractSourceLookupParticipant 
                     IFile[] arr = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(uri);
                     if (arr != null && arr.length > 0) {
                         int cnt = list.size();
-                        for (IFile fileResource : arr) {
-                            if (fileResource.isAccessible()) {
-                                list.add(fileResource);
+                        for (IFile resource : arr) {
+                            if (resource.isAccessible()) {
+                                list.add(resource);
                             }
                         }
                         if (list.size() > cnt) continue;
