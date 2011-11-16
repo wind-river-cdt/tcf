@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 Wind River Systems, Inc. and others.
+ * Copyright (c) 2010, 2011 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -104,13 +104,13 @@ public interface IDisassembly extends IService {
         /** The type of the instruction field. See FTYPE_*, String. */
         FIELD_TYPE = "Type",
 
-        /** Value of the field for “String” and “Register” types, String. */
+        /** Value of the field for "String" and "Register" types, String. */
         FIELD_TEXT = "Text",
 
-        /** Value of the field for “Address,” “Displacement,” or “Immediate” types, Number. */
+        /** Value of the field for "Address", "Displacement", or "Immediate" types, Number. */
         FIELD_VALUE = "Value",
 
-        /** Context ID of the address space used with “Address” types, String. */
+        /** Context ID of the address space used with "Address" types, String. */
         FIELD_ADDRESS_SPACE = "AddressSpace";
 
     /** Instruction field types */
