@@ -112,22 +112,25 @@ public class TerminalsLauncher extends PlatformObject implements ITerminalsLaunc
 			eventListener = null;
 		}
 
+		// Create the callback invocation delegate
+		AsyncCallbackCollector.ICallbackInvocationDelegate delegate = new AsyncCallbackCollector.ICallbackInvocationDelegate() {
+			@Override
+			public void invoke(Runnable runnable) {
+				Assert.isNotNull(runnable);
+				if (Protocol.isDispatchThread()) runnable.run();
+				else Protocol.invokeLater(runnable);
+			}
+		};
+
 		// Create the callback collector
 		final AsyncCallbackCollector collector = new AsyncCallbackCollector(new Callback() {
 			@Override
 			protected void internalDone(Object caller, IStatus status) {
+				Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 				// Close the channel as all disposal is done
-				if (finChannel != null) {
-					if (Protocol.isDispatchThread()) finChannel.close();
-					else Protocol.invokeAndWait(new Runnable() {
-						@Override
-						public void run() {
-							finChannel.close();
-						}
-					});
-				}
+				if (finChannel != null) finChannel.close();
 			}
-		});
+		}, delegate);
 
 		if (streamsListener != null) {
 			// Dispose the streams listener
@@ -590,9 +593,9 @@ public class TerminalsLauncher extends PlatformObject implements ITerminalsLaunc
 
 		// Get the terminal attributes
 
-		// Terminal Type: Default to "vt100" if not explicitly specified
+		// Terminal Type: Default to "ansi" if not explicitly specified
 		String type = properties.getStringProperty(ITerminalsLauncher.PROP_TERMINAL_TYPE);
-		if (type == null || "".equals(type.trim())) type = "vt100"; //$NON-NLS-1$ //$NON-NLS-2$
+		if (type == null || "".equals(type.trim())) type = "ansi"; //$NON-NLS-1$ //$NON-NLS-2$
 
 		// Terminal Encoding: Default to "null" if not explicitly specified
 		String encoding = properties.getStringProperty(ITerminalsLauncher.PROP_TERMINAL_ENCODING);
