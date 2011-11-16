@@ -1,0 +1,2 @@
+org.eclipse.tcf.te.ui.terminals/debugmode = 0
+org.eclipse.tcf.te.ui.terminals/trace/outputStreamMonitor = false
