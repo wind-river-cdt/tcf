@@ -322,7 +322,17 @@ public final class JSON {
                 else {
                     tmp_buf[tmp_buf_pos++] = (char)cur_ch;
                 }
-                read();
+                if (inp_pos >= inp.length || inp[inp_pos] < 0) {
+                    cur_ch = readUTF8Char();
+                }
+                else {
+                    cur_ch = inp[inp_pos++];
+                }
+                err_buf[err_buf_pos++] = (char)cur_ch;
+                if (err_buf_pos >= err_buf.length) {
+                    err_buf_pos = 0;
+                    err_buf_cnt++;
+                }
             }
             read();
             return new String(tmp_buf, 0, tmp_buf_pos);
@@ -445,23 +455,6 @@ public final class JSON {
             error();
             return null;
         }
-    }
-
-    private static Object readObject() throws IOException {
-        Object o = readNestedObject();
-        if (cur_ch >= 0) error();
-        return o;
-    }
-
-    private static Object[] readSequence() throws IOException {
-        List<Object> l = new ArrayList<Object>();
-        while (cur_ch >= 0) {
-            if (cur_ch == 0) l.add(null);
-            else l.add(readNestedObject());
-            if (cur_ch != 0) error("missing \\0 terminator");
-            read();
-        }
-        return l.toArray();
     }
 
     /**
@@ -734,7 +727,9 @@ public final class JSON {
         err_buf_pos = 0;
         err_buf_cnt = 0;
         read();
-        return readObject();
+        Object o = readNestedObject();
+        if (cur_ch >= 0) error();
+        return o;
     }
 
     /**
@@ -751,7 +746,14 @@ public final class JSON {
         err_buf_pos = 0;
         err_buf_cnt = 0;
         read();
-        return readSequence();
+        List<Object> l = new ArrayList<Object>();
+        while (cur_ch >= 0) {
+            if (cur_ch == 0) l.add(null);
+            else l.add(readNestedObject());
+            if (cur_ch != 0) error("missing \\0 terminator");
+            read();
+        }
+        return l.toArray();
     }
 
     /**
