@@ -97,7 +97,10 @@
                tooltip="%command.launch.tooltip">
                <visibleWhen checkEnabled="false">
                   <with variable="selection">
-                     <test property="org.eclipse.tcf.te.ui.terminals.hasApplicableLauncherDelegates" value="true"/>
+                     <test
+                           forcePluginActivation="true"
+                           property="org.eclipse.tcf.te.ui.terminals.hasApplicableLauncherDelegates"
+                           value="true"/>
                   </with>
                </visibleWhen>
          </command>
