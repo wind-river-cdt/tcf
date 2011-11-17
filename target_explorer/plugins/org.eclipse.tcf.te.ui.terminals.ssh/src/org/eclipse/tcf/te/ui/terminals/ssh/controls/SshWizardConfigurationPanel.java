@@ -24,9 +24,6 @@ import org.eclipse.swt.events.TypedEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tm.internal.terminal.provisional.api.ISettingsPage;
-import org.eclipse.tm.internal.terminal.ssh.SshConnector;
-import org.eclipse.tm.internal.terminal.ssh.SshSettings;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
@@ -35,6 +32,9 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.ui.controls.BaseDialogPageControl;
 import org.eclipse.tcf.te.ui.terminals.panels.AbstractConfigurationPanel;
 import org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataWizardPage;
+import org.eclipse.tm.internal.terminal.provisional.api.ISettingsPage;
+import org.eclipse.tm.internal.terminal.ssh.SshConnector;
+import org.eclipse.tm.internal.terminal.ssh.SshSettings;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
@@ -134,7 +134,7 @@ public class SshWizardConfigurationPanel extends AbstractConfigurationPanel impl
 	@Override
     public void extractData(IPropertiesContainer data) {
     	// set the terminal connector id for ssh
-    	data.setProperty(ITerminalsConnectorConstants.PROP_TERMINAL_CONNECTOR_ID, "org.eclipse.tcf.internal.terminal.ssh.SshConnector");
+    	data.setProperty(ITerminalsConnectorConstants.PROP_TERMINAL_CONNECTOR_ID, "org.eclipse.tm.internal.terminal.ssh.SshConnector");
 
     	// set the connector type for ssh
     	data.setProperty(ITerminalsConnectorConstants.PROP_CONNECTOR_TYPE_ID, "org.eclipse.tcf.te.ui.terminals.type.ssh");
