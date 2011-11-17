@@ -191,9 +191,9 @@ public class TcfURLConnection extends URLConnection {
 				// Open the file.
 				int open_flag = 0;
 				if (doInput)
-					open_flag = IFileSystem.TCF_O_READ;
+					open_flag |= IFileSystem.TCF_O_READ;
 				if (doOutput)
-					open_flag = IFileSystem.TCF_O_WRITE | IFileSystem.TCF_O_CREAT | IFileSystem.TCF_O_TRUNC;
+					open_flag |= IFileSystem.TCF_O_WRITE | IFileSystem.TCF_O_CREAT | IFileSystem.TCF_O_TRUNC;
 				service.open(path, open_flag, null, new DoneOpen() {
 					@Override
 					public void doneOpen(IToken token, FileSystemException error, IFileHandle hdl) {
