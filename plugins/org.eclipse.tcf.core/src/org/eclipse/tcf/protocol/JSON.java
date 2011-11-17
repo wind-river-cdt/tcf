@@ -166,6 +166,21 @@ public final class JSON {
         }
     }
 
+    private static void skipWS() throws IOException {
+        while (cur_ch <= ' ') {
+            switch (cur_ch) {
+            case '\r':
+            case '\n':
+            case '\t':
+            case ' ':
+                read();
+                break;
+            default:
+                return;
+            }
+        }
+    }
+
     private static void error() throws IOException {
         error("syntax error");
     }
@@ -243,6 +258,7 @@ public final class JSON {
     }
 
     private static Object readNestedObject() throws IOException {
+        skipWS();
         switch (cur_ch) {
         case '(':
             read();
@@ -311,12 +327,14 @@ public final class JSON {
             read();
             return new String(tmp_buf, 0, tmp_buf_pos);
         case '[':
-            List<Object> l = new ArrayList<Object>();
             read();
+            skipWS();
+            List<Object> l = new ArrayList<Object>();
             if (cur_ch <= 0) error();
             if (cur_ch != ']') {
                 for (;;) {
                     l.add(readNestedObject());
+                    skipWS();
                     if (cur_ch == ']') break;
                     if (cur_ch != ',') error();
                     read();
@@ -325,16 +343,19 @@ public final class JSON {
             read();
             return Collections.unmodifiableList(l);
         case '{':
-            Map<String,Object> m = new HashMap<String,Object>();
             read();
+            skipWS();
+            Map<String,Object> m = new HashMap<String,Object>();
             if (cur_ch <= 0) error();
             if (cur_ch != '}') {
                 for (;;) {
                     String key = (String)readNestedObject();
+                    skipWS();
                     if (cur_ch != ':') error();
                     read();
                     Object val = readNestedObject();
                     m.put(key, val);
+                    skipWS();
                     if (cur_ch == '}') break;
                     if (cur_ch != ',') error();
                     read();
