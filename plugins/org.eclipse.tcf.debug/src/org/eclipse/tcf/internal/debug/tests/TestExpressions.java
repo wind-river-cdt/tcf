@@ -19,6 +19,7 @@ import java.util.Random;
 import java.util.Set;
 
 import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IErrorReport;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.protocol.JSON;
 import org.eclipse.tcf.protocol.Protocol;
@@ -50,6 +51,7 @@ class TestExpressions implements ITCFTest,
     private String process_id;
     private String thread_id;
     private boolean run_to_bp_done;
+    private boolean no_cpp;
     private boolean test_done;
     private boolean cancel_test_sent;
     private IRunControl.RunControlContext test_ctx;
@@ -58,12 +60,20 @@ class TestExpressions implements ITCFTest,
     private boolean waiting_suspend;
     private String[] stack_trace;
     private IStackTrace.StackTraceContext[] stack_frames;
-    private String[] local_vars;
+    private String[] local_var_ids;
+    private final Map<String,String> global_var_ids = new HashMap<String,String>();
     private final Map<String,IExpressions.Expression> expr_ctx = new HashMap<String,IExpressions.Expression>();
     private final Map<String,IExpressions.Value> expr_val = new HashMap<String,IExpressions.Value>();
     private final Map<String,ISymbols.Symbol> expr_sym = new HashMap<String,ISymbols.Symbol>();
     private final Map<String,String[]> expr_chld = new HashMap<String,String[]>();
     private final Set<String> expr_to_dispose = new HashSet<String>();
+
+    private static String[] global_var_names = {
+        "tcf_test_char",
+        "tcf_test_short",
+        "tcf_test_long",
+        "tcf_cpp_test_bool",
+    };
 
     private static String[] test_expressions = {
         "func2_local1",
@@ -110,6 +120,11 @@ class TestExpressions implements ITCFTest,
         "tcf_test_array + 10",
         "*(tcf_test_array + 10) | 1",
         "&*(char *)(int *)0 == 0",
+        "(bool)0 == false",
+        "(bool)1 == true",
+        "sizeof(bool) == sizeof true",
+        "tcf_cpp_test_class::s_int == 0",
+        "sizeof tcf_cpp_test_class::s_int == sizeof signed",
     };
 
     TestExpressions(TCFTestSuite test_suite, RunControl test_rc, IChannel channel) {
@@ -386,24 +401,24 @@ class TestExpressions implements ITCFTest,
             });
             return;
         }
-        if (local_vars == null) {
+        if (local_var_ids == null) {
             expr.getChildren(stack_trace[stack_trace.length - 2], new IExpressions.DoneGetChildren() {
                 public void doneGetChildren(IToken token, Exception error, String[] context_ids) {
                     if (error != null || context_ids == null) {
                         // Need to continue tests even if local variables info is not available.
                         // TODO: need to distinguish absence of debug info from other errors.
-                        local_vars = new String[0];
+                        local_var_ids = new String[0];
                         runTest();
                     }
                     else {
-                        local_vars = context_ids;
+                        local_var_ids = context_ids;
                         runTest();
                     }
                 }
             });
             return;
         }
-        for (final String id : local_vars) {
+        for (final String id : local_var_ids) {
             if (expr_ctx.get(id) == null) {
                 expr.getContext(id, new IExpressions.DoneGetContext() {
                     public void doneGetContext(IToken token, Exception error, IExpressions.Expression ctx) {
@@ -419,13 +434,47 @@ class TestExpressions implements ITCFTest,
                 return;
             }
         }
+        if (syms != null && local_var_ids.length > 0) {
+            for (final String nm : global_var_names) {
+                if (!global_var_ids.containsKey(nm)) {
+                    syms.find(process_id, new BigInteger(suspended_pc), nm, new ISymbols.DoneFind() {
+                        public void doneFind(IToken token, Exception error, String symbol_id) {
+                            if (error != null) {
+                                if (nm.startsWith("tcf_cpp_") && error instanceof IErrorReport &&
+                                        ((IErrorReport)error).getErrorCode() == IErrorReport.TCF_ERROR_SYM_NOT_FOUND) {
+
+                                    global_var_ids.put(nm, null);
+                                    no_cpp = true;
+                                    runTest();
+                                    return;
+                                }
+                                exit(error);
+                            }
+                            else if (symbol_id == null) {
+                                exit(new Exception("Invalid symbol ID"));
+                            }
+                            else {
+                                global_var_ids.put(nm, symbol_id);
+                                runTest();
+                            }
+                        }
+                    });
+                    return;
+                }
+            }
+        }
         for (final String txt : test_expressions) {
-            if (local_vars.length == 0) {
+            if (local_var_ids.length == 0) {
                 // Debug info not available
-                if (txt.indexOf("local") >= 0) continue;
+                if (txt.indexOf("func2_local") >= 0) continue;
                 if (txt.indexOf("test_struct") >= 0) continue;
                 if (txt.indexOf("tcf_test_array") >= 0) continue;
                 if (txt.indexOf("(char *)") >= 0) continue;
+            }
+            if (local_var_ids.length == 0 || no_cpp) {
+                // Agent is not build with C++ compiler
+                if (txt.indexOf("tcf_cpp_test") >= 0) continue;
+                if (txt.indexOf("(bool)") >= 0) continue;
             }
             if (expr_ctx.get(txt) == null) {
                 expr.create(stack_trace[stack_trace.length - 2], null, txt, new IExpressions.DoneCreate() {
@@ -443,7 +492,7 @@ class TestExpressions implements ITCFTest,
                 return;
             }
         }
-        for (final String id : local_vars) {
+        for (final String id : local_var_ids) {
             if (expr_val.get(id) == null) {
                 expr.evaluate(id, new IExpressions.DoneEvaluate() {
                     public void doneEvaluate(IToken token, Exception error, IExpressions.Value ctx) {
