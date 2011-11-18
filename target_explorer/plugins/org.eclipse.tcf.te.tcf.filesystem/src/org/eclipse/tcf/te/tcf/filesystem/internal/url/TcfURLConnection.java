@@ -25,12 +25,12 @@ import org.eclipse.tcf.services.IFileSystem.DoneClose;
 import org.eclipse.tcf.services.IFileSystem.DoneOpen;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.services.IFileSystem.IFileHandle;
+import org.eclipse.tcf.te.tcf.core.Tcf;
+import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFChannelException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
-import org.eclipse.tcf.te.tcf.core.Tcf;
-import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel;
 
 /**
  * The URL connection returned by TCF stream service used to handler "tcf"
@@ -193,7 +193,7 @@ public class TcfURLConnection extends URLConnection {
 				if (doInput)
 					open_flag |= IFileSystem.TCF_O_READ;
 				if (doOutput)
-					open_flag |= IFileSystem.TCF_O_WRITE;
+					open_flag |= IFileSystem.TCF_O_WRITE | IFileSystem.TCF_O_CREAT | IFileSystem.TCF_O_TRUNC;
 				service.open(path, open_flag, null, new DoneOpen() {
 					@Override
 					public void doneOpen(IToken token, FileSystemException error, IFileHandle hdl) {

@@ -11,14 +11,14 @@
 package org.eclipse.tcf.te.ui.terminals.ssh.types;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.tm.internal.terminal.provisional.api.ISettingsStore;
-import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
-import org.eclipse.tm.internal.terminal.provisional.api.TerminalConnectorExtension;
-import org.eclipse.tm.internal.terminal.ssh.SshSettings;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.services.interfaces.constants.ITerminalsConnectorConstants;
 import org.eclipse.tcf.te.ui.terminals.internal.SettingsStore;
 import org.eclipse.tcf.te.ui.terminals.types.AbstractConnectorType;
+import org.eclipse.tm.internal.terminal.provisional.api.ISettingsStore;
+import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
+import org.eclipse.tm.internal.terminal.provisional.api.TerminalConnectorExtension;
+import org.eclipse.tm.internal.terminal.ssh.SshSettings;
 
 /**
  * Ssh terminal connector type implementation.
@@ -76,7 +76,7 @@ public class SshConnectorType extends AbstractConnectorType {
 		Assert.isNotNull(attributes);
 		Assert.isTrue(attributes.length == 6);
 
-		if (connectorId == null) connectorId = "org.eclipse.tcf.internal.terminal.ssh.SshConnector"; //$NON-NLS-1$
+		if (connectorId == null) connectorId = "org.eclipse.tm.internal.terminal.ssh.SshConnector"; //$NON-NLS-1$
 
 		final String serverName = attributes[0];
 		final String serverPort = Integer.toString(Integer.decode(attributes[1]).intValue() + portOffset);

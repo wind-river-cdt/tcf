@@ -9,10 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.log.core.internal.listener;
 
-import java.io.ByteArrayInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -22,6 +20,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.core.AbstractChannel.TraceListener;
 import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.te.tcf.core.utils.JSONUtils;
 import org.eclipse.tcf.te.tcf.log.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.tcf.log.core.interfaces.IPreferenceKeys;
 import org.eclipse.tcf.te.tcf.log.core.interfaces.ITracing;
@@ -149,20 +148,7 @@ public class ChannelTraceListener implements TraceListener {
 		String time = TIME_FORMAT.format(new Date(System.currentTimeMillis()));
 
 		// Decode the arguments again for tracing purpose
-		String args = null;
-		if (data != null) {
-			StringBuilder builder = new StringBuilder();
-			InputStreamReader reader = new InputStreamReader(new ByteArrayInputStream(data));
-			try {
-				int c = reader.read();
-				while (c != -1) {
-					builder.append(c != 0 ? Character.valueOf((char)c).charValue() : ' ');
-					c = reader.read();
-				}
-			} catch (IOException ex) { /* ignored on purpose */ }
-
-			if (builder.length() > 0) args = builder.toString().trim();
-		}
+		String args = JSONUtils.decodeStringFromByteArray(data);
 
 		// Construct the full message
 		//
