@@ -65,9 +65,32 @@ public class NoteCompositeHelper {
 	 *            the title of the note
 	 * @param message
 	 *            the message for the note
+	 *
 	 * @return the composite for the note
 	 */
 	public static Composite createNoteComposite(Font font, Composite composite, String title, String message) {
+		return createNoteComposite(font, composite, title, message, SWT.DEFAULT);
+	}
+
+	/**
+	 * Creates a composite with a highlighted Note entry and a message text.
+	 * This is designed to take up the full width of the page.
+	 *
+	 * @see PreferencePage#createNoteComposite, this is a plain copy of that!
+	 * @param font
+	 *            the font to use
+	 * @param composite
+	 *            the parent composite
+	 * @param title
+	 *            the title of the note
+	 * @param message
+	 *            the message for the note
+	 * @param minCharsPerLine
+	 *            the minimum number of characters per line. Defaults to '65' if less than '20'.
+	 *
+	 * @return the composite for the note
+	 */
+	public static Composite createNoteComposite(Font font, Composite composite, String title, String message, int minCharsPerLine) {
 		Composite messageComposite = new NoteComposite(composite, SWT.NONE);
 
 		GridLayout messageLayout = new GridLayout();
@@ -115,7 +138,7 @@ public class NoteCompositeHelper {
 		 * needed
 		 */
 		layoutData = new GridData(GridData.FILL_HORIZONTAL);
-		layoutData.widthHint = SWTControlUtil.convertWidthInCharsToPixels(messageLabel, 65);
+		layoutData.widthHint = SWTControlUtil.convertWidthInCharsToPixels(messageLabel, minCharsPerLine >= 20 ? minCharsPerLine : 65);
 		messageLabel.setLayoutData(layoutData);
 
 		return messageComposite;
