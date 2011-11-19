@@ -177,16 +177,16 @@ function get_make_options()
   # Currently we cannot test login feature of Terminals service
   case $CC in
   gcc)
-    OPTS="CC=gcc 'CFLAGS=-Werror -DTERMINALS_NO_LOGIN=1 $CFLAGS'"
+    OPTS="CC=gcc 'CFLAGS=-Werror -DTERMINALS_NO_LOGIN=1 -DENABLE_SignalHandlers=0 $CFLAGS'"
     ;;
   g++)
-    OPTS="CC=g++ 'CFLAGS=-Werror -DTERMINALS_NO_LOGIN=1 $CFLAGS'"
+    OPTS="CC=g++ 'CFLAGS=-Werror -DTERMINALS_NO_LOGIN=1 -DENABLE_SignalHandlers=0 $CFLAGS'"
     ;;
   msvc++)
-    OPTS="'CFLAGS=-x c++ $CFLAGS'"
+    OPTS="'CFLAGS=-x c++ -DENABLE_SignalHandlers=0 $CFLAGS'"
     ;;
   *)
-    OPTS="'CFLAGS=$CFLAGS'"
+    OPTS="'CFLAGS=-DENABLE_SignalHandlers=0 $CFLAGS'"
     ;;
   esac
   echo "OPSYS=$OPSYS CONF=$CONF $OPTS"

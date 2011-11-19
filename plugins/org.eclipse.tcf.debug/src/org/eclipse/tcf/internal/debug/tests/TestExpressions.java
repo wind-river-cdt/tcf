@@ -123,8 +123,10 @@ class TestExpressions implements ITCFTest,
         "(bool)0 == false",
         "(bool)1 == true",
         "sizeof(bool) == sizeof true",
-        "tcf_cpp_test_class::s_int == 0",
+        "tcf_cpp_test_class::s_int == 1",
         "sizeof tcf_cpp_test_class::s_int == sizeof signed",
+        "tcf_cpp_test_class::tcf_cpp_test_class_nested::s_int == 2",
+        "tcf_cpp_test_class_extension::tcf_cpp_test_class_nested::s_int == 2",
     };
 
     TestExpressions(TCFTestSuite test_suite, RunControl test_rc, IChannel channel) {
