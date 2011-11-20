@@ -30,6 +30,12 @@
    <feature url="features/org.eclipse.tcf.te.tcf.sdk.feature_0.0.0.qualifier.jar" id="org.eclipse.tcf.te.tcf.sdk.feature" version="0.0.0">
       <category name="org.eclipse.tcf.te"/>
    </feature>
+   <feature url="features/org.eclipse.tcf.te.cdt.feature_0.0.0.qualifier.jar" id="org.eclipse.tcf.te.cdt.feature" version="0.0.0">
+      <category name="org.eclipse.tcf.te"/>
+   </feature>
+   <feature url="features/org.eclipse.tcf.te.cdt.sdk.feature_0.0.0.qualifier.jar" id="org.eclipse.tcf.te.cdt.sdk.feature" version="0.0.0">
+      <category name="org.eclipse.tcf.te"/>
+   </feature>
    <feature url="features/org.eclipse.tcf.cdt.sdk.feature_0.0.0.qualifier.jar" id="org.eclipse.tcf.cdt.sdk.feature" version="0.0.0">
       <category name="org.eclipse.tcf"/>
    </feature>
