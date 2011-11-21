@@ -41,12 +41,12 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.tcf.te.runtime.interfaces.IDisposable;
 import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.dialogs.NameValuePairDialog;
 import org.eclipse.tcf.te.ui.forms.parts.TablePart;
 import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.services.IDisposable;
 
 /**
  * Peer attributes table part implementation.
@@ -119,7 +119,7 @@ public class PeerAttributesTablePart extends TablePart implements IDisposable {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ui.services.IDisposable#dispose()
+	 * @see org.eclipse.tcf.te.runtime.interfaces.IDisposable#dispose()
 	 */
 	@Override
 	public void dispose() {
