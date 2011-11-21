@@ -22,6 +22,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.tcf.te.ui.terminals.actions.AbstractAction;
+import org.eclipse.tcf.te.ui.terminals.actions.PinTerminalAction;
 import org.eclipse.tcf.te.ui.terminals.actions.TabScrollLockAction;
 import org.eclipse.tcf.te.ui.terminals.interfaces.ITerminalsView;
 import org.eclipse.tm.internal.terminal.control.ITerminalViewControl;
@@ -235,6 +236,17 @@ public class TabFolderToolbarHandler extends PlatformObject {
 				return getActiveTerminalViewControl();
 			}
 		});
+
+		// Create and add the pin view action
+		add (new PinTerminalAction(getParentView()) {
+			/* (non-Javadoc)
+			 * @see org.eclipse.tm.internal.terminal.control.actions.AbstractTerminalAction#getTarget()
+			 */
+			@Override
+			protected ITerminalViewControl getTarget() {
+				return getActiveTerminalViewControl();
+			}
+		});
 	}
 
 	/**
@@ -251,6 +263,9 @@ public class TabFolderToolbarHandler extends PlatformObject {
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		manager.add(new Separator("anchor")); //$NON-NLS-1$
 
+		// we want that at the end
+		PinTerminalAction pinAction=null;
+		
 		// Loop all actions and add them to the menu manager
 		for (AbstractTerminalAction action : toolbarActions) {
 			// Add a separator before the clear all action or if the action is a separator
@@ -258,8 +273,17 @@ public class TabFolderToolbarHandler extends PlatformObject {
 				|| (action instanceof AbstractAction && ((AbstractAction)action).isSeparator())) {
 				manager.insertAfter("anchor", new Separator()); //$NON-NLS-1$
 			}
+			// skip pin action for now
+			if(action instanceof PinTerminalAction){
+				pinAction=(PinTerminalAction)action;
+				continue;
+			}
 			// Add the action itself
 			manager.insertAfter("anchor", action); //$NON-NLS-1$
+		}
+		// now add pin at the end
+		if(pinAction!=null){
+			manager.add(pinAction);
 		}
 	}
 

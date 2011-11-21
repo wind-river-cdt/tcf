@@ -10,13 +10,13 @@
 package org.eclipse.tcf.te.ui.terminals.types;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
+import org.eclipse.tcf.te.runtime.services.interfaces.constants.ITerminalsConnectorConstants;
 import org.eclipse.tcf.te.ui.terminals.internal.SettingsStore;
 import org.eclipse.tm.internal.terminal.provisional.api.ISettingsStore;
 import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalConnectorExtension;
 import org.eclipse.tm.internal.terminal.telnet.TelnetSettings;
-import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
-import org.eclipse.tcf.te.runtime.services.interfaces.constants.ITerminalsConnectorConstants;
 
 /**
  * Telnet terminal connector type implementation.
@@ -68,7 +68,7 @@ public class TelnetConnectorType extends AbstractConnectorType {
 		Assert.isNotNull(attributes);
 		Assert.isTrue(attributes.length >= 2);
 
-		if (connectorId == null) connectorId = "org.eclipse.tcf.internal.terminal.telnet.TelnetConnector"; //$NON-NLS-1$
+		if (connectorId == null) connectorId = "org.eclipse.tm.internal.terminal.telnet.TelnetConnector"; //$NON-NLS-1$
 
 		final String serverName = attributes[0];
 		final String serverPort = Integer.toString(Integer.decode(attributes[1]).intValue() + portOffset);

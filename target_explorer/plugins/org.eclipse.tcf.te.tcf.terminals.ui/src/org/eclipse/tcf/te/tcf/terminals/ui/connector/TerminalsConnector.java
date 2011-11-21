@@ -10,15 +10,15 @@
 package org.eclipse.tcf.te.tcf.terminals.ui.connector;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.tm.internal.terminal.provisional.api.ISettingsStore;
-import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
-import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.ITerminals;
+import org.eclipse.tcf.te.runtime.interfaces.IDisposable;
 import org.eclipse.tcf.te.tcf.terminals.core.launcher.TerminalsLauncher;
 import org.eclipse.tcf.te.ui.terminals.streams.AbstractStreamsConnector;
-import org.eclipse.ui.services.IDisposable;
+import org.eclipse.tm.internal.terminal.provisional.api.ISettingsStore;
+import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
+import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
 
 /**
  * Terminals connector implementation.
@@ -75,7 +75,7 @@ public class TerminalsConnector extends AbstractStreamsConnector implements IDis
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ui.services.IDisposable#dispose()
+	 * @see org.eclipse.tcf.te.runtime.interfaces.IDisposable#dispose()
 	 */
 	@Override
 	public void dispose() {

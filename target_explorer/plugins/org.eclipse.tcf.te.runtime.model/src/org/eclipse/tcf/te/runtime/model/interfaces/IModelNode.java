@@ -53,37 +53,40 @@ public interface IModelNode extends IPropertiesContainer, ISchedulingRule {
 	public static final String PROPERTY_ERROR = "error"; //$NON-NLS-1$
 
 	/**
-	 * Returns the parent node.
-	 * @return The parent
+	 * Returns the parent model node.
+	 *
+	 * @return The model parent
 	 */
 	public IContainerModelNode getParent();
 
 	/**
-	 * Returns the first parent node that implements the given type
-	 * or <code>null</code> if no matching parent can be found.
+	 * Returns the first parent node that implements the given type or <code>null</code> if no
+	 * matching parent can be found.
 	 *
 	 * @param nodeType The interface/class the parent needs to implement/extend.
 	 * @return The parent or <code>null</code>.
 	 */
-	public IContainerModelNode getParent(Class<?> nodeType);
+	public <V extends IContainerModelNode> V getParent(Class<V> nodeType);
 
 	/**
-	 * Associated the given container model node as parent. The parent node
-	 * can be set only once.
+	 * Associated the given model node as parent node.
+	 * <p>
+	 * <b>Note:</b> The parent node can be set only once.
 	 *
-	 * @param parent The parent container model node.
-	 * @throws <code>IllegalStateException</code> if the node had been associated already with a parent.
+	 * @param parent The parent model node.
+	 * @throws <code>IllegalStateException</code> if the node had been associated already with a
+	 *         parent.
 	 */
 	public void setParent(IContainerModelNode parent) throws IllegalStateException;
 
 	/**
-	 * Moves the model node to the specified new parent container. If the model
-	 * node is associated with a parent container, the node will be removed from
-	 * the old parent container node non-recursive.
+	 * Moves the model node to the specified new parent container. If the model node is associated
+	 * with a parent container, the node will be removed from the old parent container node
+	 * non-recursive.
 	 * <p>
-	 * <b>Note:</b> The method will trigger 2 change events, a {@link IContainerModelNode#NOTIFY_REMOVED}
-	 * notification for the old parent (if any) and a {@link IContainerModelNode#NOTIFY_ADDED} notification
-	 * for the new parent container.
+	 * <b>Note:</b> The method will trigger 2 change events, a
+	 * {@link IContainerModelNode#NOTIFY_REMOVED} notification for the old parent (if any) and a
+	 * {@link IContainerModelNode#NOTIFY_ADDED} notification for the new parent container.
 	 *
 	 * @param newParent The new parent container. Must not be <code>null</code>.
 	 * @throws IllegalStateException if the move of the node failed.

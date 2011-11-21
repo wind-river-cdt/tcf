@@ -9,6 +9,7 @@
 <!-- View contributions -->
    <extension point="org.eclipse.ui.views">
       <view
+            allowMultiple="true"
             category="org.eclipse.tcf.te.ui.views.category"
             class="org.eclipse.tcf.te.ui.terminals.view.TerminalsView"
             icon="platform:/plugin/org.eclipse.ui.console/icons/full/eview16/console_view.gif"

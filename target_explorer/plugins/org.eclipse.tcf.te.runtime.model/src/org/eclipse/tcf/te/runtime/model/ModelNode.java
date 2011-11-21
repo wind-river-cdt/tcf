@@ -14,11 +14,11 @@ import java.util.UUID;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
+import org.eclipse.tcf.te.runtime.activator.CoreBundleActivator;
+import org.eclipse.tcf.te.runtime.interfaces.tracing.ITraceIds;
 import org.eclipse.tcf.te.runtime.model.interfaces.IContainerModelNode;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNodeProvider;
-import org.eclipse.tcf.te.runtime.activator.CoreBundleActivator;
-import org.eclipse.tcf.te.runtime.interfaces.tracing.ITraceIds;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
 
 /**
@@ -58,14 +58,15 @@ public class ModelNode extends PropertiesContainer implements IModelNode, IModel
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.interfaces.nodes.IModelNode#getParent(java.lang.Class)
+	 * @see org.eclipse.tcf.te.runtime.model.interfaces.IModelNode#getParent(java.lang.Class)
 	 */
-	@Override
-	public final IContainerModelNode getParent(Class<?> nodeType) {
+	@SuppressWarnings("unchecked")
+    @Override
+	public final <V extends IContainerModelNode> V getParent(Class<V> nodeType) {
 		Assert.isTrue(checkThreadAccess(), "Illegal Thread Access"); //$NON-NLS-1$
 		if (this.parent != null) {
 			if (nodeType.isInstance(this.parent)) {
-				return this.parent;
+				return (V)this.parent;
 			}
 			return this.parent.getParent(nodeType);
 		}
