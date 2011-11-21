@@ -33,6 +33,10 @@ public class Messages extends NLS {
 
 	public static String TabTerminalListener_consoleTerminated;
 
+	public static String PinTerminalAction_menu;
+
+	public static String PinTerminalAction_toolTip;
+
 	public static String ProcessSettingsPage_dialogTitle;
 	public static String ProcessSettingsPage_processImagePathSelectorControl_label;
 	public static String ProcessSettingsPage_processImagePathSelectorControl_button;

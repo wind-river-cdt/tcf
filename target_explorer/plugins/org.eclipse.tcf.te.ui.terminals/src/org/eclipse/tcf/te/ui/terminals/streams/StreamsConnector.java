@@ -10,10 +10,10 @@
 package org.eclipse.tcf.te.ui.terminals.streams;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.tcf.te.runtime.interfaces.IDisposable;
 import org.eclipse.tm.internal.terminal.provisional.api.ISettingsStore;
 import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
-import org.eclipse.ui.services.IDisposable;
 
 /**
  * Streams connector implementation.
@@ -66,7 +66,7 @@ public class StreamsConnector extends AbstractStreamsConnector implements IDispo
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ui.services.IDisposable#dispose()
+	 * @see org.eclipse.tcf.te.runtime.interfaces.IDisposable#dispose()
 	 */
 	@Override
 	public void dispose() {
