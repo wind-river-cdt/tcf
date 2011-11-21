@@ -159,9 +159,12 @@ class TestPathMap implements ITCFTest {
     }
 
     private PathMapRule[] filterMap(PathMapRule[] map) {
+        if (map == null) return null;
         ArrayList<PathMapRule> res = new ArrayList<PathMapRule>();
         for (PathMapRule r : map) {
-            if (r.getID().startsWith(test_id)) res.add(r);
+            String id = r.getID();
+            if (id == null) continue;
+            if (id.startsWith(test_id)) res.add(r);
         }
         return res.toArray(new PathMapRule[res.size()]);
     }
