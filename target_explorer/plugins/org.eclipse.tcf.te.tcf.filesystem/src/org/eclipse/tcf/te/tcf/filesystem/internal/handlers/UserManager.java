@@ -7,6 +7,8 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  * William Chen (Wind River)- [345552] Edit the remote files with a proper editor
+ * William Chen (Wind River) - [361324] Add more file operations in the file system
+ * 												of Target Explorer.
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.handlers;
 
@@ -139,7 +141,7 @@ public class UserManager {
 			@Override
             public void doneOpenChannel(Throwable error, IChannel channel) {
 				if(error!=null){
-					String message = NLS.bind(Messages.TCFUtilities_OpeningFailureMessage,
+					String message = NLS.bind(Messages.OpeningChannelFailureMessage,
 							new Object[]{peer.getID(), error.getLocalizedMessage()});
 					errors[0] = new TCFChannelException(message, error);
 				}else{
@@ -150,7 +152,7 @@ public class UserManager {
 		try {
 			rendezvous.waiting(5000L);
 		} catch (InterruptedException e) {
-			String message = NLS.bind(Messages.TCFUtilities_OpeningFailureMessage,
+			String message = NLS.bind(Messages.OpeningChannelFailureMessage,
 					new Object[]{peer.getID(), e.getLocalizedMessage()});
 			errors[0] = new TCFChannelException(message, e);
 		}

@@ -7,6 +7,8 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  * William Chen (Wind River)- [345552] Edit the remote files with a proper editor
+ * William Chen (Wind River) - [361324] Add more file operations in the file system
+ * 												of Target Explorer.
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.handlers;
 
@@ -150,22 +152,6 @@ public class StateManager {
 	}
 
 	/**
-	 * Commit the content of the local file to the target.
-	 *
-	 * @param node The tree node whose local file is going to committed.
-	 * @throws TCFException
-	 */
-	public void commitState(final FSTreeNode node) throws TCFException {
-		File file = CacheManager.getInstance().getCacheFile(node);
-		Assert.isTrue(file.exists());
-		long mtime = file.lastModified();
-		// Create the new file attribute based on the file's last modified time.
-		IFileSystem.FileAttrs attrs = new IFileSystem.FileAttrs(node.attr.flags, node.attr.size, node.attr.uid, node.attr.gid, node.attr.permissions, node.attr.atime, mtime,
-				node.attr.attributes);
-		setFileAttrs(node, attrs);
-	}
-
-	/**
 	 * Set the file's attributes using the new attributes.
 	 * 
 	 * @param node The file's node.
@@ -227,7 +213,7 @@ public class StateManager {
 			@Override
             public void doneOpenChannel(Throwable error, IChannel channel) {
 				if(error!=null){
-					String message = NLS.bind(Messages.TCFUtilities_OpeningFailureMessage,
+					String message = NLS.bind(Messages.OpeningChannelFailureMessage,
 							new Object[]{peer.getID(), error.getLocalizedMessage()});
 					errors[0] = new TCFChannelException(message, error);
 				}else{
@@ -238,7 +224,7 @@ public class StateManager {
 		try {
 			rendezvous.waiting(5000L);
 		} catch (InterruptedException e) {
-			String message = NLS.bind(Messages.TCFUtilities_OpeningFailureMessage,
+			String message = NLS.bind(Messages.OpeningChannelFailureMessage,
 					new Object[]{peer.getID(), e.getLocalizedMessage()});
 			errors[0] = new TCFChannelException(message, e);
 		}

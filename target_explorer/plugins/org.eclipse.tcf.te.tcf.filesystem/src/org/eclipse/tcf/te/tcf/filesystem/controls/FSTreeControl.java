@@ -7,6 +7,8 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  * William Chen (Wind River) - [345384] Provide property pages for remote file system nodes
+ * William Chen (Wind River) - [361324] Add more file operations in the file system
+ * 												of Target Explorer.
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.controls;
 
@@ -15,6 +17,8 @@ import java.util.Collections;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.expressions.EvaluationContext;
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelDecorator;
@@ -27,8 +31,13 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.tcf.te.tcf.filesystem.internal.dnd.FSDragSourceListener;
+import org.eclipse.tcf.te.tcf.filesystem.internal.dnd.FSDropTargetListener;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.ui.interfaces.IUIConstants;
 import org.eclipse.tcf.te.ui.trees.AbstractTreeControl;
@@ -64,6 +73,17 @@ public class FSTreeControl extends AbstractTreeControl implements ISelectionChan
 		super(parentPart);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.trees.AbstractTreeControl#doCreateTreeViewer(org.eclipse.swt.widgets.Composite)
+	 */
+	@Override
+    protected TreeViewer doCreateTreeViewer(Composite parent) {
+		Assert.isNotNull(parent);
+		// Override the parent method to create a multiple-selection tree.
+		return new TreeViewer(parent, SWT.FULL_SELECTION | SWT.MULTI);
+    }
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.tcf.vtl.ui.datasource.controls.trees.AbstractTreeControl#configureTreeViewer(org.eclipse.jface.viewers.TreeViewer)
 	 */
@@ -87,6 +107,13 @@ public class FSTreeControl extends AbstractTreeControl implements ISelectionChan
 		}
 		tree.setHeaderVisible(hasColumns());
 		viewer.addDoubleClickListener(this);
+		//Add DnD support.
+	    int operations = DND.DROP_MOVE;
+		Transfer[] transferTypes = {LocalSelectionTransfer.getTransfer()};
+		viewer.addDragSupport(operations, transferTypes, new FSDragSourceListener(viewer));
+		viewer.addDropSupport(operations, transferTypes, new FSDropTargetListener(viewer));
+		// Add editing support to rename files/folders.
+		FSCellConfigurator.addEditingSupport(viewer);
 	}
 
 	/**

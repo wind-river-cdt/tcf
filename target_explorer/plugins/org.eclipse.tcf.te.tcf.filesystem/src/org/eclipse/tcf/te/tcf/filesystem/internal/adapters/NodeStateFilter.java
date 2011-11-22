@@ -7,11 +7,18 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  * William Chen (Wind River)- [345552] Edit the remote files with a proper editor
+ * William Chen (Wind River) - [361324] Add more file operations in the file system
+ * 												of Target Explorer.
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.adapters;
 
+import java.net.URL;
+import java.util.List;
+
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.StateManager;
+import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSClipboard;
 import org.eclipse.tcf.te.tcf.filesystem.model.CacheState;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.ui.IActionFilter;
@@ -44,6 +51,19 @@ public class NodeStateFilter implements IActionFilter {
 			if (value == null)
 				value = CacheState.consistent.name();
 			return value.equals(state.name());
+		}
+		else if (name.equals("edit.cut")) { //$NON-NLS-1$
+			FSClipboard cb = UIPlugin.getDefault().getClipboard();
+			if (!cb.isEmpty()) {
+				int operation = cb.getOperation();
+				if (operation == FSClipboard.CUT) {
+					URL nodeURL = node.getLocationURL();
+					List<URL> files = cb.getFiles();
+					for (URL file : files) {
+						if (nodeURL.equals(file)) return true;
+					}
+				}
+			}
 		}
 		return false;
 	}

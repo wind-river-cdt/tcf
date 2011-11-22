@@ -35,6 +35,7 @@ public class ViewViewer extends CommonViewer {
 	 */
 	public ViewViewer(String viewerId, Composite parent, int style) {
 		super(viewerId, parent, style);
+		new ViewViewerConfigurator(viewerId).configure(this);
 	}
 
 	/* (non-Javadoc)

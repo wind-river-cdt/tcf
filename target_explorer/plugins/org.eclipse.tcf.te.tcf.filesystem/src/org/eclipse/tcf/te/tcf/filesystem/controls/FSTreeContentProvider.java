@@ -6,6 +6,8 @@
  *
  * Contributors:
  * Wind River Systems - initial API and implementation
+ * William Chen (Wind River) - [361324] Add more file operations in the file system
+ * 												of Target Explorer.
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.controls;
 
@@ -594,12 +596,18 @@ public class FSTreeContentProvider implements ITreeContentProvider, INodeStateLi
 		// Make sure that this node is inside of this viewer.
 		Display display = PlatformUI.getWorkbench().getDisplay();
 		if (display.getThread() == Thread.currentThread()) {
-			viewer.refresh(node);
+			if (node != null) {
+				viewer.refresh(node);
+			}
+			else {
+				//Refresh the whole tree.
+				viewer.refresh();
+			}
 		} else {
 			display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
-					viewer.refresh(node);
+					stateChanged(node);
 				}
 			});
 		}

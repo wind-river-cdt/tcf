@@ -16,6 +16,10 @@
                   pattern="org.eclipse.tcf.te.tcf.filesystem.navigator.*"/>
          </includes>
       </viewerContentBinding>
+      <dragAssistant
+            class="org.eclipse.tcf.te.tcf.filesystem.internal.dnd.FSDragAdapterAssistant"
+            viewerId="org.eclipse.tcf.te.ui.views.TargetExplorer">
+      </dragAssistant>
    </extension>
    
    <extension point="org.eclipse.ui.navigator.navigatorContent">
@@ -28,13 +32,13 @@
             name="%navigatorContent.name"
             priority="normal">
             <triggerPoints>
-                <adapt
-                      type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel">
-                   <test
-                         property="org.eclipse.tcf.te.tcf.locator.hasRemoteService"
-                         value="FileSystem">
-                   </test>
-                </adapt>
+               <instanceof
+                     value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel">
+               </instanceof>
+                <test
+                      property="org.eclipse.tcf.te.tcf.locator.hasRemoteService"
+                      value="FileSystem">
+                </test>
             </triggerPoints>
             <possibleChildren>
             	<instanceof value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode"/>
@@ -43,6 +47,14 @@
                   class="org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeViewerSorter"
                   id="org.eclipse.tcf.te.tcf.filesystem.navigator.sorter">
             </commonSorter>
+            <dropAssistant
+                  class="org.eclipse.tcf.te.tcf.filesystem.internal.dnd.FSDropAdapterAssistant"
+                  id="org.eclipse.tcf.te.tcf.filesystem.dropAssistant">
+               <possibleDropTargets>
+                  <instanceof
+                        value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                  </instanceof></possibleDropTargets>
+            </dropAssistant>
       </navigatorContent>
       <commonFilter
             activeByDefault="true"
@@ -149,6 +161,153 @@
                   id="openWithMenu">
             </dynamic>
          </menu>
+         <separator
+               name="group.edit"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.ui.edit.cut"
+               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Cut"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/cut_edit.gif"
+               id="cut"
+               label="%command.label.cut"
+               mnemonic="t"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="+">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.ui.edit.copy"
+               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Copy"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/copy_edit.gif"
+               id="copy"
+               label="%command.label.copy"
+               mnemonic="C"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="+">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.ui.edit.paste"
+               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Paste"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/paste_edit.gif"
+               id="paste"
+               label="%command.label.paste"
+               mnemonic="P"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="+">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <separator
+               name="group.delete">
+         </separator>
+         <command
+               commandId="org.eclipse.ui.edit.delete"
+               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Delete"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/obj16/delete_obj.gif"
+               id="delete"
+               label="%command.label.delete"
+               mnemonic="D"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="+">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <separator
+               name="group.move"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.ui.edit.rename"
+               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Rename"
+               id="rename"
+               label="%command.label.rename"
+               mnemonic="R"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.ui.edit.move"
+               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Move"
+               id="move"
+               label="%command.label.move"
+               mnemonic="M"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="+">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
          <separator
                name="group.state"
                visible="true">
@@ -403,6 +562,153 @@
             </dynamic>
          </menu>
          <separator
+               name="file.group.edit"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.ui.edit.cut"
+               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Cut"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/cut_edit.gif"
+               id="cut"
+               label="%command.label.cut.1"
+               mnemonic="t"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="+">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.ui.edit.copy"
+               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Copy"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/copy_edit.gif"
+               id="copy"
+               label="%command.label.copy.1"
+               mnemonic="C"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="+">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.ui.edit.paste"
+               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Paste"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/paste_edit.gif"
+               id="paste"
+               label="%command.label.paste.1"
+               mnemonic="P"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="+">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <separator
+               name="group.delete">
+         </separator>
+         <command
+               commandId="org.eclipse.ui.edit.delete"
+               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Delete"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/obj16/delete_obj.gif"
+               id="delete"
+               label="%command.label.delete.1"
+               mnemonic="D"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="+">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <separator
+               name="group.move"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.ui.edit.rename"
+               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Rename"
+               id="rename"
+               label="%command.label.rename.1"
+               mnemonic="R"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.ui.edit.move"
+               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Move"
+               id="move"
+               label="%command.label.move.1"
+               mnemonic="M"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="+">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <separator
                name="group.state"
                visible="true">
          </separator>
@@ -583,7 +889,7 @@
             class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.FSTreeNodePropertyTester"
             id="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode"
             namespace="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode"
-            properties="isFile,isDirectory,isBinaryFile,isReadable,isWritable,isExecutable,getCacheState"
+            properties="isFile,isDirectory,isBinaryFile,isReadable,isWritable,isExecutable,isRoot,isReadOnly,isHidden,isWindows,getCacheState,isSamePeer"
             type="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
       </propertyTester>
       <propertyTester
@@ -591,6 +897,13 @@
             id="org.eclipse.tcf.te.tcf.filesystem.propertytester.cache"
             namespace="org.eclipse.tcf.te.tcf.filesystem.propertytester.cache"
             properties="isAutoSavingOn"
+            type="java.lang.Object">
+      </propertyTester>
+      <propertyTester
+            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.ClipboardPropertyTester"
+            id="org.eclipse.tcf.te.tcf.filesystem.propertytester.clipboard"
+            namespace="org.eclipse.tcf.te.tcf.filesystem.propertytester.clipboard"
+            properties="canPaste"
             type="java.lang.Object">
       </propertyTester>
    </extension>
@@ -626,6 +939,17 @@
          <activeWhen>
             <and>
                <with
+                     variable="activePartId">
+                  <or>
+                     <equals
+                           value="org.eclipse.tcf.te.ui.views.TargetExplorer">
+                     </equals>
+                     <equals
+                           value="org.eclipse.tcf.te.ui.view.Editor">
+                     </equals>
+                  </or>
+               </with>
+               <with
                      variable="selection">
                   <count
                         value="1">
@@ -650,23 +974,100 @@
                      </not>
                   </iterate>
                </with>
-               <with
-                     variable="activePartId">
-                  <or>
-                     <equals
-                           value="org.eclipse.tcf.te.ui.views.TargetExplorer">
-                     </equals>
-                     <equals
-                           value="org.eclipse.tcf.te.ui.view.Editor">
-                     </equals>
-                  </or>
-               </with>
             </and>
          </activeWhen>
+         <enabledWhen>
+            <with
+                  variable="selection">
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                  </instanceof>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isFile">
+                  </test>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isReadable">
+                  </test>
+                  <not>
+                     <test
+                           forcePluginActivation="true"
+                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isBinaryFile">
+                     </test>
+                  </not>
+               </iterate>
+            </with>
+         </enabledWhen>
       </handler>
       <handler
             class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.RefreshHandler"
             commandId="org.eclipse.ui.file.refresh">
+         <activeWhen>
+           <and>
+            <with
+                  variable="activePartId">
+               <or>
+                  <equals
+                        value="org.eclipse.tcf.te.ui.views.TargetExplorer">
+                  </equals>
+                  <equals
+                        value="org.eclipse.tcf.te.ui.view.Editor">
+                  </equals>
+               </or>
+            </with>
+            <with
+                  variable="selection">
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                  </instanceof>
+                  <test
+                        property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isFile">
+                  </test>
+               </iterate>
+            </with>
+            <not>
+               <test
+                     property="org.eclipse.tcf.te.tcf.filesystem.propertytester.cache.isAutoSavingOn">
+               </test>
+            </not>
+            </and>
+         </activeWhen>
+         <enabledWhen>
+            <and>
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                     </instanceof>
+                     <test
+                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isFile">
+                     </test>
+                  </iterate>
+               </with>
+               <not>
+                  <test
+                        property="org.eclipse.tcf.te.tcf.filesystem.propertytester.cache.isAutoSavingOn">
+                  </test>
+               </not>
+            </and>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.UpdateHandler"
+            commandId="org.eclipse.tcf.te.tcf.filesystem.commands.update">
          <activeWhen>
             <with
                   variable="activePartId">
@@ -680,80 +1081,477 @@
                </or>
             </with>
          </activeWhen>
-      </handler>
-      <handler
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.UpdateHandler"
-            commandId="org.eclipse.tcf.te.tcf.filesystem.commands.update">
          <enabledWhen>
-            <with
-                  variable="selection">
-               <count
-                     value="1">
-               </count>
-               <iterate>
+            <and>
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                     </instanceof>
+                     <test
+                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isFile">
+                     </test>
+                     <test
+                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.getCacheState"
+                           value="outdated">
+                     </test>
+                  </iterate>
+               </with>
+               <not>
                   <test
-                        property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.getCacheState"
-                        value="outdated">
+                        property="org.eclipse.tcf.te.tcf.filesystem.propertytester.cache.isAutoSavingOn">
                   </test>
-               </iterate>
-            </with>
+               </not>
+            </and>
          </enabledWhen>
       </handler>
       <handler
             class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.CommitHandler"
             commandId="org.eclipse.tcf.te.tcf.filesystem.commands.commit">
-         <enabledWhen>
+         <activeWhen>
             <with
-                  variable="selection">
-               <count
-                     value="1">
-               </count>
-               <iterate>
-                  <test
-                        property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.getCacheState"
-                        value="modified">
-                  </test>
-               </iterate>
+                  variable="activePartId">
+               <or>
+                  <equals
+                        value="org.eclipse.tcf.te.ui.views.TargetExplorer">
+                  </equals>
+                  <equals
+                        value="org.eclipse.tcf.te.ui.view.Editor">
+                  </equals>
+               </or>
             </with>
+         </activeWhen>
+         <enabledWhen>
+            <and>
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                     </instanceof>
+                     <test
+                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isFile">
+                     </test>
+                     <test
+                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.getCacheState"
+                           value="modified">
+                     </test>
+                  </iterate>
+               </with>
+               <not>
+                  <test
+                        property="org.eclipse.tcf.te.tcf.filesystem.propertytester.cache.isAutoSavingOn">
+                  </test>
+               </not>
+            </and>
          </enabledWhen>
       </handler>
       <handler
             class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.MergeHandler"
             commandId="org.eclipse.tcf.te.tcf.filesystem.commands.merge">
-         <enabledWhen>
+         <activeWhen>
             <with
-                  variable="selection">
-               <count
-                     value="1">
-               </count>
-               <iterate>
-                  <test
-                        property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.getCacheState"
-                        value="conflict">
-                  </test>
-               </iterate>
+                  variable="activePartId">
+               <or>
+                  <equals
+                        value="org.eclipse.tcf.te.ui.views.TargetExplorer">
+                  </equals>
+                  <equals
+                        value="org.eclipse.tcf.te.ui.view.Editor">
+                  </equals>
+               </or>
             </with>
-         </enabledWhen>
-      </handler>
-      <handler
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.RevertHandler"
-            commandId="org.eclipse.tcf.te.tcf.filesystem.commands.revert">
+         </activeWhen>
          <enabledWhen>
-            <with
-                  variable="selection">
-               <count
-                     value="1">
-               </count>
-               <iterate>
-                  <or>
+            <and>
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                     </instanceof>
                      <test
-                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.getCacheState"
-                           value="modified">
+                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isFile">
                      </test>
                      <test
                            property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.getCacheState"
                            value="conflict">
                      </test>
+                  </iterate>
+               </with>
+               <not>
+                  <test
+                        property="org.eclipse.tcf.te.tcf.filesystem.propertytester.cache.isAutoSavingOn">
+                  </test>
+               </not>
+            </and>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.RevertHandler"
+            commandId="org.eclipse.tcf.te.tcf.filesystem.commands.revert">
+         <activeWhen>
+            <with
+                  variable="activePartId">
+               <or>
+                  <equals
+                        value="org.eclipse.tcf.te.ui.views.TargetExplorer">
+                  </equals>
+                  <equals
+                        value="org.eclipse.tcf.te.ui.view.Editor">
+                  </equals>
+               </or>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+            <and>
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                     </instanceof>
+                     <test
+                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isFile">
+                     </test>
+                     <or>
+                        <test
+                              property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.getCacheState"
+                              value="modified">
+                        </test>
+                        <test
+                              property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.getCacheState"
+                              value="conflict">
+                        </test>
+                     </or>
+                  </iterate>
+               </with>
+               <not>
+                  <test
+                        property="org.eclipse.tcf.te.tcf.filesystem.propertytester.cache.isAutoSavingOn">
+                  </test>
+               </not>
+            </and>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.DeleteFilesHandler"
+            commandId="org.eclipse.ui.edit.delete">
+         <activeWhen>
+            <with
+                  variable="activePartId">
+               <or>
+                  <equals
+                        value="org.eclipse.tcf.te.ui.views.TargetExplorer">
+                  </equals>
+                  <equals
+                        value="org.eclipse.tcf.te.ui.view.Editor">
+                  </equals>
+               </or>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+            <with
+                  variable="selection">
+               <count
+                     value="+">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                  </instanceof>
+                  <not>
+                     <test
+                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isRoot">
+                     </test>
+                  </not>
+                  <or>
+                     <and>
+                        <test
+                              property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isWindows">
+                        </test>
+                        <not>
+                           <test
+                                 property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isReadOnly">
+                           </test>
+                        </not>
+                     </and>
+                     <and>
+                        <not>
+                           <test
+                                 property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isWindows">
+                           </test>
+                        </not>
+                        <test
+                              property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isWritable">
+                        </test>
+                     </and>
+                  </or>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.CutFilesHandler"
+            commandId="org.eclipse.ui.edit.cut">
+         <activeWhen>
+            <with
+                  variable="activePartId">
+               <or>
+                  <equals
+                        value="org.eclipse.tcf.te.ui.views.TargetExplorer">
+                  </equals>
+                  <equals
+                        value="org.eclipse.tcf.te.ui.view.Editor">
+                  </equals>
+               </or>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+            <with
+                  variable="selection">
+               <count
+                     value="+">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                  </instanceof>
+                  <not>
+                     <test
+                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isRoot">
+                     </test>
+                  </not>
+                  <or>
+                     <and>
+                        <test
+                              property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isWindows">
+                        </test>
+                        <not>
+                           <test
+                                 property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isReadOnly">
+                           </test>
+                        </not>
+                     </and>
+                     <and>
+                        <not>
+                           <test
+                                 property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isWindows">
+                           </test>
+                        </not>
+                        <test
+                              property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isWritable">
+                        </test>
+                     </and>
+                  </or>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.CopyFilesHandler"
+            commandId="org.eclipse.ui.edit.copy">
+         <activeWhen>
+            <with
+                  variable="activePartId">
+               <or>
+                  <equals
+                        value="org.eclipse.tcf.te.ui.views.TargetExplorer">
+                  </equals>
+                  <equals
+                        value="org.eclipse.tcf.te.ui.view.Editor">
+                  </equals>
+               </or>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+            <with
+                  variable="selection">
+               <count
+                     value="+">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                  </instanceof>
+                  <test
+                        property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isReadable">
+                  </test>
+                  <not>
+                     <test
+                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isRoot">
+                     </test>
+                  </not>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.PasteFilesHandler"
+            commandId="org.eclipse.ui.edit.paste">
+         <activeWhen>
+            <with
+                  variable="activePartId">
+               <or>
+                  <equals
+                        value="org.eclipse.tcf.te.ui.views.TargetExplorer">
+                  </equals>
+                  <equals
+                        value="org.eclipse.tcf.te.ui.view.Editor">
+                  </equals>
+               </or>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+         <and>
+            <with
+                  variable="selection">
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                  </instanceof>
+                  <test
+                        property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isWritable">
+                  </test>
+                  <test
+                        property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isDirectory">
+                  </test>
+                  <test
+                        property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isSamePeer">
+                  </test>
+               </iterate>
+            </with>
+            <test
+                  property="org.eclipse.tcf.te.tcf.filesystem.propertytester.clipboard.canPaste">
+            </test>
+         </and>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.MoveFilesHandler"
+            commandId="org.eclipse.ui.edit.move">
+         <activeWhen>
+            <with
+                  variable="activePartId">
+               <or>
+                  <equals
+                        value="org.eclipse.tcf.te.ui.views.TargetExplorer">
+                  </equals>
+                  <equals
+                        value="org.eclipse.tcf.te.ui.view.Editor">
+                  </equals>
+               </or>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+            <with
+                  variable="selection">
+               <count
+                     value="+">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                  </instanceof>
+                  <not>
+                     <test
+                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isRoot">
+                     </test>
+                  </not>
+                  <or>
+                     <and>
+                        <test
+                              property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isWindows">
+                        </test>
+                        <not>
+                           <test
+                                 property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isReadOnly">
+                           </test>
+                        </not>
+                     </and>
+                     <and>
+                        <not>
+                           <test
+                                 property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isWindows">
+                           </test>
+                        </not>
+                        <test
+                              property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isWritable">
+                        </test>
+                     </and>
+                  </or>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.RenameFilesHandler"
+            commandId="org.eclipse.ui.edit.rename">
+         <activeWhen>
+            <with
+                  variable="activePartId">
+               <or>
+                  <equals
+                        value="org.eclipse.tcf.te.ui.views.TargetExplorer">
+                  </equals>
+                  <equals
+                        value="org.eclipse.tcf.te.ui.view.Editor">
+                  </equals>
+               </or>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+            <with
+                  variable="selection">
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                  </instanceof>
+                  <not>
+                     <test
+                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isRoot">
+                     </test>
+                  </not>
+                  <or>
+                     <and>
+                        <test
+                              property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isWindows">
+                        </test>
+                        <not>
+                           <test
+                                 property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isReadOnly">
+                           </test>
+                        </not>
+                     </and>
+                     <and>
+                        <not>
+                           <test
+                                 property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isWindows">
+                           </test>
+                        </not>
+                        <test
+                              property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isWritable">
+                        </test>
+                     </and>
                   </or>
                </iterate>
             </with>
@@ -804,6 +1602,18 @@
             </objectState>
          </enablement>
       </decorator>
+      <decorator
+            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.CutDecorator"
+            id="org.eclipse.tcf.te.tcf.filesystem.decorators.cut"
+            label="%decorator.label.cut"
+            state="true">
+         <enablement>
+            <objectState
+                  name="edit.cut"
+                  value="true">
+            </objectState>
+         </enablement>
+      </decorator>
    </extension>
    
    <extension point="org.eclipse.ui.preferencePages">
@@ -822,6 +1632,13 @@
                type="org.eclipse.ui.IActionFilter">
          </adapter>
       </factory>
+   </extension>
+   <extension
+         point="org.eclipse.tcf.te.ui.views.configurators">
+      <configurator
+            class="org.eclipse.tcf.te.tcf.filesystem.controls.FSCellConfigurator"
+            viewerId="org.eclipse.tcf.te.ui.views.TargetExplorer">
+      </configurator>
    </extension>
    
 </plugin>

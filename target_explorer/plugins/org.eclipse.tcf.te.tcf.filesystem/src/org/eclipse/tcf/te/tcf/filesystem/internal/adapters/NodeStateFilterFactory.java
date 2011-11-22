@@ -40,7 +40,7 @@ public class NodeStateFilterFactory implements IAdapterFactory {
 	 */
 	@Override
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
-		if(adaptableObject instanceof FSTreeNode){
+		if(adaptableObject instanceof FSTreeNode && adapterType == IActionFilter.class){
 			FSTreeNode node = (FSTreeNode) adaptableObject;
 			NodeStateFilter filter = filters.get(node);
 			if(filter == null){

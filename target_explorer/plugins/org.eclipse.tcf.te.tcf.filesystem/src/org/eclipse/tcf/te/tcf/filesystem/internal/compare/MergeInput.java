@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 
 /**
  * An abstract compare input whose purpose is to support change notification
@@ -88,7 +89,7 @@ public class MergeInput implements ICompareInput {
 	 */
 	@Override
 	public void copy(boolean leftToRight) {
-		Assert.isTrue(false, "Copy is not support by this type of compare input"); //$NON-NLS-1$
+		Assert.isTrue(false, Messages.MergeInput_CopyNotSupported);
 	}
 
 	/* (non-Javadoc)
