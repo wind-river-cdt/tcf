@@ -6,6 +6,7 @@
  *
  * Contributors:
  * Wind River Systems - initial API and implementation
+ * Max Weninger (Wind River) - [361363] [TERMINALS] Implement "Pin&Clone" for the "Terminals" view
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.terminals.view;
 

@@ -6,6 +6,7 @@
  *
  * Contributors:
  * Wind River Systems - initial API and implementation
+ * Max Weninger (Wind River) - [361363] [TERMINALS] Implement "Pin&Clone" for the "Terminals" view
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.terminals.interfaces;
 
@@ -33,20 +34,19 @@ public interface ITerminalsView extends IViewPart {
 	 * @return The context help id or <code>null</code> if none is associated.
 	 */
 	public String getContextHelpId();
-	
+
 	/**
-	 * Set the state of the view to be pinned
-	 * which means a new terminal connection will be created
-	 * in a new view
-	 * 
-	 * @param pin
+	 * Set the state of the view to be pinned, which means a new terminal tab will be created
+	 * in a new view instance.
+	 *
+	 * @param pin <code>True</code> to set the view state to pinned, <code>false</code> otherwise.
 	 */
 	public void setPinned(boolean pin);
-	
+
 	/**
 	 * Return the pin state of the terminal view
-	 * 
-	 * @return
+	 *
+	 * @return <code>True</code> if the view instance is pinned, <code>false</code> if not.
 	 */
 	public boolean isPinned();
 }
