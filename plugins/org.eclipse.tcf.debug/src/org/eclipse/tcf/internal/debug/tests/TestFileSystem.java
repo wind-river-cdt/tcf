@@ -15,6 +15,7 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
+import java.util.UUID;
 
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
@@ -36,6 +37,8 @@ class TestFileSystem implements ITCFTest, IFileSystem.DoneStat,
 
     private final TCFTestSuite test_suite;
     private final int channel_id;
+
+    private static final String client_id = UUID.randomUUID().toString();
 
     private static final int
         STATE_PRE = 0,
@@ -128,7 +131,7 @@ class TestFileSystem implements ITCFTest, IFileSystem.DoneStat,
         else if (state == STATE_RD_DIR) {
             if (entries != null) {
                 for (DirEntry e : entries) {
-                    if (e.filename.startsWith("tcf-test-" + channel_id + "-")) {
+                    if (e.filename.startsWith("tcf-test-" + client_id + "-" + channel_id + "-")) {
                         tmp_files.add(e.filename);
                     }
                 }
@@ -177,7 +180,7 @@ class TestFileSystem implements ITCFTest, IFileSystem.DoneStat,
                 }
                 bf[i] = ch;
             }
-            file_name = tmp_path + "/tcf-test-" + channel_id + "-" + new String(bf) + ".tmp";
+            file_name = tmp_path + "/tcf-test-" + client_id + "-" + channel_id + "-" + new String(bf) + ".tmp";
             files.open(file_name, IFileSystem.TCF_O_CREAT | IFileSystem.TCF_O_TRUNC | IFileSystem.TCF_O_WRITE, null, this);
         }
         else {
