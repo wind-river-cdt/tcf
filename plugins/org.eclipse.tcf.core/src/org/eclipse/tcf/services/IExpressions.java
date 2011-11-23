@@ -146,6 +146,12 @@ public interface IExpressions extends IService {
         String getRegisterID();
 
         /**
+         * Return symbol ID if the value represents a symbol.
+         * @return symbol ID or null.
+         */
+        String getSymbolID();
+
+        /**
          * Return value memory address, if applicable.
          * @return address or null.
          */
@@ -172,6 +178,7 @@ public interface IExpressions extends IService {
         VAL_TYPE = "Type",
         VAL_BIG_ENDIAN = "BigEndian",
         VAL_REGISTER = "Register",
+        VAL_SYMBOL = "Symbol",
         VAL_ADDRESS = "Address";
 
     /**

@@ -110,6 +110,10 @@ public class ExpressionsProxy implements IExpressions {
             return (String)props.get(VAL_REGISTER);
         }
 
+        public String getSymbolID() {
+            return (String)props.get(VAL_SYMBOL);
+        }
+
         public Number getAddress() {
             return (Number)props.get(VAL_ADDRESS);
         }
