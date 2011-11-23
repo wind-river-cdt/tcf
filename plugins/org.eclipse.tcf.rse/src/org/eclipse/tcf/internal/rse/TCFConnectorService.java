@@ -46,6 +46,7 @@ import org.eclipse.tcf.util.TCFTask;
 public class TCFConnectorService extends StandardConnectorService implements ITCFSessionProvider{
 
     public static final String PROPERTY_SET_NAME = "TCF Connection Settings"; //$NON-NLS-1$
+    public static final String PROPERTY_TRANSPORT_NAME = "Transport.Name"; //$NON-NLS-1$
     public static final String PROPERTY_LOGIN_REQUIRED = "Login.Required"; //$NON-NLS-1$
     public static final String PROPERTY_PWD_REQUIRED="Pwd.Required"; //$NON-NLS-1$
     public static final String PROPERTY_LOGIN_PROMPT = "Login.Prompt"; //$NON-NLS-1$
@@ -90,6 +91,7 @@ public class TCFConnectorService extends StandardConnectorService implements ITC
         if (tcfSet == null) {
             tcfSet = createPropertySet(PROPERTY_SET_NAME, Messages.PropertySet_Description);
             //add default values if not set
+            tcfSet.addProperty(PROPERTY_TRANSPORT_NAME, "TCP", PropertyType.getEnumPropertyType(new String[] {"TCP", "SSL"}));  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
             tcfSet.addProperty(PROPERTY_LOGIN_REQUIRED, "false", PropertyType.getEnumPropertyType(new String[] {"true", "false"}));  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
             tcfSet.addProperty(PROPERTY_PWD_REQUIRED, "false", PropertyType.getEnumPropertyType(new String[] {"true", "false"}));  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
             tcfSet.addProperty(PROPERTY_LOGIN_PROMPT, "ogin: ", PropertyType.getStringPropertyType()); //$NON-NLS-1$
@@ -220,11 +222,11 @@ public class TCFConnectorService extends StandardConnectorService implements ITC
             }
             IPeer peer = null;
             String port_str = Integer.toString(port);
+            String transport = getTCFPropertySet().getPropertyValue(TCFConnectorService.PROPERTY_TRANSPORT_NAME);
             ILocator locator = Protocol.getLocator();
             for (IPeer p : locator.getPeers().values()) {
                 Map<String, String> attrs = p.getAttributes();
-                if (("TCP".equals(attrs.get(IPeer.ATTR_TRANSPORT_NAME)) || //$NON-NLS-1$
-                        "SSL".equals(attrs.get(IPeer.ATTR_TRANSPORT_NAME)))&& //$NON-NLS-1$
+                if (transport.equals(attrs.get(IPeer.ATTR_TRANSPORT_NAME)) && //$NON-NLS-1$
                         host.equalsIgnoreCase(attrs.get(IPeer.ATTR_IP_HOST)) &&
                         port_str.equals(attrs.get(IPeer.ATTR_IP_PORT))) {
                     peer = p;
@@ -235,7 +237,7 @@ public class TCFConnectorService extends StandardConnectorService implements ITC
                 Map<String, String> attrs = new HashMap<String, String>();
                 attrs.put(IPeer.ATTR_ID, "RSE:" + host + ":" + port_str); //$NON-NLS-1$ //$NON-NLS-2$
                 attrs.put(IPeer.ATTR_NAME, getName());
-                attrs.put(IPeer.ATTR_TRANSPORT_NAME, "TCP"); //$NON-NLS-1$
+                attrs.put(IPeer.ATTR_TRANSPORT_NAME, transport);
                 attrs.put(IPeer.ATTR_IP_HOST, host);
                 attrs.put(IPeer.ATTR_IP_PORT, port_str);
                 peer = new AbstractPeer(attrs);
