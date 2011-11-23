@@ -214,6 +214,13 @@ public interface IPropertiesContainer extends IAdaptable {
 	public void clearProperties();
 
 	/**
+	 * Returns whether this properties container is empty or not.
+	 *
+	 * @return <code>True</code> if the properties container is empty, <code>false</code> if not.
+	 */
+	public boolean isEmpty();
+
+	/**
 	 * Test if the property value stored under the given property is equal ignoring the case to the given
 	 * expected string value.
 	 *

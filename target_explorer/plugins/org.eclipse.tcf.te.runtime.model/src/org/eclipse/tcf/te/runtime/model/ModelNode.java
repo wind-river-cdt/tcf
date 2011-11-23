@@ -137,17 +137,6 @@ public class ModelNode extends PropertiesContainer implements IModelNode, IModel
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.nodes.PropertiesContainer#getProperty(java.lang.String)
-	 */
-	@Override
-	public Object getProperty(String key) {
-		if (PROPERTY_NAME.equals(key)) {
-			return getName();
-		}
-		return super.getProperty(key);
-	}
-
-	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.runtime.interfaces.nodes.IModelNode#getDescription()
 	 */
 	@Override
