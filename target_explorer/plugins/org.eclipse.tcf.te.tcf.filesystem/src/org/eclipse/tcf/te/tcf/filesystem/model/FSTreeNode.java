@@ -9,6 +9,8 @@
  * William Chen (Wind River) - [345384] Provide property pages for remote file system nodes
  * William Chen (Wind River) - [352302]Opening a file in an editor depending on
  *                             the client's permissions.
+ * William Chen (Wind River) - [361324] Add more file operations in the file system
+ * 												of Target Explorer.
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.model;
 
@@ -98,23 +100,48 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 	 */
 	@Override
 	public Object clone() {
-		FSTreeNode clone;
-        try {
-	        clone = (FSTreeNode) super.clone();
-        } catch (CloneNotSupportedException e) {
-        	clone = new FSTreeNode();
-        	clone.children = children;
-        	clone.childrenQueried = childrenQueried;
-        	clone.childrenQueryRunning = childrenQueryRunning;
-        	clone.name = name;
-        	clone.parent = parent;
-        	clone.peerNode = peerNode;
-        	clone.type = type;
-        }
-		Map<String, Object> attributes = new HashMap<String, Object>(attr.attributes);
-		clone.attr = new IFileSystem.FileAttrs(attr.flags, attr.size, attr.uid, attr.gid, attr.permissions, attr.atime, attr.mtime, attributes);
-		return clone;
+		if (Protocol.isDispatchThread()) {
+			FSTreeNode clone = new FSTreeNode();
+			clone.childrenQueried = childrenQueried;
+			clone.childrenQueryRunning = childrenQueryRunning;
+			clone.name = name;
+			clone.parent = parent;
+			clone.peerNode = peerNode;
+			clone.type = type;
+			Map<String, Object> attributes = new HashMap<String, Object>(attr.attributes);
+			clone.attr = new IFileSystem.FileAttrs(attr.flags, attr.size, attr.uid, attr.gid, attr.permissions, attr.atime, attr.mtime, attributes);
+			return clone;
+		}
+		final Object[] objects = new Object[1];
+		Protocol.invokeAndWait(new Runnable() {
+
+			@Override
+			public void run() {
+				objects[0] = FSTreeNode.this.clone();
+			}
+		});
+		return objects[0];
 	}
+
+	/**
+	 * Change the file/folder's write permission.
+	 * @param b true if the agent is granted with its write permission.
+	 */
+	public void setWritable(boolean b) {
+		UserAccount account = UserManager.getInstance().getUserAccount(peerNode);
+		if (account != null && attr != null) {
+			int bit;
+			if (attr.uid == account.getEUID()) {
+				bit = IFileSystem.S_IWUSR;
+			} else if (attr.gid == account.getEGID()) {
+				bit = IFileSystem.S_IWGRP;
+			} else {
+				bit = IFileSystem.S_IWOTH;
+			}
+			int permissions = attr.permissions;
+			setPermissions(b ? (permissions | bit):(permissions & ~ bit));
+		}
+    }
 
 	/**
 	 * Set the file's permissions.
@@ -284,13 +311,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 	 * @return The location of the file/folder.
 	 */
 	public String getLocation() {
-		if (parent == null)
-			return null;
-		String location = parent.getLocation(false);
-		if (parent.isRoot()) {
-			return location + (isWindowsNode() ? "\\" : "/"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		return location;
+		return getLocation(false);
 	}
 
 	/**
@@ -301,11 +322,17 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 	 * @return The path to the file/folder.
 	 */
 	public String getLocation(boolean cross) {
-		if (parent == null)
-			return null;
+		if(isRoot()) {
+			if(cross) {
+				if(isWindowsNode()) {
+					return name.substring(0, name.length() - 1) + "/"; //$NON-NLS-1$
+				}
+			}
+			return name;
+		}
 		String pLoc = parent.getLocation(cross);
-		if (pLoc == null) {
-			return name.substring(0, name.length() - 1);
+		if(parent.isRoot()) {
+			return pLoc + name; 
 		}
 		String pathSep = (!cross && isWindowsNode()) ? "\\" : "/"; //$NON-NLS-1$ //$NON-NLS-2$
 		return pLoc + pathSep + name;
@@ -360,6 +387,19 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 	}
 
 	/**
+	 * If the agent is the owner of this file/folder.
+	 * 
+	 * @return true if the agent is the owner of this file/folder.
+	 */
+	public boolean isAgentOwner() {
+		UserAccount account = UserManager.getInstance().getUserAccount(peerNode);
+		if (account != null && attr != null) {
+			return attr.uid == account.getEUID();
+		}
+		return false;
+	}
+
+	/**
 	 * If this file is writable.
 	 * 
 	 * @return true if it is writable.
@@ -395,5 +435,15 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * If this node is ancestor of the specified node.
+	 * @return true if it is.
+	 */
+	public boolean isAncestorOf(FSTreeNode node) {
+		if (node == null) return false;
+		if (node.parent == this) return true;
+		return isAncestorOf(node.parent);
 	}
 }

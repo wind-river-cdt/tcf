@@ -21,8 +21,8 @@ import org.eclipse.tm.internal.terminal.control.actions.AbstractTerminalAction;
  */
 @SuppressWarnings("restriction")
 public class PinTerminalAction extends AbstractTerminalAction {
-	
-	private ITerminalsView fView = null;
+
+	private ITerminalsView view = null;
 
 	/**
 	 * Constructor.
@@ -30,25 +30,22 @@ public class PinTerminalAction extends AbstractTerminalAction {
 	public PinTerminalAction(ITerminalsView view) {
 		super(null, PinTerminalAction.class.getName(), IAction.AS_CHECK_BOX);
 
-		fView=view;
-        setupAction(Messages.PinTerminalAction_menu,
-                    Messages.PinTerminalAction_toolTip,
-                    UIPlugin.getImageDescriptor(ImageConsts.ACTION_PinTerminal_Hover),
-                    UIPlugin.getImageDescriptor(ImageConsts.ACTION_PinTerminal_Enabled),
-                    UIPlugin.getImageDescriptor(ImageConsts.ACTION_PinTerminal_Disabled),
-                    true);
-		setChecked(fView.isPinned());
+		this.view = view;
+		setupAction(Messages.PinTerminalAction_menu, Messages.PinTerminalAction_toolTip,
+						UIPlugin.getImageDescriptor(ImageConsts.ACTION_PinTerminal_Hover),
+						UIPlugin.getImageDescriptor(ImageConsts.ACTION_PinTerminal_Enabled),
+						UIPlugin.getImageDescriptor(ImageConsts.ACTION_PinTerminal_Disabled), true);
+		setChecked(view.isPinned());
 	}
 
-	
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.action.IAction#run()
 	 */
 	@Override
     public void run() {
-        fView.setPinned(isChecked());
+        view.setPinned(isChecked());
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.tm.internal.terminal.control.actions.AbstractTerminalAction#updateAction(boolean)
 	 */

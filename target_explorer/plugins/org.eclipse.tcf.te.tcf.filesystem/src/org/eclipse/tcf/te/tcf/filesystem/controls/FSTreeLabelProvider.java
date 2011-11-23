@@ -6,12 +6,15 @@
  *
  * Contributors:
  * Wind River Systems - initial API and implementation
+ * William Chen (Wind River) - [361324] Add more file operations in the file system
+ * 												of Target Explorer.
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.controls;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -20,6 +23,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.internal.ImageConsts;
+import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
 import org.eclipse.ui.IEditorRegistry;
@@ -57,6 +61,15 @@ public class FSTreeLabelProvider extends LabelProvider implements ITableLabelPro
 	 */
 	public FSTreeLabelProvider(TreeViewer viewer) {
 		super();
+		parentViewer = viewer;
+	}
+
+	/**
+	 * Set the parent viewer who will use this label provider for rendering.
+	 * 
+	 * @param viewer The parent tree viewer.
+	 */
+	public void setParentViewer(TreeViewer viewer) {
 		parentViewer = viewer;
 	}
 
@@ -101,9 +114,9 @@ public class FSTreeLabelProvider extends LabelProvider implements ITableLabelPro
 			if (element instanceof FSTreeNode) {
 				FSTreeNode node = (FSTreeNode)element;
 				if ("FSRootDirNode".equals(node.type)) {//$NON-NLS-1$
-					return isExpanded ? UIPlugin.getImage(ImageConsts.ROOT_DRIVE_OPEN) : UIPlugin.getImage(ImageConsts.ROOT_DRIVE);
+					return (isExpanded && hasChildren(node))  ? UIPlugin.getImage(ImageConsts.ROOT_DRIVE_OPEN) : UIPlugin.getImage(ImageConsts.ROOT_DRIVE);
 				} else if ("FSDirNode".equals(node.type)) { //$NON-NLS-1$
-					return isExpanded ? PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER) : UIPlugin.getImage(ImageConsts.FOLDER);
+					return (isExpanded && hasChildren(node)) ? PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER) : UIPlugin.getImage(ImageConsts.FOLDER);
 				} else if ("FSFileNode".equals(node.type)) { //$NON-NLS-1$
 					String key = node.name;
 					Image image = UIPlugin.getImage(key);
@@ -120,6 +133,11 @@ public class FSTreeLabelProvider extends LabelProvider implements ITableLabelPro
 		}
 
 		return super.getImage(element);
+	}
+
+	private boolean hasChildren(FSTreeNode folder) {
+		List<FSTreeNode> children = FSOperation.getCurrentChildren(folder);
+		return children != null && !children.isEmpty();
 	}
 
 	/**

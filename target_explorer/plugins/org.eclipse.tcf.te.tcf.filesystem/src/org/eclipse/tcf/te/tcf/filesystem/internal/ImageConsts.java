@@ -28,6 +28,17 @@ public interface ImageConsts {
      */
     public final static String  IMAGE_DIR_OBJ = "obj16/"; //$NON-NLS-1$
 
+    /**
+     * The directory where to load model object images from,
+     * relative to the image root directory.
+     */
+    public final static String  IMAGE_DIR_OBJ32 = "obj32/"; //$NON-NLS-1$
+    
+    /**
+     * The directory where to load the decorator image from.
+     */
+    public final static String IMAGE_DIR_OVR = "ovr/"; //$NON-NLS-1$
+    
     // ***** The image constants *****
 
     /**
@@ -49,4 +60,29 @@ public interface ImageConsts {
      * The key to access the image of compare editor.
      */
     public static final String COMPARE_EDITOR = "CompareEditor"; //$NON-NLS-1$
+    
+    /**
+     * The key to access the title image of "replace folder confirm" dialog.
+     */
+    public static final String REPLACE_FOLDER_CONFIRM = "ReplaceFolderConfirm"; //$NON-NLS-1$
+    
+    /**
+     * The key to access the title image of "confirm read only delete" dialog.
+     */
+    public static final String DELETE_READONLY_CONFIRM = "ConfirmReadOnlyDelete"; //$NON-NLS-1$
+    
+    /**
+     * The key to access the cut decorator image.
+     */
+    public static final String CUT_DECORATOR_IMAGE = "CutDecorator";  //$NON-NLS-1$
+    
+	/** 
+	 * The key to access the banner image of the advanced attributes dialog.
+	 */
+	public static final String BANNER_IMAGE = "BannerImage"; //$NON-NLS-1$
+
+	/**
+	 * The key to access the error image used in the tool tip popped up during renaming.
+	 */
+	public static final String ERROR_IMAGE = "ErrorImage"; //$NON-NLS-1$
 }

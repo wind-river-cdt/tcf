@@ -6,6 +6,7 @@
  *
  * Contributors:
  * Wind River Systems - initial API and implementation
+ * Max Weninger (Wind River) - [361363] [TERMINALS] Implement "Pin&Clone" for the "Terminals" view
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.terminals.view;
 
@@ -22,6 +23,7 @@ import org.eclipse.tcf.te.ui.terminals.interfaces.ITerminalsView;
 import org.eclipse.tcf.te.ui.terminals.tabs.TabFolderManager;
 import org.eclipse.tcf.te.ui.terminals.tabs.TabFolderMenuHandler;
 import org.eclipse.tcf.te.ui.terminals.tabs.TabFolderToolbarHandler;
+import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.PageBook;
@@ -45,7 +47,7 @@ public class TerminalsView extends ViewPart implements ITerminalsView {
 	// Reference to the empty page control (to be show if no console is open)
 	private Control emptyPageControl;
 	// Whether this terminal is pinned.
-	private boolean fPinned = false;
+	private boolean pinned = false;
 
 	/**
 	 * Constructor.
@@ -110,6 +112,13 @@ public class TerminalsView extends ViewPart implements ITerminalsView {
 
 		// Show the empty page control by default
 		switchToEmptyPageControl();
+
+		String secondaryId=((IViewSite)getSite()).getSecondaryId();
+		if(secondaryId!=null){
+			String defaultTitle=getPartName();
+			// set title
+			setPartName(defaultTitle+ " "+secondaryId); //$NON-NLS-1$
+		}
 	}
 
 	/**
@@ -308,22 +317,20 @@ public class TerminalsView extends ViewPart implements ITerminalsView {
 
 		return super.getAdapter(adapter);
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.tm.te.ui.terminals.interfaces.ITerminalsView#setPinned(boolean)
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.terminals.interfaces.ITerminalsView#setPinned(boolean)
 	 */
 	@Override
     public void setPinned(boolean pin) {
-        fPinned = pin;
+        this.pinned = pin;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.tm.te.ui.terminals.interfaces.ITerminalsView#isPinned()
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.terminals.interfaces.ITerminalsView#isPinned()
 	 */
 	@Override
-    public boolean isPinned() {
-		return fPinned;
+	public boolean isPinned() {
+		return pinned;
 	}
 }

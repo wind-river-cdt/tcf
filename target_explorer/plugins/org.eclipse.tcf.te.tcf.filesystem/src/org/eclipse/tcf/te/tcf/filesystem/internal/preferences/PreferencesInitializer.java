@@ -6,6 +6,8 @@
  *
  * Contributors:
  * Wind River Systems - initial API and implementation
+ * William Chen (Wind River) - [361324] Add more file operations in the file system
+ * 												of Target Explorer.
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.preferences;
 
@@ -42,5 +44,8 @@ public class PreferencesInitializer extends AbstractPreferenceInitializer {
 		}
 		IPreferenceStore preferenceStore = UIPlugin.getDefault().getPreferenceStore();
 		preferenceStore.setDefault(TargetExplorerPreferencePage.PREF_AUTOSAVING, TargetExplorerPreferencePage.DEFAULT_AUTOSAVING);
+		preferenceStore.setDefault(TargetExplorerPreferencePage.PREF_RENAMING_IN_PLACE_EDITOR, TargetExplorerPreferencePage.DEFAULT_RENAMING_IN_PLACE_EDITOR);
+		preferenceStore.setDefault(TargetExplorerPreferencePage.PREF_COPY_PERMISSION, TargetExplorerPreferencePage.DEFAULT_COPY_PERMISSION);
+		preferenceStore.setDefault(TargetExplorerPreferencePage.PREF_COPY_OWNERSHIP, TargetExplorerPreferencePage.DEFAULT_COPY_OWNERSHIP);
 	}
 }

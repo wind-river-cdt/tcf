@@ -6,6 +6,7 @@
  *
  * Contributors:
  * Wind River Systems - initial API and implementation
+ * Max Weninger (Wind River) - [361363] [TERMINALS] Implement "Pin&Clone" for the "Terminals" view
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.terminals.tabs;
 
@@ -265,7 +266,7 @@ public class TabFolderToolbarHandler extends PlatformObject {
 
 		// we want that at the end
 		PinTerminalAction pinAction=null;
-		
+
 		// Loop all actions and add them to the menu manager
 		for (AbstractTerminalAction action : toolbarActions) {
 			// Add a separator before the clear all action or if the action is a separator

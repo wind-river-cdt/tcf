@@ -15,6 +15,18 @@
       </factory>
    </extension>
 
+<!-- Property tester contributions -->
+   <extension point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.eclipse.tcf.te.core.adapters.PropertyTester"
+            id="org.eclipse.tcf.te.core.adapters.PropertyTester"
+            namespace="org.eclipse.tcf.te.core"
+            properties="hasAdapter,canAdaptTo"
+            type="org.eclipse.core.runtime.IAdaptable">
+      </propertyTester>
+      
+   </extension>
+
 <!-- Reusable core expression fragments -->   
    <extension point="org.eclipse.core.expressions.definitions">
    

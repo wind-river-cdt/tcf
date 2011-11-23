@@ -8,6 +8,8 @@
  * Wind River Systems - initial API and implementation
  * William Chen (Wind River) - [345387] Open the remote files with a proper editor
  * William Chen (Wind River) - [345552] Edit the remote files with a proper editor
+ * William Chen (Wind River) - [361324] Add more file operations in the file system
+ * 								system of Target Explorer.
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.activator;
 
@@ -25,8 +27,10 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.ImageConsts;
 import org.eclipse.tcf.te.tcf.filesystem.internal.autosave.SaveAllListener;
 import org.eclipse.tcf.te.tcf.filesystem.internal.autosave.SaveListener;
 import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.PersistenceManager;
+import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSClipboard;
 import org.eclipse.tcf.te.tcf.filesystem.internal.url.TcfURLConnection;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
+import org.eclipse.tcf.te.ui.jface.images.AbstractImageDescriptor;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
@@ -49,6 +53,8 @@ public class UIPlugin extends AbstractUIPlugin {
 	private IExecutionListener saveListener;
 	// The listener which listens to command "SAVE ALL" and synchronize the local file with the target.
 	private IExecutionListener saveAllListener;
+	// The shared instance of Clipboard
+	private FSClipboard clipboard;
 	
 	/**
 	 * The constructor
@@ -82,6 +88,7 @@ public class UIPlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		clipboard = new FSClipboard();
 
 		// Register the "tcf" URL stream handler service.
 		Hashtable<String, String[]> properties = new Hashtable<String, String[]>();
@@ -106,6 +113,13 @@ public class UIPlugin extends AbstractUIPlugin {
 		}
 	}
 
+	/**
+	 * Get the shared instance of clipboard
+	 */
+	public FSClipboard getClipboard() {
+		return clipboard;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
@@ -126,6 +140,7 @@ public class UIPlugin extends AbstractUIPlugin {
 			Command saveAllCmd = commandService.getCommand(IWorkbenchCommandConstants.FILE_SAVE_ALL); 
 			saveAllCmd.removeExecutionListener(saveAllListener);
 		}
+		clipboard = null;
 		plugin = null;
 		super.stop(context);
 	}
@@ -144,6 +159,16 @@ public class UIPlugin extends AbstractUIPlugin {
 		registry.put(ImageConsts.ROOT_DRIVE_OPEN, ImageDescriptor.createFromURL(url));
 		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OBJ + "synch_synch.gif"); //$NON-NLS-1$
 		registry.put(ImageConsts.COMPARE_EDITOR, ImageDescriptor.createFromURL(url));
+		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OBJ32 + "replace_confirm.png"); //$NON-NLS-1$
+		registry.put(ImageConsts.REPLACE_FOLDER_CONFIRM, ImageDescriptor.createFromURL(url));
+		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OBJ32 + "delete_readonly.png"); //$NON-NLS-1$
+		registry.put(ImageConsts.DELETE_READONLY_CONFIRM, ImageDescriptor.createFromURL(url));
+		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OVR + "ovr_cut.png"); //$NON-NLS-1$
+		registry.put(ImageConsts.CUT_DECORATOR_IMAGE, ImageDescriptor.createFromURL(url));
+		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OBJ32 + "banner.png"); //$NON-NLS-1$
+		registry.put(ImageConsts.BANNER_IMAGE, ImageDescriptor.createFromURL(url));
+		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OBJ + "error.gif"); //$NON-NLS-1$
+		registry.put(ImageConsts.ERROR_IMAGE, ImageDescriptor.createFromURL(url));
 	}
 
 	/**
@@ -167,4 +192,26 @@ public class UIPlugin extends AbstractUIPlugin {
 	public static ImageDescriptor getImageDescriptor(String key) {
 		return getDefault().getImageRegistry().getDescriptor(key);
 	}
+
+	/**
+	 * Loads the image given by the specified image descriptor from the image
+	 * registry. If the image has been loaded ones before already, the cached
+	 * <code>Image</code> object instance is returned. Otherwise, the <code>
+	 * Image</code> object instance will be created and cached before returned.
+	 *
+	 * @param descriptor The image descriptor.
+	 * @return The corresponding <code>Image</code> object instance or <code>null</code>.
+	 */
+	public static Image getSharedImage(AbstractImageDescriptor descriptor) {
+		ImageRegistry registry = getDefault().getImageRegistry();
+
+		String imageKey = descriptor.getDecriptorKey();
+		Image image = registry.get(imageKey);
+		if (image == null) {
+			registry.put(imageKey, descriptor);
+			image = registry.get(imageKey);
+		}
+
+		return image;
+	}	
 }

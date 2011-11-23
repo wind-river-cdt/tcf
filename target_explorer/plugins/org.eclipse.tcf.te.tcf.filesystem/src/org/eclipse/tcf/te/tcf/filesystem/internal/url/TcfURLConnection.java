@@ -148,7 +148,7 @@ public class TcfURLConnection extends URLConnection {
 			@Override
             public void doneOpenChannel(Throwable error, IChannel channel) {
 				if(error!=null){
-					String message = NLS.bind(Messages.TCFUtilities_OpeningFailureMessage,
+					String message = NLS.bind(Messages.OpeningChannelFailureMessage,
 							new Object[]{peer.getID(), error.getLocalizedMessage()});
 					errors[0] = new TCFChannelException(message, error);
 				}else{
@@ -159,7 +159,7 @@ public class TcfURLConnection extends URLConnection {
 		try {
 			rendezvous.waiting(5000L);
 		} catch (InterruptedException e) {
-			String message = NLS.bind(Messages.TCFUtilities_OpeningFailureMessage,
+			String message = NLS.bind(Messages.OpeningChannelFailureMessage,
 					new Object[]{peer.getID(), e.getLocalizedMessage()});
 			errors[0] = new TCFChannelException(message, e);
 		}

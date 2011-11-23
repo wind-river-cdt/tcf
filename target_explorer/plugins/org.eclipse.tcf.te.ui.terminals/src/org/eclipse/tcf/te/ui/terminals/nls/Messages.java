@@ -6,6 +6,7 @@
  *
  * Contributors:
  * Wind River Systems - initial API and implementation
+ * Max Weninger (Wind River) - [361363] [TERMINALS] Implement "Pin&Clone" for the "Terminals" view
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.terminals.nls;
 
@@ -34,7 +35,6 @@ public class Messages extends NLS {
 	public static String TabTerminalListener_consoleTerminated;
 
 	public static String PinTerminalAction_menu;
-
 	public static String PinTerminalAction_toolTip;
 
 	public static String ProcessSettingsPage_dialogTitle;

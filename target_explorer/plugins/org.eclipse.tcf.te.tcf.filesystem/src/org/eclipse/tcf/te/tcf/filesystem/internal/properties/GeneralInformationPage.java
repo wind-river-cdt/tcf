@@ -122,8 +122,7 @@ public class GeneralInformationPage extends PropertyPage {
 	 * @return The string in the format of SIZE_FORMAT.
 	 */
 	protected String getSizeText(long size) {
-		return SIZE_FORMAT.format(size / 1024)
-				+ " KB (" + SIZE_FORMAT.format(size) + " bytes)"; //$NON-NLS-1$ //$NON-NLS-2$
+		return NLS.bind(Messages.GeneralInformationPage_FileSizeInfo, SIZE_FORMAT.format(size / 1024), SIZE_FORMAT.format(size));
 	}
 
 	/**
@@ -158,6 +157,8 @@ public class GeneralInformationPage extends PropertyPage {
 		// Read-only
 		btnReadOnly = new Button(attr, SWT.CHECK);
 		btnReadOnly.setText(Messages.GeneralInformationPage_ReadOnly);
+		// Only the owner can edit this property
+		btnReadOnly.setEnabled(node.isAgentOwner());
 		btnReadOnly.addSelectionListener(new SelectionAdapter(){
 			@Override
             public void widgetSelected(SelectionEvent e) {
@@ -169,6 +170,8 @@ public class GeneralInformationPage extends PropertyPage {
 		// Hidden
 		btnHidden = new Button(attr, SWT.CHECK);
 		btnHidden.setText(Messages.GeneralInformationPage_Hidden);
+		// Only the owner can edit this property
+		btnHidden.setEnabled(node.isAgentOwner());
 		btnHidden.addSelectionListener(new SelectionAdapter(){
 			@Override
             public void widgetSelected(SelectionEvent e) {
@@ -219,7 +222,7 @@ public class GeneralInformationPage extends PropertyPage {
 	protected void createPermissionsSection(Composite parent) {
 		GridLayout gridLayout;
 		Label label = new Label(parent, SWT.NONE);
-		label.setText("Permissions:"); //$NON-NLS-1$
+		label.setText(Messages.GeneralInformationPage_PermissionText); 
 		GridData data = new GridData();
 		data.horizontalAlignment = SWT.LEFT;
 		data.verticalAlignment = SWT.TOP;
@@ -277,6 +280,8 @@ public class GeneralInformationPage extends PropertyPage {
 	private void createPermissionButton(String label, final int index, Composite parent) {
 		btnPermissions[index] = new Button(parent, SWT.CHECK);
 		btnPermissions[index].setText(label);
+		// Only the owner can edit its permission.
+		btnPermissions[index].setEnabled(node.isAgentOwner());
 		btnPermissions[index].addSelectionListener(new SelectionAdapter(){
 			@Override
             public void widgetSelected(SelectionEvent e) {

@@ -18,9 +18,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
+import org.eclipse.tcf.te.runtime.events.EventManager;
 import org.eclipse.tcf.te.runtime.model.interfaces.IContainerModelNode;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
-import org.eclipse.tcf.te.runtime.events.EventManager;
 
 /**
  * A common (data) model container node implementation.
@@ -212,7 +212,17 @@ public class ContainerModelNode extends ModelNode implements IContainerModelNode
 	 */
 	@Override
 	public int size() {
-		return childList.size();
+		int size = 0;
+		try { childListLock.lock(); size = childList.size(); } finally { childListLock.unlock(); }
+		return size;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.properties.PropertiesContainer#isEmpty()
+	 */
+	@Override
+	public boolean isEmpty() {
+	    return super.isEmpty() && !hasChildren();
 	}
 
 	/* (non-Javadoc)
@@ -308,11 +318,16 @@ public class ContainerModelNode extends ModelNode implements IContainerModelNode
 		IModelNode find = super.find(uuid);
 		if (find != null) return find;
 
-		for (IModelNode child : childList) {
-			find = child.find(uuid);
-			if (find != null) {
-				return find;
+		try {
+			childListLock.lock();
+			for (IModelNode child : childList) {
+				find = child.find(uuid);
+				if (find != null) {
+					return find;
+				}
 			}
+		} finally {
+			childListLock.unlock();
 		}
 
 		return find;

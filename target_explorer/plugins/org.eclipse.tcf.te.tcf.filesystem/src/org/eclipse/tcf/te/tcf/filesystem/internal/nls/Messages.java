@@ -115,11 +115,28 @@ public class Messages extends NLS {
 	public static String CmmitHandler_StateChangedDialogTitle;
 	public static String CmmitHandler_StateChangedMessage;
 
+	public static String FSDelete_ButtonCancel;
+	public static String FSDelete_ButtonNo;
+	public static String FSDelete_ButtonYes;
+	public static String FSDelete_ButtonYes2All;
+	public static String FSDelete_CannotRemoveFile;
+	public static String FSDelete_CannotRemoveFolder;
+	public static String FSDelete_ConfirmDelete;
+	public static String FSDelete_ConfirmMessage;
+	public static String FSDelete_Deleting;
+	public static String FSDelete_PrepareToDelete;
+	public static String FSDelete_RemovingFileFolder;
+
+	public static String DeleteFilesHandler_DeleteMultipleFilesConfirmation;
+	public static String DeleteFilesHandler_DeleteOneFileConfirmation;
+	public static String DeleteFilesHandler_ConfirmDialogTitle;
+	
 	public static String GeneralInformationPage_Accessed;
 	public static String GeneralInformationPage_Advanced;
 	public static String GeneralInformationPage_Attributes;
 	public static String GeneralInformationPage_Computer;
 	public static String GeneralInformationPage_File;
+	public static String GeneralInformationPage_FileSizeInfo;
 	public static String GeneralInformationPage_Folder;
 	public static String GeneralInformationPage_Hidden;
 	public static String GeneralInformationPage_Location;
@@ -128,17 +145,25 @@ public class Messages extends NLS {
 	public static String GeneralInformationPage_ReadOnly;
 	public static String GeneralInformationPage_Size;
 	public static String GeneralInformationPage_Type;
+	public static String GeneralInformationPage_PermissionText;
 	public static String GeneralInformationPage_PropertiesChangeFailure;
 	public static String GeneralInformationPage_PropertiesChangeTitle;
 	public static String GeneralInformationPage_UnknownFileType;
 
 	public static String FSExplorerTreeControl_section_title;
 
+	public static String FSFolderSelectionDialog_MoveDialogMessage;
+	public static String FSFolderSelectionDialog_MoveDialogTitle;
 	public static String FSTreeControl_column_name_label;
 	public static String FSTreeControl_column_size_label;
 	public static String FSTreeControl_column_modified_label;
 
+	public static String FSTreeNodeDropAdapterAssistant_DragError;
+	public static String FSTreeNodeDropAdapterAssistant_MoveFailure;
+	public static String FSTreeNodeDropAdapterAssistant_NoFileSelected;
 	public static String FSOpenFileDialog_title;
+	public static String FSOperation_CopyNOfFile;
+	public static String FSOperation_CopyOfFile;
 
 	public static String LocalTypedElement_SavingFile;
 
@@ -155,6 +180,39 @@ public class Messages extends NLS {
 	public static String OpenWithMenu_NoEditorFound;
 	public static String OpenWithMenu_OpenWith;
 
+	public static String FSCopy_CannotCopyFile;
+	public static String FSCopy_CopyFileFolderTitle;
+	public static String FSCopy_Copying;
+	public static String FSCopy_CopyingFile;
+	public static String FSCopy_PrepareToCopy;
+
+	public static String FSMove_CannotMove;
+	public static String FSMove_FileExistsError;
+	public static String FSMove_FolderExistsError;
+	public static String FSMove_MovingFile;
+	public static String FSMove_Moving;
+	public static String FSMove_PrepareToMove;
+	public static String FSMove_MoveFileFolderTitle;
+
+	public static String FSDelete_DeleteFileFolderTitle;
+
+	public static String FSRename_CannotRename;
+	public static String FSRename_RenameFileFolderTitle;
+
+	public static String FSOperation_CannotCreateDirectory;
+	public static String FSOperation_ConfirmDialogCancel;
+	public static String FSOperation_ConfirmDialogNo;
+	public static String FSOperation_ConfirmDialogYes;
+	public static String FSOperation_ConfirmDialogYesToAll;
+	public static String FSOperation_ConfirmFileReplace;
+	public static String FSOperation_ConfirmFileReplaceMessage;
+	public static String FSOperation_ConfirmFolderReplaceMessage;
+	public static String FSOperation_ConfirmFolderReplaceTitle;
+	public static String FSOperation_NoFileSystemError;
+	public static String FSOperation_CannotOpenDir;
+	public static String FSOperation_CannotReadDir;
+	public static String FSOperation_TimedOutWhenOpening;
+
 	public static String PermissionsGroup_Executable;
 	public static String PermissionsGroup_GroupPermissions;
 	public static String PermissionsGroup_OtherPermissions;
@@ -163,6 +221,16 @@ public class Messages extends NLS {
 	public static String PermissionsGroup_Writable;
 
 	public static String RemoteTypedElement_GettingRemoteContent;
+	public static String RenameFilesHandler_PromptNewName;
+	public static String RenameFilesHandler_RenamePromptMessage;
+	public static String RenameFilesHandler_TitleRename;
+	public static String RenameFilesHandler_TitleRenameFile;
+	public static String RenameFilesHandler_TitleRenameFolder;
+	public static String FSRenamingAssistant_NameAlreadyExists;
+	public static String FSRenamingAssistant_NoNodeSelected;
+	public static String FSRenamingAssistant_SpecifyNonEmptyName;
+	public static String FSRenamingAssistant_UnixIllegalCharacters;
+	public static String FSRenamingAssistant_WinIllegalCharacters;
 
 	public static String SaveAllListener_Cancel;
 	public static String SaveAllListener_Merge;
@@ -186,6 +254,10 @@ public class Messages extends NLS {
 	public static String StateManager_TCFNotProvideFSMessage2;
 	public static String StateManager_UpdateFailureTitle;
 
+	public static String TargetExplorerPreferencePage_AutoSavingText;
+	public static String TargetExplorerPreferencePage_CopyOwnershipText;
+	public static String TargetExplorerPreferencePage_CopyPermissionText;
+	public static String TargetExplorerPreferencePage_RenamingOptionText;
 	public static String TcfInputStream_CloseTimeout;
 	public static String TcfInputStream_NoDataAvailable;
 	public static String TcfInputStream_NoFileReturned;
@@ -205,8 +277,8 @@ public class Messages extends NLS {
 	public static String TcfURLConnection_OpenFileTimeout;
 	public static String TcfURLConnection_OpenTCFChannelTimeout;
 
-	public static String TCFUtilities_OpeningFailureMessage;
-	public static String TCFUtilities_OpeningFailureTitle;
+	public static String OpeningChannelFailureMessage;
+	public static String OpeningChannelFailureTitle;
 
 	public static String UpdateHandler_Cancel;
 	public static String UpdateHandler_Merge;
@@ -218,4 +290,10 @@ public class Messages extends NLS {
 	public static String UserManager_CannotGetUserAccountMessage2;
 	public static String UserManager_TCFNotProvideFSMessage;
 	public static String UserManager_UserAccountTitle;
+
+	public static String MergeEditorInput_CompareLeftAndRight;
+	public static String MergeEditorInput_CompareWithLocalCache;
+	public static String MergeEditorInput_LocalFile;
+	public static String MergeEditorInput_RemoteFile;
+	public static String MergeInput_CopyNotSupported;	
 }

@@ -473,6 +473,15 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer#isEmpty()
+	 */
+	@Override
+	public boolean isEmpty() {
+		Assert.isTrue(checkThreadAccess(), "Illegal Thread Access"); //$NON-NLS-1$
+	    return properties.isEmpty();
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.runtime.interfaces.IPropertiesContainer#isProperty(java.lang.String, long)
 	 */
 	@Override

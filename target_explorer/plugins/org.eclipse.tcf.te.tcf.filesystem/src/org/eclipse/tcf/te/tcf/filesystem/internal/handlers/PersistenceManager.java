@@ -7,6 +7,8 @@
  * Contributors:
  * William Chen (Wind River)	[360494]Provide an "Open With" action in the pop 
  * 								up menu of file system nodes of Target Explorer.
+ * William Chen (Wind River) - [361324] Add more file operations in the file system
+ * 												of Target Explorer.
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.handlers;
 
@@ -177,6 +179,42 @@ public class PersistenceManager {
 		IPreferenceStore preferenceStore = UIPlugin.getDefault().getPreferenceStore();
 		boolean autoSaving = preferenceStore
 		                .getBoolean(TargetExplorerPreferencePage.PREF_AUTOSAVING);
+		return autoSaving;
+	}
+
+	/**
+	 * If the option of "in-place editor" is set to on.
+	 * 
+	 * @return true if it uses in-place editor when renaming files/folders.
+	 */
+	public boolean isInPlaceEditor() {
+		IPreferenceStore preferenceStore = UIPlugin.getDefault().getPreferenceStore();
+		boolean autoSaving = preferenceStore
+		                .getBoolean(TargetExplorerPreferencePage.PREF_RENAMING_IN_PLACE_EDITOR);
+		return autoSaving;
+	}
+
+	/**
+	 * If the option of "copy permissions" is set to on.
+	 * 
+	 * @return true if it should copy source file permissions.
+	 */
+	public boolean isCopyPermission() {
+		IPreferenceStore preferenceStore = UIPlugin.getDefault().getPreferenceStore();
+		boolean autoSaving = preferenceStore
+		                .getBoolean(TargetExplorerPreferencePage.PREF_COPY_PERMISSION);
+		return autoSaving;
+	}
+
+	/**
+	 * If the option of "copy ownership" is set to on.
+	 * 
+	 * @return true if it should copy source file ownership.
+	 */
+	public boolean isCopyOwnership() {
+		IPreferenceStore preferenceStore = UIPlugin.getDefault().getPreferenceStore();
+		boolean autoSaving = preferenceStore
+		                .getBoolean(TargetExplorerPreferencePage.PREF_COPY_OWNERSHIP);
 		return autoSaving;
 	}
 

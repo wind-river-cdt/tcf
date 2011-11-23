@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.osgi.util.TextProcessor;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -35,6 +36,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.internal.ImageConsts;
+import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.ISaveablesSource;
@@ -88,11 +90,11 @@ public class MergeEditorInput extends CompareEditorInput implements
 		cc.setRightEditable(false);
 
 		String name = TextProcessor.process(left.getName());
-		String label = "Local: " + name; //$NON-NLS-1$
+		String label = NLS.bind(Messages.MergeEditorInput_LocalFile, name);
 		cc.setLeftLabel(label);
 
 		name = TextProcessor.process(right.toString());
-		label = "Remote: " + name; //$NON-NLS-1$
+		label = NLS.bind(Messages.MergeEditorInput_RemoteFile, name);
 		cc.setRightLabel(label);
 	}
 
@@ -136,7 +138,7 @@ public class MergeEditorInput extends CompareEditorInput implements
 	 */
 	@Override
 	public String getToolTipText() {
-		return "Compare " + left + " and " + right; //$NON-NLS-1$ //$NON-NLS-2$
+		return NLS.bind(Messages.MergeEditorInput_CompareLeftAndRight, left, right); 
 	}
 
 	/* (non-Javadoc)
@@ -144,7 +146,7 @@ public class MergeEditorInput extends CompareEditorInput implements
 	 */
 	@Override
 	public String getTitle() {
-		return "Compare " + left.getName() + " with Local Cache"; //$NON-NLS-1$ //$NON-NLS-2$
+		return NLS.bind(Messages.MergeEditorInput_CompareWithLocalCache, left.getName()); 
 	}
 
 	/**

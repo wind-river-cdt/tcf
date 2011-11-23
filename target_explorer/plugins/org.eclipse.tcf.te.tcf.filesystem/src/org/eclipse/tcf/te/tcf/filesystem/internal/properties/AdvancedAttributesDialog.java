@@ -9,10 +9,7 @@
  *********************************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.properties;
 
-import java.net.URL;
-
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -27,6 +24,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.interfaces.IWindowsFileAttributes;
+import org.eclipse.tcf.te.tcf.filesystem.internal.ImageConsts;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 
@@ -35,10 +33,6 @@ import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
  * folder.
  */
 public class AdvancedAttributesDialog extends Dialog {
-	// The key to store the banner image in the plug-in's image registry.
-	private static final String BANNER_IMAGE_KEY = "BannerImage"; //$NON-NLS-1$
-	// The path to the image used in the banner.
-	private static final String BANNER_IMAGE_PATH = "icons/obj32/banner.png"; //$NON-NLS-1$
 
 	// The file or folder node whose advanced attributes are to be displayed.
 	FSTreeNode node;
@@ -87,14 +81,7 @@ public class AdvancedAttributesDialog extends Dialog {
 	 * @return The image in the banner area.
 	 */
 	private Image getBannerImage() {
-		Image bImg = UIPlugin.getImage(BANNER_IMAGE_KEY);
-		if (bImg == null) {
-			URL bannerUrl = UIPlugin.getDefault().getBundle().getResource(BANNER_IMAGE_PATH);
-			ImageDescriptor desc = ImageDescriptor.createFromURL(bannerUrl);
-			UIPlugin.getDefault().getImageRegistry().put(BANNER_IMAGE_KEY, desc);
-			bImg = UIPlugin.getImage(BANNER_IMAGE_KEY);
-		}
-		return bImg;
+		return UIPlugin.getImage(ImageConsts.BANNER_IMAGE);
 	}
 
 	/**
@@ -196,6 +183,8 @@ public class AdvancedAttributesDialog extends Dialog {
 		final Button button = new Button(group, SWT.CHECK);
 		button.setText(label);
 		button.setSelection(on);
+		// Only the owner can edit the properties
+		button.setEnabled(node.isAgentOwner());
 		button.addSelectionListener(new SelectionAdapter(){
 			@Override
             public void widgetSelected(SelectionEvent e) {
