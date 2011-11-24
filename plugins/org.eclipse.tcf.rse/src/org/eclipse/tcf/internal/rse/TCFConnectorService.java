@@ -15,9 +15,9 @@
  *******************************************************************************/
 package org.eclipse.tcf.internal.rse;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +29,7 @@ import org.eclipse.rse.core.model.SystemSignonInformation;
 import org.eclipse.rse.core.subsystems.CommunicationsEvent;
 import org.eclipse.rse.services.files.RemoteFileException;
 import org.eclipse.rse.ui.subsystems.StandardConnectorService;
-import org.eclipse.tcf.core.AbstractPeer;
+import org.eclipse.tcf.core.TransientPeer;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.IService;
@@ -40,7 +40,6 @@ import org.eclipse.tcf.services.ILocator;
 import org.eclipse.tcf.services.IStreams;
 import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.services.ITerminals;
-import org.eclipse.tcf.util.TCFTask;
 
 
 public class TCFConnectorService extends StandardConnectorService implements ITCFSessionProvider{
@@ -59,30 +58,33 @@ public class TCFConnectorService extends StandardConnectorService implements ITC
 
     private boolean poll_timer_started;
 
-    private boolean bSubscribed = false;
+    private boolean streams_subscribed = false;
+    private boolean streams_connecting = false;
+    private final HashSet<String> stream_ids = new HashSet<String>();
 
     /* subscribe the stream service on this TCP connection */
-    private IStreams.StreamsListener streamListener = new IStreams.StreamsListener() {
-        public void created(String stream_type, String stream_id,
-                String context_id) {
+    private final IStreams.StreamsListener streams_listener = new IStreams.StreamsListener() {
+        public void created(String stream_type, String stream_id, String context_id) {
+            if (streams_connecting) {
+                stream_ids.add(stream_id);
+            }
+            else {
+                getService(IStreams.class).disconnect(stream_id, new IStreams.DoneDisconnect() {
+                    public void doneDisconnect(IToken token, Exception error) {
+                        if (error != null) channel.terminate(error);
+                    }
+                });
+            }
         }
-        /**
-         * Called when a stream is disposed.
-         *
-         * @param stream_type
-         *            - source type of the stream.
-         * @param stream_id
-         *            - ID of the stream.
-         */
+
         public void disposed(String stream_type, String stream_id) {
+            stream_ids.remove(stream_id);
         }
     };
 
 
     public TCFConnectorService(IHost host, int port) {
-        super(Messages.TCFConnectorService_Name,
-                Messages.TCFConnectorService_Description, host,
-                port);
+        super(Messages.TCFConnectorService_Name, Messages.TCFConnectorService_Description, host, port);
         getTCFPropertySet();
     }
 
@@ -104,7 +106,6 @@ public class TCFConnectorService extends StandardConnectorService implements ITC
     /**
      * @return true if the associated connector service requires a password.
      */
-
     public final boolean requiresPassword() {
         return false;
     }
@@ -119,8 +120,17 @@ public class TCFConnectorService extends StandardConnectorService implements ITC
         synchronized (res) {
             Protocol.invokeLater(new Runnable() {
                 public void run() {
-                    if (!connectTCFChannel(res, monitor))
-                        add_to_wait_list(this);
+                    try {
+                        if (!connectTCFChannel(res, monitor))
+                            add_to_wait_list(this);
+                    }
+                    catch (Throwable x) {
+                        synchronized (res) {
+                            if (x instanceof Exception) res[0] = (Exception)x;
+                            else res[0] = new Exception(x);
+                            res.notify();
+                        }
+                    }
                 }
             });
             res.wait();
@@ -130,16 +140,13 @@ public class TCFConnectorService extends StandardConnectorService implements ITC
     }
 
     @Override
-    protected void internalDisconnect(final IProgressMonitor monitor)
-            throws Exception {
+    protected void internalDisconnect(final IProgressMonitor monitor) throws Exception {
         assert !Protocol.isDispatchThread();
         final Exception[] res = new Exception[1];
         // Fire comm event to signal state about to change
         fireCommunicationsEvent(CommunicationsEvent.BEFORE_DISCONNECT);
         monitor.beginTask("Disconnecting " + getHostName(), 1); //$NON-NLS-1$
         try {
-            /* First UnSubscribe TCP channel */
-            unsubscribe();
             /* Disconnecting TCP channel */
             synchronized (res) {
                 Protocol.invokeLater(new Runnable() {
@@ -240,7 +247,7 @@ public class TCFConnectorService extends StandardConnectorService implements ITC
                 attrs.put(IPeer.ATTR_TRANSPORT_NAME, transport);
                 attrs.put(IPeer.ATTR_IP_HOST, host);
                 attrs.put(IPeer.ATTR_IP_PORT, port_str);
-                peer = new AbstractPeer(attrs);
+                peer = new TransientPeer(attrs);
             }
             channel = peer.openChannel();
             channel.addChannelListener(new IChannel.IChannelListener() {
@@ -263,9 +270,10 @@ public class TCFConnectorService extends StandardConnectorService implements ITC
                     else {
                         run_wait_list();
                     }
-                    bSubscribed = false;
                     channel = null;
                     channel_error = null;
+                    streams_subscribed = false;
+                    stream_ids.clear();
                 }
 
             });
@@ -332,61 +340,33 @@ public class TCFConnectorService extends StandardConnectorService implements ITC
         return password;
     }
 
-    public boolean isSubscribed() {
-        return bSubscribed;
-    }
-
-    public void unsubscribe() throws IOException {
-        if (bSubscribed) {
-            new TCFTask<Object>() {
-                public void run() {
-                    IStreams streams = getService(IStreams.class);
-                    streams.unsubscribe(ITerminals.NAME, streamListener,
-                            new IStreams.DoneUnsubscribe() {
-                                public void doneUnsubscribe(IToken token,
-                                        Exception error) {
-                                    done(this);
-                                }
-                            });
-                }
-            }.getIO();
-            bSubscribed = false;
-        }
-
-    }
-
-    public void subscribe() throws RemoteFileException {
-        try {
-            new TCFTask<Object>() {
-                public void run() {
-                    if (bSubscribed) {
-                        done(this);
+    public void onStreamsConnecting() {
+        if (!streams_subscribed) {
+            streams_subscribed = true;
+            IStreams streams = getService(IStreams.class);
+            if (streams != null) {
+                streams.subscribe(ITerminals.NAME, streams_listener, new IStreams.DoneSubscribe() {
+                    public void doneSubscribe(IToken token, Exception error) {
+                        if (error != null) channel.terminate(error);
                     }
-                    else {
-                        bSubscribed = true;
-                        IStreams streams = getService(IStreams.class);
-                        streams.subscribe(ITerminals.NAME, streamListener,
-                                new IStreams.DoneSubscribe() {
-                            public void doneSubscribe(IToken token,
-                                    Exception error) {
-                                if (error != null) {
-                                    bSubscribed = false;
-                                    error(error);
-                                }
-                                else
-                                    done(this);
-                            }
-
-                        });
-                    }}
-            }.getIO();
-
+                });
+            }
         }
-        catch (Exception e) {
-            e.printStackTrace();//$NON-NLS-1$
-            throw new RemoteFileException(
-                    "Error When Subscribe Terminal streams!", e); //$NON-NLS-1$
-        }
+        streams_connecting = true;
+    }
 
+    public void onStreamsID(String id) {
+        stream_ids.remove(id);
+    }
+
+    public void onStreamsConnected() {
+        streams_connecting = false;
+        for (String id : stream_ids) {
+            getService(IStreams.class).disconnect(id, new IStreams.DoneDisconnect() {
+                public void doneDisconnect(IToken token, Exception error) {
+                    if (error != null) channel.terminate(error);
+                }
+            });
+        }
     }
 }

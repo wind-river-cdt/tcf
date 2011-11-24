@@ -14,12 +14,13 @@
 package org.eclipse.tcf.internal.rse.shells;
 
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.rse.core.model.IPropertySet;
@@ -56,27 +57,26 @@ public class TCFTerminalShell extends AbstractTerminalShell {
     private String fContextID;
     private String in_id;
     private String out_id;
-    private boolean connected = false;
-    private ITerminals terminal;
+    private boolean connected;
+    private boolean exited;
+    private ITerminals terminals;
+    private IStreams streams;
     private int status;
 
     private IPropertySet tcfPropertySet = null;
 
-    private static String defaultEncoding = new java.io.InputStreamReader(new java.io.ByteArrayInputStream(new byte[0])).getEncoding();
+    private static String defaultEncoding = new InputStreamReader(new ByteArrayInputStream(new byte[0])).getEncoding();
     private ITerminals.TerminalsListener listeners = new ITerminals.TerminalsListener(){
 
         public void exited(String terminalId, int exitCode) {
-
-            if(!terminalContext.getID().equals(terminalId))
-                return;
-            terminal.removeListener(listeners);
-            TCFTerminalShell.this.connected = false;
+            if(!terminalContext.getID().equals(terminalId)) return;
+            terminals.removeListener(listeners);
+            connected = false;
+            exited = true;
         }
 
 
-        public void winSizeChanged(String terminalId, int newWidth,
-                int newHeight) {
-
+        public void winSizeChanged(String terminalId, int newWidth, int newHeight) {
         }
     };
 
@@ -120,7 +120,8 @@ public class TCFTerminalShell extends AbstractTerminalShell {
                     status = readUntil(command_prompt,fInputStream);
                     write("\n"); //$NON-NLS-1$
                 }
-            } else {
+            }
+            else {
                 status = ITCFSessionProvider.SUCCESS_CODE;
             }
         }
@@ -157,20 +158,19 @@ public class TCFTerminalShell extends AbstractTerminalShell {
         public int getLoginStatus() {
             return this.status;
         }
-
     }
 
     public void write(String value) {
         try {
             fOutputStream.write(value.getBytes());
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private int login(String username, String password) throws InterruptedException
-    {
-        long millisToEnd = System.currentTimeMillis() + ITCFSessionProvider.TCP_CONNECT_TIMEOUT*1000;
+    private int login(String username, String password) throws InterruptedException {
+        long millisToEnd = System.currentTimeMillis() + ITCFSessionProvider.TCP_CONNECT_TIMEOUT * 1000;
         LoginThread checkLogin = new LoginThread(username, password);
         status = ITCFSessionProvider.ERROR_CODE;
         checkLogin.start();
@@ -204,7 +204,6 @@ public class TCFTerminalShell extends AbstractTerminalShell {
             final String encoding, final String[] environment,
             String initialWorkingDirectory, String commandToRun)
     throws SystemMessageException {
-        Map<String, Object> map_ids;
         Exception nestedException = null;
         try {
             fSessionProvider = sessionProvider;
@@ -214,22 +213,22 @@ public class TCFTerminalShell extends AbstractTerminalShell {
 
             if (fChannel == null || fChannel.getState() != IChannel.STATE_OPEN)
                 throw new Exception("TCP channel is not connected!");//$NON-NLS-1$
-            if (((TCFConnectorService)sessionProvider).isSubscribed() == false)
-                ((TCFConnectorService)sessionProvider).subscribe();
-            assert (((TCFConnectorService)sessionProvider).isSubscribed());
 
             new TCFRSETask<ITerminals.TerminalContext>() {
                 public void run() {
-                    terminal = ((TCFConnectorService)sessionProvider).getService(ITerminals.class);
-                    terminal.launch(ptyType, encoding, environment, new ITerminals.DoneLaunch() {
-                        public void doneLaunch(IToken token, Exception error,
-                                ITerminals.TerminalContext ctx) {
+                    terminals = ((TCFConnectorService)sessionProvider).getService(ITerminals.class);
+                    streams = ((TCFConnectorService)sessionProvider).getService(IStreams.class);
+                    fSessionProvider.onStreamsConnecting();
+                    terminals.launch(ptyType, encoding, environment, new ITerminals.DoneLaunch() {
+                        public void doneLaunch(IToken token, Exception error, ITerminals.TerminalContext ctx) {
 
                             if (ctx != null) {
                                 terminalContext = ctx;
-                                terminal.addListener(listeners);
+                                terminals.addListener(listeners);
                             }
-
+                            fSessionProvider.onStreamsID(ctx.getStdInID());
+                            fSessionProvider.onStreamsID(ctx.getStdOutID());
+                            fSessionProvider.onStreamsConnected();
                             if (error != null) error(error);
                             else done(ctx);
                         }
@@ -243,24 +242,19 @@ public class TCFTerminalShell extends AbstractTerminalShell {
             fContextID = terminalContext.getID();
             fWidth = terminalContext.getWidth();
             fHeight = terminalContext.getHeight();
-            map_ids = terminalContext.getProperties();
-            in_id = (String)map_ids.get(ITerminals.PROP_STDOUT_ID);
-            out_id = (String)map_ids.get(ITerminals.PROP_STDIN_ID);
+            in_id = terminalContext.getStdOutID();
+            out_id = terminalContext.getStdInID();
 
             String user = fSessionProvider.getSessionUserId();
             String password = fSessionProvider.getSessionPassword();
             status = ITCFSessionProvider.ERROR_CODE;
 
-            IStreams streams = new TCFRSETask<IStreams>() {
-                public void run() {
-                    done(((TCFConnectorService)sessionProvider).getService(IStreams.class));
-                }
-            }.getS(null, Messages.TCFTerminalService_Name);
-            fOutputStream = new TCFTerminalOutputStream(streams, out_id);
-            fInputStream = new TCFTerminalInputStream(streams, in_id);
+            fOutputStream = new TCFTerminalOutputStream(this, streams, out_id);
+            fInputStream = new TCFTerminalInputStream(this, streams, in_id);
             if (fEncoding != null) {
                 fOutputStreamWriter = new BufferedWriter(new OutputStreamWriter(fOutputStream, encoding));
-            } else {
+            }
+            else {
                 // default encoding == System.getProperty("file.encoding")
                 // TODO should try to determine remote encoding if possible
                 fOutputStreamWriter = new BufferedWriter(new OutputStreamWriter(fOutputStream));
@@ -269,21 +263,15 @@ public class TCFTerminalShell extends AbstractTerminalShell {
             try {
                 status = login(user, password);
             }
-            finally
-            {
-                if ((status == ITCFSessionProvider.CONNECT_CLOSED))
-                {
+            finally {
+                if ((status == ITCFSessionProvider.CONNECT_CLOSED)) {
                     //Give one time chance of retrying....
                 }
-
             }
 
             //give another chance of retrying
             if ((status == ITCFSessionProvider.CONNECT_CLOSED))
             {
-                ((TCFConnectorService)sessionProvider).unsubscribe();
-                ((TCFConnectorService)sessionProvider).subscribe();
-                assert (((TCFConnectorService)sessionProvider).isSubscribed());
                 status = login(user, password);
             }
 
@@ -300,8 +288,7 @@ public class TCFTerminalShell extends AbstractTerminalShell {
             }
 
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             e.printStackTrace();
             nestedException = e;
         }
@@ -316,7 +303,8 @@ public class TCFTerminalShell extends AbstractTerminalShell {
                             ICommonMessageIds.MSG_EXCEPTION_OCCURRED,
                             IStatus.ERROR,
                             CommonMessages.MSG_EXCEPTION_OCCURRED, nestedException);
-                } else {
+                }
+                else {
                     String strErr;
                     if (status == ITCFSessionProvider.CONNECT_CLOSED)
                         strErr = "Connection closed!";//$NON-NLS-1$
@@ -342,7 +330,8 @@ public class TCFTerminalShell extends AbstractTerminalShell {
         if (isActive()) {
             if ("#break".equals(command)) { //$NON-NLS-1$
                 command = "\u0003"; // Unicode 3 == Ctrl+C //$NON-NLS-1$
-            } else {
+            }
+            else {
                 command += "\r\n"; //$NON-NLS-1$
             }
             fOutputStreamWriter.write(command);
@@ -367,16 +356,13 @@ public class TCFTerminalShell extends AbstractTerminalShell {
             new TCFRSETask<Object>() {
                 public void run() {
                     terminalContext.exit(new ITerminals.DoneCommand(){
-                        public void doneCommand(IToken token,
-                                Exception error) {
-                            if (error != null)
-                                error(error);
-                            else {
-                                done(this);
-                            }
+                        public void doneCommand(IToken token, Exception error) {
+                            if (error != null) error(error);
+                            else done(this);
                         }
                     });
-                }}.getS(null, Messages.TCFShellService_Name); //seems no need block here. need further modification.
+                }
+            }.getS(null, Messages.TCFShellService_Name); //seems no need block here. need further modification.
         }
         catch (SystemMessageException e) {
             e.printStackTrace();
@@ -392,7 +378,7 @@ public class TCFTerminalShell extends AbstractTerminalShell {
     }
 
     public boolean isActive() {
-        if (fChannel != null && !(fChannel.getState() == IChannel.STATE_CLOSED) && connected) {
+        if (fChannel != null && fChannel.getState() != IChannel.STATE_CLOSED && connected) {
             return true;
         }
         exit();
@@ -415,25 +401,22 @@ public class TCFTerminalShell extends AbstractTerminalShell {
             new TCFRSETask<Object>() {
                 public void run() {
                     if (fChannel != null && connected) {
-                        terminal.setWinSize(fContextID, fWidth, fHeight, new ITerminals.DoneCommand(){
-
+                        terminals.setWinSize(fContextID, fWidth, fHeight, new ITerminals.DoneCommand(){
                             public void doneCommand(IToken token, Exception error) {
-                                if (error != null)
-                                    error(error);
-                                else
-                                    done(this);
-
-                            }});
-
+                                if (error != null) error(error);
+                                else done(this);
+                            }
+                        });
                     }
                     else {
                         done(this);
                     }
-                }}.getS(null, Messages.TCFShellService_Name);
+                }
+            }.getS(null, Messages.TCFShellService_Name);
         }
         catch (SystemMessageException e) {
             e.printStackTrace();
-        } //$NON-NLS-1$;
+        }
     }
 
     public String getDefaultEncoding() {
@@ -441,4 +424,23 @@ public class TCFTerminalShell extends AbstractTerminalShell {
         return defaultEncoding;
     }
 
+    void onInputStreamClosed() {
+        in_id = null;
+        if (out_id == null && !exited) {
+            terminalContext.exit(new ITerminals.DoneCommand(){
+                public void doneCommand(IToken token, Exception error) {
+                }
+            });
+        }
+    }
+
+    void onOutputStreamClosed() {
+        out_id = null;
+        if (in_id == null && !exited) {
+            terminalContext.exit(new ITerminals.DoneCommand(){
+                public void doneCommand(IToken token, Exception error) {
+                }
+            });
+        }
+    }
 }

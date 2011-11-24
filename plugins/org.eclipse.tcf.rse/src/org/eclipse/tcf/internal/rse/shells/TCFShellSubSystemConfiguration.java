@@ -32,8 +32,7 @@ import org.eclipse.tcf.internal.rse.*;
 import org.eclipse.tcf.internal.rse.terminals.TCFTerminalService;
 
 
-public class TCFShellSubSystemConfiguration extends
-        ShellServiceSubSystemConfiguration {
+public class TCFShellSubSystemConfiguration extends ShellServiceSubSystemConfiguration {
 
     public TCFShellSubSystemConfiguration() {
         super();
@@ -44,25 +43,22 @@ public class TCFShellSubSystemConfiguration extends
      * Do not populate it yet though!
      * @see org.eclipse.rse.core.subsystems.SubSystemConfiguration#createSubSystemInternal(IHost)
      */
-    public ISubSystem createSubSystemInternal(IHost host)
-    {
-            TCFConnectorService connectorService = (TCFConnectorService)getConnectorService(host);
-            ISubSystem subsys = new ShellServiceSubSystem(host, connectorService, createShellService(host));
-            return subsys;
+    public ISubSystem createSubSystemInternal(IHost host) {
+        TCFConnectorService connectorService = (TCFConnectorService)getConnectorService(host);
+        ISubSystem subsys = new ShellServiceSubSystem(host, connectorService, createShellService(host));
+        return subsys;
     }
 
     public IConnectorService getConnectorService(IHost host) {
         return TCFConnectorServiceManager.getInstance().getConnectorService(host, getServiceImplType());
-}
+    }
 
-    public void setConnectorService(IHost host,
-                IConnectorService connectorService) {
+    public void setConnectorService(IHost host, IConnectorService connectorService) {
         TCFConnectorServiceManager.getInstance().setConnectorService(host, getServiceImplType(), connectorService);
     }
 
-    public Class<ITCFService> getServiceImplType()
-    {
-            return ITCFService.class;
+    public Class<ITCFService> getServiceImplType() {
+        return ITCFService.class;
     }
 
     public IServiceCommandShell createRemoteCommandShell(IRemoteCmdSubSystem cmdSS, IHostShell hostShell) {
@@ -71,9 +67,6 @@ public class TCFShellSubSystemConfiguration extends
 
     public IShellService createShellService(IHost host) {
         TCFConnectorService cserv = (TCFConnectorService)getConnectorService(host);
-
         return (IShellService) (new TCFTerminalService(cserv)).getAdapter(IShellService.class);
     }
-
-
 }

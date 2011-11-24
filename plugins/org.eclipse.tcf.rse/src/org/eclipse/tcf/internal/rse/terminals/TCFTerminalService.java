@@ -23,34 +23,27 @@ import org.eclipse.tcf.internal.rse.shells.TCFTerminalShell;
 public class TCFTerminalService extends AbstractTerminalService implements ITCFService{
     private final ITCFSessionProvider fSessionProvider;
 
-    /**
-     * Return the TCF property set, and fill it with default values if it has
-     * not been created yet. Extender may override in order to set different
-     * default values.
-     *
-     * @return a property set holding properties understood by the TCF
-     *         connector service.
-     */
     public ITerminalShell launchTerminal(String ptyType, String encoding,
             String[] environment, String initialWorkingDirectory,
             String commandToRun, IProgressMonitor monitor)
             throws SystemMessageException {
-        TCFTerminalShell hostShell = new TCFTerminalShell(fSessionProvider, ptyType, encoding, environment, initialWorkingDirectory, commandToRun);
-        return hostShell;
+        return new TCFTerminalShell(fSessionProvider, ptyType, encoding,
+                environment, initialWorkingDirectory, commandToRun);
     }
-
 
     public TCFTerminalService(ITCFSessionProvider sessionProvider) {
         fSessionProvider = sessionProvider;
     }
 
     public ITCFSessionProvider getSessionProvider() {
-                return fSessionProvider;
-        }
+        return fSessionProvider;
+    }
+
     @Override
     public String getName() {
         return Messages.TCFTerminalService_Name;
     }
+
     @Override
     public String getDescription() {
         return Messages.TCFTerminalService_Description;

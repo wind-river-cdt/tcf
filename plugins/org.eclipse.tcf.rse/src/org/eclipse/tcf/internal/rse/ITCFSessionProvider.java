@@ -11,7 +11,6 @@
 
 package org.eclipse.tcf.internal.rse;
 
-import org.eclipse.rse.services.files.RemoteFileException;
 import org.eclipse.tcf.protocol.IChannel;
 
 public interface ITCFSessionProvider {
@@ -24,6 +23,7 @@ public interface ITCFSessionProvider {
     public String getSessionUserId();
     public String getSessionPassword();
     public String getSessionHostName();
-    public boolean isSubscribed();
-    public void subscribe() throws RemoteFileException;
+    public void onStreamsConnecting();
+    public void onStreamsID(String id);
+    public void onStreamsConnected();
 }
