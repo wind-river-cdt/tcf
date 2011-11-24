@@ -8,8 +8,6 @@
  * Wind River Systems - initial API and implementation
  * William Chen (Wind River)- [345387] Open the remote files with a proper editor
  * William Chen (Wind River)- [345552] Edit the remote files with a proper editor
- * William Chen (Wind River) - [361324] Add more file operations in the file system
- * 												of Target Explorer.
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.handlers;
 
@@ -27,11 +25,11 @@ import java.text.DecimalFormat;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
@@ -384,12 +382,7 @@ public class CacheManager {
 				if(!monitor.isCanceled()){
 					// Once upload is successful, synchronize the modified time.
 					final FSTreeNode node = nodes[i];
-					SafeRunner.run(new ISafeRunnable() {
-						@Override
-						public void handleException(Throwable exception) {
-							// Just ignore it.
-						}
-
+					SafeRunner.run(new SafeRunnable() {
 						@Override
 						public void run() throws Exception {
 							StateManager.getInstance().updateState(node);

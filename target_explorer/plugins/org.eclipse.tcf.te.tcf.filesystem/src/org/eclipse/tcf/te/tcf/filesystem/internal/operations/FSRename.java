@@ -5,8 +5,7 @@
  * available at http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- * William Chen (Wind River) - [361324] Add more file operations in the file 
- * 												system of Target Explorer.
+ * Wind River Systems - initial API and implementation
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.operations;
 
@@ -14,6 +13,7 @@ import java.io.File;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
@@ -105,10 +105,16 @@ public class FSRename extends FSOperation {
 					errors[0] = new TCFFileSystemException(message, error);
 				}
 				else {
-					File file = CacheManager.getInstance().getCacheFile(node);
+					final File file = CacheManager.getInstance().getCacheFile(node);
 					if (file.exists()) {
 						if (node.isFile()) {
-							closeEditor(file);
+							Display display = PlatformUI.getWorkbench().getDisplay();
+							display.asyncExec(new Runnable(){
+								@Override
+					            public void run() {
+									closeEditor(file);
+								}
+							});
 							PersistenceManager.getInstance().removeBaseTimestamp(node.getLocationURL());
 						}
 						file.delete();

@@ -5,8 +5,7 @@
  * available at http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- * William Chen (Wind River) - [361324] Add more file operations in the file 
- * 												system of Target Explorer.
+ * Wind River Systems - initial API and implementation
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.operations;
 
@@ -16,23 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
-import org.eclipse.tcf.te.tcf.filesystem.internal.ImageConsts;
-import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFChannelException;
-import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
-import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.CacheManager;
-import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.PersistenceManager;
-import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
-import org.eclipse.tcf.te.tcf.filesystem.internal.url.Rendezvous;
-import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
-import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.IToken;
@@ -47,6 +36,16 @@ import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.services.IFileSystem.IFileHandle;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel;
+import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
+import org.eclipse.tcf.te.tcf.filesystem.internal.ImageConsts;
+import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFChannelException;
+import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
+import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.CacheManager;
+import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.PersistenceManager;
+import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
+import org.eclipse.tcf.te.tcf.filesystem.internal.url.Rendezvous;
+import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
+import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
@@ -121,15 +120,18 @@ public abstract class FSOperation {
 
 	/**
 	 * Close the editor that opens the specified file.
+	 * <p>
+	 * <b>Note:</b> The method must be called within the UI thread.
 	 * 
 	 * @param file The file that is opened.
 	 */
 	protected void closeEditor(final File file) {
+		Assert.isNotNull(Display.findDisplay(Thread.currentThread()));
 		final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		IEditorReference[] refs = page.getEditorReferences();
 		for (IEditorReference ref : refs) {
 			final IEditorReference editorRef = ref;
-			SafeRunner.run(new ISafeRunnable() {
+			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() throws Exception {
 					IEditorInput input = editorRef.getEditorInput();
@@ -142,11 +144,6 @@ public abstract class FSOperation {
 						}
 					}
 				}
-
-				@Override
-				public void handleException(Throwable exception) {
-					// Logged by safe runner.
-				}
 			});
 		}
 	}
@@ -157,9 +154,15 @@ public abstract class FSOperation {
 	 * @param node the file node that is to be cleaned.
 	 */
 	protected void cleanUpFile(FSTreeNode node) {
-		File file = CacheManager.getInstance().getCacheFile(node);
+		final File file = CacheManager.getInstance().getCacheFile(node);
 		if (file.exists()) {
-			closeEditor(file);
+			Display display = PlatformUI.getWorkbench().getDisplay();
+			display.asyncExec(new Runnable(){
+				@Override
+	            public void run() {
+					closeEditor(file);
+				}
+			});
 			file.delete();
 		}
 		PersistenceManager.getInstance().removeBaseTimestamp(node.getLocationURL());
@@ -438,7 +441,7 @@ public abstract class FSOperation {
 	 * @return The new target node with the new name following the rule.
 	 * @throws TCFFileSystemException Thrown during children querying.
 	 */
-	protected FSTreeNode createCopyFile(IFileSystem service, FSTreeNode node, FSTreeNode dest) throws TCFFileSystemException {
+	protected FSTreeNode createCopyDestination(IFileSystem service, FSTreeNode node, FSTreeNode dest) throws TCFFileSystemException {
 		FSTreeNode copy = (FSTreeNode) node.clone();
 		String name = node.name;
 		FSTreeNode possibleChild = findChild(service, dest, name);

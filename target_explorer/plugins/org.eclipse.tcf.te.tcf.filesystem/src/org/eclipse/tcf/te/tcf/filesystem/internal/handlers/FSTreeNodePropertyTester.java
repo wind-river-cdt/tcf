@@ -9,21 +9,14 @@
  * William Chen (Wind River) - [345387]Open the remote files with a proper editor
  * William Chen (Wind River) - [352302]Opening a file in an editor depending on
  *                             the client's permissions.
- * William Chen (Wind River) - [361324] Add more file operations in the file system
- * 												of Target Explorer.
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.handlers;
 
 import java.io.File;
-import java.net.URL;
-import java.util.List;
 
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
-import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSClipboard;
 import org.eclipse.tcf.te.tcf.filesystem.model.CacheState;
-import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 
 /**
@@ -33,8 +26,7 @@ import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
  * it is writable, "isExecutable" if it is executable, "isRoot" if it is a
  * root directory, "isWindows" if it is a windows file node, "isReadOnly"
  * if it is read only, "isHidden" if it is hidden, "getCacheState" to
- * get a node's state, and "isSamePeer" to test if the selected folder is
- * from the same peer with the files in the clip board.
+ * get a node's state.
  */
 public class FSTreeNodePropertyTester extends PropertyTester {
 
@@ -71,20 +63,6 @@ public class FSTreeNodePropertyTester extends PropertyTester {
 				return false;
 			CacheState state = StateManager.getInstance().getCacheState(node);
 			return state.name().equals(expectedValue);
-		} else if (property.equals("isSamePeer")) { //$NON-NLS-1$
-			String id = node.peerNode.getPeer().getID();
-			FSClipboard cb = UIPlugin.getDefault().getClipboard();
-			if (!cb.isEmpty()) {
-				List<URL> urls = cb.getFiles();
-				for (URL url : urls) {
-					FSTreeNode clipped = FSModel.getInstance().getTreeNode(url);
-					String cid = clipped.peerNode.getPeer().getID();
-					if(!id.equals(cid)){
-						return false;
-					}
-				}
-				return true;
-			}
 		}
 		return false;
 	}

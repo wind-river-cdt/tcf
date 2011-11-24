@@ -5,8 +5,7 @@
  * available at http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- * William Chen (Wind River) - [361324] Add more file operations in the file 
- * 												system of Target Explorer.
+ * Wind River Systems - initial API and implementation
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.operations;
 
@@ -124,69 +123,65 @@ public class FSMove extends FSOperation {
 	 * @throws InterruptedException Thrown when the operation is canceled.
 	 */
 	void moveNode(IProgressMonitor monitor, IFileSystem service, final FSTreeNode node, FSTreeNode dest) throws TCFFileSystemException, InterruptedException {
-		if (!monitor.isCanceled()) {
-			monitor.subTask(NLS.bind(Messages.FSMove_Moving, node.name));
-			FSTreeNode copy = findChild(service, dest, node.name);
-			if (copy == null || !copy.equals(node) && confirmReplace(node)) {
-				if (copy != null && copy.isDirectory() && node.isDirectory()) {
-					List<FSTreeNode> children = new ArrayList<FSTreeNode>(getChildren(node, service));
-					for (FSTreeNode child : children) {
-						moveNode(monitor, service, child, copy);
-					}
-					removeFolder(node, service);
-					monitor.worked(1);
+		if (monitor.isCanceled()) throw new InterruptedException();
+		monitor.subTask(NLS.bind(Messages.FSMove_Moving, node.name));
+		FSTreeNode copy = findChild(service, dest, node.name);
+		if (copy == null || !copy.equals(node) && confirmReplace(node)) {
+			if (copy != null && copy.isDirectory() && node.isDirectory()) {
+				List<FSTreeNode> children = new ArrayList<FSTreeNode>(getChildren(node, service));
+				for (FSTreeNode child : children) {
+					moveNode(monitor, service, child, copy);
 				}
-				else if (copy != null && copy.isFile() && node.isDirectory()) {
-					String error = NLS.bind(Messages.FSMove_FileExistsError, copy.name);
-					throw new TCFFileSystemException(error);
-				}
-				else if (copy != null && copy.isDirectory() && node.isFile()) {
-					String error = NLS.bind(Messages.FSMove_FolderExistsError, copy.name);
-					throw new TCFFileSystemException(error);
-				}
-				else {
-					if (copy != null && copy.isFile() && node.isFile()) {
-						removeFile(copy, service);
-					}
-					else if (copy == null) {
-						copy = (FSTreeNode) node.clone();
-					}
-					addChild(service, dest, copy);
-					String dst_path = copy.getLocation(true);
-					String src_path = node.getLocation(true);
-					final FSTreeNode copyNode = copy;
-					final TCFFileSystemException[] errors = new TCFFileSystemException[1];
-					final Rendezvous rendezvous = new Rendezvous();
-					service.rename(src_path, dst_path, new DoneRename() {
-						@Override
-						public void doneRename(IToken token, FileSystemException error) {
-							if (error != null) {
-								String message = NLS.bind(Messages.FSMove_CannotMove, node.name, error);
-								errors[0] = new TCFFileSystemException(message, error);
-							}
-							else {
-								cleanUpNode(node, copyNode);
-							}
-							rendezvous.arrive();
-						}
-					});
-					try {
-						rendezvous.waiting(5000L);
-					}
-					catch (InterruptedException e) {
-						String message = NLS.bind(Messages.FSMove_CannotMove, node.name, Messages.FSOperation_TimedOutWhenOpening);
-						errors[0] = new TCFFileSystemException(message);
-					}
-					if (errors[0] != null) {
-						removeChild(service, dest, copy);
-						throw errors[0];
-					}
-					monitor.worked(1);
-				}
+				removeFolder(node, service);
+				monitor.worked(1);
 			}
-		}
-		else {
-			throw new InterruptedException();
+			else if (copy != null && copy.isFile() && node.isDirectory()) {
+				String error = NLS.bind(Messages.FSMove_FileExistsError, copy.name);
+				throw new TCFFileSystemException(error);
+			}
+			else if (copy != null && copy.isDirectory() && node.isFile()) {
+				String error = NLS.bind(Messages.FSMove_FolderExistsError, copy.name);
+				throw new TCFFileSystemException(error);
+			}
+			else {
+				if (copy != null && copy.isFile() && node.isFile()) {
+					removeFile(copy, service);
+				}
+				else if (copy == null) {
+					copy = (FSTreeNode) node.clone();
+				}
+				addChild(service, dest, copy);
+				String dst_path = copy.getLocation(true);
+				String src_path = node.getLocation(true);
+				final FSTreeNode copyNode = copy;
+				final TCFFileSystemException[] errors = new TCFFileSystemException[1];
+				final Rendezvous rendezvous = new Rendezvous();
+				service.rename(src_path, dst_path, new DoneRename() {
+					@Override
+					public void doneRename(IToken token, FileSystemException error) {
+						if (error != null) {
+							String message = NLS.bind(Messages.FSMove_CannotMove, node.name, error);
+							errors[0] = new TCFFileSystemException(message, error);
+						}
+						else {
+							cleanUpNode(node, copyNode);
+						}
+						rendezvous.arrive();
+					}
+				});
+				try {
+					rendezvous.waiting(5000L);
+				}
+				catch (InterruptedException e) {
+					String message = NLS.bind(Messages.FSMove_CannotMove, node.name, Messages.FSOperation_TimedOutWhenOpening);
+					errors[0] = new TCFFileSystemException(message);
+				}
+				if (errors[0] != null) {
+					removeChild(service, dest, copy);
+					throw errors[0];
+				}
+				monitor.worked(1);
+			}
 		}
 	}
 

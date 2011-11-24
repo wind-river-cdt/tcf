@@ -11,8 +11,8 @@ package org.eclipse.tcf.te.ui.views.internal;
 
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tcf.te.ui.views.events.ViewerContentChangeEvent;
 import org.eclipse.tcf.te.runtime.events.EventManager;
+import org.eclipse.tcf.te.ui.views.events.ViewerContentChangeEvent;
 import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.navigator.CommonViewerSorter;
 
@@ -35,7 +35,6 @@ public class ViewViewer extends CommonViewer {
 	 */
 	public ViewViewer(String viewerId, Composite parent, int style) {
 		super(viewerId, parent, style);
-		new ViewViewerConfigurator(viewerId).configure(this);
 	}
 
 	/* (non-Javadoc)

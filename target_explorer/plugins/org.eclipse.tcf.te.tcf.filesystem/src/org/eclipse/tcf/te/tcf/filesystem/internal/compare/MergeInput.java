@@ -15,9 +15,9 @@ import org.eclipse.compare.structuremergeviewer.Differencer;
 import org.eclipse.compare.structuremergeviewer.ICompareInput;
 import org.eclipse.compare.structuremergeviewer.ICompareInputChangeListener;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 
@@ -69,15 +69,10 @@ public class MergeInput implements ICompareInput {
 			Object[] _listeners = listeners.getListeners();
 			for (int i = 0; i < _listeners.length; i++) {
 				final ICompareInputChangeListener listener = (ICompareInputChangeListener) _listeners[i];
-				SafeRunner.run(new ISafeRunnable() {
+				SafeRunner.run(new SafeRunnable() {
 					@Override
 					public void run() throws Exception {
 						listener.compareInputChanged(MergeInput.this);
-					}
-
-					@Override
-					public void handleException(Throwable exception) {
-						// Logged by the safe runner
 					}
 				});
 			}

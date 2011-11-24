@@ -314,7 +314,7 @@
          </separator>
          <command
                commandId="org.eclipse.ui.file.refresh"
-               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Refresh"
+               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_RefreshFile"
                icon="platform:/plugin/org.eclipse.ui/icons/full/elcl16/refresh_nav.gif"
                id="refresh"
                label="%fsmenu.refresh.label"
@@ -342,6 +342,31 @@
                     </test>
                  </not>
                </and>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.ui.file.refresh"
+               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_RefreshDirectory"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/elcl16/refresh_nav.gif"
+               id="refresh"
+               label="%fsmenu.refresh.label"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                     </instanceof>
+                     <test
+                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isDirectory">
+                     </test>
+                  </iterate>
+               </with>
             </visibleWhen>
          </command>
          <command
@@ -714,7 +739,7 @@
          </separator>
          <command
                commandId="org.eclipse.ui.file.refresh"
-               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Refresh"
+               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_RefreshFile"
                icon="platform:/plugin/org.eclipse.ui/icons/full/elcl16/refresh_nav.gif"
                id="refresh"
                label="%temenu.refresh.label"
@@ -742,6 +767,31 @@
                      </test>
                   </not>
                </and>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.ui.file.refresh"
+               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_RefreshDirectory"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/elcl16/refresh_nav.gif"
+               id="refresh"
+               label="%fsmenu.refresh.label"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                     </instanceof>
+                     <test
+                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isDirectory">
+                     </test>
+                  </iterate>
+               </with>
             </visibleWhen>
          </command>
          <command
@@ -889,7 +939,7 @@
             class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.FSTreeNodePropertyTester"
             id="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode"
             namespace="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode"
-            properties="isFile,isDirectory,isBinaryFile,isReadable,isWritable,isExecutable,isRoot,isReadOnly,isHidden,isWindows,getCacheState,isSamePeer"
+            properties="isFile,isDirectory,isBinaryFile,isReadable,isWritable,isExecutable,isRoot,isReadOnly,isHidden,isWindows,getCacheState"
             type="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
       </propertyTester>
       <propertyTester
@@ -904,7 +954,14 @@
             id="org.eclipse.tcf.te.tcf.filesystem.propertytester.clipboard"
             namespace="org.eclipse.tcf.te.tcf.filesystem.propertytester.clipboard"
             properties="canPaste"
-            type="java.lang.Object">
+            type="org.eclipse.jface.viewers.IStructuredSelection">
+      </propertyTester>
+      <propertyTester
+            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.EditorActivationEventPropertyTester"
+            id="org.eclipse.tcf.te.tcf.filesystem.propertytester.event"
+            namespace="org.eclipse.tcf.te.tcf.filesystem.propertytester.event"
+            properties="isEditorActivation"
+            type="org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent">
       </propertyTester>
    </extension>
    
@@ -1420,26 +1477,17 @@
             <with
                   variable="selection">
                <count
-                     value="1">
+                     value="+">
                </count>
                <iterate>
                   <instanceof
                         value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
                   </instanceof>
-                  <test
-                        property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isWritable">
-                  </test>
-                  <test
-                        property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isDirectory">
-                  </test>
-                  <test
-                        property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isSamePeer">
-                  </test>
                </iterate>
+               <test
+                     property="org.eclipse.tcf.te.tcf.filesystem.propertytester.clipboard.canPaste">
+               </test>
             </with>
-            <test
-                  property="org.eclipse.tcf.te.tcf.filesystem.propertytester.clipboard.canPaste">
-            </test>
          </and>
          </enabledWhen>
       </handler>
@@ -1557,6 +1605,55 @@
             </with>
          </enabledWhen>
       </handler>
+      <handler
+            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.RefreshDirectoryHandler"
+            commandId="org.eclipse.ui.file.refresh">
+         <activeWhen>
+            <and>
+               <with
+                     variable="activePartId">
+                  <or>
+                     <equals
+                           value="org.eclipse.tcf.te.ui.views.TargetExplorer">
+                     </equals>
+                     <equals
+                           value="org.eclipse.tcf.te.ui.view.Editor">
+                     </equals>
+                  </or>
+               </with>
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                     </instanceof>
+                     <test
+                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isDirectory">
+                     </test>
+                  </iterate>
+               </with>
+            </and>
+         </activeWhen>
+         <enabledWhen>
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                     </instanceof>
+                     <test
+                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isDirectory">
+                     </test>
+                  </iterate>
+               </with>
+         </enabledWhen>
+      </handler>
    </extension>
    
    <extension point="org.eclipse.ui.decorators">
@@ -1634,11 +1731,31 @@
       </factory>
    </extension>
    <extension
-         point="org.eclipse.tcf.te.ui.views.configurators">
-      <configurator
-            class="org.eclipse.tcf.te.tcf.filesystem.controls.FSCellConfigurator"
+         point="org.eclipse.tcf.te.ui.views.cellEditors">
+      <cellEditor
+            editorFactory="org.eclipse.tcf.te.tcf.filesystem.controls.FSViewerCellEditorFactory"
             viewerId="org.eclipse.tcf.te.ui.views.TargetExplorer">
-      </configurator>
-   </extension>
-   
+         <activation>
+            <and>
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                     </instanceof>
+                  </iterate>
+               </with>
+               <with
+                     variable="event">
+                  <test
+                        property="org.eclipse.tcf.te.tcf.filesystem.propertytester.event.isEditorActivation">
+                  </test>
+               </with>
+            </and>
+         </activation>
+      </cellEditor>
+   </extension>   
 </plugin>

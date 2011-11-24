@@ -5,8 +5,7 @@
  * available at http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- * William Chen (Wind River) - [361324] Add more file operations in the file 
- * 												system of Target Explorer.
+ * Wind River Systems - initial API and implementation
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.dialogs;
 
@@ -146,6 +145,8 @@ public class FSFolderSelectionDialog extends ElementTreeSelectionDialog {
 				return error;
 			}
 		}
+		if(!target.isWritable())
+			return error;
 		return new Status(IStatus.OK, pluginId, null);
 	}
 }

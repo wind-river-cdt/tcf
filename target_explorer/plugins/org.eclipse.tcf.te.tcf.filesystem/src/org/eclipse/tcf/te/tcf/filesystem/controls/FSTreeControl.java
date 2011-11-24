@@ -7,8 +7,6 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  * William Chen (Wind River) - [345384] Provide property pages for remote file system nodes
- * William Chen (Wind River) - [361324] Add more file operations in the file system
- * 												of Target Explorer.
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.controls;
 
@@ -108,12 +106,12 @@ public class FSTreeControl extends AbstractTreeControl implements ISelectionChan
 		tree.setHeaderVisible(hasColumns());
 		viewer.addDoubleClickListener(this);
 		//Add DnD support.
-	    int operations = DND.DROP_MOVE;
+	    int operations = DND.DROP_COPY | DND.DROP_MOVE | DND.DROP_LINK;
 		Transfer[] transferTypes = {LocalSelectionTransfer.getTransfer()};
 		viewer.addDragSupport(operations, transferTypes, new FSDragSourceListener(viewer));
 		viewer.addDropSupport(operations, transferTypes, new FSDropTargetListener(viewer));
 		// Add editing support to rename files/folders.
-		FSCellConfigurator.addEditingSupport(viewer);
+		new FSViewerCellEditorFactory().addEditingSupport(viewer);
 	}
 
 	/**
