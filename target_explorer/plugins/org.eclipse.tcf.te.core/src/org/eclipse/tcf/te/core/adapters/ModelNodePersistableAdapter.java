@@ -26,10 +26,13 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.te.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.core.nls.Messages;
+import org.eclipse.tcf.te.runtime.model.factory.Factory;
+import org.eclipse.tcf.te.runtime.model.interfaces.IContainerModelNode;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
 import org.eclipse.tcf.te.runtime.persistence.PersistenceDelegateManager;
 import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistable;
 import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistenceDelegate;
+import org.osgi.framework.Bundle;
 
 /**
  * Model node persistable adapter implementation.
@@ -67,7 +70,7 @@ public class ModelNodePersistableAdapter implements IPersistable {
 				IPath path = new Path(node.getStringProperty("Path")); //$NON-NLS-1$
 				uri = path.toFile().toURI();
 			}
-			// Final fallback is to use the UUID
+			// No name and no explicit path is set -> use the UUID
 			else if (node.getUUID() != null) {
 				IPath path = getRoot().append(makeValidFileSystemName(node.getUUID().toString().trim()));
 				if (!"ini".equals(path.getFileExtension())) path = path.addFileExtension("ini"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -115,6 +118,20 @@ public class ModelNodePersistableAdapter implements IPersistable {
 		}
 
 		return location;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistable#getInterfaceType(java.lang.Object)
+	 */
+	@SuppressWarnings("restriction")
+    @Override
+	public String getInterfaceTypeName(Object data) {
+		if (data instanceof IContainerModelNode) {
+			return org.eclipse.tcf.te.runtime.model.activator.CoreBundleActivator.getUniqueIdentifier() + ":" + IContainerModelNode.class.getName(); //$NON-NLS-1$
+		} else if (data instanceof IModelNode) {
+			return org.eclipse.tcf.te.runtime.model.activator.CoreBundleActivator.getUniqueIdentifier() + ":" + IModelNode.class.getName(); //$NON-NLS-1$
+		}
+	    return null;
 	}
 
 	/* (non-Javadoc)
@@ -201,6 +218,7 @@ public class ModelNodePersistableAdapter implements IPersistable {
 			if (persistable != null) {
 				String storageID = persistable.getStorageID();
 				URI uri = persistable.getURI(value);
+				String interfaceTypeName = persistable.getInterfaceTypeName(value);
 
 				// Check if the persistable returns complete information to create the reference
 				if (storageID == null) {
@@ -209,16 +227,20 @@ public class ModelNodePersistableAdapter implements IPersistable {
 				if (uri == null) {
 					throw new IOException(NLS.bind(Messages.ModelNodePersistableAdapter_export_invalidPersistable, value.getClass().getCanonicalName(), "uri")); //$NON-NLS-1$
 				}
+				if (interfaceTypeName == null) {
+					throw new IOException(NLS.bind(Messages.ModelNodePersistableAdapter_export_invalidPersistable, value.getClass().getCanonicalName(), "interfaceTypeName")); //$NON-NLS-1$
+				}
 
 				// Create a reference object
 				Map<String, String> reference = new HashMap<String, String>();
 				reference.put("storageID", storageID); //$NON-NLS-1$
 				reference.put("uri", uri.toString()); //$NON-NLS-1$
+				reference.put("interfaceType", interfaceTypeName); //$NON-NLS-1$
 
 				IPersistenceDelegate delegate = PersistenceDelegateManager.getInstance().getDelegate(storageID, false);
 				if (delegate != null) {
 					delegate.write(uri, persistable.exportFrom(value));
-					dst.put(key, reference);
+					dst.put("reference:" + key, reference); //$NON-NLS-1$
 					continue;
 				}
 			}
@@ -241,7 +263,68 @@ public class ModelNodePersistableAdapter implements IPersistable {
 		if (data instanceof IModelNode) {
 			IModelNode node = (IModelNode) data;
 			for (String key : external.keySet()) {
-				node.setProperty(key, external.get(key));
+				// Get the property value
+				Object value = external.get(key);
+
+				// Check for reference objects
+				if (key.startsWith("reference:") && value instanceof Map<?,?>) { //$NON-NLS-1$
+					// Cut the "reference:" from the key
+					String newKey = key.substring(10);
+
+					@SuppressWarnings("unchecked")
+                    Map<String, String> reference = (Map<String, String>)value;
+
+					// Get the storage id and the URI from the reference
+					String storageID = reference.get("storageID"); //$NON-NLS-1$
+					String uri = reference.get("uri"); //$NON-NLS-1$
+					String interfaceTypeName = reference.get("interfaceType"); //$NON-NLS-1$
+
+					// Check if the reference returns complete information to read the referenced storage
+					if (storageID == null) {
+						throw new IOException(NLS.bind(Messages.ModelNodePersistableAdapter_import_invalidReference, "storageID")); //$NON-NLS-1$
+					}
+					if (uri == null) {
+						throw new IOException(NLS.bind(Messages.ModelNodePersistableAdapter_import_invalidReference, "uri")); //$NON-NLS-1$
+					}
+					if (interfaceTypeName == null) {
+						throw new IOException(NLS.bind(Messages.ModelNodePersistableAdapter_import_invalidReference, "interfaceType")); //$NON-NLS-1$
+					}
+
+					// Get the persistence delegate
+					IPersistenceDelegate delegate = PersistenceDelegateManager.getInstance().getDelegate(storageID, false);
+					if (delegate != null) {
+						Map<String, Object> referenceData = delegate.read(URI.create(uri));
+						if (referenceData != null && !referenceData.isEmpty()) {
+							try {
+								// Now, we have to recreate the object
+
+								// Separate the bundleId from the interface name
+								String[] pieces = interfaceTypeName.split(":", 2); //$NON-NLS-1$
+								String bundleId = pieces.length > 1 ? pieces[0] : null;
+								if (pieces.length > 1) interfaceTypeName = pieces[1];
+
+								// Determine the bundle to use for loading the class
+								Bundle bundle = bundleId != null && !"".equals(bundleId.trim()) ? Platform.getBundle(bundleId.trim()) : CoreBundleActivator.getContext().getBundle(); //$NON-NLS-1$
+
+								Class<? extends IModelNode> interfaceType = (Class<? extends IModelNode>)bundle.loadClass(interfaceTypeName);
+								IModelNode referenceNode = Factory.getInstance().newInstance(interfaceType);
+
+								IPersistable persistable = (IPersistable)referenceNode.getAdapter(IPersistable.class);
+								if (persistable == null) persistable = (IPersistable)Platform.getAdapterManager().getAdapter(referenceNode, IPersistable.class);
+								if (persistable != null) {
+									persistable.importTo(referenceNode, referenceData);
+									node.setProperty(newKey, referenceNode);
+								}
+							} catch (ClassNotFoundException e) {
+								throw new IOException(NLS.bind(Messages.ModelNodePersistableAdapter_import_cannotLoadClass, interfaceTypeName), e);
+							}
+						}
+					}
+				}
+				// Not a reference object -> store the object as is to the node
+				else {
+					node.setProperty(key, value);
+				}
 			}
 		}
 	}

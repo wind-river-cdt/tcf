@@ -224,7 +224,8 @@ public class PropertiesFilePersistenceDelegate extends AbstractPersistenceDelega
 		while (line != null) {
 			Matcher matcher = SECTION.matcher(line);
 			if (matcher.matches()) {
-				currentSection = matcher.group(1).toLowerCase();
+				// Section names are case-sensitive too
+				currentSection = matcher.group(1);
 				if (sections.get(currentSection) == null) {
 					sections.put(currentSection, new HashMap<String, Object>());
 				}

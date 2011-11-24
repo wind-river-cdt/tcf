@@ -16,8 +16,9 @@ import java.util.Map;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.tcf.protocol.Protocol;
-import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistable;
+import org.eclipse.tcf.te.tcf.locator.activator.CoreBundleActivator;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 
 /**
  * Persistable implementation handling peer attributes.
@@ -63,6 +64,17 @@ public class PeerModelPersistableAdapter implements IPersistable {
 
 		return uri;
 	}
+
+    /* (non-Javadoc)
+     * @see org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistable#getInterfaceType(java.lang.Object)
+     */
+    @Override
+    public String getInterfaceTypeName(Object data) {
+    	if (data instanceof IPeerModel) {
+    		return CoreBundleActivator.getUniqueIdentifier() + ":" + IPeerModel.class.getName(); //$NON-NLS-1$
+    	}
+        return null;
+    }
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistable#exportFrom(java.lang.Object)

@@ -37,4 +37,6 @@ public class Messages extends NLS {
 
 	public static String ModelNodePersistableAdapter_export_invalidPersistable;
 	public static String ModelNodePersistableAdapter_export_unknownType;
+	public static String ModelNodePersistableAdapter_import_invalidReference;
+	public static String ModelNodePersistableAdapter_import_cannotLoadClass;
 }

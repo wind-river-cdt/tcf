@@ -18,8 +18,8 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.tcf.protocol.IPeer;
-import org.eclipse.tcf.te.tcf.locator.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistable;
+import org.eclipse.tcf.te.tcf.locator.activator.CoreBundleActivator;
 
 /**
  * Persistable implementation handling peer attributes.
@@ -95,6 +95,18 @@ public class MapPersistableAdapter implements IPersistable {
 		}
 
 		return location;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistable#getInterfaceType(java.lang.Object)
+	 */
+	@Override
+	public String getInterfaceTypeName(Object data) {
+		if (data instanceof Map) {
+			// No bundle id needed here, it's a POJO
+			return Map.class.getName();
+		}
+	    return null;
 	}
 
 	/* (non-Javadoc)
