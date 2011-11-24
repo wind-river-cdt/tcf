@@ -193,6 +193,14 @@ public class ModelNodePersistableAdapter implements IPersistable {
 			IPersistable persistable = value instanceof IAdaptable ? (IPersistable)((IAdaptable)value).getAdapter(IPersistable.class) : null;
 			if (persistable == null) persistable = (IPersistable)Platform.getAdapterManager().getAdapter(value, IPersistable.class);
 			if (persistable != null) {
+				// Check if the persistable returns complete information to create the reference
+				if (persistable.getStorageID() == null) {
+					throw new IOException(NLS.bind(Messages.ModelNodePersistableAdapter_export_invalidPersistable, value.getClass().getCanonicalName(), "storageID")); //$NON-NLS-1$
+				}
+				if (persistable.getURI(value) == null) {
+					throw new IOException(NLS.bind(Messages.ModelNodePersistableAdapter_export_invalidPersistable, value.getClass().getCanonicalName(), "uri")); //$NON-NLS-1$
+				}
+
 				// Create a reference object
 				Map<String, String> reference = new HashMap<String, String>();
 				reference.put("storageID", persistable.getStorageID()); //$NON-NLS-1$
