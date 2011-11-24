@@ -282,6 +282,19 @@
                </pluginState>
             </enablement>
          </action>
+         <action
+            id="org.eclipse.tcf.debug.ui.actions.Console"
+            class="org.eclipse.tcf.internal.debug.ui.commands.ConsoleCommand"
+            icon="icons/console.gif"
+            label="%Console.label"
+            menubarPath="additions">
+            <enablement>
+               <pluginState
+                     value="activated"
+                     id="org.eclipse.tcf.debug.ui">
+               </pluginState>
+            </enablement>
+         </action>
       </objectContribution>
 
       <!-- TCFNodeExpression popup menu contributions -->
