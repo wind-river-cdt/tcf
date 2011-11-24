@@ -58,13 +58,19 @@ public class ModelNodePersistableAdapter implements IPersistable {
 			IModelNode node = (IModelNode) data;
 			if (node.getName() != null && !"".equals(node.getName().trim())) { //$NON-NLS-1$
 				// Get the node name and make it a valid file system name (no spaces etc).
-				IPath path = getRoot().append(makeValidFileSystemName(((IModelNode) data).getName().trim()));
+				IPath path = getRoot().append(makeValidFileSystemName(node.getName().trim()));
 				if (!"ini".equals(path.getFileExtension())) path = path.addFileExtension("ini"); //$NON-NLS-1$ //$NON-NLS-2$
 				uri = path.toFile().toURI();
 			}
 			// If the name is not set, check for "Path"
 			else if (node.getStringProperty("Path") != null && !"".equals(node.getStringProperty("Path").trim())) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				IPath path = new Path(node.getStringProperty("Path")); //$NON-NLS-1$
+				uri = path.toFile().toURI();
+			}
+			// Final fallback is to use the UUID
+			else if (node.getUUID() != null) {
+				IPath path = getRoot().append(makeValidFileSystemName(node.getUUID().toString().trim()));
+				if (!"ini".equals(path.getFileExtension())) path = path.addFileExtension("ini"); //$NON-NLS-1$ //$NON-NLS-2$
 				uri = path.toFile().toURI();
 			}
 		}
@@ -193,22 +199,25 @@ public class ModelNodePersistableAdapter implements IPersistable {
 			IPersistable persistable = value instanceof IAdaptable ? (IPersistable)((IAdaptable)value).getAdapter(IPersistable.class) : null;
 			if (persistable == null) persistable = (IPersistable)Platform.getAdapterManager().getAdapter(value, IPersistable.class);
 			if (persistable != null) {
+				String storageID = persistable.getStorageID();
+				URI uri = persistable.getURI(value);
+
 				// Check if the persistable returns complete information to create the reference
-				if (persistable.getStorageID() == null) {
+				if (storageID == null) {
 					throw new IOException(NLS.bind(Messages.ModelNodePersistableAdapter_export_invalidPersistable, value.getClass().getCanonicalName(), "storageID")); //$NON-NLS-1$
 				}
-				if (persistable.getURI(value) == null) {
+				if (uri == null) {
 					throw new IOException(NLS.bind(Messages.ModelNodePersistableAdapter_export_invalidPersistable, value.getClass().getCanonicalName(), "uri")); //$NON-NLS-1$
 				}
 
 				// Create a reference object
 				Map<String, String> reference = new HashMap<String, String>();
-				reference.put("storageID", persistable.getStorageID()); //$NON-NLS-1$
-				reference.put("uri", persistable.getURI(value).toString()); //$NON-NLS-1$
+				reference.put("storageID", storageID); //$NON-NLS-1$
+				reference.put("uri", uri.toString()); //$NON-NLS-1$
 
-				IPersistenceDelegate delegate = PersistenceDelegateManager.getInstance().getDelegate(persistable.getStorageID(), false);
+				IPersistenceDelegate delegate = PersistenceDelegateManager.getInstance().getDelegate(storageID, false);
 				if (delegate != null) {
-					delegate.write(persistable.getURI(value), persistable.exportFrom(value));
+					delegate.write(uri, persistable.exportFrom(value));
 					dst.put(key, reference);
 					continue;
 				}
