@@ -31,6 +31,7 @@ import org.eclipse.tcf.te.runtime.model.interfaces.IContainerModelNode;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
 import org.eclipse.tcf.te.runtime.persistence.PersistenceDelegateManager;
 import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistable;
+import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistableNodeProperties;
 import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistenceDelegate;
 import org.osgi.framework.Bundle;
 
@@ -59,20 +60,32 @@ public class ModelNodePersistableAdapter implements IPersistable {
 		// Only model nodes are supported
 		if (data instanceof IModelNode) {
 			IModelNode node = (IModelNode) data;
-			if (node.getName() != null && !"".equals(node.getName().trim())) { //$NON-NLS-1$
-				// Get the node name and make it a valid file system name (no spaces etc).
-				IPath path = getRoot().append(makeValidFileSystemName(node.getName().trim()));
-				if (!"ini".equals(path.getFileExtension())) path = path.addFileExtension("ini"); //$NON-NLS-1$ //$NON-NLS-2$
-				uri = path.toFile().toURI();
+
+			IPath path = null;
+
+			// If the persistence node name is set, use it and ignore all other possibilities
+			String persistenceNodeName = node.getStringProperty(IPersistableNodeProperties.PROPERTY_NODE_NAME);
+			if (persistenceNodeName != null && !"".equals(node.getName().trim())) { //$NON-NLS-1$
+				path = getRoot().append(makeValidFileSystemName(persistenceNodeName.trim()));
 			}
-			// If the name is not set, check for "Path"
-			else if (node.getStringProperty("Path") != null && !"".equals(node.getStringProperty("Path").trim())) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				IPath path = new Path(node.getStringProperty("Path")); //$NON-NLS-1$
-				uri = path.toFile().toURI();
+			// If the persistence name not set, check for the node name
+			else if (node.getName() != null && !"".equals(node.getName().trim())) { //$NON-NLS-1$
+				path = getRoot().append(makeValidFileSystemName(node.getName().trim()));
+			}
+			// If the name is not set, check for an URI
+			else if (node.getProperty(IPersistableNodeProperties.PROPERTY_URI) != null) {
+				Object candidate = node.getProperty(IPersistableNodeProperties.PROPERTY_URI);
+				if (candidate instanceof URI) uri = (URI)candidate;
+				else if (candidate instanceof String && !"".equals(((String)candidate).trim())) { //$NON-NLS-1$
+					uri = URI.create(((String)candidate).trim());
+				}
 			}
 			// No name and no explicit path is set -> use the UUID
 			else if (node.getUUID() != null) {
-				IPath path = getRoot().append(makeValidFileSystemName(node.getUUID().toString().trim()));
+				path = getRoot().append(makeValidFileSystemName(node.getUUID().toString().trim()));
+			}
+
+			if (path != null) {
 				if (!"ini".equals(path.getFileExtension())) path = path.addFileExtension("ini"); //$NON-NLS-1$ //$NON-NLS-2$
 				uri = path.toFile().toURI();
 			}
@@ -276,14 +289,14 @@ public class ModelNodePersistableAdapter implements IPersistable {
 
 					// Get the storage id and the URI from the reference
 					String storageID = reference.get("storageID"); //$NON-NLS-1$
-					String uri = reference.get("uri"); //$NON-NLS-1$
+					String uriString = reference.get("uri"); //$NON-NLS-1$
 					String interfaceTypeName = reference.get("interfaceType"); //$NON-NLS-1$
 
 					// Check if the reference returns complete information to read the referenced storage
 					if (storageID == null) {
 						throw new IOException(NLS.bind(Messages.ModelNodePersistableAdapter_import_invalidReference, "storageID")); //$NON-NLS-1$
 					}
-					if (uri == null) {
+					if (uriString == null) {
 						throw new IOException(NLS.bind(Messages.ModelNodePersistableAdapter_import_invalidReference, "uri")); //$NON-NLS-1$
 					}
 					if (interfaceTypeName == null) {
@@ -293,7 +306,8 @@ public class ModelNodePersistableAdapter implements IPersistable {
 					// Get the persistence delegate
 					IPersistenceDelegate delegate = PersistenceDelegateManager.getInstance().getDelegate(storageID, false);
 					if (delegate != null) {
-						Map<String, Object> referenceData = delegate.read(URI.create(uri));
+						URI uri = URI.create(uriString);
+						Map<String, Object> referenceData = delegate.read(uri);
 						if (referenceData != null && !referenceData.isEmpty()) {
 							try {
 								// Now, we have to recreate the object

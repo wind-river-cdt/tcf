@@ -29,6 +29,8 @@ import org.eclipse.tcf.core.TransientPeer;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.ILocator;
+import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistableNodeProperties;
+import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.locator.ScannerRunnable;
 import org.eclipse.tcf.te.tcf.locator.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
@@ -39,7 +41,6 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelRefreshSe
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelUpdateService;
 import org.eclipse.tcf.te.tcf.locator.nodes.LocatorModel;
 import org.eclipse.tcf.te.tcf.locator.nodes.PeerModel;
-import org.eclipse.tcf.te.tcf.core.Tcf;
 
 
 /**
@@ -172,7 +173,9 @@ public class LocatorModelRefreshService extends AbstractLocatorModelService impl
 							}
 
 							// Remember the file path within the properties
-							properties.setProperty("Path", candidate.getAbsolutePath()); //$NON-NLS-1$
+							properties.setProperty(IPersistableNodeProperties.PROPERTY_URI, candidate.getAbsoluteFile().toURI().toString());
+							// Mark the node as static peer model node
+							properties.setProperty("static.transient", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 
 							// Validate the name attribute. If not set, set
 							// it to the file name without the .ini extension.

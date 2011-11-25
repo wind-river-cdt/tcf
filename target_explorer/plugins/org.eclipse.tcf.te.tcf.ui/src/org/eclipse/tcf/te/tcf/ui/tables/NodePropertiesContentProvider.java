@@ -23,9 +23,9 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.tcf.protocol.Protocol;
-import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
+import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.tables.properties.NodePropertiesTableTableNode;
 import org.eclipse.ui.forms.widgets.Section;
 
@@ -41,7 +41,7 @@ public class NodePropertiesContentProvider implements IStructuredContentProvider
 	protected final static String[] FILTERED_PROPERTIES = new String[] {
 		"name", "typeLabel", //$NON-NLS-1$ //$NON-NLS-2$
 		"instance", "childrenQueried", //$NON-NLS-1$ //$NON-NLS-2$
-		IPeerModelProperties.PROP_CHANNEL_REF_COUNTER, "Path", //$NON-NLS-1$
+		IPeerModelProperties.PROP_CHANNEL_REF_COUNTER,
 		"hasTabularProperties" //$NON-NLS-1$
 	};
 
@@ -93,7 +93,7 @@ public class NodePropertiesContentProvider implements IStructuredContentProvider
 
 			for (String name : properties.keySet()) {
 				// Check if the property is filtered
-				if (name.endsWith(".silent") || Arrays.asList(FILTERED_PROPERTIES).contains(name)) continue; //$NON-NLS-1$
+				if (name.endsWith(".silent") || name.contains(".transient") || Arrays.asList(FILTERED_PROPERTIES).contains(name)) continue; //$NON-NLS-1$ //$NON-NLS-2$
 				// Create the properties node, if not one of the services nodes
 				if (!IPeerModelProperties.PROP_LOCAL_SERVICES.equals(name) && !IPeerModelProperties.PROP_REMOTE_SERVICES.equals(name)) {
 					NodePropertiesTableTableNode propertiesNode = new NodePropertiesTableTableNode(name, properties.get(name) != null ? properties.get(name).toString() : ""); //$NON-NLS-1$

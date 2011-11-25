@@ -82,8 +82,8 @@ public class MyPropertyTester extends PropertyTester {
 		}
 
 		if ("isStaticPeer".equals(property)) { //$NON-NLS-1$
-			String path = node.getPeer().getAttributes().get("Path"); //$NON-NLS-1$
-			boolean isStaticPeer = path != null && !"".equals(path.trim()); //$NON-NLS-1$
+			String value = node.getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
+			boolean isStaticPeer = value != null && Boolean.parseBoolean(value.trim());
 			if (expectedValue instanceof Boolean) return ((Boolean)expectedValue).booleanValue() == isStaticPeer;
 		}
 
