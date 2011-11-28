@@ -1009,6 +1009,26 @@ public class TCFLaunch extends Launch {
         return connecting;
     }
 
+    public void onDetach(String prs_id) {
+        if (disconnecting) return;
+        if (process == null) return;
+        if (process_exited) return;
+        if (!prs_id.equals(process.getID())) return;
+        IProcesses processes = getService(IProcesses.class);
+        processes.removeListener(prs_listener);
+        IStreams streams = getService(IStreams.class);
+        for (String id : stream_ids.keySet()) {
+            streams.disconnect(id, new IStreams.DoneDisconnect() {
+                public void doneDisconnect(IToken token, Exception error) {
+                    if (error != null) channel.terminate(error);
+                }
+            });
+        }
+        stream_ids.clear();
+        process_input_stream_id = null;
+        process = null;
+    }
+
     public void onLastContextRemoved() {
         ILaunchConfiguration cfg = getLaunchConfiguration();
         try {

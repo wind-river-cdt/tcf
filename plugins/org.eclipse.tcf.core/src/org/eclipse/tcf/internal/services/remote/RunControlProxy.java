@@ -98,6 +98,11 @@ public class RunControlProxy implements IRunControl {
             return b != null && b.booleanValue();
         }
 
+        public boolean canDetach() {
+            Boolean b = (Boolean)props.get(PROP_CAN_DETACH);
+            return b != null && b.booleanValue();
+        }
+
         public String getRCGroup() {
             return (String)props.get(PROP_RC_GROUP);
         }
@@ -147,6 +152,10 @@ public class RunControlProxy implements IRunControl {
 
         public IToken terminate(DoneCommand done) {
             return command("terminate", new Object[]{ getID() }, done);
+        }
+
+        public IToken detach(DoneCommand done) {
+            return command("detach", new Object[]{ getID() }, done);
         }
 
         private IToken command(String cmd, Object[] args, final DoneCommand done) {

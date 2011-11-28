@@ -57,6 +57,9 @@ public interface IRunControl extends IService {
         /** true if terminate command is supported by the context */
         PROP_CAN_TERMINATE = "CanTerminate",
 
+        /** true if detach command is supported by the context */
+        PROP_CAN_DETACH = "CanDetach",
+
         /** Context ID of a run control group that contains the context.
          * Members of same group are always suspended and resumed together:
          * resuming/suspending a context resumes/suspends all members of the group */
@@ -359,11 +362,21 @@ public interface IRunControl extends IService {
          * Utility method to read context property PROP_CAN_TERMINATE.
          * Value 'true' means terminate command is supported by the context,
          * however the method does not check that the command can be executed successfully in
-         * the current state of the context. For example, the command still can fail if context is
-         * already exited.
-         * @return value of PROP_CAN_SUSPEND.
+         * the current state of the context. For example, the command still can fail if the context
+         * already has exited.
+         * @return value of PROP_CAN_TERMINATE.
          */
         boolean canTerminate();
+
+        /**
+         * Utility method to read context property PROP_CAN_DETACH.
+         * Value 'true' means detach command is supported by the context,
+         * however the method does not check that the command can be executed successfully in
+         * the current state of the context. For example, the command still can fail if the context
+         * already has exited.
+         * @return value of PROP_CAN_DETACH.
+         */
+        boolean canDetach();
 
         /**
          * Utility method to read context property PROP_RC_GROUP -
@@ -435,6 +448,13 @@ public interface IRunControl extends IService {
          * @return pending command handle, can be used to cancel the command.
          */
         IToken terminate(DoneCommand done);
+
+        /**
+         * Send a command to detach a context.
+         * @param done - command result call back object.
+         * @return pending command handle, can be used to cancel the command.
+         */
+        IToken detach(DoneCommand done);
     }
 
     class RunControlError extends Exception {

@@ -236,16 +236,33 @@ class RunControl {
                     assert resume_cmds.get(id) == null;
                     final String test_id = test_suite.getCanceledTests().get(id);
                     if (test_id != null) {
+                        boolean ok = false;
                         if (enable_trace) System.out.println("" + channel_id + " cancel " + id);
-                        IDiagnostics diag = channel.getRemoteService(IDiagnostics.class);
-                        resume_cmds.put(id, diag.cancelTest(test_id, new IDiagnostics.DoneCancelTest() {
-                            public void doneCancelTest(IToken token, Throwable error) {
-                                assert resume_cmds.get(id) == token;
-                                resume_cmds.remove(id);
-                                if (enable_trace) System.out.println("" + channel_id + " done cancel " + error);
-                                if (error != null && ctx_map.get(test_id) != null) exit(error);
+                        if (rnd.nextInt(4) == 0) {
+                            IRunControl.RunControlContext ctx = ctx_map.get(test_id);
+                            if (ctx != null && ctx.canTerminate()) {
+                                resume_cmds.put(id, ctx.terminate(new IRunControl.DoneCommand() {
+                                    public void doneCommand(IToken token, Exception error) {
+                                        assert resume_cmds.get(id) == token;
+                                        resume_cmds.remove(id);
+                                        if (enable_trace) System.out.println("" + channel_id + " done cancel " + error);
+                                        if (error != null && ctx_map.get(test_id) != null) exit(error);
+                                    }
+                                }));
+                                ok = true;
                             }
-                        }));
+                        }
+                        if (!ok) {
+                            IDiagnostics diag = channel.getRemoteService(IDiagnostics.class);
+                            resume_cmds.put(id, diag.cancelTest(test_id, new IDiagnostics.DoneCancelTest() {
+                                public void doneCancelTest(IToken token, Throwable error) {
+                                    assert resume_cmds.get(id) == token;
+                                    resume_cmds.remove(id);
+                                    if (enable_trace) System.out.println("" + channel_id + " done cancel " + error);
+                                    if (error != null && ctx_map.get(test_id) != null) exit(error);
+                                }
+                            }));
+                        }
                     }
                     else {
                         IRunControl.RunControlContext ctx = ctx_map.get(id);
