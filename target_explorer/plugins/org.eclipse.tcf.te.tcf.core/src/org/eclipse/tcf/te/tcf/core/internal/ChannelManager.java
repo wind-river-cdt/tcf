@@ -361,4 +361,37 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 		refCounters.remove(id);
 		channels.remove(id);
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager#closeAll()
+	 */
+	@Override
+	public void closeAll() {
+		if (Protocol.isDispatchThread()) {
+			internalCloseAll();
+		} else {
+			Protocol.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					internalCloseAll();
+				}
+			});
+		}
+	}
+
+	/**
+	 * Close all open channel, no matter of the current reference count.
+	 * <p>
+	 * <b>Note:</b> This method must be invoked at the TCF dispatch thread.
+	 */
+	/* default */ void internalCloseAll() {
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+
+		IChannel[] openChannels = channels.values().toArray(new IChannel[channels.values().size()]);
+
+		refCounters.clear();
+		channels.clear();
+
+		for (IChannel channel : openChannels) internalCloseChannel(channel);
+	}
 }

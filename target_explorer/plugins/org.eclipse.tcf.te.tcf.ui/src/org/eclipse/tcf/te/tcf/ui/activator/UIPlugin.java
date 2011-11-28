@@ -14,8 +14,12 @@ import java.net.URL;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.ui.internal.ImageConsts;
 import org.eclipse.tcf.te.ui.jface.images.AbstractImageDescriptor;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchListener;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -26,6 +30,8 @@ import org.osgi.framework.BundleContext;
 public class UIPlugin extends AbstractUIPlugin {
 	// The shared instance
 	private static UIPlugin plugin;
+	// The workbench listener instance
+	private IWorkbenchListener listener;
 
 	/**
 	 * Constructor.
@@ -59,6 +65,21 @@ public class UIPlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+
+		// Create and register the workbench listener instance
+		listener = new IWorkbenchListener() {
+
+			@Override
+			public boolean preShutdown(IWorkbench workbench, boolean forced) {
+				Tcf.getChannelManager().closeAll();
+				return true;
+			}
+
+			@Override
+			public void postShutdown(IWorkbench workbench) {
+			}
+		};
+		PlatformUI.getWorkbench().addWorkbenchListener(listener);
 	}
 
 	/* (non-Javadoc)
@@ -67,6 +88,7 @@ public class UIPlugin extends AbstractUIPlugin {
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
+		if (listener != null) { PlatformUI.getWorkbench().removeWorkbenchListener(listener); listener = null; }
 		super.stop(context);
 	}
 

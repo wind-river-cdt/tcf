@@ -76,4 +76,11 @@ public interface IChannelManager extends IAdaptable {
 	 * @param channel The channel. Must not be <code>null</code>.
 	 */
 	public void closeChannel(IChannel channel);
+
+	/**
+	 * Close all open channel, no matter of the current reference count.
+	 * <p>
+	 * The method can be called from any thread context.
+	 */
+	public void closeAll();
 }
