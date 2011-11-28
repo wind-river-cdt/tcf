@@ -327,6 +327,7 @@ public class ModelNodePersistableAdapter implements IPersistable {
 								if (persistable == null) persistable = (IPersistable)Platform.getAdapterManager().getAdapter(referenceNode, IPersistable.class);
 								if (persistable != null) {
 									persistable.importTo(referenceNode, referenceData);
+									referenceNode.setProperty(IPersistableNodeProperties.PROPERTY_URI, uriString);
 									node.setProperty(newKey, referenceNode);
 								}
 							} catch (ClassNotFoundException e) {
