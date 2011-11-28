@@ -15,6 +15,12 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.services.IFileSystem;
+import org.eclipse.tcf.services.IFileSystem.DoneRename;
+import org.eclipse.tcf.services.IFileSystem.FileSystemException;
+import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.CacheManager;
@@ -23,11 +29,6 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.internal.url.Rendezvous;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
-import org.eclipse.tcf.protocol.IChannel;
-import org.eclipse.tcf.protocol.IToken;
-import org.eclipse.tcf.services.IFileSystem;
-import org.eclipse.tcf.services.IFileSystem.DoneRename;
-import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.ui.PlatformUI;
 /**
  * FSRename renames the specified file/folder to a
@@ -42,7 +43,7 @@ public class FSRename extends FSOperation {
 
 	/**
 	 * Create a rename operation that renames the node with the new name.
-	 * 
+	 *
 	 * @param node The file/folder node to be renamed.
 	 * @param newName The new name of this node.
 	 */
@@ -77,7 +78,7 @@ public class FSRename extends FSOperation {
 			MessageDialog.openError(parent, Messages.FSRename_RenameFileFolderTitle, e.getLocalizedMessage());
 		}
 		finally {
-			if (channel != null) channel.close();
+			if (channel != null) Tcf.getChannelManager().closeChannel(channel);
 			FSModel.getInstance().fireNodeStateChanged(node);
 		}
 		return false;
@@ -85,7 +86,7 @@ public class FSRename extends FSOperation {
 
 	/**
 	 * Rename the node using the new name.
-	 * 
+	 *
 	 * @param service File system service used to rename.
 	 * @throws TCFFileSystemException The exception thrown during renaming.
 	 */

@@ -144,7 +144,7 @@ public class TcfURLConnection extends URLConnection {
 		final Rendezvous rendezvous = new Rendezvous();
 		final TCFChannelException[] errors = new TCFChannelException[1];
 		final IChannel[] channels = new IChannel[1];
-		Tcf.getChannelManager().openChannel(peer, new DoneOpenChannel(){
+		Tcf.getChannelManager().openChannel(peer, false, new DoneOpenChannel(){
 			@Override
             public void doneOpenChannel(Throwable error, IChannel channel) {
 				if(error!=null){
@@ -289,7 +289,7 @@ public class TcfURLConnection extends URLConnection {
 			} catch (InterruptedException e) {
 				throw new IOException(Messages.TcfURLConnection_CloseFileTimeout);
 			}
-			channel.close();
+			Tcf.getChannelManager().closeChannel(channel);
 		}
 	}
 

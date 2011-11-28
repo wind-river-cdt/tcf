@@ -18,6 +18,12 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.services.IFileSystem;
+import org.eclipse.tcf.services.IFileSystem.DoneRename;
+import org.eclipse.tcf.services.IFileSystem.FileSystemException;
+import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
@@ -26,11 +32,6 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.internal.url.Rendezvous;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
-import org.eclipse.tcf.protocol.IChannel;
-import org.eclipse.tcf.protocol.IToken;
-import org.eclipse.tcf.services.IFileSystem;
-import org.eclipse.tcf.services.IFileSystem.DoneRename;
-import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.ui.PlatformUI;
 
 /**
@@ -44,7 +45,7 @@ public class FSMove extends FSOperation {
 
 	/**
 	 * Create a move operation to move the specified nodes to the destination folder.
-	 * 
+	 *
 	 * @param nodes The nodes to be moved.
 	 * @param dest the destination folder to move to.
 	 */
@@ -89,7 +90,7 @@ public class FSMove extends FSOperation {
 				finally {
 					// Clear the clip board.
 					UIPlugin.getDefault().getClipboard().clear();
-					if (channel != null) channel.close();
+					if (channel != null) Tcf.getChannelManager().closeChannel(channel);
 					// Refresh the file system tree.
 					FSModel.getInstance().fireNodeStateChanged(null);
 					monitor.done();
@@ -114,7 +115,7 @@ public class FSMove extends FSOperation {
 
 	/**
 	 * Move the file/folder to the destination folder using the specified file system service.
-	 * 
+	 *
 	 * @param monitor The monitor used to report the moving progress.
 	 * @param service The file system service used to move the remote files.
 	 * @param node The file/folder node to be moved.
@@ -187,7 +188,7 @@ public class FSMove extends FSOperation {
 
 	/**
 	 * Clean up the node after successful moving.
-	 * 
+	 *
 	 * @param node The node being moved.
 	 * @param copyNode The target node that is moved to.
 	 */

@@ -21,14 +21,14 @@ import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.DoneUser;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
+import org.eclipse.tcf.te.tcf.core.Tcf;
+import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel;
 import org.eclipse.tcf.te.tcf.filesystem.internal.UserAccount;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFChannelException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.internal.url.Rendezvous;
-import org.eclipse.tcf.te.tcf.core.Tcf;
-import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.ui.PlatformUI;
 
@@ -107,20 +107,19 @@ public class UserManager {
 		UserAccount account = getUserFromPeer(peerNode);
 		if (account == null) {
 			IChannel channel = null;
-			try{
-			channel = openChannel(peerNode.getPeer());
-			if (channel != null) {
-				account = getUserByChannel(channel);
-				if (account != null)
-					setUserToPeer(peerNode, account);
+			try {
+				channel = openChannel(peerNode.getPeer());
+				if (channel != null) {
+					account = getUserByChannel(channel);
+					if (account != null) setUserToPeer(peerNode, account);
+				}
 			}
-			}catch(TCFException e){
+			catch (TCFException e) {
 				Shell parent = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 				MessageDialog.openError(parent, Messages.UserManager_UserAccountTitle, e.getLocalizedMessage());
-			}finally{
-				if(channel!=null){
-					channel.close();
-				}
+			}
+			finally {
+				if (channel != null) Tcf.getChannelManager().closeChannel(channel);
 			}
 		}
 		return account;
@@ -135,7 +134,7 @@ public class UserManager {
 		final Rendezvous rendezvous = new Rendezvous();
 		final TCFChannelException[] errors = new TCFChannelException[1];
 		final IChannel[] channels = new IChannel[1];
-		Tcf.getChannelManager().openChannel(peer, new DoneOpenChannel(){
+		Tcf.getChannelManager().openChannel(peer, false, new DoneOpenChannel(){
 			@Override
             public void doneOpenChannel(Throwable error, IChannel channel) {
 				if(error!=null){
@@ -159,7 +158,7 @@ public class UserManager {
 		}
 		return channels[0];
 	}
-	
+
 	/**
 	 * Get the user account stored in the specified peer model using a key named
 	 * "user.account" defined by the constant USER_ACCOUNT_KEY.

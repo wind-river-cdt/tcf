@@ -39,11 +39,6 @@ import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IStreams;
 import org.eclipse.tcf.services.ITerminals;
 import org.eclipse.tcf.services.ITerminals.TerminalContext;
-import org.eclipse.tcf.te.tcf.terminals.core.activator.CoreBundleActivator;
-import org.eclipse.tcf.te.tcf.terminals.core.interfaces.launcher.ITerminalsContextAwareListener;
-import org.eclipse.tcf.te.tcf.terminals.core.interfaces.launcher.ITerminalsLauncher;
-import org.eclipse.tcf.te.tcf.terminals.core.internal.tracing.ITraceIds;
-import org.eclipse.tcf.te.tcf.terminals.core.nls.Messages;
 import org.eclipse.tcf.te.core.async.AsyncCallbackCollector;
 import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.runtime.events.DisposedEvent;
@@ -59,6 +54,11 @@ import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
 import org.eclipse.tcf.te.tcf.core.streams.StreamsDataProvider;
 import org.eclipse.tcf.te.tcf.core.streams.StreamsDataReceiver;
+import org.eclipse.tcf.te.tcf.terminals.core.activator.CoreBundleActivator;
+import org.eclipse.tcf.te.tcf.terminals.core.interfaces.launcher.ITerminalsContextAwareListener;
+import org.eclipse.tcf.te.tcf.terminals.core.interfaces.launcher.ITerminalsLauncher;
+import org.eclipse.tcf.te.tcf.terminals.core.internal.tracing.ITraceIds;
+import org.eclipse.tcf.te.tcf.terminals.core.nls.Messages;
 
 /**
  * Remote terminals launcher.
@@ -128,7 +128,7 @@ public class TerminalsLauncher extends PlatformObject implements ITerminalsLaunc
 			protected void internalDone(Object caller, IStatus status) {
 				Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 				// Close the channel as all disposal is done
-				if (finChannel != null) finChannel.close();
+				if (finChannel != null) Tcf.getChannelManager().closeChannel(finChannel);
 			}
 		}, delegate);
 
@@ -256,7 +256,7 @@ public class TerminalsLauncher extends PlatformObject implements ITerminalsLaunc
 		this.properties = properties;
 
 		// Open a channel to the given peer
-		Tcf.getChannelManager().openChannel(peer, new IChannelManager.DoneOpenChannel() {
+		Tcf.getChannelManager().openChannel(peer, false, new IChannelManager.DoneOpenChannel() {
 			/* (non-Javadoc)
 			 * @see org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel#doneOpenChannel(java.lang.Throwable, org.eclipse.tcf.protocol.IChannel)
 			 */

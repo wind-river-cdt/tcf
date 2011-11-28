@@ -15,13 +15,14 @@ import java.util.List;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.services.IFileSystem;
+import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
-import org.eclipse.tcf.protocol.IChannel;
-import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.ui.PlatformUI;
 
 /**
@@ -35,7 +36,7 @@ public class FSRefresh extends FSOperation {
 
 	/**
 	 * Create an FSRefresh to refresh the specified node and its descendants.
-	 * 
+	 *
 	 * @param node The root node to be refreshed.
 	 */
 	public FSRefresh(FSTreeNode node) {
@@ -70,7 +71,7 @@ public class FSRefresh extends FSOperation {
 				return false;
 			}
 			finally {
-				if (channel != null) channel.close();
+				if (channel != null) Tcf.getChannelManager().closeChannel(channel);
 				// Refresh the file system tree.
 				FSModel.getInstance().fireNodeStateChanged(node);
 			}
@@ -80,7 +81,7 @@ public class FSRefresh extends FSOperation {
 
 	/**
 	 * Refresh the specified node and its children recursively using the file system service.
-	 * 
+	 *
 	 * @param node The node to be refreshed.
 	 * @param service The file system service.
 	 * @throws TCFFileSystemException Thrown during refreshing.
@@ -94,11 +95,11 @@ public class FSRefresh extends FSOperation {
 			}
 		}
 	}
-	
+
 
 	/**
 	 * Update the children of the specified folder node using the file system service.
-	 * 
+	 *
 	 * @param node The folder node.
 	 * @param service The file system service.
 	 * @throws TCFFileSystemException Thrown during querying the children nodes.
@@ -121,7 +122,7 @@ public class FSRefresh extends FSOperation {
 
 	/**
 	 * Find those nodes which are in aList yet not in bList and return them as a list.
-	 * 
+	 *
 	 * @param aList
 	 * @param bList
 	 * @return the difference list.
@@ -141,5 +142,5 @@ public class FSRefresh extends FSOperation {
 			}
 		}
 		return newList;
-	}	
+	}
 }

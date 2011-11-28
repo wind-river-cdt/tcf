@@ -72,7 +72,7 @@ public abstract class FSOperation {
 	 * Get the top most nodes of the specified node list, removing those nodes whose ancestors are
 	 * one of the other nodes in the list. This method is used to remove those children or grand
 	 * children of the nodes that are cut, copied, moved or deleted.
-	 * 
+	 *
 	 * @param nodes The original node list.
 	 * @return The top most nodes.
 	 */
@@ -88,7 +88,7 @@ public abstract class FSOperation {
 
 	/**
 	 * If the target node has ancestor in the specified node list.
-	 * 
+	 *
 	 * @param target The node to be tested.
 	 * @param nodes The node list to search in.
 	 * @return true if the target node has an ancestor in the node list.
@@ -104,7 +104,7 @@ public abstract class FSOperation {
 
 	/**
 	 * Clean up the folder node after moving, deleting or copying.
-	 * 
+	 *
 	 * @param node the folder node that is to be cleaned.
 	 */
 	protected void cleanUpFolder(FSTreeNode node) {
@@ -122,7 +122,7 @@ public abstract class FSOperation {
 	 * Close the editor that opens the specified file.
 	 * <p>
 	 * <b>Note:</b> The method must be called within the UI thread.
-	 * 
+	 *
 	 * @param file The file that is opened.
 	 */
 	protected void closeEditor(final File file) {
@@ -150,7 +150,7 @@ public abstract class FSOperation {
 
 	/**
 	 * Clean up the file node after moving, deleting or copying.
-	 * 
+	 *
 	 * @param node the file node that is to be cleaned.
 	 */
 	protected void cleanUpFile(FSTreeNode node) {
@@ -174,14 +174,14 @@ public abstract class FSOperation {
 
 	/**
 	 * Open a channel connected to the target represented by the peer.
-	 * 
+	 *
 	 * @return The channel or null if the operation fails.
 	 */
 	protected IChannel openChannel(final IPeer peer) throws TCFChannelException {
 		final Rendezvous rendezvous = new Rendezvous();
 		final TCFChannelException[] errors = new TCFChannelException[1];
 		final IChannel[] channels = new IChannel[1];
-		Tcf.getChannelManager().openChannel(peer, new DoneOpenChannel() {
+		Tcf.getChannelManager().openChannel(peer, false, new DoneOpenChannel() {
 			@Override
 			public void doneOpenChannel(Throwable error, IChannel channel) {
 				if (error != null) {
@@ -210,7 +210,7 @@ public abstract class FSOperation {
 	/**
 	 * Count the total nodes in the node list including their children and grand children
 	 * recursively.
-	 * 
+	 *
 	 * @param service The file system service used to open those folders that are not expanded yet.
 	 * @param nodes The node list to be counted.
 	 * @return The count of the total nodes.
@@ -233,7 +233,7 @@ public abstract class FSOperation {
 	/**
 	 * Get the children of the specified folder node. If the folder node is not expanded, then
 	 * expanded using the specified file system service.
-	 * 
+	 *
 	 * @param node The folder node.
 	 * @param service The file system service.
 	 * @return The children of the folder node.
@@ -249,7 +249,7 @@ public abstract class FSOperation {
 
 	/**
 	 * Get the current children of the specified folder node.
-	 * 
+	 *
 	 * @param node The folder node.
 	 * @return The children of the folder node.
 	 */
@@ -271,7 +271,7 @@ public abstract class FSOperation {
 
 	/**
 	 * Load the children of the specified folder node using the file system service.
-	 * 
+	 *
 	 * @param node The folder node.
 	 * @param service The file system service.
 	 * @throws TCFFileSystemException Thrown during querying the children nodes.
@@ -290,7 +290,7 @@ public abstract class FSOperation {
 
 	/**
 	 * Query the children of the specified node using the file system service.
-	 * 
+	 *
 	 * @param node The folder node.
 	 * @param service The file system service.
 	 * @return The children of the folder node.
@@ -385,7 +385,7 @@ public abstract class FSOperation {
 	/**
 	 * Remove the child from the children list of the specified folder. If the folder has not yet
 	 * expanded, then expand it.
-	 * 
+	 *
 	 * @param service The file system service.
 	 * @param folder The folder node from which the node is going to be removed.
 	 * @param child The child node to be removed.
@@ -416,7 +416,7 @@ public abstract class FSOperation {
 
 	/**
 	 * Find the node with the name from the children list of the folder.
-	 * 
+	 *
 	 * @param service The file system service.
 	 * @param folder The folder node.
 	 * @param name The target node's name.
@@ -434,7 +434,7 @@ public abstract class FSOperation {
 	/**
 	 * Create the name for the target file that is copied. If there exists a file with the same
 	 * name, then "Copy of xxxx" and "Copy (n) of xxxx" will be used as the target file name.
-	 * 
+	 *
 	 * @param service File system service used to query the children nodes of the folder.
 	 * @param node The node whose target file is to be created.
 	 * @param dest The destination folder.
@@ -461,7 +461,7 @@ public abstract class FSOperation {
 
 	/**
 	 * Make a new directory with for the new node.
-	 * 
+	 *
 	 * @param service The file system service.
 	 * @param node The directory node to be made.
 	 * @throws TCFFileSystemException Thrown during children querying.
@@ -495,7 +495,7 @@ public abstract class FSOperation {
 
 	/**
 	 * Confirm if the file/folder represented by the specified should be replaced.
-	 * 
+	 *
 	 * @param node The file/folder node.
 	 * @return The confirming result. true yes, false no.
 	 * @throws InterruptedException Thrown when canceled.
@@ -534,7 +534,7 @@ public abstract class FSOperation {
 
 	/**
 	 * Add the specified child to the folder node's children list.
-	 * 
+	 *
 	 * @param service The file system service.
 	 * @param folder The folder node.
 	 * @param child The child node to be added.
@@ -567,7 +567,7 @@ public abstract class FSOperation {
 	/**
 	 * Create an directory entry using the specified DirEntry which contains the directory
 	 * information.
-	 * 
+	 *
 	 * @param entry The directory entry node.
 	 * @param entryIsRootNode If it is root node.
 	 * @return An FSTreeNode representing the folder.
@@ -601,7 +601,7 @@ public abstract class FSOperation {
 
 	/**
 	 * Remove the file.
-	 * 
+	 *
 	 * @param node
 	 * @param service
 	 * @throws TCFFileSystemException
@@ -638,7 +638,7 @@ public abstract class FSOperation {
 
 	/**
 	 * Remove the folder.
-	 * 
+	 *
 	 * @param node
 	 * @param service
 	 * @throws TCFFileSystemException
@@ -675,7 +675,7 @@ public abstract class FSOperation {
 
 	/**
 	 * Do the actual operation.
-	 * 
+	 *
 	 * @return true if it is successful.
 	 */
 	public abstract boolean doit();

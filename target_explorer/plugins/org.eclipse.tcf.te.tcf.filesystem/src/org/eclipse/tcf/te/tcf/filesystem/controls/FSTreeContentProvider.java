@@ -28,11 +28,11 @@ import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.DirEntry;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.services.IFileSystem.IFileHandle;
+import org.eclipse.tcf.te.tcf.core.Tcf;
+import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
 import org.eclipse.tcf.te.tcf.filesystem.internal.events.INodeStateListener;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
-import org.eclipse.tcf.te.tcf.core.Tcf;
-import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
 import org.eclipse.tcf.te.ui.nls.Messages;
@@ -80,18 +80,7 @@ public class FSTreeContentProvider implements ITreeContentProvider, INodeStateLi
 	 * Close the open communication channel.
 	 */
 	protected void closeOpenChannel(final IChannel channel) {
-		if (channel != null) {
-			if (Protocol.isDispatchThread()) {
-				channel.close();
-			} else {
-				Protocol.invokeAndWait(new Runnable() {
-					@Override
-					public void run() {
-						channel.close();
-					}
-				});
-			}
-		}
+		if (channel != null) Tcf.getChannelManager().closeChannel(channel);
 	}
 
 	/* (non-Javadoc)
@@ -185,7 +174,7 @@ public class FSTreeContentProvider implements ITreeContentProvider, INodeStateLi
 
 					children = candidates.toArray();
 
-					Tcf.getChannelManager().openChannel(peer, new IChannelManager.DoneOpenChannel() {
+					Tcf.getChannelManager().openChannel(peer, false, new IChannelManager.DoneOpenChannel() {
 						@Override
 						public void doneOpenChannel(final Throwable error, final IChannel channel) {
 							Assert.isTrue(Protocol.isDispatchThread());
@@ -308,7 +297,7 @@ public class FSTreeContentProvider implements ITreeContentProvider, INodeStateLi
 
 					if (absName != null) {
 						// Open a channel to the peer and query the children
-						Tcf.getChannelManager().openChannel(node.peerNode.getPeer(), new IChannelManager.DoneOpenChannel() {
+						Tcf.getChannelManager().openChannel(node.peerNode.getPeer(), false, new IChannelManager.DoneOpenChannel() {
 							@Override
 							public void doneOpenChannel(final Throwable error, final IChannel channel) {
 								Assert.isTrue(Protocol.isDispatchThread());
@@ -368,7 +357,7 @@ public class FSTreeContentProvider implements ITreeContentProvider, INodeStateLi
 
 	/**
 	 * Adapt the specified element to a IPeerModel.
-	 * 
+	 *
 	 * @param element The element to be adapted.
 	 * @return The IPeerModel adapted.
 	 */

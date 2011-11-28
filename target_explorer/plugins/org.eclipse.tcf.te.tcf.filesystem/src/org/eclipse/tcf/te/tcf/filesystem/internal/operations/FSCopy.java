@@ -23,6 +23,7 @@ import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.DoneCopy;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
+import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.PersistenceManager;
@@ -44,7 +45,7 @@ public class FSCopy extends FSOperation {
 
 	/**
 	 * Create a copy operation using the specified nodes and destination folder.
-	 * 
+	 *
 	 * @param nodes The file/folder nodes to be copied.
 	 * @param dest The destination folder to be copied to.
 	 */
@@ -89,7 +90,7 @@ public class FSCopy extends FSOperation {
 					throw new InvocationTargetException(e);
 				}
 				finally {
-					if (channel != null) channel.close();
+					if (channel != null) Tcf.getChannelManager().closeChannel(channel);
 					// Refresh the file system tree.
 					FSModel.getInstance().fireNodeStateChanged(null);
 					monitor.done();
@@ -114,7 +115,7 @@ public class FSCopy extends FSOperation {
 
 	/**
 	 * Copy the file/folder represented by the specified node to the destination folder.
-	 * 
+	 *
 	 * @param monitor The monitor to report the progress.
 	 * @param service The file system service to do the remote copying.
 	 * @param node The file/folder node to be copied.
@@ -133,7 +134,7 @@ public class FSCopy extends FSOperation {
 
 	/**
 	 * Copy the folder represented by the specified node to the destination folder.
-	 * 
+	 *
 	 * @param monitor The monitor to report the progress.
 	 * @param service The file system service to do the remote copying.
 	 * @param node The folder node to be copied.
@@ -164,7 +165,7 @@ public class FSCopy extends FSOperation {
 
 	/**
 	 * Copy the children of the node to the destination folder.
-	 * 
+	 *
 	 * @param monitor The monitor to report the progress.
 	 * @param service The file system service to do the remote copying.
 	 * @param node The folder node to be copied.
@@ -184,7 +185,7 @@ public class FSCopy extends FSOperation {
 
 	/**
 	 * Copy the file represented by the specified node to the destination folder.
-	 * 
+	 *
 	 * @param monitor The monitor to report the progress.
 	 * @param service The file system service to do the remote copying.
 	 * @param node The file node to be copied.

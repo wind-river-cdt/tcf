@@ -66,17 +66,7 @@ public class ProcessesTreeContentProvider implements ITreeContentProvider {
 	 */
 	protected void closeOpenChannel() {
 		if (channel != null) {
-			final IChannel finChannel = channel;
-			if (Protocol.isDispatchThread()) {
-				finChannel.close();
-			} else {
-				Protocol.invokeAndWait(new Runnable() {
-					@Override
-                    public void run() {
-						finChannel.close();
-					}
-				});
-			}
+			Tcf.getChannelManager().closeChannel(channel);
 			channel = null;
 			service = null;
 		}
@@ -122,17 +112,7 @@ public class ProcessesTreeContentProvider implements ITreeContentProvider {
 
 				// If we still have a channel open, for now, we just close the old channel
 				if (channel != null) {
-					final IChannel finChannel = channel;
-					if (Protocol.isDispatchThread()) {
-						finChannel.close();
-					} else {
-						Protocol.invokeAndWait(new Runnable() {
-							@Override
-                            public void run() {
-								finChannel.close();
-							}
-						});
-					}
+					Tcf.getChannelManager().closeChannel(channel);
 					channel = null;
 				}
 
@@ -151,7 +131,7 @@ public class ProcessesTreeContentProvider implements ITreeContentProvider {
 
 					children = new Object[] { pendingNode };
 
-					Tcf.getChannelManager().openChannel(peer, new IChannelManager.DoneOpenChannel() {
+					Tcf.getChannelManager().openChannel(peer, false, new IChannelManager.DoneOpenChannel() {
 						@Override
                         @SuppressWarnings("synthetic-access")
 						public void doneOpenChannel(Throwable error, IChannel channel) {

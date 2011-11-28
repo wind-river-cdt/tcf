@@ -27,6 +27,7 @@ import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.DoneRemove;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
+import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.internal.ImageConsts;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
@@ -48,7 +49,7 @@ public class FSDelete extends FSOperation {
 
 	/**
 	 * Create a delete operation using the specified nodes.
-	 * 
+	 *
 	 * @param nodes The nodes to be deleted.
 	 */
 	public FSDelete(List<FSTreeNode> nodes) {
@@ -89,7 +90,7 @@ public class FSDelete extends FSOperation {
 					throw new InvocationTargetException(e);
 				}
 				finally {
-					if (channel != null) channel.close();
+					if (channel != null) Tcf.getChannelManager().closeChannel(channel);
 					// Refresh the file system tree.
 					FSModel.getInstance().fireNodeStateChanged(null);
 					monitor.done();
@@ -114,7 +115,7 @@ public class FSDelete extends FSOperation {
 
 	/**
 	 * Delete the file/folder node using the file system service.
-	 * 
+	 *
 	 * @param monitor The monitor to report the progress.
 	 * @param node The file/folder node to be deleted.
 	 * @param service The file system service.
@@ -132,7 +133,7 @@ public class FSDelete extends FSOperation {
 
 	/**
 	 * Delete the folder node and its children using the file system service.
-	 * 
+	 *
 	 * @param monitor The monitor to report the progress.
 	 * @param node The folder node to be deleted.
 	 * @param service The file system service.
@@ -155,7 +156,7 @@ public class FSDelete extends FSOperation {
 
 	/**
 	 * Delete the folder node using the file system service.
-	 * 
+	 *
 	 * @param monitor The monitor to report the progress.
 	 * @param node The folder node to be deleted.
 	 * @param service The file system service.
@@ -193,7 +194,7 @@ public class FSDelete extends FSOperation {
 
 	/**
 	 * Delete the file node using the file system service.
-	 * 
+	 *
 	 * @param monitor The monitor to report the progress.
 	 * @param node The file node to be deleted.
 	 * @param service The file system service.
@@ -238,10 +239,10 @@ public class FSDelete extends FSOperation {
 		removeFile(node, service);
 		monitor.worked(1);
 	}
-	
+
 	/**
 	 * Confirm deleting the read only file.
-	 *  
+	 *
 	 * @param node The read only file node.
 	 * @return The confirming result, 0-yes, 1-yes to all, 2-no, 3-cancel.
 	 */

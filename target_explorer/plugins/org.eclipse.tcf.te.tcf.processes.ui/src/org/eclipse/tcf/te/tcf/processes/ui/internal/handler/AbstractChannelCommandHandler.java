@@ -22,10 +22,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
-import org.eclipse.tcf.protocol.Protocol;
-import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
-import org.eclipse.tcf.te.tcf.processes.ui.internal.help.IContextHelpIds;
-import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
 import org.eclipse.tcf.te.runtime.statushandler.StatusHandlerManager;
@@ -34,6 +30,9 @@ import org.eclipse.tcf.te.runtime.statushandler.interfaces.IStatusHandlerConstan
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
+import org.eclipse.tcf.te.tcf.processes.ui.internal.help.IContextHelpIds;
+import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.swt.DisplayUtil;
 import org.eclipse.ui.handlers.HandlerUtil;
 
@@ -63,7 +62,7 @@ public abstract class AbstractChannelCommandHandler extends AbstractHandler {
 					// If the peer is available, we can open a channel to the remote peer
 					if (peer != null) {
 						// Get the channel
-						Tcf.getChannelManager().openChannel(peer, new IChannelManager.DoneOpenChannel() {
+						Tcf.getChannelManager().openChannel(peer, false, new IChannelManager.DoneOpenChannel() {
 							@Override
                             public void doneOpenChannel(final Throwable error, final IChannel channel) {
 								if (error == null) {
@@ -78,19 +77,7 @@ public abstract class AbstractChannelCommandHandler extends AbstractHandler {
 														handleException(channel, new CoreException(status));
 													} else {
 														// Close the channel
-														if (channel != null) {
-															final IChannel finChannel = channel;
-															if (Protocol.isDispatchThread()) {
-																finChannel.close();
-															} else {
-																Protocol.invokeAndWait(new Runnable() {
-																	@Override
-		                                                            public void run() {
-																		finChannel.close();
-																	}
-																});
-															}
-														}
+														if (channel != null) Tcf.getChannelManager().closeChannel(channel);
 													}
 												}
 											});
@@ -145,19 +132,7 @@ public abstract class AbstractChannelCommandHandler extends AbstractHandler {
 		Assert.isNotNull(exception);
 
 		// Close the backend channel
-		if (channel != null) {
-			final IChannel finChannel = channel;
-			if (Protocol.isDispatchThread()) {
-				finChannel.close();
-			} else {
-				Protocol.invokeAndWait(new Runnable() {
-					@Override
-                    public void run() {
-						finChannel.close();
-					}
-				});
-			}
-		}
+		if (channel != null) Tcf.getChannelManager().closeChannel(channel);
 
 		// Get the status handler
 		IStatusHandler[] handler = StatusHandlerManager.getInstance().getHandler(getClass());

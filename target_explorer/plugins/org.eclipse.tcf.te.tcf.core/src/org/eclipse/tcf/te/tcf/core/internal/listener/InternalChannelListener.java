@@ -16,6 +16,7 @@ import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.core.internal.interfaces.IChannelOpenListener;
 import org.eclipse.tcf.te.tcf.core.internal.nls.Messages;
+import org.eclipse.tcf.te.tcf.core.internal.tracing.ITraceIds;
 import org.eclipse.tcf.te.tcf.core.internal.utils.LogUtils;
 
 
@@ -69,7 +70,7 @@ public class InternalChannelListener implements IChannel.IChannelListener {
 		}
 
 		// Trace the channel closing
-		LogUtils.logMessageForChannel(getChannel(), NLS.bind(Messages.InternalChannelListener_onChannelClosed_message, cause), "debug/channels", this); //$NON-NLS-1$
+		LogUtils.logMessageForChannel(getChannel(), NLS.bind(Messages.InternalChannelListener_onChannelClosed_message, cause), ITraceIds.TRACE_CHANNELS, this);
 
 		// Fire the property change event for the channel
 		Tcf.fireChannelStateChangeListeners(getChannel(), IChannel.STATE_CLOSED);
