@@ -5,13 +5,16 @@
  * available at http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- * William Chen (Wind River) - [361324] Add more file operations in the file 
- * 												system of Target Explorer.
+ * Wind River Systems - initial API and implementation
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.operations;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
+
+import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
+import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 
 /**
  * The clip board to which copy or cut files/folders.
@@ -87,4 +90,13 @@ public class FSClipboard {
 		operation = NONE;
 		this.files = null;
 	}
+
+	public List<FSTreeNode> getTreeNodes() {
+		List<FSTreeNode> nodes = new ArrayList<FSTreeNode>();
+		for (URL file : files) {
+			FSTreeNode node = FSModel.getInstance().getTreeNode(file);
+			nodes.add(node);
+		}
+	    return nodes;
+    }
 }

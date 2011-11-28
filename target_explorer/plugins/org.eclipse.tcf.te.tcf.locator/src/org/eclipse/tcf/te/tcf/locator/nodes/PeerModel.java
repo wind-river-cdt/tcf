@@ -12,16 +12,17 @@ package org.eclipse.tcf.te.tcf.locator.nodes;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.te.runtime.interfaces.workingsets.IWorkingSetElement;
+import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
 import org.eclipse.tcf.te.tcf.locator.interfaces.IModelListener;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
-import org.eclipse.tcf.te.runtime.interfaces.workingsets.IWorkingSetElement;
-import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
 
 
 /**
@@ -107,18 +108,18 @@ public class PeerModel extends PropertiesContainer implements IPeerModel, IWorki
 		// NOTE: The getAdapter(...) method can be invoked from many place and
 		//       many threads where we cannot control the calls. Therefore, this
 		//       method is allowed be called from any thread.
-		final Object[] object = new Object[1];
-		if (Protocol.isDispatchThread()) {
-			object[0] = doGetAdapter(adapter);
-		} else {
-			Protocol.invokeAndWait(new Runnable() {
-				@Override
-				public void run() {
-					object[0] = doGetAdapter(adapter);
-				}
-			});
-		}
-		return object[0] != null ? object[0] : super.getAdapter(adapter);
+		final AtomicReference<Object> object = new AtomicReference<Object>();
+		Runnable runnable = new Runnable() {
+			@Override
+			public void run() {
+				object.set(doGetAdapter(adapter));
+			}
+		};
+
+		if (Protocol.isDispatchThread()) runnable.run();
+		else Protocol.invokeAndWait(runnable);
+
+		return object.get() != null ? object.get() : super.getAdapter(adapter);
 	}
 
 	/**

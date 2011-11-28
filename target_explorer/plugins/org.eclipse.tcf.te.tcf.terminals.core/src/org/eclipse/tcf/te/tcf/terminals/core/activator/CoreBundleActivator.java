@@ -67,5 +67,6 @@ public class CoreBundleActivator implements BundleActivator {
 	@Override
 	public void stop(BundleContext bundleContext) throws Exception {
 		CoreBundleActivator.context = null;
+		traceHandler = null;
 	}
 }

@@ -21,8 +21,11 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.viewers.ColumnViewerEditor;
+import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.TreeViewerEditor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -146,7 +149,11 @@ public class View extends CommonNavigator {
 	 */
 	@Override
 	protected CommonViewer createCommonViewerObject(Composite parent) {
-		return new ViewViewer(getViewSite().getId(), parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		ViewViewer viewer = new ViewViewer(getViewSite().getId(), parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		// Define an editor activation strategy for the common viewer so as to be invoked only programmatically.
+		ColumnViewerEditorActivationStrategy activationStrategy = new ViewViewerEditorActivationStrategy(getSite().getId(), viewer);
+		TreeViewerEditor.create(viewer, null, activationStrategy, ColumnViewerEditor.DEFAULT);
+		return viewer;
 	}
 
 	/* (non-Javadoc)

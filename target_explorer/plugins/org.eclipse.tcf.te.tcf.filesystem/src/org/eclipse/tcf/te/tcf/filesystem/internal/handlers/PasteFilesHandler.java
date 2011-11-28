@@ -5,13 +5,10 @@
  * available at http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- * William Chen (Wind River) - [361324] Add more file operations in the file 
- * 												system of Target Explorer.
+ * Wind River Systems - initial API and implementation
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.handlers;
 
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -23,9 +20,9 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSClipboard;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSCopy;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSMove;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation;
-import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.ui.handlers.HandlerUtil;
+
 /**
  * The handler that pastes the files or folders in the clip board.
  */
@@ -33,35 +30,53 @@ public class PasteFilesHandler extends AbstractHandler {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 * @see
+	 * org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
 	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		FSClipboard cb = UIPlugin.getDefault().getClipboard();
 		if (!cb.isEmpty()) {
 			// Get the files/folders from the clip board.
-			List<FSTreeNode> nodes = new ArrayList<FSTreeNode>();
-			List<URL> files = cb.getFiles();
-			for (URL file : files) {
-				FSTreeNode node = FSModel.getInstance().getTreeNode(file);
-				nodes.add(node);
-			}
-			// Get the destination folder.
+			int operations = cb.getOperation();
 			IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getCurrentSelectionChecked(event);
-			FSTreeNode dest = (FSTreeNode) selection.getFirstElement();
-			int operation = cb.getOperation();
-			FSOperation fsop;
-			if (operation == FSClipboard.COPY) {
-				// Copy action.
-				fsop = new FSCopy(nodes, dest);
+			List<FSTreeNode> nodes = cb.getTreeNodes();
+			FSOperation operation = null;
+			if (operations == FSClipboard.CUT) {
+				FSTreeNode dest = (FSTreeNode) selection.getFirstElement();
+				operation = new FSMove(nodes, dest);
 			}
-			else {
-				// Cut action.
-				fsop = new FSMove(nodes, dest);
+			else if (operations == FSClipboard.COPY) {
+				FSTreeNode hovered = (FSTreeNode) selection.getFirstElement();
+				FSTreeNode dest = getCopyDestination(hovered, nodes);
+				operation = new FSCopy(nodes, dest);
 			}
-			fsop.doit();
+			if (operation != null) operation.doit();
 		}
 		return null;
 	}
 
+	/**
+	 * Return an appropriate destination directory for copying according to
+	 * the specified hovered node.  If the hovered node is a file, then return 
+	 * its parent directory. If the hovered node is a directory, then return its
+	 * self if it is not a node being copied. Return its parent directory if it is
+	 * a node being copied.
+	 * @param hovered
+	 * @param nodes
+	 * @return
+	 */
+	private FSTreeNode getCopyDestination(FSTreeNode hovered, List<FSTreeNode> nodes) {
+		if (hovered.isFile()) {
+			return hovered.parent;
+		}
+		else if (hovered.isDirectory()) {
+			for (FSTreeNode node : nodes) {
+				if (node == hovered) {
+					return hovered.parent;
+				}
+			}
+		}
+		return hovered;
+	}
 }

@@ -1,0 +1,197 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.tcf.te.ui.views" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="org.eclipse.tcf.te.ui.views" id="cellEditors" name="Common Viewer Cell Editors"/>
+      </appinfo>
+      <documentation>
+         This extension point is used to declare the cell editor factories in Target Explorer view.
+      </documentation>
+   </annotation>
+
+   <include schemaLocation="schema://org.eclipse.core.expressions/schema/expressionLanguage.exsd"/>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="cellEditor" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="cellEditor">
+      <annotation>
+         <documentation>
+            Declares a cell editor factory for Target Explorer view.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="activation"/>
+         </sequence>
+         <attribute name="viewerId" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The id of the common viewer that this cell editor factory contributes to. If the viewer is in a common navigator then the id must match the navigator&apos;s id defined in its &lt;b&gt;org.eclipse.ui.views&lt;/b&gt; extension.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.ui.navigator.viewer/viewer/@viewerId"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="editorFactory" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The class that implements &lt;code&gt;org.eclipse.tcf.te.ui.views.interfaces.IViewerCellEditorFactory&lt;/code&gt;.
+&lt;p&gt;
+The cell editor factory implementation class must be specified either by the &quot;editorFactory&quot; attribute!
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.tcf.te.ui.views.interfaces.IViewerCellEditorFactory"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="activation">
+      <annotation>
+         <documentation>
+            The &lt;b&gt;activation&lt;/b&gt; expression defines the event that triggers the cell editing and the elements selected when the cell editor is about to be activated.
+         </documentation>
+      </annotation>
+      <complexType>
+         <choice>
+            <element ref="not"/>
+            <element ref="and"/>
+            <element ref="or"/>
+            <element ref="instanceof"/>
+            <element ref="test"/>
+            <element ref="systemTest"/>
+            <element ref="equals"/>
+            <element ref="count"/>
+            <element ref="with"/>
+            <element ref="resolve"/>
+            <element ref="adapt"/>
+            <element ref="iterate"/>
+            <element ref="reference"/>
+         </choice>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         Target Explorer 1.0.0
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         &lt;pre&gt;
+   &lt;extension
+         point=&quot;org.eclipse.tcf.te.ui.views.cellEditors&quot;&gt;
+      &lt;cellEditor
+            editorFactory=&quot;org.eclipse.tcf.te.tcf.filesystem.controls.FSViewerCellEditorFactory&quot;
+            viewerId=&quot;org.eclipse.tcf.te.ui.views.TargetExplorer&quot;&gt;
+         &lt;activation&gt;
+            &lt;and&gt;
+               &lt;with
+                     variable=&quot;selection&quot;&gt;
+                  &lt;count
+                        value=&quot;1&quot;&gt;
+                  &lt;/count&gt;
+                  &lt;iterate&gt;
+                     &lt;instanceof
+                           value=&quot;org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode&quot;&gt;
+                     &lt;/instanceof&gt;
+                  &lt;/iterate&gt;
+               &lt;/with&gt;
+               &lt;with
+                     variable=&quot;event&quot;&gt;
+                  &lt;test
+                        property=&quot;org.eclipse.tcf.te.tcf.filesystem.propertytester.event.isEditorActivation&quot;&gt;
+                  &lt;/test&gt;
+               &lt;/with&gt;
+            &lt;/and&gt;
+         &lt;/activation&gt;
+      &lt;/cellEditor&gt;
+   &lt;/extension&gt;
+&lt;/pre&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="apiinfo"/>
+      </appinfo>
+      <documentation>
+         Plug-ins that want to extend this extension point, the referenced class must implement &lt;samp&gt;org.eclipse.tcf.te.ui.views.interfaces.IViewerCellEditorFactory&lt;/samp&gt; interface.
+&lt;p&gt;
+In the &quot;activation&quot; element, the evaluation context has two variables: &quot;selection&quot; and &quot;event&quot;.
+&quot;selection&quot; stores the currently selected elements in the viewer. &quot;event&quot; is the event that
+triggers cell editing, an instance of &lt;code&gt;org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent&lt;/code&gt;.
+See &lt;code&gt;org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy&lt;/code&gt; for more information.
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="implementation"/>
+      </appinfo>
+      <documentation>
+         [Enter information about supplied implementation of this extension point.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="copyright"/>
+      </appinfo>
+      <documentation>
+         Copyright (c) 2011 Wind River Systems, Inc. and others.
+
+All rights reserved.
+
+This program and the accompanying materials are made available under the terms
+of the Eclipse Public License v1.0 which accompanies this distribution, and is
+available at http://www.eclipse.org/legal/epl-v10.html.
+      </documentation>
+   </annotation>
+
+</schema>

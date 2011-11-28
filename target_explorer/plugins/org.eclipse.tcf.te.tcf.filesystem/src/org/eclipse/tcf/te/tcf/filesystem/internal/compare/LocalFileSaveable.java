@@ -20,7 +20,6 @@ import org.eclipse.compare.contentmergeviewer.ContentMergeViewer;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
@@ -29,6 +28,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tcf.te.tcf.filesystem.internal.compare.EditableSharedDocumentAdapter.ISharedDocumentAdapterListener;
 import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.CacheManager;
@@ -462,16 +462,11 @@ public class LocalFileSaveable extends Saveable implements
 		Object[] allListeners = listeners.getListeners();
 		for (int i = 0; i < allListeners.length; i++) {
 			final Object object = allListeners[i];
-			SafeRunner.run(new ISafeRunnable() {
+			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() throws Exception {
 					((IPropertyListener) object).propertyChanged(
 							LocalFileSaveable.this, property);
-				}
-
-				@Override
-				public void handleException(Throwable exception) {
-					// handled by platform
 				}
 			});
 		}

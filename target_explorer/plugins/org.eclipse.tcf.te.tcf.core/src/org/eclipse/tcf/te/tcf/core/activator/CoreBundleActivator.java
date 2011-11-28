@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.core.activator;
 
+import org.eclipse.tcf.te.runtime.tracing.TraceHandler;
 import org.eclipse.tcf.te.tcf.core.internal.Startup;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -20,6 +21,8 @@ import org.osgi.framework.BundleContext;
 public class CoreBundleActivator implements BundleActivator {
 	// The bundle context
 	private static BundleContext context;
+	// The trace handler instance
+	private static TraceHandler traceHandler;
 
 	/**
 	 * Returns the bundle context
@@ -40,6 +43,18 @@ public class CoreBundleActivator implements BundleActivator {
 		return null;
 	}
 
+	/**
+	 * Returns the bundles trace handler.
+	 *
+	 * @return The bundles trace handler.
+	 */
+	public static TraceHandler getTraceHandler() {
+		if (traceHandler == null) {
+			traceHandler = new TraceHandler(getUniqueIdentifier());
+		}
+		return traceHandler;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
 	 */
@@ -54,9 +69,9 @@ public class CoreBundleActivator implements BundleActivator {
 	@Override
 	public void stop(BundleContext bundleContext) throws Exception {
 		CoreBundleActivator.context = null;
-
 		// Mark the core framework as not started anymore
 		Startup.setStarted(false);
+		traceHandler = null;
 	}
 
 }

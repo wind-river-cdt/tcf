@@ -5,8 +5,7 @@
  * available at http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- * William Chen (Wind River) - [361324] Add more file operations in the file 
- * 												system of Target Explorer.
+ * Wind River Systems - initial API and implementation
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.operations;
 
@@ -19,6 +18,12 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.services.IFileSystem;
+import org.eclipse.tcf.services.IFileSystem.DoneRename;
+import org.eclipse.tcf.services.IFileSystem.FileSystemException;
+import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
@@ -27,11 +32,6 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.internal.url.Rendezvous;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
-import org.eclipse.tcf.protocol.IChannel;
-import org.eclipse.tcf.protocol.IToken;
-import org.eclipse.tcf.services.IFileSystem;
-import org.eclipse.tcf.services.IFileSystem.DoneRename;
-import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.ui.PlatformUI;
 
 /**
@@ -45,7 +45,7 @@ public class FSMove extends FSOperation {
 
 	/**
 	 * Create a move operation to move the specified nodes to the destination folder.
-	 * 
+	 *
 	 * @param nodes The nodes to be moved.
 	 * @param dest the destination folder to move to.
 	 */
@@ -90,7 +90,7 @@ public class FSMove extends FSOperation {
 				finally {
 					// Clear the clip board.
 					UIPlugin.getDefault().getClipboard().clear();
-					if (channel != null) channel.close();
+					if (channel != null) Tcf.getChannelManager().closeChannel(channel);
 					// Refresh the file system tree.
 					FSModel.getInstance().fireNodeStateChanged(null);
 					monitor.done();
@@ -115,7 +115,7 @@ public class FSMove extends FSOperation {
 
 	/**
 	 * Move the file/folder to the destination folder using the specified file system service.
-	 * 
+	 *
 	 * @param monitor The monitor used to report the moving progress.
 	 * @param service The file system service used to move the remote files.
 	 * @param node The file/folder node to be moved.
@@ -124,75 +124,71 @@ public class FSMove extends FSOperation {
 	 * @throws InterruptedException Thrown when the operation is canceled.
 	 */
 	void moveNode(IProgressMonitor monitor, IFileSystem service, final FSTreeNode node, FSTreeNode dest) throws TCFFileSystemException, InterruptedException {
-		if (!monitor.isCanceled()) {
-			monitor.subTask(NLS.bind(Messages.FSMove_Moving, node.name));
-			FSTreeNode copy = findChild(service, dest, node.name);
-			if (copy == null || !copy.equals(node) && confirmReplace(node)) {
-				if (copy != null && copy.isDirectory() && node.isDirectory()) {
-					List<FSTreeNode> children = new ArrayList<FSTreeNode>(getChildren(node, service));
-					for (FSTreeNode child : children) {
-						moveNode(monitor, service, child, copy);
-					}
-					removeFolder(node, service);
-					monitor.worked(1);
+		if (monitor.isCanceled()) throw new InterruptedException();
+		monitor.subTask(NLS.bind(Messages.FSMove_Moving, node.name));
+		FSTreeNode copy = findChild(service, dest, node.name);
+		if (copy == null || !copy.equals(node) && confirmReplace(node)) {
+			if (copy != null && copy.isDirectory() && node.isDirectory()) {
+				List<FSTreeNode> children = new ArrayList<FSTreeNode>(getChildren(node, service));
+				for (FSTreeNode child : children) {
+					moveNode(monitor, service, child, copy);
 				}
-				else if (copy != null && copy.isFile() && node.isDirectory()) {
-					String error = NLS.bind(Messages.FSMove_FileExistsError, copy.name);
-					throw new TCFFileSystemException(error);
-				}
-				else if (copy != null && copy.isDirectory() && node.isFile()) {
-					String error = NLS.bind(Messages.FSMove_FolderExistsError, copy.name);
-					throw new TCFFileSystemException(error);
-				}
-				else {
-					if (copy != null && copy.isFile() && node.isFile()) {
-						removeFile(copy, service);
-					}
-					else if (copy == null) {
-						copy = (FSTreeNode) node.clone();
-					}
-					addChild(service, dest, copy);
-					String dst_path = copy.getLocation(true);
-					String src_path = node.getLocation(true);
-					final FSTreeNode copyNode = copy;
-					final TCFFileSystemException[] errors = new TCFFileSystemException[1];
-					final Rendezvous rendezvous = new Rendezvous();
-					service.rename(src_path, dst_path, new DoneRename() {
-						@Override
-						public void doneRename(IToken token, FileSystemException error) {
-							if (error != null) {
-								String message = NLS.bind(Messages.FSMove_CannotMove, node.name, error);
-								errors[0] = new TCFFileSystemException(message, error);
-							}
-							else {
-								cleanUpNode(node, copyNode);
-							}
-							rendezvous.arrive();
-						}
-					});
-					try {
-						rendezvous.waiting(5000L);
-					}
-					catch (InterruptedException e) {
-						String message = NLS.bind(Messages.FSMove_CannotMove, node.name, Messages.FSOperation_TimedOutWhenOpening);
-						errors[0] = new TCFFileSystemException(message);
-					}
-					if (errors[0] != null) {
-						removeChild(service, dest, copy);
-						throw errors[0];
-					}
-					monitor.worked(1);
-				}
+				removeFolder(node, service);
+				monitor.worked(1);
 			}
-		}
-		else {
-			throw new InterruptedException();
+			else if (copy != null && copy.isFile() && node.isDirectory()) {
+				String error = NLS.bind(Messages.FSMove_FileExistsError, copy.name);
+				throw new TCFFileSystemException(error);
+			}
+			else if (copy != null && copy.isDirectory() && node.isFile()) {
+				String error = NLS.bind(Messages.FSMove_FolderExistsError, copy.name);
+				throw new TCFFileSystemException(error);
+			}
+			else {
+				if (copy != null && copy.isFile() && node.isFile()) {
+					removeFile(copy, service);
+				}
+				else if (copy == null) {
+					copy = (FSTreeNode) node.clone();
+				}
+				addChild(service, dest, copy);
+				String dst_path = copy.getLocation(true);
+				String src_path = node.getLocation(true);
+				final FSTreeNode copyNode = copy;
+				final TCFFileSystemException[] errors = new TCFFileSystemException[1];
+				final Rendezvous rendezvous = new Rendezvous();
+				service.rename(src_path, dst_path, new DoneRename() {
+					@Override
+					public void doneRename(IToken token, FileSystemException error) {
+						if (error != null) {
+							String message = NLS.bind(Messages.FSMove_CannotMove, node.name, error);
+							errors[0] = new TCFFileSystemException(message, error);
+						}
+						else {
+							cleanUpNode(node, copyNode);
+						}
+						rendezvous.arrive();
+					}
+				});
+				try {
+					rendezvous.waiting(5000L);
+				}
+				catch (InterruptedException e) {
+					String message = NLS.bind(Messages.FSMove_CannotMove, node.name, Messages.FSOperation_TimedOutWhenOpening);
+					errors[0] = new TCFFileSystemException(message);
+				}
+				if (errors[0] != null) {
+					removeChild(service, dest, copy);
+					throw errors[0];
+				}
+				monitor.worked(1);
+			}
 		}
 	}
 
 	/**
 	 * Clean up the node after successful moving.
-	 * 
+	 *
 	 * @param node The node being moved.
 	 * @param copyNode The target node that is moved to.
 	 */

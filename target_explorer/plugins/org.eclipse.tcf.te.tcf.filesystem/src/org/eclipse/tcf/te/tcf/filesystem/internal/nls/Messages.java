@@ -158,9 +158,6 @@ public class Messages extends NLS {
 	public static String FSTreeControl_column_size_label;
 	public static String FSTreeControl_column_modified_label;
 
-	public static String FSTreeNodeDropAdapterAssistant_DragError;
-	public static String FSTreeNodeDropAdapterAssistant_MoveFailure;
-	public static String FSTreeNodeDropAdapterAssistant_NoFileSelected;
 	public static String FSOpenFileDialog_title;
 	public static String FSOperation_CopyNOfFile;
 	public static String FSOperation_CopyOfFile;

@@ -5,8 +5,7 @@
  * available at http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- * William Chen (Wind River) - [361324] Add more file operations in the file 
- * 												system of Target Explorer.
+ * Wind River Systems - initial API and implementation
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.operations;
 
@@ -24,6 +23,7 @@ import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.DoneCopy;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
+import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.PersistenceManager;
@@ -45,7 +45,7 @@ public class FSCopy extends FSOperation {
 
 	/**
 	 * Create a copy operation using the specified nodes and destination folder.
-	 * 
+	 *
 	 * @param nodes The file/folder nodes to be copied.
 	 * @param dest The destination folder to be copied to.
 	 */
@@ -90,7 +90,7 @@ public class FSCopy extends FSOperation {
 					throw new InvocationTargetException(e);
 				}
 				finally {
-					if (channel != null) channel.close();
+					if (channel != null) Tcf.getChannelManager().closeChannel(channel);
 					// Refresh the file system tree.
 					FSModel.getInstance().fireNodeStateChanged(null);
 					monitor.done();
@@ -115,7 +115,7 @@ public class FSCopy extends FSOperation {
 
 	/**
 	 * Copy the file/folder represented by the specified node to the destination folder.
-	 * 
+	 *
 	 * @param monitor The monitor to report the progress.
 	 * @param service The file system service to do the remote copying.
 	 * @param node The file/folder node to be copied.
@@ -134,7 +134,7 @@ public class FSCopy extends FSOperation {
 
 	/**
 	 * Copy the folder represented by the specified node to the destination folder.
-	 * 
+	 *
 	 * @param monitor The monitor to report the progress.
 	 * @param service The file system service to do the remote copying.
 	 * @param node The folder node to be copied.
@@ -143,33 +143,49 @@ public class FSCopy extends FSOperation {
 	 * @throws InterruptedException The exception thrown when the operation is canceled.
 	 */
 	private void copyFolder(IProgressMonitor monitor, IFileSystem service, FSTreeNode node, FSTreeNode dest) throws TCFFileSystemException, InterruptedException {
-		if (!monitor.isCanceled()) {
-			FSTreeNode copy = findChild(service, dest, node.name);
-			if (copy == null || confirmReplace(node)) {
-				if (copy == null) {
-					// If no existing directory with the same name, create it.
-					copy = (FSTreeNode) node.clone();
-					addChild(service, dest, copy);
-					mkdir(service, copy);
-				}
-				List<FSTreeNode> children = new ArrayList<FSTreeNode>(getChildren(node, service));
-				if (!children.isEmpty()) {
-					for (FSTreeNode child : children) {
-						// Iterate and copy its children nodes.
-						copyNode(monitor, service, child, copy);
-					}
-				}
-			}
-			monitor.worked(1);
+		if (monitor.isCanceled()) throw new InterruptedException();
+		FSTreeNode copy = findChild(service, dest, node.name);
+		if (copy == null) {
+			// If no existing directory with the same name, create it.
+			copy = (FSTreeNode) node.clone();
+			addChild(service, dest, copy);
+			mkdir(service, copy);
+			copyChildren(monitor, service, node, copy);
 		}
-		else {
-			throw new InterruptedException();
+		else if (node == copy) {
+			copy = createCopyDestination(service, node, dest);
+			mkdir(service, copy);
+			copyChildren(monitor, service, node, copy);
 		}
+		else if (confirmReplace(node)) {
+			copyChildren(monitor, service, node, copy);
+		}
+		monitor.worked(1);
 	}
 
 	/**
+	 * Copy the children of the node to the destination folder.
+	 *
+	 * @param monitor The monitor to report the progress.
+	 * @param service The file system service to do the remote copying.
+	 * @param node The folder node to be copied.
+	 * @param dest The destination folder.
+	 * @throws TCFFileSystemException The exception thrown during copying
+	 * @throws InterruptedException The exception thrown when the operation is canceled.
+	 */
+	private void copyChildren(IProgressMonitor monitor, IFileSystem service, FSTreeNode node, FSTreeNode dest) throws TCFFileSystemException, InterruptedException {
+	    List<FSTreeNode> children = new ArrayList<FSTreeNode>(getChildren(node, service));
+	    if (!children.isEmpty()) {
+	    	for (FSTreeNode child : children) {
+	    		// Iterate and copy its children nodes.
+	    		copyNode(monitor, service, child, dest);
+	    	}
+	    }
+    }
+
+	/**
 	 * Copy the file represented by the specified node to the destination folder.
-	 * 
+	 *
 	 * @param monitor The monitor to report the progress.
 	 * @param service The file system service to do the remote copying.
 	 * @param node The file node to be copied.
@@ -178,43 +194,38 @@ public class FSCopy extends FSOperation {
 	 * @throws InterruptedException The exception thrown when the operation is canceled.
 	 */
 	private void copyFile(IProgressMonitor monitor, IFileSystem service, FSTreeNode node, FSTreeNode dest) throws TCFFileSystemException, InterruptedException {
-		if (!monitor.isCanceled()) {
-			monitor.subTask(NLS.bind(Messages.FSCopy_Copying, node.name));
-			// Create the copy target file
-			final FSTreeNode copy = createCopyFile(service, node, dest);
-			String src_path = node.getLocation(true);
-			String dst_path = copy.getLocation(true);
-			final TCFFileSystemException[] errors = new TCFFileSystemException[1];
-			final Rendezvous rendezvous = new Rendezvous();
-			// Get the options of copy permission and ownership.
-			boolean copyPermission = PersistenceManager.getInstance().isCopyPermission();
-			boolean copyOwnership = PersistenceManager.getInstance().isCopyOwnership();
-			service.copy(src_path, dst_path, copyPermission, copyOwnership, new DoneCopy() {
-				@Override
-				public void doneCopy(IToken token, FileSystemException error) {
-					if (error != null) {
-						String message = NLS.bind(Messages.FSCopy_CannotCopyFile, copy.name, error);
-						errors[0] = new TCFFileSystemException(message, error);
-					}
-					rendezvous.arrive();
+		if (monitor.isCanceled()) throw new InterruptedException();
+		monitor.subTask(NLS.bind(Messages.FSCopy_Copying, node.name));
+		// Create the copy target file
+		final FSTreeNode copy = createCopyDestination(service, node, dest);
+		String src_path = node.getLocation(true);
+		String dst_path = copy.getLocation(true);
+		final TCFFileSystemException[] errors = new TCFFileSystemException[1];
+		final Rendezvous rendezvous = new Rendezvous();
+		// Get the options of copy permission and ownership.
+		boolean copyPermission = PersistenceManager.getInstance().isCopyPermission();
+		boolean copyOwnership = PersistenceManager.getInstance().isCopyOwnership();
+		service.copy(src_path, dst_path, copyPermission, copyOwnership, new DoneCopy() {
+			@Override
+			public void doneCopy(IToken token, FileSystemException error) {
+				if (error != null) {
+					String message = NLS.bind(Messages.FSCopy_CannotCopyFile, copy.name, error);
+					errors[0] = new TCFFileSystemException(message, error);
 				}
-			});
-			try {
-				rendezvous.waiting(5000L);
+				rendezvous.arrive();
 			}
-			catch (InterruptedException e) {
-				String message = NLS.bind(Messages.FSCopy_CannotCopyFile, node.name, Messages.FSOperation_TimedOutWhenOpening);
-				errors[0] = new TCFFileSystemException(message);
-			}
-			if (errors[0] != null) {
-				removeChild(service, dest, copy);
-				throw errors[0];
-			}
-			monitor.worked(1);
+		});
+		try {
+			rendezvous.waiting(5000L);
 		}
-		else {
-			// Canceled.
-			throw new InterruptedException();
+		catch (InterruptedException e) {
+			String message = NLS.bind(Messages.FSCopy_CannotCopyFile, node.name, Messages.FSOperation_TimedOutWhenOpening);
+			errors[0] = new TCFFileSystemException(message);
 		}
+		if (errors[0] != null) {
+			removeChild(service, dest, copy);
+			throw errors[0];
+		}
+		monitor.worked(1);
 	}
 }

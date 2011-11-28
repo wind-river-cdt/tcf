@@ -7,8 +7,6 @@
  * Contributors:
  * William Chen (Wind River)	[360494]Provide an "Open With" action in the pop 
  * 								up menu of file system nodes of Target Explorer.
- * William Chen (Wind River) - [361324] Add more file operations in the file system
- * 												of Target Explorer.
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.handlers;
 

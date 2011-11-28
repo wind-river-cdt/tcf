@@ -41,6 +41,18 @@ public interface IPersistable {
 	public URI getURI(Object data);
 
 	/**
+	 * Returns the interface type name to use for recreating the object from the
+	 * persisted object representation.
+	 * <p>
+	 * <b>Note:</b> The returned string is expected in the format <code>&quot;&lt;bundleId&gt;:&lt;full qualified interface type name&gt;&quot;</code>.
+	 *              If the bundle id is not present, it is very likely that the object recreation will fail with a {@link ClassNotFoundException}.
+	 *
+	 * @param data The data object. Must not be <code>null</code>.
+	 * @return The interface type or <code>null</code>.
+	 */
+	public String getInterfaceTypeName(Object data);
+
+	/**
 	 * Exports the given data object to an external representation.
 	 * <p>
 	 * As a general guide line, it is expected that the external representation contains only base

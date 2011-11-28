@@ -20,10 +20,10 @@ import org.eclipse.compare.structuremergeviewer.ICompareInput;
 import org.eclipse.compare.structuremergeviewer.ICompareInputChangeListener;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.osgi.util.TextProcessor;
@@ -254,15 +254,10 @@ public class MergeEditorInput extends CompareEditorInput implements
 			Object[] allListeners = inputChangeListeners.getListeners();
 			for (int i = 0; i < allListeners.length; i++) {
 				final ICompareInputChangeListener listener = (ICompareInputChangeListener) allListeners[i];
-				SafeRunner.run(new ISafeRunnable() {
+				SafeRunner.run(new SafeRunnable() {
 					@Override
 					public void run() throws Exception {
 						listener.compareInputChanged(getCompareResult());
-					}
-
-					@Override
-					public void handleException(Throwable exception) {
-						// Logged by the safe runner
 					}
 				});
 			}

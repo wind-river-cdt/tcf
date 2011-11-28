@@ -9,8 +9,6 @@
  * William Chen (Wind River) - [345384] Provide property pages for remote file system nodes
  * William Chen (Wind River) - [352302]Opening a file in an editor depending on
  *                             the client's permissions.
- * William Chen (Wind River) - [361324] Add more file operations in the file system
- * 												of Target Explorer.
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.model;
 

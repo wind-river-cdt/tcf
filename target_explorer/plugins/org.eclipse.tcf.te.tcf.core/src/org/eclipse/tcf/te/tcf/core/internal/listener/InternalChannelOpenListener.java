@@ -19,6 +19,7 @@ import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.core.internal.interfaces.IChannelOpenListener;
 import org.eclipse.tcf.te.tcf.core.internal.nls.Messages;
+import org.eclipse.tcf.te.tcf.core.internal.tracing.ITraceIds;
 import org.eclipse.tcf.te.tcf.core.internal.utils.LogUtils;
 
 
@@ -39,7 +40,7 @@ public class InternalChannelOpenListener implements IChannelOpenListener {
 		Assert.isTrue(Protocol.isDispatchThread());
 
 		// Trace the channel opening
-		LogUtils.logMessageForChannel(channel, Messages.InternalChannelOpenListener_onChannelOpen_message, "debug/channels", this); //$NON-NLS-1$
+		LogUtils.logMessageForChannel(channel, Messages.InternalChannelOpenListener_onChannelOpen_message, ITraceIds.TRACE_CHANNELS, this);
 
 		// As the channel has just opened, there should be no channel listener, but better be safe and check.
 		IChannel.IChannelListener channelListener = channelListeners.remove(channel);

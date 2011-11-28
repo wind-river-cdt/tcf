@@ -30,4 +30,6 @@ public class Messages extends NLS {
 	// **** Declare externalized string id's down here *****
 
 	public static String PendingOperationModelNode_label;
+
+	public static String FactoryDelegateProxy_warning_failedToLoadNodeType;
 }

@@ -43,12 +43,6 @@ import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.IProcesses.ProcessContext;
 import org.eclipse.tcf.services.IStreams;
-import org.eclipse.tcf.te.tcf.processes.core.activator.CoreBundleActivator;
-import org.eclipse.tcf.te.tcf.processes.core.interfaces.launcher.IProcessContextAwareListener;
-import org.eclipse.tcf.te.tcf.processes.core.interfaces.launcher.IProcessLauncher;
-import org.eclipse.tcf.te.tcf.processes.core.interfaces.launcher.IProcessStreamsProxy;
-import org.eclipse.tcf.te.tcf.processes.core.internal.tracing.ITraceIds;
-import org.eclipse.tcf.te.tcf.processes.core.nls.Messages;
 import org.eclipse.tcf.te.core.async.AsyncCallbackCollector;
 import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.runtime.events.DisposedEvent;
@@ -64,6 +58,12 @@ import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
 import org.eclipse.tcf.te.tcf.core.streams.StreamsDataProvider;
 import org.eclipse.tcf.te.tcf.core.streams.StreamsDataReceiver;
+import org.eclipse.tcf.te.tcf.processes.core.activator.CoreBundleActivator;
+import org.eclipse.tcf.te.tcf.processes.core.interfaces.launcher.IProcessContextAwareListener;
+import org.eclipse.tcf.te.tcf.processes.core.interfaces.launcher.IProcessLauncher;
+import org.eclipse.tcf.te.tcf.processes.core.interfaces.launcher.IProcessStreamsProxy;
+import org.eclipse.tcf.te.tcf.processes.core.internal.tracing.ITraceIds;
+import org.eclipse.tcf.te.tcf.processes.core.nls.Messages;
 
 /**
  * Remote process launcher.
@@ -144,7 +144,7 @@ public class ProcessLauncher extends PlatformObject implements IProcessLauncher 
 			protected void internalDone(Object caller, IStatus status) {
 				Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 				// Close the channel as all disposal is done
-				if (finChannel != null) finChannel.close();
+				if (finChannel != null) Tcf.getChannelManager().closeChannel(finChannel);
 			}
 		}, delegate);
 
@@ -332,7 +332,7 @@ public class ProcessLauncher extends PlatformObject implements IProcessLauncher 
 		this.properties = properties;
 
 		// Open a channel to the given peer
-		Tcf.getChannelManager().openChannel(peer, new IChannelManager.DoneOpenChannel() {
+		Tcf.getChannelManager().openChannel(peer, false, new IChannelManager.DoneOpenChannel() {
 			/* (non-Javadoc)
 			 * @see org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel#doneOpenChannel(java.lang.Throwable, org.eclipse.tcf.protocol.IChannel)
 			 */

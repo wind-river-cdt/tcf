@@ -6,8 +6,6 @@
  *
  * Contributors:
  * Wind River Systems - initial API and implementation
- * William Chen (Wind River) - [361324] Add more file operations in the file system
- * 												of Target Explorer.
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.preferences;
 

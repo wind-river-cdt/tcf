@@ -14,9 +14,9 @@ import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.tcf.protocol.Protocol;
-import org.eclipse.tcf.te.tcf.ui.internal.ImageConsts;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
+import org.eclipse.tcf.te.tcf.ui.internal.ImageConsts;
 import org.eclipse.tcf.te.ui.jface.images.AbstractImageDescriptor;
 
 
@@ -84,13 +84,7 @@ public class PeerImageDescriptor extends AbstractImageDescriptor {
 	protected void drawCompositeImage(int width, int height) {
 		drawCentered(baseImage, width, height);
 
-		if (state == IPeerModelProperties.STATE_UNKNOWN) { /* unknown */
-			drawBottomRight(ImageConsts.GREY_OVR);
-		}
-		else if (state == IPeerModelProperties.STATE_REACHABLE) { /* not connected, but reachable */
-			drawBottomRight(ImageConsts.GOLD_OVR);
-		}
-		else if (state == IPeerModelProperties.STATE_CONNECTED) { /* connected */
+		if (state == IPeerModelProperties.STATE_CONNECTED) { /* connected */
 			drawBottomRight(ImageConsts.GREEN_OVR);
 		}
 		else if (state == IPeerModelProperties.STATE_NOT_REACHABLE) { /* not connected, not reachable */

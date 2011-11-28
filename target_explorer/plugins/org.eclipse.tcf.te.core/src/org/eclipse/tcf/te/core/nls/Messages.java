@@ -35,5 +35,8 @@ public class Messages extends NLS {
 	public static String ConnectStrategyStepExecutor_error_stepFailed;
 	public static String ConnectStrategyStepExecutor_stepFailed_debugInfo;
 
+	public static String ModelNodePersistableAdapter_export_invalidPersistable;
 	public static String ModelNodePersistableAdapter_export_unknownType;
+	public static String ModelNodePersistableAdapter_import_invalidReference;
+	public static String ModelNodePersistableAdapter_import_cannotLoadClass;
 }

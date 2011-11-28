@@ -3,7 +3,7 @@
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
@@ -74,4 +74,13 @@ public class Messages extends NLS {
 	public static String InternalChannelListener_onChannelClosed_message;
 	public static String InternalChannelListener_onChannelClosed_cause;
 
+	public static String ChannelManager_openChannel_message;
+	public static String ChannelManager_openChannel_reuse_message;
+	public static String ChannelManager_openChannel_new_message;
+	public static String ChannelManager_openChannel_success_message;
+	public static String ChannelManager_openChannel_failed_message;
+	public static String ChannelManager_createPeer_new_message;
+	public static String ChannelManager_closeChannel_message;
+	public static String ChannelManager_closeChannel_inuse_message;
+	public static String ChannelManager_closeChannel_closed_message;
 }

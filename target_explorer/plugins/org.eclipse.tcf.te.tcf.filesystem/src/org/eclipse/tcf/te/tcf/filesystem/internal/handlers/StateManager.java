@@ -7,8 +7,6 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  * William Chen (Wind River)- [345552] Edit the remote files with a proper editor
- * William Chen (Wind River) - [361324] Add more file operations in the file system
- * 												of Target Explorer.
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.handlers;
 
@@ -24,6 +22,8 @@ import org.eclipse.tcf.services.IFileSystem.DoneSetStat;
 import org.eclipse.tcf.services.IFileSystem.DoneStat;
 import org.eclipse.tcf.services.IFileSystem.FileAttrs;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
+import org.eclipse.tcf.te.tcf.core.Tcf;
+import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFChannelException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
@@ -32,8 +32,6 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.url.Rendezvous;
 import org.eclipse.tcf.te.tcf.filesystem.model.CacheState;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
-import org.eclipse.tcf.te.tcf.core.Tcf;
-import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel;
 
 /**
  * This class provides several utility methods to get, update, commit
@@ -127,8 +125,7 @@ public class StateManager {
 				}
 			}
 		} finally {
-			if (channel != null)
-				channel.close();
+			if (channel != null) Tcf.getChannelManager().closeChannel(channel);
 		}
 	}
 
@@ -153,7 +150,7 @@ public class StateManager {
 
 	/**
 	 * Set the file's attributes using the new attributes.
-	 * 
+	 *
 	 * @param node The file's node.
 	 * @param attrs The new file attributes.
 	 * @throws TCFException
@@ -195,8 +192,7 @@ public class StateManager {
 				}
 			}
 		}  finally {
-			if (channel != null)
-				channel.close();
+			if (channel != null) Tcf.getChannelManager().closeChannel(channel);
 		}
 	}
 
@@ -209,7 +205,7 @@ public class StateManager {
 		final Rendezvous rendezvous = new Rendezvous();
 		final TCFChannelException[] errors = new TCFChannelException[1];
 		final IChannel[] channels = new IChannel[1];
-		Tcf.getChannelManager().openChannel(peer, new DoneOpenChannel(){
+		Tcf.getChannelManager().openChannel(peer, false, new DoneOpenChannel(){
 			@Override
             public void doneOpenChannel(Throwable error, IChannel channel) {
 				if(error!=null){

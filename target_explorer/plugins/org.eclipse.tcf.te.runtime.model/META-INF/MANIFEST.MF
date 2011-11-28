@@ -12,5 +12,8 @@ Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: org.eclipse.tcf.te.runtime.model,
  org.eclipse.tcf.te.runtime.model.activator;x-internal:=true,
+ org.eclipse.tcf.te.runtime.model.factory,
  org.eclipse.tcf.te.runtime.model.interfaces,
+ org.eclipse.tcf.te.runtime.model.interfaces.factory,
+ org.eclipse.tcf.te.runtime.model.internal.factory;x-internal:=true,
  org.eclipse.tcf.te.runtime.model.nls;x-internal:=true

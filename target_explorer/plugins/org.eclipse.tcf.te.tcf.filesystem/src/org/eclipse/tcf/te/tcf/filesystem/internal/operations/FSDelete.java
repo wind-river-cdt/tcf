@@ -5,8 +5,7 @@
  * available at http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- * William Chen (Wind River) - [361324] Add more file operations in the file 
- * 												system of Target Explorer.
+ * Wind River Systems - initial API and implementation
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.operations;
 
@@ -15,14 +14,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.services.IFileSystem;
+import org.eclipse.tcf.services.IFileSystem.DoneRemove;
+import org.eclipse.tcf.services.IFileSystem.FileSystemException;
+import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.internal.ImageConsts;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
@@ -33,11 +38,6 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.internal.url.Rendezvous;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
-import org.eclipse.tcf.protocol.IChannel;
-import org.eclipse.tcf.protocol.IToken;
-import org.eclipse.tcf.services.IFileSystem;
-import org.eclipse.tcf.services.IFileSystem.DoneRemove;
-import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.ui.PlatformUI;
 
 /**
@@ -49,7 +49,7 @@ public class FSDelete extends FSOperation {
 
 	/**
 	 * Create a delete operation using the specified nodes.
-	 * 
+	 *
 	 * @param nodes The nodes to be deleted.
 	 */
 	public FSDelete(List<FSTreeNode> nodes) {
@@ -90,7 +90,7 @@ public class FSDelete extends FSOperation {
 					throw new InvocationTargetException(e);
 				}
 				finally {
-					if (channel != null) channel.close();
+					if (channel != null) Tcf.getChannelManager().closeChannel(channel);
 					// Refresh the file system tree.
 					FSModel.getInstance().fireNodeStateChanged(null);
 					monitor.done();
@@ -115,7 +115,7 @@ public class FSDelete extends FSOperation {
 
 	/**
 	 * Delete the file/folder node using the file system service.
-	 * 
+	 *
 	 * @param monitor The monitor to report the progress.
 	 * @param node The file/folder node to be deleted.
 	 * @param service The file system service.
@@ -133,7 +133,7 @@ public class FSDelete extends FSOperation {
 
 	/**
 	 * Delete the folder node and its children using the file system service.
-	 * 
+	 *
 	 * @param monitor The monitor to report the progress.
 	 * @param node The folder node to be deleted.
 	 * @param service The file system service.
@@ -148,17 +148,15 @@ public class FSDelete extends FSOperation {
 				remove(monitor, child, service);
 			}
 		}
-		if (!monitor.isCanceled()) {
-			monitor.subTask(NLS.bind(Messages.FSDelete_RemovingFileFolder, node.name));
-			removeFolder(service, node);
-			monitor.worked(1);
-		}
-		else throw new InterruptedException();
+		if (monitor.isCanceled()) throw new InterruptedException();
+		monitor.subTask(NLS.bind(Messages.FSDelete_RemovingFileFolder, node.name));
+		removeFolder(service, node);
+		monitor.worked(1);
 	}
 
 	/**
 	 * Delete the folder node using the file system service.
-	 * 
+	 *
 	 * @param monitor The monitor to report the progress.
 	 * @param node The folder node to be deleted.
 	 * @param service The file system service.
@@ -196,7 +194,7 @@ public class FSDelete extends FSOperation {
 
 	/**
 	 * Delete the file node using the file system service.
-	 * 
+	 *
 	 * @param monitor The monitor to report the progress.
 	 * @param node The file node to be deleted.
 	 * @param service The file system service.
@@ -204,52 +202,47 @@ public class FSDelete extends FSOperation {
 	 * @throws InterruptedException Thrown when the operation is canceled.
 	 */
 	private void removeFile(IProgressMonitor monitor, final FSTreeNode node, IFileSystem service) throws TCFFileSystemException, InterruptedException {
-		if (!monitor.isCanceled()) {
-			monitor.subTask(NLS.bind(Messages.FSDelete_RemovingFileFolder, node.name));
-			// If the file is read only on windows or not writable on unix, then make it deletable.
-			if (node.isWindowsNode() && node.isReadOnly() || !node.isWindowsNode() && !node.isWritable()) {
-				if (!yes2All) {
-					int result = confirmDelete(node);
-					if (result == 1) {
-						yes2All = true;
-					}
-					else if (result == 2) {
-						monitor.worked(1);
-						return;
-					}
-					else if (result == 3) {
-						// Cancel the whole operation
-						throw new InterruptedException();
-					}
+		if (monitor.isCanceled()) throw new InterruptedException();
+		monitor.subTask(NLS.bind(Messages.FSDelete_RemovingFileFolder, node.name));
+		// If the file is read only on windows or not writable on unix, then make it deletable.
+		if (node.isWindowsNode() && node.isReadOnly() || !node.isWindowsNode() && !node.isWritable()) {
+			if (!yes2All) {
+				int result = confirmDelete(node);
+				if (result == 1) {
+					yes2All = true;
 				}
-				final FSTreeNode clone = (FSTreeNode) node.clone();
-				if (node.isWindowsNode()) {
-					clone.setReadOnly(false);
+				else if (result == 2) {
+					monitor.worked(1);
+					return;
 				}
-				else {
-					clone.setWritable(true);
+				else if (result == 3) {
+					// Cancel the whole operation
+					monitor.setCanceled(true);
+					throw new InterruptedException();
 				}
-				// Make the file writable.
-				SafeRunner.run(new ISafeRunnable() {
-					@Override
-					public void handleException(Throwable exception) {
-					}
-
-					@Override
-					public void run() throws Exception {
-						StateManager.getInstance().setFileAttrs(node, clone.attr);
-					}
-				});
 			}
-			removeFile(node, service);
-			monitor.worked(1);
+			final FSTreeNode clone = (FSTreeNode) node.clone();
+			if (node.isWindowsNode()) {
+				clone.setReadOnly(false);
+			}
+			else {
+				clone.setWritable(true);
+			}
+			// Make the file writable.
+			SafeRunner.run(new SafeRunnable() {
+				@Override
+				public void run() throws Exception {
+					StateManager.getInstance().setFileAttrs(node, clone.attr);
+				}
+			});
 		}
-		else throw new InterruptedException();
+		removeFile(node, service);
+		monitor.worked(1);
 	}
-	
+
 	/**
 	 * Confirm deleting the read only file.
-	 *  
+	 *
 	 * @param node The read only file node.
 	 * @return The confirming result, 0-yes, 1-yes to all, 2-no, 3-cancel.
 	 */

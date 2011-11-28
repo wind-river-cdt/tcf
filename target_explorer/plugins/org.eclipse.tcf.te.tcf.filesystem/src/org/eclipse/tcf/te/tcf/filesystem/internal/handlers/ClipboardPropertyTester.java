@@ -5,18 +5,17 @@
  * available at http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- * William Chen (Wind River) - [361324] Add more file operations in the file 
- * 												system of Target Explorer.
+ * Wind River Systems - initial API and implementation
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.handlers;
 
-import java.net.URL;
 import java.util.List;
 
 import org.eclipse.core.expressions.PropertyTester;
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSClipboard;
-import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 /**
  * Provide a tester to test if the paste operation is enabled.
@@ -35,29 +34,33 @@ public class ClipboardPropertyTester extends PropertyTester {
 	 */
 	@Override
 	public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
+		Assert.isTrue(receiver instanceof IStructuredSelection);
 		if (property.equals("canPaste")) { //$NON-NLS-1$
 			FSClipboard cb = UIPlugin.getDefault().getClipboard();
 			if (!cb.isEmpty()) {
+				List<FSTreeNode> nodes = cb.getTreeNodes();
 				int operation = cb.getOperation();
-				List<URL> urls = cb.getFiles();
-				for (URL url : urls) {
-					FSTreeNode node = FSModel.getInstance().getTreeNode(url);
-					if (node != null) {
-						if (operation == FSClipboard.COPY) {
-							// If it is not a windows node and it is not readable, 
-							// then it cannot be moved.
-							if (!node.isWindowsNode() && !node.isReadable()) return false;
-						}
-						else if (operation == FSClipboard.CUT) {
-							// If it is a windows node and is read only, or it is not 
-							// a windows node and is not writable, then it cannot be moved.
-							if (node.isWindowsNode() && node.isReadOnly() || !node.isWindowsNode() && !node.isWritable()) {
+				boolean moving = operation == FSClipboard.CUT;
+				boolean copying = operation == FSClipboard.COPY;
+				List<FSTreeNode> selection = ((IStructuredSelection) receiver).toList();
+				FSTreeNode hovered = null;
+				for (FSTreeNode node : selection) {
+					if (hovered == null) hovered = node.parent;
+					else if (hovered != node.parent) return false;
+				}
+				if (hovered.isDirectory() && hovered.isWritable() && (moving || copying)) {
+					FSTreeNode head = nodes.get(0);
+					String hid = head.peerNode.getPeer().getID();
+					String tid = hovered.peerNode.getPeer().getID();
+					if (hid.equals(tid)) {
+						for (FSTreeNode node : nodes) {
+							if (moving && node.parent == hovered || node.isAncestorOf(hovered)) {
 								return false;
 							}
 						}
+						return true;
 					}
 				}
-				return true;
 			}
 		}
 		return false;
