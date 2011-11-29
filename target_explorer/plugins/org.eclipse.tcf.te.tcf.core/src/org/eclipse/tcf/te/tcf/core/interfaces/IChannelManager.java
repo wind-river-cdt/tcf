@@ -66,6 +66,19 @@ public interface IChannelManager extends IAdaptable {
 	public void openChannel(Map<String, String> peerAttributes, boolean forceNew, DoneOpenChannel done);
 
 	/**
+	 * Returns the shared channel instance for the given peer. Channels retrieved using this
+	 * method cannot be closed by the caller.
+	 * <p>
+	 * Callers of this method are expected to test for the current channel state themselves.
+	 * <p>
+	 * The method can be called from any thread context.
+	 *
+	 * @param peer The peer. Must not be <code>null</code>.
+	 * @return The channel instance or <code>null</code>.
+	 */
+	public IChannel getChannel(IPeer peer);
+
+	/**
 	 * Closes the given channel.
 	 * <p>
 	 * If the given channel is a reference counted channel, the channel will be closed if the reference counter
