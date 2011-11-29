@@ -171,11 +171,16 @@ public class TCFConnectorService extends StandardConnectorService implements ITC
 
     public boolean isConnected() {
         final boolean res[] = new boolean[1];
-        Protocol.invokeAndWait(new Runnable() {
-            public void run() {
-               res[0] = channel != null && channel.getState() == IChannel.STATE_OPEN;
-            }
-        });
+        try {
+            Protocol.invokeAndWait(new Runnable() {
+                public void run() {
+                    res[0] = channel != null && channel.getState() == IChannel.STATE_OPEN;
+                }
+            });
+        }
+        catch (IllegalStateException e) {
+            res[0] = false;
+        }
         return res[0];
     }
 
