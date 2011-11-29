@@ -104,7 +104,7 @@ public class FSRefresh extends FSOperation {
 	 * @param service The file system service.
 	 * @throws TCFFileSystemException Thrown during querying the children nodes.
 	 */
-	private void updateChildren(final FSTreeNode node, final IFileSystem service) throws TCFFileSystemException {
+	protected void updateChildren(final FSTreeNode node, final IFileSystem service) throws TCFFileSystemException {
 		List<FSTreeNode> current = getCurrentChildren(node);
 		List<FSTreeNode> latest = queryChildren(node, service);
 		List<FSTreeNode> newNodes = diff(latest, new ArrayList<FSTreeNode>(current));

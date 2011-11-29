@@ -39,6 +39,7 @@ import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.internal.ImageConsts;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFChannelException;
+import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.CacheManager;
 import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.PersistenceManager;
@@ -248,6 +249,29 @@ public abstract class FSOperation {
 	}
 
 	/**
+	 * Get the children the specified folder node. If the folder has not yet been loaded, then load it.
+	 * 
+	 * @param node The folder node.
+	 * @return The children of the folder node.
+	 * @throws TCFException Thrown during querying the children nodes.
+	 */
+	public List<FSTreeNode> getChildren(final FSTreeNode node) throws TCFException {
+		IChannel channel = null;
+		try {
+			channel = openChannel(node.peerNode.getPeer());
+			IFileSystem service = channel.getRemoteService(IFileSystem.class);
+			if (service != null) {
+				return getChildren(node, service);
+			}
+			String message = NLS.bind(Messages.FSOperation_NoFileSystemError, node.peerNode.getPeer().getID());
+			throw new TCFFileSystemException(message);
+		}
+		finally {
+			if (channel != null) Tcf.getChannelManager().closeChannel(channel);
+		}
+	}
+	
+	/**
 	 * Get the current children of the specified folder node.
 	 *
 	 * @param node The folder node.
@@ -257,15 +281,14 @@ public abstract class FSOperation {
 		if (Protocol.isDispatchThread()) {
 			return node.getChildren();
 		}
-		@SuppressWarnings("unchecked")
-		final List<FSTreeNode>[] objects = new List[1];
+		final List<FSTreeNode> result = new ArrayList<FSTreeNode>();
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
-				objects[0] = getCurrentChildren(node);
+				result.addAll(getCurrentChildren(node));
 			}
 		});
-		return objects[0];
+		return result;
 	}
 
 
@@ -276,7 +299,7 @@ public abstract class FSOperation {
 	 * @param service The file system service.
 	 * @throws TCFFileSystemException Thrown during querying the children nodes.
 	 */
-	private void loadChildren(final FSTreeNode node, final IFileSystem service) throws TCFFileSystemException {
+	protected void loadChildren(final FSTreeNode node, final IFileSystem service) throws TCFFileSystemException {
 		List<FSTreeNode> children = queryChildren(node, service);
 		List<FSTreeNode> current = getCurrentChildren(node);
 		for (FSTreeNode childNode : children) {

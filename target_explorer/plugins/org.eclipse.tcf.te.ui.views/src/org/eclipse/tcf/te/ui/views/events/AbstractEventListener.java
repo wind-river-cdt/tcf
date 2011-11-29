@@ -18,9 +18,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNodeProvider;
+import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -73,7 +73,7 @@ public abstract class AbstractEventListener extends org.eclipse.tcf.te.ui.events
 	 */
 	protected void refresh(Object node, boolean scheduled) {
 		CommonViewer viewer = getViewer();
-		if (viewer == null) return;
+		if (viewer == null || (viewer.getControl() != null && viewer.getControl().isDisposed())) return;
 
 		if (scheduled) {
 			scheduleRefreshJob(node != null ? node : viewer, viewer);
@@ -99,7 +99,7 @@ public abstract class AbstractEventListener extends org.eclipse.tcf.te.ui.events
 		Assert.isNotNull(node);
 
 		CommonViewer viewer = getViewer();
-		if (viewer == null) return;
+		if (viewer == null || (viewer.getControl() != null && viewer.getControl().isDisposed())) return;
 
 		if (scheduled) {
 			scheduleUpdateJob(node, viewer);
@@ -242,10 +242,12 @@ public abstract class AbstractEventListener extends org.eclipse.tcf.te.ui.events
 			return new Runnable() {
 				@Override
                 public void run() {
-					if (node instanceof CommonViewer) {
-						parentViewer.refresh();
-					} else {
-						parentViewer.refresh(node);
+					if (parentViewer != null && parentViewer.getControl() != null && !parentViewer.getControl().isDisposed()) {
+						if (node instanceof CommonViewer) {
+							parentViewer.refresh();
+						} else {
+							parentViewer.refresh(node);
+						}
 					}
 				}
 			};
@@ -275,10 +277,12 @@ public abstract class AbstractEventListener extends org.eclipse.tcf.te.ui.events
 			return new Runnable() {
 				@Override
                 public void run() {
-					if (node instanceof CommonViewer) {
-						parentViewer.refresh();
-					} else {
-						parentViewer.update(node, null);
+					if (parentViewer != null && parentViewer.getControl() != null && !parentViewer.getControl().isDisposed()) {
+						if (node instanceof CommonViewer) {
+							parentViewer.refresh();
+						} else {
+							parentViewer.update(node, null);
+						}
 					}
 				}
 			};

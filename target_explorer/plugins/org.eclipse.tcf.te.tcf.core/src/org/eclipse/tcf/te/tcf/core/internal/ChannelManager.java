@@ -12,6 +12,7 @@ package org.eclipse.tcf.te.tcf.core.internal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
@@ -298,6 +299,38 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 
 		// Return the peer instance
 		return peer;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager#getChannel(org.eclipse.tcf.protocol.IPeer)
+	 */
+	@Override
+	public IChannel getChannel(final IPeer peer) {
+		final AtomicReference<IChannel> channel = new AtomicReference<IChannel>();
+		Runnable runnable = new Runnable() {
+			@Override
+			public void run() {
+				channel.set(internalGetChannel(peer));
+			}
+		};
+		if (Protocol.isDispatchThread()) runnable.run();
+		else Protocol.invokeAndWait(runnable);
+
+	    return channel.get();
+	}
+
+	/**
+	 * Returns the shared channel instance for the given peer.
+	 * <p>
+	 * <b>Note:</b> This method must be invoked at the TCF dispatch thread.
+	 *
+	 * @param peer The peer. Must not be <code>null</code>.
+	 * @return The channel instance or <code>null</code>.
+	 */
+	public IChannel internalGetChannel(IPeer peer) {
+		Assert.isNotNull(peer);
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+		return channels.get(peer.getID());
 	}
 
 	/* (non-Javadoc)

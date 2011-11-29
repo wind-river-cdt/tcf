@@ -20,6 +20,7 @@ import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.ILocator;
+import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.locator.interfaces.IScanner;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
@@ -45,6 +46,8 @@ public class ScannerRunnable implements Runnable, IChannel.IChannelListener {
 	private final IPeerModel peerNode;
 	// Reference to the channel
 	private IChannel channel = null;
+	// Mark if the used channel is a shared channel instance
+	private boolean sharedChannel = false;
 
 	/**
 	 * Constructor.
@@ -76,16 +79,25 @@ public class ScannerRunnable implements Runnable, IChannel.IChannelListener {
 	@Override
 	public void run() {
 		if (peerNode != null && peerNode.getPeer() != null) {
-			// Open the channel
-			channel = peerNode.getPeer().openChannel();
-			// Configure the connect timeout
-			if (channel instanceof ChannelTCP) {
-				int timeout = peerNode.getIntProperty(IPeerModelProperties.PROP_CONNECT_TIMEOUT);
-				if (timeout == -1) timeout = DEFAULT_SOCKET_CONNECT_TIMEOUT;
-				((ChannelTCP)channel).setConnectTimeout(timeout);
+			// Check if there is a shared channel available which is still in open state
+			channel = Tcf.getChannelManager().getChannel(peerNode.getPeer());
+			if (channel == null || channel.getState() != IChannel.STATE_OPEN) {
+				sharedChannel = false;
+				// Open the channel
+				channel = peerNode.getPeer().openChannel();
+				// Configure the connect timeout
+				if (channel instanceof ChannelTCP) {
+					int timeout = peerNode.getIntProperty(IPeerModelProperties.PROP_CONNECT_TIMEOUT);
+					if (timeout == -1) timeout = DEFAULT_SOCKET_CONNECT_TIMEOUT;
+					((ChannelTCP)channel).setConnectTimeout(timeout);
+				}
+				// Add ourself as channel listener
+				channel.addChannelListener(this);
+			} else {
+				sharedChannel = true;
+				// Shared channel is in open state -> use it
+				onChannelOpened();
 			}
-			// Add ourself as channel listener
-			channel.addChannelListener(this);
 		}
 	}
 
@@ -95,7 +107,7 @@ public class ScannerRunnable implements Runnable, IChannel.IChannelListener {
 	@Override
 	public void onChannelOpened() {
 		// Peer is reachable
-		if (channel != null) {
+		if (channel != null && !sharedChannel) {
 			// Remove ourself as channel listener
 			channel.removeChannelListener(this);
 		}
@@ -150,7 +162,7 @@ public class ScannerRunnable implements Runnable, IChannel.IChannelListener {
 			}
 
 			// And close the channel
-			channel.close();
+			if (!sharedChannel) channel.close();
 		}
 	}
 
@@ -171,7 +183,7 @@ public class ScannerRunnable implements Runnable, IChannel.IChannelListener {
 		if (peerNode != null && (parentScanner == null || parentScanner != null && !parentScanner.isTerminated())) {
 			peerNode.setProperty(IPeerModelProperties.PROP_CHANNEL_REF_COUNTER, null);
 			peerNode.setProperty(IPeerModelProperties.PROP_STATE,
-			                  error instanceof SocketTimeoutException ? IPeerModelProperties.STATE_NOT_REACHABLE : IPeerModelProperties.STATE_ERROR);
+			                  	 error instanceof SocketTimeoutException ? IPeerModelProperties.STATE_NOT_REACHABLE : IPeerModelProperties.STATE_ERROR);
 			peerNode.setProperty(IPeerModelProperties.PROP_LAST_SCANNER_ERROR, error instanceof SocketTimeoutException ? null : error);
 		}
 	}
