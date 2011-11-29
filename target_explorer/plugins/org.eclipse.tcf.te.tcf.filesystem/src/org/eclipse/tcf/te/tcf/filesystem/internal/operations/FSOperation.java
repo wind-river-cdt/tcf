@@ -267,7 +267,7 @@ public abstract class FSOperation {
 			throw new TCFFileSystemException(message);
 		}
 		finally {
-			if (channel != null) channel.close();
+			if (channel != null) Tcf.getChannelManager().closeChannel(channel);
 		}
 	}
 	

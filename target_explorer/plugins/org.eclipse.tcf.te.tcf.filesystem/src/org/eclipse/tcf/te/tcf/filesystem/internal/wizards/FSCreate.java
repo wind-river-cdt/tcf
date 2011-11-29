@@ -17,6 +17,7 @@ import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.DoneStat;
 import org.eclipse.tcf.services.IFileSystem.FileAttrs;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
+import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
@@ -81,7 +82,7 @@ public abstract class FSCreate extends FSOperation {
 			return false;
 		}
 		finally {
-			if (channel != null) channel.close();
+			if (channel != null) Tcf.getChannelManager().closeChannel(channel);
 		}
 		return true;
 	}
