@@ -27,6 +27,36 @@ import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
  * root directory, "isWindows" if it is a windows file node, "isReadOnly"
  * if it is read only, "isHidden" if it is hidden, "getCacheState" to
  * get a node's state.
+ * <p>
+ * "testParent" is a property by which the parent or even the grand parent
+ * of a node can be tested. The arguments is a recursive list of the above
+ * test property including "testParent". 
+ * <p>
+ * The following is an example of how it is used.
+ * <pre>
+ *     &lt;test
+ *         args="isWritable"
+ *         property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.testParent"&gt;
+ *     &lt;/test&gt;
+ * </pre>
+ * <p>
+ * The above example tests if the parent node is writable.
+ * <pre>
+ *     &lt;test
+ *         args="testParent,isWritable"
+ *         property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.testParent"&gt;
+ *     &lt;/test&gt;
+ * </pre>
+ * <p>
+ * The above example tests if the grand parent node is writable.
+ * <p>
+ * And so on, you can test its ancestor recursively:
+ * <pre>
+ *     &lt;test
+ *         args="testParent,testParent,testParent,...,isWritable"
+ *         property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.testParent"&gt;
+ *     &lt;/test&gt;
+ * </pre> 
  */
 public class FSTreeNodePropertyTester extends PropertyTester {
 
@@ -35,6 +65,8 @@ public class FSTreeNodePropertyTester extends PropertyTester {
 	 */
 	@Override
 	public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
+		if(receiver == null)
+			return false;
 		Assert.isTrue(receiver instanceof FSTreeNode);
 		FSTreeNode node = (FSTreeNode) receiver;
 		if (property.equals("isFile")) { //$NON-NLS-1$
@@ -57,6 +89,8 @@ public class FSTreeNodePropertyTester extends PropertyTester {
 			return node.isReadOnly();
 		} else if (property.equals("isHidden")) { //$NON-NLS-1$
 			return node.isHidden();
+		} else if (property.equals("testParent")) { //$NON-NLS-1$
+			return testParent(node, args, expectedValue);
 		} else if (property.equals("getCacheState")){ //$NON-NLS-1$
 			File file = CacheManager.getInstance().getCacheFile(node);
 			if(!file.exists())
@@ -66,4 +100,13 @@ public class FSTreeNodePropertyTester extends PropertyTester {
 		}
 		return false;
 	}
+
+	private boolean testParent(FSTreeNode node, Object[] args, Object expectedValue) {
+		if(args == null || args.length == 0)
+			return false;
+		String arg = (String) args[0];
+		Object[] newArgs = new Object[args.length -1];
+		System.arraycopy(args, 1, newArgs, 0, args.length - 1);
+	    return test(node.parent, arg, newArgs, expectedValue);
+    }
 }

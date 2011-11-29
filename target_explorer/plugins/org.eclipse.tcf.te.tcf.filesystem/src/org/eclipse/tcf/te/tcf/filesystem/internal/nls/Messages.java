@@ -292,5 +292,13 @@ public class Messages extends NLS {
 	public static String MergeEditorInput_CompareWithLocalCache;
 	public static String MergeEditorInput_LocalFile;
 	public static String MergeEditorInput_RemoteFile;
-	public static String MergeInput_CopyNotSupported;	
+	public static String MergeInput_CopyNotSupported;
+	public static String NewFileWizard_NewFileWizardTitle;
+	public static String NewFileWizardPage_NewFileWizardPageDescription;
+	public static String NewFileWizardPage_NewFileWizardPageNameLabel;
+	public static String NewFileWizardPage_NewFileWizardPageTitle;
+	public static String NewFolderWizard_NewFolderWizardTitle;
+	public static String NewFolderWizardPage_NewFolderWizardPageDescription;
+	public static String NewFolderWizardPage_NewFolderWizardPageNameLabel;
+	public static String NewFolderWizardPage_NewFolderWizardPageTitle;	
 }

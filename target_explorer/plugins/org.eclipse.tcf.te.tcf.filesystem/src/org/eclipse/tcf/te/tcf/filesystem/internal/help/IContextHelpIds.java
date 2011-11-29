@@ -22,8 +22,12 @@ public interface IContextHelpIds {
 	public final static String PREFIX = UIPlugin.getUniqueIdentifier() + "."; //$NON-NLS-1$
 
 	/**
-	/**
 	 * Target Explorer details editor page: File system explorer
 	 */
 	public final static String FS_EXPLORER_EDITOR_PAGE = PREFIX + "FSExplorerEditorPage"; //$NON-NLS-1$
+
+	/**
+	 * The wizard for creating a new file.
+	 */
+	public final static String FS_NEW_FILE_WIZARD_PAGE = PREFIX + "FSNewFilePage"; //$NON-NLS-1$
 }
