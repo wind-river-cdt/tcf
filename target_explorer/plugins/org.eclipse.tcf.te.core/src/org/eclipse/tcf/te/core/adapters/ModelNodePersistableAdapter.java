@@ -65,7 +65,7 @@ public class ModelNodePersistableAdapter implements IPersistable {
 
 			// If the persistence node name is set, use it and ignore all other possibilities
 			String persistenceNodeName = node.getStringProperty(IPersistableNodeProperties.PROPERTY_NODE_NAME);
-			if (persistenceNodeName != null && !"".equals(node.getName().trim())) { //$NON-NLS-1$
+			if (persistenceNodeName != null && !"".equals(persistenceNodeName.trim())) { //$NON-NLS-1$
 				path = getRoot().append(makeValidFileSystemName(persistenceNodeName.trim()));
 			}
 			// If the persistence name not set, check for the node name

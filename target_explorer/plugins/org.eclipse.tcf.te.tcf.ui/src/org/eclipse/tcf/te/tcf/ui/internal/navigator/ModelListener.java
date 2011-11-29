@@ -62,7 +62,9 @@ public class ModelListener extends ModelAdapter {
 			PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
 				@Override
 				public void run() {
-					viewer.refresh(peer);
+					if (viewer.getControl() != null && !viewer.getControl().isDisposed()) {
+						viewer.refresh(peer);
+					}
 				}
 			});
 		}
