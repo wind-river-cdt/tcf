@@ -69,7 +69,7 @@ class WizardLoginPage extends WizardPage implements Listener {
     public void handleEvent(Event event) {
         getContainer().updateButtons();
 
-        IEclipsePreferences n = new InstanceScope().getNode(Activator.PLUGIN_ID);
+        IEclipsePreferences n = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
         n.put(PREF_PROTOCOL, protocol.getText());
         n.put(PREF_HOST, host.getText());
         n.put(PREF_USER, user.getText());
@@ -143,10 +143,10 @@ class WizardLoginPage extends WizardPage implements Listener {
         root_password.setLayoutData(gd);
         root_password.addListener(SWT.KeyUp, this);
 
-        IEclipsePreferences d = new DefaultScope().getNode(Activator.PLUGIN_ID);
+        IEclipsePreferences d = DefaultScope.INSTANCE.getNode(Activator.PLUGIN_ID);
         d.put(PREF_PROTOCOL, protocols[0]);
 
-        IEclipsePreferences[] n = { new InstanceScope().getNode(Activator.PLUGIN_ID) };
+        IEclipsePreferences[] n = { InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID) };
         IPreferencesService s = Platform.getPreferencesService();
         protocol.setText(s.get(PREF_PROTOCOL, "", n));
         host.setText(s.get(PREF_HOST, "", n));

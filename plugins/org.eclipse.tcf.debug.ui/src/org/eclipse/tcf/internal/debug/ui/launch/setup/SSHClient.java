@@ -44,8 +44,8 @@ class SSHClient extends AbstractRemoteShell {
 
     SSHClient(final Shell parent, String host, String user, final String password) throws Exception {
         BundleContext ctx = Activator.getDefault().getBundle().getBundleContext();
-        ServiceReference ref = ctx.getServiceReference(IJSchService.class.getName());
-        IJSchService s = (IJSchService)ctx.getService(ref);
+        ServiceReference<IJSchService> ref = ctx.getServiceReference(IJSchService.class);
+        IJSchService s = ctx.getService(ref);
         session = s.createSession(host, 22, user);
         session.setPassword(password);
         new UserInfoPrompter(session);

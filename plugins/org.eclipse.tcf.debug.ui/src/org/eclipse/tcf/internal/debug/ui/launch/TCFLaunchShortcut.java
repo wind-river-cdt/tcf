@@ -111,7 +111,7 @@ public class TCFLaunchShortcut implements ILaunchShortcut {
         try {
             ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
             ILaunchConfigurationType type = manager.getLaunchConfigurationType(LAUNCH_CONFIGURATION_TYPE_ID);
-            wc = type.newInstance(null, manager.generateUniqueLaunchConfigurationNameFrom("TCF Local Host " + path.lastSegment()));
+            wc = type.newInstance(null, manager.generateLaunchConfigurationName("TCF Local Host " + path.lastSegment()));
             wc.setAttribute(TCFLaunchDelegate.ATTR_LOCAL_PROGRAM_FILE, path.toOSString());
             wc.setAttribute(TCFLaunchDelegate.ATTR_PROJECT_NAME, project.getName());
             // wc.setMappedResources(new IResource[] { });
