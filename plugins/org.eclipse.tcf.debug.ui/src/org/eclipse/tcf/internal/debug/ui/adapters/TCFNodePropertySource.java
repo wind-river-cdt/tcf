@@ -36,7 +36,7 @@ import org.eclipse.ui.views.properties.PropertyDescriptor;
 /**
  * Adapts TCFNode to IPropertySource.
  */
-public class TCFNodePropertySource implements IPropertySource {
+class TCFNodePropertySource implements IPropertySource {
 
     private final TCFNode fNode;
     private final Map<String, Object> fProperties = new HashMap<String, Object>();
