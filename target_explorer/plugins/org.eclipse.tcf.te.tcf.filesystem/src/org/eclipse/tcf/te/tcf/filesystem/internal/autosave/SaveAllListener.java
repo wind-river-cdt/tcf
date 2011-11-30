@@ -131,7 +131,7 @@ public class SaveAllListener implements IExecutionListener {
 				MergeEditorInput mergeInput = new MergeEditorInput(local, remote, page);
 				CompareUI.openCompareDialog(mergeInput);
 			} else if (index == 1) { // Save anyway
-				CacheManager.getInstance().upload(conflicts.toArray(new FSTreeNode[conflicts.size()]));
+				CacheManager.getInstance().upload(node);
 			}
 		}
 	}

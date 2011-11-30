@@ -140,9 +140,11 @@ public class StateManager {
 	void updateNodeAttr(FSTreeNode node, FileAttrs attr, boolean sync){
 		node.attr = attr;
 		if (sync) {
-			File file = CacheManager.getInstance().getCacheFile(node);
-			Assert.isTrue(file.exists());
-			file.setLastModified(attr.mtime);
+			if (!PersistenceManager.getInstance().isAutoSaving()) {
+				File file = CacheManager.getInstance().getCacheFile(node);
+				Assert.isTrue(file.exists());
+				file.setLastModified(attr.mtime);
+			}
 			PersistenceManager.getInstance().setBaseTimestamp(node.getLocationURL(), attr.mtime);
 		}
 		FSModel.getInstance().fireNodeStateChanged(node);
@@ -258,7 +260,7 @@ public class StateManager {
 		long mtime = 0;
 		if(node.attr!=null)
 			mtime = node.attr.mtime;
-		if(btime == ltime){
+		if(isUnchanged(btime, ltime)){
 			if(isUnchanged(mtime, btime))
 				return CacheState.consistent;
 			return CacheState.outdated;
@@ -274,9 +276,9 @@ public class StateManager {
 	 *
 	 * @param mtime The modified time of the remote file.
 	 * @param btime The base timestamp cached.
-	 * @return true if they are equal in second precision.
+	 * @return true if they are equal in minute precision.
 	 */
 	private boolean isUnchanged(long mtime, long btime){
-		return Math.abs(mtime-btime)/1000 == 0;
+		return Math.abs(mtime-btime)/60000 == 0;
 	}
 }
