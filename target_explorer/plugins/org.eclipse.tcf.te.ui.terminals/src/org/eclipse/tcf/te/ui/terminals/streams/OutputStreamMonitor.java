@@ -248,10 +248,12 @@ public class OutputStreamMonitor implements IDisposable {
 
 		// Check on the line separator setting
     	if (lineSeparator != null
-    			&& !ILineSeparatorConstants.LINE_SEPARATOR_CRLF.equals(lineSeparator)
-    			&& text.contains(lineSeparator)) {
-    		text = text.replaceAll(lineSeparator, "\r\n"); //$NON-NLS-1$
-    		changed = true;
+    			&& !ILineSeparatorConstants.LINE_SEPARATOR_CRLF.equals(lineSeparator)) {
+    		String separator = ILineSeparatorConstants.LINE_SEPARATOR_LF.equals(lineSeparator) ? "\n" : "\r"; //$NON-NLS-1$ //$NON-NLS-2$
+    		if (text.contains(separator)) {
+    			text = text.replaceAll(separator, "\r\n"); //$NON-NLS-1$
+    			changed = true;
+    		}
     	}
 
     	// If changed, get the new bytes array
