@@ -30,6 +30,11 @@ public interface IPreferenceKeys {
 	public final String PREF_SHOW_HEARTBEATS = PREFIX + "show.heartbeats"; //$NON-NLS-1$
 
 	/**
+	 * If set to <code>true</code>, TCF framework events are logged.
+	 */
+	public final String PREF_SHOW_FRAMEWORK_EVENTS = PREFIX + "show.frameworkEvents"; //$NON-NLS-1$
+
+	/**
 	 * The maximum number of bytes the log files are allowed to grow to, in bytes.
 	 * Defaults to 5MB.
 	 */
