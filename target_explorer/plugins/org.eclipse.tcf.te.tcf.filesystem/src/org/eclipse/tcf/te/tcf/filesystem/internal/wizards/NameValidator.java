@@ -28,16 +28,16 @@ import org.eclipse.tcf.te.ui.controls.validator.Validator;
  */
 public class NameValidator extends Validator {
 	// The folder in which the new file/folder is to be created.
-	FSTreeNode folder;
+	NewNodeWizardPage wizard;
 
 	/**
 	 * Create a NameValidator with the folder in which the file/folder is created.
 	 * 
-	 * @param folder The parent folder in which the file/folder is created.
+	 * @param wizard The parent folder in which the file/folder is created.
 	 */
-	public NameValidator(FSTreeNode folder) {
+	public NameValidator(NewNodeWizardPage wizard) {
 		super(ATTR_MANDATORY);
-		this.folder = folder;
+		this.wizard = wizard;
 	}
 
 	/*
@@ -48,6 +48,11 @@ public class NameValidator extends Validator {
 	public boolean isValid(String newText) {
 		if (newText == null || newText.trim().length() == 0) {
 			setMessage(Messages.FSRenamingAssistant_SpecifyNonEmptyName, IMessageProvider.ERROR);
+			return false;
+		}
+		FSTreeNode folder = wizard.getInputDir();
+		if(folder == null) {
+			setMessage(Messages.NameValidator_SpecifyFolder, IMessageProvider.ERROR);
 			return false;
 		}
 		String text = newText.toString().trim();
@@ -73,7 +78,10 @@ public class NameValidator extends Validator {
 	private boolean hasChild(String name) {
 		List<FSTreeNode> nodes = getChildren();
 		for (FSTreeNode node : nodes) {
-			if (node.name.equals(name)) return true;
+			if (node.isWindowsNode()) {
+				if (node.name.equalsIgnoreCase(name)) return true;
+			}
+			else if (node.name.equals(name)) return true;
 		}
 		return false;
 	}
@@ -84,8 +92,9 @@ public class NameValidator extends Validator {
 	 * @return The current children of the folder.
 	 */
 	private List<FSTreeNode> getChildren() {
+		final FSTreeNode folder = wizard.getInputDir();
 		if (folder.childrenQueried) {
-			return FSOperation.getCurrentChildren(folder);
+			return new ArrayList<FSTreeNode>(FSOperation.getCurrentChildren(folder));
 		}
 		final List<FSTreeNode> result = new ArrayList<FSTreeNode>();
 		new FSOperation() {

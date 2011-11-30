@@ -37,9 +37,7 @@ public class FSCreateFile extends FSCreate {
 
 	/*
 	 * (non-Javadoc)
-	 * @see
-	 * org.eclipse.tcf.te.tcf.filesystem.internal.wizards.FSCreate#create(org.eclipse.tcf.services
-	 * .IFileSystem)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.wizards.FSCreate#create(org.eclipse.tcf.services.IFileSystem)
 	 */
 	@Override
 	protected void create(IFileSystem service) throws TCFFileSystemException {

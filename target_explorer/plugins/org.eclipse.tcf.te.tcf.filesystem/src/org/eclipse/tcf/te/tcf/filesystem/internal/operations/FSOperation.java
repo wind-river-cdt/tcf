@@ -281,14 +281,14 @@ public abstract class FSOperation {
 		if (Protocol.isDispatchThread()) {
 			return node.getChildren();
 		}
-		final List<FSTreeNode> result = new ArrayList<FSTreeNode>();
+		final List<List<FSTreeNode>> result = new ArrayList<List<FSTreeNode>>();
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
-				result.addAll(getCurrentChildren(node));
+				result.add(getCurrentChildren(node));
 			}
 		});
-		return result;
+		return result.get(0);
 	}
 
 
@@ -701,5 +701,7 @@ public abstract class FSOperation {
 	 *
 	 * @return true if it is successful.
 	 */
-	public abstract boolean doit();
+	public boolean doit(){
+		return false;
+	}
 }

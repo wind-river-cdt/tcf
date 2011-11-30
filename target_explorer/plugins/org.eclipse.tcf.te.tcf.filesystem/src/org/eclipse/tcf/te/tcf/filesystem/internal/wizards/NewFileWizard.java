@@ -19,20 +19,16 @@ public class NewFileWizard extends NewNodeWizard {
 
 	/*
 	 * (non-Javadoc)
-	 * @see
-	 * org.eclipse.tcf.te.tcf.filesystem.internal.wizards.NewNodeWizard#createWizardPage(org.eclipse
-	 * .tcf.te.tcf.filesystem.model.FSTreeNode)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.wizards.NewNodeWizard#createWizardPage()
 	 */
 	@Override
-	protected NewNodeWizardPage createWizardPage(FSTreeNode folder) {
-		return new NewFileWizardPage(folder);
+	protected NewNodeWizardPage createWizardPage() {
+		return new NewFileWizardPage();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see
-	 * org.eclipse.tcf.te.tcf.filesystem.internal.wizards.NewNodeWizard#getCreateOp(org.eclipse.
-	 * tcf.te.tcf.filesystem.model.FSTreeNode, java.lang.String)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.wizards.NewNodeWizard#getCreateOp(org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode, java.lang.String)
 	 */
 	@Override
 	protected FSCreate getCreateOp(FSTreeNode folder, String name) {
