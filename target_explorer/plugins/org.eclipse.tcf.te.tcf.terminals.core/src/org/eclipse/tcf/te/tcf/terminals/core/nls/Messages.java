@@ -31,7 +31,6 @@ public class Messages extends NLS {
 
 	public static String TerminalsLauncher_error_channelConnectFailed;
 	public static String TerminalsLauncher_error_channelNotConnected;
-	public static String TerminalsLauncher_error_missingProcessPath;
 	public static String TerminalsLauncher_error_missingRequiredService;
 	public static String TerminalsLauncher_error_illegalNullArgument;
 	public static String TerminalsLauncher_error_terminalLaunchFailed;
