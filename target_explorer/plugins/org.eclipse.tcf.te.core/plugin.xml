@@ -22,7 +22,7 @@
             id="org.eclipse.tcf.te.core.adapters.PropertyTester"
             namespace="org.eclipse.tcf.te.core"
             properties="hasAdapter,canAdaptTo"
-            type="org.eclipse.core.runtime.IAdaptable">
+            type="java.lang.Object">
       </propertyTester>
       
    </extension>
