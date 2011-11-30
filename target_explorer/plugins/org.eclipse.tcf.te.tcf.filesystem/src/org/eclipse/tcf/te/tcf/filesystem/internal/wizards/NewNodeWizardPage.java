@@ -9,7 +9,6 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.wizards;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -320,14 +319,15 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 		NewNodeWizard wizard = getWizard();
 		IPeerModel peer = wizard.getPeer();
 		if (peer == null) return null;
-		getWizard().getPeer();
 		String path = folderControl.getEditFieldControlText();
 		if (path != null) {
 			path = path.trim();
 			Object[] elements = contentProvider.getChildren(peer);
-			FSTreeNode[] children = Arrays.asList(elements)
-			                .toArray(new FSTreeNode[elements.length]);
-			return findPath(children, path);
+			if (elements != null && elements.length != 0 && path.length() != 0) {
+				FSTreeNode[] children = new FSTreeNode[elements.length];
+				System.arraycopy(elements, 0, children, 0, elements.length);
+				return findPath(children, path);
+			}
 		}
 		return null;
 	}
@@ -343,7 +343,7 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 	 */
 	private FSTreeNode findPath(FSTreeNode[] children, String path) {
 		Assert.isTrue(children != null && children.length != 0);
-		Assert.isTrue(path != null && path.trim().length() != 0);
+		Assert.isTrue(path != null && path.length() != 0);
 		FSTreeNode node = children[0];
 		String pathSep = node.isWindowsNode() ? "\\" : "/"; //$NON-NLS-1$ //$NON-NLS-2$
 		int delim = path.indexOf(pathSep);

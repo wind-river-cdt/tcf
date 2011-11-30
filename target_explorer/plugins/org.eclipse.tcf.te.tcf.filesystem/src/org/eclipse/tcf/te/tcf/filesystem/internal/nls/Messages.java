@@ -116,6 +116,7 @@ public class Messages extends NLS {
 	public static String CmmitHandler_StateChangedMessage;
 
 	public static String FolderValidator_DirNotExist;
+	public static String FolderValidator_NotWritable;
 	public static String FolderValidator_SpecifyFolder;
 	public static String FSDelete_ButtonCancel;
 	public static String FSDelete_ButtonNo;

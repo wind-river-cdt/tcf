@@ -50,6 +50,10 @@ public class FolderValidator extends Validator {
 			setMessage(NLS.bind(Messages.FolderValidator_DirNotExist, newText), IMessageProvider.ERROR);
 			return false;
 		}
+		if (!folder.isWritable()) {
+			setMessage(NLS.bind(Messages.FolderValidator_NotWritable, newText), IMessageProvider.ERROR);
+			return false;
+		}
 		setMessage(null, IMessageProvider.NONE);
 		return true;
 	}
