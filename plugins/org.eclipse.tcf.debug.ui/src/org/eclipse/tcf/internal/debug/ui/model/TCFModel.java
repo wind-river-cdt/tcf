@@ -290,7 +290,8 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
     private final Map<IWorkbenchPart,TCFSnapshot> locks = new HashMap<IWorkbenchPart,TCFSnapshot>();
     private final Map<IWorkbenchPart,Integer> lock_policy = new HashMap<IWorkbenchPart,Integer>();
 
-    private TCFConsole console;
+    private final Map<String,TCFConsole> process_consoles = new HashMap<String,TCFConsole>();;
+    private final List<TCFConsole> debug_consoles = new ArrayList<TCFConsole>();
 
     private static final Map<ILaunchConfiguration,IEditorInput> editor_not_found =
         new HashMap<ILaunchConfiguration,IEditorInput>();
@@ -752,10 +753,9 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
     }
 
     void onProcessOutput(String process_id, final int stream_id, byte[] data) {
-        IProcesses.ProcessContext prs = launch.getProcessContext();
-        if (prs == null || !process_id.equals(prs.getID())) return;
-        if (console == null) console = new TCFConsole(this, process_id);
-        console.write(stream_id, data);
+        TCFConsole c = process_consoles.get(process_id);
+        if (c == null) process_consoles.put(process_id, c = new TCFConsole(this, process_id));
+        c.write(stream_id, data);
     }
 
     void onProcessStreamError(String process_id, int stream_id, Exception x, int lost_size) {
@@ -927,7 +927,8 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
     void dispose() {
         launch.removeActionsListener(actions_listener);
         expr_manager.removeExpressionListener(expressions_listener);
-        if (console != null) console.close();
+        for (TCFConsole c : process_consoles.values()) c.close();
+        for (TCFConsole c : debug_consoles) c.close();
     }
 
     void addNode(String id, TCFNode node) {
@@ -1599,6 +1600,13 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
                 }
             });
         }
+    }
+
+    /**
+     * Open debugger console that provide command line UI for the debugger.
+     */
+    public void showDebugConsole() {
+        debug_consoles.add(new TCFConsole(this, null));
     }
 
     /**

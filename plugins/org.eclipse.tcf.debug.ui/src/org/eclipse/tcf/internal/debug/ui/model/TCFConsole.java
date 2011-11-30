@@ -18,6 +18,7 @@ import java.util.Map;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.tcf.internal.debug.cmdline.TCFCommandLine;
 import org.eclipse.tcf.internal.debug.ui.Activator;
 import org.eclipse.tcf.internal.debug.ui.ImageCache;
 import org.eclipse.tcf.protocol.Protocol;
@@ -37,8 +38,12 @@ class TCFConsole {
     private final TCFModel model;
     private final IOConsole console;
     private final Display display;
-
+    private final String process_id;
     private final LinkedList<Message> out_queue;
+    private final TCFCommandLine cmd_line;
+
+    private final byte[] prompt = { 't', 'c', 'f', '>' };
+    private final StringBuffer cmd_buf = new StringBuffer();
 
     private static class Message {
         int stream_id;
@@ -59,10 +64,38 @@ class TCFConsole {
                     Protocol.invokeAndWait(new Runnable() {
                         public void run() {
                             try {
-                                model.getLaunch().writeProcessInputStream(buf, 0, n);
+                                if (cmd_line != null) {
+                                    String s = new String(buf, 0, n, "UTF-8");
+                                    int l = s.length();
+                                    for (int i = 0; i < l; i++) {
+                                        char ch = s.charAt(i);
+                                        if (ch == '\r') {
+                                            String res = cmd_line.command(cmd_buf.toString());
+                                            cmd_buf.setLength(0);
+                                            if (res != null) {
+                                                if (res.length() > 0 && res.charAt(res.length() - 1) != '\n') {
+                                                    res += '\n';
+                                                }
+                                                write(0, res.getBytes("UTF-8"));
+                                            }
+                                            write(0, prompt);
+                                        }
+                                        else if (ch == '\b') {
+                                            int n = cmd_buf.length();
+                                            if (n > 0) n--;
+                                            cmd_buf.setLength(n);
+                                        }
+                                        else {
+                                            cmd_buf.append(ch);
+                                        }
+                                    }
+                                }
+                                else {
+                                    model.getLaunch().writeProcessInputStream(process_id, buf, 0, n);
+                                }
                             }
                             catch (Exception x) {
-                                model.onProcessStreamError(null, 0, x, 0);
+                                model.onProcessStreamError(process_id, 0, x, 0);
                             }
                         }
                     });
@@ -143,12 +176,18 @@ class TCFConsole {
         }
     };
 
+    /* process_id == null means debug console */
     TCFConsole(final TCFModel model, String process_id) {
         this.model = model;
+        this.process_id = process_id;
         display = model.getDisplay();
         out_queue = new LinkedList<Message>();
-        console = new IOConsole("TCF " + process_id, null,
-                ImageCache.getImageDescriptor(ImageCache.IMG_TCF), "UTF-8", true);
+        String image = process_id != null ? ImageCache.IMG_PROCESS_RUNNING : ImageCache.IMG_TCF;
+        console = new IOConsole(
+                "TCF " + (process_id != null ? process_id : "Debugger"), null,
+                ImageCache.getImageDescriptor(image), "UTF-8", true);
+        cmd_line = process_id != null ? null : new TCFCommandLine();
+        if (cmd_line != null) write(0, prompt);
         display.asyncExec(new Runnable() {
             public void run() {
                 if (!PlatformUI.isWorkbenchRunning() || PlatformUI.getWorkbench().isStarting()) {
@@ -171,8 +210,8 @@ class TCFConsole {
                 }
             }
         });
-        inp_thread.setName("TCF Launch Console Input");
-        out_thread.setName("TCF Launch Console Output");
+        inp_thread.setName("TCF Console Input");
+        out_thread.setName("TCF Console Output");
         inp_thread.start();
         out_thread.start();
     }

@@ -986,7 +986,7 @@ public class TCFLaunch extends Launch {
         return process;
     }
 
-    public void writeProcessInputStream(byte[] buf, int pos, final int len) throws Exception {
+    public void writeProcessInputStream(String prs_id, byte[] buf, int pos, final int len) throws Exception {
         assert Protocol.isDispatchThread();
         final String id = process_input_stream_id;
         if (channel.getState() != IChannel.STATE_OPEN) throw new IOException("Connection closed");

@@ -44,6 +44,7 @@ public class TCFCommandLine {
                 char ch = cmd.charAt(i);
                 if (ch == ' ' || ch == '#') break;
                 bf.append(ch);
+                i++;
             }
             if (bf.length() > 0) {
                 CommandInfo cmd_info = null;
