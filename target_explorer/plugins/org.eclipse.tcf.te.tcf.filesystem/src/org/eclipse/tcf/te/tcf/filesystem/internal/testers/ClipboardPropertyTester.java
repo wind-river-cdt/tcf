@@ -44,9 +44,21 @@ public class ClipboardPropertyTester extends PropertyTester {
 				boolean copying = operation == FSClipboard.COPY;
 				List<FSTreeNode> selection = ((IStructuredSelection) receiver).toList();
 				FSTreeNode hovered = null;
-				for (FSTreeNode node : selection) {
-					if (hovered == null) hovered = node.parent;
-					else if (hovered != node.parent) return false;
+				Assert.isTrue(!selection.isEmpty());
+				if (selection.size() == 1) {
+					FSTreeNode node = selection.get(0);
+					if (node.isDirectory() && moving) {
+						hovered = node;
+					}
+					else {
+						hovered = node.parent;
+					}
+				}
+				else {
+					for (FSTreeNode node : selection) {
+						if (hovered == null) hovered = node.parent;
+						else if (hovered != node.parent) return false;
+					}
 				}
 				if (hovered.isDirectory() && hovered.isWritable() && (moving || copying)) {
 					FSTreeNode head = nodes.get(0);

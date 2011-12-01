@@ -60,6 +60,15 @@ public class FSMove extends FSOperation {
 	 */
 	@Override
 	public boolean doit() {
+		// Remove its self from the clipped nodes.
+		nodes.remove(dest);
+		if(nodes.isEmpty()) {
+			// Clear the clip board.
+			UIPlugin.getDefault().getClipboard().clear();
+			// Refresh the file system tree.
+			FSModel.getInstance().fireNodeStateChanged(null);
+			return true;
+		}
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
