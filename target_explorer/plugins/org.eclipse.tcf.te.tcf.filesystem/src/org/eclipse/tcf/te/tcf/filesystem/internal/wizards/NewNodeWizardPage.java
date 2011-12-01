@@ -27,11 +27,20 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.services.IFileSystem;
+import org.eclipse.tcf.services.IFileSystem.FileAttrs;
+import org.eclipse.tcf.services.IFileSystem.FileSystemException;
+import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeContentProvider;
 import org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeLabelProvider;
+import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
+import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.help.IContextHelpIds;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation;
+import org.eclipse.tcf.te.tcf.filesystem.internal.url.Rendezvous;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.ui.controls.BaseEditBrowseTextControl;
@@ -54,6 +63,8 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 	private FSTreeContentProvider contentProvider;
 	// The viewer of the file tree displaying the file system.
 	private TreeViewer treeViewer;
+	// The shared channel created during validation.
+	private IChannel channel;
 
 	/**
 	 * Create an instance page with the specified page name.
@@ -319,19 +330,30 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 		NewNodeWizard wizard = getWizard();
 		IPeerModel peer = wizard.getPeer();
 		if (peer == null) return null;
-		String path = folderControl.getEditFieldControlText();
-		if (path != null) {
-			path = path.trim();
+		final String text = folderControl.getEditFieldControlText();
+		if (text != null) {
+			final String path = text.trim();
 			Object[] elements = contentProvider.getChildren(peer);
 			if (elements != null && elements.length != 0 && path.length() != 0) {
-				FSTreeNode[] children = new FSTreeNode[elements.length];
+				final FSTreeNode[] children = new FSTreeNode[elements.length];
 				System.arraycopy(elements, 0, children, 0, elements.length);
-				return findPath(children, path);
+				final FSTreeNode[] result = new FSTreeNode[1];
+				SafeRunner.run(new SafeRunnable(){
+					@Override
+                    public void run() throws Exception {
+						result[0] = findPath(children, path);
+                    }
+				});
+				if (channel != null) {
+					Tcf.getChannelManager().closeChannel(channel);
+					channel = null;
+				}
+				return result[0];
 			}
 		}
 		return null;
 	}
-
+	
 	/**
 	 * Search the path in the children list. If it exists, then search
 	 * the children of the found node recursively until the whole
@@ -340,8 +362,9 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 	 * @param children The children nodes to search the path.
 	 * @param path The path to be searched.
 	 * @return The leaf node that has the searched path.
+	 * @throws TCFException Thrown during searching.
 	 */
-	private FSTreeNode findPath(FSTreeNode[] children, String path) {
+	FSTreeNode findPath(FSTreeNode[] children, String path) throws TCFException {
 		Assert.isTrue(children != null && children.length != 0);
 		Assert.isTrue(path != null && path.length() != 0);
 		FSTreeNode node = children[0];
@@ -386,23 +409,54 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 	 * children before getting its children.
 	 * 
 	 * @param folder The directory node.
-	 * @return
+	 * @return The nodes of the updated children.
+	 * @throws TCFException Thrown during updating.
 	 */
-	private FSTreeNode[] getUpdatedChildren(final FSTreeNode folder) {
+	private FSTreeNode[] getUpdatedChildren(final FSTreeNode folder) throws TCFException {
 		if (folder.childrenQueried) {
 			List<FSTreeNode> list = FSOperation.getCurrentChildren(folder);
 			return list.toArray(new FSTreeNode[list.size()]);
 		}
-		final FSTreeNode[][] result = new FSTreeNode[1][];
-		SafeRunner.run(new SafeRunnable(){
-			@Override
-            public void run() throws Exception {
-				FSOperation op = new FSOperation() {};
-				List<FSTreeNode> list = op.getChildren(folder);
-				result[0] = list.toArray(new FSTreeNode[list.size()]);
-            }});
-		return result[0];
+		FSOperation op = new FSOperation() {};
+		if (channel == null) {
+			channel = op.openChannel(folder.peerNode.getPeer());
+			if (!existsByStat()) return null;
+		}
+		IFileSystem service = channel.getRemoteService(IFileSystem.class);
+		List<FSTreeNode> list = op.getChildren(folder, service);
+		return list.toArray(new FSTreeNode[list.size()]);
 	}
+
+	/**
+	 * Check if the input path exists by calling lstat. If the path does not
+	 * exists, then it will save the effort to search directory by directory. 
+	 * 
+	 * @return true the input path exists or else false.
+	 * @throws TCFFileSystemException Thrown during  lstat call.
+	 */
+	private boolean existsByStat() throws TCFFileSystemException {
+	    IFileSystem service = channel.getRemoteService(IFileSystem.class);
+	    String text = folderControl.getEditFieldControlText();
+	    String path = text.trim();
+	    final boolean[] result = new boolean[1];
+	    result[0] = true;
+	    final Rendezvous rendezvous = new Rendezvous();
+	    service.lstat(path, new IFileSystem.DoneStat() {
+	    	@Override
+	    	public void doneStat(IToken token, FileSystemException error, FileAttrs attrs) {
+	    		if(error!=null && error.getStatus()==IFileSystem.STATUS_NO_SUCH_FILE) {
+	    			result[0] = false;
+	    		}
+	    		rendezvous.arrive();
+	    	}
+	    });
+	    try{
+	    	rendezvous.waiting(5000L);
+	    }catch(InterruptedException e) {
+	    	throw new TCFFileSystemException(Messages.NewNodeWizardPage_LstatTimedout);
+	    }
+	    return result[0];
+    }
 
 	/**
 	 * Find in the children array the node that has the specified name.

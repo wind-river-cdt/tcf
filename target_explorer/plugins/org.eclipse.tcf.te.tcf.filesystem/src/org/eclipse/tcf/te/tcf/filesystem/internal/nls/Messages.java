@@ -308,5 +308,6 @@ public class Messages extends NLS {
 	public static String NewFolderWizardPage_NewFolderWizardPageDescription;
 	public static String NewFolderWizardPage_NewFolderWizardPageNameLabel;
 	public static String NewFolderWizardPage_NewFolderWizardPageTitle;
+	public static String NewNodeWizardPage_LstatTimedout;
 	public static String NewNodeWizardPage_PromptFolderLabel;	
 }

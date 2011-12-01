@@ -178,7 +178,7 @@ public abstract class FSOperation {
 	 *
 	 * @return The channel or null if the operation fails.
 	 */
-	protected IChannel openChannel(final IPeer peer) throws TCFChannelException {
+	public IChannel openChannel(final IPeer peer) throws TCFChannelException {
 		final Rendezvous rendezvous = new Rendezvous();
 		final TCFChannelException[] errors = new TCFChannelException[1];
 		final IChannel[] channels = new IChannel[1];
@@ -240,7 +240,7 @@ public abstract class FSOperation {
 	 * @return The children of the folder node.
 	 * @throws TCFFileSystemException Thrown during querying the children nodes.
 	 */
-	protected List<FSTreeNode> getChildren(final FSTreeNode node, final IFileSystem service) throws TCFFileSystemException {
+	public List<FSTreeNode> getChildren(final FSTreeNode node, final IFileSystem service) throws TCFFileSystemException {
 		if (node.childrenQueried) {
 			return getCurrentChildren(node);
 		}
