@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.filesystem.internal.wizards;
+package org.eclipse.tcf.te.tcf.filesystem.internal.operations;
 
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IChannel;
@@ -21,8 +21,7 @@ import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
-import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation;
-import org.eclipse.tcf.te.tcf.filesystem.internal.url.Rendezvous;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.Rendezvous;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 

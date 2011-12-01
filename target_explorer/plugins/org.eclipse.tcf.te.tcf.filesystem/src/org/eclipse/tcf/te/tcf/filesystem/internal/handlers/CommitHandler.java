@@ -25,6 +25,8 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.compare.MergeEditorInput;
 import org.eclipse.tcf.te.tcf.filesystem.internal.compare.RemoteTypedElement;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.CacheManager;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.StateManager;
 import org.eclipse.tcf.te.tcf.filesystem.model.CacheState;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.ui.IWorkbenchPage;

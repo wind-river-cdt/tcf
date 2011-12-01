@@ -8,9 +8,10 @@
  * Wind River Systems - initial API and implementation
  * William Chen (Wind River)- [345552] Edit the remote files with a proper editor
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.filesystem.internal.handlers;
+package org.eclipse.tcf.te.tcf.filesystem.internal.testers;
 
 import org.eclipse.core.expressions.PropertyTester;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.PersistenceManager;
 
 /**
  * Provide a tester to test if the current auto saving mode is on or off.

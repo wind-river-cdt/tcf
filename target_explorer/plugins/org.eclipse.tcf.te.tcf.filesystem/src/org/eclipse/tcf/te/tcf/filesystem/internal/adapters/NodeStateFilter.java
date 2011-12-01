@@ -15,9 +15,9 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
-import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.PersistenceManager;
-import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.StateManager;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSClipboard;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.PersistenceManager;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.StateManager;
 import org.eclipse.tcf.te.tcf.filesystem.model.CacheState;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.ui.IActionFilter;

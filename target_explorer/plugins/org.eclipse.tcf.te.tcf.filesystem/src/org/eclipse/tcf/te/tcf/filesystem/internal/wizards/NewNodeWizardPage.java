@@ -40,7 +40,7 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemExcept
 import org.eclipse.tcf.te.tcf.filesystem.internal.help.IContextHelpIds;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation;
-import org.eclipse.tcf.te.tcf.filesystem.internal.url.Rendezvous;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.Rendezvous;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.ui.controls.BaseEditBrowseTextControl;

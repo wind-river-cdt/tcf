@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.filesystem.internal.handlers;
+package org.eclipse.tcf.te.tcf.filesystem.internal.testers;
 
 import java.util.List;
 

@@ -10,12 +10,15 @@
  * William Chen (Wind River) - [352302]Opening a file in an editor depending on
  *                             the client's permissions.
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.filesystem.internal.handlers;
+package org.eclipse.tcf.te.tcf.filesystem.internal.testers;
 
 import java.io.File;
 
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.CacheManager;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.ContentTypeHelper;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.StateManager;
 import org.eclipse.tcf.te.tcf.filesystem.model.CacheState;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 

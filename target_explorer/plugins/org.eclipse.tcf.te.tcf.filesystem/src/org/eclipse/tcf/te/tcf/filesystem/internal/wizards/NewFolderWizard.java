@@ -10,6 +10,8 @@
 package org.eclipse.tcf.te.tcf.filesystem.internal.wizards;
 
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
+import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSCreate;
+import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSCreateFolder;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 
 /**

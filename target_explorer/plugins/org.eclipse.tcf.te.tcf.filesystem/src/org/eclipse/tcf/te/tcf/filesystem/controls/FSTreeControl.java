@@ -34,6 +34,9 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.tcf.te.tcf.filesystem.filters.HiddenFilesViewerFilter;
+import org.eclipse.tcf.te.tcf.filesystem.filters.SystemFilesViewerFilter;
+import org.eclipse.tcf.te.tcf.filesystem.internal.celleditor.FSViewerCellEditorFactory;
 import org.eclipse.tcf.te.tcf.filesystem.internal.dnd.FSDragSourceListener;
 import org.eclipse.tcf.te.tcf.filesystem.internal.dnd.FSDropTargetListener;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
@@ -112,6 +115,9 @@ public class FSTreeControl extends AbstractTreeControl implements ISelectionChan
 		viewer.addDropSupport(operations, transferTypes, new FSDropTargetListener(viewer));
 		// Add editing support to rename files/folders.
 		new FSViewerCellEditorFactory().addEditingSupport(viewer);
+		// Add viewer filters.
+		viewer.addFilter(new HiddenFilesViewerFilter());
+		viewer.addFilter(new SystemFilesViewerFilter());
 	}
 
 	/**

@@ -12,6 +12,7 @@ package org.eclipse.tcf.te.tcf.filesystem.internal.wizards;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSCreate;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;

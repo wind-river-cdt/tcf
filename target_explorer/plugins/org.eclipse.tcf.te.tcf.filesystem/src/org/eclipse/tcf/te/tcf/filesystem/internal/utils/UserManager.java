@@ -8,7 +8,7 @@
  * Wind River Systems - initial API and implementation
  * William Chen (Wind River)- [345552] Edit the remote files with a proper editor
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.filesystem.internal.handlers;
+package org.eclipse.tcf.te.tcf.filesystem.internal.utils;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -28,7 +28,6 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFChannelException
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
-import org.eclipse.tcf.te.tcf.filesystem.internal.url.Rendezvous;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.ui.PlatformUI;
 

@@ -8,7 +8,7 @@
  * Contributors:
  * IBM - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.filesystem.internal.handlers;
+package org.eclipse.tcf.te.tcf.filesystem.dialogs;
 
 import java.lang.reflect.InvocationTargetException;
 

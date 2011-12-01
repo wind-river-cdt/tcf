@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.filesystem.controls;
+package org.eclipse.tcf.te.tcf.filesystem.internal.celleditor;
 
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditor;
@@ -22,9 +22,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.tcf.te.tcf.filesystem.internal.celleditor.FSCellListener;
-import org.eclipse.tcf.te.tcf.filesystem.internal.celleditor.FSCellModifier;
-import org.eclipse.tcf.te.tcf.filesystem.internal.celleditor.FSCellValidator;
 import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.RenameFilesHandler;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.ui.views.interfaces.IViewerCellEditorFactory;

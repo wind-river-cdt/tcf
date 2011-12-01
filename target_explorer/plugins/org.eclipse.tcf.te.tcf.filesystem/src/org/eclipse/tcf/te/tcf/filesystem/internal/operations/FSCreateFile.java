@@ -7,29 +7,31 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.filesystem.internal.wizards;
+package org.eclipse.tcf.te.tcf.filesystem.internal.operations;
 
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IFileSystem;
-import org.eclipse.tcf.services.IFileSystem.DoneMkDir;
+import org.eclipse.tcf.services.IFileSystem.DoneClose;
+import org.eclipse.tcf.services.IFileSystem.DoneOpen;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
+import org.eclipse.tcf.services.IFileSystem.IFileHandle;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
-import org.eclipse.tcf.te.tcf.filesystem.internal.url.Rendezvous;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.Rendezvous;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 
 /**
- * The file operation class to create a folder in the file system of Target Explorer.
+ * The file operation class to create a file in the file system of Target Explorer.
  */
-public class FSCreateFolder extends FSCreate {
+public class FSCreateFile extends FSCreate {
 
 	/**
-	 * Create an instance to create a folder with the name in the folder.
+	 * Create an instance to create a file with the name in the folder.
 	 * 
-	 * @param folder The folder in which the new folder is to be created.
-	 * @param name The name of the new folder.
+	 * @param folder The folder in which the file is to be created.
+	 * @param name The new file's name.
 	 */
-	public FSCreateFolder(FSTreeNode folder, String name) {
+	public FSCreateFile(FSTreeNode folder, String name) {
 		super(folder, name);
 	}
 
@@ -44,12 +46,13 @@ public class FSCreateFolder extends FSCreate {
 		path += name;
 		final Rendezvous rendezvous = new Rendezvous();
 		final FileSystemException[] errors = new FileSystemException[1];
-		service.mkdir(path, null, new DoneMkDir() {
+		// Open the file.
+		final IFileHandle[] handles = new IFileHandle[1];
+		service.open(path, IFileSystem.TCF_O_WRITE | IFileSystem.TCF_O_CREAT | IFileSystem.TCF_O_TRUNC, null, new DoneOpen() {
 			@Override
-			public void doneMkDir(IToken token, FileSystemException error) {
-				if (error != null) {
-					errors[0] = error;
-				}
+			public void doneOpen(IToken token, FileSystemException error, IFileHandle hdl) {
+				errors[0] = error;
+				handles[0] = hdl;
 				rendezvous.arrive();
 			}
 		});
@@ -64,6 +67,22 @@ public class FSCreateFolder extends FSCreate {
 			exception.initCause(errors[0]);
 			throw exception;
 		}
+		if (handles[0] == null) {
+			throw new TCFFileSystemException(Messages.TcfURLConnection_NoFileHandleReturned);
+		}
+		rendezvous.reset();
+		service.close(handles[0], new DoneClose() {
+			@Override
+			public void doneClose(IToken token, FileSystemException error) {
+				rendezvous.arrive();
+			}
+		});
+		try {
+			rendezvous.waiting(5000L);
+		}
+		catch (InterruptedException e) {
+			throw new TCFFileSystemException(Messages.TcfURLConnection_CloseFileTimeout);
+		}
 	}
 
 	/*
@@ -72,6 +91,6 @@ public class FSCreateFolder extends FSCreate {
 	 */
 	@Override
 	protected String getNodeType() {
-		return "FSDirNode"; //$NON-NLS-1$
+		return "FSFileNode"; //$NON-NLS-1$
 	}
 }
