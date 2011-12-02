@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.tcf.core.ChannelTCP;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
@@ -35,10 +34,6 @@ import org.eclipse.tcf.te.tcf.locator.nodes.PeerModel;
  * TCF event dispatch thread.
  */
 public class ScannerRunnable implements Runnable, IChannel.IChannelListener {
-	/**
-	 * The default socket connect timeout in milliseconds.
-	 */
-	private static final int DEFAULT_SOCKET_CONNECT_TIMEOUT = 10000;
 
 	// Reference to the parent model scanner
 	private final IScanner parentScanner;
@@ -85,12 +80,6 @@ public class ScannerRunnable implements Runnable, IChannel.IChannelListener {
 				sharedChannel = false;
 				// Open the channel
 				channel = peerNode.getPeer().openChannel();
-				// Configure the connect timeout
-				if (channel instanceof ChannelTCP) {
-					int timeout = peerNode.getIntProperty(IPeerModelProperties.PROP_CONNECT_TIMEOUT);
-					if (timeout == -1) timeout = DEFAULT_SOCKET_CONNECT_TIMEOUT;
-					((ChannelTCP)channel).setConnectTimeout(timeout);
-				}
 				// Add ourself as channel listener
 				channel.addChannelListener(this);
 			} else {
