@@ -14,7 +14,6 @@ import java.io.File;
 
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IChannel;
-import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.DoneSetStat;
@@ -22,11 +21,10 @@ import org.eclipse.tcf.services.IFileSystem.DoneStat;
 import org.eclipse.tcf.services.IFileSystem.FileAttrs;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.te.tcf.core.Tcf;
-import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel;
-import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFChannelException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
+import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation;
 import org.eclipse.tcf.te.tcf.filesystem.model.CacheState;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
@@ -68,7 +66,7 @@ public class StateManager {
 	public void refreshState(final FSTreeNode node) throws TCFException {
 		IChannel channel = null;
 		try {
-			channel = openChannel(node.peerNode.getPeer());
+			channel = FSOperation.openChannel(node.peerNode.getPeer());
 			if (channel != null) {
 				IFileSystem service = channel.getRemoteService(IFileSystem.class);
 				if (service != null) {
@@ -116,7 +114,7 @@ public class StateManager {
 	public void setFileAttrs(final FSTreeNode node, final IFileSystem.FileAttrs attrs) throws TCFException {
 	    IChannel channel = null;
 		try {
-			channel = openChannel(node.peerNode.getPeer());
+			channel = FSOperation.openChannel(node.peerNode.getPeer());
 			if (channel != null) {
 				IFileSystem service = channel.getRemoteService(IFileSystem.class);
 				if (service != null) {
@@ -152,40 +150,6 @@ public class StateManager {
 		}  finally {
 			if (channel != null) Tcf.getChannelManager().closeChannel(channel);
 		}
-	}
-
-	/**
-	 * Open a channel connected to the target represented by the peer.
-	 *
-	 * @return The channel or null if the operation fails.
-	 */
-	private IChannel openChannel(final IPeer peer) throws TCFChannelException {
-		final Rendezvous rendezvous = new Rendezvous();
-		final TCFChannelException[] errors = new TCFChannelException[1];
-		final IChannel[] channels = new IChannel[1];
-		Tcf.getChannelManager().openChannel(peer, false, new DoneOpenChannel(){
-			@Override
-            public void doneOpenChannel(Throwable error, IChannel channel) {
-				if(error!=null){
-					String message = NLS.bind(Messages.OpeningChannelFailureMessage,
-							new Object[]{peer.getID(), error.getLocalizedMessage()});
-					errors[0] = new TCFChannelException(message, error);
-				}else{
-					channels[0] = channel;
-				}
-				rendezvous.arrive();
-            }});
-		try {
-			rendezvous.waiting(5000L);
-		} catch (InterruptedException e) {
-			String message = NLS.bind(Messages.OpeningChannelFailureMessage,
-					new Object[]{peer.getID(), e.getLocalizedMessage()});
-			errors[0] = new TCFChannelException(message, e);
-		}
-		if(errors[0] != null){
-			throw errors[0];
-		}
-		return channels[0];
 	}
 
 	/**

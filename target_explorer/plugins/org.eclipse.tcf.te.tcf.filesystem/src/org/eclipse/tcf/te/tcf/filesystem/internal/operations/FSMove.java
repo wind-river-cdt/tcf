@@ -114,7 +114,8 @@ public class FSMove extends FSOperation {
 		}
 		catch (InvocationTargetException e) {
 			// Display the error reported during moving.
-			MessageDialog.openError(parent, Messages.FSMove_MoveFileFolderTitle, e.getLocalizedMessage());
+			Throwable throwable = e.getTargetException() != null ? e.getTargetException() : e;
+			MessageDialog.openError(parent, Messages.FSMove_MoveFileFolderTitle, throwable.getLocalizedMessage());
 		}
 		catch (InterruptedException e) {
 			// It is canceled.

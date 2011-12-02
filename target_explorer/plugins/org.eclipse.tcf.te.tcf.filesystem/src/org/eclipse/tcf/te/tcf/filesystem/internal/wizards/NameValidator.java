@@ -97,18 +97,12 @@ public class NameValidator extends Validator {
 			return new ArrayList<FSTreeNode>(FSOperation.getCurrentChildren(folder));
 		}
 		final List<FSTreeNode> result = new ArrayList<FSTreeNode>();
-		new FSOperation() {
+		SafeRunner.run(new SafeRunnable() {
 			@Override
-			public boolean doit() {
-				SafeRunner.run(new SafeRunnable() {
-					@Override
-					public void run() throws Exception {
-						result.addAll(getChildren(folder));
-					}
-				});
-				return false;
+			public void run() throws Exception {
+				result.addAll(new FSOperation().getChildren(folder));
 			}
-		}.doit();
+		});
 		return result;
 	}
 }

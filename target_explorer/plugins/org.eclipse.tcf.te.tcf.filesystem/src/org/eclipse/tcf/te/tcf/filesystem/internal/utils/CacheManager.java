@@ -314,9 +314,8 @@ public class CacheManager {
 	 *            The error exception.
 	 */
 	private void displayError(Shell parent, InvocationTargetException e) {
-		Throwable target = e.getTargetException();
-		Throwable cause = target.getCause() != null ? target.getCause() : target;
-		MessageDialog.openError(parent, Messages.CacheManager_DownloadingError, cause.getLocalizedMessage());
+		Throwable throwable = e.getTargetException() != null ? e.getTargetException() : e;
+		MessageDialog.openError(parent, Messages.CacheManager_DownloadingError, throwable.getLocalizedMessage());
 	}
 
 	/**

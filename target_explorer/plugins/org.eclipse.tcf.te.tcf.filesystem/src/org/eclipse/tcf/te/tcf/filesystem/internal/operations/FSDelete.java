@@ -105,7 +105,8 @@ public class FSDelete extends FSOperation {
 		}
 		catch (InvocationTargetException e) {
 			// Display the error message during deleting.
-			MessageDialog.openError(parent, Messages.FSDelete_DeleteFileFolderTitle, e.getLocalizedMessage());
+			Throwable throwable = e.getTargetException() != null ? e.getTargetException() : e;
+			MessageDialog.openError(parent, Messages.FSDelete_DeleteFileFolderTitle, throwable.getLocalizedMessage());
 		}
 		catch (InterruptedException e) {
 			// It is canceled.

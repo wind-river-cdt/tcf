@@ -209,6 +209,7 @@ public class Messages extends NLS {
 	public static String FSOperation_ConfirmFolderReplaceMessage;
 	public static String FSOperation_ConfirmFolderReplaceTitle;
 	public static String FSOperation_NoFileSystemError;
+	public static String FSOperation_NotResponding;
 	public static String FSOperation_CannotOpenDir;
 	public static String FSOperation_CannotReadDir;
 	public static String FSOperation_TimedOutWhenOpening;

@@ -105,7 +105,8 @@ public class FSCopy extends FSOperation {
 		}
 		catch (InvocationTargetException e) {
 			// Display the error during copy.
-			MessageDialog.openError(parent, Messages.FSCopy_CopyFileFolderTitle, e.getLocalizedMessage());
+			Throwable throwable = e.getTargetException() != null ? e.getTargetException() : e;
+			MessageDialog.openError(parent, Messages.FSCopy_CopyFileFolderTitle, throwable.getLocalizedMessage());
 		}
 		catch (InterruptedException e) {
 			// It is canceled.

@@ -417,13 +417,12 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 			List<FSTreeNode> list = FSOperation.getCurrentChildren(folder);
 			return list.toArray(new FSTreeNode[list.size()]);
 		}
-		FSOperation op = new FSOperation() {};
 		if (channel == null) {
-			channel = op.openChannel(folder.peerNode.getPeer());
+			channel = FSOperation.openChannel(folder.peerNode.getPeer());
 			if (!existsByStat()) return null;
 		}
 		IFileSystem service = channel.getRemoteService(IFileSystem.class);
-		List<FSTreeNode> list = op.getChildren(folder, service);
+		List<FSTreeNode> list = new FSOperation().getChildren(folder, service);
 		return list.toArray(new FSTreeNode[list.size()]);
 	}
 

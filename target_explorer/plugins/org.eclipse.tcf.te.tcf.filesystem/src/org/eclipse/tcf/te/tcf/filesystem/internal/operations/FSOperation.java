@@ -10,6 +10,7 @@
 package org.eclipse.tcf.te.tcf.filesystem.internal.operations;
 
 import java.io.File;
+import java.net.ConnectException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +59,7 @@ import org.eclipse.ui.PlatformUI;
  * FSOperation is the base class of file system operation classes including FSCopy, FSDelete, FSMove
  * and FSRename.
  */
-public abstract class FSOperation {
+public class FSOperation {
 	// The flag indicating if the following action should be executed without asking.
 	protected boolean yes2All;
 
@@ -178,7 +179,7 @@ public abstract class FSOperation {
 	 *
 	 * @return The channel or null if the operation fails.
 	 */
-	public IChannel openChannel(final IPeer peer) throws TCFChannelException {
+	public static IChannel openChannel(final IPeer peer) throws TCFChannelException {
 		final Rendezvous rendezvous = new Rendezvous();
 		final TCFChannelException[] errors = new TCFChannelException[1];
 		final IChannel[] channels = new IChannel[1];
@@ -186,8 +187,14 @@ public abstract class FSOperation {
 			@Override
 			public void doneOpenChannel(Throwable error, IChannel channel) {
 				if (error != null) {
-					String message = NLS.bind(Messages.OpeningChannelFailureMessage, peer.getID(), error.getLocalizedMessage());
-					errors[0] = new TCFChannelException(message, error);
+					if (error instanceof ConnectException) {
+						String message = NLS.bind(Messages.FSOperation_NotResponding, peer.getID());
+						errors[0] = new TCFChannelException(message);
+					}
+					else {
+						String message = NLS.bind(Messages.OpeningChannelFailureMessage, peer.getID(), error.getLocalizedMessage());
+						errors[0] = new TCFChannelException(message, error);
+					}
 				}
 				else {
 					channels[0] = channel;
