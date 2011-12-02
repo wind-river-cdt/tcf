@@ -157,7 +157,7 @@ public class NewWizardSelectionPage extends WizardPage {
 
 		final TreeViewer treeViewer = filteredTree.getViewer();
 		treeViewer.setContentProvider(new WizardContentProvider());
-		treeViewer.setLabelProvider(new WorkbenchLabelProvider());
+		treeViewer.setLabelProvider(WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider());
 		treeViewer.setComparator(new NewWizardViewerComparator());
 
 		treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
