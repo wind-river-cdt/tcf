@@ -132,7 +132,7 @@ public class LocalFileSaveable extends Saveable implements
 			monitor.done();
 			//Trigger upload action
 			FSTreeNode node = fileElement.getFSTreeNode();
-			CacheManager.getInstance().upload(node);
+			CacheManager.getInstance().upload(new FSTreeNode[]{node}, true);
 		}
 	}
 

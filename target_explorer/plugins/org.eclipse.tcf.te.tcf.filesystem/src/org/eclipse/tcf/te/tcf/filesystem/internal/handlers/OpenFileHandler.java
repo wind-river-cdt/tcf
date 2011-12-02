@@ -11,7 +11,6 @@ package org.eclipse.tcf.te.tcf.filesystem.internal.handlers;
 
 import java.io.File;
 
-import org.eclipse.compare.CompareUI;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -20,19 +19,12 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.tcf.te.tcf.filesystem.internal.compare.LocalTypedElement;
-import org.eclipse.tcf.te.tcf.filesystem.internal.compare.MergeEditorInput;
-import org.eclipse.tcf.te.tcf.filesystem.internal.compare.RemoteTypedElement;
-import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.CacheManager;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.ContentTypeHelper;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.PersistenceManager;
-import org.eclipse.tcf.te.tcf.filesystem.internal.utils.StateManager;
-import org.eclipse.tcf.te.tcf.filesystem.model.CacheState;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
@@ -84,56 +76,7 @@ public class OpenFileHandler extends AbstractHandler {
 				return;
 			}
 		}
-		if (!PersistenceManager.getInstance().isAutoSaving()) {
-			openEditor(page, node);
-		} else {
-			try {
-				StateManager.getInstance().refreshState(node);
-			} catch (TCFException e) {
-				Shell parent = page.getWorkbenchWindow().getShell();
-				MessageDialog.openError(parent, Messages.StateManager_RefreshFailureTitle, e.getLocalizedMessage());
-				return;
-			}
-			CacheState state = StateManager.getInstance().getCacheState(node);
-			switch (state) {
-			case consistent:
-				openEditor(page, node);
-				break;
-			case modified: {
-				// If the file node's local cache has been modified, upload it
-				// before open it.
-				boolean successful = CacheManager.getInstance().upload(node);
-				if (successful)
-					openEditor(page, node);
-			}
-				break;
-			case outdated: {
-				// If the file node's local cache does not exist yet, download
-				// it.
-				boolean successful = CacheManager.getInstance().download(node);
-				if (successful)
-					openEditor(page, node);
-			}
-				break;
-			case conflict: {
-				String title = Messages.OpenFileHandler_ConflictingTitle;
-				String message = NLS.bind(Messages.OpenFileHandler_ConflictingMessage, node.name);
-				Shell parent = page.getWorkbenchWindow().getShell();
-				MessageDialog msgDialog = new MessageDialog(parent, title, null, message, MessageDialog.QUESTION, new String[] { Messages.OpenFileHandler_Merge, Messages.OpenFileHandler_OpenAnyway,
-						Messages.OpenFileHandler_Cancel }, 0);
-				int index = msgDialog.open();
-				if (index == 0) {
-					LocalTypedElement local = new LocalTypedElement(node);
-					RemoteTypedElement remote = new RemoteTypedElement(node);
-					MergeEditorInput input = new MergeEditorInput(local, remote, page);
-					CompareUI.openCompareDialog(input);
-				} else if (index == 1) {
-					openEditor(page, node);
-				}
-			}
-				break;
-			}
-		}
+		openEditor(page, node);
 	}
 
 	/**

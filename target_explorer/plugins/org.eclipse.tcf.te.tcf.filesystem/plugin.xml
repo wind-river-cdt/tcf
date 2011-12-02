@@ -1326,7 +1326,7 @@
          </enabledWhen>
       </handler>
       <handler
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.RevertHandler"
+            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.UpdateHandler"
             commandId="org.eclipse.tcf.te.tcf.filesystem.commands.revert">
          <activeWhen>
             <with

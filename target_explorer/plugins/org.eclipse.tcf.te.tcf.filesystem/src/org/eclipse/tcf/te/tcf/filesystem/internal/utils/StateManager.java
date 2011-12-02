@@ -12,7 +12,6 @@ package org.eclipse.tcf.te.tcf.filesystem.internal.utils;
 
 import java.io.File;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
@@ -61,33 +60,12 @@ public class StateManager {
 	}
 
 	/**
-	 * Update the state of the specified node.
-	 *
-	 * @param node The tree node whose state is going to be updated.
-	 * @throws TCFException
-	 */
-	public void updateState(FSTreeNode node) throws TCFException {
-		updateFileStat(node, true);
-	}
-
-	/**
 	 * Refresh the state of the specified node.
 	 *
 	 * @param node The tree node whose state is going to be refreshed.
 	 * @throws TCFException
 	 */
-	public void refreshState(FSTreeNode node) throws TCFException {
-		updateFileStat(node, false);
-	}
-
-	/**
-	 * Update the file's state of the specified tree node. Synchronize the time stamp of
-	 * the file with the base time stamp and that of the remote file if sync is true.
-	 *
-	 * @param node The tree node whose file state is going to be updated.
-	 * @param sync If its base time stamp and its remote file's time stamp should be synchronized.
-	 */
-	private void updateFileStat(final FSTreeNode node, final boolean sync) throws TCFException {
+	public void refreshState(final FSTreeNode node) throws TCFException {
 		IChannel channel = null;
 		try {
 			channel = openChannel(node.peerNode.getPeer());
@@ -101,7 +79,7 @@ public class StateManager {
 						@Override
 						public void doneStat(IToken token, FileSystemException error, FileAttrs attrs) {
 							if (error == null) {
-								updateNodeAttr(node, attrs, sync);
+								node.attr = attrs;
 							} else {
 								String message = NLS.bind(Messages.StateManager_CannotGetFileStatMessage, new Object[]{node.name, error});
 								errors[0] = new TCFFileSystemException(message, error);
@@ -126,27 +104,6 @@ public class StateManager {
 		} finally {
 			if (channel != null) Tcf.getChannelManager().closeChannel(channel);
 		}
-	}
-
-	/**
-	 * Update the file attribute of the specified tree node with the specified value
-	 * and synchronize its base timestamp and its remote file's timestamp if "sync" is true.
-	 *
-	 * @param node The tree node whose file attribute is to updated.
-	 * @param attr The new file attribute.
-	 * @param sync If the timestamps should be synchronized.
-	 */
-	void updateNodeAttr(FSTreeNode node, FileAttrs attr, boolean sync){
-		node.attr = attr;
-		if (sync) {
-			if (!PersistenceManager.getInstance().isAutoSaving()) {
-				File file = CacheManager.getInstance().getCacheFile(node);
-				Assert.isTrue(file.exists());
-				file.setLastModified(attr.mtime);
-			}
-			PersistenceManager.getInstance().setBaseTimestamp(node.getLocationURL(), attr.mtime);
-		}
-		FSModel.getInstance().fireNodeStateChanged(node);
 	}
 
 	/**

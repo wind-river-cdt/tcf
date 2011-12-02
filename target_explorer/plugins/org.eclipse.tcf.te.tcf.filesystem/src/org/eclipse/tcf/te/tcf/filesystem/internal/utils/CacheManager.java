@@ -34,9 +34,9 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.dialogs.TimeTriggeredProgressMonitorDialog;
-import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.internal.url.TcfURLConnection;
+import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.ui.PlatformUI;
 
@@ -214,6 +214,23 @@ public class CacheManager {
 						} catch (Exception e) {
 						}
 					}
+					if(!monitor.isCanceled()){
+						SafeRunner.run(new SafeRunnable() {
+							@Override
+							public void run() throws Exception {
+								File file = getCachePath(node).toFile();
+								if (file.exists()) {
+									// If downloading is successful, update the attributes of the file and
+									// set the last modified time to that of its corresponding file.
+									StateManager.getInstance().refreshState(node);
+									PersistenceManager.getInstance().setBaseTimestamp(node.getLocationURL(), node.attr.mtime);
+									file.setLastModified(node.attr.mtime);
+									if (!node.isWritable()) file.setReadOnly();
+									FSModel.getInstance().fireNodeStateChanged(node);		
+								}
+							}
+						});
+					}
 					monitor.done();
 				}
 			}
@@ -225,15 +242,7 @@ public class CacheManager {
 		File file = getCachePath(node).toFile();
 		try {
 			dialog.run(true, true, runnable);
-			// If downloading is successful, update the attributes of the file and
-			// set the last modified time to that of its corresponding file.
-			StateManager.getInstance().updateState(node);
-			// If the node is read-only, make the cache file read-only.
-			if(!node.isWritable())
-				file.setReadOnly();
 			return true;
-		} catch(TCFException e) {
-			MessageDialog.openError(parent, Messages.StateManager_UpdateFailureTitle, e.getLocalizedMessage());
 		} catch (InvocationTargetException e) {
 			// Something's gone wrong. Roll back the downloading and display the
 			// error.
@@ -257,7 +266,7 @@ public class CacheManager {
 	 * @return true if it is successful, false there're errors or it is
 	 *         canceled.
 	 */
-	public boolean upload(final FSTreeNode... nodes) {
+	public boolean upload(final FSTreeNode[] nodes, final boolean sync) {
 		Shell parent = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 		try {
 			IRunnableWithProgress runnable = new IRunnableWithProgress() {
@@ -270,7 +279,7 @@ public class CacheManager {
 						else
 							message = NLS.bind(Messages.CacheManager_UploadNFiles, Long.valueOf(nodes.length));
 						monitor.beginTask(message, 100);
-						boolean canceled = uploadFiles(monitor, nodes);
+						boolean canceled = uploadFiles(monitor, sync, nodes);
 						if (canceled)
 							throw new InterruptedException();
 					} catch (Exception e) {
@@ -323,7 +332,7 @@ public class CacheManager {
 	 * @throws Exception
 	 *             an Exception thrown during downloading and storing data.
 	 */
-	public boolean uploadFiles(IProgressMonitor monitor, FSTreeNode... nodes) throws IOException {
+	public boolean uploadFiles(IProgressMonitor monitor, final boolean sync,  final FSTreeNode[] nodes) throws IOException {
 		BufferedInputStream input = null;
 		BufferedOutputStream output = null;
 		// The buffer used to download the file.
@@ -386,7 +395,13 @@ public class CacheManager {
 					SafeRunner.run(new SafeRunnable() {
 						@Override
 						public void run() throws Exception {
-							StateManager.getInstance().updateState(node);
+							StateManager.getInstance().refreshState(node);
+							PersistenceManager.getInstance().setBaseTimestamp(node.getLocationURL(), node.attr.mtime);
+							if(sync) {
+								File file = getCacheFile(node);
+								file.setLastModified(node.attr.mtime);
+							}
+							FSModel.getInstance().fireNodeStateChanged(node);		
 						}
 					});
 				}
