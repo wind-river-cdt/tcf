@@ -132,3 +132,6 @@ plugins/org.eclipse.tcf.rse/bin
 /target_explorer/features/org.eclipse.tcf.te.tcf.rcp.feature/bin
 /target_explorer/features/org.eclipse.tcf.te.tcf.sdk.feature/target
 /target_explorer/features/org.eclipse.tcf.te.tcf.sdk.feature/bin
+
+/target_explorer/experimental/plugins/org.eclipse.tcf.te.ui.sequoyah.vnc/target
+/target_explorer/experimental/plugins/org.eclipse.tcf.te.ui.sequoyah.vnc/bin
