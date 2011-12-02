@@ -121,6 +121,7 @@ public class FSRename extends FSOperation {
 						file.delete();
 					}
 					node.name = newName;
+					FSModel.getInstance().addNode(node);
 				}
 				rendezvous.arrive();
 			}
