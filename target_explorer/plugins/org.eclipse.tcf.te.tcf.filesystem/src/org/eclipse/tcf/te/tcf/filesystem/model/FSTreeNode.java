@@ -206,6 +206,8 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 	 * @return true if it is a Windows node, or else false.
 	 */
 	public boolean isWindowsNode() {
+		if(attr == null && parent != null)
+			return parent.isWindowsNode();
 		return attr != null && attr.attributes != null && attr.attributes.containsKey(KEY_WIN32_ATTRS);
 	}
 
@@ -348,7 +350,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 		try {
 			String id = peerNode.getPeer().getID();
 			String path = getLocation(true);
-			String location = TcfURLConnection.PROTOCOL_SCHEMA + ":/" + id + (isWindowsNode() ? "/" + path : path); //$NON-NLS-1$ //$NON-NLS-2$
+			String location = TcfURLConnection.PROTOCOL_SCHEMA + ":/" + id + (path.startsWith("/") ? path : "/" + path); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			return new URL(location);
 		} catch (MalformedURLException e) {
 			assert false;
