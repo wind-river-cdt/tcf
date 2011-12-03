@@ -12,6 +12,8 @@ A step group bundles a set of single steps and/or other step groups into a more 
       </documentation>
    </annotation>
 
+   <include schemaLocation="schema://org.eclipse.core.expressions/schema/expressionLanguage.exsd"/>
+
    <element name="extension">
       <annotation>
          <appinfo>
@@ -187,8 +189,9 @@ The step group iterator implementation class can be specified either by the iter
          </documentation>
       </annotation>
       <complexType>
-         <sequence minOccurs="0" maxOccurs="unbounded">
-            <element ref="requires"/>
+         <sequence>
+            <element ref="requires" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="enablement"/>
          </sequence>
          <attribute name="id" type="string" use="required">
             <annotation>

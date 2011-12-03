@@ -32,7 +32,6 @@ public class Messages extends NLS {
 	public static String AbstractContextStep_error_missingRequiredAttribute;
 	public static String AbstractContextStep_warning_stepFinishedWithWarnings;
 
-	public static String AbstractContextStepper_error_typeAndSubtype;
 	public static String AbstractContextStepper_error_stepGroup;
 	public static String AbstractContextStepper_error_step;
 	public static String AbstractContextStepper_error_referencedBaseGroup;
@@ -40,7 +39,9 @@ public class Messages extends NLS {
 	public static String AbstractContextStepper_error_requiredStepOrGroup;
 	public static String AbstractContextStepper_error_requiredStep;
 	public static String AbstractContextStepper_error_initializeNotCalled;
+	public static String AbstractContextStepper_error_missingStepGroupId;
 	public static String AbstractContextStepper_error_missingStepGroup;
+	public static String AbstractContextStepper_error_missingSteps;
 	public static String AbstractContextStepper_multiStatus_finishedWithWarnings;
 	public static String AbstractContextStepper_multiStatus_finishedWithErrors;
 	public static String AbstractContextStepper_error_missingRequiredStep;
@@ -51,11 +52,16 @@ public class Messages extends NLS {
 	public static String ContextStepGroup_error_missingRequiredStep;
 	public static String ContextStepGroup_error_invalidRequiredStep;
 	public static String ContextStepGroup_error_multipleSingletonOccurrences;
-	public static String ContextStepGroup_error_typeAndMode;
 	public static String ContextStepGroup_error_step;
 	public static String ContextStepGroup_error_stepGroup;
 	public static String ContextStepGroup_error_requiredStep;
 	public static String ContextStepGroup_error_referencedBaseGroup;
 	public static String ContextStepGroup_error_referencedStepOrGroup;
 	public static String ContextStepGroup_error_requiredStepOrGroup;
+
+	public static String ContextStepExecutor_checkPoint_normalizationNeeded;
+	public static String ContextStepExecutor_info_stepFailed;
+	public static String ContextStepExecutor_warning_stepFailed;
+	public static String ContextStepExecutor_error_stepFailed;
+	public static String ContextStepExecutor_stepFailed_debugInfo;
 }

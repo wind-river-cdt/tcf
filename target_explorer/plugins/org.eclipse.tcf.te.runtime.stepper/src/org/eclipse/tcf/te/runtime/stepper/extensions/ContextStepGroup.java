@@ -22,15 +22,16 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.tcf.te.runtime.interfaces.extensions.IExecutableExtension;
 import org.eclipse.tcf.te.runtime.stepper.StepperManager;
 import org.eclipse.tcf.te.runtime.stepper.activator.CoreBundleActivator;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IContext;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStep;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroup;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroupable;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IExtendedContextStep;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.tracing.ITraceIds;
 import org.eclipse.tcf.te.runtime.stepper.nls.Messages;
-import org.eclipse.tcf.te.runtime.interfaces.extensions.IExecutableExtension;
 
 /**
  * A default step group implementation.
@@ -318,19 +319,18 @@ public class ContextStepGroup extends AbstractContextStepGroup {
 	}
 
 	/**
-	 * Check for duplicates of the referenced step or step group. The check
-	 * will fail if multiple occurrence of a step or step group are found and
-	 * the step or step group is supposed to be a singleton.
+	 * Check for duplicates of the referenced step or step group. The check will fail if multiple
+	 * occurrence of a step or step group are found and the step or step group is supposed to be a
+	 * singleton.
 	 *
 	 * @param steps The list of steps. Must not be <code>null</code>.
 	 * @param reference The reference. Must not be <code>null</code>.
-	 * @param type The type id. Must not be <code>null</code>.
-	 * @param mode The sub type id. Must not be <code>null</code>.
 	 *
 	 * @throws CoreException If multiple occurrences of singleton references are found.
 	 */
-	protected void checkForDuplicates(List<IContextStepGroupable> steps, ReferenceSubElement reference, String type, String mode) throws CoreException {
-		assert steps != null && reference != null;
+	protected void checkForDuplicates(List<IContextStepGroupable> steps, ReferenceSubElement reference) throws CoreException {
+		Assert.isNotNull(steps);
+		Assert.isNotNull(reference);
 
 		// If the reference overwrites another reference, it is not a duplicate
 		String overwrite = reference.getOverwrite();
@@ -359,8 +359,7 @@ public class ContextStepGroup extends AbstractContextStepGroup {
 				CoreBundleActivator.getUniqueIdentifier(),
 				MessageFormat.format(Messages.ContextStepGroup_error_multipleSingletonOccurrences,
 					NLS.bind(Messages.ContextStepGroup_error_stepGroup, getLabel()),
-					NLS.bind(Messages.ContextStepGroup_error_referencedStepOrGroup, reference.getId()),
-					NLS.bind(Messages.ContextStepGroup_error_typeAndMode, type, mode))
+					NLS.bind(Messages.ContextStepGroup_error_referencedStepOrGroup, reference.getId()))
 				));
 		}
 	}
@@ -376,7 +375,10 @@ public class ContextStepGroup extends AbstractContextStepGroup {
 	 * @return The list of affected groupable's or an empty list.
 	 */
 	protected List<IContextStepGroupable> onOverwrite(List<IContextStepGroupable> steps, String oldId, IExecutableExtension replacement, ReferenceSubElement reference) {
-		assert steps != null && oldId != null && replacement != null && reference != null;
+		Assert.isNotNull(steps);
+		Assert.isNotNull(oldId);
+		Assert.isNotNull(replacement);
+		Assert.isNotNull(reference);
 
 		List<IContextStepGroupable> affected = new ArrayList<IContextStepGroupable>();
 
@@ -434,7 +436,10 @@ public class ContextStepGroup extends AbstractContextStepGroup {
 	 * @return The list of affected groupable's or an empty list.
 	 */
 	protected List<IContextStepGroupable> onInsertBefore(List<IContextStepGroupable> steps, String id, IExecutableExtension newStep, ReferenceSubElement reference) {
-		assert steps != null && id != null && newStep != null && reference != null;
+		Assert.isNotNull(steps);
+		Assert.isNotNull(id);
+		Assert.isNotNull(newStep);
+		Assert.isNotNull(reference);
 
 		List<IContextStepGroupable> affected = new ArrayList<IContextStepGroupable>();
 
@@ -492,7 +497,10 @@ public class ContextStepGroup extends AbstractContextStepGroup {
 	 * @return The list of affected groupable's or an empty list.
 	 */
 	protected List<IContextStepGroupable> onInsertAfter(List<IContextStepGroupable> steps, String id, IExecutableExtension newStep, ReferenceSubElement reference) {
-		assert steps != null && id != null && newStep != null && reference != null;
+		Assert.isNotNull(steps);
+		Assert.isNotNull(id);
+		Assert.isNotNull(newStep);
+		Assert.isNotNull(reference);
 
 		List<IContextStepGroupable> affected = new ArrayList<IContextStepGroupable>();
 
@@ -536,11 +544,11 @@ public class ContextStepGroup extends AbstractContextStepGroup {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroup#getSteps(java.lang.String, java.lang.String)
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroup#getSteps(org.eclipse.tcf.te.runtime.stepper.interfaces.IContext[])
 	 */
 	@Override
-	public IContextStepGroupable[] getSteps(String type, String mode) throws CoreException {
-		assert type != null && mode != null;
+	public IContextStepGroupable[] getSteps(IContext[] contexts) throws CoreException {
+		Assert.isNotNull(contexts);
 
 		// The list of resolved steps for the specified type and mode
 		List<IContextStepGroupable> steps = new ArrayList<IContextStepGroupable>();
@@ -556,13 +564,12 @@ public class ContextStepGroup extends AbstractContextStepGroup {
 					CoreBundleActivator.getUniqueIdentifier(),
 					MessageFormat.format(Messages.ContextStepGroup_error_missingBaseStepGroup,
 						NLS.bind(Messages.ContextStepGroup_error_stepGroup, getLabel()),
-						NLS.bind(Messages.ContextStepGroup_error_referencedBaseGroup, getBaseOn()),
-						NLS.bind(Messages.ContextStepGroup_error_typeAndMode, type, mode))
+						NLS.bind(Messages.ContextStepGroup_error_referencedBaseGroup, getBaseOn()))
 					));
 			}
 
 			// Add all the steps from the base step group now to the list
-			steps.addAll(Arrays.asList(baseStepGroup.getSteps(type, mode)));
+			steps.addAll(Arrays.asList(baseStepGroup.getSteps(contexts)));
 		}
 
 		// Now process the references and modify the steps list accordingly
@@ -579,31 +586,29 @@ public class ContextStepGroup extends AbstractContextStepGroup {
 					CoreBundleActivator.getUniqueIdentifier(),
 					MessageFormat.format(Messages.ContextStepGroup_error_missingReferencedStep,
 						NLS.bind(Messages.ContextStepGroup_error_stepGroup, getLabel()),
-						NLS.bind(Messages.ContextStepGroup_error_referencedStepOrGroup, reference.getId()),
-						NLS.bind(Messages.ContextStepGroup_error_typeAndMode, type, mode))
+						NLS.bind(Messages.ContextStepGroup_error_referencedStepOrGroup, reference.getId()))
 					));
 			}
 
 			// Check if the step is valid for the current launch configuration type and mode.
 			if (candidate instanceof IContextStep) {
-				boolean valid = isValidStep(candidate.getId(), type, mode);
+				boolean valid = isValidStep(candidate.getId(), contexts);
 
 				if (!valid) {
 					CoreBundleActivator.getTraceHandler().trace(
 						"StepGroup#getSteps: SKIPPED step = '" + candidate.getLabel() + "'." //$NON-NLS-1$ //$NON-NLS-2$
-						+ " Not valid for type id '" + type + "'" //$NON-NLS-1$ //$NON-NLS-2$
-						+ " and mode '" + mode + "'",  //$NON-NLS-1$ //$NON-NLS-2$
+						+ " Not valid for contexts '" + Arrays.deepToString(contexts),  //$NON-NLS-1$
 						0, ITraceIds.TRACE_STEPPING, IStatus.WARNING, this);
 					continue;
 				}
 			}
 
 			// Check for duplicates of singleton references.
-			checkForDuplicates(steps, reference, type, mode);
+			checkForDuplicates(steps, reference);
 
 			// Check for the steps own dependencies to be valid for the current type id and mode
 			if (candidate instanceof IContextStep) {
-				checkForDependenciesValid((IContextStep) candidate, type, mode);
+				checkForDependenciesValid((IContextStep) candidate, contexts);
 			}
 
 			// Will contain the list of affected groupables from the whole list
@@ -726,13 +731,13 @@ public class ContextStepGroup extends AbstractContextStepGroup {
 	 * and valid for the given type id and mode.
 	 *
 	 * @param step The step. Must not be <code>null</code>.
-	 * @param type The type id. Must not be <code>null</code>.
-	 * @param mode The mode. Must not be <code>null</code>.
+	 * @param contexts The array of context objects. Must be not <code>null</code>.
 	 *
 	 * @throws CoreException If a required step or step group is not available or not valid.
 	 */
-	protected void checkForDependenciesValid(IContextStep step, String type, String mode) throws CoreException {
-		assert step != null && type != null && mode != null;
+	protected void checkForDependenciesValid(IContextStep step, IContext[] contexts) throws CoreException {
+		Assert.isNotNull(step);
+		Assert.isNotNull(contexts);
 
 		String[] dependencies = step.getDependencies();
 		for (String dependency : dependencies) {
@@ -748,27 +753,25 @@ public class ContextStepGroup extends AbstractContextStepGroup {
 					CoreBundleActivator.getUniqueIdentifier(),
 					MessageFormat.format(Messages.ContextStepGroup_error_missingRequiredStep,
 						NLS.bind(Messages.ContextStepGroup_error_step, step.getLabel()),
-						NLS.bind(Messages.ContextStepGroup_error_requiredStepOrGroup, dependency),
-						NLS.bind(Messages.ContextStepGroup_error_typeAndMode, type, mode))
+						NLS.bind(Messages.ContextStepGroup_error_requiredStepOrGroup, dependency))
 					));
 			}
 
 			// If the candidate a step, validate the step
 			if (candidate instanceof IContextStep) {
 				IContextStep candidateStep = (IContextStep)candidate;
-				boolean valid = isValidStep(candidateStep.getId(), type, mode);
+				boolean valid = isValidStep(candidateStep.getId(), contexts);
 				if (!valid) {
 					throw new CoreException(new Status(IStatus.ERROR,
 						CoreBundleActivator.getUniqueIdentifier(),
 						MessageFormat.format(Messages.ContextStepGroup_error_invalidRequiredStep,
 							NLS.bind(Messages.ContextStepGroup_error_step, step.getLabel()),
-							NLS.bind(Messages.ContextStepGroup_error_requiredStep, dependency),
-							NLS.bind(Messages.ContextStepGroup_error_typeAndMode, type, mode))
+							NLS.bind(Messages.ContextStepGroup_error_requiredStep, dependency))
 						));
 				}
 
 				// Step is valid -> recursively check required steps.
-				checkForDependenciesValid(candidateStep, type, mode);
+				checkForDependenciesValid(candidateStep, contexts);
 			}
 		}
 	}
@@ -803,12 +806,13 @@ public class ContextStepGroup extends AbstractContextStepGroup {
 	 * <b>Note:</b> The default implementation returns always <code>true</code>.
 	 *
 	 * @param id The step id. Must not be <code>null</code>.
-	 * @param type The type id. Must not be <code>null</code>.
-	 * @param mode The mode. Must not be <code>null</code>.
+	 * @param contexts The array of context objects. Must be not <code>null</code>.
 	 *
 	 * @return <code>True</code> if the step is valid, <code>false</code> otherwise.
 	 */
-	protected boolean isValidStep(String id, String type, String mode) {
+	protected boolean isValidStep(String id, IContext[] contexts) {
+		Assert.isNotNull(id);
+		Assert.isNotNull(contexts);
 		return true;
 	}
 }

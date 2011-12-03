@@ -28,17 +28,15 @@ public interface IContextStepGroup extends IExecutableExtension {
 	public boolean isLocked();
 
 	/**
-	 * Returns the list of steps or step groups enlisted in the group for the specified stepper,
-	 * type and sub type.
+	 * Returns the list of steps or step groups enlisted and enabled in the group for the
+	 * given contexts.
 	 *
-	 * @param type The type id. Must be not <code>null</code>.
-	 * @param subType The sub type Must be not <code>null</code>.
-	 *
+	 * @param contexts The array of context objects. Must be not <code>null</code>.
 	 * @return The list of steps and step groups or an empty array.
 	 *
 	 * @throws CoreException If the steps cannot be determined.
 	 */
-	public IContextStepGroupable[] getSteps(String type, String subType) throws CoreException;
+	public IContextStepGroupable[] getSteps(IContext[] contexts) throws CoreException;
 
 	/**
 	 * Return the step group iterator or <code>null</code>. The step group iterator can be used to
