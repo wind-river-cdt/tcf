@@ -18,6 +18,8 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.StateManager;
+import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -36,6 +38,7 @@ public class RefreshHandler extends AbstractHandler {
 		FSTreeNode node = (FSTreeNode) selection.getFirstElement();
 		try {
 			StateManager.getInstance().refreshState(node);
+			FSModel.getInstance().fireNodeStateChanged(node);		
 		} catch (TCFException e) {
 			Shell parent = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 			MessageDialog.openError(parent, Messages.StateManager_RefreshFailureTitle, e.getLocalizedMessage());

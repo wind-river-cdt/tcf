@@ -10,6 +10,7 @@
 package org.eclipse.tcf.te.tcf.filesystem.internal.operations;
 
 import java.io.File;
+import java.net.ConnectException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,10 +42,10 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.ImageConsts;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFChannelException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
-import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.CacheManager;
-import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.PersistenceManager;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
-import org.eclipse.tcf.te.tcf.filesystem.internal.url.Rendezvous;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.CacheManager;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.PersistenceManager;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.Rendezvous;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.ui.IEditorInput;
@@ -58,7 +59,7 @@ import org.eclipse.ui.PlatformUI;
  * FSOperation is the base class of file system operation classes including FSCopy, FSDelete, FSMove
  * and FSRename.
  */
-public abstract class FSOperation {
+public class FSOperation {
 	// The flag indicating if the following action should be executed without asking.
 	protected boolean yes2All;
 
@@ -178,7 +179,7 @@ public abstract class FSOperation {
 	 *
 	 * @return The channel or null if the operation fails.
 	 */
-	protected IChannel openChannel(final IPeer peer) throws TCFChannelException {
+	public static IChannel openChannel(final IPeer peer) throws TCFChannelException {
 		final Rendezvous rendezvous = new Rendezvous();
 		final TCFChannelException[] errors = new TCFChannelException[1];
 		final IChannel[] channels = new IChannel[1];
@@ -186,8 +187,14 @@ public abstract class FSOperation {
 			@Override
 			public void doneOpenChannel(Throwable error, IChannel channel) {
 				if (error != null) {
-					String message = NLS.bind(Messages.OpeningChannelFailureMessage, peer.getID(), error.getLocalizedMessage());
-					errors[0] = new TCFChannelException(message, error);
+					if (error instanceof ConnectException) {
+						String message = NLS.bind(Messages.FSOperation_NotResponding, peer.getID());
+						errors[0] = new TCFChannelException(message);
+					}
+					else {
+						String message = NLS.bind(Messages.OpeningChannelFailureMessage, peer.getID(), error.getLocalizedMessage());
+						errors[0] = new TCFChannelException(message, error);
+					}
 				}
 				else {
 					channels[0] = channel;
@@ -240,7 +247,7 @@ public abstract class FSOperation {
 	 * @return The children of the folder node.
 	 * @throws TCFFileSystemException Thrown during querying the children nodes.
 	 */
-	protected List<FSTreeNode> getChildren(final FSTreeNode node, final IFileSystem service) throws TCFFileSystemException {
+	public List<FSTreeNode> getChildren(final FSTreeNode node, final IFileSystem service) throws TCFFileSystemException {
 		if (node.childrenQueried) {
 			return getCurrentChildren(node);
 		}
@@ -281,14 +288,14 @@ public abstract class FSOperation {
 		if (Protocol.isDispatchThread()) {
 			return node.getChildren();
 		}
-		final List<FSTreeNode> result = new ArrayList<FSTreeNode>();
+		final List<List<FSTreeNode>> result = new ArrayList<List<FSTreeNode>>();
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
-				result.addAll(getCurrentChildren(node));
+				result.add(getCurrentChildren(node));
 			}
 		});
-		return result;
+		return result.get(0);
 	}
 
 
@@ -701,5 +708,7 @@ public abstract class FSOperation {
 	 *
 	 * @return true if it is successful.
 	 */
-	public abstract boolean doit();
+	public boolean doit(){
+		return false;
+	}
 }

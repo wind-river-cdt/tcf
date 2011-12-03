@@ -20,7 +20,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.tcf.te.tcf.filesystem.internal.events.INodeStateListener;
-import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.CacheManager;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.CacheManager;
 
 /**
  * The file system model implementation.

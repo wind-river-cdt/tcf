@@ -27,8 +27,8 @@ import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.te.tcf.filesystem.interfaces.IWindowsFileAttributes;
 import org.eclipse.tcf.te.tcf.filesystem.internal.UserAccount;
-import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.UserManager;
 import org.eclipse.tcf.te.tcf.filesystem.internal.url.TcfURLConnection;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.UserManager;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 
 /**
@@ -206,6 +206,8 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 	 * @return true if it is a Windows node, or else false.
 	 */
 	public boolean isWindowsNode() {
+		if(attr == null && parent != null)
+			return parent.isWindowsNode();
 		return attr != null && attr.attributes != null && attr.attributes.containsKey(KEY_WIN32_ATTRS);
 	}
 
@@ -348,7 +350,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 		try {
 			String id = peerNode.getPeer().getID();
 			String path = getLocation(true);
-			String location = TcfURLConnection.PROTOCOL_SCHEMA + ":/" + id + (isWindowsNode() ? "/" + path : path); //$NON-NLS-1$ //$NON-NLS-2$
+			String location = TcfURLConnection.PROTOCOL_SCHEMA + ":/" + id + (path.startsWith("/") ? path : "/" + path); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			return new URL(location);
 		} catch (MalformedURLException e) {
 			assert false;

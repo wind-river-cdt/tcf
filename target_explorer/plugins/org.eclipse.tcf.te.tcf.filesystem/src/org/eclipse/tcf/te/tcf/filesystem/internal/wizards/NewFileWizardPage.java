@@ -9,9 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.wizards;
 
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
-import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 
 /**
  * The wizard page to create a new file in the file system of Target Explorer.
@@ -20,11 +18,9 @@ public class NewFileWizardPage extends NewNodeWizardPage {
 
 	/**
 	 * Create a wizard page to create a new file in the specified folder.
-	 * 
-	 * @param folder The folder in which the file is created.
 	 */
-	public NewFileWizardPage(FSTreeNode folder) {
-		super("NewFileWizardPage", folder); //$NON-NLS-1$
+	public NewFileWizardPage() {
+		super("NewFileWizardPage"); //$NON-NLS-1$
 	}
 
 	/*
@@ -38,13 +34,11 @@ public class NewFileWizardPage extends NewNodeWizardPage {
 
 	/*
 	 * (non-Javadoc)
-	 * @see
-	 * org.eclipse.tcf.te.tcf.filesystem.internal.wizards.NewNodeWizardPage#getPageDescription()
+	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.wizards.NewNodeWizardPage#getPageDescription()
 	 */
 	@Override
 	protected String getPageDescription() {
-		return NLS.bind(Messages.NewFileWizardPage_NewFileWizardPageDescription, folder
-		                .getLocation(false));
+		return Messages.NewFileWizardPage_NewFileWizardPageDescription;
 	}
 
 	/*

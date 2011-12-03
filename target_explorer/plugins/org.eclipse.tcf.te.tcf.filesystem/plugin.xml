@@ -999,28 +999,28 @@
 <!-- Target Explorer property tester contributions -->   
    <extension point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.FSTreeNodePropertyTester"
+            class="org.eclipse.tcf.te.tcf.filesystem.internal.testers.FSTreeNodePropertyTester"
             id="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode"
             namespace="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode"
             properties="isFile,isDirectory,isBinaryFile,isReadable,isWritable,isExecutable,isRoot,isReadOnly,isHidden,isWindows,testParent,getCacheState"
             type="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
       </propertyTester>
       <propertyTester
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.CachePropertyTester"
+            class="org.eclipse.tcf.te.tcf.filesystem.internal.testers.CachePropertyTester"
             id="org.eclipse.tcf.te.tcf.filesystem.propertytester.cache"
             namespace="org.eclipse.tcf.te.tcf.filesystem.propertytester.cache"
             properties="isAutoSavingOn"
             type="java.lang.Object">
       </propertyTester>
       <propertyTester
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.ClipboardPropertyTester"
+            class="org.eclipse.tcf.te.tcf.filesystem.internal.testers.ClipboardPropertyTester"
             id="org.eclipse.tcf.te.tcf.filesystem.propertytester.clipboard"
             namespace="org.eclipse.tcf.te.tcf.filesystem.propertytester.clipboard"
             properties="canPaste"
             type="org.eclipse.jface.viewers.IStructuredSelection">
       </propertyTester>
       <propertyTester
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.EditorActivationEventPropertyTester"
+            class="org.eclipse.tcf.te.tcf.filesystem.internal.testers.EditorActivationEventPropertyTester"
             id="org.eclipse.tcf.te.tcf.filesystem.propertytester.event"
             namespace="org.eclipse.tcf.te.tcf.filesystem.propertytester.event"
             properties="isEditorActivation"
@@ -1326,7 +1326,7 @@
          </enabledWhen>
       </handler>
       <handler
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.RevertHandler"
+            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.UpdateHandler"
             commandId="org.eclipse.tcf.te.tcf.filesystem.commands.revert">
          <activeWhen>
             <with
@@ -1859,7 +1859,7 @@
          </enablement>
       </decorator>
       <decorator
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.CutDecorator"
+            class="org.eclipse.tcf.te.tcf.filesystem.internal.decorators.CutDecorator"
             id="org.eclipse.tcf.te.tcf.filesystem.decorators.cut"
             label="%decorator.label.cut"
             state="true">
@@ -1892,7 +1892,7 @@
    <extension
          point="org.eclipse.tcf.te.ui.views.cellEditors">
       <cellEditor
-            editorFactory="org.eclipse.tcf.te.tcf.filesystem.controls.FSViewerCellEditorFactory"
+            editorFactory="org.eclipse.tcf.te.tcf.filesystem.internal.celleditor.FSViewerCellEditorFactory"
             viewerId="org.eclipse.tcf.te.ui.views.TargetExplorer">
          <activation>
             <and>

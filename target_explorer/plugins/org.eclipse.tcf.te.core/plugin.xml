@@ -2,10 +2,6 @@
 <?eclipse version="3.4"?>
 <plugin>
 
-<!-- Extension point contributions -->
-   <extension-point id="connectionTypes" name="Connection Type Contributions" schema="schema/connectionTypes.exsd"/>
-   <extension-point id="connectionTypeBindings" name="Connection Type Bindings Contributions" schema="schema/connectionTypeBindings.exsd"/>
-
 <!-- Adapter factory contributions -->
    <extension point="org.eclipse.core.runtime.adapters">
       <factory
@@ -22,24 +18,9 @@
             id="org.eclipse.tcf.te.core.adapters.PropertyTester"
             namespace="org.eclipse.tcf.te.core"
             properties="hasAdapter,canAdaptTo"
-            type="org.eclipse.core.runtime.IAdaptable">
+            type="java.lang.Object">
       </propertyTester>
       
-   </extension>
-
-<!-- Reusable core expression fragments -->   
-   <extension point="org.eclipse.core.expressions.definitions">
-   
-      <!-- Expression to test if the selection contains only one element which
-           is an connectable model node -->
-      <definition id="te.core.expression.isConnectable">
-         <with variable="selection">
-            <count value="1"/>
-            <iterate operator="and" ifEmpty="false">
-               <instanceof value="org.eclipse.tcf.te.core.model.interfaces.IConnectable"/>
-            </iterate>
-         </with>
-      </definition>
    </extension>
 
 </plugin>

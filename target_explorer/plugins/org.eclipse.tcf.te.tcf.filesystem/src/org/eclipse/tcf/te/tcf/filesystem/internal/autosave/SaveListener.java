@@ -12,7 +12,6 @@ package org.eclipse.tcf.te.tcf.filesystem.internal.autosave;
 import java.io.File;
 import java.net.URI;
 
-import org.eclipse.compare.CompareUI;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IExecutionListener;
@@ -21,25 +20,12 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.tcf.te.tcf.filesystem.internal.compare.LocalTypedElement;
-import org.eclipse.tcf.te.tcf.filesystem.internal.compare.MergeEditorInput;
-import org.eclipse.tcf.te.tcf.filesystem.internal.compare.RemoteTypedElement;
-import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
-import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.CacheManager;
-import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.PersistenceManager;
-import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.StateManager;
-import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
-import org.eclipse.tcf.te.tcf.filesystem.model.CacheState;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.CacheManager;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.PersistenceManager;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IURIEditorInput;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
@@ -65,43 +51,11 @@ public class SaveListener implements IExecutionListener {
 	@Override
 	public void postExecuteSuccess(String commandId, Object returnValue) {
 		if (dirtyNode != null) {
-			try{
-			// Refresh the fDirtyNode's state.
-			StateManager.getInstance().refreshState(dirtyNode);
 			if (PersistenceManager.getInstance().isAutoSaving()) {
-				CacheState state = StateManager.getInstance().getCacheState(dirtyNode);
-				switch (state) {
-				case conflict:
-					String title = Messages.SaveListener_StateChangedDialogTitle;
-					String message = NLS.bind(Messages.SaveListener_StateChangedMessage, dirtyNode.name);
-					IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-					IWorkbenchPage page = window.getActivePage();
-					Shell parent = window.getShell();
-					MessageDialog msgDialog = new MessageDialog(parent, title, null, message, MessageDialog.QUESTION,
-							new String[] { Messages.SaveListener_Merge, Messages.SaveListener_SaveAnyway, Messages.SaveListener_Cancel }, 0);
-					int index = msgDialog.open();
-					if (index == 0) {// Merge
-						LocalTypedElement local = new LocalTypedElement(dirtyNode);
-						RemoteTypedElement remote = new RemoteTypedElement(dirtyNode);
-						MergeEditorInput mergeInput = new MergeEditorInput(local, remote, page);
-						CompareUI.openCompareDialog(mergeInput);
-					} else if (index == 1) {// Save anyway.
-						CacheManager.getInstance().upload(dirtyNode);
-					}
-					break;
-				case modified:
-					// Save anyway
-					CacheManager.getInstance().upload(dirtyNode);
-					break;
-				case consistent:
-					break;
-				case outdated:
-					break;
-				}
+				CacheManager.getInstance().upload(new FSTreeNode[]{dirtyNode}, false);
 			}
-			}catch(TCFException tcfe){
-				Shell parent = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-				MessageDialog.openError(parent, Messages.StateManager_RefreshFailureTitle, tcfe.getLocalizedMessage());
+			else {
+				FSModel.getInstance().fireNodeStateChanged(dirtyNode);
 			}
 		}
 	}

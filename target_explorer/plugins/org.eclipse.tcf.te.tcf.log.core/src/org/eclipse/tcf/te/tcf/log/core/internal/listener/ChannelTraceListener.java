@@ -124,6 +124,12 @@ public class ChannelTraceListener implements TraceListener {
 		if (!showHeartbeats && name != null && name.toLowerCase().contains("heartbeat")) { //$NON-NLS-1$
 			return;
 		}
+		// Filter out framework events if not overwritten by the preferences
+		boolean frameworkEvents = Platform.getPreferencesService().getBoolean(CoreBundleActivator.getUniqueIdentifier(),
+						 													  IPreferenceKeys.PREF_SHOW_FRAMEWORK_EVENTS, false, null);
+		if (!frameworkEvents && type == 'F') {
+			return;
+		}
 
 		// Format the message
 		final String message = formatMessage(type, token, service, name, data, received);

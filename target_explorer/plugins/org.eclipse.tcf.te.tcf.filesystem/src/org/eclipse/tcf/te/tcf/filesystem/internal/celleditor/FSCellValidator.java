@@ -75,7 +75,10 @@ public class FSCellValidator implements ICellEditorValidator {
 	private boolean hasChild(FSTreeNode folder, String name) {
 		List<FSTreeNode> nodes = new ArrayList<FSTreeNode>(FSOperation.getCurrentChildren(folder.parent));
 		for (FSTreeNode node : nodes) {
-			if (node.name.equals(name)) return true;
+			if (node.isWindowsNode()) {
+				if (node.name.equalsIgnoreCase(name)) return true;
+			}
+			else if (node.name.equals(name)) return true;
 		}
 		return false;
 	}	

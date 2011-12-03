@@ -29,13 +29,13 @@ import org.eclipse.tcf.services.IFileSystem.DoneRemove;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
+import org.eclipse.tcf.te.tcf.filesystem.dialogs.TimeTriggeredProgressMonitorDialog;
 import org.eclipse.tcf.te.tcf.filesystem.internal.ImageConsts;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
-import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.StateManager;
-import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.TimeTriggeredProgressMonitorDialog;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
-import org.eclipse.tcf.te.tcf.filesystem.internal.url.Rendezvous;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.Rendezvous;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.StateManager;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.ui.PlatformUI;
@@ -105,7 +105,8 @@ public class FSDelete extends FSOperation {
 		}
 		catch (InvocationTargetException e) {
 			// Display the error message during deleting.
-			MessageDialog.openError(parent, Messages.FSDelete_DeleteFileFolderTitle, e.getLocalizedMessage());
+			Throwable throwable = e.getTargetException() != null ? e.getTargetException() : e;
+			MessageDialog.openError(parent, Messages.FSDelete_DeleteFileFolderTitle, throwable.getLocalizedMessage());
 		}
 		catch (InterruptedException e) {
 			// It is canceled.

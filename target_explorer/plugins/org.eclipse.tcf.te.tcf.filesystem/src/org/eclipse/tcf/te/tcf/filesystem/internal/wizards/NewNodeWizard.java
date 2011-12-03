@@ -11,7 +11,11 @@ package org.eclipse.tcf.te.tcf.filesystem.internal.wizards;
 
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSCreate;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
 import org.eclipse.tcf.te.ui.wizards.AbstractWizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
@@ -22,9 +26,10 @@ import org.eclipse.ui.IWorkbench;
 public abstract class NewNodeWizard extends AbstractWizard implements INewWizard {
 	// The folder in which the new node is created.
 	private FSTreeNode folder;
+	// The target peer where the new node is created.
+	private IPeerModel peer;
 	// The wizard page used to create the new node.
-	private NewNodeWizardPage page;
-
+	private NewNodeWizardPage newPage;
 	/**
 	 * Create an instance.
 	 */
@@ -33,8 +38,7 @@ public abstract class NewNodeWizard extends AbstractWizard implements INewWizard
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench,
-	 * org.eclipse.jface.viewers.IStructuredSelection)
+	 * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench, org.eclipse.jface.viewers.IStructuredSelection)
 	 */
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
@@ -45,11 +49,47 @@ public abstract class NewNodeWizard extends AbstractWizard implements INewWizard
 			if (element instanceof FSTreeNode) {
 				folder = (FSTreeNode) element;
 				if (folder.isFile()) {
+					// If the selected is a file, then create the node in the parent folder.
 					folder = folder.parent;
+				}
+				peer = folder.peerNode;
+			}
+			else if (element instanceof IPeerModel) {
+				if(hasFileSystem((IPeerModel) element)) {
+					peer = (IPeerModel) element;
 				}
 			}
 		}
 	}
+	
+	/**
+	 * Test if the specified target peer has a file system service.
+	 * 
+	 * @param peer The target peer.
+	 * @return true if it has a file system service.
+	 */
+	public boolean hasFileSystem(final IPeerModel peer) {
+		if(Protocol.isDispatchThread()) {
+			String services = null;
+			services = peer.getStringProperty(IPeerModelProperties.PROP_REMOTE_SERVICES);
+			if (services != null) {
+				// Lookup each service individually
+				for (String service : services.split(",")) { //$NON-NLS-1$
+					if (service != null && service.trim().equals("FileSystem")) { //$NON-NLS-1$
+						return true;
+					}
+				}
+			}
+		    return false;
+		}
+		final boolean[] result = new boolean[1];
+		Protocol.invokeAndWait(new Runnable(){
+			@Override
+            public void run() {
+				result[0] = hasFileSystem(peer);
+            }});
+		return result[0];
+    }
 
 	/*
 	 * (non-Javadoc)
@@ -57,9 +97,10 @@ public abstract class NewNodeWizard extends AbstractWizard implements INewWizard
 	 */
 	@Override
 	public void addPages() {
-		if (folder != null) {
-			addPage(page = createWizardPage(folder));
+		if (peer == null) {
+			addPage(new TargetSelectionPage());
 		}
+		addPage(newPage = createWizardPage());
 	}
 
 	/*
@@ -68,16 +109,17 @@ public abstract class NewNodeWizard extends AbstractWizard implements INewWizard
 	 */
 	@Override
 	public boolean performFinish() {
-		if (page != null) {
+		if (newPage != null) {
 			// Save the value so that next time it is used as the default input.
-			page.saveWidgetValues();
+			newPage.saveWidgetValues();
 			// Get the new name and create the node.
-			String name = page.getNodeName();
-			FSCreate create = getCreateOp(folder, name);
+			String name = newPage.getNodeName();
+			FSTreeNode dest = newPage.getInputDir();
+			FSCreate create = getCreateOp(dest, name);
 			boolean doit = create.doit();
 			if (!doit) {
 				// The the error message generated during creation.
-				page.setMessage(create.getError(), IMessageProvider.ERROR);
+				newPage.setMessage(create.getError(), IMessageProvider.ERROR);
 				return false;
 			}
 		}
@@ -85,12 +127,11 @@ public abstract class NewNodeWizard extends AbstractWizard implements INewWizard
 	}
 
 	/**
-	 * Create a wizard page to create a new node in the specified folder.
+	 * Create a wizard page to create a new node.
 	 * 
-	 * @param folder The parent folder in which the new node is created.
 	 * @return The new wizard page.
 	 */
-	protected abstract NewNodeWizardPage createWizardPage(FSTreeNode folder);
+	protected abstract NewNodeWizardPage createWizardPage();
 
 	/**
 	 * Create a Create operation instance using the specified folder and the new name.
@@ -107,4 +148,32 @@ public abstract class NewNodeWizard extends AbstractWizard implements INewWizard
 	 * @return The wizard's title to be used.
 	 */
 	protected abstract String getTitle();
+	
+	/**
+	 * Get the current target peer selected.
+	 * 
+	 * @return The target peer selected.
+	 */
+	public IPeerModel getPeer(){
+		return peer;
+	}
+	
+	/**
+	 * Set the currently selected target peer.
+	 * 
+	 * @param peer The newly selected target peer.
+	 */
+	public void setPeer(IPeerModel peer) {
+		this.peer = peer;
+		newPage.setPeer(peer);
+	}
+	
+	/**
+	 * Get the current selected folder.
+	 * 
+	 * @return the current selected folder.
+	 */
+	public FSTreeNode getFolder() {
+		return folder;
+	}
 }

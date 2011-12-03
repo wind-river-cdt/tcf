@@ -24,6 +24,7 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.celleditor.FSCellValidator;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSRename;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.PersistenceManager;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.ui.dialogs.RenameDialog;
 import org.eclipse.ui.handlers.HandlerUtil;

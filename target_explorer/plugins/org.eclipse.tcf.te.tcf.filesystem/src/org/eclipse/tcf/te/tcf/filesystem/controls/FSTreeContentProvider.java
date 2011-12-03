@@ -439,7 +439,7 @@ public class FSTreeContentProvider implements ITreeContentProvider, INodeStateLi
 						PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
 							@Override
 							public void run() {
-								viewer.refresh(parentNode);
+								if (!viewer.getTree().isDisposed()) viewer.refresh(parentNode);
 							}
 						});
 					}

@@ -31,7 +31,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tcf.te.tcf.filesystem.internal.compare.EditableSharedDocumentAdapter.ISharedDocumentAdapterListener;
-import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.CacheManager;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.CacheManager;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPropertyListener;
@@ -132,7 +132,7 @@ public class LocalFileSaveable extends Saveable implements
 			monitor.done();
 			//Trigger upload action
 			FSTreeNode node = fileElement.getFSTreeNode();
-			CacheManager.getInstance().upload(node);
+			CacheManager.getInstance().upload(new FSTreeNode[]{node}, true);
 		}
 	}
 

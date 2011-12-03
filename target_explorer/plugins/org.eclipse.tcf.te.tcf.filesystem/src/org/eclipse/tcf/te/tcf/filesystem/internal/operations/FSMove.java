@@ -25,11 +25,11 @@ import org.eclipse.tcf.services.IFileSystem.DoneRename;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
+import org.eclipse.tcf.te.tcf.filesystem.dialogs.TimeTriggeredProgressMonitorDialog;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
-import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.TimeTriggeredProgressMonitorDialog;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
-import org.eclipse.tcf.te.tcf.filesystem.internal.url.Rendezvous;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.Rendezvous;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.ui.PlatformUI;
@@ -60,6 +60,15 @@ public class FSMove extends FSOperation {
 	 */
 	@Override
 	public boolean doit() {
+		// Remove its self from the clipped nodes.
+		nodes.remove(dest);
+		if(nodes.isEmpty()) {
+			// Clear the clip board.
+			UIPlugin.getDefault().getClipboard().clear();
+			// Refresh the file system tree.
+			FSModel.getInstance().fireNodeStateChanged(null);
+			return true;
+		}
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
@@ -105,7 +114,8 @@ public class FSMove extends FSOperation {
 		}
 		catch (InvocationTargetException e) {
 			// Display the error reported during moving.
-			MessageDialog.openError(parent, Messages.FSMove_MoveFileFolderTitle, e.getLocalizedMessage());
+			Throwable throwable = e.getTargetException() != null ? e.getTargetException() : e;
+			MessageDialog.openError(parent, Messages.FSMove_MoveFileFolderTitle, throwable.getLocalizedMessage());
 		}
 		catch (InterruptedException e) {
 			// It is canceled.

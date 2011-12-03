@@ -14,7 +14,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.compare.CompareUI;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IExecutionListener;
@@ -23,26 +22,14 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.tcf.te.tcf.filesystem.internal.compare.LocalTypedElement;
-import org.eclipse.tcf.te.tcf.filesystem.internal.compare.MergeEditorInput;
-import org.eclipse.tcf.te.tcf.filesystem.internal.compare.RemoteTypedElement;
-import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
-import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.CacheManager;
-import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.PersistenceManager;
-import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.StateManager;
-import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
-import org.eclipse.tcf.te.tcf.filesystem.model.CacheState;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.CacheManager;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.PersistenceManager;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
@@ -68,70 +55,11 @@ public class SaveAllListener implements IExecutionListener {
 	@Override
 	public void postExecuteSuccess(String commandId, Object returnValue) {
 		if (!fDirtyNodes.isEmpty()) {
-			try {
-				List<FSTreeNode> modified = new ArrayList<FSTreeNode>();
-				List<FSTreeNode> conflicts = new ArrayList<FSTreeNode>();
-				for (FSTreeNode node : fDirtyNodes) {
-					// Refresh the dirty nodes and get their latest states.
-					StateManager.getInstance().refreshState(node);
-					CacheState state = StateManager.getInstance().getCacheState(node);
-					switch (state) {
-					case consistent:
-						break;
-					case outdated:
-						break;
-					case modified:
-						// Reclassifying
-						modified.add(node);
-						break;
-					case conflict:
-						// Reclassifying
-						conflicts.add(node);
-						break;
-					}
-				}
-
-				if (PersistenceManager.getInstance().isAutoSaving()) {
-					// If auto saving is on.
-					if (!modified.isEmpty()) {
-						// Upload the modified nodes.
-						CacheManager.getInstance().upload(modified.toArray(new FSTreeNode[modified.size()]));
-					}
-					if (!conflicts.isEmpty()) {
-						// Merge the conflicting ones.
-						mergeConflicts(conflicts);
-					}
-				}
-			} catch (TCFException tcfe) {
-				Shell parent = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-				MessageDialog.openError(parent, Messages.StateManager_RefreshFailureTitle, tcfe.getLocalizedMessage());
+			if (PersistenceManager.getInstance().isAutoSaving()) {
+				CacheManager.getInstance().upload(fDirtyNodes.toArray(new FSTreeNode[fDirtyNodes.size()]), false);
 			}
-		}
-	}
-
-	/**
-	 * Merge those conflicting nodes.
-	 *
-	 * @param conflicts The conflicting nodes.
-	 */
-	private void mergeConflicts(List<FSTreeNode> conflicts) {
-		for (FSTreeNode node : conflicts) {
-			String title = Messages.SaveAllListener_StateChangedDialogTitle;
-			String message = NLS.bind(Messages.SaveAllListener_SingularMessage, node.name);
-			IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-			IWorkbenchPage page = window.getActivePage();
-			Shell parent = window.getShell();
-			MessageDialog msgDialog = new MessageDialog(parent, title, null, message,
-					MessageDialog.QUESTION, new String[] { Messages.SaveAllListener_Merge,
-					Messages.SaveAllListener_SaveAnyway, Messages.SaveAllListener_Cancel }, 0);
-			int index = msgDialog.open();
-			if (index == 0) { // Merge
-				LocalTypedElement local = new LocalTypedElement(node);
-				RemoteTypedElement remote = new RemoteTypedElement(node);
-				MergeEditorInput mergeInput = new MergeEditorInput(local, remote, page);
-				CompareUI.openCompareDialog(mergeInput);
-			} else if (index == 1) { // Save anyway
-				CacheManager.getInstance().upload(conflicts.toArray(new FSTreeNode[conflicts.size()]));
+			else {
+				FSModel.getInstance().fireNodeStateChanged(null);
 			}
 		}
 	}

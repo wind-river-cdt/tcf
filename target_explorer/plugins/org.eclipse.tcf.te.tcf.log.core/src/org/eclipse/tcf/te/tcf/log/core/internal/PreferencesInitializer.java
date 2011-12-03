@@ -40,6 +40,8 @@ public class PreferencesInitializer extends AbstractPreferenceInitializer {
 			prefs.putBoolean(IPreferenceKeys.PREF_LOGGING_ENABLED, true);
 			// [Hidden] Heat beat events: default off
 			prefs.putBoolean(IPreferenceKeys.PREF_SHOW_HEARTBEATS, false);
+			// [Hidden] Framework events: default off
+			prefs.putBoolean(IPreferenceKeys.PREF_SHOW_FRAMEWORK_EVENTS, false);
 			// [Hidden] Maximum log file size in bytes: default 5M
 			prefs.put(IPreferenceKeys.PREF_MAX_FILE_SIZE, "5M"); //$NON-NLS-1$
 			// [Hidden] Maximum number of log files in cycle: default 5

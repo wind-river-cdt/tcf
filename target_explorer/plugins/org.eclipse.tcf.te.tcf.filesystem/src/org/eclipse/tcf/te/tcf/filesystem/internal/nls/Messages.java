@@ -115,6 +115,9 @@ public class Messages extends NLS {
 	public static String CmmitHandler_StateChangedDialogTitle;
 	public static String CmmitHandler_StateChangedMessage;
 
+	public static String FolderValidator_DirNotExist;
+	public static String FolderValidator_NotWritable;
+	public static String FolderValidator_SpecifyFolder;
 	public static String FSDelete_ButtonCancel;
 	public static String FSDelete_ButtonNo;
 	public static String FSDelete_ButtonYes;
@@ -206,6 +209,7 @@ public class Messages extends NLS {
 	public static String FSOperation_ConfirmFolderReplaceMessage;
 	public static String FSOperation_ConfirmFolderReplaceTitle;
 	public static String FSOperation_NoFileSystemError;
+	public static String FSOperation_NotResponding;
 	public static String FSOperation_CannotOpenDir;
 	public static String FSOperation_CannotReadDir;
 	public static String FSOperation_TimedOutWhenOpening;
@@ -255,6 +259,9 @@ public class Messages extends NLS {
 	public static String TargetExplorerPreferencePage_CopyOwnershipText;
 	public static String TargetExplorerPreferencePage_CopyPermissionText;
 	public static String TargetExplorerPreferencePage_RenamingOptionText;
+	public static String TargetSelectionPage_Description;
+	public static String TargetSelectionPage_Targets;
+	public static String TargetSelectionPage_Title;
 	public static String TcfInputStream_CloseTimeout;
 	public static String TcfInputStream_NoDataAvailable;
 	public static String TcfInputStream_NoFileReturned;
@@ -293,6 +300,7 @@ public class Messages extends NLS {
 	public static String MergeEditorInput_LocalFile;
 	public static String MergeEditorInput_RemoteFile;
 	public static String MergeInput_CopyNotSupported;
+	public static String NameValidator_SpecifyFolder;
 	public static String NewFileWizard_NewFileWizardTitle;
 	public static String NewFileWizardPage_NewFileWizardPageDescription;
 	public static String NewFileWizardPage_NewFileWizardPageNameLabel;
@@ -300,5 +308,7 @@ public class Messages extends NLS {
 	public static String NewFolderWizard_NewFolderWizardTitle;
 	public static String NewFolderWizardPage_NewFolderWizardPageDescription;
 	public static String NewFolderWizardPage_NewFolderWizardPageNameLabel;
-	public static String NewFolderWizardPage_NewFolderWizardPageTitle;	
+	public static String NewFolderWizardPage_NewFolderWizardPageTitle;
+	public static String NewNodeWizardPage_LstatTimedout;
+	public static String NewNodeWizardPage_PromptFolderLabel;	
 }
