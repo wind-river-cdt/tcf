@@ -37,9 +37,9 @@ import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepExecutor;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroup;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroupIterator;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroupable;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepper;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IExtendedContextStep;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.tracing.ITraceIds;
 import org.eclipse.tcf.te.runtime.stepper.nls.Messages;
 import org.eclipse.tcf.te.runtime.utils.ProgressHelper;
@@ -48,7 +48,7 @@ import org.eclipse.tcf.te.runtime.utils.StatusHelper;
 /**
  * An abstract stepper implementation.
  */
-public abstract class AbstractContextStepper extends ExecutableExtension implements IStepper, IContextManipulator {
+public abstract class AbstractContextStepper extends ExecutableExtension implements IContextStepper, IContextManipulator {
 
 	private boolean initialized = false;
 	private boolean finished = false;
@@ -87,7 +87,7 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 	protected abstract String getName();
 
 	/**
-	 * Returns the contexts the stepper is working with.
+	 * Returns the contexts the stepper is associated with.
 	 *
 	 * @return An array of context objects or an empty list.
 	 */
@@ -120,7 +120,7 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 	protected abstract IContextStepGroup getStepGroup(String id);
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper#initialize(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepper#initialize(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
     public final void initialize(IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor) throws IllegalStateException {
@@ -176,7 +176,7 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper#isInitialized()
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepper#isInitialized()
 	 */
 	@Override
     public final boolean isInitialized() {
@@ -315,7 +315,7 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper#isFinished()
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepper#isFinished()
 	 */
 	@Override
     public final boolean isFinished() {
@@ -323,7 +323,7 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper#cleanup()
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepper#cleanup()
 	 */
 	@Override
     public void cleanup() {
@@ -355,7 +355,7 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper#execute()
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepper#execute()
 	 */
 	@Override
     public final void execute() throws CoreException {

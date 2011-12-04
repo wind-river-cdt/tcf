@@ -3,7 +3,7 @@
 <schema targetNamespace="org.eclipse.tcf.te.runtime.statushandler" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.eclipse.tcf.te.runtime.statushandler" id="handlers" name="Target Explorer Status Handler Extension Point"/>
+         <meta.schema plugin="org.eclipse.tcf.te.runtime.statushandler" id="handlers" name="Status Handler Extension Point"/>
       </appinfo>
       <documentation>
          This extension point is used to allow the contribution of new Target Explorer status handler.

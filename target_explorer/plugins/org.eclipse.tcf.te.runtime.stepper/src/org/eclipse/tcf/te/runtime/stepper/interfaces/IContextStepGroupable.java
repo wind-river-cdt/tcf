@@ -73,7 +73,7 @@ public interface IContextStepGroupable {
 	 * If one of the listed dependencies have not been executed before, the execution of the
 	 * groupable will fail.
 	 * <p>
-	 * The launch step or launch step group id might be fully qualified using the form
+	 * The step or step group id might be fully qualified using the form
 	 * <code>&quot;primaryId##secondaryId</code>. The <code>secondaryId</code> is optional.
 	 *
 	 * @return The list of dependencies or an empty list.

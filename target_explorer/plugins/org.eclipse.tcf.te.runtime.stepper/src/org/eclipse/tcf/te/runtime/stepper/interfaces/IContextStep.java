@@ -22,8 +22,8 @@ import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
  * finished, the passed in <b>callback must be invoked</b>. The parent launch
  * stepper suspend the step sequence execution till the callback is invoked.
  * <p>
- * Context steps signals the execution state to the parent launch stepper via
- * the <code>IStatus</code> object passed to the callback as first argument.
+ * Context steps signals the execution state to the parent stepper via the
+ * <code>IStatus</code> object passed to the callback as first argument.
  * The status object is mandatory and cannot be <code>null</code>. If the step
  * execution succeeds, an status with severity {@link IStatus#OK} is expected.
  */

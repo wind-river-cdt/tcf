@@ -21,9 +21,9 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.tcf.te.runtime.statushandler.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.runtime.extensions.AbstractExtensionPointManager;
 import org.eclipse.tcf.te.runtime.extensions.ExecutableExtensionProxy;
+import org.eclipse.tcf.te.runtime.statushandler.activator.CoreBundleActivator;
 
 
 /**
@@ -104,8 +104,7 @@ public class StatusHandlerBindingExtensionPointManager extends AbstractExtension
 		for (StatusHandlerBinding binding : getBindings()) {
 			Expression enablement = binding.getEnablement();
 
-			// The page binding is applicable by default if no expression
-			// is specified.
+			// The binding is applicable by default if no expression is specified.
 			boolean isApplicable = enablement == null;
 
 			if (enablement != null) {
@@ -121,13 +120,12 @@ public class StatusHandlerBindingExtensionPointManager extends AbstractExtension
 						Platform.getLog(CoreBundleActivator.getContext().getBundle()).log(status);
 					}
 				} else {
-					// The enablement is false by definition if no
-					// handler context is not given.
+					// The enablement is false by definition if no handler context is given.
 					isApplicable = false;
 				}
 			}
 
-			// Add the page if applicable
+			// Add the binding if applicable
 			if (isApplicable) applicable.add(binding);
 		}
 

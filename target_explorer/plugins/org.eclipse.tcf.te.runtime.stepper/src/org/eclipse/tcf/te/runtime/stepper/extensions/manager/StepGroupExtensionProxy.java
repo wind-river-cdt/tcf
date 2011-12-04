@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.runtime.stepper.internal.extensions;
+package org.eclipse.tcf.te.runtime.stepper.extensions.manager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,15 +16,15 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.tcf.te.runtime.extensions.ExecutableExtensionProxy;
 import org.eclipse.tcf.te.runtime.stepper.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.runtime.stepper.extensions.ContextStepGroup;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroup;
-import org.eclipse.tcf.te.runtime.extensions.ExecutableExtensionProxy;
 
 /**
  * Step group extension proxy implementation.
  */
-public class StepGroupExtensionProxy extends ExecutableExtensionProxy<IContextStepGroup> {
+public final class StepGroupExtensionProxy extends ExecutableExtensionProxy<IContextStepGroup> {
 	private List<IConfigurationElement> groupExtensions = new ArrayList<IConfigurationElement>();
 
 	/**

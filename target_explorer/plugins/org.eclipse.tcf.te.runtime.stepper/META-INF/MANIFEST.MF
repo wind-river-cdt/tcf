@@ -15,7 +15,8 @@ Bundle-Localization: plugin
 Export-Package: org.eclipse.tcf.te.runtime.stepper,
  org.eclipse.tcf.te.runtime.stepper.activator;x-internal:=true,
  org.eclipse.tcf.te.runtime.stepper.extensions,
+ org.eclipse.tcf.te.runtime.stepper.extensions.manager,
  org.eclipse.tcf.te.runtime.stepper.interfaces,
  org.eclipse.tcf.te.runtime.stepper.interfaces.tracing,
- org.eclipse.tcf.te.runtime.stepper.internal.extensions;x-internal:=true,
- org.eclipse.tcf.te.runtime.stepper.nls;x-internal:=true
+ org.eclipse.tcf.te.runtime.stepper.nls;x-internal:=true,
+ org.eclipse.tcf.te.runtime.stepper.stepper

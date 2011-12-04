@@ -7,21 +7,21 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.runtime.stepper.internal.extensions;
+package org.eclipse.tcf.te.runtime.stepper.extensions.manager;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper;
 import org.eclipse.tcf.te.runtime.extensions.AbstractExtensionPointManager;
 import org.eclipse.tcf.te.runtime.extensions.ExecutableExtensionProxy;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepper;
 
 /**
  * Stepper extension point manager implementation.
  */
-public class StepperExtensionPointManager extends AbstractExtensionPointManager<IStepper> {
+public final class StepperExtensionPointManager extends AbstractExtensionPointManager<IContextStepper> {
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.runtime.extensions.AbstractExtensionPointManager#getExtensionPointId()
@@ -47,17 +47,17 @@ public class StepperExtensionPointManager extends AbstractExtensionPointManager<
 	 *
 	 * @return The list of contributed stepper, or an empty array.
 	 */
-	public IStepper[] getStepper(boolean unique) {
-		List<IStepper> contributions = new ArrayList<IStepper>();
-		Collection<ExecutableExtensionProxy<IStepper>> delegates = getExtensions().values();
-		for (ExecutableExtensionProxy<IStepper> delegate : delegates) {
-			IStepper instance = unique ? delegate.newInstance() : delegate.getInstance();
+	public IContextStepper[] getStepper(boolean unique) {
+		List<IContextStepper> contributions = new ArrayList<IContextStepper>();
+		Collection<ExecutableExtensionProxy<IContextStepper>> delegates = getExtensions().values();
+		for (ExecutableExtensionProxy<IContextStepper> delegate : delegates) {
+			IContextStepper instance = unique ? delegate.newInstance() : delegate.getInstance();
 			if (instance != null && !contributions.contains(instance)) {
 				contributions.add(instance);
 			}
 		}
 
-		return contributions.toArray(new IStepper[contributions.size()]);
+		return contributions.toArray(new IContextStepper[contributions.size()]);
 	}
 
 	/**
@@ -69,11 +69,11 @@ public class StepperExtensionPointManager extends AbstractExtensionPointManager<
 	 *
 	 * @return The stepper instance or <code>null</code>.
 	 */
-	public IStepper getStepper(String id, boolean unique) {
+	public IContextStepper getStepper(String id, boolean unique) {
 		Assert.isNotNull(id);
-		IStepper contribution = null;
+		IContextStepper contribution = null;
 		if (getExtensions().containsKey(id)) {
-			ExecutableExtensionProxy<IStepper> proxy = getExtensions().get(id);
+			ExecutableExtensionProxy<IContextStepper> proxy = getExtensions().get(id);
 			// Get the extension instance
 			contribution = unique ? proxy.newInstance() : proxy.getInstance();
 		}

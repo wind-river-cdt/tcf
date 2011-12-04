@@ -19,8 +19,8 @@ import org.eclipse.tcf.te.runtime.stepper.interfaces.IContext;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStep;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepExecutor;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroup;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepperProperties;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepperProperties;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.tracing.ITraceIds;
 
 /**
@@ -31,7 +31,7 @@ import org.eclipse.tcf.te.runtime.stepper.interfaces.tracing.ITraceIds;
  * <li>The step group to execute needs to be passed to the stepper via the properties container
  * given by the {@link #onInitialize(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId, org.eclipse.core.runtime.IProgressMonitor)}
  * call.</li>
- * <li>The stepper executes single launch steps through {@link DefaultStepExecutor}.
+ * <li>The stepper executes single steps through {@link DefaultStepExecutor}.
  * <li>The stepper stops the step group execution if the progress monitor is set to canceled
  * or a status with severity {@link IStatus#CANCEL} is thrown by a single step.
  * <li>The stepper stops the step group execution on first error.</li>
@@ -61,7 +61,7 @@ public class SingleContextStepper extends AbstractContextStepper {
 	 */
 	@Override
 	protected String getName() {
-		return getData() != null ? getData().getStringProperty(IStepperProperties.PROP_NAME) : null;
+		return getData() != null ? getData().getStringProperty(IContextStepperProperties.PROP_NAME) : null;
 	}
 
 	/* (non-Javadoc)
@@ -69,7 +69,7 @@ public class SingleContextStepper extends AbstractContextStepper {
 	 */
 	@Override
 	protected IContext[] getContexts() {
-	    return getData() != null && getData().getProperty(IStepperProperties.PROP_CONTEXTS) != null ? (IContext[])getData().getProperty(IStepperProperties.PROP_CONTEXTS) : new IContext[0];
+	    return getData() != null && getData().getProperty(IContextStepperProperties.PROP_CONTEXTS) != null ? (IContext[])getData().getProperty(IContextStepperProperties.PROP_CONTEXTS) : new IContext[0];
 	}
 
 	/* (non-Javadoc)
@@ -77,7 +77,7 @@ public class SingleContextStepper extends AbstractContextStepper {
 	 */
 	@Override
 	protected String getStepGroupId() {
-		return getData() != null ? getData().getStringProperty(IStepperProperties.PROP_STEP_GROUP_ID) : null;
+		return getData() != null ? getData().getStringProperty(IContextStepperProperties.PROP_STEP_GROUP_ID) : null;
 	}
 
 	/* (non-Javadoc)

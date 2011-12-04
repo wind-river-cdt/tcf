@@ -13,10 +13,10 @@ package org.eclipse.tcf.te.runtime.stepper.interfaces;
  * Common stepper configuration property definitions.
  * <p>
  * Stepper are configured by setting properties within the properties container passed to the stepper via the
- * {@link IStepper#initialize(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, IFullQualifiedId, org.eclipse.core.runtime.IProgressMonitor)}
+ * {@link IContextStepper#initialize(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, IFullQualifiedId, org.eclipse.core.runtime.IProgressMonitor)}
  * call.
  */
-public interface IStepperProperties {
+public interface IContextStepperProperties {
 
 	/**
 	 * The id of the step group to execute by the stepper.

@@ -3,7 +3,7 @@
 <schema targetNamespace="org.eclipse.tcf.te.runtime.stepper" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.eclipse.tcf.te.runtime.stepper" id="stepGroups" name="Step Groups"/>
+         <meta.schema plugin="org.eclipse.tcf.te.runtime.stepper" id="stepGroups" name="Step Groups Extension Point"/>
       </appinfo>
       <documentation>
          This extension point is used to contribute step groups.
@@ -191,7 +191,7 @@ The step group iterator implementation class can be specified either by the iter
       <complexType>
          <sequence>
             <element ref="requires" minOccurs="0" maxOccurs="unbounded"/>
-            <element ref="enablement"/>
+            <element ref="enablement" minOccurs="0" maxOccurs="1"/>
          </sequence>
          <attribute name="id" type="string" use="required">
             <annotation>

@@ -7,21 +7,24 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.runtime.stepper.internal.extensions;
+package org.eclipse.tcf.te.runtime.stepper.extensions.manager;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroup;
 import org.eclipse.tcf.te.runtime.extensions.AbstractExtensionPointManager;
 import org.eclipse.tcf.te.runtime.extensions.ExecutableExtensionProxy;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroup;
 
 /**
  * Step group extension manager implementation.
  */
-public class StepGroupExtensionPointManager extends AbstractExtensionPointManager<IContextStepGroup> {
+public final class StepGroupExtensionPointManager extends AbstractExtensionPointManager<IContextStepGroup> {
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.runtime.extensions.AbstractExtensionPointManager#getExtensionPointId()
@@ -45,6 +48,27 @@ public class StepGroupExtensionPointManager extends AbstractExtensionPointManage
 	@Override
 	protected ExecutableExtensionProxy<IContextStepGroup> doCreateExtensionProxy(IConfigurationElement element) throws CoreException {
 		return new StepGroupExtensionProxy(element);
+	}
+
+	/**
+	 * Returns the list of all contributed step groups.
+	 *
+	 * @param unique If <code>true</code>, the method returns new instances for each
+	 *               contributed step group.
+	 *
+	 * @return The list of contributed step groups, or an empty array.
+	 */
+	public IContextStepGroup[] getStepGroups(boolean unique) {
+		List<IContextStepGroup> contributions = new ArrayList<IContextStepGroup>();
+		Collection<ExecutableExtensionProxy<IContextStepGroup>> delegates = getExtensions().values();
+		for (ExecutableExtensionProxy<IContextStepGroup> delegate : delegates) {
+			IContextStepGroup instance = unique ? delegate.newInstance() : delegate.getInstance();
+			if (instance != null && !contributions.contains(instance)) {
+				contributions.add(instance);
+			}
+		}
+
+		return contributions.toArray(new IContextStepGroup[contributions.size()]);
 	}
 
 	/**

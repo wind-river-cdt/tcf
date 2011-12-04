@@ -14,8 +14,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroupable;
 import org.eclipse.tcf.te.runtime.interfaces.extensions.IExecutableExtension;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroupable;
 
 /**
  * Context step groupable implementation.
@@ -158,7 +158,7 @@ public class ContextStepGroupable implements IContextStepGroupable {
 	}
 
 	/**
-	 * Sets if or if not the launch step is a singleton. Singleton steps can occur in step groups
+	 * Sets if or if not the step is a singleton. Singleton steps can occur in step groups
 	 * only once. Multiple occurrences are forbidden.
 	 *
 	 * @param singleton Specify <code>true</code> if the step is a singleton, <code>false</code> otherwise.

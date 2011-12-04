@@ -3,7 +3,7 @@
 <schema targetNamespace="org.eclipse.tcf.te.runtime.stepper" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.eclipse.tcf.te.runtime.stepper" id="steps" name="Steps"/>
+         <meta.schema plugin="org.eclipse.tcf.te.runtime.stepper" id="steps" name="Steps Extension Point"/>
       </appinfo>
       <documentation>
          This extension point is used to contribute steps.

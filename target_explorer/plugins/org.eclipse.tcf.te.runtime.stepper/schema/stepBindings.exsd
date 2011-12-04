@@ -1,14 +1,14 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.eclipse.tcf.te.runtime.statushandler" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="org.eclipse.tcf.te.runtime.stepper" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.eclipse.tcf.te.runtime.statushandler" id="bindings" name="Status Handler Bindings Extension Point"/>
+         <meta.schema plugin="org.eclipse.tcf.te.runtime.stepper" id="stepBindings" name="Step Bindings Extension Point"/>
       </appinfo>
       <documentation>
-         This extension point is used to declare the Target Explorer status handler bindings.
+         This extension point is used to declare step bindings.
 &lt;p&gt;
-&lt;b&gt;Note:&lt;/b&gt; For the enablement expression evaluation, note that only the default variable is set and it is non-iterable. The default variable is set to the handler context, which is typically the object calling the status handler.
+&lt;b&gt;Note:&lt;/b&gt; For the enablement expression evaluation, the default variable is the same as &quot;activeContexts&quot;, and the variable is iterable. The variable is set to the list of contexts the executing stepper is associated with.
       </documentation>
    </annotation>
 
@@ -54,7 +54,7 @@
    <element name="binding">
       <annotation>
          <documentation>
-            Declares a Target Explorer status handler binding.
+            Declares a step binding.
          </documentation>
       </annotation>
       <complexType>
@@ -64,17 +64,17 @@
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  The unique id of the status handler binding contribution.
+                  The unique id of the step binding contribution.
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="handlerId" type="string" use="required">
+         <attribute name="stepId" type="string" use="required">
             <annotation>
                <documentation>
-                  The unique id of the referenced status handler.
+                  The unique id of the referenced step.
                </documentation>
                <appinfo>
-                  <meta.attribute kind="identifier" basedOn="org.eclipse.tcf.te.runtime.statushandler.handlers/handler/@id"/>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.tcf.te.runtime.stepper.steps/step/@id"/>
                </appinfo>
             </annotation>
          </attribute>
@@ -96,10 +96,10 @@
       </appinfo>
       <documentation>
          &lt;pre&gt;
-   &lt;extension point=&quot;org.eclipse.tcf.te.runtime.statushandler.bindings&quot;&gt;
+   &lt;extension point=&quot;org.eclipse.tcf.te.runtime.stepper.stepBindings&quot;&gt;
       &lt;binding
-            id=&quot;org.eclipse.tcf.te.ui.statushandler.binding.NotificationPopupStatusHandler&quot;
-            handlerId=&quot;org.eclipse.tcf.te.ui.statushandler.NotificationPopupStatusHandler&quot;&gt;
+            id=&quot;org.eclipse.tcf.te.ui.stepper.step.binding.OpenChannelStep&quot;
+            stepId=&quot;org.eclipse.tcf.te.ui.stepper.step.OpenChannelStep&quot;&gt;
          &lt;enablement&gt;
             ...
          &lt;/enablement&gt;

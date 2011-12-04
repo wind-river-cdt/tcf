@@ -52,6 +52,7 @@
             </parameter>
          </class>
       </step>
+
       <step
             class="org.eclipse.tcf.te.tests.stepper.TestStep"
             id="org.eclipse.tcf.te.tests.stepper.step3"
@@ -60,6 +61,7 @@
             Just another test step
          </description>
       </step>
+
       <step
             class="org.eclipse.tcf.te.tests.stepper.TestStep"
             id="org.eclipse.tcf.te.tests.stepper.step4"
@@ -68,7 +70,119 @@
                id="org.eclipse.tcf.te.tests.stepper.step1">
          </requires>
       </step>
+
+      <step
+            class="org.eclipse.tcf.te.tests.stepper.TestStep"
+            id="org.eclipse.tcf.te.tests.stepper.step5"
+            label="Test Step 5">
+      </step>
    </extension>
 
+   <extension point="org.eclipse.tcf.te.runtime.stepper.stepBindings">
+      <binding
+            id="org.eclipse.tcf.te.tests.stepper.steps.binding1"
+            stepId="org.eclipse.tcf.te.tests.stepper.step5">
+            <enablement>
+               <with variable="activeContexts">
+                  <count value="1"/>
+               </with>
+            </enablement>
+      </binding>
+   </extension>
 
+   <extension point="org.eclipse.tcf.te.runtime.stepper.stepGroups">
+      <stepGroup
+            id="org.eclipse.tcf.te.tests.stepper.stepGroup1"
+            label="Test Step Group 1"
+            locked="false">
+      </stepGroup>
+
+      <stepGroup
+            id="org.eclipse.tcf.te.tests.stepper.stepGroup2"
+            label="Test Step Group 2"
+            locked="true">
+         <description>
+            Just a step group description
+         </description>
+      </stepGroup>
+
+      <stepGroup
+            id="org.eclipse.tcf.te.tests.stepper.stepGroup3"
+            label="Test Step Group 3"
+            locked="false">
+         <references>
+            <reference
+                  disable="false"
+                  hidden="false"
+                  id="org.eclipse.tcf.te.tests.stepper.step1"
+                  removable="true"
+                  singleton="true">
+            </reference>
+            <reference
+                  disable="false"
+                  hidden="false"
+                  id="org.eclipse.tcf.te.tests.stepper.step2"
+                  removable="true"
+                  singleton="true">
+            </reference>
+            <reference
+                  disable="false"
+                  hidden="false"
+                  id="org.eclipse.tcf.te.tests.stepper.step3"
+                  removable="true"
+                  singleton="true">
+            </reference>
+            <reference
+                  disable="false"
+                  hidden="false"
+                  id="org.eclipse.tcf.te.tests.stepper.step4"
+                  removable="true"
+                  singleton="true">
+            </reference>
+         </references>
+      </stepGroup>
+
+      <stepGroup
+            id="org.eclipse.tcf.te.tests.stepper.stepGroup4"
+            label="Test Step Group 4"
+            locked="false">
+         <references>
+            <reference
+                  disable="false"
+                  hidden="false"
+                  id="org.eclipse.tcf.te.tests.stepper.step1"
+                  removable="true"
+                  singleton="true">
+            </reference>
+            <reference
+                  disable="false"
+                  hidden="false"
+                  id="org.eclipse.tcf.te.tests.stepper.step2"
+                  removable="true"
+                  singleton="true">
+            </reference>
+            <reference
+                  disable="false"
+                  hidden="false"
+                  id="org.eclipse.tcf.te.tests.stepper.step3"
+                  removable="true"
+                  singleton="true">
+            </reference>
+            <reference
+                  disable="false"
+                  hidden="false"
+                  id="org.eclipse.tcf.te.tests.stepper.step4"
+                  removable="true"
+                  singleton="true">
+            </reference>
+            <reference
+                  disable="false"
+                  hidden="false"
+                  id="org.eclipse.tcf.te.tests.stepper.step5"
+                  removable="true"
+                  singleton="true">
+            </reference>
+         </references>
+      </stepGroup>
+   </extension>
 </plugin>

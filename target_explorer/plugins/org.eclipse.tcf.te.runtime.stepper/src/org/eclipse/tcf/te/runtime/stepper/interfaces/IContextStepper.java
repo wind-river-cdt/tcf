@@ -20,15 +20,14 @@ import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 /**
  * A stepper.
  * <p>
- * Stepper are executing a set of steps and/or step groups read from a given type for the current
- * sub type. The stepper is responsible for handling any exceptions which occurred during step
- * execution.
+ * Stepper are executing a set of steps and/or step groups for the given context(s). The stepper is
+ * responsible for handling any exceptions which occurred during step execution.
  * <p>
- * Stepper are synchronous where steps are asynchronous.
+ * <b>Note:</b> Stepper are synchronous where steps are asynchronous.
  * <p>
  * Stepper must run in worker threads.
  */
-public interface IStepper extends IExecutableExtension {
+public interface IContextStepper extends IExecutableExtension {
 
 	public static final String ID_TYPE_STEPPER_ID = "Stepper"; //$NON-NLS-1$
 	public static final String ID_TYPE_CONTEXT_ID = "Context"; //$NON-NLS-1$
@@ -40,14 +39,14 @@ public interface IStepper extends IExecutableExtension {
 	 * Condition Tester to test for finished execution of the associated stepper.
 	 */
 	public static class ExecutionFinishedConditionTester implements IConditionTester {
-		private final IStepper stepper;
+		private final IContextStepper stepper;
 
 		/**
 		 * Constructor.
 		 *
 		 * @param stepper The stepper. Must not be <code>null</code>.
 		 */
-		public ExecutionFinishedConditionTester(IStepper stepper) {
+		public ExecutionFinishedConditionTester(IContextStepper stepper) {
 			Assert.isNotNull(stepper);
 			this.stepper = stepper;
 		}

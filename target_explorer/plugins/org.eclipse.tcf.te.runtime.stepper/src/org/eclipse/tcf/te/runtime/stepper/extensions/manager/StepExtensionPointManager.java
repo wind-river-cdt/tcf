@@ -7,21 +7,21 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.runtime.stepper.internal.extensions;
+package org.eclipse.tcf.te.runtime.stepper.extensions.manager;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStep;
 import org.eclipse.tcf.te.runtime.extensions.AbstractExtensionPointManager;
 import org.eclipse.tcf.te.runtime.extensions.ExecutableExtensionProxy;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStep;
 
 /**
  * Step extension point manager implementation.
  */
-public class StepExtensionPointManager extends AbstractExtensionPointManager<IContextStep> {
+public final class StepExtensionPointManager extends AbstractExtensionPointManager<IContextStep> {
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.runtime.extensions.AbstractExtensionPointManager#getExtensionPointId()

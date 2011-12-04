@@ -58,6 +58,7 @@ public class ContextStepGroup extends AbstractContextStepGroup {
 		private boolean singleton;
 		private final List<String> dependencies = new ArrayList<String>();
 
+
 		/**
 		 * Returns the id of the referenced step or step group.
 		 *
@@ -590,7 +591,7 @@ public class ContextStepGroup extends AbstractContextStepGroup {
 					));
 			}
 
-			// Check if the step is valid for the current launch configuration type and mode.
+			// Check if the step is valid for the current contexts.
 			if (candidate instanceof IContextStep) {
 				boolean valid = isValidStep(candidate.getId(), contexts);
 
@@ -801,18 +802,16 @@ public class ContextStepGroup extends AbstractContextStepGroup {
 	}
 
 	/**
-	 * Returns if or if not the step identified by the given id is valid.
-	 * <p>
-	 * <b>Note:</b> The default implementation returns always <code>true</code>.
+	 * Returns if or if not the step identified by the given id is valid for
+	 * the given contexts.
 	 *
 	 * @param id The step id. Must not be <code>null</code>.
-	 * @param contexts The array of context objects. Must be not <code>null</code>.
+	 * @param contexts The array of context objects or <code>null</code>.
 	 *
 	 * @return <code>True</code> if the step is valid, <code>false</code> otherwise.
 	 */
 	protected boolean isValidStep(String id, IContext[] contexts) {
 		Assert.isNotNull(id);
-		Assert.isNotNull(contexts);
-		return true;
+		return StepperManager.getInstance().getStepBindingsExtManager().isStepEnabled(id, contexts);
 	}
 }
