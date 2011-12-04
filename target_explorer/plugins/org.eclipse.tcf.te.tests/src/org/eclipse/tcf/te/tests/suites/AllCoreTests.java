@@ -13,6 +13,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.eclipse.tcf.te.tests.statushandler.StatusHandlerTestCase;
+import org.eclipse.tcf.te.tests.stepper.StepperTestCase;
 
 /**
  * All core test suites.
@@ -41,6 +42,7 @@ public class AllCoreTests {
 		TestSuite suite = new TestSuite("All Target Explorer Core Tests"); //$NON-NLS-1$
 
 		suite.addTest(StatusHandlerTestCase.getTestSuite());
+		suite.addTest(StepperTestCase.getTestSuite());
 
 		return suite;
 	}

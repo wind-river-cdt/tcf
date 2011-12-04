@@ -32,4 +32,43 @@
             </enablement>
       </binding>
    </extension>
+   
+<!-- Test stepper engine contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.stepper.steps">
+      <step
+            class="org.eclipse.tcf.te.tests.stepper.TestStep"
+            id="org.eclipse.tcf.te.tests.stepper.step1"
+            label="Test Step 1">
+      </step>
+      
+      <step
+            id="org.eclipse.tcf.te.tests.stepper.step2"
+            label="Test Step 2">
+         <class
+               class="org.eclipse.tcf.te.tests.stepper.ParameterizedTestStep">
+            <parameter
+                  name="param1"
+                  value="value1">
+            </parameter>
+         </class>
+      </step>
+      <step
+            class="org.eclipse.tcf.te.tests.stepper.TestStep"
+            id="org.eclipse.tcf.te.tests.stepper.step3"
+            label="Test Step 3">
+         <description>
+            Just another test step
+         </description>
+      </step>
+      <step
+            class="org.eclipse.tcf.te.tests.stepper.TestStep"
+            id="org.eclipse.tcf.te.tests.stepper.step4"
+            label="Test Step 4">
+         <requires
+               id="org.eclipse.tcf.te.tests.stepper.step1">
+         </requires>
+      </step>
+   </extension>
+
+
 </plugin>

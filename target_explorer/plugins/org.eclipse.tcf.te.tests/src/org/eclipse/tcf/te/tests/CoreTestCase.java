@@ -267,7 +267,7 @@ public class CoreTestCase extends TestCase {
 	 * @param startTime The start time in milliseconds.
 	 */
 	protected void printEnd(String name, long startTime) {
-		Assert.isNotNull(null);
+		Assert.isNotNull(name);
 		long endTime = System.currentTimeMillis();
 		long duration = endTime - startTime;
 		System.out.println("=== " + name + " finished at: " + DATE_FORMAT.format(new Date(endTime)) + " (duration: " + duration + " ms)"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
