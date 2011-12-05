@@ -182,4 +182,13 @@ public abstract class FSCreate extends FSOperation {
 	 * @throws TCFFileSystemException Thrown when creating the node.
 	 */
 	protected abstract void create(IFileSystem service) throws TCFFileSystemException;
+	
+	/**
+	 * Get the node that is created by this operation.
+	 * 
+	 * @return the node created.
+	 */
+	public FSTreeNode getNode() {
+		return node;
+	}
 }

@@ -46,13 +46,13 @@ public class NameValidator extends Validator {
 	 */
 	@Override
 	public boolean isValid(String newText) {
-		if (newText == null || newText.trim().length() == 0) {
-			setMessage(Messages.FSRenamingAssistant_SpecifyNonEmptyName, IMessageProvider.ERROR);
-			return false;
-		}
 		FSTreeNode folder = wizard.getInputDir();
 		if(folder == null) {
-			setMessage(Messages.NameValidator_SpecifyFolder, IMessageProvider.ERROR);
+			setMessage(Messages.NameValidator_SpecifyFolder, IMessageProvider.INFORMATION);
+			return false;
+		}
+		if (newText == null || newText.trim().length() == 0) {
+			setMessage(Messages.FSRenamingAssistant_SpecifyNonEmptyName, IMessageProvider.ERROR);
 			return false;
 		}
 		String text = newText.toString().trim();

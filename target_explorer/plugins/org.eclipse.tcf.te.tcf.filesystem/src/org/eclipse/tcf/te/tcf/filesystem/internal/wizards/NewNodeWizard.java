@@ -10,7 +10,11 @@
 package org.eclipse.tcf.te.tcf.filesystem.internal.wizards;
 
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSCreate;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
@@ -19,6 +23,10 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
 import org.eclipse.tcf.te.ui.wizards.AbstractWizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartSite;
+import org.eclipse.ui.IWorkbenchWindow;
 
 /**
  * The base wizard class to create a new file/folder in the file system of Target Explorer.
@@ -30,6 +38,8 @@ public abstract class NewNodeWizard extends AbstractWizard implements INewWizard
 	private IPeerModel peer;
 	// The wizard page used to create the new node.
 	private NewNodeWizardPage newPage;
+	// The workbench
+	private IWorkbench workbench;
 	/**
 	 * Create an instance.
 	 */
@@ -42,6 +52,7 @@ public abstract class NewNodeWizard extends AbstractWizard implements INewWizard
 	 */
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
+		this.workbench = workbench;
 		// Set the window title
 		setWindowTitle(getTitle());
 		if (!selection.isEmpty()) {
@@ -121,6 +132,27 @@ public abstract class NewNodeWizard extends AbstractWizard implements INewWizard
 				// The the error message generated during creation.
 				newPage.setMessage(create.getError(), IMessageProvider.ERROR);
 				return false;
+			}
+			// Select the new node created.
+			FSTreeNode node = create.getNode();
+			IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+			if (window != null) {
+				IWorkbenchPage page = window.getActivePage();
+				if (page != null) {
+					IWorkbenchPart part = page.getActivePart();
+					if (part != null) {
+						IWorkbenchPartSite site = part.getSite();
+						ISelectionProvider selProvider = site.getSelectionProvider();
+						ISelection selection = new StructuredSelection(node);
+						if (selProvider instanceof Viewer) {
+							// Select and make it visible.
+							((Viewer) selProvider).setSelection(selection, true);
+						}
+						else {
+							selProvider.setSelection(selection);
+						}
+					}
+				}
 			}
 		}
 		return true;

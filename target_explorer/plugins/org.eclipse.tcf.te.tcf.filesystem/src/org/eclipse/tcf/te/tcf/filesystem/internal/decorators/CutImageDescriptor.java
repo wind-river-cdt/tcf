@@ -11,15 +11,18 @@ package org.eclipse.tcf.te.tcf.filesystem.internal.decorators;
 
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
-import org.eclipse.tcf.te.tcf.filesystem.internal.ImageConsts;
 import org.eclipse.tcf.te.ui.jface.images.AbstractImageDescriptor;
 
 /**
  * Cut image descriptor implementation.
  */
 public class CutImageDescriptor extends AbstractImageDescriptor {
+	// The alpha data when highlight the base image.
+	private static final byte HIGHLIGHT_ALPHA = (byte)128;
 	// The key to store the cut mask image.
 	private static final String ID_FS_NODE_CUT_MASK = "FS_NODE_CUT_MASK@"; //$NON-NLS-1$
 	// The key to store the cut decoration image.
@@ -64,17 +67,57 @@ public class CutImageDescriptor extends AbstractImageDescriptor {
 	    String maskKey = ID_FS_NODE_CUT_MASK + baseImage.hashCode();
 		Image maskImage = UIPlugin.getImage(maskKey);
 		if (maskImage == null) {
-			Image cutImage = UIPlugin.getImage(ImageConsts.CUT_DECORATOR_IMAGE);
-			ImageData cutSrcData = cutImage.getImageData();
 			ImageData baseData = baseImage.getImageData();
+			PaletteData palette = new PaletteData(new RGB[]{new RGB(255, 255, 255), new RGB(0,0,0)});
+			ImageData imageData = new ImageData(baseData.width, baseData.height, 1, palette);
 			// Get the base image's transparency mask.
-			ImageData transparencyMask = baseData.getTransparencyMask();
-			// Mask the decorator image.
-			maskImage = new Image(baseImage.getDevice(), cutSrcData, transparencyMask);
+			ImageData mask = baseData.getTransparencyMask();
+			imageData.alphaData = createAlphaData(mask);
+			maskImage = new Image(baseImage.getDevice(), imageData);
 			UIPlugin.getDefault().getImageRegistry().put(maskKey, maskImage);
 		}
 	    return maskImage;
     }
+
+	/**
+	 * Create the alpha data that will be used in the mask image data.
+	 * 
+	 * @param mask The original transparency mask from the base image.
+	 * @return The alpha data.
+	 */
+	private byte[] createAlphaData(ImageData mask) {
+		int bi = getBlackIndex(mask);
+		byte[] alphaData = new byte[mask.width * mask.height];
+		int[] pixels = new int[mask.width];
+		int k = 0;
+		for (int i = 0; i < mask.height; i++) {
+			mask.getPixels(0, i, mask.width, pixels, 0);
+			for (int j = 0; j < pixels.length; j++) {
+				if (pixels[j] != bi) alphaData[k] = HIGHLIGHT_ALPHA;
+				k++;
+			}
+		}
+		return alphaData;
+	}
+
+    /**
+     * Get the black index from the palette of the mask data.
+     * 
+     * @param mask
+     * @return
+     */
+	private int getBlackIndex(ImageData mask) {
+		RGB[] rgbs = mask.getRGBs();
+		if (rgbs != null) {
+			for (int i = 0; i < rgbs.length; i++) {
+				RGB rgb = rgbs[i];
+				if (rgb.red == 0 && rgb.green == 0 && rgb.blue == 0) {
+					return i;
+				}
+			}
+		}
+		return 0;
+	}
 
 	/*
 	 * (non-Javadoc)

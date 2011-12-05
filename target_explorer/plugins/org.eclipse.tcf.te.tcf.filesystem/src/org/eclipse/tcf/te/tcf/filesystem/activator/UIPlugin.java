@@ -161,8 +161,6 @@ public class UIPlugin extends AbstractUIPlugin {
 		registry.put(ImageConsts.REPLACE_FOLDER_CONFIRM, ImageDescriptor.createFromURL(url));
 		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OBJ32 + "delete_readonly.png"); //$NON-NLS-1$
 		registry.put(ImageConsts.DELETE_READONLY_CONFIRM, ImageDescriptor.createFromURL(url));
-		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OVR + "ovr_cut.png"); //$NON-NLS-1$
-		registry.put(ImageConsts.CUT_DECORATOR_IMAGE, ImageDescriptor.createFromURL(url));
 		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OBJ32 + "banner.png"); //$NON-NLS-1$
 		registry.put(ImageConsts.BANNER_IMAGE, ImageDescriptor.createFromURL(url));
 		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OBJ + "error.gif"); //$NON-NLS-1$

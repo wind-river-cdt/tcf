@@ -132,7 +132,7 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 		Dialog.applyDialogFont(mainPanel);
 
 		// Validate the page for the first time
-		validatePage();
+		setPageComplete(false);
 	}
 
 	/**

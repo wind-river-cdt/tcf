@@ -71,11 +71,6 @@ public interface ImageConsts {
      */
     public static final String DELETE_READONLY_CONFIRM = "ConfirmReadOnlyDelete"; //$NON-NLS-1$
     
-    /**
-     * The key to access the cut decorator image.
-     */
-    public static final String CUT_DECORATOR_IMAGE = "CutDecorator";  //$NON-NLS-1$
-    
 	/** 
 	 * The key to access the banner image of the advanced attributes dialog.
 	 */
