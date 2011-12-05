@@ -416,10 +416,12 @@ public class TCFNodeRegister extends TCFNode implements IElementEditor, IWatchIn
             if (!s.startsWith("0")) s = "0" + s;
             break;
         case 16:
-            int l = data.length * 2 - s.length();
-            if (l < 0) l = 0;
-            if (l > 16) l = 16;
-            s = "0000000000000000".substring(0, l) + s;
+            if (s.length() < data.length * 2) {
+                StringBuffer bf = new StringBuffer();
+                while (bf.length() + s.length() < data.length * 2) bf.append('0');
+                bf.append(s);
+                s = bf.toString();
+            }
             break;
         }
         return s;
