@@ -14,23 +14,36 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.expressions.EvaluationContext;
+import org.eclipse.core.expressions.EvaluationResult;
+import org.eclipse.core.expressions.Expression;
+import org.eclipse.core.expressions.ExpressionConverter;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IBasicPropertyConstants;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.IWizardNode;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -39,6 +52,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.tcf.te.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.interfaces.IUIConstants;
 import org.eclipse.tcf.te.ui.nls.Messages;
+import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.activities.ITriggerPoint;
@@ -48,6 +62,7 @@ import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.internal.activities.ws.WorkbenchTriggerPoints;
 import org.eclipse.ui.internal.dialogs.WizardContentProvider;
 import org.eclipse.ui.internal.dialogs.WizardPatternFilter;
+import org.eclipse.ui.internal.dialogs.WorkbenchWizardElement;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.wizards.IWizardCategory;
 import org.eclipse.ui.wizards.IWizardDescriptor;
@@ -98,6 +113,47 @@ public class NewWizardSelectionPage extends WizardPage {
 		public boolean isSorterProperty(Object element, String property) {
 			// The comparator is affected if the label of the elements should change.
 			return property.equals(IBasicPropertyConstants.P_TEXT);
+		}
+	}
+
+	/**
+	 * Internal class. The wizard viewer filter is responsible for filtering
+	 * wizard contributions based on their enablement expression.
+	 */
+	/* default */ static class NewWizardViewerFilter extends ViewerFilter {
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.ViewerFilter#select(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+		 */
+		@Override
+		public boolean select(Viewer viewer, Object parentElement, Object element) {
+			if (element instanceof WorkbenchWizardElement) {
+				IConfigurationElement configElement = ((WorkbenchWizardElement)element).getConfigurationElement();
+				IConfigurationElement[] children = configElement.getChildren("enablement"); //$NON-NLS-1$
+				// Either 0 or 1 enablement child elements are allowed
+				if (children != null && children.length > 0) {
+					try {
+						Expression expression = ExpressionConverter.getDefault().perform(children[0]);
+						if (expression != null) {
+							ISelection selection = new StructuredSelection(element);
+							EvaluationContext evalContext = new EvaluationContext(null, selection);
+							evalContext.addVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME, selection);
+							if (!expression.evaluate(evalContext).equals(EvaluationResult.TRUE)) {
+								return false;
+							}
+						}
+					} catch (CoreException e) {
+						if (Platform.inDebugMode()) {
+							IStatus status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(),
+														NLS.bind(Messages.NewWizardViewerFilter_error_evaluationFailed, e.getLocalizedMessage()),
+														e);
+							UIPlugin.getDefault().getLog().log(status);
+						}
+					}
+				}
+
+			}
+		    return true;
 		}
 	}
 
@@ -159,6 +215,8 @@ public class NewWizardSelectionPage extends WizardPage {
 		treeViewer.setContentProvider(new WizardContentProvider());
 		treeViewer.setLabelProvider(WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider());
 		treeViewer.setComparator(new NewWizardViewerComparator());
+
+		treeViewer.addFilter(new NewWizardViewerFilter());
 
 		treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override

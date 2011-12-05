@@ -36,6 +36,8 @@ public class Messages extends NLS {
 	public static String NewWizardSelectionPage_wizards;
 	public static String NewWizardSelectionPage_createWizardFailed;
 
+	public static String NewWizardViewerFilter_error_evaluationFailed;
+
 	public static String NodePropertiesTableControl_section_title;
 	public static String NodePropertiesTableControl_section_title_noSelection;
 	public static String NodePropertiesTableControl_column_name_label;

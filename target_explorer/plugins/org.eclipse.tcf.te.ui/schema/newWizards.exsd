@@ -12,6 +12,8 @@ Target creation wizards may optionally specify a description subelement whose bo
       </documentation>
    </annotation>
 
+   <include schemaLocation="schema://org.eclipse.core.expressions/schema/expressionLanguage.exsd"/>
+
    <element name="extension">
       <annotation>
          <appinfo>
@@ -86,6 +88,7 @@ Target creation wizards may optionally specify a description subelement whose bo
       <complexType>
          <sequence>
             <element ref="description" minOccurs="0" maxOccurs="1"/>
+            <element ref="enablement" minOccurs="0" maxOccurs="1"/>
          </sequence>
          <attribute name="id" type="string" use="required">
             <annotation>
