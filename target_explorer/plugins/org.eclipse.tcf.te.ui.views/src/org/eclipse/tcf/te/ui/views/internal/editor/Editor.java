@@ -63,21 +63,21 @@ public class Editor extends FormEditor implements IPersistableEditor {
 						if (!"".equals(insertBefore)) { //$NON-NLS-1$
 							// If it is "first", we insert the page at index 0
 							if ("first".equalsIgnoreCase(insertBefore)) { //$NON-NLS-1$
-								addPage(0, page);
+								addPage(0, page, input);
 							} else {
 								// Find the index of the page we shall insert this page before
 								int index = getIndexOf(insertBefore);
-								if (index != -1) addPage(index, page);
-								else addPage(page);
+								if (index != -1) addPage(index, page, input);
+								else addPage(page, input);
 							}
 						} else if (!"".equals(insertAfter) && !"last".equalsIgnoreCase(insertAfter)) { //$NON-NLS-1$ //$NON-NLS-2$
 							// Find the index of the page we shall insert this page after
 							int index = getIndexOf(insertAfter);
-							if (index != -1 && index + 1 < pages.size()) addPage(index + 1, page);
-							else addPage(page);
+							if (index != -1 && index + 1 < pages.size()) addPage(index + 1, page, input);
+							else addPage(page, input);
 						} else {
 							// And add the page to the editor as last page.
-							addPage(page);
+							addPage(page, input);
 						}
 					} catch (PartInitException e) { /* ignored on purpose */ }
 				}
