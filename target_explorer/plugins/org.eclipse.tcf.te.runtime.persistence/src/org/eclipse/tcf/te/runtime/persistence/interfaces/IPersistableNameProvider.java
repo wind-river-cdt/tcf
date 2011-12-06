@@ -10,17 +10,19 @@
 package org.eclipse.tcf.te.runtime.persistence.interfaces;
 
 /**
- * Persistable node property constants.
+ * Interface to be implemented by persistable elements which requires a
+ * custom persistence store naming schema.
  */
-public interface IPersistableNodeProperties {
+public interface IPersistableNameProvider {
 
 	/**
-	 * The URI of the node in a persistence storage.
+	 * Returns the name to use to store the data object to the persistence storage.
 	 * <p>
-	 * This property can be used by persistable implementations to store the URI to remember from
-	 * where a node got restored or written to.
-	 * <p>
-	 * The property itself is a transient property.
+	 * <b>Note:</b> The name returned by this method is expected to be a valid name to the persistence
+	 *              storage provider. The name will be passed on as returned.
+	 *
+	 * @param data The data object. Must not be <code>null</code>.
+	 * @return The persistable name for the given data object or <code<null</code>.
 	 */
-	public static final String PROPERTY_URI = "URI.transient"; //$NON-NLS-1$
+	public String getName(Object data);
 }
