@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.decorators;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
@@ -22,7 +23,7 @@ import org.eclipse.tcf.te.ui.jface.images.AbstractImageDescriptor;
  */
 public class CutImageDescriptor extends AbstractImageDescriptor {
 	// The alpha data when highlight the base image.
-	private static final byte HIGHLIGHT_ALPHA = (byte)128;
+	private static final int HIGHLIGHT_ALPHA = 128;
 	// The key to store the cut mask image.
 	private static final String ID_FS_NODE_CUT_MASK = "FS_NODE_CUT_MASK@"; //$NON-NLS-1$
 	// The key to store the cut decoration image.
@@ -71,8 +72,7 @@ public class CutImageDescriptor extends AbstractImageDescriptor {
 			PaletteData palette = new PaletteData(new RGB[]{new RGB(255, 255, 255), new RGB(0,0,0)});
 			ImageData imageData = new ImageData(baseData.width, baseData.height, 1, palette);
 			// Get the base image's transparency mask.
-			ImageData mask = baseData.getTransparencyMask();
-			imageData.alphaData = createAlphaData(mask);
+			imageData.alphaData = createAlphaData();
 			maskImage = new Image(baseImage.getDevice(), imageData);
 			UIPlugin.getDefault().getImageRegistry().put(maskKey, maskImage);
 		}
@@ -82,19 +82,104 @@ public class CutImageDescriptor extends AbstractImageDescriptor {
 	/**
 	 * Create the alpha data that will be used in the mask image data.
 	 * 
-	 * @param mask The original transparency mask from the base image.
 	 * @return The alpha data.
 	 */
-	private byte[] createAlphaData(ImageData mask) {
-		int bi = getBlackIndex(mask);
-		byte[] alphaData = new byte[mask.width * mask.height];
-		int[] pixels = new int[mask.width];
-		int k = 0;
-		for (int i = 0; i < mask.height; i++) {
-			mask.getPixels(0, i, mask.width, pixels, 0);
-			for (int j = 0; j < pixels.length; j++) {
-				if (pixels[j] != bi) alphaData[k] = HIGHLIGHT_ALPHA;
-				k++;
+	private byte[] createAlphaData() {
+		ImageData imageData = baseImage.getImageData();
+		if (imageData.maskData != null) {
+			if (imageData.depth == 32) {
+				return maskAlpha32();
+			}
+			return maskAlpha();
+		}
+		return nonMaskAlpha();
+	}
+
+	/**
+	 * Create the alpha data for the base image that has no mask data.
+	 * 
+	 * @return The alpha data.
+	 */
+	private byte[] nonMaskAlpha() {
+		ImageData imageData = baseImage.getImageData();
+		Assert.isTrue(imageData.maskData == null);
+
+		byte[] alphaData = new byte[imageData.width * imageData.height];
+		int i = 0;
+		for (int y = 0; y < imageData.height; y++) {
+			for (int x = 0; x < imageData.width; x++) {
+				int pixel = imageData.getPixel(x, y);
+				int alpha = 255;
+				if (imageData.transparentPixel != -1 && imageData.transparentPixel == pixel) {
+					// If it has a transparent pixel and the current pixel is the transparent.
+					alpha = 0;
+				}
+				else if (imageData.alpha != -1) {
+					// If it has a global alpha value.
+					alpha = imageData.alpha;
+				}
+				else if (imageData.alphaData != null) {
+					// If it has alpha data.
+					alpha = imageData.getAlpha(x, y);
+				}
+				alphaData[i++] = (byte) (alpha * HIGHLIGHT_ALPHA / 255);
+			}
+		}
+		return alphaData;
+	}
+
+	/**
+	 * Create the alpha data for the base image that has mask data, and the color depth is not of
+	 * 32-bit.
+	 * 
+	 * @return The alpha data
+	 */
+	private byte[] maskAlpha() {
+		ImageData imageData = baseImage.getImageData();
+		Assert.isTrue(imageData.maskData != null && imageData.depth != 32);
+
+		ImageData mask = imageData.getTransparencyMask();
+		// Get the black index.
+		int blackIndex = getBlackIndex(mask);
+		byte[] alphaData = new byte[imageData.width * imageData.height];
+		int i = 0;
+		for (int y = 0; y < imageData.height; y++) {
+			for (int x = 0; x < imageData.width; x++) {
+				int alpha = mask.getPixel(x, y) == blackIndex ? 0 : 255;
+				alphaData[i++] = (byte) (alpha * HIGHLIGHT_ALPHA / 255);
+			}
+		}
+		return alphaData;
+	}
+
+	/**
+	 * Create the alpha data for the base image that has mask data and the color depth is of 32-bit.
+	 * 
+	 * @return The alpha data.
+	 */
+	private byte[] maskAlpha32() {
+		ImageData imageData = baseImage.getImageData();
+		Assert.isTrue(imageData.maskData != null && imageData.depth == 32);
+
+		ImageData mask = imageData.getTransparencyMask();
+		// Get the black index.
+		int blackIndex = getBlackIndex(mask);
+		// Calculate the alpha mask and the alpha shift.
+		int alphaMask = ~(imageData.palette.redMask | imageData.palette.greenMask | imageData.palette.blueMask);
+		int alphaShift = 0;
+		while (alphaMask != 0 && ((alphaMask >>> alphaShift) & 1) == 0)
+			alphaShift++;
+		byte[] alphaData = new byte[imageData.width * imageData.height];
+		int i = 0;
+		for (int y = 0; y < imageData.height; y++) {
+			for (int x = 0; x < imageData.width; x++) {
+				int pixel = imageData.getPixel(x, y);
+				int alpha = (pixel & alphaMask) >>> alphaShift;
+				if (alpha <= 0 || alpha > 255) {
+					// If the alpha value is illegal, try to get it from the mask data.
+					alpha = mask.getPixel(x, y) == blackIndex ? 0 : 255;
+				}
+				alphaData[i++] = (byte) (alpha * HIGHLIGHT_ALPHA / 255);
 			}
 		}
 		return alphaData;
