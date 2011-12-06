@@ -31,6 +31,8 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
@@ -56,7 +58,7 @@ import org.eclipse.ui.part.MultiPageSelectionProvider;
 /**
  * File system browser control.
  */
-public class FSTreeControl extends AbstractTreeControl implements ISelectionChangedListener, IDoubleClickListener {
+public class FSTreeControl extends AbstractTreeControl implements ISelectionChangedListener, IDoubleClickListener, FocusListener {
 
 	/**
 	 * Constructor.
@@ -107,6 +109,7 @@ public class FSTreeControl extends AbstractTreeControl implements ISelectionChan
 			column.setWidth(200);
 		}
 		tree.setHeaderVisible(hasColumns());
+		tree.addFocusListener(this);
 		viewer.addDoubleClickListener(this);
 		//Add DnD support.
 	    int operations = DND.DROP_COPY | DND.DROP_MOVE | DND.DROP_LINK;
@@ -233,4 +236,27 @@ public class FSTreeControl extends AbstractTreeControl implements ISelectionChan
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.swt.events.FocusListener#focusGained(org.eclipse.swt.events.FocusEvent)
+	 */
+	@Override
+    public void focusGained(FocusEvent e) {
+		IWorkbenchPart parent = getParentPart();
+		if (parent != null) {
+			IWorkbenchPartSite site = parent.getSite();
+			if (site != null) {
+				ISelectionProvider selectionProvider = site.getSelectionProvider();
+				selectionProvider.setSelection(getViewer().getSelection());
+			}
+		}
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.swt.events.FocusListener#focusLost(org.eclipse.swt.events.FocusEvent)
+	 */
+	@Override
+    public void focusLost(FocusEvent e) {
+    }
 }
