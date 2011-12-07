@@ -115,6 +115,8 @@ public abstract class AbstractPartWithButtons extends AbstractPart {
 				button.setData(Integer.valueOf(i));
 				button.addSelectionListener(listener);
 
+				onButtonCreated(button);
+
 				layoutData = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
 				layoutData.widthHint = Math.max(new PixelConverter(button).convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH), button.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x);
 				button.setLayoutData(layoutData);
@@ -126,6 +128,18 @@ public abstract class AbstractPartWithButtons extends AbstractPart {
 		}
 
 		return panel;
+	}
+
+	/**
+	 * Called from {@link #createButtonsPanel(Composite, FormToolkit)} for each created button.
+	 * <p>
+	 * <b>Note:</b> The button layout data is set by {@link #createButtonsPanel(Composite, FormToolkit)}
+	 *              after this method has been returned.
+	 *
+	 * @param button The created button. Must not be <code>null</code>.
+	 */
+	protected void onButtonCreated(Button button) {
+		Assert.isNotNull(button);
 	}
 
 	/**
