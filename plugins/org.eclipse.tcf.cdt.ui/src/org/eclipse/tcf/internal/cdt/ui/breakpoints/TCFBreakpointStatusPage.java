@@ -39,6 +39,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.tcf.internal.cdt.ui.ImageCache;
 import org.eclipse.tcf.internal.debug.model.TCFBreakpointsStatus;
 import org.eclipse.tcf.internal.debug.model.TCFLaunch;
+import org.eclipse.tcf.internal.debug.model.TCFSourceRef;
 import org.eclipse.tcf.internal.debug.ui.model.TCFModel;
 import org.eclipse.tcf.internal.debug.ui.model.TCFModelManager;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNode;
@@ -128,6 +129,21 @@ public class TCFBreakpointStatusPage extends PropertyPage {
                                     if (size != null) z.text += "; Size " + size;
                                     String type = (String)m.get(IBreakpoints.INSTANCE_TYPE);
                                     if (type != null) z.text += "; Type: " + type;
+                                    if (y.object instanceof TCFNodeExecContext) {
+                                        TCFDataCache<TCFSourceRef> ln_cache = ((TCFNodeExecContext)y.object).getLineInfo(i);
+                                        if (ln_cache != null) {
+                                            if (!ln_cache.validate()) {
+                                                pending = ln_cache;
+                                            }
+                                            else {
+                                                TCFSourceRef ref = ln_cache.getData();
+                                                if (ref != null && ref.area != null && ref.area.file != null) {
+                                                    z.text += "; " + ref.area.file + ":" + ref.area.start_line;
+                                                    if (ref.area.start_column > 0) z.text += "." + ref.area.start_column;
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                             z.parent = y;
