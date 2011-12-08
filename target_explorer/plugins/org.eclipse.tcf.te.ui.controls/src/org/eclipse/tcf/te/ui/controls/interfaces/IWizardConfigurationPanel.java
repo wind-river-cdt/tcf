@@ -86,7 +86,9 @@ public interface IWizardConfigurationPanel extends IMessageProvider {
 	public void doSaveWidgetValues(IDialogSettings settings, String idPrefix);
 
 	/**
-	 * Called to adjust the wizard configuration panels child controls enablement.
+	 * Enables or disables all UI elements belonging to the wizard configuration panel.
+	 *
+	 * @param enabled <code>True</code> to enable the UI elements, <code>false</code> otherwise.
 	 */
-	public void adjustControlEnablement();
+	public void setEnabled(boolean enabled);
 }
