@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.ui.controls;
+package org.eclipse.tcf.te.ui.utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;

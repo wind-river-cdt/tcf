@@ -17,6 +17,7 @@ Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: org.eclipse.tcf.te.ui.controls,
  org.eclipse.tcf.te.ui.controls.activator;x-internal:=true,
+ org.eclipse.tcf.te.ui.controls.file,
  org.eclipse.tcf.te.ui.controls.interfaces,
  org.eclipse.tcf.te.ui.controls.net,
  org.eclipse.tcf.te.ui.controls.nls,
