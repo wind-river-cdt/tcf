@@ -33,17 +33,6 @@ public class TCFBreakpoint extends Breakpoint {
 
     public static final String MARKER_TYPE = "org.eclipse.tcf.debug.breakpoint.marker";
 
-    private static final String[] attr_names = {
-        TCFBreakpointsModel.ATTR_ADDRESS, "address",
-        TCFBreakpointsModel.ATTR_FUNCTION, "location",
-        TCFBreakpointsModel.ATTR_EXPRESSION, "expression",
-        TCFBreakpointsModel.ATTR_CONDITION, "condition",
-        TCFBreakpointsModel.ATTR_CONTEXTNAMES, "scope (names)",
-        TCFBreakpointsModel.ATTR_CONTEXTIDS, "scope (IDs)",
-        TCFBreakpointsModel.ATTR_EXE_PATHS, "scope (modules)",
-        TCFBreakpointsModel.ATTR_STOP_GROUP, "stop group",
-    };
-
     private static long last_id = 0;
 
     private static String createNewID() {
@@ -101,27 +90,6 @@ public class TCFBreakpoint extends Breakpoint {
 
     public String getModelIdentifier() {
         return ITCFConstants.ID_TCF_DEBUG_MODEL;
-    }
-
-    public String getText() {
-        IMarker marker = getMarker();
-        if (marker == null) return null;
-        StringBuffer bf = new StringBuffer();
-        for (int i = 0; i < attr_names.length; i += 2) {
-            String s = marker.getAttribute(attr_names[i], null);
-            if (s == null || s.length() == 0) continue;
-            bf.append('[');
-            bf.append(attr_names[i + 1]);
-            bf.append(": ");
-            bf.append(s);
-            bf.append(']');
-        }
-        if (bf.length() == 0) {
-            String id = marker.getAttribute(
-                    ITCFConstants.ID_TCF_DEBUG_MODEL + '.' + IBreakpoints.PROP_ID, null);
-            bf.append(id);
-        }
-        return bf.toString();
     }
 
     public void notifyStatusChaged() throws CoreException {

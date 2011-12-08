@@ -39,7 +39,6 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.tcf.internal.debug.model.ITCFBreakpointListener;
-import org.eclipse.tcf.internal.debug.model.ITCFConstants;
 import org.eclipse.tcf.internal.debug.model.TCFBreakpoint;
 import org.eclipse.tcf.internal.debug.model.TCFBreakpointsModel;
 import org.eclipse.tcf.internal.debug.model.TCFBreakpointsStatus;
@@ -58,8 +57,6 @@ class TCFBreakpointStatusListener {
 
     /** Ref count attribute for foreign breakpoints */
     private static final String ATTR_REFCOUNT = "org.eclipse.tcf.cdt.refcount";
-    /** TCF breakpoint ID attribute */
-    private static final String ATTR_TCF_ID = ITCFConstants.ID_TCF_DEBUG_MODEL + '.' + IBreakpoints.PROP_ID;
 
     private class BreakpointListener implements ITCFBreakpointListener {
 
@@ -284,7 +281,7 @@ class TCFBreakpointStatusListener {
                         if (bp.isPersisted()) continue;
                         IMarker marker = bp.getMarker();
                         if (marker == null) continue;
-                        if (id.equals(marker.getAttribute(ATTR_TCF_ID, null))) {
+                        if (id.equals(marker.getAttribute(TCFBreakpointsModel.ATTR_ID, null))) {
                             int cnt = marker.getAttribute(ATTR_REFCOUNT, 0) - 1;
                             if (cnt > 0) {
                                 marker.setAttribute(ATTR_REFCOUNT, cnt);

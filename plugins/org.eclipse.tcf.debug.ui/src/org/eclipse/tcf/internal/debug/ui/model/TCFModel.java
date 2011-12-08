@@ -1084,13 +1084,14 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
 
     /**
      * Asynchronously create model node for given ID.
-     * If 'cache' is valid after the method returns, the node cannot be created,
-     * and the cache will contain an error report.
+     * If 'done' is TCFDataCache and it is valid after the method returns,
+     * the node cannot be created because of an error,
+     * and the cache will contain the error report.
      * @param id - context ID.
-     * @param cache - data cache object that need the node for validation.
-     * @return - true if all done, false if 'cache' is waiting for remote data.
+     * @param done - an object waiting for cache validation.
+     * @return - true if all done, false if 'done' is waiting for remote data.
      */
-    public boolean createNode(String id, final TCFDataCache<?> cache) {
+    public boolean createNode(String id, final Runnable done) {
         TCFNode parent = getNode(id);
         if (parent != null) return true;
         LinkedList<Object> path = null;
@@ -1098,11 +1099,13 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
             Object obj = context_map.get(id);
             if (obj == null) obj = new CreateNodeRunnable(id);
             if (obj instanceof CreateNodeRunnable) {
-                ((CreateNodeRunnable)obj).wait(cache);
+                ((CreateNodeRunnable)obj).wait(done);
                 return false;
             }
             if (obj instanceof Throwable) {
-                cache.set(null, (Throwable)obj, null);
+                if (done instanceof TCFDataCache<?>) {
+                    ((TCFDataCache<?>)done).set(null, (Throwable)obj, null);
+                }
                 return true;
             }
             if (path == null) path = new LinkedList<Object>();

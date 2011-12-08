@@ -55,6 +55,7 @@ public class TCFBreakpointsModel {
     public static final String
         ATTR_ID            = ITCFConstants.ID_TCF_DEBUG_MODEL + '.' + IBreakpoints.PROP_ID,
         ATTR_STATUS        = ITCFConstants.ID_TCF_DEBUG_MODEL + '.' + "Status",
+        ATTR_ENABLED       = IBreakpoint.ENABLED,
         ATTR_INSTALL_COUNT = "org.eclipse.cdt.debug.core.installCount",
         ATTR_ADDRESS       = "org.eclipse.cdt.debug.core.address",
         ATTR_FUNCTION      = "org.eclipse.cdt.debug.core.function",
@@ -63,6 +64,7 @@ public class TCFBreakpointsModel {
         ATTR_WRITE         = "org.eclipse.cdt.debug.core.write",
         ATTR_SIZE          = "org.eclipse.cdt.debug.core.range",
         ATTR_FILE          = "org.eclipse.cdt.debug.core.sourceHandle",
+        ATTR_LINE          = IMarker.LINE_NUMBER,
         ATTR_CONDITION     = "org.eclipse.cdt.debug.core.condition",
         ATTR_IGNORE_COUNT  = "org.eclipse.cdt.debug.core.ignoreCount",
         ATTR_CONTEXTNAMES  = ITCFConstants.ID_TCF_DEBUG_MODEL + '.' + IBreakpoints.PROP_CONTEXTNAMES,
@@ -183,7 +185,7 @@ public class TCFBreakpointsModel {
                 new BreakpointUpdate(breakpoint, false) {
                     @Override
                     void update() {
-                        if (s.size() == 1 && s.contains(IBreakpoint.ENABLED)) {
+                        if (s.size() == 1 && s.contains(ATTR_ENABLED)) {
                             Boolean enabled = (Boolean)tcf_attrs.get(IBreakpoints.PROP_ENABLED);
                             if (enabled == null || !enabled.booleanValue()) {
                                 service.disable(new String[]{ marker_id }, done);
@@ -227,7 +229,7 @@ public class TCFBreakpointsModel {
                 final Map<String,IBreakpoint> map = new HashMap<String,IBreakpoint>();
                 for (int i = 0; i < arr.length; i++) {
                     IMarker marker = arr[i].getMarker();
-                    Boolean b = marker.getAttribute(IBreakpoint.ENABLED, Boolean.FALSE);
+                    Boolean b = marker.getAttribute(ATTR_ENABLED, Boolean.FALSE);
                     if (!b.booleanValue()) continue;
                     String id = getBreakpointID(arr[i]);
                     if (id == null) continue;
@@ -448,7 +450,13 @@ public class TCFBreakpointsModel {
         Map<String,Object> client_data = (Map<String,Object>)p.get(IBreakpoints.PROP_CLIENT_DATA);
         if (client_data != null) {
             Map<String,Object> m = (Map<String,Object>)client_data.get(CDATA_MARKER);
-            if (m != null) return m;
+            if (m != null) {
+                m = new HashMap<String,Object>(m);
+                m.put(ATTR_ID, p.get(IBreakpoints.PROP_ID));
+                Boolean enabled = (Boolean)p.get(IBreakpoints.PROP_ENABLED);
+                m.put(ATTR_ENABLED, enabled == null ? Boolean.FALSE : enabled);
+                return m;
+            }
         }
         Map<String,Object> m = new HashMap<String,Object>();
         for (Map.Entry<String,Object> e : p.entrySet()) {
@@ -483,8 +491,7 @@ public class TCFBreakpointsModel {
             m.put(ITCFConstants.ID_TCF_DEBUG_MODEL + '.' + key, val);
         }
         Boolean enabled = (Boolean)p.get(IBreakpoints.PROP_ENABLED);
-        if (enabled == null) m.put(IBreakpoint.ENABLED, Boolean.FALSE);
-        else m.put(IBreakpoint.ENABLED, enabled);
+        m.put(ATTR_ENABLED, enabled == null ? Boolean.FALSE : enabled);
         String location = (String)p.get(IBreakpoints.PROP_LOCATION);
         if (location != null && location.length() > 0) {
             int access_mode = IBreakpoints.ACCESSMODE_EXECUTE;
@@ -518,7 +525,7 @@ public class TCFBreakpointsModel {
         }
         Number line = (Number)p.get(IBreakpoints.PROP_LINE);
         if (line != null) {
-            m.put(IMarker.LINE_NUMBER, new Integer(line.intValue()));
+            m.put(ATTR_LINE, new Integer(line.intValue()));
             Number column = (Number)p.get(IBreakpoints.PROP_COLUMN);
             if (column != null) {
                 m.put(IMarker.CHAR_START, new Integer(column.intValue()));
@@ -575,7 +582,7 @@ public class TCFBreakpointsModel {
                 m.put(tcf_key, val);
             }
         }
-        Boolean enabled = (Boolean)p.get(IBreakpoint.ENABLED);
+        Boolean enabled = (Boolean)p.get(ATTR_ENABLED);
         if (enabled != null && enabled.booleanValue() && bp_manager.isEnabled()) {
             m.put(IBreakpoints.PROP_ENABLED, enabled);
         }
@@ -594,7 +601,7 @@ public class TCFBreakpointsModel {
                 else if (i < j) name = file.substring(j + 1);
             }
             m.put(IBreakpoints.PROP_FILE, name);
-            Integer line = (Integer)p.get(IMarker.LINE_NUMBER);
+            Integer line = (Integer)p.get(ATTR_LINE);
             if (line != null) {
                 m.put(IBreakpoints.PROP_LINE, new Integer(line.intValue()));
                 Integer column = (Integer)p.get(IMarker.CHAR_START);

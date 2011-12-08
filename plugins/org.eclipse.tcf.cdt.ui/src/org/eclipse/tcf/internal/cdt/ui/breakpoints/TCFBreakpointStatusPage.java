@@ -129,17 +129,28 @@ public class TCFBreakpointStatusPage extends PropertyPage {
                                     if (size != null) z.text += "; Size " + size;
                                     String type = (String)m.get(IBreakpoints.INSTANCE_TYPE);
                                     if (type != null) z.text += "; Type: " + type;
-                                    if (y.object instanceof TCFNodeExecContext) {
-                                        TCFDataCache<TCFSourceRef> ln_cache = ((TCFNodeExecContext)y.object).getLineInfo(i);
-                                        if (ln_cache != null) {
-                                            if (!ln_cache.validate()) {
-                                                pending = ln_cache;
+                                    if (y.object instanceof TCFNode) {
+                                        TCFDataCache<TCFNodeExecContext> mem = model.searchMemoryContext((TCFNode)y.object);
+                                        if (mem != null) {
+                                            if (!mem.validate(this)) {
+                                                pending = mem;
                                             }
                                             else {
-                                                TCFSourceRef ref = ln_cache.getData();
-                                                if (ref != null && ref.area != null && ref.area.file != null) {
-                                                    z.text += "; " + ref.area.file + ":" + ref.area.start_line;
-                                                    if (ref.area.start_column > 0) z.text += "." + ref.area.start_column;
+                                                TCFNodeExecContext ctx = mem.getData();
+                                                if (ctx != null) {
+                                                    TCFDataCache<TCFSourceRef> ln_cache = ctx.getLineInfo(i);
+                                                    if (ln_cache != null) {
+                                                        if (!ln_cache.validate()) {
+                                                            pending = ln_cache;
+                                                        }
+                                                        else {
+                                                            TCFSourceRef ref = ln_cache.getData();
+                                                            if (ref != null && ref.area != null && ref.area.file != null) {
+                                                                z.text += "; " + ref.area.file + ":" + ref.area.start_line;
+                                                                if (ref.area.start_column > 0) z.text += "." + ref.area.start_column;
+                                                            }
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }

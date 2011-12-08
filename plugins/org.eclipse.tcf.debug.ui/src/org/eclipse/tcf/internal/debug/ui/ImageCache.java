@@ -63,6 +63,7 @@ public class ImageCache {
         IMG_BREAKPOINT_DISABLED = "icons/full/obj16/brkpd_obj.gif",
         IMG_BREAKPOINT_INSTALLED = "icons/ovr16/installed_ovr.gif",
         IMG_BREAKPOINT_CONDITIONAL = "icons/ovr16/conditional_ovr.gif",
+        IMG_BREAKPOINT_MOVED = "icons/moved_ovr.gif",
         IMG_BREAKPOINT_WARNING = "icons/ovr16/warning_ovr.gif",
         IMG_BREAKPOINT_ERROR = "icons/ovr16/error_ovr.gif",
         IMG_BREAKPOINT_OVERLAY = "icons/brkp_ovr.gif";
