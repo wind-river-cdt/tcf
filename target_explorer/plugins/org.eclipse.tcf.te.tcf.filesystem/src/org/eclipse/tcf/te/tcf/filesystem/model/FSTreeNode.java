@@ -22,11 +22,14 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.PlatformObject;
+import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.te.tcf.filesystem.interfaces.IWindowsFileAttributes;
 import org.eclipse.tcf.te.tcf.filesystem.internal.UserAccount;
+import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.internal.url.TcfURLConnection;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.UserManager;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
@@ -446,4 +449,42 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 		if (node.parent == this) return true;
 		return isAncestorOf(node.parent);
 	}
+
+	/**
+	 * Test if this file is a windows system file.
+	 * 
+	 * @return true if it is a windows system file.
+	 */
+	public boolean isSystem() {
+		return !isRoot() && isWindowsNode() && isWin32AttrOn(IWindowsFileAttributes.FILE_ATTRIBUTE_SYSTEM);
+	}
+
+	/**
+	 * Get the type label of the file for displaying purpose.
+	 * 
+	 * @return The type label text.
+	 */
+	public String getFileType() {
+		if (type.equals("FSPendingNode")) {//$NON-NLS-1$
+			return ""; //$NON-NLS-1$
+		}
+		if (isRoot()) {
+			return Messages.FSTreeNode_TypeLocalDisk; 
+		}
+		if (isDirectory()) {
+			return Messages.FSTreeNode_TypeFileFolder; 
+		}
+		if (isSystem()) {
+			return Messages.FSTreeNode_TypeSystemFile; 
+		}
+		IContentType contentType = Platform.getContentTypeManager().findContentTypeFor(name);
+		if (contentType != null) {
+			return contentType.getName();
+		}
+		int lastDot = name.lastIndexOf("."); //$NON-NLS-1$
+		if (lastDot == -1) {
+			return Messages.GeneralInformationPage_UnknownFileType;
+		}
+		return name.substring(lastDot + 1).toUpperCase() + " " + Messages.FSTreeNode_TypeFile; //$NON-NLS-1$
+    }
 }

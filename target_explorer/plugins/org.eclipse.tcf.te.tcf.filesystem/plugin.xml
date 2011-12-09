@@ -1985,6 +1985,18 @@
                width="100">
          </column>
          <column
+               alignment="SWT.LEFT"
+               comparator="org.eclipse.tcf.te.tcf.filesystem.internal.columns.FileTypeComparator"
+               id="type"
+               labelProvider="org.eclipse.tcf.te.tcf.filesystem.internal.columns.FileTypeLabelProvider"
+               moveable="true"
+               name="%column.name.type"
+               resizable="true"
+               style="SWT.LEFT"
+               visible="false"
+               width="100">
+         </column>
+         <column
                alignment="SWT.RIGHT"
                comparator="org.eclipse.tcf.te.tcf.filesystem.internal.columns.ModificationTimeComparator"
                id="modified"
@@ -1994,7 +2006,19 @@
                resizable="true"
                style="SWT.RIGHT"
                visible="true"
-               width="200">
+               width="120">
+         </column>
+         <column
+               alignment="SWT.RIGHT"
+               comparator="org.eclipse.tcf.te.tcf.filesystem.internal.columns.AccessTimeComparator"
+               id="accessed"
+               labelProvider="org.eclipse.tcf.te.tcf.filesystem.internal.columns.AccessTimeLabelProvider"
+               moveable="true"
+               name="%column.name.accessed"
+               resizable="true"
+               style="SWT.RIGHT"
+               visible="false"
+               width="120">
          </column>
       </viewer>
       <viewer
