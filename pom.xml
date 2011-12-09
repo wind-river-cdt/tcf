@@ -21,7 +21,6 @@
 		<cdt-site>http://download.eclipse.org/tools/cdt/builds/hudson/cdt-nightly</cdt-site>
         <tm-version>3.3</tm-version>
         <tm-site>http://download.eclipse.org/tm/updates/${tm-version}</tm-site>
-		<rxtx-site>http://rxtx.qbang.org/eclipse</rxtx-site>
 	</properties>
 
 	<licenses>
@@ -107,11 +106,6 @@
 		<repository>
 			<id>tm</id>
 			<url>${tm-site}</url>
-			<layout>p2</layout>
-		</repository>
-		<repository>
-			<id>rxtx</id>
-			<url>${rxtx-site}</url>
 			<layout>p2</layout>
 		</repository>
 	</repositories>
