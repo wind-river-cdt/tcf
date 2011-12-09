@@ -40,6 +40,7 @@ public class ConfigFilterAction extends Action {
 	public ConfigFilterAction(AbstractTreeControl treeControl) {
 		super(null, AS_PUSH_BUTTON);
 		this.treeControl = treeControl;
+		this.setToolTipText(Messages.ConfigFilterAction_TooltipText);
 		ImageDescriptor image = UIPlugin.getImageDescriptor(ImageConsts.VIEWER_FILTER_CONFIG_ENABLED);
 		setImageDescriptor(image);
 		image = UIPlugin.getImageDescriptor(ImageConsts.VIEWER_FILTER_CONFIG_DISABLED);

@@ -45,6 +45,7 @@ import org.eclipse.tcf.te.ui.WorkbenchPartControl;
 import org.eclipse.tcf.te.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.forms.CustomFormToolkit;
 import org.eclipse.tcf.te.ui.interfaces.ImageConsts;
+import org.eclipse.tcf.te.ui.nls.Messages;
 import org.eclipse.ui.IDecoratorManager;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -457,6 +458,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 				PlatformUI.getWorkbench().getHelpSystem().displayDynamicHelp();
             }
 		};
+		action.setToolTipText(Messages.AbstractTreeControl_HelpTooltip);
 		ImageDescriptor image = UIPlugin.getImageDescriptor(ImageConsts.VIEWER_HELP);
 		action.setImageDescriptor(image);
 		toolbarManager.add(action);
