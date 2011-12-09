@@ -34,7 +34,7 @@ import org.eclipse.tcf.services.IFileSystem.FileAttrs;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeContentProvider;
-import org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeLabelProvider;
+import org.eclipse.tcf.te.tcf.filesystem.internal.columns.FSTreeElementLabelProvider;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.help.IContextHelpIds;
@@ -177,7 +177,7 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 		data.widthHint = 450;
 		treeViewer.getTree().setLayoutData(data);
 		treeViewer.setContentProvider(contentProvider = new FSTreeContentProvider());
-		treeViewer.setLabelProvider(new FSTreeLabelProvider(treeViewer));
+		treeViewer.setLabelProvider(new FSTreeElementLabelProvider(treeViewer));
 		ViewerFilter folderFilter = new ViewerFilter() {
 			@Override
 			public boolean select(Viewer viewer, Object parentElement, Object element) {

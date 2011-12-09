@@ -170,6 +170,12 @@ public class ProcessesTreeContentProvider implements ITreeContentProvider {
 																			if (node != null) {
 																				node.parent = rootNode;
 																				rootNode.children.add(node);
+																				PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+																					@Override
+				                                                                    public void run() {
+																						if (viewer != null) viewer.refresh();
+																					}
+																				});																				
 																			}
 																		}
 																	}

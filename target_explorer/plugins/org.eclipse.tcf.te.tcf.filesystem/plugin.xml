@@ -28,7 +28,7 @@
             contentProvider="org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeContentProvider"
             icon="icons/obj16/rootdrive.gif"
             id="org.eclipse.tcf.te.tcf.filesystem.navigator.content"
-            labelProvider="org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeLabelProvider"
+            labelProvider="org.eclipse.tcf.te.tcf.filesystem.internal.columns.FSTreeElementLabelProvider"
             name="%navigatorContent.name"
             priority="normal">
             <triggerPoints>
@@ -1859,13 +1859,25 @@
          </enablement>
       </decorator>
       <decorator
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.decorators.CutDecorator"
+            class="org.eclipse.tcf.te.tcf.filesystem.internal.decorators.PhantomDecorator"
             id="org.eclipse.tcf.te.tcf.filesystem.decorators.cut"
             label="%decorator.label.cut"
             state="true">
          <enablement>
             <objectState
                   name="edit.cut"
+                  value="true">
+            </objectState>
+         </enablement>
+      </decorator>
+      <decorator
+            class="org.eclipse.tcf.te.tcf.filesystem.internal.decorators.PhantomDecorator"
+            id="org.eclipse.tcf.te.tcf.filesystem.decorators.hidden"
+            label="%decorator.hidden.label"
+            state="true">
+         <enablement>
+            <objectState
+                  name="hidden"
                   value="true">
             </objectState>
          </enablement>
@@ -1943,5 +1955,62 @@
             %newfolder.wizard.description
          </description>
       </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.tcf.te.ui.viewers">
+      <viewer
+            viewerId="org.eclipse.tcf.te.ui.controls.viewer.fs">
+         <column
+               alignment="SWT.LEFT"
+               comparator="org.eclipse.tcf.te.tcf.filesystem.internal.columns.FSTreeElementComparator"
+               id="name"
+               labelProvider="org.eclipse.tcf.te.tcf.filesystem.internal.columns.FSTreeElementLabelProvider"
+               moveable="true"
+               name="%column.name.name"
+               resizable="true"
+               style="SWT.LEFT"
+               visible="true"
+               width="300">
+         </column>
+         <column
+               alignment="SWT.RIGHT"
+               comparator="org.eclipse.tcf.te.tcf.filesystem.internal.columns.SizeComparator"
+               id="size"
+               labelProvider="org.eclipse.tcf.te.tcf.filesystem.internal.columns.SizeLabelProvider"
+               moveable="true"
+               name="%column.name.size"
+               resizable="true"
+               style="SWT.RIGHT"
+               visible="true"
+               width="100">
+         </column>
+         <column
+               alignment="SWT.RIGHT"
+               comparator="org.eclipse.tcf.te.tcf.filesystem.internal.columns.ModificationTimeComparator"
+               id="modified"
+               labelProvider="org.eclipse.tcf.te.tcf.filesystem.internal.columns.ModificationTimeLabelProvider"
+               moveable="true"
+               name="%column.name.modified"
+               resizable="true"
+               style="SWT.RIGHT"
+               visible="true"
+               width="200">
+         </column>
+      </viewer>
+      <viewer
+            viewerId="org.eclipse.tcf.te.ui.controls.viewer.fs">
+         <filter
+               class="org.eclipse.tcf.te.tcf.filesystem.filters.HiddenFilesViewerFilter"
+               enabled="true"
+               id="org.eclipse.tcf.te.tcf.filesystem.filters.hiddenFiles"
+               name="%filter.name.hidden">
+         </filter>
+         <filter
+               class="org.eclipse.tcf.te.tcf.filesystem.filters.SystemFilesViewerFilter"
+               enabled="true"
+               id="org.eclipse.tcf.te.tcf.filesystem.filters.systemFiles"
+               name="%filter.name.system">
+         </filter>
+      </viewer>
    </extension>   
 </plugin>

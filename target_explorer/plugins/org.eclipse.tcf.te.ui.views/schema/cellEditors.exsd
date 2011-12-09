@@ -170,14 +170,6 @@ See &lt;code&gt;org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy&l
       </documentation>
    </annotation>
 
-   <annotation>
-      <appinfo>
-         <meta.section type="implementation"/>
-      </appinfo>
-      <documentation>
-         [Enter information about supplied implementation of this extension point.]
-      </documentation>
-   </annotation>
 
    <annotation>
       <appinfo>

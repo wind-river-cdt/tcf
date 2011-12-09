@@ -19,9 +19,9 @@ import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.jface.images.AbstractImageDescriptor;
 
 /**
- * Cut image descriptor implementation.
+ * The descriptor for a phantom-like image.
  */
-public class CutImageDescriptor extends AbstractImageDescriptor {
+public class PhantomImageDescriptor extends AbstractImageDescriptor {
 	// The alpha data when highlight the base image.
 	private static final int HIGHLIGHT_ALPHA = 128;
 	// The key to store the cut mask image.
@@ -34,7 +34,7 @@ public class CutImageDescriptor extends AbstractImageDescriptor {
 	/**
 	 * Constructor.
 	 */
-	public CutImageDescriptor(final Image baseImage) {
+	public PhantomImageDescriptor(final Image baseImage) {
 		super(UIPlugin.getDefault().getImageRegistry());
 		this.baseImage = baseImage;
 		// build up the key for the image registry

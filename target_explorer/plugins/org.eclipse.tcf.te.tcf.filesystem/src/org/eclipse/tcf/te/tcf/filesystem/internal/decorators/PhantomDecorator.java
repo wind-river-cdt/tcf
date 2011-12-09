@@ -16,9 +16,9 @@ import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.ui.jface.images.AbstractImageDescriptor;
 /**
- * The label decorator to decorate the FSTreeNodes that are cut to the clip board. 
+ * The label decorator to decorate the FSTreeNodes that are cut or hidden. 
  */
-public class CutDecorator extends LabelProvider implements ILabelDecorator {
+public class PhantomDecorator extends LabelProvider implements ILabelDecorator {
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ILabelDecorator#decorateImage(org.eclipse.swt.graphics.Image, java.lang.Object)
@@ -27,7 +27,7 @@ public class CutDecorator extends LabelProvider implements ILabelDecorator {
 	public Image decorateImage(Image image, Object element) {
 		if (element instanceof FSTreeNode && image != null) {
 			// Create the cut image for the image to be decorated.
-			AbstractImageDescriptor descriptor = new CutImageDescriptor(image);
+			AbstractImageDescriptor descriptor = new PhantomImageDescriptor(image);
 			return UIPlugin.getSharedImage(descriptor);
 		}
 		return null;

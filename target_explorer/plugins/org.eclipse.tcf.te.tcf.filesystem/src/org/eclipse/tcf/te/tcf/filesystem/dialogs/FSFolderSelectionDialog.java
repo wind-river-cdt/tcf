@@ -21,7 +21,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeContentProvider;
-import org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeLabelProvider;
+import org.eclipse.tcf.te.tcf.filesystem.internal.columns.FSTreeElementLabelProvider;
 import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.MoveFilesHandler;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
@@ -56,7 +56,7 @@ import org.eclipse.ui.dialogs.ISelectionStatusValidator;
  */
 public class FSFolderSelectionDialog extends ElementTreeSelectionDialog {
 	// Label provider used by the file system tree.
-	private FSTreeLabelProvider labelProvider;
+	private FSTreeElementLabelProvider labelProvider;
 	// The nodes that are being moved.
 	private List<FSTreeNode> movedNodes;
 
@@ -66,7 +66,7 @@ public class FSFolderSelectionDialog extends ElementTreeSelectionDialog {
 	 * @param parentShell The parent shell.
 	 */
 	public FSFolderSelectionDialog(Shell parentShell) {
-		this(parentShell, new FSTreeLabelProvider(), new FSTreeContentProvider());
+		this(parentShell, new FSTreeElementLabelProvider(), new FSTreeContentProvider());
 	}
 
 	/**
@@ -77,7 +77,7 @@ public class FSFolderSelectionDialog extends ElementTreeSelectionDialog {
 	 * @param labelProvider The label provider.
 	 * @param contentProvider The content provider.
 	 */
-	private FSFolderSelectionDialog(Shell parentShell, FSTreeLabelProvider labelProvider, ITreeContentProvider contentProvider) {
+	private FSFolderSelectionDialog(Shell parentShell, FSTreeElementLabelProvider labelProvider, ITreeContentProvider contentProvider) {
 		super(parentShell, labelProvider, contentProvider);
 		this.labelProvider = labelProvider;
 		setTitle(Messages.FSFolderSelectionDialog_MoveDialogTitle);
@@ -120,7 +120,7 @@ public class FSFolderSelectionDialog extends ElementTreeSelectionDialog {
 	protected TreeViewer doCreateTreeViewer(Composite parent, int style) {
 		TreeViewer viewer = super.doCreateTreeViewer(parent, style);
 		viewer.getTree().setLinesVisible(false);
-		labelProvider.setParentViewer(viewer);
+		labelProvider.setViewer(viewer);
 		return viewer;
 	}
 

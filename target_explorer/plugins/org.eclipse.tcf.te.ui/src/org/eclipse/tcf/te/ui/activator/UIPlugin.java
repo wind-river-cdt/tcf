@@ -14,8 +14,8 @@ import java.net.URL;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.tcf.te.ui.interfaces.ImageConsts;
 import org.eclipse.tcf.te.runtime.tracing.TraceHandler;
+import org.eclipse.tcf.te.ui.interfaces.ImageConsts;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -95,6 +95,12 @@ public class UIPlugin extends AbstractUIPlugin {
 		registry.put(ImageConsts.NEW_TARGET_WIZARD_DISABLED, ImageDescriptor.createFromURL(url));
 		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_ELCL + "newtarget_wiz.gif"); //$NON-NLS-1$
 		registry.put(ImageConsts.NEW_TARGET_WIZARD_ENABLED, ImageDescriptor.createFromURL(url));
+		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_DLCL + "filter_ps.gif"); //$NON-NLS-1$
+		registry.put(ImageConsts.VIEWER_FILTER_CONFIG_DISABLED, ImageDescriptor.createFromURL(url));
+		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_ELCL + "filter_ps.gif"); //$NON-NLS-1$
+		registry.put(ImageConsts.VIEWER_FILTER_CONFIG_ENABLED, ImageDescriptor.createFromURL(url));
+		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_ELCL + "help.gif"); //$NON-NLS-1$
+		registry.put(ImageConsts.VIEWER_HELP, ImageDescriptor.createFromURL(url));
 
 		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OVR + "gold_ovr.gif"); //$NON-NLS-1$
 		registry.put(ImageConsts.GOLD_OVR, ImageDescriptor.createFromURL(url));

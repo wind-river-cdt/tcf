@@ -75,5 +75,65 @@
             commandId="org.eclipse.tcf.te.tcf.processes.ui.command.launch">
       </handler>
    </extension>
+   <extension
+         point="org.eclipse.tcf.te.ui.viewers">
+      <viewer
+            viewerId="org.eclipse.tcf.te.ui.controls.viewer.processes">
+         <column
+               comparator="org.eclipse.tcf.te.tcf.processes.ui.internal.columns.ProcessComparator"
+               id="name"
+               labelProvider="org.eclipse.tcf.te.tcf.processes.ui.internal.columns.ProcessLabelProvider"
+               moveable="true"
+               name="%column.name.name"
+               resizable="true"
+               visible="true"
+               width="250">
+         </column>
+         <column
+               comparator="org.eclipse.tcf.te.tcf.processes.ui.internal.columns.PIDComparator"
+               id="pid"
+               labelProvider="org.eclipse.tcf.te.tcf.processes.ui.internal.columns.PIDLabelProvider"
+               moveable="true"
+               name="%column.name.pid"
+               resizable="true"
+               style="SWT.RIGHT"
+               visible="true"
+               width="50">
+         </column>
+         <column
+               comparator="org.eclipse.tcf.te.tcf.processes.ui.internal.columns.PPIDComparator"
+               id="ppid"
+               labelProvider="org.eclipse.tcf.te.tcf.processes.ui.internal.columns.PPIDLabelProvider"
+               moveable="true"
+               name="%column.name.ppid"
+               resizable="true"
+               style="SWT.RIGHT"
+               visible="true"
+               width="50">
+         </column>
+         <column
+               comparator="org.eclipse.tcf.te.tcf.processes.ui.internal.columns.StateComparator"
+               id="state"
+               labelProvider="org.eclipse.tcf.te.tcf.processes.ui.internal.columns.StateLabelProvider"
+               moveable="true"
+               name="%column.name.state"
+               resizable="true"
+               style="SWT.RIGHT"
+               visible="true"
+               width="50">
+         </column>
+         <column
+               comparator="org.eclipse.tcf.te.tcf.processes.ui.internal.columns.UserComparator"
+               id="user"
+               labelProvider="org.eclipse.tcf.te.tcf.processes.ui.internal.columns.UserLabelProvider"
+               moveable="true"
+               name="%column.name.user"
+               resizable="true"
+               style="SWT.RIGHT"
+               visible="true"
+               width="100">
+         </column>
+      </viewer>
+   </extension>
 
 </plugin>

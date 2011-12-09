@@ -11,19 +11,20 @@ package org.eclipse.tcf.te.tcf.filesystem.controls;
 
 import org.eclipse.jface.viewers.TreePathViewerSorter;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.tcf.te.tcf.filesystem.internal.columns.FSTreeElementComparator;
+import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 
 /**
  * File system tree control viewer sorter implementation.
  */
 public class FSTreeViewerSorter extends TreePathViewerSorter {
-	private final FSTreeLabelProvider labelProvider = new FSTreeLabelProvider();
-	private final FSTreeViewerComparator comparator;
+	private final FSTreeElementComparator comparator;
 
 	/**
 	 * Constructor.
 	 */
 	public FSTreeViewerSorter() {
-		comparator = new FSTreeViewerComparator(labelProvider.getParentViewer(), labelProvider);
+		comparator = new FSTreeElementComparator();
 	}
 
 	/* (non-Javadoc)
@@ -31,6 +32,9 @@ public class FSTreeViewerSorter extends TreePathViewerSorter {
 	 */
 	@Override
 	public int compare(Viewer viewer, Object e1, Object e2) {
-		return comparator.compare(viewer, e1, e2);
+		if (e1 instanceof FSTreeNode && e2 instanceof FSTreeNode) {
+			return comparator.compare((FSTreeNode) e1, (FSTreeNode) e2);
+		}
+		return super.compare(viewer, e1, e2);
 	}
 }
