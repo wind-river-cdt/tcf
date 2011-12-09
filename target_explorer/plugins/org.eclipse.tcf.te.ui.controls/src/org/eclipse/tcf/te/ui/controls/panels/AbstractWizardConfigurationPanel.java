@@ -113,10 +113,10 @@ public abstract class AbstractWizardConfigurationPanel implements IWizardConfigu
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.controls.interfaces.IWizardConfigurationPanel#adjustControlEnablement()
+	 * @see org.eclipse.tcf.te.ui.controls.interfaces.IWizardConfigurationPanel#setEnabled(boolean)
 	 */
 	@Override
-	public void adjustControlEnablement() {
+	public void setEnabled(boolean enabled) {
 	}
 
 	/* (non-Javadoc)

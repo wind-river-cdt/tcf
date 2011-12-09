@@ -17,6 +17,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tcf.te.ui.forms.parts.AbstractTreeSection.TreePartAdapter;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
@@ -71,6 +72,14 @@ public abstract class AbstractTableSection extends AbstractStructuredViewerSecti
 			Composite panel = super.createButtonsPanel(parent, toolkit);
 			initializeButtonsEnablement();
 			return panel;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.tcf.te.ui.forms.parts.AbstractPartWithButtons#onButtonCreated(org.eclipse.swt.widgets.Button)
+		 */
+		@Override
+		protected void onButtonCreated(Button button) {
+			AbstractTableSection.this.onButtonCreated(button);
 		}
 
 		/* (non-Javadoc)
@@ -167,6 +176,14 @@ public abstract class AbstractTableSection extends AbstractStructuredViewerSecti
 	 */
 	@Override
 	public void doubleClick(DoubleClickEvent event) {
+	}
+
+	/**
+	 * Called from {@link TreePartAdapter#createButtonsPanel(Composite, FormToolkit)}.
+	 *
+	 * @param button The created button. Must not be <code>null</code>.
+	 */
+	protected void onButtonCreated(Button button) {
 	}
 
 	/**

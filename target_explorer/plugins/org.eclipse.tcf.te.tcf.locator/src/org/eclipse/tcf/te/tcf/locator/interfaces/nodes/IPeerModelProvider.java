@@ -7,20 +7,20 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.runtime.persistence.interfaces;
+package org.eclipse.tcf.te.tcf.locator.interfaces.nodes;
+
+import org.eclipse.core.runtime.IAdaptable;
 
 /**
- * Persistable node property constants.
+ * Interface to be implemented by nodes providing access to an peer
+ * model object instance without being a peer model object itself.
  */
-public interface IPersistableNodeProperties {
+public interface IPeerModelProvider extends IAdaptable {
 
 	/**
-	 * The URI of the node in a persistence storage.
-	 * <p>
-	 * This property can be used by persistable implementations to store the URI to remember from
-	 * where a node got restored or written to.
-	 * <p>
-	 * The property itself is a transient property.
+	 * Returns the associated peer model object.
+	 *
+	 * @return The peer model object instance or <code>null</code>.
 	 */
-	public static final String PROPERTY_URI = "URI.transient"; //$NON-NLS-1$
+	public IPeerModel getPeerModel();
 }

@@ -31,6 +31,7 @@ import org.eclipse.tcf.te.runtime.model.interfaces.IContainerModelNode;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
 import org.eclipse.tcf.te.runtime.persistence.PersistenceDelegateManager;
 import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistable;
+import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistableNameProvider;
 import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistableNodeProperties;
 import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistenceDelegate;
 import org.osgi.framework.Bundle;
@@ -63,26 +64,34 @@ public class ModelNodePersistableAdapter implements IPersistable {
 
 			IPath path = null;
 
-			// If the persistence node name is set, use it and ignore all other possibilities
-			String persistenceNodeName = node.getStringProperty(IPersistableNodeProperties.PROPERTY_NODE_NAME);
-			if (persistenceNodeName != null && !"".equals(persistenceNodeName.trim())) { //$NON-NLS-1$
-				path = getRoot().append(makeValidFileSystemName(persistenceNodeName.trim()));
+			// Try to adapt the node to the IPersistableNameProvider interface first
+			IPersistableNameProvider provider = (IPersistableNameProvider)node.getAdapter(IPersistableNameProvider.class);
+			if (provider != null) {
+				String name = provider.getName(node);
+				if (name != null && !"".equals(name.trim())) path = getRoot().append(name.trim()); //$NON-NLS-1$
 			}
-			// If the persistence name not set, check for the node name
-			else if (node.getName() != null && !"".equals(node.getName().trim())) { //$NON-NLS-1$
-				path = getRoot().append(makeValidFileSystemName(node.getName().trim()));
-			}
-			// If the name is not set, check for an URI
-			else if (node.getProperty(IPersistableNodeProperties.PROPERTY_URI) != null) {
-				Object candidate = node.getProperty(IPersistableNodeProperties.PROPERTY_URI);
-				if (candidate instanceof URI) uri = (URI)candidate;
-				else if (candidate instanceof String && !"".equals(((String)candidate).trim())) { //$NON-NLS-1$
-					uri = URI.create(((String)candidate).trim());
+
+			if (path == null) {
+				// If the path could not be determined via the IPersistableNameProvider interface, check for the node id
+				if (node.getStringProperty(IModelNode.PROPERTY_ID) != null && !"".equals(node.getStringProperty(IModelNode.PROPERTY_ID).trim())) { //$NON-NLS-1$
+					path = getRoot().append(makeValidFileSystemName(node.getStringProperty(IModelNode.PROPERTY_ID).trim()));
 				}
-			}
-			// No name and no explicit path is set -> use the UUID
-			else if (node.getUUID() != null) {
-				path = getRoot().append(makeValidFileSystemName(node.getUUID().toString().trim()));
+				// If the id is not set, check for the node name
+				else if (node.getName() != null && !"".equals(node.getName().trim())) { //$NON-NLS-1$
+					path = getRoot().append(makeValidFileSystemName(node.getName().trim()));
+				}
+				// If the name is not set, check for an URI
+				else if (node.getProperty(IPersistableNodeProperties.PROPERTY_URI) != null) {
+					Object candidate = node.getProperty(IPersistableNodeProperties.PROPERTY_URI);
+					if (candidate instanceof URI) uri = (URI)candidate;
+					else if (candidate instanceof String && !"".equals(((String)candidate).trim())) { //$NON-NLS-1$
+						uri = URI.create(((String)candidate).trim());
+					}
+				}
+				// No name and no explicit path is set -> use the UUID
+				else if (node.getUUID() != null) {
+					path = getRoot().append(makeValidFileSystemName(node.getUUID().toString().trim()));
+				}
 			}
 
 			if (path != null) {
@@ -100,7 +109,7 @@ public class ModelNodePersistableAdapter implements IPersistable {
 	 * @param name The original name. Must not be <code>null</code>.
 	 * @return The valid file system name.
 	 */
-	private String makeValidFileSystemName(String name) {
+	protected String makeValidFileSystemName(String name) {
 		Assert.isNotNull(name);
 		return name.replaceAll("\\W", "_"); //$NON-NLS-1$ //$NON-NLS-2$
 	}

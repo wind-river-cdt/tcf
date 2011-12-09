@@ -7,20 +7,24 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.runtime.persistence.interfaces;
+package org.eclipse.tcf.te.ui.controls.wire;
+
+import org.eclipse.jface.dialogs.IDialogPage;
+import org.eclipse.tcf.te.ui.controls.BaseWizardConfigurationPanelControl;
 
 /**
- * Persistable node property constants.
+ * Custom wire type wizard panel control.
  */
-public interface IPersistableNodeProperties {
+public class WireTypePanelControl extends BaseWizardConfigurationPanelControl {
 
 	/**
-	 * The URI of the node in a persistence storage.
-	 * <p>
-	 * This property can be used by persistable implementations to store the URI to remember from
-	 * where a node got restored or written to.
-	 * <p>
-	 * The property itself is a transient property.
+	 * Constructor.
+	 *
+	 * @param parentPage The parent dialog page this control is embedded in.
+	 *                   Might be <code>null</code> if the control is not associated with a page.
 	 */
-	public static final String PROPERTY_URI = "URI.transient"; //$NON-NLS-1$
+	public WireTypePanelControl(IDialogPage parentPage) {
+		super(parentPage);
+	}
+
 }

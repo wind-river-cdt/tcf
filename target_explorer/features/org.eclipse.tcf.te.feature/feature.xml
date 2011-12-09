@@ -28,6 +28,10 @@
       <import plugin="org.eclipse.tm.terminal.telnet" version="2.1.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.tm.terminal.view" version="2.2.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.navigator" version="3.5.100" match="greaterOrEqual"/>
+      <import plugin="gnu.io.rxtx"/>
+      <import plugin="org.eclipse.tm.terminal.ssh" version="2.1.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.equinox.security" version="1.1.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.tcf.feature" version="1.0.0.qualifier"/>
    </requires>
 
    <plugin

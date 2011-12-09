@@ -24,6 +24,13 @@ import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 public interface IModelNode extends IPropertiesContainer, ISchedulingRule {
 
 	/**
+	 * Property: Model node id. For use for identifying the node externally.
+	 *           It can be identical to the node object instance UUID, but
+	 *           can be any other string or might be not even set.
+	 */
+	public static final String PROPERTY_ID = "id"; //$NON-NLS-1$
+
+	/**
 	 * Property: Model node name. May be used to represent the node
 	 *           in UI widgets.
 	 */

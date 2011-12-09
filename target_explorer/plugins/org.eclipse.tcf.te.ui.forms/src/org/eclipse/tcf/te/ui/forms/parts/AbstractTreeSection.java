@@ -80,6 +80,14 @@ public abstract class AbstractTreeSection extends AbstractStructuredViewerSectio
 		}
 
 		/* (non-Javadoc)
+		 * @see org.eclipse.tcf.te.ui.forms.parts.AbstractPartWithButtons#onButtonCreated(org.eclipse.swt.widgets.Button)
+		 */
+		@Override
+		protected void onButtonCreated(Button button) {
+		    AbstractTreeSection.this.onButtonCreated(button);
+		}
+
+		/* (non-Javadoc)
 		 * @see org.eclipse.tcf.te.ui.forms.parts.TreePart#createTreeViewer(org.eclipse.swt.widgets.Composite, int)
 		 */
 		@Override
@@ -173,6 +181,14 @@ public abstract class AbstractTreeSection extends AbstractStructuredViewerSectio
 	 */
 	@Override
 	public void doubleClick(DoubleClickEvent event) {
+	}
+
+	/**
+	 * Called from {@link TreePartAdapter#createButtonsPanel(Composite, FormToolkit)}.
+	 *
+	 * @param button The created button. Must not be <code>null</code>.
+	 */
+	protected void onButtonCreated(Button button) {
 	}
 
 	/**
