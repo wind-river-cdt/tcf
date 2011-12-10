@@ -59,7 +59,7 @@ public abstract class FSCreate extends FSOperation {
 		IChannel channel = null;
 		try {
 			channel = openChannel(folder.peerNode.getPeer());
-			IFileSystem service = channel.getRemoteService(IFileSystem.class);
+			IFileSystem service = getFileSystem(channel);
 			if (service != null) {
 				if (!folder.childrenQueried) {
 					// If the children of folder is not queried, load it first.

@@ -68,7 +68,7 @@ public class FSCopy extends FSOperation {
 				try {
 					channel = openChannel(head.peerNode.getPeer());
 					if (channel != null) {
-						IFileSystem service = channel.getRemoteService(IFileSystem.class);
+						IFileSystem service = getFileSystem(channel);
 						if (service != null) {
 							monitor.beginTask(Messages.FSCopy_PrepareToCopy, IProgressMonitor.UNKNOWN);
 							monitor.worked(1);

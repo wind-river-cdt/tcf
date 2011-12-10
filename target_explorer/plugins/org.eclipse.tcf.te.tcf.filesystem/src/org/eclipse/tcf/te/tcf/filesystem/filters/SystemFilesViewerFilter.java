@@ -11,7 +11,6 @@ package org.eclipse.tcf.te.tcf.filesystem.filters;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.tcf.te.tcf.filesystem.interfaces.IWindowsFileAttributes;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 
 /**

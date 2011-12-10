@@ -421,7 +421,7 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 			channel = FSOperation.openChannel(folder.peerNode.getPeer());
 			if (!existsByStat()) return null;
 		}
-		IFileSystem service = channel.getRemoteService(IFileSystem.class);
+		IFileSystem service = FSOperation.getFileSystem(channel);
 		List<FSTreeNode> list = new FSOperation().getChildren(folder, service);
 		return list.toArray(new FSTreeNode[list.size()]);
 	}
@@ -434,7 +434,7 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 	 * @throws TCFFileSystemException Thrown during  lstat call.
 	 */
 	private boolean existsByStat() throws TCFFileSystemException {
-	    IFileSystem service = channel.getRemoteService(IFileSystem.class);
+	    IFileSystem service = FSOperation.getFileSystem(channel);
 	    String text = folderControl.getEditFieldControlText();
 	    String path = text.trim();
 	    final boolean[] result = new boolean[1];
