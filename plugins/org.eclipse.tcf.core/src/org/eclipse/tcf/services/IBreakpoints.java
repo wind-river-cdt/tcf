@@ -121,6 +121,7 @@ public interface IBreakpoints extends IService {
     static final String
         CAPABILITY_CONTEXT_ID = "ID",                   // String
         CAPABILITY_HAS_CHILDREN = "HasChildren",        // Boolean
+        CAPABILITY_BREAKPOINT_TYPE = "BreakpointType",  // Boolean
         CAPABILITY_LOCATION = "Location",               // Boolean
         CAPABILITY_CONDITION = "Condition",             // Boolean
         CAPABILITY_FILE_LINE = "FileLine",              // Boolean
