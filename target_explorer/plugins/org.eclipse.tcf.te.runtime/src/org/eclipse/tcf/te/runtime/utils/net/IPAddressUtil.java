@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.locator.utils;
+package org.eclipse.tcf.te.runtime.utils.net;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;

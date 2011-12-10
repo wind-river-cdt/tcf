@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.ILocator;
+import org.eclipse.tcf.te.runtime.utils.net.IPAddressUtil;
 import org.eclipse.tcf.te.tcf.locator.Scanner;
 import org.eclipse.tcf.te.tcf.locator.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.tcf.locator.interfaces.IModelListener;
@@ -39,7 +40,6 @@ import org.eclipse.tcf.te.tcf.locator.listener.LocatorListener;
 import org.eclipse.tcf.te.tcf.locator.services.LocatorModelLookupService;
 import org.eclipse.tcf.te.tcf.locator.services.LocatorModelRefreshService;
 import org.eclipse.tcf.te.tcf.locator.services.LocatorModelUpdateService;
-import org.eclipse.tcf.te.tcf.locator.utils.IPAddressUtil;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.core.interfaces.listeners.IChannelStateChangeListener;
 
