@@ -19,10 +19,10 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 public class ModelAdapter implements IModelListener {
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.locator.core.interfaces.IModelListener#locatorModelChanged(org.eclipse.tcf.te.tcf.locator.core.interfaces.nodes.ILocatorModel)
+	 * @see org.eclipse.tcf.te.tcf.locator.interfaces.IModelListener#locatorModelChanged(org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel, org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel, boolean)
 	 */
 	@Override
-	public void locatorModelChanged(ILocatorModel model) {
+	public void locatorModelChanged(ILocatorModel model, IPeerModel peer, boolean added) {
 	}
 
 	/* (non-Javadoc)

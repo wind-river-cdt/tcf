@@ -23,6 +23,8 @@ import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.ILocator;
 import org.eclipse.tcf.te.runtime.utils.net.IPAddressUtil;
+import org.eclipse.tcf.te.tcf.core.Tcf;
+import org.eclipse.tcf.te.tcf.core.interfaces.listeners.IChannelStateChangeListener;
 import org.eclipse.tcf.te.tcf.locator.Scanner;
 import org.eclipse.tcf.te.tcf.locator.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.tcf.locator.interfaces.IModelListener;
@@ -40,8 +42,6 @@ import org.eclipse.tcf.te.tcf.locator.listener.LocatorListener;
 import org.eclipse.tcf.te.tcf.locator.services.LocatorModelLookupService;
 import org.eclipse.tcf.te.tcf.locator.services.LocatorModelRefreshService;
 import org.eclipse.tcf.te.tcf.locator.services.LocatorModelUpdateService;
-import org.eclipse.tcf.te.tcf.core.Tcf;
-import org.eclipse.tcf.te.tcf.core.interfaces.listeners.IChannelStateChangeListener;
 
 
 /**
@@ -348,8 +348,6 @@ public class LocatorModel extends PlatformObject implements ILocatorModel {
 															, ITracing.ID_TRACE_LOCATOR_MODEL, this);
 			}
 
-			boolean fireListener = false;
-
 			for (IPeerModel previousNode : previousNodes) {
 				// Get the peer for the previous node
 				IPeer previousPeer = previousNode.getPeer();
@@ -380,7 +378,7 @@ public class LocatorModel extends PlatformObject implements ILocatorModel {
 						if (canonical != null && canonical.equals(peerIP) && !canonical.equals(previousPeerIP)) {
 							// Remove the old node and replace it with the new new
 							peers.remove(previousNode.getPeer().getID());
-							fireListener = true;
+							fireListener(previousNode, false);
 
 							if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITracing.ID_TRACE_LOCATOR_MODEL)) {
 								CoreBundleActivator.getTraceHandler().trace("LocatorModel.validatePeerNodeForAdd: Previous peer node replaced (canonical overwrite)" //$NON-NLS-1$
@@ -390,7 +388,7 @@ public class LocatorModel extends PlatformObject implements ILocatorModel {
 								&& (canonical == null || !canonical.equals(previousPeerIP))) {
 							// Remove the old node and replace it with the new new
 							peers.remove(previousNode.getPeer().getID());
-							fireListener = true;
+							fireListener(previousNode, false);
 
 							if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITracing.ID_TRACE_LOCATOR_MODEL)) {
 								CoreBundleActivator.getTraceHandler().trace("LocatorModel.validatePeerNodeForAdd: Previous peer node replaced (loopback overwrite)" //$NON-NLS-1$
@@ -417,22 +415,30 @@ public class LocatorModel extends PlatformObject implements ILocatorModel {
 					}
 				}
 			}
-
-			if (fireListener) {
-				final IModelListener[] listeners = getListener();
-				if (listeners.length > 0) {
-					Protocol.invokeLater(new Runnable() {
-						@Override
-						public void run() {
-							for (IModelListener listener : listeners) {
-								listener.locatorModelChanged(LocatorModel.this);
-							}
-						}
-					});
-				}
-			}
 		}
 
 		return result;
+	}
+
+	/**
+	 * Fire the model listener for the given peer model.
+	 *
+	 * @param peer The peer model. Must not be <code>null</code>.
+	 * @param added <code>True</code> if the peer model got added, <code>false</code> if it got removed.
+	 */
+	protected void fireListener(final IPeerModel peer, final boolean added) {
+		Assert.isNotNull(peer);
+
+		final IModelListener[] listeners = getListener();
+		if (listeners.length > 0) {
+			Protocol.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					for (IModelListener listener : listeners) {
+						listener.locatorModelChanged(LocatorModel.this, peer, added);
+					}
+				}
+			});
+		}
 	}
 }

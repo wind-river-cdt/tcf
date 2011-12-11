@@ -120,7 +120,7 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 	 * If <code>forceNew</code> is <code>true</code>, a new and not reference counted channel is opened and returned. The returned
 	 * channel must be closed by the caller himself. The channel manager is not keeping track of non reference counted channels.
 	 * <p>
-	 * Reference counted channels are cached by the channel manager and must be closed via ... .
+	 * Reference counted channels are cached by the channel manager and must be closed via {@link #closeChannel(IChannel)} .
 	 * <p>
 	 * Method must be called within the TCF dispatch thread.
 	 *
