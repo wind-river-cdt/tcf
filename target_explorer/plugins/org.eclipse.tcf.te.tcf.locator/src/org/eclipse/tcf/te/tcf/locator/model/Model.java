@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.ui.model;
+package org.eclipse.tcf.te.tcf.locator.model;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.protocol.Protocol;
@@ -31,8 +31,25 @@ public final class Model {
 	 * @return The shared locator model.
 	 */
 	public static ILocatorModel getModel() {
+		return getModel(false);
+	}
+
+	/**
+	 * Returns the shared locator model instance.
+	 * <p>
+	 * If the shared locator model instance has not been yet initialized,
+	 * and <code>shutdown</code> is <code>false</code>, the method does
+	 * initialize the shared locator model instance.
+	 *
+	 * @param shutdown <code>True</code> if the method is called during shutdown and
+	 *                 the model should not be initialized if not done anyway. <code>
+	 *                 false</code> in any other case.
+	 *
+	 * @return The shared locator model.
+	 */
+	public static ILocatorModel getModel(boolean shutdown) {
 		// Access to the locator model must happen in the TCF dispatch thread
-		if (locatorModel == null) {
+		if (locatorModel == null && !shutdown) {
 			if (Protocol.isDispatchThread()) {
 				initialize();
 			} else {
@@ -53,9 +70,8 @@ public final class Model {
 	protected static void initialize() {
 		Assert.isTrue(Protocol.isDispatchThread());
 
+		// Create the model instance
 		locatorModel = new LocatorModel();
-		// Register the model listener
-//		locatorModel.addListener(new ModelListener(locatorModel));
 		// Start the scanner
 		locatorModel.startScanner(5000, 120000);
 	}

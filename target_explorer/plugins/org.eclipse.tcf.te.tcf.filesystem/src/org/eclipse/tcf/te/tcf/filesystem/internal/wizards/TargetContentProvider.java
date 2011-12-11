@@ -15,7 +15,7 @@ import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelRefreshService;
-import org.eclipse.tcf.te.tcf.ui.model.Model;
+import org.eclipse.tcf.te.tcf.locator.model.Model;
 import org.eclipse.tcf.te.ui.views.interfaces.IRoot;
 
 /**

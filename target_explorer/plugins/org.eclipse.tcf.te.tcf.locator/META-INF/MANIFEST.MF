@@ -25,5 +25,6 @@ Export-Package: org.eclipse.tcf.te.tcf.locator,
  org.eclipse.tcf.te.tcf.locator.internal.nls;x-internal:=true,
  org.eclipse.tcf.te.tcf.locator.internal.preferences;x-internal:=true,
  org.eclipse.tcf.te.tcf.locator.listener,
+ org.eclipse.tcf.te.tcf.locator.model,
  org.eclipse.tcf.te.tcf.locator.nodes,
  org.eclipse.tcf.te.tcf.locator.services

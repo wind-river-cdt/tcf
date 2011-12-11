@@ -12,11 +12,11 @@ package org.eclipse.tcf.te.tcf.ui.internal.navigator;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.tcf.protocol.Protocol;
-import org.eclipse.tcf.te.tcf.ui.model.Model;
 import org.eclipse.tcf.te.tcf.locator.interfaces.IModelListener;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelRefreshService;
+import org.eclipse.tcf.te.tcf.locator.model.Model;
 import org.eclipse.tcf.te.ui.views.interfaces.IRoot;
 import org.eclipse.ui.navigator.CommonViewer;
 
@@ -89,7 +89,6 @@ public class ContentProviderDelegate implements ITreeContentProvider {
 	 */
 	@Override
 	public void dispose() {
-		Model.dispose();
 	}
 
 	/* (non-Javadoc)
