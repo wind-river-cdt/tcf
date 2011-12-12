@@ -63,7 +63,7 @@ public class UserManager {
 	 * @return The user account information or null if it fails.
 	 */
 	private UserAccount getUserByChannel(final IChannel channel) throws TCFFileSystemException {
-		IFileSystem service = channel.getRemoteService(IFileSystem.class);
+		IFileSystem service = FSOperation.getFileSystem(channel);
 		if (service != null) {
 			final TCFFileSystemException[] errors = new TCFFileSystemException[1];
 			final Rendezvous rendezvous = new Rendezvous();

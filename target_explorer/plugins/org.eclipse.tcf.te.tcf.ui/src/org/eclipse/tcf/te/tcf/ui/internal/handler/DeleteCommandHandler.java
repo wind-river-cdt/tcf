@@ -22,7 +22,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.tcf.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.ui.internal.help.IContextHelpIds;
-import org.eclipse.tcf.te.tcf.ui.model.Model;
 import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistenceService;
@@ -34,6 +33,7 @@ import org.eclipse.tcf.te.runtime.statushandler.interfaces.IStatusHandlerConstan
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelRefreshService;
+import org.eclipse.tcf.te.tcf.locator.model.Model;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**

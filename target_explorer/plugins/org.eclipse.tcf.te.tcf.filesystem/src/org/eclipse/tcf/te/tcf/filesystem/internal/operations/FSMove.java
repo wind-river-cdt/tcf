@@ -77,7 +77,7 @@ public class FSMove extends FSOperation {
 				try {
 					channel = openChannel(head.peerNode.getPeer());
 					if (channel != null) {
-						IFileSystem service = channel.getRemoteService(IFileSystem.class);
+						IFileSystem service = getFileSystem(channel);
 						if (service != null) {
 							monitor.beginTask(Messages.FSMove_PrepareToMove, IProgressMonitor.UNKNOWN);
 							monitor.worked(1);

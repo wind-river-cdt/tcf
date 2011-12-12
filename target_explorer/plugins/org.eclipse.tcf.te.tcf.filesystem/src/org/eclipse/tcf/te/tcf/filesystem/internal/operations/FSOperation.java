@@ -216,6 +216,25 @@ public class FSOperation {
 	}
 
 	/**
+	 * Get the file system service from the channel.
+	 * 
+	 * @param channel The tcf channel.
+	 * @return The file system service.
+	 */
+	public static IFileSystem getFileSystem(final IChannel channel) {
+		if(Protocol.isDispatchThread()) {
+			return channel.getRemoteService(IFileSystem.class);
+		}
+		final IFileSystem[] result = new IFileSystem[1];
+		Protocol.invokeAndWait(new Runnable(){
+			@Override
+            public void run() {
+				result[0] = getFileSystem(channel);
+            }});
+		return result[0];
+	}
+
+	/**
 	 * Count the total nodes in the node list including their children and grand children
 	 * recursively.
 	 *
@@ -266,7 +285,7 @@ public class FSOperation {
 		IChannel channel = null;
 		try {
 			channel = openChannel(node.peerNode.getPeer());
-			IFileSystem service = channel.getRemoteService(IFileSystem.class);
+			IFileSystem service = getFileSystem(channel);
 			if (service != null) {
 				return getChildren(node, service);
 			}

@@ -68,7 +68,7 @@ public class StateManager {
 		try {
 			channel = FSOperation.openChannel(node.peerNode.getPeer());
 			if (channel != null) {
-				IFileSystem service = channel.getRemoteService(IFileSystem.class);
+				IFileSystem service = FSOperation.getFileSystem(channel);
 				if (service != null) {
 					final TCFFileSystemException[] errors = new TCFFileSystemException[1];
 					final Rendezvous rendezvous = new Rendezvous();
@@ -116,7 +116,7 @@ public class StateManager {
 		try {
 			channel = FSOperation.openChannel(node.peerNode.getPeer());
 			if (channel != null) {
-				IFileSystem service = channel.getRemoteService(IFileSystem.class);
+				IFileSystem service = FSOperation.getFileSystem(channel);
 				if (service != null) {
 					final TCFFileSystemException[] errors = new TCFFileSystemException[1];
 					final Rendezvous rendezvous = new Rendezvous();

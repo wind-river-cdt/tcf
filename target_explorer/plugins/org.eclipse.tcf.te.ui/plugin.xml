@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="newWizards" name="New Target Wizards" schema="schema/newWizards.exsd"/>
+   <extension-point id="newWizards" name="%extension-point.newtarget.name" schema="schema/newWizards.exsd"/>
+   <extension-point id="viewers" name="%extension-point.treeviewer.name" schema="schema/viewers.exsd"/>
 
 <!-- New target wizard contributions -->
 

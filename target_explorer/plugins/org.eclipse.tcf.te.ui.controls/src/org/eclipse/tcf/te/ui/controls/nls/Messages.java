@@ -72,9 +72,6 @@ public class Messages extends NLS {
 	public static String BaseEditBrowseTextControl_button_label;
 	public static String BaseEditBrowseTextControl_validationJob_name;
 
-	public static String NameControl_label;
-	public static String NameControl_info_missingValue;
-
 	public static String DirectorySelectionControl_title;
 	public static String DirectorySelectionControl_group_label;
 	public static String DirectorySelectionControl_editfield_label;
@@ -95,42 +92,6 @@ public class Messages extends NLS {
 	public static String RemoteHostAddressControl_error_targetNameNotResolveable;
 
 	public static String RemoteHostPortControl_label;
-
-	public static String WireTypeControl_label;
-	public static String WireTypeControl_networkType_label;
-	public static String WireTypeControl_serialType_label;
-
-	public static String NetworkCablePanel_section;
-	public static String NetworkCablePanel_addressControl_label;
-
-	public static String SerialLinePanel_section;
-	public static String SerialLinePanel_hostTTYDevice_label;
-	public static String SerialLinePanel_hostTTYSpeed_label;
-	public static String SerialLinePanel_hostTTYDatabits_label;
-	public static String SerialLinePanel_hostTTYParity_label;
-	public static String SerialLinePanel_hostTTYStopbits_label;
-	public static String SerialLinePanel_hostTTYFlowControl_label;
-	public static String SerialLinePanel_customSerialDevice_title;
-	public static String SerialLinePanel_customSerialDevice_message;
-	public static String SerialLinePanel_customSerialBaudRate_title;
-	public static String SerialLinePanel_customSerialBaudRate_message;
-	public static String SerialLinePanel_error_invalidCharactes;
-	public static String SerialLinePanel_error_invalidCharactesBaudRate;
-	public static String SerialLinePanel_error_emptyHostTTYDevice;
-	public static String SerialLinePanel_error_emptyHostTTYSpeedRate;
-	public static String SerialLinePanel_error_emptyHostTTYDatabits;
-	public static String SerialLinePanel_error_emptyHostTTYParity;
-	public static String SerialLinePanel_error_emptyHostTTYStopbits;
-	public static String SerialLinePanel_error_emptyHostTTYFlowControl;
-	public static String SerialLinePanel_info_editableTTYDeviceSelected;
-	public static String SerialLinePanel_info_editableTTYBaudRateSelected;
-	public static String SerialLinePanel_warning_FailedToLoadSerialPorts;
-	public static String SerialLinePanel_task_queryAvailableSerialDevices;
-
-	public static String SerialPortAddressDialog_port;
-	public static String SerialPortAddressDialog_Information_MissingPort;
-	public static String SerialPortAddressDialog_Error_InvalidPort;
-	public static String SerialPortAddressDialog_Error_InvalidPortRange;
 
 	public static String NameOrIPValidator_Information_MissingNameOrIP;
 	public static String NameOrIPValidator_Information_MissingName;

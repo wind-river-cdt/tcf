@@ -33,11 +33,11 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.tcf.ui.internal.help.IContextHelpIds;
 import org.eclipse.tcf.te.tcf.ui.internal.navigator.LabelProviderDelegate;
-import org.eclipse.tcf.te.tcf.ui.model.Model;
 import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelLookupService;
+import org.eclipse.tcf.te.tcf.locator.model.Model;
 import org.eclipse.tcf.te.ui.jface.dialogs.CustomTitleAreaDialog;
 import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
 

@@ -13,6 +13,9 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.viewers.DecoratingLabelProvider;
+import org.eclipse.jface.viewers.ILabelDecorator;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -21,10 +24,16 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeContentProvider;
-import org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeLabelProvider;
+import org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeViewerSorter;
+import org.eclipse.tcf.te.tcf.filesystem.filters.HiddenFilesViewerFilter;
+import org.eclipse.tcf.te.tcf.filesystem.filters.SystemFilesViewerFilter;
+import org.eclipse.tcf.te.tcf.filesystem.internal.columns.FSTreeElementLabelProvider;
 import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.MoveFilesHandler;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
+import org.eclipse.ui.IDecoratorManager;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.dialogs.ISelectionStatusValidator;
 
@@ -56,7 +65,7 @@ import org.eclipse.ui.dialogs.ISelectionStatusValidator;
  */
 public class FSFolderSelectionDialog extends ElementTreeSelectionDialog {
 	// Label provider used by the file system tree.
-	private FSTreeLabelProvider labelProvider;
+	private FSTreeElementLabelProvider labelProvider;
 	// The nodes that are being moved.
 	private List<FSTreeNode> movedNodes;
 
@@ -66,7 +75,7 @@ public class FSFolderSelectionDialog extends ElementTreeSelectionDialog {
 	 * @param parentShell The parent shell.
 	 */
 	public FSFolderSelectionDialog(Shell parentShell) {
-		this(parentShell, new FSTreeLabelProvider(), new FSTreeContentProvider());
+		this(parentShell, new FSTreeElementLabelProvider(), new FSTreeContentProvider());
 	}
 
 	/**
@@ -77,12 +86,15 @@ public class FSFolderSelectionDialog extends ElementTreeSelectionDialog {
 	 * @param labelProvider The label provider.
 	 * @param contentProvider The content provider.
 	 */
-	private FSFolderSelectionDialog(Shell parentShell, FSTreeLabelProvider labelProvider, ITreeContentProvider contentProvider) {
-		super(parentShell, labelProvider, contentProvider);
+	private FSFolderSelectionDialog(Shell parentShell, FSTreeElementLabelProvider labelProvider, ITreeContentProvider contentProvider) {
+		super(parentShell, createDecoratingLabelProvider(labelProvider), contentProvider);
 		this.labelProvider = labelProvider;
 		setTitle(Messages.FSFolderSelectionDialog_MoveDialogTitle);
 		setMessage(Messages.FSFolderSelectionDialog_MoveDialogMessage);
 		this.setAllowMultiple(false);
+		this.setComparator(new FSTreeViewerSorter());
+		this.addFilter(new HiddenFilesViewerFilter());
+		this.addFilter(new SystemFilesViewerFilter());
 		this.addFilter(new ViewerFilter() {
 			@Override
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
@@ -103,6 +115,19 @@ public class FSFolderSelectionDialog extends ElementTreeSelectionDialog {
 			}
 		});
 	}
+	
+	/**
+	 * Create a decorating label provider using the specified label provider.
+	 * 
+	 * @param labelProvider The label provider that actually provides labels and images.
+	 * @return The decorating label provider.
+	 */
+	private static ILabelProvider createDecoratingLabelProvider(ILabelProvider labelProvider) {
+		IWorkbench workbench = PlatformUI.getWorkbench();
+		IDecoratorManager manager = workbench.getDecoratorManager();
+		ILabelDecorator decorator = manager.getLabelDecorator();
+		return new DecoratingLabelProvider(labelProvider,decorator);
+	}
 
 	/**
 	 * Set the nodes that are about to be moved.
@@ -120,7 +145,7 @@ public class FSFolderSelectionDialog extends ElementTreeSelectionDialog {
 	protected TreeViewer doCreateTreeViewer(Composite parent, int style) {
 		TreeViewer viewer = super.doCreateTreeViewer(parent, style);
 		viewer.getTree().setLinesVisible(false);
-		labelProvider.setParentViewer(viewer);
+		labelProvider.setViewer(viewer);
 		return viewer;
 	}
 

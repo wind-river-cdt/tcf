@@ -1,0 +1,357 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.tcf.te.ui" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="org.eclipse.tcf.te.ui" id="viewers" name="Tree Viewer Extension"/>
+      </appinfo>
+      <documentation>
+         This extension point is used to declare the columns and the filters for a specified tree viewer.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="viewer" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="viewer">
+      <annotation>
+         <documentation>
+            Declares a viewer with a viewerId to columns or filters. Definitions of this element with the same viewerId can occur multiple time to contribute columns and filters to a same viewer.
+         </documentation>
+      </annotation>
+      <complexType>
+         <choice>
+            <sequence>
+               <element ref="column" minOccurs="1" maxOccurs="unbounded"/>
+            </sequence>
+            <sequence>
+               <element ref="filter" minOccurs="1" maxOccurs="unbounded"/>
+            </sequence>
+         </choice>
+         <attribute name="viewerId" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The viewer&apos;s id which uniquely defines a single tree viewer.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="column">
+      <annotation>
+         <documentation>
+            Declares a tree viewer column with the specified attributes.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The id of the column which must be unique in the same viewer.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The name of the tree viewer column. It is used as the column&apos;s label.
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="description" type="string">
+            <annotation>
+               <documentation>
+                  The description of the column used as the tooltip text of the column.
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="moveable" type="boolean">
+            <annotation>
+               <documentation>
+                  Declares if the column is moveable. The default value is false.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="resizable" type="boolean">
+            <annotation>
+               <documentation>
+                  Declares if the column is resizable. The default value is true.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="visible" type="boolean">
+            <annotation>
+               <documentation>
+                  Declares if the column is visible. The default value is true.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="style">
+            <annotation>
+               <documentation>
+                  The style of the column when it is created, SWT.LEFT by default.
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="SWT.LEFT">
+                  </enumeration>
+                  <enumeration value="SWT.RIGHT">
+                  </enumeration>
+                  <enumeration value="SWT.CENTER">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+         <attribute name="alignment">
+            <annotation>
+               <documentation>
+                  The alignment of the column&apos;s header text, SWT.LEFT by default.
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="SWT.LEFT">
+                  </enumeration>
+                  <enumeration value="SWT.RIGHT">
+                  </enumeration>
+                  <enumeration value="SWT.CENTER">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+         <attribute name="width" type="string">
+            <annotation>
+               <documentation>
+                  The column&apos;s initial width when it is created, 150 by default.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="image" type="string">
+            <annotation>
+               <documentation>
+                  The column&apos;s header image. No image by default.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="resource"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="labelProvider" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The label provider of the column.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn="org.eclipse.tcf.te.ui.trees.TreeColumnLabelProvider:"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="comparator" type="string">
+            <annotation>
+               <documentation>
+                  The comparator of the column, used to sort the viewer. If it is not set, then this column is not sortable.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":java.util.Comparator"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="filter">
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The id of the filter which must be unique in this viewer.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The name of the filter used to display in the viewer&apos;s filter configuration dialog.
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="description" type="string">
+            <annotation>
+               <documentation>
+                  The description of the filter.
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="enabled" type="boolean">
+            <annotation>
+               <documentation>
+                  If this filter is enabled. Disabled by default.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The viewer filter that extends &lt;samp&gt;org.eclipse.jface.viewers.ViewerFilter&lt;/samp&gt;.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn="org.eclipse.jface.viewers.ViewerFilter:"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         Target Explorer 1.0.0
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         &lt;pre&gt;
+   &lt;extension
+         point=&quot;org.eclipse.tcf.te.ui.viewers&quot;&gt;
+      &lt;viewer
+            viewerId=&quot;org.eclipse.tcf.te.ui.controls.viewer.fs&quot;&gt;
+         &lt;column
+               alignment=&quot;SWT.LEFT&quot;
+               comparator=&quot;org.eclipse.tcf.te.tcf.filesystem.internal.columns.FSTreeElementComparator&quot;
+               id=&quot;name&quot;
+               labelProvider=&quot;org.eclipse.tcf.te.tcf.filesystem.internal.columns.FSTreeElementLabelProvider&quot;
+               moveable=&quot;true&quot;
+               name=&quot;%column.name.name&quot;
+               resizable=&quot;true&quot;
+               style=&quot;SWT.LEFT&quot;
+               visible=&quot;true&quot;
+               width=&quot;300&quot;&gt;
+         &lt;/column&gt;
+         &lt;column
+               alignment=&quot;SWT.RIGHT&quot;
+               comparator=&quot;org.eclipse.tcf.te.tcf.filesystem.internal.columns.SizeComparator&quot;
+               id=&quot;size&quot;
+               labelProvider=&quot;org.eclipse.tcf.te.tcf.filesystem.internal.columns.SizeLabelProvider&quot;
+               moveable=&quot;true&quot;
+               name=&quot;%column.name.size&quot;
+               resizable=&quot;true&quot;
+               style=&quot;SWT.RIGHT&quot;
+               visible=&quot;true&quot;
+               width=&quot;100&quot;&gt;
+         &lt;/column&gt;
+         &lt;column
+               alignment=&quot;SWT.RIGHT&quot;
+               comparator=&quot;org.eclipse.tcf.te.tcf.filesystem.internal.columns.ModificationTimeComparator&quot;
+               id=&quot;modified&quot;
+               labelProvider=&quot;org.eclipse.tcf.te.tcf.filesystem.internal.columns.ModificationTimeLabelProvider&quot;
+               moveable=&quot;true&quot;
+               name=&quot;%column.name.modified&quot;
+               resizable=&quot;true&quot;
+               style=&quot;SWT.RIGHT&quot;
+               visible=&quot;true&quot;
+               width=&quot;200&quot;&gt;
+         &lt;/column&gt;
+      &lt;/viewer&gt;
+      &lt;viewer
+            viewerId=&quot;org.eclipse.tcf.te.ui.controls.viewer.fs&quot;&gt;
+         &lt;filter
+               class=&quot;org.eclipse.tcf.te.tcf.filesystem.filters.HiddenFilesViewerFilter&quot;
+               enabled=&quot;true&quot;
+               id=&quot;org.eclipse.tcf.te.tcf.filesystem.filters.hiddenFiles&quot;
+               name=&quot;%filter.name.hidden&quot;&gt;
+         &lt;/filter&gt;
+         &lt;filter
+               class=&quot;org.eclipse.tcf.te.tcf.filesystem.filters.SystemFilesViewerFilter&quot;
+               enabled=&quot;true&quot;
+               id=&quot;org.eclipse.tcf.te.tcf.filesystem.filters.systemFiles&quot;
+               name=&quot;%filter.name.system&quot;&gt;
+         &lt;/filter&gt;
+      &lt;/viewer&gt;
+   &lt;/extension&gt;   
+&lt;/pre&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="apiinfo"/>
+      </appinfo>
+      <documentation>
+         &lt;p&gt;
+In the &quot;column&quot; element, the class referenced by the attribute &quot;labelProvider&quot; must extend &lt;samp&gt;org.eclipse.tcf.te.ui.trees.TreeColumnLabelProvider&lt;/samp&gt; which provides the viewer as the parameter. The class referenced by the attribute &quot;comparator&quot; must implement &lt;samp&gt;java.util.Comparator&lt;/samp&gt; that compares the elements of the tree viewer.
+&lt;p&gt;
+In the &quot;filter&quot; element, the class referenced by the attribute &quot;class&quot; must extend &lt;samp&gt;org.eclipse.jface.viewers.ViewerFilter&lt;/samp&gt;. 
+      </documentation>
+   </annotation>
+
+
+   <annotation>
+      <appinfo>
+         <meta.section type="copyright"/>
+      </appinfo>
+      <documentation>
+         Copyright (c) 2011 Wind River Systems, Inc. and others.
+
+All rights reserved.
+
+This program and the accompanying materials are made available under the terms
+of the Eclipse Public License v1.0 which accompanies this distribution, and is
+available at http://www.eclipse.org/legal/epl-v10.html.
+      </documentation>
+   </annotation>
+
+</schema>

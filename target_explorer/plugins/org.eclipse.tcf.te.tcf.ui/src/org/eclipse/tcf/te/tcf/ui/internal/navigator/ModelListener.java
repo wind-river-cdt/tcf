@@ -39,10 +39,10 @@ public class ModelListener extends ModelAdapter {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.locator.core.listener.ModelAdapter#locatorModelChanged(org.eclipse.tcf.te.tcf.locator.core.interfaces.nodes.ILocatorModel)
+	 * @see org.eclipse.tcf.te.tcf.locator.listener.ModelAdapter#locatorModelChanged(org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel, org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel, boolean)
 	 */
 	@Override
-	public void locatorModelChanged(final ILocatorModel model) {
+	public void locatorModelChanged(ILocatorModel model, IPeerModel peer, boolean added) {
 		if (parentModel.equals(model)) {
 			PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
 				@Override

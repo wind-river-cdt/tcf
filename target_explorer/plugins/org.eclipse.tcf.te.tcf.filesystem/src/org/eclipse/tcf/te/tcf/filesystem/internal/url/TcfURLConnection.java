@@ -150,7 +150,7 @@ public class TcfURLConnection extends URLConnection {
 			throw new IOException(e.getLocalizedMessage());
 		}
 		if (channel != null) {
-			IFileSystem service = channel.getRemoteService(IFileSystem.class);
+			IFileSystem service = FSOperation.getFileSystem(channel);
 			if (service != null) {
 				final Rendezvous rendezvous = new Rendezvous();
 				final FileSystemException[] errors = new FileSystemException[1];

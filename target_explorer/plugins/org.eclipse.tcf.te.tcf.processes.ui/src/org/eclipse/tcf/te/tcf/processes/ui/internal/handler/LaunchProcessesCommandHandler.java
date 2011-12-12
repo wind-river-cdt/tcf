@@ -56,6 +56,7 @@ public class LaunchProcessesCommandHandler extends AbstractChannelCommandHandler
 		IEditorPart editorPart = activePart != null ? (IEditorPart)activePart.getAdapter(IEditorPart.class) : null;
 		// Open the dialog
 		LaunchObjectDialog dialog = doCreateDialog(editorPart, shell);
+		dialog.setNode(node);
 		if (dialog.open() == Window.OK) {
 			// Get the new launch attributes
 			Map<String, Object> launchAttributes = dialog.getLaunchAttributes();

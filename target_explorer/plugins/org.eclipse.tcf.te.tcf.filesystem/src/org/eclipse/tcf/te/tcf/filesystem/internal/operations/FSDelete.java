@@ -70,7 +70,7 @@ public class FSDelete extends FSOperation {
 				try {
 					channel = openChannel(head.peerNode.getPeer());
 					if (channel != null) {
-						IFileSystem service = channel.getRemoteService(IFileSystem.class);
+						IFileSystem service = getFileSystem(channel);
 						if (service != null) {
 							monitor.beginTask(Messages.FSDelete_PrepareToDelete, IProgressMonitor.UNKNOWN);
 							monitor.worked(1);

@@ -66,6 +66,19 @@ public class NodeStateFilter implements IActionFilter {
 				}
 			}
 		}
+		else if (name.equals("hidden")) { //$NON-NLS-1$
+			if (value == null) value = "true"; //$NON-NLS-1$
+			boolean result = false;
+			if (!node.isRoot()) {
+				if (node.isWindowsNode()) {
+					result = node.isHidden();
+				}
+				else {
+					result = node.name.startsWith("."); //$NON-NLS-1$
+				}
+			}
+			return Boolean.toString(result).equals(value);
+		}
 		return false;
 	}
 }

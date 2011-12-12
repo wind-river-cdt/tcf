@@ -15,6 +15,7 @@ features/build-workspace
 
 # features/org.eclipse.tcf.cdt.feature/
 features/org.eclipse.tcf.cdt.feature/target
+features/org.eclipse.tcf.cdt.sdk.feature/target
 
 # features/org.eclipse.tcf.feature/
 features/org.eclipse.tcf.feature/target
@@ -28,6 +29,7 @@ features/org.eclipse.tcf.repo/target
 
 # features/org.eclipse.tcf.rse.feature/
 features/org.eclipse.tcf.rse.feature/target
+features/org.eclipse.tcf.rse.sdk.feature/target
 
 # features/org.eclipse.tcf.site/
 features/org.eclipse.tcf.site/features

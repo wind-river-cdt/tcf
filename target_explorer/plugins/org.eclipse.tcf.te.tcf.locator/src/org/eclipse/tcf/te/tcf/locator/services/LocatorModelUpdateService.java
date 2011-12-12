@@ -39,7 +39,7 @@ public class LocatorModelUpdateService extends AbstractLocatorModelService imple
 	 * @see org.eclipse.tcf.te.tcf.locator.core.interfaces.services.ILocatorModelUpdateService#add(org.eclipse.tcf.te.tcf.locator.core.interfaces.nodes.IPeerModel)
 	 */
 	@Override
-	public void add(IPeerModel peer) {
+	public void add(final IPeerModel peer) {
 		Assert.isNotNull(peer);
 		Assert.isTrue(Protocol.isDispatchThread());
 
@@ -53,7 +53,7 @@ public class LocatorModelUpdateService extends AbstractLocatorModelService imple
 				@Override
 				public void run() {
 					for (IModelListener listener : listeners) {
-						listener.locatorModelChanged(getLocatorModel());
+						listener.locatorModelChanged(getLocatorModel(), peer, true);
 					}
 				}
 			});
@@ -64,7 +64,7 @@ public class LocatorModelUpdateService extends AbstractLocatorModelService imple
 	 * @see org.eclipse.tcf.te.tcf.locator.core.interfaces.services.ILocatorModelUpdateService#remove(org.eclipse.tcf.te.tcf.locator.core.interfaces.nodes.IPeerModel)
 	 */
 	@Override
-	public void remove(IPeerModel peer) {
+	public void remove(final IPeerModel peer) {
 		Assert.isNotNull(peer);
 		Assert.isTrue(Protocol.isDispatchThread());
 
@@ -78,7 +78,7 @@ public class LocatorModelUpdateService extends AbstractLocatorModelService imple
 				@Override
 				public void run() {
 					for (IModelListener listener : listeners) {
-						listener.locatorModelChanged(getLocatorModel());
+						listener.locatorModelChanged(getLocatorModel(), peer, false);
 					}
 				}
 			});

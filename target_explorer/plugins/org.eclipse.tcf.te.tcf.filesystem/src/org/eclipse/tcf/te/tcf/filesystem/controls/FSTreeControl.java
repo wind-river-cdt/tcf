@@ -19,15 +19,12 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ILabelDecorator;
-import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.Transfer;
@@ -35,18 +32,12 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeColumn;
-import org.eclipse.tcf.te.tcf.filesystem.filters.HiddenFilesViewerFilter;
-import org.eclipse.tcf.te.tcf.filesystem.filters.SystemFilesViewerFilter;
 import org.eclipse.tcf.te.tcf.filesystem.internal.celleditor.FSViewerCellEditorFactory;
 import org.eclipse.tcf.te.tcf.filesystem.internal.dnd.FSDragSourceListener;
 import org.eclipse.tcf.te.tcf.filesystem.internal.dnd.FSDropTargetListener;
-import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.ui.interfaces.IUIConstants;
 import org.eclipse.tcf.te.ui.trees.AbstractTreeControl;
-import org.eclipse.ui.IDecoratorManager;
 import org.eclipse.ui.ISources;
-import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PlatformUI;
@@ -95,20 +86,6 @@ public class FSTreeControl extends AbstractTreeControl implements ISelectionChan
 		super.configureTreeViewer(viewer);
 
 		Tree tree = viewer.getTree();
-		if (hasColumns()) {
-			TreeColumn column = new TreeColumn(tree, SWT.LEFT);
-			column.setText(Messages.FSTreeControl_column_name_label);
-			column.setWidth(300);
-
-			column = new TreeColumn(tree, SWT.RIGHT);
-			column.setText(Messages.FSTreeControl_column_size_label);
-			column.setWidth(100);
-
-			column = new TreeColumn(tree, SWT.RIGHT);
-			column.setText(Messages.FSTreeControl_column_modified_label);
-			column.setWidth(200);
-		}
-		tree.setHeaderVisible(hasColumns());
 		tree.addFocusListener(this);
 		viewer.addDoubleClickListener(this);
 		//Add DnD support.
@@ -118,18 +95,6 @@ public class FSTreeControl extends AbstractTreeControl implements ISelectionChan
 		viewer.addDropSupport(operations, transferTypes, new FSDropTargetListener(viewer));
 		// Add editing support to rename files/folders.
 		new FSViewerCellEditorFactory().addEditingSupport(viewer);
-		// Add viewer filters.
-		viewer.addFilter(new HiddenFilesViewerFilter());
-		viewer.addFilter(new SystemFilesViewerFilter());
-	}
-
-	/**
-	 * Returns if or if not to show the tree columns.
-	 *
-	 * @return <code>True</code> to show the tree columns, <code>false</code> otherwise.
-	 */
-	protected boolean hasColumns() {
-		return true;
 	}
 
 	/* (non-Javadoc)
@@ -141,31 +106,11 @@ public class FSTreeControl extends AbstractTreeControl implements ISelectionChan
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.vtl.ui.datasource.controls.trees.AbstractTreeControl#doCreateTreeViewerLabelProvider(org.eclipse.jface.viewers.TreeViewer)
-	 */
-	@Override
-	protected ILabelProvider doCreateTreeViewerLabelProvider(TreeViewer viewer) {
-		FSTreeLabelProvider labelProvider = new FSTreeLabelProvider(viewer);
-		IWorkbench workbench = PlatformUI.getWorkbench();
-		IDecoratorManager manager = workbench.getDecoratorManager();
-		ILabelDecorator decorator = manager.getLabelDecorator();
-		return new FSTreeDecoratingLabelProvider(labelProvider,decorator);
-	}
-
-	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.tcf.vtl.ui.datasource.controls.trees.AbstractTreeControl#doCreateTreeViewerSelectionChangedListener(org.eclipse.jface.viewers.TreeViewer)
 	 */
 	@Override
 	protected ISelectionChangedListener doCreateTreeViewerSelectionChangedListener(TreeViewer viewer) {
 		return this;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.vtl.ui.datasource.controls.trees.AbstractTreeControl#doCreateTreeViewerComparator(org.eclipse.jface.viewers.TreeViewer)
-	 */
-	@Override
-	protected ViewerComparator doCreateTreeViewerComparator(TreeViewer viewer) {
-		return new FSTreeViewerComparator(viewer, (ILabelProvider)viewer.getLabelProvider());
 	}
 
 	/* (non-Javadoc)
@@ -259,4 +204,22 @@ public class FSTreeControl extends AbstractTreeControl implements ISelectionChan
 	@Override
     public void focusLost(FocusEvent e) {
     }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.trees.AbstractTreeControl#getHelpId()
+	 */
+	@Override
+    protected String getHelpId() {
+		return getViewerId() + ".help"; //$NON-NLS-1$
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.trees.AbstractTreeControl#getViewerId()
+	 */
+	@Override
+    protected String getViewerId() {
+	    return IUIConstants.ID_CONTROL_MENUS_BASE + ".viewer.fs"; //$NON-NLS-1$;
+    }	
 }
