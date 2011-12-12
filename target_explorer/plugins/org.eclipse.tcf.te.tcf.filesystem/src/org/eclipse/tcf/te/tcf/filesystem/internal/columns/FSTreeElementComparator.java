@@ -27,6 +27,7 @@ public class FSTreeElementComparator extends FSTreeNodeComparator {
 		if (name1 != null && name2 != null) {
 			if (name1.startsWith(".") && !name2.startsWith(".")) return -1; //$NON-NLS-1$ //$NON-NLS-2$
 			if (!name1.startsWith(".") && name2.startsWith(".")) return 1; //$NON-NLS-1$ //$NON-NLS-2$
+			return name1.compareTo(name2);
 		}
 		return 0;
 	}
