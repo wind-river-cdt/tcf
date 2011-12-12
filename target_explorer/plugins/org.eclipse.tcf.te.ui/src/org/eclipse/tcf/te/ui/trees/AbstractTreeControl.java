@@ -125,7 +125,6 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 
 		// Prepare popup menu and toolbar
 		createContributionItems(viewer);
-		
 	}
 
 	/**
@@ -249,26 +248,56 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	/**
 	 * Create the tree columns for the viewer from the tree viewer columns.
 	 * Subclass may override to create its customized the creation.
-	 * 
+	 *  
 	 * @param viewer The tree viewer.
 	 */
 	protected void createTreeColumns(TreeViewer viewer) {
-		if (columns != null) {
-			Tree tree = viewer.getTree();
-			for (ColumnDescriptor column : columns) {
-				TreeColumn treeColumn = new TreeColumn(tree, column.getStyle());
-				treeColumn.setData(column);
-				treeColumn.setText(column.getName());
-				treeColumn.setToolTipText(column.getDescription());
-				treeColumn.setAlignment(column.getAlignment());
-				treeColumn.setImage(column.getImage());
-				treeColumn.setMoveable(column.isMoveable());
-				treeColumn.setResizable(column.isResizable());
-				treeColumn.setWidth(column.isVisible() ? column.getWidth() : 0);
-				treeColumn.addSelectionListener(this);
-				column.setTreeColumn(treeColumn);
+		Assert.isTrue(hasColumns());
+		for (ColumnDescriptor column : columns) {
+			if (column.isVisible()) createTreeColumn(column);
+		}
+	}
+
+	/**
+	 * Create the tree column described by the specified colum descriptor.
+	 * 
+	 * @param column The column descriptor.
+	 * @return The tree column created.
+	 */
+	TreeColumn createTreeColumn(ColumnDescriptor column) {
+		Tree tree = viewer.getTree();
+	    TreeColumn treeColumn = new TreeColumn(tree, column.getStyle(), getColumnIndex(column));
+	    treeColumn.setData(column);
+	    treeColumn.setText(column.getName());
+	    treeColumn.setToolTipText(column.getDescription());
+	    treeColumn.setAlignment(column.getAlignment());
+	    treeColumn.setImage(column.getImage());
+	    treeColumn.setMoveable(column.isMoveable());
+	    treeColumn.setResizable(column.isResizable());
+	    treeColumn.setWidth(column.getWidth());
+	    treeColumn.addSelectionListener(this);
+	    column.setTreeColumn(treeColumn);
+	    return treeColumn;
+    }
+	
+	/**
+	 * Get the column index of the specified column. The column index
+	 * equals to the count of the visible columns before this column.
+	 * 
+	 * @param column The column descriptor.
+	 * @return The column index.
+	 */
+	private int getColumnIndex(ColumnDescriptor column) {
+		Assert.isTrue(columns != null);
+		int visibleCount = 0;
+		for(int i=0;i<columns.length;i++) {
+			if(columns[i] == column)
+				break;
+			if(columns[i].isVisible()) {
+				visibleCount++;
 			}
 		}
+		return visibleCount;
 	}
 
 	/**
@@ -285,7 +314,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * @return <code>True</code> to show the tree columns, <code>false</code> otherwise.
 	 */
 	protected boolean hasColumns() {
-		return columns != null && columns.length > 0;
+		return columns != null && columns.length > 0 && columns[0].isVisible();
 	}
 
 	/**
@@ -378,7 +407,9 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 		// The toolbar is a bit more complicated as we want to have the
 		// toolbar placed within the section title.
 		createToolbarContributionItem(viewer);
-		new TreeViewerHeaderMenu(viewer.getTree()).create();
+		if (hasColumns()) {
+			new TreeViewerHeaderMenu(this).create();
+		}
 	}
 
 	/**

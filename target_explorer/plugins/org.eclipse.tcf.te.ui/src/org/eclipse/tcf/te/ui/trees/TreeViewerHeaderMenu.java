@@ -22,7 +22,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
-import org.eclipse.tcf.te.ui.trees.ColumnDescriptor;
 
 /**
  * The header context menu for the execution context viewer. This context menu
@@ -32,48 +31,38 @@ import org.eclipse.tcf.te.ui.trees.ColumnDescriptor;
 public class TreeViewerHeaderMenu extends Menu implements SelectionListener, Listener, DisposeListener {
 	//The menu control used to configure the columns.
 	private Menu treeMenu;
-	//The execution context tree to be configured.
-	private Tree tree;
+	//The tree to be configured.
+	private AbstractTreeControl treeControl;
+	
 
 	/**
 	 * Create a header menu for the execution context viewer.
 	 * 
 	 * @param tree The execution context tree.
 	 */
-	public TreeViewerHeaderMenu(Tree tree) {
-		super(tree);
-		this.tree = tree;
-		this.tree.addListener(SWT.MenuDetect, this);
-		this.tree.addDisposeListener(this);
-		treeMenu = this.tree.getMenu();
+	public TreeViewerHeaderMenu(AbstractTreeControl treeControl) {
+		super(treeControl.getViewer().getControl());
+		this.treeControl = treeControl;
+		Tree tree = (Tree) treeControl.getViewer().getControl();
+		tree.addListener(SWT.MenuDetect, this);
+		tree.addDisposeListener(this);
+		treeMenu = tree.getMenu();
 	}
 
 	/**
 	 * Create the menu.
 	 */
 	public void create() {
-		int count = tree.getColumnCount();
-		if (count > 0) {
-			for (int i = 0; i < count; i++) {
-				createMenuItem(i);
-			}
+		ColumnDescriptor[] columns = treeControl.getViewerColumns();
+		for (int i = 0; i < columns.length; i++) {
+			ColumnDescriptor column = columns[i];
+			MenuItem menuItem = new MenuItem(this, SWT.CHECK);
+			menuItem.setText(column.getName());
+			menuItem.setSelection(column.isVisible());
+			menuItem.addSelectionListener(this);
+			menuItem.setData(column);
+			menuItem.setEnabled(i != 0);
 		}
-	}
-
-	/**
-	 * Create the menu item for the column with the specified index.
-	 * 
-	 * @param columnIndex The column's index.
-	 */
-	private void createMenuItem(int columnIndex) {
-		TreeColumn treeColumn = tree.getColumn(columnIndex);
-		ColumnDescriptor column = (ColumnDescriptor) treeColumn.getData();
-		MenuItem menuItem = new MenuItem(this, SWT.CHECK);
-		menuItem.setText(column.getName());
-		menuItem.setSelection(column.isVisible());
-		menuItem.addSelectionListener(this);
-		menuItem.setData(column);
-		menuItem.setEnabled(columnIndex != 0);
 	}
 
 	/*
@@ -84,8 +73,18 @@ public class TreeViewerHeaderMenu extends Menu implements SelectionListener, Lis
     public void widgetSelected(SelectionEvent e) {
 		MenuItem item = (MenuItem) e.getSource();
 		ColumnDescriptor column = (ColumnDescriptor) item.getData();
-		column.setVisible(item.getSelection());
-		column.getTreeColumn().setWidth(column.isVisible() ? column.getWidth() : 0);
+		boolean ov = column.isVisible();
+		boolean nv = item.getSelection();
+		if (ov && !nv) {
+			TreeColumn treeColumn = column.getTreeColumn();
+			treeColumn.dispose();
+			column.setTreeColumn(null);
+		}
+		else if (!ov && nv) {
+			TreeColumn treeColumn = treeControl.createTreeColumn(column);
+			column.setTreeColumn(treeColumn);
+		}
+		column.setVisible(nv);
 	}
 
 	/*
