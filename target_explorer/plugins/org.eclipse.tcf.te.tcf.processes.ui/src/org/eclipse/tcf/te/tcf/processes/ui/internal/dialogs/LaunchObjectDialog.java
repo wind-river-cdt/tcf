@@ -15,8 +15,6 @@ import java.util.Map;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -32,19 +30,19 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.tcf.te.tcf.processes.ui.internal.help.IContextHelpIds;
-import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
 import org.eclipse.tcf.te.core.utils.text.StringUtil;
 import org.eclipse.tcf.te.runtime.services.interfaces.constants.ILineSeparatorConstants;
 import org.eclipse.tcf.te.runtime.services.interfaces.constants.ITerminalsConnectorConstants;
 import org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeContentProvider;
 import org.eclipse.tcf.te.tcf.filesystem.dialogs.FSOpenFileDialog;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.processes.core.interfaces.launcher.IProcessLauncher;
+import org.eclipse.tcf.te.tcf.processes.ui.internal.help.IContextHelpIds;
+import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.jface.dialogs.CustomTrayDialog;
 import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.forms.editor.FormPage;
 
 /**
  * Launch object at selected peer dialog.
@@ -53,6 +51,7 @@ public class LaunchObjectDialog extends CustomTrayDialog {
 	private Text imagePath;
 	private Button imagePathBrowse;
 	private Text arguments;
+	/* default */ IPeerModel node;
 	/* default */ Button lineSeparatorDefault;
 	/* default */ Button lineSeparatorLF;
 	/* default */ Button lineSeparatorCRLF;
@@ -91,6 +90,15 @@ public class LaunchObjectDialog extends CustomTrayDialog {
 		this.part = part;
 	}
 
+	/**
+	 * Set the peer node that this dialog relates to.
+	 * 
+	 * @param node The peer node.
+	 */
+	public void setNode(IPeerModel node) {
+		this.node = node;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.ui.jface.dialogs.CustomTrayDialog#createDialogArea(org.eclipse.swt.widgets.Composite)
 	 */
@@ -125,16 +133,14 @@ public class LaunchObjectDialog extends CustomTrayDialog {
 			@SuppressWarnings("synthetic-access")
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				FSOpenFileDialog dialog = new FSOpenFileDialog(part instanceof FormPage ? (FormPage) part : null, getShell(), null);
+				FSOpenFileDialog dialog = new FSOpenFileDialog(getShell());
+				dialog.setInput(node);
 				if (dialog.open() == Window.OK) {
-					ISelection selection = dialog.getSelection();
-					if (selection instanceof IStructuredSelection && !selection.isEmpty()) {
-						Object candidate = ((IStructuredSelection) selection).getFirstElement();
-						if (candidate instanceof FSTreeNode) {
-							String absPath = FSTreeContentProvider.getEntryAbsoluteName((FSTreeNode) candidate);
-							if (absPath != null) {
-								imagePath.setText(absPath);
-							}
+					Object candidate = dialog.getFirstResult();
+					if (candidate instanceof FSTreeNode) {
+						String absPath = FSTreeContentProvider.getEntryAbsoluteName((FSTreeNode) candidate);
+						if (absPath != null) {
+							imagePath.setText(absPath);
 						}
 					}
 				}

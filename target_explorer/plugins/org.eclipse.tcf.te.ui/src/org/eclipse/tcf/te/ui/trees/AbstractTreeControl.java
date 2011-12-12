@@ -256,6 +256,12 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 		for (ColumnDescriptor column : columns) {
 			if (column.isVisible()) createTreeColumn(column);
 		}
+		// Set the default sort column to the first column (the tree column).
+		Assert.isTrue(viewer.getTree().getColumnCount() > 0);
+		TreeColumn treeColumn = viewer.getTree().getColumn(0);
+		viewer.getTree().setSortColumn(treeColumn);
+		ColumnDescriptor column = (ColumnDescriptor) treeColumn.getData();
+		viewer.getTree().setSortDirection(column.isAscending() ? SWT.UP : SWT.DOWN);
 	}
 
 	/**

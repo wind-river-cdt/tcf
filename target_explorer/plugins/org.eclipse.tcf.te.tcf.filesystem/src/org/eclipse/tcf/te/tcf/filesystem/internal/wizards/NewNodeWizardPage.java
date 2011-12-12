@@ -15,6 +15,9 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.util.SafeRunnable;
+import org.eclipse.jface.viewers.DecoratingLabelProvider;
+import org.eclipse.jface.viewers.ILabelDecorator;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -34,6 +37,9 @@ import org.eclipse.tcf.services.IFileSystem.FileAttrs;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeContentProvider;
+import org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeViewerSorter;
+import org.eclipse.tcf.te.tcf.filesystem.filters.HiddenFilesViewerFilter;
+import org.eclipse.tcf.te.tcf.filesystem.filters.SystemFilesViewerFilter;
 import org.eclipse.tcf.te.tcf.filesystem.internal.columns.FSTreeElementLabelProvider;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
@@ -46,6 +52,8 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.ui.controls.BaseEditBrowseTextControl;
 import org.eclipse.tcf.te.ui.forms.FormLayoutFactory;
 import org.eclipse.tcf.te.ui.wizards.pages.AbstractValidatableWizardPage;
+import org.eclipse.ui.IDecoratorManager;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
@@ -177,7 +185,10 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 		data.widthHint = 450;
 		treeViewer.getTree().setLayoutData(data);
 		treeViewer.setContentProvider(contentProvider = new FSTreeContentProvider());
-		treeViewer.setLabelProvider(new FSTreeElementLabelProvider(treeViewer));
+		treeViewer.setLabelProvider(createDecoratingLabelProvider(new FSTreeElementLabelProvider(treeViewer)));
+		treeViewer.setComparator(new FSTreeViewerSorter());
+		treeViewer.addFilter(new HiddenFilesViewerFilter());
+		treeViewer.addFilter(new SystemFilesViewerFilter());
 		ViewerFilter folderFilter = new ViewerFilter() {
 			@Override
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
@@ -218,6 +229,19 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 
 		// restore the widget values from the history
 		restoreWidgetValues();
+	}
+
+	/**
+	 * Create a decorating label provider using the specified label provider.
+	 * 
+	 * @param labelProvider The label provider that actually provides labels and images.
+	 * @return The decorating label provider.
+	 */
+	private static ILabelProvider createDecoratingLabelProvider(ILabelProvider labelProvider) {
+		IWorkbench workbench = PlatformUI.getWorkbench();
+		IDecoratorManager manager = workbench.getDecoratorManager();
+		ILabelDecorator decorator = manager.getLabelDecorator();
+		return new DecoratingLabelProvider(labelProvider,decorator);
 	}
 
 	/**

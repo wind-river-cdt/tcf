@@ -9,191 +9,115 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.dialogs;
 
-import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.viewers.DecoratingLabelProvider;
+import org.eclipse.jface.viewers.ILabelDecorator;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeControl;
+import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
+import org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeContentProvider;
+import org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeViewerSorter;
+import org.eclipse.tcf.te.tcf.filesystem.filters.HiddenFilesViewerFilter;
+import org.eclipse.tcf.te.tcf.filesystem.filters.SystemFilesViewerFilter;
+import org.eclipse.tcf.te.tcf.filesystem.internal.columns.FSTreeElementLabelProvider;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
-import org.eclipse.tcf.te.ui.forms.CustomFormToolkit;
-import org.eclipse.tcf.te.ui.jface.dialogs.CustomTrayDialog;
-import org.eclipse.ui.forms.editor.FormPage;
-import org.eclipse.ui.forms.editor.IFormPage;
-import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
+import org.eclipse.ui.IDecoratorManager;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
+import org.eclipse.ui.dialogs.ISelectionStatusValidator;
 
 
 /**
  * File system open file dialog.
  */
-public class FSOpenFileDialog extends CustomTrayDialog {
-	// Reference to the sub control
-	private final FSTreeControl control;
-	// Reference to the current selection within the file system tree
-	private ISelection selection;
+public class FSOpenFileDialog extends ElementTreeSelectionDialog {
+	// Label provider used by the file system tree.
+	private FSTreeElementLabelProvider labelProvider;
 
-	protected class FSOpenFileTreeControl extends FSTreeControl {
-
-		/**
-		 * Constructor.
-		 */
-		public FSOpenFileTreeControl() {
-			super();
-		}
-
-		/**
-		 * Constructor.
-		 *
-		 * @param parentPage The parent form page this control is embedded in or
-		 *                   <code>null</code> if the control is not embedded within
-		 *                   a form page.
-		 */
-		public FSOpenFileTreeControl(FormPage parentPage) {
-			super(parentPage);
-		}
-
-		/* (non-Javadoc)
-		 * @see org.eclipse.tcf.te.tcf.vtl.tcf.ui.internal.controls.trees.fs.FSTreeControl#hasColumns()
-		 */
-		@Override
-		protected boolean hasColumns() {
-			return false;
-		}
-
-		/* (non-Javadoc)
-		 * @see org.eclipse.tcf.te.tcf.vtl.tcf.ui.internal.controls.trees.fs.FSTreeControl#doCreateTreeViewerSelectionChangedListener(org.eclipse.jface.viewers.TreeViewer)
-		 */
-		@Override
-		protected ISelectionChangedListener doCreateTreeViewerSelectionChangedListener(TreeViewer viewer) {
-			return new FSOpenFileTreeControlSelectionChangedListener();
-		}
-	}
-
-	protected class FSOpenFileTreeControlSelectionChangedListener implements ISelectionChangedListener{
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
-		 */
-		@Override
-		@SuppressWarnings("synthetic-access")
-		public void selectionChanged(SelectionChangedEvent event) {
-			selection = event.getSelection();
-			updateButtons();
-		}
+	/**
+	 * Create an FSFolderSelectionDialog using the specified shell as the parent.
+	 * 
+	 * @param parentShell The parent shell.
+	 */
+	public FSOpenFileDialog(Shell parentShell) {
+		this(parentShell, new FSTreeElementLabelProvider(), new FSTreeContentProvider());
 	}
 
 	/**
-	 * Constructor.
-	 *
-	 * @param shell The parent shell or <code>null</code>.
+	 * Create an FSFolderSelectionDialog using the specified shell, an FSTreeLabelProvider, and a
+	 * content provider that provides the tree nodes.
+	 * 
+	 * @param parentShell The parent shell.
+	 * @param labelProvider The label provider.
+	 * @param contentProvider The content provider.
 	 */
-	public FSOpenFileDialog(Shell shell) {
-		this(shell, null);
+	private FSOpenFileDialog(Shell parentShell, FSTreeElementLabelProvider labelProvider, ITreeContentProvider contentProvider) {
+		super(parentShell, createDecoratingLabelProvider(labelProvider), contentProvider);
+		this.labelProvider = labelProvider;
+		setTitle(Messages.FSOpenFileDialog_title);
+		setMessage(Messages.FSOpenFileDialog_message);
+		this.setAllowMultiple(false);
+		this.setStatusLineAboveButtons(false);
+		this.setComparator(new FSTreeViewerSorter());
+		this.addFilter(new HiddenFilesViewerFilter());
+		this.addFilter(new SystemFilesViewerFilter());
+		this.setValidator(new ISelectionStatusValidator() {
+			@Override
+			public IStatus validate(Object[] selection) {
+				return isValidSelection(selection);
+			}
+		});
+	}
+	
+	/**
+	 * Create a decorating label provider using the specified label provider.
+	 * 
+	 * @param labelProvider The label provider that actually provides labels and images.
+	 * @return The decorating label provider.
+	 */
+	private static ILabelProvider createDecoratingLabelProvider(ILabelProvider labelProvider) {
+		IWorkbench workbench = PlatformUI.getWorkbench();
+		IDecoratorManager manager = workbench.getDecoratorManager();
+		ILabelDecorator decorator = manager.getLabelDecorator();
+		return new DecoratingLabelProvider(labelProvider,decorator);
 	}
 
 	/**
-	 * Constructor.
-	 *
-	 * @param shell The parent shell or <code>null</code>.
-	 * @param contextHelpId The dialog context help id or <code>null</code>.
-	 */
-	public FSOpenFileDialog(Shell shell, String contextHelpId) {
-		this(null, shell, contextHelpId);
-	}
-
-	/**
-	 * Constructor.
-	 *
-	 * @param parentPage The parent form page this control is embedded in or
-	 *                   <code>null</code> if the control is not embedded within
-	 *                   a form page.
-	 * @param shell The parent shell or <code>null</code>.
-	 * @param contextHelpId The dialog context help id or <code>null</code>.
-	 */
-	public FSOpenFileDialog(FormPage parentPage, Shell shell, String contextHelpId) {
-		super(shell, contextHelpId);
-
-		control = new FSOpenFileTreeControl(parentPage);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.dialogs.Dialog#isResizable()
+	 * Create the tree viewer and set it to the label provider.
 	 */
 	@Override
-	protected boolean isResizable() {
-		return true;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.ide.common.ui.dialogs.WRUnifiedTrayDialog#createDialogArea(org.eclipse.swt.widgets.Composite)
-	 */
-	@Override
-	protected Control createDialogArea(Composite parent) {
-		Composite composite = (Composite)super.createDialogArea(parent);
-
-		setDialogTitle(Messages.FSOpenFileDialog_title);
-
-		Composite panel = new Composite(composite, SWT.NONE);
-		GridLayout layout = new GridLayout();
-		layout.marginWidth = 0; layout.marginHeight = 0;
-		panel.setLayout(layout);
-		GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
-		layoutData.heightHint = convertHeightInCharsToPixels(25);
-		layoutData.widthHint = convertWidthInCharsToPixels(50);
-		panel.setLayoutData(layoutData);
-
-		CustomFormToolkit toolkit = null;
-		if (control.getParentPart() instanceof IFormPage && ((IFormPage)control.getParentPart()).getManagedForm() != null) {
-			toolkit = new CustomFormToolkit(((IFormPage)control.getParentPart()).getManagedForm().getToolkit());
-		}
-		if (toolkit == null) toolkit = new CustomFormToolkit(new FormToolkit(getShell().getDisplay()));
-
-		control.setupFormPanel(panel, toolkit);
-
-		return composite;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.ide.common.ui.dialogs.WRUnifiedTrayDialog#close()
-	 */
-	@Override
-	public boolean close() {
-		if (control != null) {
-			control.dispose();
-		}
-
-		return super.close();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.dialogs.TrayDialog#createButtonBar(org.eclipse.swt.widgets.Composite)
-	 */
-	@Override
-	protected Control createButtonBar(Composite parent) {
-		Control control = super.createButtonBar(parent);
-		updateButtons();
-		return control;
+	protected TreeViewer doCreateTreeViewer(Composite parent, int style) {
+		TreeViewer viewer = super.doCreateTreeViewer(parent, style);
+		viewer.getTree().setLinesVisible(false);
+		labelProvider.setViewer(viewer);
+		return viewer;
 	}
 
 	/**
-	 * Update the button enablement.
+	 * If the specified selection is a valid folder to be selected.
+	 * 
+	 * @param selection The selected folders.
+	 * @return An error status if it is invalid or an OK status indicating it is valid.
 	 */
-	protected void updateButtons() {
-		Button okButton = getButton(IDialogConstants.OK_ID);
-		if (okButton != null) okButton.setEnabled(selection != null && !selection.isEmpty());
-	}
-
-	/**
-	 * Returns the current file system control selection.
-	 * @return
-	 */
-	public ISelection getSelection() {
-		return selection;
+	IStatus isValidSelection(Object[] selection) {
+		String pluginId = UIPlugin.getUniqueIdentifier();
+		IStatus error = new Status(IStatus.ERROR, pluginId, null);
+		if (selection == null || selection.length == 0) {
+			return error;
+		}
+		if (!(selection[0] instanceof FSTreeNode)) {
+			return error;
+		}
+		FSTreeNode target = (FSTreeNode) selection[0];
+		if(!target.isFile()) {
+			return error;
+		}
+		return new Status(IStatus.OK, pluginId, null);
 	}
 }

@@ -75,8 +75,8 @@ public class ColumnDescriptor {
 
 	//The corresponding tree column. Not intended to be changed by callers.
 	private TreeColumn treeColumn;
-	//If the column's sorting order is ascending. Not intended to be changed by callers.
-	private boolean ascending;
+	//If the column's sorting order is ascending. Defaults to true. Not intended to be changed by callers.
+	private boolean ascending = true;
 
 	/**
 	 * Create a column descriptor with specified column id.
