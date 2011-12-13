@@ -70,6 +70,10 @@ public final class Model {
 	protected static void initialize() {
 		Assert.isTrue(Protocol.isDispatchThread());
 
+		// If locator model is set in the mean while, initialize got
+		// called twice. Return immediately in this case.
+		if (locatorModel != null) return;
+
 		// Create the model instance
 		locatorModel = new LocatorModel();
 		// Start the scanner

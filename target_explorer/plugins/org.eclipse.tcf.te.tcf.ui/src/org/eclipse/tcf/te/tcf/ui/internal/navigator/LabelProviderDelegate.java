@@ -15,10 +15,10 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.ui.internal.ImageConsts;
 import org.eclipse.tcf.te.tcf.ui.internal.navigator.images.PeerImageDescriptor;
-import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.ui.jface.images.AbstractImageDescriptor;
 
 
@@ -57,7 +57,6 @@ public class LabelProviderDelegate extends LabelProvider implements ILabelDecora
 		return ""; //$NON-NLS-1$
 	}
 
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.LabelProvider#getImage(java.lang.Object)
 	 */
@@ -69,7 +68,6 @@ public class LabelProviderDelegate extends LabelProvider implements ILabelDecora
 
 		return super.getImage(element);
 	}
-
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ILabelDecorator#decorateImage(org.eclipse.swt.graphics.Image, java.lang.Object)
@@ -87,7 +85,6 @@ public class LabelProviderDelegate extends LabelProvider implements ILabelDecora
 
 		return decoratedImage;
 	}
-
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ILabelDecorator#decorateText(java.lang.String, java.lang.Object)
@@ -131,24 +128,18 @@ public class LabelProviderDelegate extends LabelProvider implements ILabelDecora
 		Assert.isNotNull(peer);
 		Assert.isTrue(Protocol.isDispatchThread());
 
-		String osName = peer.getOSName();
-
-		if (osName != null && !"".equals(osName.trim())) { //$NON-NLS-1$
-			builder.append(" [" + osName.trim() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-
 		String ip = peer.getAttributes().get(IPeer.ATTR_IP_HOST);
 		String port = peer.getAttributes().get(IPeer.ATTR_IP_PORT);
 
 		if (ip != null && !"".equals(ip.trim())) { //$NON-NLS-1$
-			builder.append(" @ "); //$NON-NLS-1$
+			builder.append(" ["); //$NON-NLS-1$
 			builder.append(ip.trim());
 
 			if (port != null && !"".equals(port.trim()) && !"1534".equals(port.trim())) { //$NON-NLS-1$ //$NON-NLS-2$
 				builder.append(":"); //$NON-NLS-1$
 				builder.append(port.trim());
 			}
+			builder.append("]"); //$NON-NLS-1$
 		}
-
 	}
 }
