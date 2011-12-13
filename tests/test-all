@@ -100,7 +100,8 @@ function start_vm()
   local LOGFILE=$HOST-Start.txt
   echo "<td>" >>$HTML
   echo "<a href=\"$LOGFILE\">" >>$HTML
-  echo Starting $VM >logs/$LOGFILE
+  date >logs/$LOGFILE
+  echo Starting $VM >>logs/$LOGFILE
   if VBoxManage --nologo list runningvms | sed -e "s/.*{\\(.*\\)}/\\1/" | grep -q $VM >>logs/$LOGFILE 2>&1 ; then
     echo $VM is already running >>logs/$LOGFILE
     echo "<img src=\"../icons/accept.png\" title=\"OK\"/>" >>$HTML
@@ -118,7 +119,8 @@ function ping_vm()
   local LOGFILE=$HOST-Ping.txt
   echo "<td>" >>$HTML
   echo "<a href=\"$LOGFILE\">" >>$HTML
-  echo Ping $VM >logs/$LOGFILE
+  date >logs/$LOGFILE
+  echo Ping $VM >>logs/$LOGFILE
   sleep 4
   if ping -c 30 $HOST >>logs/$LOGFILE 2>&1 || \
      ping -c 30 $HOST >>logs/$LOGFILE 2>&1
@@ -153,20 +155,22 @@ function ping_vm()
 
 function stop_vm()
 {
+  local LOGFILE=$HOST-Stop.txt
   echo "<td>" >>$HTML
-  echo "<a href=\"$HOST-Stop.txt\">" >>$HTML
-  echo "Stop $VM" >logs/$HOST-Stop.txt
+  echo "<a href=\"$LOGFILE\">" >>$HTML
+  date >logs/$LOGFILE
+  echo "Stop $VM" >>logs/$LOGFILE
   if [ -z "$STOP_VM" ] ; then
-    echo "VM does not need to be stopped" >>logs/$HOST-Stop.txt
+    echo "VM does not need to be stopped" >>logs/$LOGFILE
     echo "<img src=\"../icons/accept.png\" title=\"OK\"/>" >>$HTML
   elif VBoxManage --nologo list runningvms | sed -e "s/.*{\\(.*\\)}/\\1/" | grep -q $VM ; then
-    if VBoxManage --nologo controlvm $VM savestate >>logs/$HOST-Stop.txt 2>&1 ; then
+    if VBoxManage --nologo controlvm $VM savestate >>logs/$LOGFILE 2>&1 ; then
       echo "<img src=\"../icons/accept.png\" title=\"OK\"/>" >>$HTML
     else
       echo "<img src=\"../icons/cross.png\" title=\"Failed\"/>" >>$HTML
     fi
   else
-    echo $VM is already stopped >>logs/$HOST-Stop.txt 2>&1
+    echo $VM is already stopped >>logs/$LOGFILE 2>&1
     echo "<img src=\"../icons/error.png\" title=\"Already stopped\"/>" >>$HTML
   fi
   echo "</a>" >>$HTML
@@ -425,12 +429,14 @@ function test_one_opsys()
 
 function build_rpm()
 {
+  local LOGFILE=$HOST-RPM.txt
   echo "<td>" >>$HTML
-  echo "<a href=\"$HOST-RPM.txt\">" >>$HTML
-  echo RPM build on $VM >logs/$HOST-RPM.txt
+  echo "<a href=\"$LOGFILE\">" >>$HTML
+  date >logs/$LOGFILE
+  echo RPM build on $VM >>logs/$LOGFILE
   if [ -z "$BUILD_RPM" ] ; then
     echo "<img src=\"../icons/error.png\" title=\"Not supported\"/>" >>$HTML
-  elif $SSH "cd $AGENT/agent; $MAKE clean rpm" >>logs/$HOST-RPM.txt 2>&1 ; then
+  elif $SSH "cd $AGENT/agent; $MAKE clean rpm" >>logs/$LOGFILE 2>&1 ; then
     echo "<img src=\"../icons/accept.png\" title=\"OK\"/>" >>$HTML
   else
     echo "<img src=\"../icons/cross.png\" title=\"Failed\"/>" >>$HTML
