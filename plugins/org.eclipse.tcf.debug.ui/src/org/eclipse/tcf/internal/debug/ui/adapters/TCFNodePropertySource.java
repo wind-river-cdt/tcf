@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.tcf.internal.debug.model.TCFContextState;
 import org.eclipse.tcf.internal.debug.model.TCFSourceRef;
 import org.eclipse.tcf.internal.debug.ui.Activator;
+import org.eclipse.tcf.internal.debug.ui.model.TCFModel;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNode;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExecContext;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExecContext.MemoryRegion;
@@ -38,30 +39,36 @@ import org.eclipse.ui.views.properties.PropertyDescriptor;
  */
 class TCFNodePropertySource implements IPropertySource {
 
-    private final TCFNode fNode;
-    private final Map<String, Object> fProperties = new HashMap<String, Object>();
-    private IPropertyDescriptor[] fDescriptors;
+    private final TCFNode node;
+    private final Map<String, Object> properties = new HashMap<String, Object>();
+
+    private IPropertyDescriptor[] descriptors;
 
     public TCFNodePropertySource(TCFNode node) {
-        fNode = node;
+        this.node = node;
     }
 
     public Object getEditableValue() {
         return null;
     }
 
+    /* TODO: need to refresh the properties view when target state changes */
     public IPropertyDescriptor[] getPropertyDescriptors() {
-        if (fDescriptors == null) {
+        if (descriptors == null) {
             try {
-                final List<IPropertyDescriptor> descriptors = new ArrayList<IPropertyDescriptor>();
-                fDescriptors = new TCFTask<IPropertyDescriptor[]>(fNode.getChannel()) {
+                final List<IPropertyDescriptor> list = new ArrayList<IPropertyDescriptor>();
+                descriptors = new TCFTask<IPropertyDescriptor[]>(node.getChannel()) {
                     public void run() {
-                        if (fNode instanceof TCFNodeExecContext) {
-                            getExecContextDescriptors((TCFNodeExecContext) fNode);
-                        } else if (fNode instanceof TCFNodeStackFrame) {
-                            getFrameDescriptors((TCFNodeStackFrame) fNode);
-                        } else {
-                            done(descriptors.toArray(new IPropertyDescriptor[descriptors.size()]));
+                        list.clear();
+                        properties.clear();
+                        if (node instanceof TCFNodeExecContext) {
+                            getExecContextDescriptors((TCFNodeExecContext)node);
+                        }
+                        else if (node instanceof TCFNodeStackFrame) {
+                            getFrameDescriptors((TCFNodeStackFrame)node);
+                        }
+                        else {
+                            done(list.toArray(new IPropertyDescriptor[list.size()]));
                         }
                     }
 
@@ -75,28 +82,30 @@ class TCFNodePropertySource implements IPropertySource {
                             for (String key : props.keySet()) {
                                 Object value = props.get(key);
                                 if (value instanceof Number) {
-                                    value = toHexAddrString((Number) value);
+                                    value = toHexAddrString((Number)value);
                                 }
                                 addDescriptor("Context", key, value);
                             }
                         }
-                        TCFSourceRef sourceRef = line_info_cache.getData();
-                        if (sourceRef != null) {
-                            if (sourceRef.area != null) {
-                                addDescriptor("Source", "Directory", sourceRef.area.directory);
-                                addDescriptor("Source", "File", sourceRef.area.file);
-                                addDescriptor("Source", "Line", sourceRef.area.start_line);
+                        TCFSourceRef ref = line_info_cache.getData();
+                        if (ref != null) {
+                            if (ref.area != null) {
+                                if (ref.area.directory != null) addDescriptor("Source", "Directory", ref.area.directory);
+                                if (ref.area.file != null) addDescriptor("Source", "File", ref.area.file);
+                                if (ref.area.start_line > 0) addDescriptor("Source", "Line", ref.area.start_line);
+                                if (ref.area.start_column > 0) addDescriptor("Source", "Column", ref.area.start_column);
                             }
-                            if (sourceRef.error != null) {
-                                addDescriptor("Source", "Error", sourceRef.error);
+                            if (ref.error != null) {
+                                addDescriptor("Source", "Error", TCFModel.getErrorMessage(ref.error, false));
                             }
                         }
-                        done(descriptors.toArray(new IPropertyDescriptor[descriptors.size()]));
+                        done(list.toArray(new IPropertyDescriptor[list.size()]));
                     }
-                    private void getExecContextDescriptors(TCFNodeExecContext exeNode) {
-                        TCFDataCache<IRunControl.RunControlContext> ctx_cache = exeNode.getRunContext();
-                        TCFDataCache<TCFContextState> state_cache = exeNode.getState();
-                        TCFDataCache<MemoryRegion[]> mem_map_cache = exeNode.getMemoryMap();
+
+                    private void getExecContextDescriptors(TCFNodeExecContext exe_node) {
+                        TCFDataCache<IRunControl.RunControlContext> ctx_cache = exe_node.getRunContext();
+                        TCFDataCache<TCFContextState> state_cache = exe_node.getState();
+                        TCFDataCache<MemoryRegion[]> mem_map_cache = exe_node.getMemoryMap();
                         if (!validateAll(ctx_cache, state_cache, mem_map_cache)) return;
                         IRunControl.RunControlContext ctx = ctx_cache.getData();
                         if (ctx != null) {
@@ -104,7 +113,7 @@ class TCFNodePropertySource implements IPropertySource {
                             for (String key : props.keySet()) {
                                 Object value = props.get(key);
                                 if (value instanceof Number) {
-                                    value = toHexAddrString((Number) value);
+                                    value = toHexAddrString((Number)value);
                                 }
                                 addDescriptor("Context", key, value);
                             }
@@ -112,11 +121,18 @@ class TCFNodePropertySource implements IPropertySource {
                         TCFContextState state = state_cache.getData();
                         if (state != null) {
                             addDescriptor("State", "Suspended", state.is_suspended);
-                            if (state.is_suspended) {
-                                addDescriptor("State", "Suspend reason", state.suspend_reason);
-                                addDescriptor("State", "PC", toHexAddrString(new BigInteger(state.suspend_pc)));
+                            if (state.suspend_reason != null) addDescriptor("State", "Suspend reason", state.suspend_reason);
+                            if (state.suspend_pc != null) addDescriptor("State", "PC", toHexAddrString(new BigInteger(state.suspend_pc)));
+                            addDescriptor("State", "Active", !exe_node.isNotActive());
+                            if (state.suspend_params != null) {
+                                for (String key : state.suspend_params.keySet()) {
+                                    Object value = state.suspend_params.get(key);
+                                    if (value instanceof Number) {
+                                        value = toHexAddrString((Number)value);
+                                    }
+                                    addDescriptor("State Properties", key, value);
+                                }
                             }
-                            addDescriptor("State", "Active", !exeNode.isNotActive());
                         }
                         MemoryRegion[] mem_map = mem_map_cache.getData();
                         if (mem_map != null && mem_map.length > 0) {
@@ -126,28 +142,28 @@ class TCFNodePropertySource implements IPropertySource {
                                 for (String key : props.keySet()) {
                                     Object value = props.get(key);
                                     if (value instanceof Number) {
-                                        value = toHexAddrString((Number) value);
+                                        value = toHexAddrString((Number)value);
                                     }
-                                    addDescriptor("MemoryRegion["+idx+']', key, value);
+                                    addDescriptor("MemoryRegion[" + idx + ']', key, value);
                                 }
                                 idx++;
                             }
                         }
-                        done(descriptors.toArray(new IPropertyDescriptor[descriptors.size()]));
+                        done(list.toArray(new IPropertyDescriptor[list.size()]));
                     }
+
                     private void addDescriptor(String category, String key, Object value) {
                         String id = category + '.' + key;
                         PropertyDescriptor desc = new PropertyDescriptor(id, key);
                         desc.setCategory(category);
-                        descriptors.add(desc);
-                        fProperties.put(id, value);
+                        list.add(desc);
+                        properties.put(id, value);
                     }
-                    boolean validateAll(TCFDataCache<?> ... caches) {
+
+                    boolean validateAll(TCFDataCache<?>... caches) {
                         TCFDataCache<?> pending = null;
                         for (TCFDataCache<?> cache : caches) {
-                            if (!cache.validate()) {
-                                pending = cache;
-                            }
+                            if (!cache.validate()) pending = cache;
                         }
                         if (pending != null) {
                             pending.wait(this);
@@ -159,14 +175,14 @@ class TCFNodePropertySource implements IPropertySource {
             }
             catch (Exception e) {
                 Activator.log("Error retrieving property data", e);
-                fDescriptors = new IPropertyDescriptor[0];
+                descriptors = new IPropertyDescriptor[0];
             }
         }
-        return fDescriptors;
+        return descriptors;
     }
 
     public Object getPropertyValue(final Object id) {
-        return fProperties.get(id);
+        return properties.get(id);
     }
 
     public boolean isPropertySet(Object id) {
