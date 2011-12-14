@@ -10,21 +10,14 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.terminals.telnet.controls;
 
-import java.util.concurrent.atomic.AtomicReference;
-
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TypedEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tcf.protocol.IPeer;
-import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.services.interfaces.constants.ITerminalsConnectorConstants;
-import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.ui.controls.BaseDialogPageControl;
 import org.eclipse.tcf.te.ui.terminals.panels.AbstractConfigurationPanel;
 import org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataWizardPage;
@@ -64,7 +57,7 @@ public class TelnetWizardConfigurationPanel extends AbstractConfigurationPanel i
 
 		TelnetConnector conn = new TelnetConnector();
 		telnetSettings = (TelnetSettings) conn.getTelnetSettings();
-		telnetSettings.setHost(getHost());
+		telnetSettings.setHost(getSelectionHost());
 		// MWE otherwise we don't get a valid default selection of the combo
 		telnetSettings.setNetworkPort(NetworkPortMap.PROP_VALUETELNET);
 		telnetSettingsPage = conn.makeSettingsPage();
@@ -87,35 +80,6 @@ public class TelnetWizardConfigurationPanel extends AbstractConfigurationPanel i
 	@Override
     public void setupData(IPropertiesContainer data) {
     }
-
-	/**
-	 * Returns the host name or IP from the current selection.
-	 *
-	 * @return The host name or IP.
-	 */
-	private String getHost() {
-		ISelection selection = getSelection();
-		final AtomicReference<String> result = new AtomicReference<String>();
-		if (selection instanceof IStructuredSelection && !selection.isEmpty()) {
-			Object element = ((IStructuredSelection) selection).getFirstElement();
-			if (element instanceof IPeerModel) {
-				final IPeerModel peerModel = (IPeerModel) element;
-				if (Protocol.isDispatchThread()) {
-					result.set(peerModel.getPeer().getAttributes().get(IPeer.ATTR_IP_HOST));
-				}
-				else {
-					Protocol.invokeAndWait(new Runnable() {
-						@Override
-						public void run() {
-							result.set(peerModel.getPeer().getAttributes().get(IPeer.ATTR_IP_HOST));
-						}
-					});
-				}
-			}
-		}
-
-		return result.get();
-	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataWizardPage#extractData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
@@ -153,18 +117,28 @@ public class TelnetWizardConfigurationPanel extends AbstractConfigurationPanel i
 	 */
 	@Override
 	public void doRestoreWidgetValues(IDialogSettings settings, String idPrefix) {
-		String host = getHost();
-		if (settings.get(getSettingsKeyWithPrefix(host, ITerminalsConnectorConstants.PROP_IP_HOST)) != null) {
-			telnetSettings.setHost(settings.get(getSettingsKeyWithPrefix(host, ITerminalsConnectorConstants.PROP_IP_HOST)));
+		String host = getSelectionHost();
+		if (host != null) {
+			// is there a section for this host
+			IDialogSettings hostSettings = settings.getSection(host);
+			if (hostSettings != null) {
+				if (hostSettings.get(ITerminalsConnectorConstants.PROP_IP_HOST) != null) {
+					telnetSettings.setHost(hostSettings.get(ITerminalsConnectorConstants.PROP_IP_HOST));
+				}
+				if (hostSettings.get(ITerminalsConnectorConstants.PROP_IP_PORT) != null) {
+					telnetSettings.setNetworkPort(hostSettings.get(ITerminalsConnectorConstants.PROP_IP_PORT));
+				}
+				if (hostSettings.get(ITerminalsConnectorConstants.PROP_TIMEOUT) != null) {
+					telnetSettings.setTimeout(hostSettings.get(ITerminalsConnectorConstants.PROP_TIMEOUT));
+				}
+
+				// set settings in page
+				telnetSettingsPage.loadSettings();
+			}
 		}
-		if (settings.get(getSettingsKeyWithPrefix(host, ITerminalsConnectorConstants.PROP_IP_PORT)) != null) {
-			telnetSettings.setNetworkPort(settings.get(getSettingsKeyWithPrefix(host, ITerminalsConnectorConstants.PROP_IP_PORT)));
+		else {
+			// MWE TODO combo for all hosts
 		}
-		if (settings.get(getSettingsKeyWithPrefix(host, ITerminalsConnectorConstants.PROP_TIMEOUT)) != null) {
-			telnetSettings.setTimeout(settings.get(getSettingsKeyWithPrefix(host, ITerminalsConnectorConstants.PROP_TIMEOUT)));
-		}
-		// set settings in page
-		telnetSettingsPage.loadSettings();
 	}
 
 	/* (non-Javadoc)
@@ -175,17 +149,15 @@ public class TelnetWizardConfigurationPanel extends AbstractConfigurationPanel i
 		// make sure the values are saved
 		// actually not needed since this is done before in extractData
 		telnetSettingsPage.saveSettings();
-		String host = getHost();
-		settings.put(getSettingsKeyWithPrefix(host, ITerminalsConnectorConstants.PROP_IP_HOST), telnetSettings.getHost());
-		settings.put(getSettingsKeyWithPrefix(host, ITerminalsConnectorConstants.PROP_IP_PORT), telnetSettings.getNetworkPort());
-		settings.put(getSettingsKeyWithPrefix(host, ITerminalsConnectorConstants.PROP_TIMEOUT), telnetSettings.getTimeout());
-	}
 
-	/**
-	 * Constructs the full settings key.
-	 */
-	private String getSettingsKeyWithPrefix(String host, String value) {
-		return host + "." + value; //$NON-NLS-1$
+		String host = telnetSettings.getHost();
+		IDialogSettings hostSection = settings.getSection(host);
+		if (hostSection == null) {
+			hostSection = settings.addNewSection(host);
+		}
+		hostSection.put(ITerminalsConnectorConstants.PROP_IP_HOST, telnetSettings.getHost());
+		hostSection.put(ITerminalsConnectorConstants.PROP_IP_PORT, telnetSettings.getNetworkPort());
+		hostSection.put(ITerminalsConnectorConstants.PROP_TIMEOUT, telnetSettings.getTimeout());
 	}
 
 	/* (non-Javadoc)

@@ -10,25 +10,18 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.terminals.ssh.controls;
 
-import java.util.concurrent.atomic.AtomicReference;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TypedEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tcf.protocol.IPeer;
-import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.services.interfaces.constants.ITerminalsConnectorConstants;
-import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.ui.controls.BaseDialogPageControl;
 import org.eclipse.tcf.te.ui.terminals.panels.AbstractConfigurationPanel;
 import org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataWizardPage;
@@ -67,7 +60,7 @@ public class SshWizardConfigurationPanel extends AbstractConfigurationPanel impl
 
 		SshConnector conn = new SshConnector();
 		sshSettings = (SshSettings) conn.getSshSettings();
-		sshSettings.setHost(getHost());
+		sshSettings.setHost(getSelectionHost());
 		sshSettings.setUser(getDefaultUser());
 		sshSettingsPage = conn.makeSettingsPage();
 		sshSettingsPage.createControl(panel);
@@ -97,35 +90,6 @@ public class SshWizardConfigurationPanel extends AbstractConfigurationPanel impl
 	 */
 	private String getDefaultUser(){
 		return System.getProperty("user.name"); //$NON-NLS-1$
-	}
-
-	/**
-	 * Returns the host name or IP from the current selection.
-	 *
-	 * @return The host name or IP.
-	 */
-	private String getHost() {
-		ISelection selection = getSelection();
-		final AtomicReference<String> result = new AtomicReference<String>();
-		if (selection instanceof IStructuredSelection && !selection.isEmpty()) {
-			Object element = ((IStructuredSelection) selection).getFirstElement();
-			if (element instanceof IPeerModel) {
-				final IPeerModel peerModel = (IPeerModel) element;
-				if (Protocol.isDispatchThread()) {
-					result.set(peerModel.getPeer().getAttributes().get(IPeer.ATTR_IP_HOST));
-				}
-				else {
-					Protocol.invokeAndWait(new Runnable() {
-						@Override
-						public void run() {
-							result.set(peerModel.getPeer().getAttributes().get(IPeer.ATTR_IP_HOST));
-						}
-					});
-				}
-			}
-		}
-
-		return result.get();
 	}
 
 	/* (non-Javadoc)
@@ -167,28 +131,37 @@ public class SshWizardConfigurationPanel extends AbstractConfigurationPanel impl
 	 */
 	@Override
 	public void doRestoreWidgetValues(IDialogSettings settings, String idPrefix) {
-		String host = getHost();
-		if (settings.get(getSettingsKeyWithPrefix(host, ITerminalsConnectorConstants.PROP_IP_HOST)) != null) {
-			sshSettings.setHost(settings.get(getSettingsKeyWithPrefix(host, ITerminalsConnectorConstants.PROP_IP_HOST)));
+		String host = getSelectionHost();
+		if (host != null) {
+			// is there a section for this host
+			IDialogSettings hostSettings = settings.getSection(host);
+			if (hostSettings != null) {
+				if (hostSettings.get(ITerminalsConnectorConstants.PROP_IP_HOST) != null) {
+					sshSettings.setHost(hostSettings.get(ITerminalsConnectorConstants.PROP_IP_HOST));
+				}
+				if (hostSettings.get(ITerminalsConnectorConstants.PROP_IP_PORT) != null) {
+					sshSettings.setPort(hostSettings.get(ITerminalsConnectorConstants.PROP_IP_PORT));
+				}
+				if (hostSettings.get(ITerminalsConnectorConstants.PROP_TIMEOUT) != null) {
+					sshSettings.setTimeout(hostSettings.get(ITerminalsConnectorConstants.PROP_TIMEOUT));
+				}
+				if (hostSettings.get(ITerminalsConnectorConstants.PROP_SSH_KEEP_ALIVE) != null) {
+					sshSettings.setKeepalive(hostSettings.get(ITerminalsConnectorConstants.PROP_SSH_KEEP_ALIVE));
+				}
+				if (hostSettings.get(ITerminalsConnectorConstants.PROP_SSH_USER) != null) {
+					sshSettings.setUser(hostSettings.get(ITerminalsConnectorConstants.PROP_SSH_USER));
+				}
+				String password = accessSecurePassword(sshSettings.getHost());
+				if (password != null) {
+					sshSettings.setPassword(password);
+				}
+				// set settings in page
+				sshSettingsPage.loadSettings();
+			}
 		}
-		if (settings.get(getSettingsKeyWithPrefix(host, ITerminalsConnectorConstants.PROP_IP_PORT)) != null) {
-			sshSettings.setPort(settings.get(getSettingsKeyWithPrefix(host, ITerminalsConnectorConstants.PROP_IP_PORT)));
+		else {
+			// MWE TODO combo for all hosts
 		}
-		if (settings.get(getSettingsKeyWithPrefix(host, ITerminalsConnectorConstants.PROP_TIMEOUT)) != null) {
-			sshSettings.setTimeout(settings.get(getSettingsKeyWithPrefix(host, ITerminalsConnectorConstants.PROP_TIMEOUT)));
-		}
-		if (settings.get(getSettingsKeyWithPrefix(host, ITerminalsConnectorConstants.PROP_SSH_KEEP_ALIVE)) != null) {
-			sshSettings.setKeepalive(settings.get(getSettingsKeyWithPrefix(host, ITerminalsConnectorConstants.PROP_SSH_KEEP_ALIVE)));
-		}
-		if (settings.get(getSettingsKeyWithPrefix(host, ITerminalsConnectorConstants.PROP_SSH_USER)) != null) {
-			sshSettings.setUser(settings.get(getSettingsKeyWithPrefix(host, ITerminalsConnectorConstants.PROP_SSH_USER)));
-		}
-		String password = accessSecurePassword(sshSettings.getHost());
-		if (password != null) {
-			sshSettings.setPassword(password);
-		}
-		// set settings in page
-		sshSettingsPage.loadSettings();
 	}
 
 	/* (non-Javadoc)
@@ -199,23 +172,21 @@ public class SshWizardConfigurationPanel extends AbstractConfigurationPanel impl
 		// make sure the values are saved
 		// actually not needed since this is done before in extractData
 		sshSettingsPage.saveSettings();
-		String host = getHost();
-		settings.put(getSettingsKeyWithPrefix(host, ITerminalsConnectorConstants.PROP_IP_HOST), sshSettings.getHost());
-		settings.put(getSettingsKeyWithPrefix(host, ITerminalsConnectorConstants.PROP_IP_PORT), sshSettings.getPort());
-		settings.put(getSettingsKeyWithPrefix(host, ITerminalsConnectorConstants.PROP_TIMEOUT), sshSettings.getTimeout());
-		settings.put(getSettingsKeyWithPrefix(host, ITerminalsConnectorConstants.PROP_SSH_KEEP_ALIVE), sshSettings.getKeepalive());
-		settings.put(getSettingsKeyWithPrefix(host, ITerminalsConnectorConstants.PROP_SSH_USER), sshSettings.getUser());
+		String host = sshSettings.getHost();
+		IDialogSettings hostSection=settings.getSection(host);
+		if(hostSection==null){
+			hostSection=settings.addNewSection(host);
+		}
+
+		hostSection.put(ITerminalsConnectorConstants.PROP_IP_HOST, sshSettings.getHost());
+		hostSection.put(ITerminalsConnectorConstants.PROP_IP_PORT, sshSettings.getPort());
+		hostSection.put(ITerminalsConnectorConstants.PROP_TIMEOUT, sshSettings.getTimeout());
+		hostSection.put(ITerminalsConnectorConstants.PROP_SSH_KEEP_ALIVE, sshSettings.getKeepalive());
+		hostSection.put(ITerminalsConnectorConstants.PROP_SSH_USER, sshSettings.getUser());
 
 		if(sshSettings.getPassword()!=null && sshSettings.getPassword().length()!=0){
 			saveSecurePassword(host, sshSettings.getPassword());
 		}
-	}
-
-	/**
-	 * Constructs the full settings key.
-	 */
-	private String getSettingsKeyWithPrefix(String host, String value) {
-		return host + "." + value; //$NON-NLS-1$
 	}
 
 	/**
