@@ -982,6 +982,16 @@
             </visibleWhen>
          </command>
       </menuContribution>
+      <menuContribution
+            locationURI="toolbar:org.eclipse.tcf.te.ui.controls.menu.fs?after=additions">
+         <command
+               commandId="org.eclipse.tcf.te.tcf.filesystem.commands.refreshViewer"
+               icon="icons/obj16/refresh.gif"
+               label="Refresh View"
+               style="push"
+               tooltip="Refresh View">
+         </command>
+      </menuContribution>
    </extension>
    
 <!-- Target Explorer property page contributions -->   
@@ -1054,11 +1064,14 @@
             id="org.eclipse.tcf.te.tcf.filesystem.commands.newFolder"
             name="%command.newfolder.name">
       </command>
+      <command
+            id="org.eclipse.tcf.te.tcf.filesystem.commands.refreshViewer"
+            name="Refresh Viewer">
+      </command>
    </extension>
 
 <!-- Target Explorer command handler contributions -->
    <extension point="org.eclipse.ui.handlers">
-
       <!-- This handler contribution is for the double click behaviour in the
            Target Explore tree view -->
       <handler
@@ -1812,6 +1825,10 @@
                </iterate>
             </with>
          </enabledWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.RefreshViewerHandler"
+            commandId="org.eclipse.tcf.te.tcf.filesystem.commands.refreshViewer">
       </handler>
    </extension>
    

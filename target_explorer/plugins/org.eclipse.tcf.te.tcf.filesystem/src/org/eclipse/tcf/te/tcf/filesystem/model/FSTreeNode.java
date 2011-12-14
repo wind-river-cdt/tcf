@@ -371,6 +371,15 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 	}
 
 	/**
+	 * If this node is the system root.
+	 * 
+	 * @return true if this node is the system root.
+	 */
+	public boolean isSystemRoot() {
+		return type.endsWith("FSRootNode"); //$NON-NLS-1$
+	}
+
+	/**
 	 * If this file is readable.
 	 * 
 	 * @return true if it is readable.

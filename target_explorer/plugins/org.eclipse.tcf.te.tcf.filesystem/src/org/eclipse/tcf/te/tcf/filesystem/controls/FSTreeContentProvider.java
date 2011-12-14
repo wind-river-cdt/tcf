@@ -584,7 +584,12 @@ public class FSTreeContentProvider implements ITreeContentProvider, INodeStateLi
 		Display display = PlatformUI.getWorkbench().getDisplay();
 		if (display.getThread() == Thread.currentThread()) {
 			if (node != null) {
-				viewer.refresh(node);
+				if (node.isSystemRoot()) {
+					viewer.refresh();
+				}
+				else {
+					viewer.refresh(node);
+				}
 			}
 			else {
 				//Refresh the whole tree.
