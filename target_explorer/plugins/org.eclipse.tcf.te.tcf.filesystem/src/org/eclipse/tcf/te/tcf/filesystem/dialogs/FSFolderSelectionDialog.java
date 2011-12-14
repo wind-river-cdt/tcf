@@ -25,12 +25,13 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeContentProvider;
 import org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeViewerSorter;
-import org.eclipse.tcf.te.tcf.filesystem.filters.HiddenFilesViewerFilter;
-import org.eclipse.tcf.te.tcf.filesystem.filters.SystemFilesViewerFilter;
+import org.eclipse.tcf.te.tcf.filesystem.interfaces.IUIConstants;
 import org.eclipse.tcf.te.tcf.filesystem.internal.columns.FSTreeElementLabelProvider;
 import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.MoveFilesHandler;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
+import org.eclipse.tcf.te.ui.trees.FilterDescriptor;
+import org.eclipse.tcf.te.ui.trees.ViewerStateManager;
 import org.eclipse.ui.IDecoratorManager;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
@@ -93,8 +94,6 @@ public class FSFolderSelectionDialog extends ElementTreeSelectionDialog {
 		setMessage(Messages.FSFolderSelectionDialog_MoveDialogMessage);
 		this.setAllowMultiple(false);
 		this.setComparator(new FSTreeViewerSorter());
-		this.addFilter(new HiddenFilesViewerFilter());
-		this.addFilter(new SystemFilesViewerFilter());
 		this.addFilter(new ViewerFilter() {
 			@Override
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
@@ -114,6 +113,21 @@ public class FSFolderSelectionDialog extends ElementTreeSelectionDialog {
 				return isValidFolder(selection);
 			}
 		});
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.dialogs.ElementTreeSelectionDialog#setInput(java.lang.Object)
+	 */
+	@Override
+    public void setInput(Object input) {
+		super.setInput(input);
+		FilterDescriptor[] filterDescriptors = ViewerStateManager.getInstance().getFilterDescriptors(IUIConstants.ID_TREE_VIEWER_FS, input);
+		if (filterDescriptors != null) {
+			for(FilterDescriptor descriptor : filterDescriptors) {
+				if(descriptor.isEnabled()) addFilter(descriptor.getFilter());
+			}
+		}
 	}
 	
 	/**

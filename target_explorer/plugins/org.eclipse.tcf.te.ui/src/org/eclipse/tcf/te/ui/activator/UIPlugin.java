@@ -16,6 +16,7 @@ import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tcf.te.runtime.tracing.TraceHandler;
 import org.eclipse.tcf.te.ui.interfaces.ImageConsts;
+import org.eclipse.tcf.te.ui.trees.ViewerStateManager;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -72,6 +73,8 @@ public class UIPlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		// Load the tree viewer's state.
+		ViewerStateManager.getInstance().loadViewerStates();
 	}
 
 	/* (non-Javadoc)
@@ -79,6 +82,8 @@ public class UIPlugin extends AbstractUIPlugin {
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
+		// Save the tree viewer's state.
+		ViewerStateManager.getInstance().storeViewerStates();
 		plugin = null;
 		super.stop(context);
 	}

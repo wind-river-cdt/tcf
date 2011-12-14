@@ -36,14 +36,8 @@ import org.eclipse.swt.graphics.Image;
 public class TreeViewerExtension {
 	// The extension point id constant.
 	private static final String EXTENSION_POINT_ID = "org.eclipse.tcf.te.ui.viewers"; //$NON-NLS-1$
-	// The column descriptors from the definitions of defined tree viewer extensions.
-	private ColumnDescriptor[] columns;
-	// The filter descriptors from the definitions of defined tree viewer extensions.
-	private FilterDescriptor[] filterDescriptors;
 	// The id of the tree viewer for which the extension is parsed.
 	private String viewerId;
-	// The tree viewer for which the extension is parsed.
-	private TreeViewer viewer;
 
 	/**
 	 * Create an instance and parse all tree viewer extensions to get the 
@@ -52,37 +46,20 @@ public class TreeViewerExtension {
 	 * @param viewerId The tree viewer's id.
 	 * @param viewer The tree viewer to parse the extension for.
 	 */
-	public TreeViewerExtension(String viewerId, TreeViewer viewer) {
+	public TreeViewerExtension(String viewerId) {
 		this.viewerId = viewerId;
-		this.viewer = viewer;
-		parseExtension();
 	}
-
+	
 	/**
-	 * Get the column descriptors parsed from the tree viewer extension.
+	 * Parse the column declarations of this extension point and return the 
+	 * column descriptors.
 	 * 
-	 * @return The column descriptors.
+	 * @param viewer The viewer used to initialize the columns.
+	 * @return The column descriptors from this extension point.
 	 */
-	public ColumnDescriptor[] getColumns() {
-		return columns;
-	}
-
-	/**
-	 * Get the filter descriptors parsed from the tree viewer extension.
-	 * 
-	 * @return The filter descriptors.
-	 */
-	public FilterDescriptor[] getFilterDescriptors() {
-		return filterDescriptors;
-	}
-
-	/**
-	 * Parse the tree viewer's extensions.
-	 */
-	private void parseExtension() {
+	public ColumnDescriptor[] parseColumns(TreeViewer viewer) {
 		Assert.isNotNull(viewerId);
 		List<ColumnDescriptor> columns = Collections.synchronizedList(new ArrayList<ColumnDescriptor>());
-		List<FilterDescriptor> descriptors = Collections.synchronizedList(new ArrayList<FilterDescriptor>());
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
 		IExtensionPoint extensionPoint = registry.getExtensionPoint(EXTENSION_POINT_ID);
 		IConfigurationElement[] configurations = extensionPoint.getConfigurationElements();
@@ -97,7 +74,30 @@ public class TreeViewerExtension {
 							createColumnDescriptor(columns, child, viewer);
 						}
 					}
-					children = configuration.getChildren("filter"); //$NON-NLS-1$
+				}
+			}
+		}
+		return columns.toArray(new ColumnDescriptor[columns.size()]);
+	}
+
+	/**
+	 * Parse the viewer filter declarations of this extension point and return the 
+	 * filter descriptors.
+	 * 
+	 * @return The column descriptors from this extension point.
+	 */
+	public FilterDescriptor[] parseFilters() {
+		Assert.isNotNull(viewerId);
+		List<FilterDescriptor> descriptors = Collections.synchronizedList(new ArrayList<FilterDescriptor>());
+		IExtensionRegistry registry = Platform.getExtensionRegistry();
+		IExtensionPoint extensionPoint = registry.getExtensionPoint(EXTENSION_POINT_ID);
+		IConfigurationElement[] configurations = extensionPoint.getConfigurationElements();
+		for (IConfigurationElement configuration : configurations) {
+			String name = configuration.getName();
+			if ("viewer".equals(name)) { //$NON-NLS-1$
+				String aViewerId = configuration.getAttribute("viewerId"); //$NON-NLS-1$
+				if (viewerId.equals(aViewerId)) {
+					IConfigurationElement[] children = configuration.getChildren("filter"); //$NON-NLS-1$
 					if (children != null && children.length > 0) {
 						for (IConfigurationElement child : children) {
 							createFilterDescriptor(descriptors, child);
@@ -106,8 +106,7 @@ public class TreeViewerExtension {
 				}
 			}
 		}
-		this.columns = columns.toArray(new ColumnDescriptor[columns.size()]);
-		this.filterDescriptors = descriptors.toArray(new FilterDescriptor[descriptors.size()]);
+		return descriptors.toArray(new FilterDescriptor[descriptors.size()]);
 	}
 
 	/**
@@ -146,6 +145,13 @@ public class TreeViewerExtension {
 		if (attribute != null) {
 			descriptor.setDescription(attribute);
 		}
+		attribute = configuration.getAttribute("image"); //$NON-NLS-1$
+		if (attribute != null) {
+			String symbolicName = configuration.getContributor().getName();
+			URL resource = Platform.getBundle(symbolicName).getResource(attribute);
+			Image image = ImageDescriptor.createFromURL(resource).createImage();
+			descriptor.setImage(image);
+		}
 		attribute = configuration.getAttribute("enabled"); //$NON-NLS-1$
 		if (attribute != null) {
 			descriptor.setEnabled(Boolean.valueOf(attribute).booleanValue());
@@ -165,7 +171,7 @@ public class TreeViewerExtension {
 	 * @param configuration The configuration element to read the descriptor from.
 	 * @param viewer The tree viewer to add the column to.
 	 */
-	private void createColumnDescriptor(List<ColumnDescriptor> columns, final IConfigurationElement configuration, final TreeViewer viewer) {
+	private void createColumnDescriptor(final List<ColumnDescriptor> columns, final IConfigurationElement configuration, final TreeViewer viewer) {
 		String id = configuration.getAttribute("id"); //$NON-NLS-1$
 		Assert.isNotNull(id);
 		final ColumnDescriptor column = new ColumnDescriptor(id);
@@ -174,6 +180,7 @@ public class TreeViewerExtension {
 			@Override
 			public void run() throws Exception {
 				initColumn(column, configuration, viewer);
+				column.setOrder(columns.size());
 			}
 		});
 	}

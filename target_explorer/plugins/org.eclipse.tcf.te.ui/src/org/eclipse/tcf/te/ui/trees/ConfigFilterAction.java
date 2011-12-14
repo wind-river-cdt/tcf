@@ -18,6 +18,7 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.window.Window;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.te.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.interfaces.ImageConsts;
@@ -82,6 +83,7 @@ public class ConfigFilterAction extends Action {
 				}
 			}
 			treeControl.updateFilters();
+			treeControl.updateFilterState();
 		}
 	}
 
@@ -99,6 +101,13 @@ public class ConfigFilterAction extends Action {
 				}
 				return super.getText(element);
 			}
+			@Override
+            public Image getImage(Object element) {
+				if (element instanceof FilterDescriptor) {
+					return ((FilterDescriptor) element).getImage();
+				}
+	            return super.getImage(element);
+            }
 		};
 	}
 }

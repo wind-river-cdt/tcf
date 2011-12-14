@@ -9,193 +9,133 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.processes.ui.dialogs;
 
-import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.viewers.DecoratingLabelProvider;
+import org.eclipse.jface.viewers.ILabelDecorator;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessesTreeControl;
-import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
-import org.eclipse.tcf.te.ui.forms.CustomFormToolkit;
-import org.eclipse.tcf.te.ui.jface.dialogs.CustomTrayDialog;
-import org.eclipse.ui.forms.editor.FormPage;
-import org.eclipse.ui.forms.editor.IFormPage;
-import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessesTreeContentProvider;
+import org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessesTreeNode;
+import org.eclipse.tcf.te.tcf.processes.ui.internal.columns.ProcessComparator;
+import org.eclipse.tcf.te.tcf.processes.ui.internal.columns.ProcessLabelProvider;
+import org.eclipse.tcf.te.ui.activator.UIPlugin;
+import org.eclipse.tcf.te.ui.interfaces.IUIConstants;
+import org.eclipse.tcf.te.ui.trees.FilterDescriptor;
+import org.eclipse.tcf.te.ui.trees.ViewerStateManager;
+import org.eclipse.ui.IDecoratorManager;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
+import org.eclipse.ui.dialogs.ISelectionStatusValidator;
 
 /**
  * Process selection dialog.
  */
-public class ProcessSelectionDialog extends CustomTrayDialog {
-	// Reference to the subcontrol
-	private final ProcessesTreeControl control;
-	// Reference to the current selection within the file system tree
-	private ISelection selection;
+public class ProcessSelectionDialog extends ElementTreeSelectionDialog {
+	// Label provider used by the file system tree.
+	private ProcessLabelProvider labelProvider;
 
-	protected class ProcessSelectionTreeControl extends ProcessesTreeControl {
-
-		/**
-		 * Constructor.
-		 */
-		public ProcessSelectionTreeControl() {
-			super();
-		}
-
-		/**
-		 * Constructor.
-		 *
-		 * @param parentPage The parent form page this control is embedded in or <code>null</code>
-		 *            if the control is not embedded within a form page.
-		 */
-		public ProcessSelectionTreeControl(FormPage parentPage) {
-			super(parentPage);
-		}
-
-		/* (non-Javadoc)
-		 * @see org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessesTreeControl#hasColumns()
-		 */
-		@Override
-		protected boolean hasColumns() {
-			return false;
-		}
-
-		/* (non-Javadoc)
-		 * @see org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessesTreeControl#doCreateTreeViewerSelectionChangedListener(org.eclipse.jface.viewers.TreeViewer)
-		 */
-		@Override
-		protected ISelectionChangedListener doCreateTreeViewerSelectionChangedListener(TreeViewer viewer) {
-			return new ProcessSelectionTreeControlSelectionChangedListener();
-		}
-	}
-
-	protected class ProcessSelectionTreeControlSelectionChangedListener implements ISelectionChangedListener {
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
-		 */
-		@Override
-		@SuppressWarnings("synthetic-access")
-		public void selectionChanged(SelectionChangedEvent event) {
-			selection = event.getSelection();
-			updateButtons();
-		}
+	/**
+	 * Create an FSFolderSelectionDialog using the specified shell as the parent.
+	 * 
+	 * @param parentShell The parent shell.
+	 */
+	public ProcessSelectionDialog(Shell parentShell) {
+		this(parentShell, new ProcessLabelProvider(), new ProcessesTreeContentProvider());
 	}
 
 	/**
-	 * Constructor.
-	 *
-	 * @param shell The parent shell or <code>null</code>.
+	 * Create an FSFolderSelectionDialog using the specified shell, an FSTreeLabelProvider, and a
+	 * content provider that provides the tree nodes.
+	 * 
+	 * @param parentShell The parent shell.
+	 * @param labelProvider The label provider.
+	 * @param contentProvider The content provider.
 	 */
-	public ProcessSelectionDialog(Shell shell) {
-		this(shell, null);
-	}
-
-	/**
-	 * Constructor.
-	 *
-	 * @param shell The parent shell or <code>null</code>.
-	 * @param contextHelpId The dialog context help id or <code>null</code>.
-	 */
-	public ProcessSelectionDialog(Shell shell, String contextHelpId) {
-		this(null, shell, contextHelpId);
-	}
-
-	/**
-	 * Constructor.
-	 *
-	 * @param parentPage The parent form page this control is embedded in or <code>null</code> if
-	 *            the control is not embedded within a form page.
-	 * @param shell The parent shell or <code>null</code>.
-	 * @param contextHelpId The dialog context help id or <code>null</code>.
-	 */
-	public ProcessSelectionDialog(FormPage parentPage, Shell shell, String contextHelpId) {
-		super(shell, contextHelpId);
-
-		control = new ProcessSelectionTreeControl(parentPage);
+	private ProcessSelectionDialog(Shell parentShell, ProcessLabelProvider labelProvider, ITreeContentProvider contentProvider) {
+		super(parentShell, createDecoratingLabelProvider(labelProvider), contentProvider);
+		this.labelProvider = labelProvider;
+		this.setAllowMultiple(false);
+		this.setStatusLineAboveButtons(false);
+		this.setComparator(new ViewerComparator(){
+			private ProcessComparator comparator = new ProcessComparator();
+			@Override
+			public int compare(Viewer viewer, Object e1, Object e2) {
+				if (e1 instanceof ProcessesTreeNode && e2 instanceof ProcessesTreeNode) {
+					return comparator.compare((ProcessesTreeNode) e1, (ProcessesTreeNode) e2);
+				}
+				return super.compare(viewer, e1, e2);
+			}
+		});
+		this.setValidator(new ISelectionStatusValidator() {
+			@Override
+			public IStatus validate(Object[] selection) {
+				return isValidSelection(selection);
+			}
+		});
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.jface.dialogs.Dialog#isResizable()
+	 * @see org.eclipse.ui.dialogs.ElementTreeSelectionDialog#setInput(java.lang.Object)
 	 */
 	@Override
-	protected boolean isResizable() {
-		return true;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.jface.dialogs.CustomTrayDialog#createDialogArea(org.eclipse.swt.widgets.Composite)
-	 */
-	@Override
-	protected Control createDialogArea(Composite parent) {
-		Composite composite = (Composite) super.createDialogArea(parent);
-
-		setDialogTitle(Messages.ProcessSelectionDialog_title);
-
-		Composite panel = new Composite(composite, SWT.NONE);
-		GridLayout layout = new GridLayout();
-		layout.marginWidth = 0;
-		layout.marginHeight = 0;
-		panel.setLayout(layout);
-		GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
-		layoutData.heightHint = convertHeightInCharsToPixels(25);
-		layoutData.widthHint = convertWidthInCharsToPixels(50);
-		panel.setLayoutData(layoutData);
-
-		CustomFormToolkit toolkit = null;
-		if (control.getParentPart() instanceof IFormPage && ((IFormPage) control.getParentPart()).getManagedForm() != null) {
-			toolkit = new CustomFormToolkit(((IFormPage) control.getParentPart()).getManagedForm().getToolkit());
+    public void setInput(Object input) {
+		super.setInput(input);
+		FilterDescriptor[] filterDescriptors = ViewerStateManager.getInstance().
+						getFilterDescriptors(IUIConstants.ID_CONTROL_MENUS_BASE + ".viewer.processes", input); //$NON-NLS-1$
+		if (filterDescriptors != null) {
+			for(FilterDescriptor descriptor : filterDescriptors) {
+				if(descriptor.isEnabled()) addFilter(descriptor.getFilter());
+			}
 		}
-		if (toolkit == null) toolkit = new CustomFormToolkit(new FormToolkit(getShell().getDisplay()));
-
-		control.setupFormPanel(panel, toolkit);
-
-		return composite;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.jface.dialogs.CustomTrayDialog#close()
-	 */
-	@Override
-	public boolean close() {
-		if (control != null) {
-			control.dispose();
-		}
-
-		return super.close();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.dialogs.TrayDialog#createButtonBar(org.eclipse.swt.widgets.Composite)
-	 */
-	@Override
-	protected Control createButtonBar(Composite parent) {
-		Control control = super.createButtonBar(parent);
-		updateButtons();
-		return control;
 	}
 
 	/**
-	 * Update the button enablement.
+	 * Create a decorating label provider using the specified label provider.
+	 * 
+	 * @param labelProvider The label provider that actually provides labels and images.
+	 * @return The decorating label provider.
 	 */
-	protected void updateButtons() {
-		Button okButton = getButton(IDialogConstants.OK_ID);
-		if (okButton != null) okButton.setEnabled(selection != null && !selection.isEmpty());
+	private static ILabelProvider createDecoratingLabelProvider(ILabelProvider labelProvider) {
+		IWorkbench workbench = PlatformUI.getWorkbench();
+		IDecoratorManager manager = workbench.getDecoratorManager();
+		ILabelDecorator decorator = manager.getLabelDecorator();
+		return new DecoratingLabelProvider(labelProvider,decorator);
 	}
 
 	/**
-	 * Returns the current file system control selection.
-	 *
-	 * @return
+	 * Create the tree viewer and set it to the label provider.
 	 */
-	public ISelection getSelection() {
-		return selection;
+	@Override
+	protected TreeViewer doCreateTreeViewer(Composite parent, int style) {
+		TreeViewer viewer = super.doCreateTreeViewer(parent, style);
+		viewer.getTree().setLinesVisible(false);
+		labelProvider.setViewer(viewer);
+		return viewer;
+	}
+
+	/**
+	 * If the specified selection is a valid folder to be selected.
+	 * 
+	 * @param selection The selected folders.
+	 * @return An error status if it is invalid or an OK status indicating it is valid.
+	 */
+	IStatus isValidSelection(Object[] selection) {
+		String pluginId = UIPlugin.getUniqueIdentifier();
+		IStatus error = new Status(IStatus.ERROR, pluginId, null);
+		if (selection == null || selection.length == 0) {
+			return error;
+		}
+		if (!(selection[0] instanceof ProcessesTreeNode)) {
+			return error;
+		}
+		return new Status(IStatus.OK, pluginId, null);
 	}
 }

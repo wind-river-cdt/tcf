@@ -230,6 +230,16 @@
                </appinfo>
             </annotation>
          </attribute>
+         <attribute name="image" type="string">
+            <annotation>
+               <documentation>
+                  The filter&apos;s displaying image. No image by default.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="resource"/>
+               </appinfo>
+            </annotation>
+         </attribute>
          <attribute name="enabled" type="boolean">
             <annotation>
                <documentation>
@@ -334,7 +344,7 @@
          &lt;p&gt;
 In the &quot;column&quot; element, the class referenced by the attribute &quot;labelProvider&quot; must extend &lt;samp&gt;org.eclipse.tcf.te.ui.trees.TreeColumnLabelProvider&lt;/samp&gt; which provides the viewer as the parameter. The class referenced by the attribute &quot;comparator&quot; must implement &lt;samp&gt;java.util.Comparator&lt;/samp&gt; that compares the elements of the tree viewer.
 &lt;p&gt;
-In the &quot;filter&quot; element, the class referenced by the attribute &quot;class&quot; must extend &lt;samp&gt;org.eclipse.jface.viewers.ViewerFilter&lt;/samp&gt;. 
+In the &quot;filter&quot; element, the class referenced by the attribute &quot;class&quot; must extend &lt;samp&gt;org.eclipse.jface.viewers.ViewerFilter&lt;/samp&gt;.
       </documentation>
    </annotation>
 

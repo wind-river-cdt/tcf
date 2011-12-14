@@ -2025,12 +2025,14 @@
             viewerId="org.eclipse.tcf.te.ui.controls.viewer.fs">
          <filter
                class="org.eclipse.tcf.te.tcf.filesystem.filters.HiddenFilesViewerFilter"
+               description="%filter.description.hidden"
                enabled="true"
                id="org.eclipse.tcf.te.tcf.filesystem.filters.hiddenFiles"
                name="%filter.name.hidden">
          </filter>
          <filter
                class="org.eclipse.tcf.te.tcf.filesystem.filters.SystemFilesViewerFilter"
+               description="%filter.description.system"
                enabled="true"
                id="org.eclipse.tcf.te.tcf.filesystem.filters.systemFiles"
                name="%filter.name.system">

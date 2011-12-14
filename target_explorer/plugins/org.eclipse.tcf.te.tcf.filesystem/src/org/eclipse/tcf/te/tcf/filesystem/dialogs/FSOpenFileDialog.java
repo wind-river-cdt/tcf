@@ -21,11 +21,12 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeContentProvider;
 import org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeViewerSorter;
-import org.eclipse.tcf.te.tcf.filesystem.filters.HiddenFilesViewerFilter;
-import org.eclipse.tcf.te.tcf.filesystem.filters.SystemFilesViewerFilter;
+import org.eclipse.tcf.te.tcf.filesystem.interfaces.IUIConstants;
 import org.eclipse.tcf.te.tcf.filesystem.internal.columns.FSTreeElementLabelProvider;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
+import org.eclipse.tcf.te.ui.trees.FilterDescriptor;
+import org.eclipse.tcf.te.ui.trees.ViewerStateManager;
 import org.eclipse.ui.IDecoratorManager;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
@@ -65,8 +66,6 @@ public class FSOpenFileDialog extends ElementTreeSelectionDialog {
 		this.setAllowMultiple(false);
 		this.setStatusLineAboveButtons(false);
 		this.setComparator(new FSTreeViewerSorter());
-		this.addFilter(new HiddenFilesViewerFilter());
-		this.addFilter(new SystemFilesViewerFilter());
 		this.setValidator(new ISelectionStatusValidator() {
 			@Override
 			public IStatus validate(Object[] selection) {
@@ -74,7 +73,23 @@ public class FSOpenFileDialog extends ElementTreeSelectionDialog {
 			}
 		});
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.dialogs.ElementTreeSelectionDialog#setInput(java.lang.Object)
+	 */
+	@Override
+    public void setInput(Object input) {
+		super.setInput(input);
+		FilterDescriptor[] filterDescriptors = ViewerStateManager.getInstance()
+		                .getFilterDescriptors(IUIConstants.ID_TREE_VIEWER_FS, input);
+		if (filterDescriptors != null) {
+			for(FilterDescriptor descriptor : filterDescriptors) {
+				if(descriptor.isEnabled()) addFilter(descriptor.getFilter());
+			}
+		}
+	}
+
 	/**
 	 * Create a decorating label provider using the specified label provider.
 	 * 

@@ -10,7 +10,12 @@
 package org.eclipse.tcf.te.ui.trees;
 
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -31,6 +36,8 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -67,6 +74,10 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	private FilterDescriptor[] filterDescriptors;
 	// The tree viewer columns of this viewer.
 	private ColumnDescriptor[] columns;
+	// The state of the tree viewer used to restore and save the the tree viewer's state.
+	private TreeViewerState viewerState;
+	// The action to configure the filters.
+	private ConfigFilterAction configFilterAction;
 
 	/**
 	 * Constructor.
@@ -89,6 +100,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 */
 	@Override
 	public void dispose() {
+		saveViewerState();
 		// Unregister the selection changed listener
 		if (selectionChangedListener != null) {
 			if (getViewer() != null) {
@@ -105,6 +117,13 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 				}
 				if (column.getLabelProvider() != null) {
 					column.getLabelProvider().dispose();
+				}
+			}
+		}
+		if(filterDescriptors != null) {
+			for(FilterDescriptor filterDescriptor : filterDescriptors) {
+				if(filterDescriptor.getImage() != null) {
+					filterDescriptor.getImage().dispose();
 				}
 			}
 		}
@@ -149,7 +168,22 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 		viewer.setAutoExpandLevel(getAutoExpandLevel());
 
 		viewer.setLabelProvider(doCreateTreeViewerLabelProvider(viewer));
-		viewer.setContentProvider(doCreateTreeViewerContentProvider(viewer));
+		
+		final ITreeContentProvider contentProvider = doCreateTreeViewerContentProvider(viewer);
+		InvocationHandler handler = new InvocationHandler() {
+			@Override
+			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+				if (method.getName().equals("inputChanged")) { //$NON-NLS-1$
+					onInputChanged(args[2]);
+				}
+				return method.invoke(contentProvider, args);
+			}
+		};
+		ClassLoader classLoader = getClass().getClassLoader();
+		Class<?>[] interfaces = new Class[] { ITreeContentProvider.class };
+		ITreeContentProvider proxy = (ITreeContentProvider) Proxy.newProxyInstance(classLoader, interfaces, handler);
+		viewer.setContentProvider(proxy);
+		
 		viewer.setComparator(doCreateTreeViewerComparator(viewer));
 
 		viewer.getTree().setLayoutData(doCreateTreeViewerLayoutData(viewer));
@@ -160,19 +194,6 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 			viewer.addSelectionChangedListener(selectionChangedListener);
 		}
 		
-		// Create the tree columns.
-		columns = doCreateViewerColumns(viewer);
-		if (hasColumns()) {
-			createTreeColumns(viewer);
-		}
-		
-		// Add the viewer filters.
-		filterDescriptors = doCreateFilterDescriptors(viewer);
-		updateFilters();
-		
-		// Set the header visible.
-		viewer.getTree().setHeaderVisible(hasColumns());
-		
 		// Set the help context.
 		String helpContextId = getHelpId();
 		if (helpContextId != null) {
@@ -180,6 +201,101 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 		}
 	}
 	
+	/**
+	 * Handle the event when the new input is set. Get the viewer's state
+	 * and update the state of the viewer's columns and filters.
+	 * 
+	 * @param newInput The new input.
+	 */
+	void onInputChanged(Object newInput) {
+		columns = doCreateViewerColumns(viewer);
+		filterDescriptors = doCreateFilterDescriptors(viewer);
+		if (isStatePersistent()) {
+			updateViewerState(newInput);
+		}
+		createTreeColumns(viewer);
+		viewer.getTree().setHeaderVisible(true);
+		updateFilters();
+		new TreeViewerHeaderMenu(this).create();
+		configFilterAction.setEnabled(filterDescriptors != null);
+	}
+
+	/**
+	 * Update the viewer state using the states from the viewerState which
+	 * is retrieved or created based on the input.
+	 * 
+	 * @param newInput The new input of the viewer.
+	 */
+	private void updateViewerState(Object newInput) {
+	    String inputId = ViewerStateManager.getInputId(newInput);
+	    if (inputId != null) {
+	    	inputId = getViewerId() + "." + inputId; //$NON-NLS-1$
+	    	viewerState = ViewerStateManager.getInstance().getViewerState(inputId);
+	    	if (viewerState == null) {
+	    		viewerState = ViewerStateManager.createViewerState(columns, filterDescriptors);
+	    		ViewerStateManager.getInstance().putViewerState(inputId, viewerState);
+	    	}
+	    	else {
+	    		viewerState.updateColumnDescriptor(columns);
+	    		viewerState.updateFilterDescriptor(filterDescriptors);
+	    	}
+	    }
+    }
+
+	/**
+	 * Save the viewer's state.
+	 */
+	private void saveViewerState() {
+		if (isStatePersistent() && viewerState != null) {
+    		viewerState.updateColumnState(columns);
+    		viewerState.updateFilterState(filterDescriptors);
+		}
+	}
+	
+	/**
+	 * Update the filter's state using the latest filter descriptors.
+	 */
+	void updateFilterState() {
+		if (isStatePersistent() && viewerState != null) {
+    		viewerState.updateFilterState(filterDescriptors);
+		}
+	}
+
+	/**
+	 * Show or hide the specified column. Return true if the visible
+	 * state has changed. 
+	 * 
+	 * @param column The column to be changed.
+	 * @param visible The new visible value.
+	 * @return true if the state has changed.
+	 */
+	boolean setColumnVisible(ColumnDescriptor column, boolean visible) {
+	    if (column.isVisible() && !visible) {
+	    	TreeColumn treeColumn = column.getTreeColumn();
+	    	treeColumn.dispose();
+	    	column.setTreeColumn(null);
+		    column.setVisible(visible);
+		    return true;
+	    }
+	    else if (!column.isVisible() && visible) {
+	    	TreeColumn treeColumn = createTreeColumn(column, false);
+	    	column.setTreeColumn(treeColumn);
+		    column.setVisible(visible);
+		    return true;
+	    }
+		return false;
+    }
+
+	/**
+	 * Return if this tree viewer's state is persistent. If it is persistent,
+	 * then its viewer state will be persisted during different session.
+	 * 
+	 * @return true if the viewer's state is persistent.
+	 */
+	protected boolean isStatePersistent() {
+	    return true;
+    }
+
 	/**
 	 * Get the help context id of this viewer.
 	 * 
@@ -198,20 +314,10 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 */
 	protected ColumnDescriptor[] doCreateViewerColumns(TreeViewer viewer) {
 		if(columns == null) {
-			parseExtension();
+			TreeViewerExtension viewerExtension = new TreeViewerExtension(getViewerId());
+			columns = viewerExtension.parseColumns(viewer);
 		}
 		return columns;
-	}
-	
-	/**
-	 * Parse the viewer extension to create tree viewer columns and viewer filters.
-	 */
-	private void parseExtension() {
-		if (getViewerId() != null) {
-			TreeViewerExtension viewerExtension = new TreeViewerExtension(getViewerId(), viewer);
-			columns = viewerExtension.getColumns();
-			filterDescriptors = viewerExtension.getFilterDescriptors();
-		}
 	}
 	
 	/**
@@ -223,7 +329,8 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 */
 	protected FilterDescriptor[] doCreateFilterDescriptors(TreeViewer viewer) {
 		if(filterDescriptors == null) {
-			parseExtension();
+			TreeViewerExtension viewerExtension = new TreeViewerExtension(getViewerId());
+			filterDescriptors = viewerExtension.parseFilters();
 		}
 		return filterDescriptors;
 	}
@@ -252,9 +359,18 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * @param viewer The tree viewer.
 	 */
 	protected void createTreeColumns(TreeViewer viewer) {
-		Assert.isTrue(hasColumns());
+		Assert.isTrue(columns != null && columns.length > 0);
+		List<ColumnDescriptor> visibleColumns = new ArrayList<ColumnDescriptor>();
 		for (ColumnDescriptor column : columns) {
-			if (column.isVisible()) createTreeColumn(column);
+			if (column.isVisible()) visibleColumns.add(column);
+		}
+		Collections.sort(visibleColumns, new Comparator<ColumnDescriptor>(){
+			@Override
+            public int compare(ColumnDescriptor o1, ColumnDescriptor o2) {
+				return o1.getOrder() < o2.getOrder() ? -1 : (o1.getOrder() > o2.getOrder() ? 1 : 0);
+            }});
+		for(ColumnDescriptor visibleColumn : visibleColumns) {
+			createTreeColumn(visibleColumn, true);
 		}
 		// Set the default sort column to the first column (the tree column).
 		Assert.isTrue(viewer.getTree().getColumnCount() > 0);
@@ -268,11 +384,13 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * Create the tree column described by the specified colum descriptor.
 	 * 
 	 * @param column The column descriptor.
+	 * @param append If the new column should be appended.
 	 * @return The tree column created.
 	 */
-	TreeColumn createTreeColumn(ColumnDescriptor column) {
+	TreeColumn createTreeColumn(final ColumnDescriptor column, boolean append) {
 		Tree tree = viewer.getTree();
-	    TreeColumn treeColumn = new TreeColumn(tree, column.getStyle(), getColumnIndex(column));
+		final TreeColumn treeColumn = append ? new TreeColumn(tree, column.getStyle()) : 
+			new TreeColumn(tree, column.getStyle(), getColumnIndex(column));
 	    treeColumn.setData(column);
 	    treeColumn.setText(column.getName());
 	    treeColumn.setToolTipText(column.getDescription());
@@ -282,9 +400,36 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	    treeColumn.setResizable(column.isResizable());
 	    treeColumn.setWidth(column.getWidth());
 	    treeColumn.addSelectionListener(this);
+	    treeColumn.addControlListener(new ControlAdapter(){
+	    	
+			@Override
+            public void controlMoved(ControlEvent e) {
+				columnMoved();
+            }
+
+			@Override
+            public void controlResized(ControlEvent e) {
+				column.setWidth(treeColumn.getWidth());
+            }});
 	    column.setTreeColumn(treeColumn);
 	    return treeColumn;
     }
+	
+	/**
+	 * Called when a column is moved. Store the column's order.
+	 */
+	void columnMoved() {
+		Tree tree = viewer.getTree();
+		TreeColumn[] treeColumns = tree.getColumns();
+		if(treeColumns != null && treeColumns.length > 0) {
+			int[] orders = tree.getColumnOrder();
+			for(int i=0;i<orders.length;i++) {
+				TreeColumn treeColumn = treeColumns[orders[i]];
+				ColumnDescriptor column = (ColumnDescriptor) treeColumn.getData();
+				column.setOrder(i);
+			}
+		}
+	}
 	
 	/**
 	 * Get the column index of the specified column. The column index
@@ -313,15 +458,6 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * @return This viewer's id or null.
 	 */
 	protected abstract String getViewerId();
-	
-	/**
-	 * Returns if or if not to show the tree columns.
-	 *
-	 * @return <code>True</code> to show the tree columns, <code>false</code> otherwise.
-	 */
-	protected boolean hasColumns() {
-		return columns != null && columns.length > 0 && columns[0].isVisible();
-	}
 
 	/**
 	 * Returns the number of levels to auto expand.
@@ -413,9 +549,6 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 		// The toolbar is a bit more complicated as we want to have the
 		// toolbar placed within the section title.
 		createToolbarContributionItem(viewer);
-		if (hasColumns()) {
-			new TreeViewerHeaderMenu(this).create();
-		}
 	}
 
 	/**
@@ -488,7 +621,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	protected void createToolBarItems(ToolBarManager toolbarManager) {
 		Assert.isNotNull(toolbarManager);
 		toolbarManager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-		toolbarManager.add(new ConfigFilterAction(this));
+		toolbarManager.add(configFilterAction = new ConfigFilterAction(this));
 		Action action = new Action(null, IAction.AS_PUSH_BUTTON){
 			@Override
             public void run() {

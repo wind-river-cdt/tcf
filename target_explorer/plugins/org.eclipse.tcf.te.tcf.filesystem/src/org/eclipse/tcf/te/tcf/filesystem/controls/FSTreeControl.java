@@ -32,10 +32,10 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.tcf.te.tcf.filesystem.interfaces.IUIConstants;
 import org.eclipse.tcf.te.tcf.filesystem.internal.celleditor.FSViewerCellEditorFactory;
 import org.eclipse.tcf.te.tcf.filesystem.internal.dnd.FSDragSourceListener;
 import org.eclipse.tcf.te.tcf.filesystem.internal.dnd.FSDropTargetListener;
-import org.eclipse.tcf.te.ui.interfaces.IUIConstants;
 import org.eclipse.tcf.te.ui.trees.AbstractTreeControl;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbenchPart;
@@ -126,7 +126,7 @@ public class FSTreeControl extends AbstractTreeControl implements ISelectionChan
 	 */
 	@Override
 	protected String getContextMenuId() {
-		return IUIConstants.ID_CONTROL_MENUS_BASE + ".menu.fs"; //$NON-NLS-1$;
+		return IUIConstants.ID_TREE_VIEWER_FS_CONTEXT_MENU;
 	}
 
 	/* (non-Javadoc)
@@ -211,7 +211,7 @@ public class FSTreeControl extends AbstractTreeControl implements ISelectionChan
 	 */
 	@Override
     protected String getHelpId() {
-		return getViewerId() + ".help"; //$NON-NLS-1$
+		return IUIConstants.ID_TREE_VIEWER_FS_HELP;
     }
 
 	/*
@@ -220,6 +220,6 @@ public class FSTreeControl extends AbstractTreeControl implements ISelectionChan
 	 */
 	@Override
     protected String getViewerId() {
-	    return IUIConstants.ID_CONTROL_MENUS_BASE + ".viewer.fs"; //$NON-NLS-1$;
+	    return IUIConstants.ID_TREE_VIEWER_FS;
     }	
 }

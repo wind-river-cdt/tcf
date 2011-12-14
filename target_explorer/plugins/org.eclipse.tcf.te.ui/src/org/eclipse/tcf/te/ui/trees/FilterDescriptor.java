@@ -10,6 +10,7 @@
 package org.eclipse.tcf.te.ui.trees;
 
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.swt.graphics.Image;
 
 /**
  * A data structure to describe a viewer filter including its id, name, description, enablement and
@@ -24,6 +25,9 @@ public class FilterDescriptor {
 	private String description;
 	// If the filter is enabled.
 	private boolean enabled;
+	// The image of this filter.
+	private Image image;
+
 	// The viewer filter.
 	private ViewerFilter filter;
 
@@ -116,4 +120,22 @@ public class FilterDescriptor {
 	public void setFilter(ViewerFilter filter) {
 		this.filter = filter;
 	}
+	
+	/**
+	 * Get the filter's display image.
+	 * 
+	 * @return The filter's image.
+	 */
+	public Image getImage() {
+    	return image;
+    }
+
+	/**
+	 * Set the filter's display image.
+	 * 
+	 * @param image The filter's new image.
+	 */
+	public void setImage(Image image) {
+    	this.image = image;
+    }
 }

@@ -38,8 +38,7 @@ import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeContentProvider;
 import org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeViewerSorter;
-import org.eclipse.tcf.te.tcf.filesystem.filters.HiddenFilesViewerFilter;
-import org.eclipse.tcf.te.tcf.filesystem.filters.SystemFilesViewerFilter;
+import org.eclipse.tcf.te.tcf.filesystem.interfaces.IUIConstants;
 import org.eclipse.tcf.te.tcf.filesystem.internal.columns.FSTreeElementLabelProvider;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
@@ -51,6 +50,8 @@ import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.ui.controls.BaseEditBrowseTextControl;
 import org.eclipse.tcf.te.ui.forms.FormLayoutFactory;
+import org.eclipse.tcf.te.ui.trees.FilterDescriptor;
+import org.eclipse.tcf.te.ui.trees.ViewerStateManager;
 import org.eclipse.tcf.te.ui.wizards.pages.AbstractValidatableWizardPage;
 import org.eclipse.ui.IDecoratorManager;
 import org.eclipse.ui.IWorkbench;
@@ -187,8 +188,6 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 		treeViewer.setContentProvider(contentProvider = new FSTreeContentProvider());
 		treeViewer.setLabelProvider(createDecoratingLabelProvider(new FSTreeElementLabelProvider(treeViewer)));
 		treeViewer.setComparator(new FSTreeViewerSorter());
-		treeViewer.addFilter(new HiddenFilesViewerFilter());
-		treeViewer.addFilter(new SystemFilesViewerFilter());
 		ViewerFilter folderFilter = new ViewerFilter() {
 			@Override
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
@@ -203,7 +202,7 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 		treeViewer.addFilter(folderFilter);
 		IPeerModel peer = wizard.getPeer();
 		if (peer != null) {
-			treeViewer.setInput(peer);
+			setInput(peer);
 		}
 		treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
@@ -230,7 +229,22 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 		// restore the widget values from the history
 		restoreWidgetValues();
 	}
-
+	
+	/**
+	 * Set the input of the tree viewer and apply the appropriate filters.
+	 * 
+	 * @param input The tree viewer's input.
+	 */
+    private void setInput(Object input) {
+		treeViewer.setInput(input);
+		FilterDescriptor[] filterDescriptors = ViewerStateManager.getInstance().getFilterDescriptors(IUIConstants.ID_TREE_VIEWER_FS, input);
+		if (filterDescriptors != null) {
+			for (FilterDescriptor descriptor : filterDescriptors) {
+				if (descriptor.isEnabled()) treeViewer.addFilter(descriptor.getFilter());
+			}
+		}
+	}
+    
 	/**
 	 * Create a decorating label provider using the specified label provider.
 	 * 

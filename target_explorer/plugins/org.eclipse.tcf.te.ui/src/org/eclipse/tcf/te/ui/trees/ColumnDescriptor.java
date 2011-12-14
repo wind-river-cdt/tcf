@@ -73,10 +73,12 @@ public class ColumnDescriptor {
 	@SuppressWarnings("rawtypes")
 	private Comparator comparator;
 
-	//The corresponding tree column. Not intended to be changed by callers.
+	//The corresponding tree column. Not intended to be changed by other callers.
 	private TreeColumn treeColumn;
-	//If the column's sorting order is ascending. Defaults to true. Not intended to be changed by callers.
+	//If the column's sorting order is ascending. Defaults to true. Not intended to be changed by other callers.
 	private boolean ascending = true;
+	//The column's order. Not intended to be changed by other callers.
+	private int order;
 
 	/**
 	 * Create a column descriptor with specified column id.
@@ -341,4 +343,22 @@ public class ColumnDescriptor {
 	public ILabelProvider getLabelProvider() {
 		return labelProvider;
 	}
+
+	/**
+	 * Get the column's order number. 
+	 * 
+	 * @return The column's order.
+	 */
+	public int getOrder() {
+    	return order;
+    }
+
+	/**
+	 * Set the column's order.
+	 * 
+	 * @param order The new order.
+	 */
+	public void setOrder(int order) {
+    	this.order = order;
+    }
 }

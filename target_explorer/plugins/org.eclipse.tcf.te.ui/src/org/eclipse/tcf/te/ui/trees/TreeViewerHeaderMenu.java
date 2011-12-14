@@ -21,7 +21,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeColumn;
 
 /**
  * The header context menu for the execution context viewer. This context menu
@@ -73,18 +72,11 @@ public class TreeViewerHeaderMenu extends Menu implements SelectionListener, Lis
     public void widgetSelected(SelectionEvent e) {
 		MenuItem item = (MenuItem) e.getSource();
 		ColumnDescriptor column = (ColumnDescriptor) item.getData();
-		boolean ov = column.isVisible();
-		boolean nv = item.getSelection();
-		if (ov && !nv) {
-			TreeColumn treeColumn = column.getTreeColumn();
-			treeColumn.dispose();
-			column.setTreeColumn(null);
+		boolean visible = item.getSelection();
+		if (treeControl.setColumnVisible(column, visible)){
+			treeControl.columnMoved();
+			treeControl.getViewer().refresh();
 		}
-		else if (!ov && nv) {
-			TreeColumn treeColumn = treeControl.createTreeColumn(column);
-			column.setTreeColumn(treeColumn);
-		}
-		column.setVisible(nv);
 	}
 
 	/*
@@ -126,4 +118,16 @@ public class TreeViewerHeaderMenu extends Menu implements SelectionListener, Lis
 	@Override
 	protected void checkSubclass() {
 	}
+
+	/**
+	 * Update the menu item's check state according to the new column's visibility.
+	 */
+	public void updateSelection() {
+		ColumnDescriptor[] columns = treeControl.getViewerColumns();
+		for (int i = 0; i < columns.length; i++) {
+			MenuItem item = this.getItem(i);
+			ColumnDescriptor column = columns[i];
+			item.setSelection(column.isVisible());
+		}
+    }
 }
