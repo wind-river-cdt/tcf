@@ -17,8 +17,17 @@ import java.util.HashMap;
  */
 class TCFChildrenHoverExpressions extends TCFChildren {
 
+    private String expression;
+
     TCFChildrenHoverExpressions(TCFNode parent) {
         super(parent, 16);
+    }
+
+    void setExpression(String expression) {
+        if (expression == this.expression) return;
+        if (expression != null && expression.equals(this.expression)) return;
+        this.expression = expression;
+        cancel();
     }
 
     void onSuspended() {
@@ -48,17 +57,10 @@ class TCFChildrenHoverExpressions extends TCFChildren {
     @Override
     protected boolean startDataRetrieval() {
         HashMap<String,TCFNode> data = new HashMap<String,TCFNode>();
-        String expression_script = null;
-        if (node instanceof TCFNodeExecContext) {
-            expression_script = ((TCFNodeExecContext)node).getHoverExpression();
-        }
-        else if (node instanceof TCFNodeStackFrame) {
-            expression_script = ((TCFNodeStackFrame)node).getHoverExpression();
-        }
-        if (expression_script != null) {
-            TCFNodeExpression expression_node = findScript(expression_script);
+        if (expression != null) {
+            TCFNodeExpression expression_node = findScript(expression);
             if (expression_node == null) {
-                add(expression_node = new TCFNodeExpression(node, expression_script, null, null, null, -1, false));
+                add(expression_node = new TCFNodeExpression(node, expression, null, null, null, -1, false));
             }
             data.put(expression_node.id, expression_node);
         }

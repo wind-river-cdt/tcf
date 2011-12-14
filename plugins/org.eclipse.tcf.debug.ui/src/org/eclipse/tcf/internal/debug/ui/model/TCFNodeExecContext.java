@@ -133,8 +133,6 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
     private ChildrenStateInfo last_children_state_info;
     private boolean delayed_children_list_delta;
 
-    private String hover_expression;
-
     /**
      * Wrapper class for IMemoryMap.MemoryRegion.
      * The class help to search memory region by address by
@@ -499,15 +497,8 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
     }
 
     TCFChildren getHoverExpressionCache(String expression) {
-        if (expression != hover_expression && (expression == null || !expression.equals(hover_expression))) {
-            hover_expression = expression;
-            children_hover_exps.cancel();
-        }
+        children_hover_exps.setExpression(expression);
         return children_hover_exps;
-    }
-
-    String getHoverExpression() {
-        return hover_expression;
     }
 
     public TCFChildrenLogExpressions getLogExpressionCache() {

@@ -47,8 +47,6 @@ public class TCFNodeStackFrame extends TCFNode {
     private final TCFData<TCFFunctionRef> func_info;
     private final TCFData<BigInteger> address;
 
-    private String hover_expression;
-
     TCFNodeStackFrame(final TCFNodeExecContext parent, final String id, final boolean emulated) {
         super(parent, id);
         this.emulated = emulated;
@@ -190,15 +188,8 @@ public class TCFNodeStackFrame extends TCFNode {
     }
 
     TCFChildren getHoverExpressionCache(String expression) {
-        if (expression != hover_expression && (expression == null || !expression.equals(hover_expression))) {
-            hover_expression = expression;
-            children_hover_exps.cancel();
-        }
+        children_hover_exps.setExpression(expression);
         return children_hover_exps;
-    }
-
-    String getHoverExpression() {
-        return hover_expression;
     }
 
     public TCFDataCache<TCFSourceRef> getLineInfo() {
