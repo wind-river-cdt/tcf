@@ -17,6 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.debug.ui.IDebugView;
+import org.eclipse.swt.graphics.Device;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.internal.debug.model.TCFContextState;
 import org.eclipse.tcf.internal.debug.model.TCFSourceRef;
 import org.eclipse.tcf.internal.debug.ui.Activator;
@@ -30,14 +33,20 @@ import org.eclipse.tcf.services.IRunControl;
 import org.eclipse.tcf.services.IStackTrace;
 import org.eclipse.tcf.util.TCFDataCache;
 import org.eclipse.tcf.util.TCFTask;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
+import org.eclipse.ui.views.properties.PropertySheet;
+import org.eclipse.ui.views.properties.PropertySheetPage;
 
 /**
  * Adapts TCFNode to IPropertySource.
  */
-class TCFNodePropertySource implements IPropertySource {
+public class TCFNodePropertySource implements IPropertySource {
 
     private final TCFNode node;
     private final Map<String, Object> properties = new HashMap<String, Object>();
@@ -52,7 +61,6 @@ class TCFNodePropertySource implements IPropertySource {
         return null;
     }
 
-    /* TODO: need to refresh the properties view when target state changes */
     public IPropertyDescriptor[] getPropertyDescriptors() {
         if (descriptors == null) {
             try {
@@ -203,5 +211,28 @@ class TCFNodePropertySource implements IPropertySource {
         if (l < 0) l = 0;
         if (l > 16) l = 16;
         return "0x0000000000000000".substring(0, 2 + l) + s;
+    }
+
+    public static void refresh(Display display, TCFNode node) {
+        synchronized (Device.class) {
+            if (!display.isDisposed()) {
+                display.asyncExec(new Runnable() {
+                    public void run() {
+                        for (IWorkbenchWindow window : PlatformUI.getWorkbench().getWorkbenchWindows()) {
+                            IWorkbenchPart active_part = window.getActivePage().getActivePart();
+                            if (active_part instanceof IDebugView) {
+                                IViewPart part = window.getActivePage().findView("org.eclipse.ui.views.PropertySheet");
+                                if (part instanceof PropertySheet) {
+                                    PropertySheet props = (PropertySheet)part;
+                                    PropertySheetPage page = (PropertySheetPage)props.getCurrentPage();
+                                    // TODO: need to get Properties view selection to skip unnecessary refreshes
+                                    if (page != null) page.refresh();
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
     }
 }
