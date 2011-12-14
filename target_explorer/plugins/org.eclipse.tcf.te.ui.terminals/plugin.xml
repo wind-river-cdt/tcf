@@ -73,12 +73,6 @@
 <!-- Terminal connector type contributions -->
    <extension point="org.eclipse.tcf.te.ui.terminals.connectorTypes">
       <connectorType
-            class="org.eclipse.tcf.te.ui.terminals.types.TelnetConnectorType"
-            id="org.eclipse.tcf.te.ui.terminals.type.telnet"
-            label="%TelnetConnectorType.label">
-      </connectorType>
-
-      <connectorType
             class="org.eclipse.tcf.te.ui.terminals.types.StreamsConnectorType"
             id="org.eclipse.tcf.te.ui.terminals.type.streams"
             label="%StreamsConnectorType.label">

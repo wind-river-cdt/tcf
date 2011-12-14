@@ -201,7 +201,11 @@ public class BaseWizardConfigurationPanelControl extends BaseDialogPageControl {
 		if (settings != null) {
 			for (String key : configurationPanels.keySet()) {
 				IWizardConfigurationPanel configPanel = getConfigurationPanel(key);
-				if (configPanel != null) configPanel.doSaveWidgetValues(settings, idPrefix);
+				if (configPanel != null) {
+					IDialogSettings configPanelSettings = settings.getSection(key);
+					if (configPanelSettings == null) configPanelSettings = settings.addNewSection(key);
+					configPanel.doSaveWidgetValues(configPanelSettings, idPrefix);
+				}
 			}
 		}
 	}
@@ -215,7 +219,11 @@ public class BaseWizardConfigurationPanelControl extends BaseDialogPageControl {
 		if (settings != null) {
 			for (String key : configurationPanels.keySet()) {
 				IWizardConfigurationPanel configPanel = getConfigurationPanel(key);
-				if (configPanel != null) configPanel.doRestoreWidgetValues(settings, idPrefix);
+				if (configPanel != null) {
+					IDialogSettings configPanelSettings = settings.getSection(key);
+					if (configPanelSettings == null) configPanelSettings = settings.addNewSection(key);
+					configPanel.doRestoreWidgetValues(configPanelSettings, idPrefix);
+				}
 			}
 		}
 	}

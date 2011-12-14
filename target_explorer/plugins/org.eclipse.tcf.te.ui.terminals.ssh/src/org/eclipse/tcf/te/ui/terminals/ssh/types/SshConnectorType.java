@@ -101,7 +101,7 @@ public class SshConnectorType extends AbstractConnectorType {
 		sshSettings.save(store);
 
 		// MWE TODO make sure this is NOT passed outside as this is plain text
-		store.put("Password", password);
+		store.put("Password", password); //$NON-NLS-1$
 
 		// Construct the terminal connector instance
 		ITerminalConnector connector = TerminalConnectorExtension.makeTerminalConnector(connectorId);

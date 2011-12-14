@@ -5,18 +5,18 @@
 <!-- Terminal connector type contributions -->
    <extension point="org.eclipse.tcf.te.ui.terminals.connectorTypes">
       <connectorType
-            class="org.eclipse.tcf.te.ui.terminals.ssh.types.SshConnectorType"
-            id="org.eclipse.tcf.te.ui.terminals.type.ssh"
-            label="%SshConnectorType.label">
+            class="org.eclipse.tcf.te.ui.terminals.telnet.types.TelnetConnectorType"
+            id="org.eclipse.tcf.te.ui.terminals.type.telnet"
+            label="%TelnetConnectorType.label">
       </connectorType>
    </extension>
    
 <!-- Terminals launcher delegate contributions -->
    <extension point="org.eclipse.tcf.te.ui.terminals.launcherDelegates">
       <delegate
-            class="org.eclipse.tcf.te.ui.terminals.ssh.launcher.SshLauncherDelegate"
-            id="org.eclipse.tcf.te.ui.terminals.ssh.launcher.ssh"
-            label="%SshLauncherDelegate.label">
+            class="org.eclipse.tcf.te.ui.terminals.telnet.launcher.TelnetLauncherDelegate"
+            id="org.eclipse.tcf.te.ui.terminals.telnet.launcher.telnet"
+            label="%TelnetLauncherDelegate.label">
             <enablement>
                <with variable="selection">
                   <count value="1"/>
