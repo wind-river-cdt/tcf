@@ -121,7 +121,6 @@
       </perspectiveExtension>
    </extension>
 
-
 <!-- Script Pad menu contributions -->
    <extension point="org.eclipse.ui.viewActions">
       <viewContribution
@@ -133,7 +132,16 @@
                id="org.eclipse.tcf.te.tcf.ui.scriptpad.toolbar.peers"
                label="%PeersSubMenuAction.label"
                style="pulldown"
-               toolbarPath="additions">
+               toolbarPath="peers">
+         </action>
+
+         <action
+               class="org.eclipse.tcf.te.tcf.ui.views.scriptpad.actions.PlayAction"
+               icon="icons/etool16/run_exc.gif"
+               id="org.eclipse.tcf.te.tcf.ui.scriptpad.toolbar.play"
+               label="%PlayAction.label"
+               style="push"
+               toolbarPath="play">
          </action>
       </viewContribution>
    </extension>

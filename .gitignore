@@ -84,6 +84,8 @@ plugins/org.eclipse.tcf.rse/bin
 /target_explorer/plugins/org.eclipse.tcf.te.runtime.stepper/bin
 /target_explorer/plugins/org.eclipse.tcf.te.tcf.core/target
 /target_explorer/plugins/org.eclipse.tcf.te.tcf.core/bin
+/target_explorer/plugins/org.eclipse.tcf.te.tcf.core.scripting/target
+/target_explorer/plugins/org.eclipse.tcf.te.tcf.core.scripting/bin
 /target_explorer/plugins/org.eclipse.tcf.te.tcf.filesystem/target
 /target_explorer/plugins/org.eclipse.tcf.te.tcf.filesystem/bin
 /target_explorer/plugins/org.eclipse.tcf.te.tcf.locator/target
@@ -116,6 +118,8 @@ plugins/org.eclipse.tcf.rse/bin
 /target_explorer/plugins/org.eclipse.tcf.te.ui.terminals.process/bin
 /target_explorer/plugins/org.eclipse.tcf.te.ui.terminals.ssh/target
 /target_explorer/plugins/org.eclipse.tcf.te.ui.terminals.ssh/bin
+/target_explorer/plugins/org.eclipse.tcf.te.ui.terminals.telnet/target
+/target_explorer/plugins/org.eclipse.tcf.te.ui.terminals.telnet/bin
 /target_explorer/plugins/org.eclipse.tcf.te.ui.views/target
 /target_explorer/plugins/org.eclipse.tcf.te.ui.views/bin
 /target_explorer/features/org.eclipse.tcf.te.feature/target

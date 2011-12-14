@@ -67,8 +67,10 @@
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.ui.terminals</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.ui.terminals.process</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.ui.terminals.ssh</module>
+	  <module>target_explorer/plugins/org.eclipse.tcf.te.ui.terminals.telnet</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.ui.views</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.core</module>
+	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.core.scripting</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.filesystem</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.locator</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.log.core</module>

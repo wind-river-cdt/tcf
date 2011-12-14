@@ -71,7 +71,7 @@ import org.eclipse.tcf.te.tcf.processes.core.nls.Messages;
  * The process launcher is implemented fully asynchronous.
  */
 public class ProcessLauncher extends PlatformObject implements IProcessLauncher {
-	// The backend channel instance
+	// The channel instance
 	/* default */ IChannel channel;
 	// The process properties instance
 	private IPropertiesContainer properties;

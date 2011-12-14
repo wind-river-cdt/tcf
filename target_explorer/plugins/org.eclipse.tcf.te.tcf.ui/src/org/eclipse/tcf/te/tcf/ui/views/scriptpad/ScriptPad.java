@@ -35,6 +35,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IWorkbenchPartConstants;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -63,7 +64,9 @@ public class ScriptPad extends ViewPart implements ISelectionProvider, Selection
      */
     @Override
     public void dispose() {
-    	text.removeSelectionListener(this);
+    	if (text != null && !text.isDisposed()) {
+    		text.removeSelectionListener(this);
+    	}
         listeners.clear();
         super.dispose();
     }
@@ -127,6 +130,8 @@ public class ScriptPad extends ViewPart implements ISelectionProvider, Selection
 	 */
 	private void createToolbar() {
 		IToolBarManager manager = getViewSite().getActionBars().getToolBarManager();
+		manager.add(new Separator("peers")); //$NON-NLS-1$
+		manager.add(new Separator("play")); //$NON-NLS-1$
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 
@@ -222,6 +227,10 @@ public class ScriptPad extends ViewPart implements ISelectionProvider, Selection
 	 */
 	public void setPeerModel(IPeerModel peerModel) {
 		this.peerModel = peerModel;
+		// Update the action bars
+		getViewSite().getActionBars().updateActionBars();
+		// Fire a property change
+		firePropertyChange(IWorkbenchPartConstants.PROP_INPUT);
 	}
 
 	/**

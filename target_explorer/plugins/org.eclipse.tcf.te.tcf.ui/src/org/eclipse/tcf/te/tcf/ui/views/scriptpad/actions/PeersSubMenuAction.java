@@ -61,6 +61,12 @@ public class PeersSubMenuAction extends Action implements IMenuCreator, IViewAct
     			if (actionProxy != null) {
     				IPeerModel[] peers = Model.getModel().getPeers();
     				actionProxy.setEnabled(peers != null && peers.length > 0);
+
+    				// If the peer is not set to the view yet, but the action get's
+    				// enabled, than force the first peer in the list to be the selected one.
+    				if (actionProxy.isEnabled() && view instanceof ScriptPad && ((ScriptPad)view).getPeerModel() == null) {
+    					((ScriptPad)view).setPeerModel(peers[0]);
+    				}
     			}
     		}
     	};
@@ -100,7 +106,13 @@ public class PeersSubMenuAction extends Action implements IMenuCreator, IViewAct
         	// Determine the enablement. The action is disabled
         	// if no peers are available.
         	IPeerModel[] peers = Model.getModel().getPeers();
-        	action.setEnabled(peers != null && peers.length > 0);
+        	if (peers != null && peers.length > 0) {
+        		action.setEnabled(true);
+				if (view instanceof ScriptPad) ((ScriptPad)view).setPeerModel(peers[0]);
+        	} else {
+        		action.setEnabled(false);
+				if (view instanceof ScriptPad) ((ScriptPad)view).setPeerModel(null);
+        	}
     	}
     }
 

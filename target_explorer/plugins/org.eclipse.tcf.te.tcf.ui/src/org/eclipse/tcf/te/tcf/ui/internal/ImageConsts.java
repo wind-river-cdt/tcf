@@ -46,6 +46,18 @@ public interface ImageConsts {
      */
     public final static String  IMAGE_DIR_OVR = "ovr16/"; //$NON-NLS-1$
 
+    /**
+     * The directory where to load disabled toolbar images from,
+     * relative to the image root directory.
+     */
+    public final static String  IMAGE_DIR_DTOOL = "dtool16/"; //$NON-NLS-1$
+
+    /**
+     * The directory where to load enabled toolbar images from,
+     * relative to the image root directory.
+     */
+    public final static String  IMAGE_DIR_ETOOL = "etool16/"; //$NON-NLS-1$
+
     // ***** The image constants *****
 
     /**
@@ -77,4 +89,14 @@ public interface ImageConsts {
      * The key to access the target object red X overlay image.
      */
     public static final String RED_X_OVR = "RedXOverlay"; //$NON-NLS-1$
+
+    /**
+     * The key to access the base run action image.
+     */
+    public static final String RUN_ENABLED = "RunEnabled"; //$NON-NLS-1$
+
+    /**
+     * The key to access the base run action image.
+     */
+    public static final String RUN_DISABLED = "RunDisabled"; //$NON-NLS-1$
 }
