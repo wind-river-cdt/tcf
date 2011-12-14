@@ -23,7 +23,7 @@ import org.eclipse.tcf.te.ui.jface.images.AbstractImageDescriptor;
  */
 public class PhantomImageDescriptor extends AbstractImageDescriptor {
 	// The alpha data when highlight the base image.
-	private static final int HIGHLIGHT_ALPHA = 128;
+	private static final int HIGHLIGHT_ALPHA = 127;
 	// The key to store the cut mask image.
 	private static final String ID_FS_NODE_CUT_MASK = "FS_NODE_CUT_MASK@"; //$NON-NLS-1$
 	// The key to store the cut decoration image.
