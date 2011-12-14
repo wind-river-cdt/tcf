@@ -33,5 +33,7 @@ public class Messages extends NLS {
 	public static String ScriptLauncher_error_channelNotConnected;
 	public static String ScriptLauncher_error_missingScript;
 	public static String ScriptLauncher_error_illegalNullArgument;
+	public static String ScriptLauncher_error_illegalIndex;
 	public static String ScriptLauncher_error_parsingScript;
+	public static String ScriptLauncher_error_executionFailed;
 }

@@ -241,4 +241,13 @@ public class ScriptPad extends ViewPart implements ISelectionProvider, Selection
 	public IPeerModel getPeerModel() {
 		return peerModel;
 	}
+
+	/**
+	 * Returns the script.
+	 *
+	 * @return The script.
+	 */
+	public String getScript() {
+		return text.getText();
+	}
 }

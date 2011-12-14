@@ -9,10 +9,21 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.ui.views.scriptpad.actions;
 
+import java.util.concurrent.atomic.AtomicReference;
+
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.tcf.protocol.IPeer;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.te.runtime.callback.Callback;
+import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
+import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
+import org.eclipse.tcf.te.tcf.core.scripting.interfaces.IScriptLauncherProperties;
+import org.eclipse.tcf.te.tcf.core.scripting.launcher.ScriptLauncher;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.ui.views.scriptpad.ScriptPad;
 import org.eclipse.ui.IActionDelegate2;
 import org.eclipse.ui.IPropertyListener;
@@ -31,6 +42,9 @@ public class PlayAction extends Action implements IViewActionDelegate, IActionDe
 
 	// Reference to the view property listener
 	private IPropertyListener listener;
+
+	// Flag to remember if a script is currently running
+	/* default */ boolean running;
 
 	/**
      * Constructor.
@@ -54,7 +68,7 @@ public class PlayAction extends Action implements IViewActionDelegate, IActionDe
     					// Update the action enablement
     		    		boolean enabled = false;
     		    		if (PlayAction.this.view instanceof ScriptPad) enabled = ((ScriptPad)PlayAction.this.view).getPeerModel() != null;
-    		    		actionProxy.setEnabled(enabled);
+    		    		actionProxy.setEnabled(enabled && !running);
     				}
     			}
     		};
@@ -71,7 +85,53 @@ public class PlayAction extends Action implements IViewActionDelegate, IActionDe
     	if (action != null) {
     		boolean enabled = false;
     		if (view instanceof ScriptPad) enabled = ((ScriptPad)view).getPeerModel() != null;
-    		action.setEnabled(enabled);
+    		action.setEnabled(enabled && !running);
+    	}
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.action.Action#run()
+     */
+    @Override
+    public void run() {
+    	String script = null;
+    	IPeerModel peerModel = null;
+
+    	if (view instanceof ScriptPad) {
+    		script = ((ScriptPad)view).getScript();
+    		peerModel = ((ScriptPad)view).getPeerModel();
+    	}
+
+    	if (script != null && !"".equals(script) && peerModel != null) { //$NON-NLS-1$
+        	final ScriptLauncher launcher = new ScriptLauncher();
+
+        	IPropertiesContainer properties = new PropertiesContainer();
+        	properties.setProperty(IScriptLauncherProperties.PROP_SCRIPT, script);
+
+        	final AtomicReference<IPeer> peer = new AtomicReference<IPeer>();
+        	final IPeerModel finPeerModel = peerModel;
+        	Runnable runnable = new Runnable() {
+        		@Override
+        		public void run() {
+        			peer.set(finPeerModel.getPeer());
+        		}
+        	};
+        	if (Protocol.isDispatchThread()) runnable.run();
+        	else Protocol.invokeAndWait(runnable);
+
+        	running = true;
+
+        	launcher.launch(peer.get(), properties, new Callback() {
+        		@Override
+        		protected void internalDone(Object caller, IStatus status) {
+        			running = false;
+        			launcher.dispose();
+
+		    		boolean enabled = false;
+		    		if (PlayAction.this.view instanceof ScriptPad) enabled = ((ScriptPad)PlayAction.this.view).getPeerModel() != null;
+		    		actionProxy.setEnabled(enabled && !running);
+        		}
+        	});
     	}
     }
 
@@ -80,6 +140,7 @@ public class PlayAction extends Action implements IViewActionDelegate, IActionDe
      */
     @Override
     public void run(IAction action) {
+    	run();
     }
 
     /* (non-Javadoc)
@@ -87,6 +148,7 @@ public class PlayAction extends Action implements IViewActionDelegate, IActionDe
      */
     @Override
     public void runWithEvent(IAction action, Event event) {
+    	runWithEvent(event);
     }
 
 	/* (non-Javadoc)

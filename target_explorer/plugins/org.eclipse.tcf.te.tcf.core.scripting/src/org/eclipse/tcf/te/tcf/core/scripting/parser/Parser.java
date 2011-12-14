@@ -19,6 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.tcf.protocol.JSON;
 
 /**
  * Script parser implementation.
@@ -73,6 +74,9 @@ public class Parser {
 
     			// Parse the arguments
     			parseArguments(token, arguments);
+
+    			// Add the token to the list
+    			tokens.add(token);
     		}
     	}
 
@@ -101,6 +105,25 @@ public class Parser {
     		String tok = tokenizer.nextToken();
     		if (tok == null || "".equals(tok.trim())) continue; //$NON-NLS-1$
 
+    		if (tok.startsWith("\"")) { //$NON-NLS-1$
+    			// String type
+
+    			String fullTok = tok;
+    			boolean complete = isComplete(fullTok, '"', '"');
+    			while (!complete && tokenizer.hasMoreTokens()) {
+    				fullTok = fullTok + " " + tokenizer.nextToken(); //$NON-NLS-1$
+    				complete = isComplete(fullTok, '"', '"');
+    			}
+
+    			if (complete) {
+    				fullTok = fullTok.trim();
+    				if (fullTok.startsWith("\"")) fullTok = fullTok.substring(1); //$NON-NLS-1$
+    				if (fullTok.endsWith("\"")) fullTok = fullTok.substring(0, fullTok.length() - 1); //$NON-NLS-1$
+    				token.addArgument(fullTok);
+    				continue;
+    			}
+    		}
+
     		if ("true".equalsIgnoreCase(tok) || "false".equalsIgnoreCase(tok)) { //$NON-NLS-1$ //$NON-NLS-2$
     			token.addArgument(Boolean.valueOf(tok));
     			continue;
@@ -110,33 +133,73 @@ public class Parser {
     			Integer i = Integer.decode(tok);
     			token.addArgument(i);
     			continue;
-    		} catch (NumberFormatException e) {}
+    		} catch (NumberFormatException e) { /* ignored on purpose */ }
 
     		try {
     			Long l = Long.decode(tok);
     			token.addArgument(l);
     			continue;
-    		} catch (NumberFormatException e) {}
+    		} catch (NumberFormatException e) { /* ignored on purpose */ }
 
     		try {
     			Float f = Float.valueOf(tok);
     			token.addArgument(f);
     			continue;
-    		} catch (NumberFormatException e) {}
+    		} catch (NumberFormatException e) { /* ignored on purpose */ }
 
     		try {
     			Double d = Double.valueOf(tok);
     			token.addArgument(d);
     			continue;
-    		} catch (NumberFormatException e) {}
+    		} catch (NumberFormatException e) { /* ignored on purpose */ }
 
     		// If it starts with '{' or '[', it's a map or list type
     		if (tok.startsWith("{")) { //$NON-NLS-1$
     			// Map type
+
+    			String fullTok = tok;
+    			boolean complete = isComplete(fullTok, '{', '}');
+    			while (!complete && tokenizer.hasMoreTokens()) {
+    				fullTok = fullTok + " " + tokenizer.nextToken(); //$NON-NLS-1$
+    				complete = isComplete(fullTok, '{', '}');
+    			}
+
+    			if (complete) {
+    				fullTok = fullTok + "\0"; //$NON-NLS-1$
+    				try {
+    					Object[] args = JSON.parseSequence(fullTok.getBytes());
+    					if (args != null) {
+    						for (Object arg : args) {
+    							if (arg != null) token.addArgument(arg);
+    						}
+    						continue;
+    					}
+    				} catch (IOException e) { /* ignored on purpose */ e.printStackTrace(); }
+    			}
     		}
 
     		if (tok.startsWith("[")) { //$NON-NLS-1$
     			// List type
+
+    			String fullTok = tok;
+    			boolean complete = isComplete(fullTok, '[', ']');
+    			while (!complete && tokenizer.hasMoreTokens()) {
+    				fullTok = fullTok + " " + tokenizer.nextToken(); //$NON-NLS-1$
+    				complete = isComplete(fullTok, '[', ']');
+    			}
+
+    			if (complete) {
+    				fullTok = fullTok + "\0"; //$NON-NLS-1$
+    				try {
+    					Object[] args = JSON.parseSequence(fullTok.getBytes());
+    					if (args != null) {
+    						for (Object arg : args) {
+    							if (arg != null) token.addArgument(arg);
+    						}
+    						continue;
+    					}
+    				} catch (IOException e) { /* ignored on purpose */ }
+    			}
     		}
 
     		// Add the argument token as is
@@ -160,10 +223,18 @@ public class Parser {
     	int countOpening = 0;
     	int countClosing = 0;
 
+    	boolean same = opening == closing;
+
     	for (int i = 0; i < tok.length(); i++) {
     		char c = tok.charAt(i);
-    		if (c == opening) { countOpening++; continue; }
-    		if (c == closing) { countClosing++; continue; }
+
+    		if (c == opening && same) {
+    			if (countOpening > countClosing) countClosing++;
+    			else countOpening++;
+    		} else {
+    			if (c == opening) { countOpening++; continue; }
+    			if (c == closing) { countClosing++; continue; }
+    		}
     	}
 
     	return countOpening > 0 && countOpening == countClosing;

@@ -16,9 +16,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.tcf.core.Command;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IChannel.IChannelListener;
 import org.eclipse.tcf.protocol.IPeer;
+import org.eclipse.tcf.protocol.IService;
 import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
@@ -163,7 +165,7 @@ public class ScriptLauncher extends PlatformObject implements IScriptLauncher {
 	/**
 	 * Executes the script launch.
 	 */
-	protected void executeLaunch() {
+    protected void executeLaunch() {
 		// Get the script properties container
 		final IPropertiesContainer properties = getProperties();
 		if (properties == null) {
@@ -188,10 +190,68 @@ public class ScriptLauncher extends PlatformObject implements IScriptLauncher {
 		// Create the script parser instance
 		Parser parser = new Parser(script);
 		try {
+			// Parse the script
 			Token[] tokens = parser.parse();
-		} catch (IOException e) {
 
+			// And execute the tokens extracted, one by one sequentially
+			if (tokens != null && tokens.length > 0) {
+				executeToken(tokens, 0);
+			} else {
+				invokeCallback(Status.OK_STATUS, null);
+				return;
+			}
+		} catch (IOException e) {
+			IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
+										NLS.bind(Messages.ScriptLauncher_error_parsingScript, e.getLocalizedMessage()),
+										e);
+			invokeCallback(status, null);
+			return;
 		}
+	}
+
+	/**
+	 * Executes the token at the given index.
+	 *
+	 * @param tokens The tokens. Must not be <code>null</code>.
+	 * @param index The index.
+	 */
+	@SuppressWarnings("unused")
+	protected void executeToken(final Token[] tokens, final int index) {
+		Assert.isNotNull(tokens);
+
+		if (index < 0 || index >= tokens.length) {
+			IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
+										NLS.bind(Messages.ScriptLauncher_error_illegalIndex, Integer.valueOf(index)),
+										new IllegalArgumentException("index")); //$NON-NLS-1$
+			invokeCallback(status, null);
+			return;
+		}
+
+		Token token = tokens[index];
+
+		IService service = channel.getRemoteService(token.getServiceName());
+		new Command(channel, service, token.getCommandName(), token.getArguments()) {
+
+			@Override
+			public void done(Exception error, Object[] args) {
+				if (error == null) {
+					// Execute the next token
+					int nextIndex = index + 1;
+					if (nextIndex == tokens.length) {
+						// All tokens executed
+						invokeCallback(Status.OK_STATUS, null);
+					} else {
+						executeToken(tokens, nextIndex);
+					}
+				} else {
+					// Stop the execution
+					IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
+									NLS.bind(Messages.ScriptLauncher_error_parsingScript, error.getLocalizedMessage()),
+									error);
+					invokeCallback(status, null);
+				}
+			}
+		};
 	}
 
 	/**
