@@ -208,8 +208,8 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * @param newInput The new input.
 	 */
 	void onInputChanged(Object newInput) {
-		columns = doCreateViewerColumns(viewer);
-		filterDescriptors = doCreateFilterDescriptors(viewer);
+		columns = doCreateViewerColumns(newInput, viewer);
+		filterDescriptors = doCreateFilterDescriptors(newInput, viewer);
 		if (isStatePersistent()) {
 			updateViewerState(newInput);
 		}
@@ -309,13 +309,14 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * Create the tree viewer columns from the viewers extension. 
 	 * Subclass may override it to provide its customized viewer columns. 
 	 * 
+	 * @param newInput the input when the columns are created.
 	 * @param viewer The tree viewer to create the columns for.
 	 * @return The tree viewer columns.
 	 */
-	protected ColumnDescriptor[] doCreateViewerColumns(TreeViewer viewer) {
+	protected ColumnDescriptor[] doCreateViewerColumns(Object newInput, TreeViewer viewer) {
 		if(columns == null) {
 			TreeViewerExtension viewerExtension = new TreeViewerExtension(getViewerId());
-			columns = viewerExtension.parseColumns(viewer);
+			columns = viewerExtension.parseColumns(newInput, viewer);
 		}
 		return columns;
 	}
@@ -324,13 +325,14 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * Create the viewer filters from the viewers extension. Subclass may 
 	 * override it to provide its customized viewer filters. 
 	 * 
+	 * @param newInput the input when the filters are initialized.
 	 * @param viewer The tree viewer to create filters for.
 	 * @return The filter descriptors for the viewer.
 	 */
-	protected FilterDescriptor[] doCreateFilterDescriptors(TreeViewer viewer) {
+	protected FilterDescriptor[] doCreateFilterDescriptors(Object newInput, TreeViewer viewer) {
 		if(filterDescriptors == null) {
 			TreeViewerExtension viewerExtension = new TreeViewerExtension(getViewerId());
-			filterDescriptors = viewerExtension.parseFilters();
+			filterDescriptors = viewerExtension.parseFilters(newInput);
 		}
 		return filterDescriptors;
 	}

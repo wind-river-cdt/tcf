@@ -89,7 +89,7 @@ public class ViewerStateManager {
 	public FilterDescriptor[] getFilterDescriptors(String viewerId, Object input) {
 		if (input != null) {
 			TreeViewerExtension viewerExtension = new TreeViewerExtension(viewerId);
-			FilterDescriptor[] filterDescriptors = viewerExtension.parseFilters();
+			FilterDescriptor[] filterDescriptors = viewerExtension.parseFilters(input);
 			if (filterDescriptors != null) {
 				String inputId = getInputId(input);
 				if (inputId != null) {
