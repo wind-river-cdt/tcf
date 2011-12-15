@@ -29,6 +29,7 @@ import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExecContext;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExecContext.MemoryRegion;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNodeStackFrame;
 import org.eclipse.tcf.protocol.JSON;
+import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IRunControl;
 import org.eclipse.tcf.services.IStackTrace;
 import org.eclipse.tcf.util.TCFDataCache;
@@ -213,26 +214,46 @@ public class TCFNodePropertySource implements IPropertySource {
         return "0x0000000000000000".substring(0, 2 + l) + s;
     }
 
-    public static void refresh(Display display, TCFNode node) {
-        synchronized (Device.class) {
-            if (!display.isDisposed()) {
-                display.asyncExec(new Runnable() {
-                    public void run() {
-                        for (IWorkbenchWindow window : PlatformUI.getWorkbench().getWorkbenchWindows()) {
-                            IWorkbenchPart active_part = window.getActivePage().getActivePart();
-                            if (active_part instanceof IDebugView) {
-                                IViewPart part = window.getActivePage().findView("org.eclipse.ui.views.PropertySheet");
-                                if (part instanceof PropertySheet) {
-                                    PropertySheet props = (PropertySheet)part;
-                                    PropertySheetPage page = (PropertySheetPage)props.getCurrentPage();
-                                    // TODO: need to get Properties view selection to skip unnecessary refreshes
-                                    if (page != null) page.refresh();
+    private static final long REFRESH_DELAY = 250;
+    private static boolean refresh_posted = false;
+    private static long refresh_time = 0;
+
+    public static void refresh(TCFNode node) {
+        assert Protocol.isDispatchThread();
+        refresh_time = System.currentTimeMillis();
+        if (refresh_posted) return;
+        refresh_posted = true;
+        Protocol.invokeLater(REFRESH_DELAY, new Runnable() {
+            public void run() {
+                long time = System.currentTimeMillis();
+                if (time - refresh_time < REFRESH_DELAY * 3 / 4) {
+                    Protocol.invokeLater(refresh_time + REFRESH_DELAY - time, this);
+                    return;
+                }
+                refresh_posted = false;
+                synchronized (Device.class) {
+                    Display display = Display.getDefault();
+                    if (!display.isDisposed()) {
+                        display.asyncExec(new Runnable() {
+                            public void run() {
+                                System.out.println("" + System.currentTimeMillis());
+                                for (IWorkbenchWindow window : PlatformUI.getWorkbench().getWorkbenchWindows()) {
+                                    IWorkbenchPart active_part = window.getActivePage().getActivePart();
+                                    if (active_part instanceof IDebugView) {
+                                        IViewPart part = window.getActivePage().findView("org.eclipse.ui.views.PropertySheet");
+                                        if (part instanceof PropertySheet) {
+                                            PropertySheet props = (PropertySheet)part;
+                                            PropertySheetPage page = (PropertySheetPage)props.getCurrentPage();
+                                            // TODO: need to check Properties view selection to skip unnecessary refreshes
+                                            if (page != null) page.refresh();
+                                        }
+                                    }
                                 }
                             }
-                        }
+                        });
                     }
-                });
+                }
             }
-        }
+        });
     }
 }

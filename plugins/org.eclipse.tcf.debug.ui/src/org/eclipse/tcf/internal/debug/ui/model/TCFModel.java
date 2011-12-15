@@ -385,7 +385,7 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
             if (action_cnt == 0) {
                 setDebugViewSelection(node, reason);
                 annotation_manager.updateAnnotations(null, launch);
-                TCFNodePropertySource.refresh(display, node);
+                TCFNodePropertySource.refresh(node);
             }
             action_results.remove(context);
         }
@@ -417,7 +417,7 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
                 }
                 onMemoryChanged(id, true, false);
                 if (active_actions.get(id) == null) {
-                    TCFNodePropertySource.refresh(display, node);
+                    TCFNodePropertySource.refresh(node);
                 }
             }
             launch_node.onAnyContextSuspendedOrChanged();
@@ -452,7 +452,7 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
             if (active_actions.get(id) == null) {
                 setDebugViewSelection(node, reason);
                 annotation_manager.updateAnnotations(null, launch);
-                TCFNodePropertySource.refresh(display, node);
+                TCFNodePropertySource.refresh(node);
             }
             onMemoryChanged(id, false, true);
         }
@@ -566,7 +566,7 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
             setDebugViewSelection(id2node.get(id), "Action");
             for (TCFModelProxy p : model_proxies.values()) p.post();
             annotation_manager.updateAnnotations(null, launch);
-            TCFNodePropertySource.refresh(display, node);
+            TCFNodePropertySource.refresh(node);
         }
     };
 
