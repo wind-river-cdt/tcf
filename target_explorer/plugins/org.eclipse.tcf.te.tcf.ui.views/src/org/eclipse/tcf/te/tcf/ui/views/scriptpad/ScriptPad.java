@@ -27,6 +27,8 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CaretEvent;
+import org.eclipse.swt.custom.CaretListener;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -34,9 +36,16 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.tcf.ui.views.scriptpad.actions.CopyAction;
+import org.eclipse.tcf.te.tcf.ui.views.scriptpad.actions.CutAction;
+import org.eclipse.tcf.te.tcf.ui.views.scriptpad.actions.DeleteAction;
+import org.eclipse.tcf.te.tcf.ui.views.scriptpad.actions.PasteAction;
+import org.eclipse.tcf.te.tcf.ui.views.scriptpad.actions.SelectAllAction;
 import org.eclipse.tcf.te.ui.swt.DisplayUtil;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPartConstants;
+import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -51,6 +60,13 @@ public class ScriptPad extends ViewPart implements ISelectionProvider, Selection
 
 	// Reference to the selected peer model
 	private IPeerModel peerModel;
+
+	// References to the global action handlers
+	private CutAction cutHandler;
+	private CopyAction copyHandler;
+	private PasteAction pasteHandler;
+	/* default */ DeleteAction deleteHandler;
+	private SelectAllAction selectAllHandler;
 
 	/**
      * Constructor.
@@ -82,6 +98,12 @@ public class ScriptPad extends ViewPart implements ISelectionProvider, Selection
 		text.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		text.setFont(JFaceResources.getTextFont());
 		text.addSelectionListener(this);
+		text.addCaretListener(new CaretListener() {
+			@Override
+			public void caretMoved(CaretEvent event) {
+				if (deleteHandler != null) deleteHandler.updateEnabledState();
+			}
+		});
 
 		// Register ourselves as selection provider
 		getViewSite().setSelectionProvider(this);
@@ -90,6 +112,9 @@ public class ScriptPad extends ViewPart implements ISelectionProvider, Selection
 		createContextMenu();
 		// Create the toolbar
 		createToolbar();
+
+		// Hook the global actions
+		hookGlobalActions();
 
 		// Update the action bars
 		getViewSite().getActionBars().updateActionBars();
@@ -124,6 +149,30 @@ public class ScriptPad extends ViewPart implements ISelectionProvider, Selection
 	 */
 	protected void fillContextMenu(IMenuManager manager) {
 		Assert.isNotNull(manager);
+	}
+
+	/**
+	 * Hook the global actions.
+	 */
+	protected void hookGlobalActions() {
+		IActionBars actionBars = getViewSite().getActionBars();
+
+		cutHandler = new CutAction(this);
+		actionBars.setGlobalActionHandler(ActionFactory.CUT.getId(), cutHandler);
+
+		copyHandler = new CopyAction(this);
+		actionBars.setGlobalActionHandler(ActionFactory.COPY.getId(), copyHandler);
+
+		pasteHandler = new PasteAction(this);
+		actionBars.setGlobalActionHandler(ActionFactory.PASTE.getId(), pasteHandler);
+
+		deleteHandler = new DeleteAction(this);
+		actionBars.setGlobalActionHandler(ActionFactory.DELETE.getId(), deleteHandler);
+
+		selectAllHandler = new SelectAllAction(this);
+		actionBars.setGlobalActionHandler(ActionFactory.SELECT_ALL.getId(), selectAllHandler);
+
+		updateActionEnablements();
 	}
 
 	/**
@@ -190,6 +239,7 @@ public class ScriptPad extends ViewPart implements ISelectionProvider, Selection
 
 		// Fire the selection changed event
 		fireSelectionChanged();
+		updateActionEnablements();
 	}
 
 	/**
@@ -206,6 +256,17 @@ public class ScriptPad extends ViewPart implements ISelectionProvider, Selection
 		}
 	}
 
+	/**
+	 * Update the action enablements
+	 */
+	public void updateActionEnablements() {
+		if (cutHandler != null) cutHandler.updateEnabledState();
+		if (copyHandler != null) copyHandler.updateEnabledState();
+		if (pasteHandler != null) pasteHandler.updateEnabledState();
+		if (deleteHandler != null) deleteHandler.updateEnabledState();
+		if (selectAllHandler != null) selectAllHandler.updateEnabledState();
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
 	 */
@@ -219,6 +280,7 @@ public class ScriptPad extends ViewPart implements ISelectionProvider, Selection
 	@Override
 	public void widgetSelected(SelectionEvent e) {
 		fireSelectionChanged();
+		updateActionEnablements();
 	}
 
 	/**
@@ -250,11 +312,11 @@ public class ScriptPad extends ViewPart implements ISelectionProvider, Selection
 	}
 
 	/**
-	 * Returns the script.
+	 * Returns the styled text widget.
 	 *
-	 * @return The script.
+	 * @return The styled text widget or <code>null</code>.
 	 */
-	public String getScript() {
-		return text.getText();
+	public StyledText getStyledText() {
+		return text;
 	}
 }

@@ -97,8 +97,8 @@ public class PlayAction extends Action implements IViewActionDelegate, IActionDe
     	String script = null;
     	IPeerModel peerModel = null;
 
-    	if (view instanceof ScriptPad) {
-    		script = ((ScriptPad)view).getScript();
+    	if (view instanceof ScriptPad && ((ScriptPad)view).getStyledText() != null) {
+    		script = ((ScriptPad)view).getStyledText().getText();
     		peerModel = ((ScriptPad)view).getPeerModel();
     	}
 

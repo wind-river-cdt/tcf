@@ -80,6 +80,51 @@
       </viewContribution>
    </extension>
 
+   <extension point="org.eclipse.ui.menus">
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.tcf.ui.views.scriptpad">
+         <separator name="group.edit" visible="true"/>
+         <command
+               commandId="org.eclipse.ui.edit.cut"
+               disabledIcon="platform:/plugin/org.eclipse.ui/icons/full/dtool16/cut_edit.gif"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/cut_edit.gif"
+               label="%command.cut.label"
+               style="push"
+               tooltip="%command.cut.tooltip">
+         </command>
+         <command
+               commandId="org.eclipse.ui.edit.copy"
+               disabledIcon="platform:/plugin/org.eclipse.ui/icons/full/dtool16/copy_edit.gif"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/copy_edit.gif"
+               label="%command.copy.label"
+               style="push"
+               tooltip="%command.copy.tooltip">
+         </command>
+         <command
+               commandId="org.eclipse.ui.edit.paste"
+               disabledIcon="platform:/plugin/org.eclipse.ui/icons/full/dtool16/paste_edit.gif"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/paste_edit.gif"
+               label="%command.paste.label"
+               style="push"
+               tooltip="%command.paste.tooltip">
+         </command>
+         <separator name="group.select" visible="true"/>
+         <command
+               commandId="org.eclipse.ui.edit.delete"
+               disabledIcon="platform:/plugin/org.eclipse.ui/icons/full/dtool16/delete.gif"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/delete.gif"
+               label="%command.delete.label"
+               style="push"
+               tooltip="%command.delete.tooltip">
+         </command>
+         <command
+               commandId="org.eclipse.ui.edit.selectAll"
+               label="%command.selectall.label"
+               style="push"
+               tooltip="%command.selectall.tooltip">
+         </command>
+      </menuContribution>
+   </extension>
+   
 <!-- Script Pad event listener contributions -->
    <extension point="org.eclipse.tcf.te.runtime.eventListeners">
       <eventListener
