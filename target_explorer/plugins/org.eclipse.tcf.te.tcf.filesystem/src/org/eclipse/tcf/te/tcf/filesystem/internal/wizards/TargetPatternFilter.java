@@ -10,14 +10,13 @@ import org.eclipse.ui.dialogs.PatternFilter;
  * string and keywords
  * <p>
  * This class is copied and adapted from <code>org.eclipse.ui.internal.dialogs.WizardPatternFilter</code>.
- * 
+ *
  * @since 3.8
  */
-@SuppressWarnings("restriction")
 public class TargetPatternFilter extends PatternFilter {
     private LabelProvider targetLabelProvider = new LabelProvider();
 	/**
-	 * Create a new instance of a WizardPatternFilter 
+	 * Create a new instance of a WizardPatternFilter
 	 * @param isMatchItem
 	 */
 	public TargetPatternFilter() {

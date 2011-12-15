@@ -80,6 +80,7 @@
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.terminals.ui</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.ui</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.ui.console</module>
+	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.ui.views</module>
 
 	  <module>target_explorer/features/org.eclipse.tcf.te.feature</module>
 	  <module>target_explorer/features/org.eclipse.tcf.te.sdk.feature</module>

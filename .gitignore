@@ -104,6 +104,8 @@ plugins/org.eclipse.tcf.rse/bin
 /target_explorer/plugins/org.eclipse.tcf.te.tcf.ui/bin
 /target_explorer/plugins/org.eclipse.tcf.te.tcf.ui.console/target
 /target_explorer/plugins/org.eclipse.tcf.te.tcf.ui.console/bin
+/target_explorer/plugins/org.eclipse.tcf.te.tcf.ui.views/target
+/target_explorer/plugins/org.eclipse.tcf.te.tcf.ui.views/bin
 /target_explorer/plugins/org.eclipse.tcf.te.tests/target
 /target_explorer/plugins/org.eclipse.tcf.te.tests/bin
 /target_explorer/plugins/org.eclipse.tcf.te.ui/target
