@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Test
+Bundle-SymbolicName: org.eclipse.tcf.debug.test
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.eclipse.tcf.debug.test.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.tcf.debug,
+ org.eclipse.tcf.debug.ui,
+ org.eclipse.tcf.core,
+ org.junit;bundle-version="3.8.2",
+ org.eclipse.debug.ui;bundle-version="3.7.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Import-Package: org.eclipse.debug.internal.ui.viewers.model

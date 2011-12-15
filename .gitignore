@@ -61,6 +61,9 @@ plugins/org.eclipse.tcf.debug.ui/bin
 plugins/org.eclipse.tcf.rse/target
 plugins/org.eclipse.tcf.rse/bin
 
+# Tests
+tests/plugins/org.eclipse.tcf.debug.test/bin
+
 # target explorer
 /target_explorer/plugins/org.eclipse.tcf.te.core/target
 /target_explorer/plugins/org.eclipse.tcf.te.core/bin
