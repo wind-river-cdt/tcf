@@ -10,6 +10,8 @@
       </documentation>
    </annotation>
 
+   <include schemaLocation="schema://org.eclipse.core.expressions/schema/expressionLanguage.exsd"/>
+
    <element name="extension">
       <annotation>
          <appinfo>
@@ -79,6 +81,9 @@
          </documentation>
       </annotation>
       <complexType>
+         <sequence minOccurs="0" maxOccurs="1">
+            <element ref="activation"/>
+         </sequence>
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
@@ -203,6 +208,9 @@
 
    <element name="filter">
       <complexType>
+         <sequence minOccurs="0" maxOccurs="1">
+            <element ref="activation" minOccurs="0" maxOccurs="1"/>
+         </sequence>
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
@@ -260,6 +268,31 @@
       </complexType>
    </element>
 
+   <element name="activation">
+      <annotation>
+         <documentation>
+            The &lt;b&gt;activation&lt;/b&gt; expression defines a condition under which the column/filter should be activated.
+         </documentation>
+      </annotation>
+      <complexType>
+         <choice>
+            <element ref="not"/>
+            <element ref="and"/>
+            <element ref="or"/>
+            <element ref="instanceof"/>
+            <element ref="test"/>
+            <element ref="systemTest"/>
+            <element ref="equals"/>
+            <element ref="count"/>
+            <element ref="with"/>
+            <element ref="resolve"/>
+            <element ref="adapt"/>
+            <element ref="iterate"/>
+            <element ref="reference"/>
+         </choice>
+      </complexType>
+   </element>
+
    <annotation>
       <appinfo>
          <meta.section type="since"/>
@@ -304,6 +337,18 @@
                width=&quot;100&quot;&gt;
          &lt;/column&gt;
          &lt;column
+               alignment=&quot;SWT.LEFT&quot;
+               comparator=&quot;org.eclipse.tcf.te.tcf.filesystem.internal.columns.FileTypeComparator&quot;
+               id=&quot;type&quot;
+               labelProvider=&quot;org.eclipse.tcf.te.tcf.filesystem.internal.columns.FileTypeLabelProvider&quot;
+               moveable=&quot;true&quot;
+               name=&quot;%column.name.type&quot;
+               resizable=&quot;true&quot;
+               style=&quot;SWT.LEFT&quot;
+               visible=&quot;false&quot;
+               width=&quot;100&quot;&gt;
+         &lt;/column&gt;
+         &lt;column
                alignment=&quot;SWT.RIGHT&quot;
                comparator=&quot;org.eclipse.tcf.te.tcf.filesystem.internal.columns.ModificationTimeComparator&quot;
                id=&quot;modified&quot;
@@ -313,22 +358,46 @@
                resizable=&quot;true&quot;
                style=&quot;SWT.RIGHT&quot;
                visible=&quot;true&quot;
-               width=&quot;200&quot;&gt;
+               width=&quot;120&quot;&gt;
+         &lt;/column&gt;
+         &lt;column
+               alignment=&quot;SWT.RIGHT&quot;
+               comparator=&quot;org.eclipse.tcf.te.tcf.filesystem.internal.columns.AccessTimeComparator&quot;
+               id=&quot;accessed&quot;
+               labelProvider=&quot;org.eclipse.tcf.te.tcf.filesystem.internal.columns.AccessTimeLabelProvider&quot;
+               moveable=&quot;true&quot;
+               name=&quot;%column.name.accessed&quot;
+               resizable=&quot;true&quot;
+               style=&quot;SWT.RIGHT&quot;
+               visible=&quot;false&quot;
+               width=&quot;120&quot;&gt;
          &lt;/column&gt;
       &lt;/viewer&gt;
       &lt;viewer
             viewerId=&quot;org.eclipse.tcf.te.ui.controls.viewer.fs&quot;&gt;
          &lt;filter
                class=&quot;org.eclipse.tcf.te.tcf.filesystem.filters.HiddenFilesViewerFilter&quot;
+               description=&quot;%filter.description.hidden&quot;
                enabled=&quot;true&quot;
                id=&quot;org.eclipse.tcf.te.tcf.filesystem.filters.hiddenFiles&quot;
+               image=&quot;icons/obj16/hidden_file_filter.png&quot;
                name=&quot;%filter.name.hidden&quot;&gt;
          &lt;/filter&gt;
          &lt;filter
                class=&quot;org.eclipse.tcf.te.tcf.filesystem.filters.SystemFilesViewerFilter&quot;
+               description=&quot;%filter.description.system&quot;
                enabled=&quot;true&quot;
                id=&quot;org.eclipse.tcf.te.tcf.filesystem.filters.systemFiles&quot;
+               image=&quot;icons/obj16/system_file_filter.png&quot;
                name=&quot;%filter.name.system&quot;&gt;
+            &lt;activation&gt;
+               &lt;with
+                     variable=&quot;input&quot;&gt;
+                  &lt;test
+                        property=&quot;org.eclipse.tcf.te.tcf.filesystem.propertytester.peer.isWindows&quot;&gt;
+                  &lt;/test&gt;
+               &lt;/with&gt;
+            &lt;/activation&gt;
          &lt;/filter&gt;
       &lt;/viewer&gt;
    &lt;/extension&gt;   
@@ -345,6 +414,8 @@
 In the &quot;column&quot; element, the class referenced by the attribute &quot;labelProvider&quot; must extend &lt;samp&gt;org.eclipse.tcf.te.ui.trees.TreeColumnLabelProvider&lt;/samp&gt; which provides the viewer as the parameter. The class referenced by the attribute &quot;comparator&quot; must implement &lt;samp&gt;java.util.Comparator&lt;/samp&gt; that compares the elements of the tree viewer.
 &lt;p&gt;
 In the &quot;filter&quot; element, the class referenced by the attribute &quot;class&quot; must extend &lt;samp&gt;org.eclipse.jface.viewers.ViewerFilter&lt;/samp&gt;.
+&lt;p&gt;
+In the &quot;activation&quot; element, the evaluation context has only one variable &quot;input&quot;, which stores the current input object of the viewer.
       </documentation>
    </annotation>
 

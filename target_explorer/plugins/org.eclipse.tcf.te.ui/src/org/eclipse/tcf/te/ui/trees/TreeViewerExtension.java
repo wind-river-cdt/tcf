@@ -15,6 +15,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.eclipse.core.expressions.EvaluationContext;
+import org.eclipse.core.expressions.EvaluationResult;
+import org.eclipse.core.expressions.Expression;
+import org.eclipse.core.expressions.ExpressionConverter;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -54,10 +58,11 @@ public class TreeViewerExtension {
 	 * Parse the column declarations of this extension point and return the 
 	 * column descriptors.
 	 * 
+	 * @param input The input used to initialize the columns.
 	 * @param viewer The viewer used to initialize the columns.
 	 * @return The column descriptors from this extension point.
 	 */
-	public ColumnDescriptor[] parseColumns(TreeViewer viewer) {
+	public ColumnDescriptor[] parseColumns(Object input, TreeViewer viewer) {
 		Assert.isNotNull(viewerId);
 		List<ColumnDescriptor> columns = Collections.synchronizedList(new ArrayList<ColumnDescriptor>());
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
@@ -71,7 +76,7 @@ public class TreeViewerExtension {
 					IConfigurationElement[] children = configuration.getChildren("column"); //$NON-NLS-1$
 					if (children != null && children.length > 0) {
 						for (IConfigurationElement child : children) {
-							createColumnDescriptor(columns, child, viewer);
+							createColumnDescriptor(input, columns, child, viewer);
 						}
 					}
 				}
@@ -84,9 +89,10 @@ public class TreeViewerExtension {
 	 * Parse the viewer filter declarations of this extension point and return the 
 	 * filter descriptors.
 	 * 
+	 * @param input the new input
 	 * @return The column descriptors from this extension point.
 	 */
-	public FilterDescriptor[] parseFilters() {
+	public FilterDescriptor[] parseFilters(Object input) {
 		Assert.isNotNull(viewerId);
 		List<FilterDescriptor> descriptors = Collections.synchronizedList(new ArrayList<FilterDescriptor>());
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
@@ -100,7 +106,7 @@ public class TreeViewerExtension {
 					IConfigurationElement[] children = configuration.getChildren("filter"); //$NON-NLS-1$
 					if (children != null && children.length > 0) {
 						for (IConfigurationElement child : children) {
-							createFilterDescriptor(descriptors, child);
+							createFilterDescriptor(input, descriptors, child);
 						}
 					}
 				}
@@ -113,21 +119,24 @@ public class TreeViewerExtension {
 	 * Create an filter descriptor from the specified configuration element and 
 	 * add it to the filter list.
 	 * 
+	 * @param input the input of the viewer to initialize the descriptors.
 	 * @param descriptors The filter list to add the created descriptor to.
 	 * @param configuration The extension configuration element to create the descriptor from.
 	 */
-	private void createFilterDescriptor(List<FilterDescriptor> descriptors, final IConfigurationElement configuration) {
-		String id = configuration.getAttribute("id"); //$NON-NLS-1$
-		Assert.isNotNull(id);
-		final FilterDescriptor descriptor = new FilterDescriptor();
-		descriptor.setId(id);
-		descriptors.add(descriptor);
-		SafeRunner.run(new SafeRunnable() {
-			@Override
-			public void run() throws Exception {
-				initFilter(descriptor, configuration);
-			}
-		});
+	private void createFilterDescriptor(Object input, List<FilterDescriptor> descriptors, final IConfigurationElement configuration) {
+		if (isElementActivated(input, configuration)) {
+			String id = configuration.getAttribute("id"); //$NON-NLS-1$
+			Assert.isNotNull(id);
+			final FilterDescriptor descriptor = new FilterDescriptor();
+			descriptor.setId(id);
+			descriptors.add(descriptor);
+			SafeRunner.run(new SafeRunnable() {
+				@Override
+				public void run() throws Exception {
+					initFilter(descriptor, configuration);
+				}
+			});
+		}
 	}
 
 	/**
@@ -167,24 +176,50 @@ public class TreeViewerExtension {
 	 * Create a column descriptor from the specified configuration element and add it to
 	 * the column descriptor list.
 	 * 
+	 * @param input the new input.
 	 * @param columns The column descriptor.
 	 * @param configuration The configuration element to read the descriptor from.
 	 * @param viewer The tree viewer to add the column to.
 	 */
-	private void createColumnDescriptor(final List<ColumnDescriptor> columns, final IConfigurationElement configuration, final TreeViewer viewer) {
-		String id = configuration.getAttribute("id"); //$NON-NLS-1$
-		Assert.isNotNull(id);
-		final ColumnDescriptor column = new ColumnDescriptor(id);
-		columns.add(column);
+	private void createColumnDescriptor(Object input, final List<ColumnDescriptor> columns, final IConfigurationElement configuration, final TreeViewer viewer) {
+		if (isElementActivated(input, configuration)) {
+			String id = configuration.getAttribute("id"); //$NON-NLS-1$
+			Assert.isNotNull(id);
+			final ColumnDescriptor column = new ColumnDescriptor(id);
+			columns.add(column);
+			SafeRunner.run(new SafeRunnable() {
+				@Override
+				public void run() throws Exception {
+					initColumn(column, configuration, viewer);
+					column.setOrder(columns.size());
+				}
+			});
+		}
+	}
+	
+	private boolean isElementActivated(Object input, final IConfigurationElement configuration) {
+		IConfigurationElement[] children = configuration.getChildren("activation"); //$NON-NLS-1$
+		if(children == null || children.length == 0)
+			return true;
+		children = children[0].getChildren();
+		if(children == null || children.length == 0)
+			return true;
+		final IConfigurationElement config = children[0];
+		final EvaluationContext context = new EvaluationContext(null, input);
+		context.addVariable("input", input); //$NON-NLS-1$
+		final boolean[] result = new boolean[1];
 		SafeRunner.run(new SafeRunnable() {
 			@Override
 			public void run() throws Exception {
-				initColumn(column, configuration, viewer);
-				column.setOrder(columns.size());
+				Expression expression = ExpressionConverter.getDefault().perform(config);
+				EvaluationResult evaluate = expression.evaluate(context);
+				if (evaluate == EvaluationResult.TRUE) {
+					result[0] = true;
+				}
 			}
 		});
+		return result[0];
 	}
-
 	/**
 	 * Initialize the column descriptor by reading the attributes from the configuration element.
 	 * 

@@ -61,9 +61,9 @@ public interface ImageConsts {
     // ***** The image constants *****
 
     /**
-     * The key to access the base target object image.
+     * The key to access the base peer object image.
      */
-    public static final String TARGET = "TargetObject"; //$NON-NLS-1$
+    public static final String PEER = "PeerObject"; //$NON-NLS-1$
 
     /**
      * The key to access the target object gold overlay image.

@@ -97,8 +97,8 @@ public class UIPlugin extends AbstractUIPlugin {
 	 */
 	@Override
 	protected void initializeImageRegistry(ImageRegistry registry) {
-		URL url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OBJ + "target.gif"); //$NON-NLS-1$
-		registry.put(ImageConsts.TARGET, ImageDescriptor.createFromURL(url));
+		URL url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OBJ + "peer.gif"); //$NON-NLS-1$
+		registry.put(ImageConsts.PEER, ImageDescriptor.createFromURL(url));
 
 		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OVR + "gold_ovr.gif"); //$NON-NLS-1$
 		registry.put(ImageConsts.GOLD_OVR, ImageDescriptor.createFromURL(url));

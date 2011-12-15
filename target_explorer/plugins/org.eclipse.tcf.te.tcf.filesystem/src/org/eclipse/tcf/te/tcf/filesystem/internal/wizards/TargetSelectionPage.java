@@ -33,7 +33,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.model.Model;
-import org.eclipse.tcf.te.tcf.ui.internal.navigator.LabelProvider;
+import org.eclipse.tcf.te.tcf.ui.navigator.LabelProvider;
 import org.eclipse.tcf.te.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.interfaces.IUIConstants;
 import org.eclipse.tcf.te.ui.wizards.pages.AbstractValidatableWizardPage;
@@ -46,10 +46,9 @@ import org.eclipse.ui.dialogs.PatternFilter;
  * The New Target creation wizard selection page implementation.
  * <p>
  * This class is copied and adapted from <code>org.eclipse.tcf.te.ui.wizards.newWizard.NewWizardSelectionPage</code>.
- * 
- * @since 3.8 
+ *
+ * @since 3.8
  */
-@SuppressWarnings("restriction")
 public class TargetSelectionPage extends AbstractValidatableWizardPage {
 	// References to the page subcontrol's
 	private FilteredTree filteredTree;
@@ -82,7 +81,7 @@ public class TargetSelectionPage extends AbstractValidatableWizardPage {
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param wizardRegistry The new target wizard registry. Must not be <code>null</code>.
 	 */
 	public TargetSelectionPage() {
@@ -97,7 +96,7 @@ public class TargetSelectionPage extends AbstractValidatableWizardPage {
 	}
 	/**
 	 * Returns the default page title.
-	 * 
+	 *
 	 * @return The default page title. Must be never <code>null</code>.
 	 */
 	protected String getDefaultTitle() {
@@ -106,7 +105,7 @@ public class TargetSelectionPage extends AbstractValidatableWizardPage {
 
 	/**
 	 * Returns the default page description.
-	 * 
+	 *
 	 * @return The default page description. Must be never <code>null</code>.
 	 */
 	protected String getDefaultDescription() {
@@ -198,7 +197,7 @@ public class TargetSelectionPage extends AbstractValidatableWizardPage {
 		// Initialize the context help id
 		PlatformUI.getWorkbench().getHelpSystem()
 		                .setHelp(getControl(), IUIConstants.HELP_NEW_WIZARD_SELECTION_PAGE);
-		
+
 		setPageComplete(peer != null);
 	}
 
@@ -224,7 +223,7 @@ public class TargetSelectionPage extends AbstractValidatableWizardPage {
 
 	/**
 	 * Initialize the page with the current workbench instance and the current workbench selection.
-	 * 
+	 *
 	 * @param workbench The current workbench.
 	 * @param selection The current object selection.
 	 */
@@ -235,7 +234,7 @@ public class TargetSelectionPage extends AbstractValidatableWizardPage {
 
 	/**
 	 * Returns the current workbench.
-	 * 
+	 *
 	 * @return The current workbench or <code>null</code> if not set.
 	 */
 	public IWorkbench getWorkbench() {
@@ -244,7 +243,7 @@ public class TargetSelectionPage extends AbstractValidatableWizardPage {
 
 	/**
 	 * Returns the current object selection.
-	 * 
+	 *
 	 * @return The current object selection or <code>null</code> if not set.
 	 */
 	public IStructuredSelection getSelection() {

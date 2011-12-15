@@ -16,10 +16,10 @@
    <extension point="org.eclipse.ui.navigator.navigatorContent">
       <navigatorContent
             activeByDefault="true"
-            contentProvider="org.eclipse.tcf.te.tcf.ui.internal.navigator.ContentProviderDelegate"
+            contentProvider="org.eclipse.tcf.te.tcf.ui.navigator.ContentProviderDelegate"
             icon="icons/obj16/rootNode_obj.gif"
             id="org.eclipse.tcf.te.tcf.ui.navigator.content"
-            labelProvider="org.eclipse.tcf.te.tcf.ui.internal.navigator.LabelProvider"
+            labelProvider="org.eclipse.tcf.te.tcf.ui.navigator.LabelProvider"
             name="Dynamic Target Discovery (TCF)"
             priority="normal">
             <enablement>
@@ -85,65 +85,6 @@
             </with>
          </enablement>
       </editorPageBinding>
-   </extension>
-
-<!-- View contributions -->
-   <extension point="org.eclipse.ui.views">
-      <view
-            allowMultiple="true"
-            category="org.eclipse.tcf.te.ui.views.category"
-            class="org.eclipse.tcf.te.tcf.ui.views.scriptpad.ScriptPad"
-            icon="icons/eview16/scriptpad.gif"
-            id="org.eclipse.tcf.te.tcf.ui.views.scriptpad"
-            name="%ScriptPad.name"
-            restorable="true">
-      </view>
-   </extension>
-   
-<!-- Perspective extension contributions -->
-   <extension point="org.eclipse.ui.perspectiveExtensions">
-      <perspectiveExtension targetID="org.eclipse.tcf.te.ui.perspective">
-         <view
-               closeable="true"
-               id="org.eclipse.tcf.te.tcf.ui.views.scriptpad"
-               minimized="false"
-               moveable="true"
-               ratio="0.4"
-               relationship="bottom"
-               relative="org.eclipse.tcf.te.ui.views.TargetExplorer"
-               showTitle="true"
-               standalone="false"
-               visible="false">
-         </view>
-         <viewShortcut
-               id="org.eclipse.tcf.te.tcf.ui.views.scriptpad">
-         </viewShortcut>
-      </perspectiveExtension>
-   </extension>
-
-<!-- Script Pad menu contributions -->
-   <extension point="org.eclipse.ui.viewActions">
-      <viewContribution
-            id="org.eclipse.tcf.te.tcf.ui.scriptpad.toolbar"
-            targetID="org.eclipse.tcf.te.tcf.ui.views.scriptpad">
-         <action
-               class="org.eclipse.tcf.te.tcf.ui.views.scriptpad.actions.PeersSubMenuAction"
-               icon="icons/obj16/target.gif"
-               id="org.eclipse.tcf.te.tcf.ui.scriptpad.toolbar.peers"
-               label="%PeersSubMenuAction.label"
-               style="pulldown"
-               toolbarPath="peers">
-         </action>
-
-         <action
-               class="org.eclipse.tcf.te.tcf.ui.views.scriptpad.actions.PlayAction"
-               icon="icons/etool16/run_exc.gif"
-               id="org.eclipse.tcf.te.tcf.ui.scriptpad.toolbar.play"
-               label="%PlayAction.label"
-               style="push"
-               toolbarPath="play">
-         </action>
-      </viewContribution>
    </extension>
 
 <!-- Target Explorer menu contributions -->

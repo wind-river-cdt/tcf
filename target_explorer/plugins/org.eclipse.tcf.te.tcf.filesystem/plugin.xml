@@ -987,9 +987,9 @@
          <command
                commandId="org.eclipse.tcf.te.tcf.filesystem.commands.refreshViewer"
                icon="icons/obj16/refresh.gif"
-               label="Refresh View"
+               label="%command.refreshViewer.label"
                style="push"
-               tooltip="Refresh View">
+               tooltip="%command.refreshViewer.tooltip">
          </command>
       </menuContribution>
    </extension>
@@ -1036,6 +1036,13 @@
             properties="isEditorActivation"
             type="org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent">
       </propertyTester>
+      <propertyTester
+            class="org.eclipse.tcf.te.tcf.filesystem.internal.testers.TargetPropertyTester"
+            id="org.eclipse.tcf.te.tcf.filesystem.propertytester.peer"
+            namespace="org.eclipse.tcf.te.tcf.filesystem.propertytester.peer"
+            properties="isWindows"
+            type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel">
+      </propertyTester>
    </extension>
    
 <!-- Target Explorer command contributions -->
@@ -1066,7 +1073,7 @@
       </command>
       <command
             id="org.eclipse.tcf.te.tcf.filesystem.commands.refreshViewer"
-            name="Refresh Viewer">
+            name="%command.refreshViewer.name">
       </command>
    </extension>
 
@@ -2045,6 +2052,7 @@
                description="%filter.description.hidden"
                enabled="true"
                id="org.eclipse.tcf.te.tcf.filesystem.filters.hiddenFiles"
+               image="icons/obj16/hidden_file_filter.png"
                name="%filter.name.hidden">
          </filter>
          <filter
@@ -2052,7 +2060,15 @@
                description="%filter.description.system"
                enabled="true"
                id="org.eclipse.tcf.te.tcf.filesystem.filters.systemFiles"
+               image="icons/obj16/system_file_filter.png"
                name="%filter.name.system">
+            <activation>
+               <with
+                     variable="input">
+                  <test
+                        property="org.eclipse.tcf.te.tcf.filesystem.propertytester.peer.isWindows">
+                  </test>
+               </with></activation>
          </filter>
       </viewer>
    </extension>   

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+<!-- View contributions -->
+   <extension point="org.eclipse.ui.views">
+      <view
+            allowMultiple="true"
+            category="org.eclipse.tcf.te.ui.views.category"
+            class="org.eclipse.tcf.te.tcf.ui.views.scriptpad.ScriptPad"
+            icon="icons/eview16/scriptpad.gif"
+            id="org.eclipse.tcf.te.tcf.ui.views.scriptpad"
+            name="%ScriptPad.name"
+            restorable="true">
+      </view>
+   </extension>
+   
+<!-- Perspective extension contributions -->
+   <extension point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension targetID="org.eclipse.tcf.te.ui.perspective">
+         <view
+               closeable="true"
+               id="org.eclipse.tcf.te.tcf.ui.views.scriptpad"
+               minimized="false"
+               moveable="true"
+               ratio="0.4"
+               relationship="bottom"
+               relative="org.eclipse.tcf.te.ui.views.TargetExplorer"
+               showTitle="true"
+               standalone="false"
+               visible="false">
+         </view>
+         <viewShortcut
+               id="org.eclipse.tcf.te.tcf.ui.views.scriptpad">
+         </viewShortcut>
+      </perspectiveExtension>
+   </extension>
+
+<!-- Console contributions -->
+   <extension point="org.eclipse.ui.console.consoleFactories">
+      <consoleFactory
+            class="org.eclipse.tcf.te.tcf.ui.views.scriptpad.console.Factory"
+            icon="icons/eview16/scriptpad_console.gif"
+            label="%ScriptConsole.label">
+      </consoleFactory>
+   </extension>
+
+   <extension point="org.eclipse.ui.console.consolePageParticipants">
+      <consolePageParticipant
+            class="org.eclipse.tcf.te.tcf.ui.console.PageParticipant"
+            id="org.eclipse.tcf.te.tcf.ui.console.PageParticipant">
+         <enablement>
+            <instanceof value="org.eclipse.tcf.te.tcf.ui.views.scriptpad.console.Console"/>
+         </enablement>
+      </consolePageParticipant>
+   </extension>
+
+<!-- Script Pad menu contributions -->
+   <extension point="org.eclipse.ui.viewActions">
+      <viewContribution
+            id="org.eclipse.tcf.te.tcf.ui.scriptpad.toolbar"
+            targetID="org.eclipse.tcf.te.tcf.ui.views.scriptpad">
+         <action
+               class="org.eclipse.tcf.te.tcf.ui.views.scriptpad.actions.PeersSubMenuAction"
+               icon="icons/obj16/peer.gif"
+               id="org.eclipse.tcf.te.tcf.ui.scriptpad.toolbar.peers"
+               label="%PeersSubMenuAction.label"
+               style="pulldown"
+               toolbarPath="peers">
+         </action>
+
+         <action
+               class="org.eclipse.tcf.te.tcf.ui.views.scriptpad.actions.PlayAction"
+               icon="icons/etool16/run_exc.gif"
+               id="org.eclipse.tcf.te.tcf.ui.scriptpad.toolbar.play"
+               label="%PlayAction.label"
+               style="push"
+               toolbarPath="play">
+         </action>
+      </viewContribution>
+   </extension>
+
+   <extension point="org.eclipse.ui.menus">
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.tcf.ui.views.scriptpad">
+         <separator name="group.edit" visible="true"/>
+         <command
+               commandId="org.eclipse.ui.edit.cut"
+               disabledIcon="platform:/plugin/org.eclipse.ui/icons/full/dtool16/cut_edit.gif"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/cut_edit.gif"
+               label="%command.cut.label"
+               style="push"
+               tooltip="%command.cut.tooltip">
+         </command>
+         <command
+               commandId="org.eclipse.ui.edit.copy"
+               disabledIcon="platform:/plugin/org.eclipse.ui/icons/full/dtool16/copy_edit.gif"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/copy_edit.gif"
+               label="%command.copy.label"
+               style="push"
+               tooltip="%command.copy.tooltip">
+         </command>
+         <command
+               commandId="org.eclipse.ui.edit.paste"
+               disabledIcon="platform:/plugin/org.eclipse.ui/icons/full/dtool16/paste_edit.gif"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/paste_edit.gif"
+               label="%command.paste.label"
+               style="push"
+               tooltip="%command.paste.tooltip">
+         </command>
+         <separator name="group.select" visible="true"/>
+         <command
+               commandId="org.eclipse.ui.edit.delete"
+               disabledIcon="platform:/plugin/org.eclipse.ui/icons/full/dtool16/delete.gif"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/delete.gif"
+               label="%command.delete.label"
+               style="push"
+               tooltip="%command.delete.tooltip">
+         </command>
+         <command
+               commandId="org.eclipse.ui.edit.selectAll"
+               label="%command.selectall.label"
+               style="push"
+               tooltip="%command.selectall.tooltip">
+         </command>
+      </menuContribution>
+   </extension>
+   
+<!-- Script Pad event listener contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.eventListeners">
+      <eventListener
+            class="org.eclipse.tcf.te.tcf.ui.views.scriptpad.events.EventListener"
+            forcePluginActivation="true">
+            <eventType
+                  class="org.eclipse.tcf.te.tcf.core.scripting.events.ScriptEvent">
+            </eventType>
+      </eventListener>
+   </extension>
+
+</plugin>

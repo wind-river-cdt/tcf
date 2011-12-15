@@ -24,7 +24,7 @@
             categoryId="org.eclipse.tcf.te.ui.commands.category"
             defaultHandler="org.eclipse.tcf.te.ui.wizards.newWizard.NewWizardCommandHandler"
             description="%Command.newWizards.description"
-            helpContextId="org.eclipse.tcf.te.ui.command.newWizards"
+            helpContextId="org.eclipse.tcf.te.ui.command_NewWizards"
             id="org.eclipse.tcf.te.ui.command.newWizards"
             name="%Command.newWizards.name">
       </command>
