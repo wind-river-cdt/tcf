@@ -12,7 +12,7 @@ package org.eclipse.tcf.te.tcf.ui.views.scriptpad.actions;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.Action;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
-import org.eclipse.tcf.te.tcf.ui.internal.navigator.LabelProviderDelegate;
+import org.eclipse.tcf.te.tcf.ui.navigator.LabelProviderDelegate;
 import org.eclipse.tcf.te.tcf.ui.views.scriptpad.ScriptPad;
 import org.eclipse.ui.IViewPart;
 

@@ -28,4 +28,7 @@ public class Messages extends NLS {
 	}
 
 	// **** Declare externalized string id's down here *****
+
+	public static String PageParticipant_command_remove_label;
+	public static String PageParticipant_command_remove_tooltip;
 }

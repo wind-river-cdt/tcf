@@ -29,7 +29,7 @@ import org.osgi.framework.BundleContext;
 public class UIPlugin extends AbstractUIPlugin {
 	// The shared instance
 	private static UIPlugin plugin;
-
+	// The scoped preferences instance
 	private static ScopedEclipsePreferences scopedPreferences = null;
 	// The trace handler instance
 	private static TraceHandler traceHandler;

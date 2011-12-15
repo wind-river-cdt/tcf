@@ -2,7 +2,7 @@ package org.eclipse.tcf.te.tcf.filesystem.internal.wizards;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
-import org.eclipse.tcf.te.tcf.ui.internal.navigator.LabelProvider;
+import org.eclipse.tcf.te.tcf.ui.navigator.LabelProvider;
 import org.eclipse.ui.dialogs.PatternFilter;
 
 /**

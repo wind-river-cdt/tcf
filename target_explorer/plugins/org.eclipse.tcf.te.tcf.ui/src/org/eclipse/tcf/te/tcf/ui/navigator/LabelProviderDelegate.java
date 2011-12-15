@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.ui.internal.navigator;
+package org.eclipse.tcf.te.tcf.ui.navigator;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ILabelDecorator;
@@ -18,7 +18,7 @@ import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.ui.internal.ImageConsts;
-import org.eclipse.tcf.te.tcf.ui.internal.navigator.images.PeerImageDescriptor;
+import org.eclipse.tcf.te.tcf.ui.navigator.images.PeerImageDescriptor;
 import org.eclipse.tcf.te.ui.jface.images.AbstractImageDescriptor;
 
 
@@ -63,7 +63,7 @@ public class LabelProviderDelegate extends LabelProvider implements ILabelDecora
 	@Override
 	public Image getImage(Object element) {
 		if (element instanceof IPeerModel) {
-			return UIPlugin.getImage(ImageConsts.TARGET);
+			return UIPlugin.getImage(ImageConsts.PEER);
 		}
 
 		return super.getImage(element);

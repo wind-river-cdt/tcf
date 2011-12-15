@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.tcf.ui.internal.help.IContextHelpIds;
-import org.eclipse.tcf.te.tcf.ui.internal.navigator.LabelProviderDelegate;
+import org.eclipse.tcf.te.tcf.ui.navigator.LabelProviderDelegate;
 import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
@@ -113,7 +113,7 @@ public class AgentSelectionDialog extends CustomTitleAreaDialog {
 	    viewer.setContentProvider(new ArrayContentProvider());
 	    LabelProviderDelegate labelProvider = new LabelProviderDelegate() {
 	    	/* (non-Javadoc)
-	    	 * @see org.eclipse.tcf.te.tcf.ui.internal.navigator.LabelProviderDelegate#decorateImage(org.eclipse.swt.graphics.Image, java.lang.Object)
+	    	 * @see org.eclipse.tcf.te.tcf.ui.navigator.LabelProviderDelegate#decorateImage(org.eclipse.swt.graphics.Image, java.lang.Object)
 	    	 */
 	    	@Override
 	    	public Image decorateImage(Image image, Object element) {

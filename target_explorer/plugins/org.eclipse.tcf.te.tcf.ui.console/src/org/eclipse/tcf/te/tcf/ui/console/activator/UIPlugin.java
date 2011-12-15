@@ -1,8 +1,18 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * This program and the accompanying materials are made available under the terms
+ * of the Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ * Wind River Systems - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.tcf.te.tcf.ui.console.activator;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.tcf.te.runtime.preferences.ScopedEclipsePreferences;
 import org.eclipse.tcf.te.ui.jface.images.AbstractImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -13,6 +23,8 @@ import org.osgi.framework.BundleContext;
 public class UIPlugin extends AbstractUIPlugin {
 	// The shared instance
 	private static UIPlugin plugin;
+	// The scoped preferences instance
+	private static ScopedEclipsePreferences scopedPreferences = null;
 
 	/**
 	 * The constructor
@@ -39,8 +51,17 @@ public class UIPlugin extends AbstractUIPlugin {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Return the scoped preferences for this plugin.
+	 */
+	public static ScopedEclipsePreferences getScopedPreferences() {
+		if (scopedPreferences == null) {
+			scopedPreferences = new ScopedEclipsePreferences(getUniqueIdentifier());
+		}
+		return scopedPreferences;
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
 	@Override
@@ -49,13 +70,13 @@ public class UIPlugin extends AbstractUIPlugin {
 		plugin = this;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	@Override
     public void stop(BundleContext context) throws Exception {
 		plugin = null;
+		scopedPreferences = null;
 		super.stop(context);
 	}
 

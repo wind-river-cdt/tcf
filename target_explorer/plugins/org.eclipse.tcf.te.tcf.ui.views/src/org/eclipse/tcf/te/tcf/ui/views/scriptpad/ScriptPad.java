@@ -34,6 +34,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.ui.swt.DisplayUtil;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPartConstants;
 import org.eclipse.ui.part.ViewPart;
@@ -229,8 +230,14 @@ public class ScriptPad extends ViewPart implements ISelectionProvider, Selection
 		this.peerModel = peerModel;
 		// Update the action bars
 		getViewSite().getActionBars().updateActionBars();
-		// Fire a property change
-		firePropertyChange(IWorkbenchPartConstants.PROP_INPUT);
+		// Fire a property change (in the UI Thread)
+		DisplayUtil.safeAsyncExec(new Runnable() {
+	        @SuppressWarnings("synthetic-access")
+            @Override
+            public void run() {
+	    		firePropertyChange(IWorkbenchPartConstants.PROP_INPUT);
+	        }
+        });
 	}
 
 	/**

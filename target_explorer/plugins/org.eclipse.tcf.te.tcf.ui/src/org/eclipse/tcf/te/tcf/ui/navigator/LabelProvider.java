@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.ui.internal.navigator;
+package org.eclipse.tcf.te.tcf.ui.navigator;
 
 import org.eclipse.jface.viewers.DecoratingLabelProvider;
 

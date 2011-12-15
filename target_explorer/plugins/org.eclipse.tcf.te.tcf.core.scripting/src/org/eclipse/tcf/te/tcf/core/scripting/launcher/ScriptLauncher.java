@@ -16,22 +16,27 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.tcf.core.AbstractChannel;
+import org.eclipse.tcf.core.AbstractChannel.TraceListener;
 import org.eclipse.tcf.core.Command;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IChannel.IChannelListener;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.IService;
 import org.eclipse.tcf.te.runtime.callback.Callback;
+import org.eclipse.tcf.te.runtime.events.EventManager;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
 import org.eclipse.tcf.te.tcf.core.scripting.activator.CoreBundleActivator;
+import org.eclipse.tcf.te.tcf.core.scripting.events.ScriptEvent;
 import org.eclipse.tcf.te.tcf.core.scripting.interfaces.IScriptLauncher;
 import org.eclipse.tcf.te.tcf.core.scripting.interfaces.IScriptLauncherProperties;
 import org.eclipse.tcf.te.tcf.core.scripting.nls.Messages;
 import org.eclipse.tcf.te.tcf.core.scripting.parser.Parser;
 import org.eclipse.tcf.te.tcf.core.scripting.parser.Token;
+import org.eclipse.tcf.te.tcf.core.utils.JSONUtils;
 
 /**
  * Script launcher implementation.
@@ -45,6 +50,9 @@ public class ScriptLauncher extends PlatformObject implements IScriptLauncher {
 	// The callback instance
 	private ICallback callback;
 
+	// The channel trace listener instance
+	/* default */ TraceListener traceListener;
+
 	/**
      * Constructor.
      */
@@ -57,14 +65,20 @@ public class ScriptLauncher extends PlatformObject implements IScriptLauncher {
      */
     @Override
     public void dispose() {
-		// Store a final reference to the channel instance
-		final IChannel finChannel = channel;
+    	if (channel != null) {
+    		// Remove the trace listener
+    		if (traceListener != null) { ((AbstractChannel)channel).removeTraceListener(traceListener); traceListener = null; }
 
-		// Close the channel as all disposal is done
-		if (finChannel != null) Tcf.getChannelManager().closeChannel(finChannel);
+    		// Close the channel as all disposal is done
+    		Tcf.getChannelManager().closeChannel(channel);
 
-		// Dissociate the channel
-		channel = null;
+			// Fire the stop event
+			ScriptEvent event = new ScriptEvent(ScriptLauncher.this, ScriptEvent.Type.STOP, null);
+			EventManager.getInstance().fireEvent(event);
+
+    		// Dissociate the channel
+    		channel = null;
+    	}
     }
 
     /* (non-Javadoc)
@@ -103,6 +117,10 @@ public class ScriptLauncher extends PlatformObject implements IScriptLauncher {
 				if (error == null) {
 					ScriptLauncher.this.channel = channel;
 
+					// Fire the start event
+					ScriptEvent event = new ScriptEvent(ScriptLauncher.this, ScriptEvent.Type.START, null);
+					EventManager.getInstance().fireEvent(event);
+
 					// Attach a channel listener so we can dispose ourself if the channel
 					// is closed from the remote side.
 					channel.addChannelListener(new IChannelListener() {
@@ -117,6 +135,7 @@ public class ScriptLauncher extends PlatformObject implements IScriptLauncher {
 						 */
 						@Override
 						public void onChannelClosed(Throwable error) {
+							if (traceListener != null) { ((AbstractChannel)ScriptLauncher.this.channel).removeTraceListener(traceListener); traceListener = null; }
 							if (error != null) {
 								IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
 															NLS.bind(Messages.ScriptLauncher_error_channelConnectFailed, peer.getID(), error.getLocalizedMessage()),
@@ -131,6 +150,52 @@ public class ScriptLauncher extends PlatformObject implements IScriptLauncher {
 						public void congestionLevel(int level) {
 						}
 					});
+
+					// Create the trace listener instance
+					traceListener = new TraceListener() {
+
+						@Override
+						public void onMessageSent(char type, String token, String service, String name, byte[] data) {
+							String message = formatMessage(type, token, service, name, data, false);
+							ScriptEvent event = new ScriptEvent(ScriptLauncher.this, ScriptEvent.Type.OUTPUT, new ScriptEvent.Message(type, message));
+							EventManager.getInstance().fireEvent(event);
+						}
+
+						@Override
+						public void onMessageReceived(char type, String token, String service, String name, byte[] data) {
+							String message = formatMessage(type, token, service, name, data, true);
+							ScriptEvent event = new ScriptEvent(ScriptLauncher.this, ScriptEvent.Type.OUTPUT, new ScriptEvent.Message(type, message));
+							EventManager.getInstance().fireEvent(event);
+						}
+
+						@Override
+						public void onChannelClosed(Throwable error) {
+						}
+
+						/**
+						 * Format the trace message.
+						 */
+						protected String formatMessage(char type, String token, String service, String name, byte[] data, boolean received) {
+							// Decode the arguments again for tracing purpose
+							String args = JSONUtils.decodeStringFromByteArray(data);
+
+							// Construct the full message
+							//
+							// The message format is: [<---|--->] <type> <token> <service>#<name> <args>
+							StringBuilder message = new StringBuilder();
+							message.append(received ? "<---" : "--->"); //$NON-NLS-1$ //$NON-NLS-2$
+							message.append(" ").append(Character.valueOf(type)); //$NON-NLS-1$
+							if (token != null) message.append(" ").append(token); //$NON-NLS-1$
+							if (service != null) message.append(" ").append(service); //$NON-NLS-1$
+							if (name != null) message.append(" ").append(name); //$NON-NLS-1$
+							if (args != null && args.trim().length() > 0) message.append(" ").append(args.trim()); //$NON-NLS-1$
+
+							return message.toString();
+						}
+					};
+
+					// Register the trace listener
+					((AbstractChannel)channel).addTraceListener(traceListener);
 
 					// Check if the channel is in connected state
 					if (channel.getState() != IChannel.STATE_OPEN) {

@@ -7,10 +7,10 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.ui.console.internal;
+package org.eclipse.tcf.te.tcf.ui.views.internal;
 
 /**
- * TCF Console UI Plug-in Image registry constants.
+ * TCF Console Plug-in Image registry constants.
  */
 public interface ImageConsts {
 
@@ -60,4 +60,8 @@ public interface ImageConsts {
 
     // ***** The image constants *****
 
+    /**
+     * The key to access the Script Pad console view image.
+     */
+    public static final String SCRIPT_PAD_CONSOLE = "ScriptPadConsole"; //$NON-NLS-1$
 }

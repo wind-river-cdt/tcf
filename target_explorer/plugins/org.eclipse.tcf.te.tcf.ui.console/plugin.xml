@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+<!-- Console command contributions -->
+   <extension point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.eclipse.tcf.te.tcf.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.tcf.ui.console.command_Remove"
+            id="org.eclipse.tcf.te.tcf.ui.console.command.remove"
+            name="%command.remove.name">
+      </command>
+   </extension>
+   
+   <extension point="org.eclipse.ui.commandImages">
+      <image
+            commandId="org.eclipse.tcf.te.tcf.ui.console.command.remove"
+            disabledIcon="platform:/plugin/org.eclipse.ui.console/icons/full/dlcl16/rem_co.gif"
+            icon="platform:/plugin/org.eclipse.ui.console/icons/full/elcl16/rem_co.gif">
+      </image>
+   </extension>
+
+   <extension point="org.eclipse.ui.handlers">
+      <handler
+            class="org.eclipse.tcf.te.tcf.ui.console.handler.RemoveHandler"
+            commandId="org.eclipse.tcf.te.tcf.ui.console.command.remove">
+      </handler>
+   </extension>
+
+<!-- Preference contributions -->
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.tcf.te.tcf.ui.console.internal.preferences.PreferencesInitializer">
+      </initializer>
+   </extension>
+
+<!-- UI Themes contributions -->
+   <extension point="org.eclipse.ui.themes">
+      <themeElementCategory
+            id="org.eclipse.tcf.te.tcf.ui.console.theme"
+            label="%ThemeCategory.name"/>
+      <fontDefinition
+            label="%Console.font.label"
+            categoryId="org.eclipse.tcf.te.tcf.ui.console.theme"
+            defaultsTo="org.eclipse.jface.textfont"
+            id="te.tcf.ui.console.pref.font">
+            <description>
+                  %Console.font.description
+            </description>
+      </fontDefinition>   	
+   </extension>
+
+</plugin>

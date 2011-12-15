@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.ui.internal.navigator.images;
+package org.eclipse.tcf.te.tcf.ui.navigator.images;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.resource.ImageRegistry;
