@@ -41,6 +41,13 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CaretEvent;
 import org.eclipse.swt.custom.CaretListener;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DropTarget;
+import org.eclipse.swt.dnd.DropTargetAdapter;
+import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.dnd.FileTransfer;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -81,7 +88,7 @@ public class ScriptPad extends ViewPart implements ISelectionProvider, Selection
 	// Reference to the header line
 	private Label head;
 	// Reference to the Text widget
-	private StyledText text;
+	/* default */ StyledText text;
 
 	// The list of registered selection changed listeners
 	private final List<ISelectionChangedListener> listeners = new ArrayList<ISelectionChangedListener>();
@@ -168,6 +175,9 @@ public class ScriptPad extends ViewPart implements ISelectionProvider, Selection
 		// Hook the global actions
 		hookGlobalActions();
 
+		// Setup Drag n Drop
+		setupDnD();
+
 		// Update the action bars
 		getViewSite().getActionBars().updateActionBars();
 	}
@@ -242,6 +252,42 @@ public class ScriptPad extends ViewPart implements ISelectionProvider, Selection
 		manager.add(new Separator());
 		manager.add(new GroupMarker("peers")); //$NON-NLS-1$
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+	}
+
+	/**
+	 * Setup Drag n Drop support.
+	 */
+	private void setupDnD() {
+		DropTarget target = new DropTarget(text, DND.DROP_DEFAULT | DND.DROP_COPY);
+		target.setTransfer(new Transfer[] { TextTransfer.getInstance(), FileTransfer.getInstance() });
+		target.addDropListener(new DropTargetAdapter() {
+
+			@Override
+			public void drop(DropTargetEvent event) {
+				if (FileTransfer.getInstance().isSupportedType(event.currentDataType)) {
+					String[] names = (String[]) FileTransfer.getInstance().nativeToJava(event.currentDataType);
+					if (names != null && names.length > 0) {
+						openFile(names[0]);
+					}
+				}
+				else if (TextTransfer.getInstance().isSupportedType(event.currentDataType)) {
+					String content = (String) TextTransfer.getInstance().nativeToJava(event.currentDataType);
+					if (content != null && !"".equals(content)) { //$NON-NLS-1$
+						if (text != null && !text.isDisposed()) text.setText(content);
+					}
+				}
+			}
+
+			@Override
+			public void dragOperationChanged(DropTargetEvent event) {
+		        if (event.detail == DND.DROP_DEFAULT) event.detail = DND.DROP_COPY;
+			}
+
+			@Override
+			public void dragEnter(DropTargetEvent event) {
+		        if (event.detail == DND.DROP_DEFAULT) event.detail = DND.DROP_COPY;
+			}
+		});
 	}
 
 	/* (non-Javadoc)
