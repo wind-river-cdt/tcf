@@ -77,7 +77,7 @@ public class TreePart extends AbstractStructuredViewerPart implements ISelection
 		Assert.isNotNull(parent);
 
 		// Adjust the style bits
-		style |= SWT.H_SCROLL | SWT.V_SCROLL | (toolkit != null ? toolkit.getBorderStyle() : SWT.BORDER);
+		style |= SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER;
 
 		TreeViewer viewer = createTreeViewer(parent, style);
 		Assert.isNotNull(viewer);
