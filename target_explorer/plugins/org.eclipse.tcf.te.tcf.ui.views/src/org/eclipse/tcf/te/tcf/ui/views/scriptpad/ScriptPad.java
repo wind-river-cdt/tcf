@@ -89,6 +89,8 @@ public class ScriptPad extends ViewPart implements ISelectionProvider, Selection
 	private Label head;
 	// Reference to the Text widget
 	/* default */ StyledText text;
+	// Reference to the line style listener
+	private ScriptPadLineStyleListener lineStyleListener;
 
 	// The list of registered selection changed listeners
 	private final List<ISelectionChangedListener> listeners = new ArrayList<ISelectionChangedListener>();
@@ -125,6 +127,11 @@ public class ScriptPad extends ViewPart implements ISelectionProvider, Selection
     public void dispose() {
     	if (text != null && !text.isDisposed()) {
     		text.removeSelectionListener(this);
+    		if (lineStyleListener != null) {
+    			text.removeLineStyleListener(lineStyleListener);
+    			lineStyleListener.dispose();
+    			lineStyleListener = null;
+    		}
     	}
         listeners.clear();
         fileLoaded = null;
@@ -163,6 +170,9 @@ public class ScriptPad extends ViewPart implements ISelectionProvider, Selection
 				if (!isDirty()) markDirty(true);
 			}
 		});
+
+		lineStyleListener = new ScriptPadLineStyleListener();
+		text.addLineStyleListener(lineStyleListener);
 
 		// Register ourselves as selection provider
 		getViewSite().setSelectionProvider(this);
