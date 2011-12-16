@@ -25,4 +25,9 @@ public interface IContextHelpIds {
 	 * Script Pad console view.
 	 */
 	public final static String SCRIPT_PAD_CONSOLE_VIEW = PREFIX + "ScriptPadConsoleView"; //$NON-NLS-1$
+
+	/**
+	 * Script Pad error: open failed
+	 */
+	public final static String SCRIPT_PAD_ERROR_OPEN_FILE = PREFIX + "ScriptPadErrorOpenFile"; //$NON-NLS-1$
 }

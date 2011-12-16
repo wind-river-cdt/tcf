@@ -9,11 +9,21 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.ui.views.scriptpad;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -26,23 +36,39 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CaretEvent;
 import org.eclipse.swt.custom.CaretListener;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
+import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
+import org.eclipse.tcf.te.runtime.statushandler.StatusHandlerManager;
+import org.eclipse.tcf.te.runtime.statushandler.interfaces.IStatusHandler;
+import org.eclipse.tcf.te.runtime.statushandler.interfaces.IStatusHandlerConstants;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.tcf.ui.views.activator.UIPlugin;
+import org.eclipse.tcf.te.tcf.ui.views.help.IContextHelpIds;
+import org.eclipse.tcf.te.tcf.ui.views.nls.Messages;
 import org.eclipse.tcf.te.tcf.ui.views.scriptpad.actions.CopyAction;
 import org.eclipse.tcf.te.tcf.ui.views.scriptpad.actions.CutAction;
 import org.eclipse.tcf.te.tcf.ui.views.scriptpad.actions.DeleteAction;
 import org.eclipse.tcf.te.tcf.ui.views.scriptpad.actions.PasteAction;
 import org.eclipse.tcf.te.tcf.ui.views.scriptpad.actions.SelectAllAction;
 import org.eclipse.tcf.te.ui.swt.DisplayUtil;
+import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPartConstants;
 import org.eclipse.ui.actions.ActionFactory;
@@ -51,8 +77,10 @@ import org.eclipse.ui.part.ViewPart;
 /**
  * Script Pad view implementation.
  */
-public class ScriptPad extends ViewPart implements ISelectionProvider, SelectionListener {
-	// Reference to the Text widget used by the script pad
+public class ScriptPad extends ViewPart implements ISelectionProvider, SelectionListener, ISaveablePart {
+	// Reference to the header line
+	private Label head;
+	// Reference to the Text widget
 	private StyledText text;
 
 	// The list of registered selection changed listeners
@@ -67,6 +95,13 @@ public class ScriptPad extends ViewPart implements ISelectionProvider, Selection
 	private PasteAction pasteHandler;
 	/* default */ DeleteAction deleteHandler;
 	private SelectAllAction selectAllHandler;
+
+	// If the user loaded a script either via the "Open" action or DnD, remember the file name
+	// so the user can save it back.
+	private String fileLoaded = null;
+
+	// The dirty state
+	private boolean dirty = false;
 
 	/**
      * Constructor.
@@ -85,6 +120,7 @@ public class ScriptPad extends ViewPart implements ISelectionProvider, Selection
     		text.removeSelectionListener(this);
     	}
         listeners.clear();
+        fileLoaded = null;
         super.dispose();
     }
 
@@ -93,8 +129,18 @@ public class ScriptPad extends ViewPart implements ISelectionProvider, Selection
 	 */
 	@Override
 	public void createPartControl(Composite parent) {
+		Composite panel = new Composite(parent, SWT.NONE);
+		GridLayout layout = new GridLayout();
+		layout.marginHeight = 0; layout.marginWidth = 0;
+		panel.setLayout(layout);
+		panel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+		// Create the head label
+		head = new Label(panel, SWT.HORIZONTAL);
+		head.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
 		// Create the StyledText widget
-		text = new StyledText(parent, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
+		text = new StyledText(panel, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
 		text.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		text.setFont(JFaceResources.getTextFont());
 		text.addSelectionListener(this);
@@ -102,6 +148,12 @@ public class ScriptPad extends ViewPart implements ISelectionProvider, Selection
 			@Override
 			public void caretMoved(CaretEvent event) {
 				if (deleteHandler != null) deleteHandler.updateEnabledState();
+			}
+		});
+		text.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				if (!isDirty()) markDirty(true);
 			}
 		});
 
@@ -180,8 +232,15 @@ public class ScriptPad extends ViewPart implements ISelectionProvider, Selection
 	 */
 	private void createToolbar() {
 		IToolBarManager manager = getViewSite().getActionBars().getToolBarManager();
-		manager.add(new Separator("peers")); //$NON-NLS-1$
-		manager.add(new Separator("play")); //$NON-NLS-1$
+		manager.add(new Separator());
+		manager.add(new GroupMarker("open")); //$NON-NLS-1$
+		manager.add(new GroupMarker("save")); //$NON-NLS-1$
+		manager.add(new Separator());
+		manager.add(new GroupMarker("clear")); //$NON-NLS-1$
+		manager.add(new Separator());
+		manager.add(new GroupMarker("play")); //$NON-NLS-1$
+		manager.add(new Separator());
+		manager.add(new GroupMarker("peers")); //$NON-NLS-1$
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 
@@ -267,6 +326,18 @@ public class ScriptPad extends ViewPart implements ISelectionProvider, Selection
 		if (selectAllHandler != null) selectAllHandler.updateEnabledState();
 	}
 
+	/**
+	 * Update the head label
+	 */
+	protected void updateHeadLabel() {
+		if (fileLoaded == null) {
+			SWTControlUtil.setText(head, ""); //$NON-NLS-1$
+		} else {
+			IPath path = new Path(fileLoaded);
+			SWTControlUtil.setText(head, path.lastSegment() + " - " + path.removeLastSegments(1).toOSString()); //$NON-NLS-1$
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
 	 */
@@ -318,5 +389,167 @@ public class ScriptPad extends ViewPart implements ISelectionProvider, Selection
 	 */
 	public StyledText getStyledText() {
 		return text;
+	}
+
+	/**
+	 * Sets the dirty state.
+	 *
+	 * @param dirty <code>True</code> to mark the view dirty, <code>false</code> otherwise.
+	 */
+	public void markDirty(boolean dirty) {
+		if (this.dirty != dirty) {
+			this.dirty = dirty;
+			firePropertyChange(IWorkbenchPartConstants.PROP_DIRTY);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#isDirty()
+	 */
+	@Override
+    public boolean isDirty() {
+		return dirty;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#doSave(org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	@Override
+	public void doSave(IProgressMonitor monitor) {
+		if (fileLoaded != null) saveFile(fileLoaded);
+		else doSaveAs();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#doSaveAs()
+	 */
+	@Override
+	public void doSaveAs() {
+		FileDialog dialog = new FileDialog(getViewSite().getShell(), SWT.SAVE);
+		dialog.setFilterExtensions(new String[] { "*.tcf", "*" }); //$NON-NLS-1$ //$NON-NLS-2$
+		dialog.setFilterPath(fileLoaded != null ? fileLoaded : System.getProperty("user.home")); //$NON-NLS-1$
+		String file = dialog.open();
+		if (file != null) {
+			saveFile(file);
+			// Save succeeded ?
+			if (!isDirty()) {
+				fileLoaded = file;
+				updateHeadLabel();
+			}
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#isSaveAsAllowed()
+	 */
+	@Override
+	public boolean isSaveAsAllowed() {
+	    return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#isSaveOnCloseNeeded()
+	 */
+	@Override
+	public boolean isSaveOnCloseNeeded() {
+	    return isDirty();
+	}
+
+	/**
+	 * Clears all content and reset the loaded file path.
+	 */
+	public void clear() {
+		this.fileLoaded = null;
+		updateHeadLabel();
+		if (text != null && !text.isDisposed()) text.setText(""); //$NON-NLS-1$
+	}
+
+	/**
+	 * Opens the file.
+	 *
+	 * @param file The absolute file name of the script to load. Must not be <code>null</code>.
+	 */
+	public void openFile(String file) {
+		Assert.isNotNull(file);
+
+		// The file name must be absolute and denote a readable file
+		File f = new File(file);
+		if (f.isAbsolute() && f.isFile() && f.canRead()) {
+			// Remember the file name
+			this.fileLoaded = file;
+			updateHeadLabel();
+			// Clear out the old text
+			text.setText(""); //$NON-NLS-1$
+
+			FileReader reader = null;
+			try {
+				reader = new FileReader(f);
+				StringBuilder buffer = new StringBuilder();
+				int c;
+				while ((c = reader.read()) != -1) {
+					buffer.append((char)c);
+				}
+				text.setText(buffer.toString());
+				markDirty(false);
+			} catch (Exception e) {
+				IStatus status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(),
+											NLS.bind(Messages.ScriptPad_error_openFile, file, e.getLocalizedMessage()), e);
+
+				IStatusHandler[] handlers = StatusHandlerManager.getInstance().getHandler(this);
+				if (handlers.length > 0) {
+					IPropertiesContainer data = new PropertiesContainer();
+					data.setProperty(IStatusHandlerConstants.PROPERTY_TITLE, Messages.ScriptPad_error_title);
+					data.setProperty(IStatusHandlerConstants.PROPERTY_CONTEXT_HELP_ID, IContextHelpIds.SCRIPT_PAD_ERROR_OPEN_FILE);
+					data.setProperty(IStatusHandlerConstants.PROPERTY_CALLER, this);
+
+					handlers[0].handleStatus(status, data, null);
+				} else {
+					UIPlugin.getDefault().getLog().log(status);
+				}
+			} finally {
+				if (reader != null) try { reader.close(); } catch (IOException e) { /* ignored on purpose */ }
+			}
+		}
+		updateActionEnablements();
+	}
+
+	/**
+	 * Saves the file.
+	 *
+	 * @param file The absolute file name to save the script to. Must not be <code>null</code>.
+	 */
+	public void saveFile(String file) {
+		Assert.isNotNull(file);
+
+		// The file name must be absolute and denote a writable file
+		File f = new File(file);
+		if (f.isAbsolute() && ((f.exists() && f.isFile() && f.canWrite() || !f.exists()))) {
+			String content = text.getText();
+
+			FileWriter writer = null;
+			try {
+				writer = new FileWriter(f);
+				writer.write(content);
+				markDirty(false);
+			} catch (Exception e) {
+				IStatus status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(),
+											NLS.bind(Messages.ScriptPad_error_saveFile, file, e.getLocalizedMessage()), e);
+
+				IStatusHandler[] handlers = StatusHandlerManager.getInstance().getHandler(this);
+				if (handlers.length > 0) {
+					IPropertiesContainer data = new PropertiesContainer();
+					data.setProperty(IStatusHandlerConstants.PROPERTY_TITLE, Messages.ScriptPad_error_title);
+					data.setProperty(IStatusHandlerConstants.PROPERTY_CONTEXT_HELP_ID, IContextHelpIds.SCRIPT_PAD_ERROR_OPEN_FILE);
+					data.setProperty(IStatusHandlerConstants.PROPERTY_CALLER, this);
+
+					handlers[0].handleStatus(status, data, null);
+				} else {
+					UIPlugin.getDefault().getLog().log(status);
+				}
+			} finally {
+				if (writer != null) try { writer.close(); } catch (IOException e) { /* ignored on purpose */ }
+			}
+		}
+		updateActionEnablements();
 	}
 }

@@ -66,7 +66,8 @@
                id="org.eclipse.tcf.te.tcf.ui.scriptpad.toolbar.peers"
                label="%PeersSubMenuAction.label"
                style="pulldown"
-               toolbarPath="peers">
+               toolbarPath="peers"
+               tooltip="%PeersSubMenuAction.tooltip">
          </action>
 
          <action
@@ -75,7 +76,29 @@
                id="org.eclipse.tcf.te.tcf.ui.scriptpad.toolbar.play"
                label="%PlayAction.label"
                style="push"
-               toolbarPath="play">
+               toolbarPath="play"
+               tooltip="%PlayAction.tooltip">
+         </action>
+
+         <action
+               class="org.eclipse.tcf.te.tcf.ui.views.scriptpad.actions.OpenAction"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/obj16/fldr_obj.gif"
+               id="org.eclipse.tcf.te.tcf.ui.scriptpad.toolbar.open"
+               label="%OpenAction.label"
+               style="push"
+               toolbarPath="open"
+               tooltip="%OpenAction.tooltip">
+         </action>
+ 
+         <action
+               class="org.eclipse.tcf.te.tcf.ui.views.scriptpad.actions.ClearAction"
+               disabledIcon="platform:/plugin/org.eclipse.ui/icons/full/dtool16/clear.gif"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/clear.gif"
+               id="org.eclipse.tcf.te.tcf.ui.scriptpad.toolbar.clear"
+               label="%ClearAction.label"
+               style="push"
+               toolbarPath="clear"
+               tooltip="%ClearAction.tooltip">
          </action>
       </viewContribution>
    </extension>
@@ -121,6 +144,25 @@
                label="%command.selectall.label"
                style="push"
                tooltip="%command.selectall.tooltip">
+         </command>
+      </menuContribution>
+
+      <menuContribution locationURI="toolbar:org.eclipse.tcf.te.tcf.ui.views.scriptpad?after=save">
+         <command
+               commandId="org.eclipse.ui.file.save"
+               disabledIcon="platform:/plugin/org.eclipse.ui/icons/full/dtool16/save_edit.gif"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/save_edit.gif"
+               label="%command.save.label"
+               style="push"
+               tooltip="%command.save.tooltip">
+         </command>
+         <command
+               commandId="org.eclipse.ui.file.saveAs"
+               disabledIcon="platform:/plugin/org.eclipse.ui/icons/full/dtool16/saveas_edit.gif"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/saveas_edit.gif"
+               label="%command.saveas.label"
+               style="push"
+               tooltip="%command.saveas.tooltip">
          </command>
       </menuContribution>
    </extension>

@@ -15,14 +15,14 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.tcf.te.ui.activator.UIPlugin;
-import org.eclipse.tcf.te.ui.nls.Messages;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
 import org.eclipse.tcf.te.runtime.statushandler.AbstractStatusHandler;
 import org.eclipse.tcf.te.runtime.statushandler.interfaces.IStatusHandlerConstants;
 import org.eclipse.tcf.te.runtime.utils.Host;
+import org.eclipse.tcf.te.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.jface.dialogs.OptionalMessageDialog;
+import org.eclipse.tcf.te.ui.nls.Messages;
 import org.eclipse.ui.PlatformUI;
 
 /**
@@ -79,11 +79,10 @@ public class DefaultStatusHandler extends AbstractStatusHandler {
 	 *
 	 * @param status The status. Must not be <code>null</code>.
 	 * @param data The custom status data object, or <code>null</code> if none.
-	 * @param done The callback. Must not be <code>null</code>.
+	 * @param done The callback, or <code>null</code>.
 	 */
 	protected void doHandleStatus(IStatus status, IPropertiesContainer data, DoneHandleStatus done) {
 		Assert.isNotNull(status);
-		Assert.isNotNull(done);
 		Assert.isTrue(Thread.currentThread().equals(PlatformUI.getWorkbench().getDisplay().getThread()));
 
 		Object result = null;
@@ -180,7 +179,7 @@ public class DefaultStatusHandler extends AbstractStatusHandler {
 			error = e;
 		} finally {
 			// Invoke the callback
-			done.doneHandleStatus(error, data);
+			if (done != null) done.doneHandleStatus(error, data);
 		}
 
 		return;
