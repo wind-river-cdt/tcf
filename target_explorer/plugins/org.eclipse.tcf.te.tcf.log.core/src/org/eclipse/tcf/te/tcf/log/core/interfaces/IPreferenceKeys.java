@@ -25,6 +25,12 @@ public interface IPreferenceKeys {
 	public final String PREF_LOGGING_ENABLED = PREFIX + "enabled"; //$NON-NLS-1$
 
 	/**
+	 * If set to <code>true</code>, the logger will send events to the monitor
+	 * to allow following the back-end communication within the UI.
+	 */
+	public final String PREF_MONITOR_ENABLED = PREFIX + "monitor.enabled"; //$NON-NLS-1$
+
+	/**
 	 * If set to <code>true</code>, locator heart beat events are logged.
 	 */
 	public final String PREF_SHOW_HEARTBEATS = PREFIX + "show.heartbeats"; //$NON-NLS-1$

@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.core.AbstractChannel;
 import org.eclipse.tcf.protocol.IChannel;
@@ -74,8 +73,7 @@ public class ChannelTraceListenerManager {
 		if (!(channel instanceof AbstractChannel)) return;
 
 		// Get the preference key if or if not logging is enabled
-		boolean loggingEnabled = Platform.getPreferencesService().getBoolean(CoreBundleActivator.getUniqueIdentifier(),
-																			 IPreferenceKeys.PREF_LOGGING_ENABLED, false, null);
+		boolean loggingEnabled = CoreBundleActivator.getScopedPreferences().getBoolean(IPreferenceKeys.PREF_LOGGING_ENABLED);
 		// If false, we are done here and wont create any console or trace listener.
 		if (!loggingEnabled) return;
 

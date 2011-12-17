@@ -19,19 +19,18 @@ import java.util.Map;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.te.tcf.core.Tcf;
+import org.eclipse.tcf.te.tcf.core.interfaces.listeners.IChannelStateChangeListener;
+import org.eclipse.tcf.te.tcf.core.interfaces.listeners.IProtocolStateChangeListener;
 import org.eclipse.tcf.te.tcf.log.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.tcf.log.core.interfaces.IPreferenceKeys;
 import org.eclipse.tcf.te.tcf.log.core.internal.listener.ChannelStateChangeListener;
 import org.eclipse.tcf.te.tcf.log.core.internal.listener.ChannelTraceListener;
 import org.eclipse.tcf.te.tcf.log.core.internal.nls.Messages;
-import org.eclipse.tcf.te.tcf.core.Tcf;
-import org.eclipse.tcf.te.tcf.core.interfaces.listeners.IChannelStateChangeListener;
-import org.eclipse.tcf.te.tcf.core.interfaces.listeners.IProtocolStateChangeListener;
 
 
 /**
@@ -102,8 +101,8 @@ public final class LogManager implements IProtocolStateChangeListener {
 	 * preference settings
 	 */
 	private void initializeFromPreferences() {
-		String fileSize = Platform.getPreferencesService().getString(CoreBundleActivator.getUniqueIdentifier(),
-																	 IPreferenceKeys.PREF_MAX_FILE_SIZE, "5M", null); //$NON-NLS-1$
+		String fileSize = CoreBundleActivator.getScopedPreferences().getString(IPreferenceKeys.PREF_MAX_FILE_SIZE);
+		if (fileSize == null) fileSize = "5M"; //$NON-NLS-1$
 
 		try {
 			// If the last character is either K, M or G -> convert to bytes
@@ -128,8 +127,8 @@ public final class LogManager implements IProtocolStateChangeListener {
 			maxFileSize = 5242880L;
 		}
 
-		maxInCycle = Platform.getPreferencesService().getInt(CoreBundleActivator.getUniqueIdentifier(),
-															 IPreferenceKeys.PREF_MAX_FILES_IN_CYCLE, 5, null);
+		maxInCycle = CoreBundleActivator.getScopedPreferences().getInt(IPreferenceKeys.PREF_MAX_FILES_IN_CYCLE);
+		if (maxInCycle <= 0) maxInCycle = 5;
 	}
 
 	/**

@@ -10,8 +10,7 @@
 package org.eclipse.tcf.te.tcf.log.core.internal;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.core.runtime.preferences.DefaultScope;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.tcf.te.runtime.preferences.ScopedEclipsePreferences;
 import org.eclipse.tcf.te.tcf.log.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.tcf.log.core.interfaces.IPreferenceKeys;
 
@@ -33,19 +32,21 @@ public class PreferencesInitializer extends AbstractPreferenceInitializer {
 	 */
 	@Override
 	public void initializeDefaultPreferences() {
-		// Get the bundles preferences manager
-		IEclipsePreferences prefs = DefaultScope.INSTANCE.getNode(CoreBundleActivator.getUniqueIdentifier());
+		// Get the bundles scoped preferences store
+		ScopedEclipsePreferences prefs = CoreBundleActivator.getScopedPreferences();
 		if (prefs != null) {
-			// [Hidden] Enable back-end communication logging: default on
-			prefs.putBoolean(IPreferenceKeys.PREF_LOGGING_ENABLED, true);
-			// [Hidden] Heat beat events: default off
-			prefs.putBoolean(IPreferenceKeys.PREF_SHOW_HEARTBEATS, false);
-			// [Hidden] Framework events: default off
-			prefs.putBoolean(IPreferenceKeys.PREF_SHOW_FRAMEWORK_EVENTS, false);
-			// [Hidden] Maximum log file size in bytes: default 5M
-			prefs.put(IPreferenceKeys.PREF_MAX_FILE_SIZE, "5M"); //$NON-NLS-1$
-			// [Hidden] Maximum number of log files in cycle: default 5
-			prefs.putInt(IPreferenceKeys.PREF_MAX_FILES_IN_CYCLE, 5);
+			// Enable back-end communication logging: default on
+			prefs.putDefaultBoolean(IPreferenceKeys.PREF_LOGGING_ENABLED, true);
+			// Enable back-end communication monitor: default off
+			prefs.putDefaultBoolean(IPreferenceKeys.PREF_MONITOR_ENABLED, false);
+			// Heat beat events: default off
+			prefs.putDefaultBoolean(IPreferenceKeys.PREF_SHOW_HEARTBEATS, false);
+			// Framework events: default off
+			prefs.putDefaultBoolean(IPreferenceKeys.PREF_SHOW_FRAMEWORK_EVENTS, false);
+			// Maximum log file size in bytes: default 5M
+			prefs.putDefaultString(IPreferenceKeys.PREF_MAX_FILE_SIZE, "5M"); //$NON-NLS-1$
+			// Maximum number of log files in cycle: default 5
+			prefs.putDefaultInt(IPreferenceKeys.PREF_MAX_FILES_IN_CYCLE, 5);
 		}
 	}
 }

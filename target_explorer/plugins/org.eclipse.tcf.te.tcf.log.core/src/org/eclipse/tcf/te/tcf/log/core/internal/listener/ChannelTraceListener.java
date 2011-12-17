@@ -16,7 +16,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.core.AbstractChannel.TraceListener;
 import org.eclipse.tcf.protocol.IChannel;
@@ -119,14 +118,12 @@ public class ChannelTraceListener implements TraceListener {
 	 */
 	private void doLogMessage(final char type, String token, String service, String name, byte[] data, boolean received) {
 		// Filter out the heart beat messages if not overwritten by the preferences
-		boolean showHeartbeats = Platform.getPreferencesService().getBoolean(CoreBundleActivator.getUniqueIdentifier(),
-																			 IPreferenceKeys.PREF_SHOW_HEARTBEATS, false, null);
+		boolean showHeartbeats = CoreBundleActivator.getScopedPreferences().getBoolean(IPreferenceKeys.PREF_SHOW_HEARTBEATS);
 		if (!showHeartbeats && name != null && name.toLowerCase().contains("heartbeat")) { //$NON-NLS-1$
 			return;
 		}
 		// Filter out framework events if not overwritten by the preferences
-		boolean frameworkEvents = Platform.getPreferencesService().getBoolean(CoreBundleActivator.getUniqueIdentifier(),
-						 													  IPreferenceKeys.PREF_SHOW_FRAMEWORK_EVENTS, false, null);
+		boolean frameworkEvents = CoreBundleActivator.getScopedPreferences().getBoolean(IPreferenceKeys.PREF_SHOW_FRAMEWORK_EVENTS);
 		if (!frameworkEvents && type == 'F') {
 			return;
 		}

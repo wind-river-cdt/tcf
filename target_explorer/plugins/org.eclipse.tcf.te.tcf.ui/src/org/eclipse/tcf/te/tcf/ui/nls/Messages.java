@@ -133,4 +133,15 @@ public class Messages extends NLS {
 	public static String AgentSelectionDialog_dialogTitle;
 	public static String AgentSelectionDialog_title;
 	public static String AgentSelectionDialog_message;
+
+	public static String LoggingPreferencePage_label;
+	public static String LoggingPreferencePage_enabled_label;
+	public static String LoggingPreferencePage_monitorEnabled_label;
+	public static String LoggingPreferencePage_filterGroup_label;
+	public static String LoggingPreferencePage_showHeartbeats_label;
+	public static String LoggingPreferencePage_showFrameworkEvents_label;
+	public static String LoggingPreferencePage_logfileGroup_label;
+	public static String LoggingPreferencePage_maxFileSize_label;
+	public static String LoggingPreferencePage_maxFileSize_error;
+	public static String LoggingPreferencePage_maxFilesInCycle_label;
 }
