@@ -64,4 +64,6 @@ public class Messages extends NLS {
 	public static String NameValuePairDialog_missingName_error;
 	public static String NameValuePairDialog_missingValue_error;
 	public static String NameValuePairDialog_usedOrIllegalName_error;
+
+	public static String PreferencePage_label;
 }

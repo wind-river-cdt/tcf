@@ -2,11 +2,6 @@
 <?eclipse version="3.4"?>
 <plugin>
 
-<!-- Preference contributions -->
-   <extension point="org.eclipse.core.runtime.preferences">
-      <initializer class="org.eclipse.tcf.te.tcf.filesystem.internal.preferences.PreferencesInitializer"/>
-   </extension>
-
 <!-- Common navigator contributions -->
    <extension point="org.eclipse.ui.navigator.viewer">
       <viewerContentBinding viewerId="org.eclipse.tcf.te.ui.views.TargetExplorer">
@@ -101,7 +96,7 @@
       </commonFilter>
    </extension>
 
-<!-- Target Explorer Details Editor page contributions -->
+<!-- Editor page contributions -->
    <extension point="org.eclipse.tcf.te.ui.views.editorPages">
       <editorPage
             class="org.eclipse.tcf.te.tcf.filesystem.internal.explorer.FSExplorerEditorPage"
@@ -110,7 +105,7 @@
       </editorPage>
    </extension>
 
-<!-- Target Explorer Details Editor page binding contributions -->
+<!-- Editor page binding contributions -->
    <extension point="org.eclipse.tcf.te.ui.views.editorPageBindings">
       <editorPageBinding
             id="org.eclipse.tcf.te.tcf.filesystem.binding.FSExplorerEditorPage"
@@ -132,7 +127,7 @@
       </editorPageBinding>
    </extension>
    
-<!-- Target Explorer context menu contributions -->
+<!-- Menu contributions -->
    <extension point="org.eclipse.ui.menus">
       <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.controls.menu.fs?after=additions">
          <separator
@@ -994,7 +989,7 @@
       </menuContribution>
    </extension>
    
-<!-- Target Explorer property page contributions -->   
+<!-- Property page contributions -->   
    <extension point="org.eclipse.ui.propertyPages">
       <page
             class="org.eclipse.tcf.te.tcf.filesystem.internal.properties.GeneralInformationPage"
@@ -1006,7 +1001,7 @@
       </page>
    </extension>
    
-<!-- Target Explorer property tester contributions -->   
+<!-- Property tester contributions -->   
    <extension point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
             class="org.eclipse.tcf.te.tcf.filesystem.internal.testers.FSTreeNodePropertyTester"
@@ -1045,7 +1040,7 @@
       </propertyTester>
    </extension>
    
-<!-- Target Explorer command contributions -->
+<!-- Command contributions -->
    <extension point="org.eclipse.ui.commands">
       <command
             id="org.eclipse.tcf.te.tcf.filesystem.commands.update"
@@ -1077,7 +1072,7 @@
       </command>
    </extension>
 
-<!-- Target Explorer command handler contributions -->
+<!-- Command handler contributions -->
    <extension point="org.eclipse.ui.handlers">
       <!-- This handler contribution is for the double click behaviour in the
            Target Explore tree view -->
@@ -1839,6 +1834,7 @@
       </handler>
    </extension>
    
+<!-- Decorator contributions -->
    <extension point="org.eclipse.ui.decorators">
       <decorator
             icon="icons/ovr/ovr_modified.png"
@@ -1908,14 +1904,22 @@
       </decorator>
    </extension>
    
+<!-- Preference contributions -->
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.eclipse.tcf.te.tcf.filesystem.internal.preferences.PreferencesInitializer"/>
+   </extension>
+
+<!-- Preference page contributions -->
    <extension point="org.eclipse.ui.preferencePages">
       <page
+            category="org.eclipse.tcf.te.ui.preferences.general"
             class="org.eclipse.tcf.te.tcf.filesystem.internal.preferences.TargetExplorerPreferencePage"
-            id="org.eclipse.tcf.te.tcf.filesystem.preferencePage"
+            id="org.eclipse.tcf.te.ui.preferences.tcf.filesystem"
             name="%preference.page.name">
       </page>
    </extension>
    
+<!-- Adapter contributions -->   
    <extension point="org.eclipse.core.runtime.adapters">
       <factory
             adaptableType="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode"
@@ -1925,36 +1929,30 @@
          </adapter>
       </factory>
    </extension>
-   <extension
-         point="org.eclipse.tcf.te.ui.views.cellEditors">
+
+<!-- CellEditor factory contributions -->   
+   <extension point="org.eclipse.tcf.te.ui.views.cellEditors">
       <cellEditor
             editorFactory="org.eclipse.tcf.te.tcf.filesystem.internal.celleditor.FSViewerCellEditorFactory"
             viewerId="org.eclipse.tcf.te.ui.views.TargetExplorer">
          <activation>
             <and>
-               <with
-                     variable="selection">
-                  <count
-                        value="1">
-                  </count>
+               <with variable="selection">
+                  <count value="1"/>
                   <iterate>
-                     <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
-                     </instanceof>
+                     <instanceof value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode"/>
                   </iterate>
                </with>
-               <with
-                     variable="event">
-                  <test
-                        property="org.eclipse.tcf.te.tcf.filesystem.propertytester.event.isEditorActivation">
-                  </test>
+               <with variable="event">
+                  <test property="org.eclipse.tcf.te.tcf.filesystem.propertytester.event.isEditorActivation"/>
                </with>
             </and>
          </activation>
       </cellEditor>
    </extension>
-   <extension
-         point="org.eclipse.tcf.te.ui.newWizards">
+
+<!-- New wizard contributions -->   
+   <extension point="org.eclipse.tcf.te.ui.newWizards">
       <wizard
             canFinishEarly="false"
             category="org.eclipse.tcf.te.tcf.ui.newWizards.category"
@@ -1980,10 +1978,9 @@
          </description>
       </wizard>
    </extension>
-   <extension
-         point="org.eclipse.tcf.te.ui.viewers">
-      <viewer
-            viewerId="org.eclipse.tcf.te.ui.controls.viewer.fs">
+   
+   <extension point="org.eclipse.tcf.te.ui.viewers">
+      <viewer viewerId="org.eclipse.tcf.te.ui.controls.viewer.fs">
          <column
                alignment="SWT.LEFT"
                comparator="org.eclipse.tcf.te.tcf.filesystem.internal.columns.FSTreeElementComparator"
@@ -2045,8 +2042,8 @@
                width="120">
          </column>
       </viewer>
-      <viewer
-            viewerId="org.eclipse.tcf.te.ui.controls.viewer.fs">
+      
+      <viewer viewerId="org.eclipse.tcf.te.ui.controls.viewer.fs">
          <filter
                class="org.eclipse.tcf.te.tcf.filesystem.filters.HiddenFilesViewerFilter"
                description="%filter.description.hidden"
@@ -2063,12 +2060,10 @@
                image="icons/obj16/system_file_filter.png"
                name="%filter.name.system">
             <activation>
-               <with
-                     variable="input">
-                  <test
-                        property="org.eclipse.tcf.te.tcf.filesystem.propertytester.peer.isWindows">
-                  </test>
-               </with></activation>
+               <with variable="input">
+                  <test property="org.eclipse.tcf.te.tcf.filesystem.propertytester.peer.isWindows"/>
+               </with>
+            </activation>
          </filter>
       </viewer>
    </extension>   
