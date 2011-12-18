@@ -13,6 +13,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: org.eclipse.tcf.te.tcf.log.core.activator;x-internal:=true,
+ org.eclipse.tcf.te.tcf.log.core.events,
  org.eclipse.tcf.te.tcf.log.core.interfaces,
  org.eclipse.tcf.te.tcf.log.core.internal;x-internal:=true,
  org.eclipse.tcf.te.tcf.log.core.internal.listener;x-internal:=true,

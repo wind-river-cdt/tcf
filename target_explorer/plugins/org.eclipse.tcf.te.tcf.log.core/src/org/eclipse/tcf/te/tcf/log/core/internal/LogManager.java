@@ -23,10 +23,12 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.te.runtime.events.EventManager;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.core.interfaces.listeners.IChannelStateChangeListener;
 import org.eclipse.tcf.te.tcf.core.interfaces.listeners.IProtocolStateChangeListener;
 import org.eclipse.tcf.te.tcf.log.core.activator.CoreBundleActivator;
+import org.eclipse.tcf.te.tcf.log.core.events.MonitorEvent;
 import org.eclipse.tcf.te.tcf.log.core.interfaces.IPreferenceKeys;
 import org.eclipse.tcf.te.tcf.log.core.internal.listener.ChannelStateChangeListener;
 import org.eclipse.tcf.te.tcf.log.core.internal.listener.ChannelTraceListener;
@@ -137,7 +139,7 @@ public final class LogManager implements IProtocolStateChangeListener {
 	 * <b>Note:</b> This method is supposed to be called from {@link Startup} only!
 	 */
 	/* default */ final void initListeners() {
-		Assert.isTrue(Protocol.isDispatchThread());
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 
 		// If the channel state change listener instance has been created
 		// already, there is nothing left to do here
@@ -175,7 +177,7 @@ public final class LogManager implements IProtocolStateChangeListener {
 	 */
 	public FileWriter getWriter(IChannel channel) {
 		Assert.isNotNull(channel);
-		Assert.isTrue(Protocol.isDispatchThread());
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 
 		// Before looking up the writer, check the file limits
 		checkLimits(channel);
@@ -207,7 +209,7 @@ public final class LogManager implements IProtocolStateChangeListener {
 	 */
 	public void closeWriter(IChannel channel, String message) {
 		Assert.isNotNull(channel);
-		Assert.isTrue(Protocol.isDispatchThread());
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 
 		// Remove the writer from the map
 		String logName = getLogName(channel);
@@ -240,7 +242,7 @@ public final class LogManager implements IProtocolStateChangeListener {
 	 */
 	public String getLogName(IChannel channel) {
 		Assert.isNotNull(channel);
-		Assert.isTrue(Protocol.isDispatchThread());
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 
 		String logName = null;
 
@@ -381,4 +383,31 @@ public final class LogManager implements IProtocolStateChangeListener {
 			}
 		}
 	}
+
+	/**
+	 * Sends an event to the monitor signaling the given message and type.
+	 *
+	 * @param channel The channel. Must not be <code>null</code>.
+	 * @param type The message type. Must not be <code>null</code>.
+	 * @param message The message. Must not be <code>null</code>.
+	 */
+	public void monitor(IChannel channel, MonitorEvent.Type type, MonitorEvent.Message message) {
+		Assert.isNotNull(channel);
+		Assert.isNotNull(type);
+		Assert.isNotNull(message);
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+
+		// If monitoring is not enabled, return immediately
+		if (!CoreBundleActivator.getScopedPreferences().getBoolean(IPreferenceKeys.PREF_MONITOR_ENABLED)) {
+			return;
+		}
+
+		// The source of a monitor event is the peer.
+		IPeer peer = channel.getRemotePeer();
+		if (peer != null) {
+			MonitorEvent event = new MonitorEvent(peer, type, message);
+			EventManager.getInstance().fireEvent(event);
+		}
+	}
+
 }

@@ -76,7 +76,7 @@ public class TablePart extends AbstractStructuredViewerPart implements ISelectio
 		Assert.isNotNull(parent);
 
 		// Adjust the style bits
-		style |= SWT.H_SCROLL | SWT.V_SCROLL | (toolkit != null ? toolkit.getBorderStyle() : SWT.BORDER);
+		style |= SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER;
 
 		TableViewer viewer = createTableViewer(parent, style);
 		Assert.isNotNull(viewer);

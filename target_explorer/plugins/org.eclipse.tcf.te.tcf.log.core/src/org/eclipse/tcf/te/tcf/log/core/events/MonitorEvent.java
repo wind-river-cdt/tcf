@@ -7,23 +7,23 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.core.scripting.events;
+package org.eclipse.tcf.te.tcf.log.core.events;
 
 import java.util.EventObject;
 
 /**
- * Script event implementation.
+ * Monitor event implementation.
  */
-public class ScriptEvent extends EventObject {
-    private static final long serialVersionUID = -5350037587555199985L;
+public class MonitorEvent extends EventObject {
+    private static final long serialVersionUID = 2503050052196826683L;
 
 	/**
-	 * Script event types.
+	 * Monitor event types.
 	 */
-	public static enum Type { START, OUTPUT, STOP }
+	public static enum Type { OPEN, ACTIVITY, CLOSE }
 
 	/**
-	 * Immutable script event message.
+	 * Immutable monitor event message.
 	 */
 	public static final class Message {
 		/** The message type */
@@ -44,17 +44,16 @@ public class ScriptEvent extends EventObject {
 	private Type type;
 	private Message message;
 
-
 	/**
 	 * Constructor.
 	 *
 	 * @param source The source object. Must not be <code>null</code>.
-	 * @param type The script event type. Must not be <code>null</code>.
-	 * @param message The script event message or <code>null</code>.
+	 * @param type The event type. Must not be <code>null</code>.
+	 * @param message The event message or <code>null</code>.
 	 *
 	 * @exception IllegalArgumentException if type == null.
 	 */
-	public ScriptEvent(Object source, Type type, Message message) {
+	public MonitorEvent(Object source, Type type, Message message) {
 		super(source);
 
 		if (type == null) throw new IllegalArgumentException("null type"); //$NON-NLS-1$
@@ -64,18 +63,18 @@ public class ScriptEvent extends EventObject {
 	}
 
 	/**
-	 * Returns the script event type.
+	 * Returns the event type.
 	 *
-	 * @return The script event type.
+	 * @return The event type.
 	 */
 	public Type getType() {
 		return type;
 	}
 
 	/**
-	 * Returns the script event message.
+	 * Returns the event message.
 	 *
-	 * @return The script event message or <code>null</code>.
+	 * @return The event message or <code>null</code>.
 	 */
 	public Message getMessage() {
 		return message;

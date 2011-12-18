@@ -55,6 +55,16 @@
       </consolePageParticipant>
    </extension>
 
+   <extension point="org.eclipse.ui.console.consolePageParticipants">
+      <consolePageParticipant
+            class="org.eclipse.tcf.te.tcf.ui.console.PageParticipant"
+            id="org.eclipse.tcf.te.tcf.ui.console.PageParticipant">
+         <enablement>
+            <instanceof value="org.eclipse.tcf.te.tcf.ui.views.monitor.console.Console"/>
+         </enablement>
+      </consolePageParticipant>
+   </extension>
+
 <!-- Script Pad menu contributions -->
    <extension point="org.eclipse.ui.viewActions">
       <viewContribution
@@ -174,6 +184,17 @@
             forcePluginActivation="true">
             <eventType
                   class="org.eclipse.tcf.te.tcf.core.scripting.events.ScriptEvent">
+            </eventType>
+      </eventListener>
+   </extension>
+
+<!-- Monitor console event listener contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.eventListeners">
+      <eventListener
+            class="org.eclipse.tcf.te.tcf.ui.views.monitor.events.EventListener"
+            forcePluginActivation="true">
+            <eventType
+                  class="org.eclipse.tcf.te.tcf.log.core.events.MonitorEvent">
             </eventType>
       </eventListener>
    </extension>

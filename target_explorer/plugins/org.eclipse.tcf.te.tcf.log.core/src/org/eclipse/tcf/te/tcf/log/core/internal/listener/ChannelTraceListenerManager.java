@@ -21,6 +21,7 @@ import org.eclipse.tcf.core.AbstractChannel;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.tcf.log.core.activator.CoreBundleActivator;
+import org.eclipse.tcf.te.tcf.log.core.events.MonitorEvent;
 import org.eclipse.tcf.te.tcf.log.core.interfaces.IPreferenceKeys;
 import org.eclipse.tcf.te.tcf.log.core.interfaces.ITracing;
 import org.eclipse.tcf.te.tcf.log.core.internal.LogManager;
@@ -107,6 +108,7 @@ public class ChannelTraceListenerManager {
 				/* ignored on purpose */
 			}
 		}
+		LogManager.getInstance().monitor(channel, MonitorEvent.Type.OPEN, new MonitorEvent.Message('F', message));
 	}
 
 	/**

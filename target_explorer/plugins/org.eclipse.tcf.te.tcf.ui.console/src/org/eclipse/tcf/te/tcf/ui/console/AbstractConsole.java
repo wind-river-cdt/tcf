@@ -421,21 +421,16 @@ public class AbstractConsole extends MessageConsole implements IConsoleListener,
 						break;
 					case 'E':
 						stream = streams.get(IPreferenceKeys.PREF_CONSOLE_COLOR_EVENT);
-						if (stream != null) {
-							// Heart beat message are not shown
-							if (!message.toLowerCase().contains("heartbeat")) stream.println(message); //$NON-NLS-1$
-						}
+						if (stream != null) stream.println(message);
 						break;
 					case 'P':
 						stream = streams.get(IPreferenceKeys.PREF_CONSOLE_COLOR_PROGRESS);
 						if (stream != null) stream.println(message);
 						break;
 					case 'N':
+					case 'F':
 						stream = streams.get(IPreferenceKeys.PREF_CONSOLE_COLOR_TEXT);
 						if (stream != null) stream.println(message);
-						break;
-					case 'F':
-						// Framework messages are not shown
 						break;
 					default:
 						stream = streams.get(IPreferenceKeys.PREF_CONSOLE_COLOR_ERROR);

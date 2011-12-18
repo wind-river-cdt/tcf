@@ -156,6 +156,7 @@ public class ScriptLauncher extends PlatformObject implements IScriptLauncher {
 
 						@Override
 						public void onMessageSent(char type, String token, String service, String name, byte[] data) {
+							if (isFiltered(type, name)) return;
 							String message = formatMessage(type, token, service, name, data, false);
 							ScriptEvent event = new ScriptEvent(ScriptLauncher.this, ScriptEvent.Type.OUTPUT, new ScriptEvent.Message(type, message));
 							EventManager.getInstance().fireEvent(event);
@@ -163,6 +164,7 @@ public class ScriptLauncher extends PlatformObject implements IScriptLauncher {
 
 						@Override
 						public void onMessageReceived(char type, String token, String service, String name, byte[] data) {
+							if (isFiltered(type, name)) return;
 							String message = formatMessage(type, token, service, name, data, true);
 							ScriptEvent event = new ScriptEvent(ScriptLauncher.this, ScriptEvent.Type.OUTPUT, new ScriptEvent.Message(type, message));
 							EventManager.getInstance().fireEvent(event);
@@ -170,6 +172,26 @@ public class ScriptLauncher extends PlatformObject implements IScriptLauncher {
 
 						@Override
 						public void onChannelClosed(Throwable error) {
+						}
+
+						/**
+						 * Checks if a given message is filtered. Filtered messages are not send to
+						 * the script output console.
+						 *
+						 * @param type The message type.
+						 * @param name The message name.
+						 *
+						 * @return <code>True</code> if the message is filtered, <code>false</code> otherwise.
+						 */
+						private boolean isFiltered(char type, String name) {
+							boolean filtered = false;
+
+							// Filter out the heart beat and framework messages
+							if (type == 'F' || (name != null && name.toLowerCase().contains("heartbeat"))) { //$NON-NLS-1$
+								filtered = true;
+							}
+
+							return filtered;
 						}
 
 						/**

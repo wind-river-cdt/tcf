@@ -24,7 +24,7 @@ public class Console extends AbstractConsole {
      * Constructor.
      */
     public Console() {
-		super(Messages.Console_name, UIPlugin.getImageDescriptor(ImageConsts.SCRIPT_PAD_CONSOLE));
+		super(Messages.ScriptPad_Console_name, UIPlugin.getImageDescriptor(ImageConsts.SCRIPT_PAD_CONSOLE));
     }
 
 	/* (non-Javadoc)
@@ -32,6 +32,6 @@ public class Console extends AbstractConsole {
 	 */
     @Override
 	public String getHelpContextId() {
-    	return IContextHelpIds.SCRIPT_PAD_CONSOLE_VIEW;
+    	return IContextHelpIds.SCRIPT_PAD_CONSOLE;
     }
 }

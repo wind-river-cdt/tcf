@@ -22,12 +22,17 @@ public interface IContextHelpIds {
 	public final static String PREFIX = UIPlugin.getUniqueIdentifier() + "."; //$NON-NLS-1$
 
 	/**
-	 * Script Pad console view.
+	 * Script Pad console.
 	 */
-	public final static String SCRIPT_PAD_CONSOLE_VIEW = PREFIX + "ScriptPadConsoleView"; //$NON-NLS-1$
+	public final static String SCRIPT_PAD_CONSOLE = PREFIX + "ScriptPadConsole"; //$NON-NLS-1$
 
 	/**
 	 * Script Pad error: open failed
 	 */
 	public final static String SCRIPT_PAD_ERROR_OPEN_FILE = PREFIX + "ScriptPadErrorOpenFile"; //$NON-NLS-1$
+
+	/**
+	 * Communication monitor console.
+	 */
+	public final static String MONITOR_CONSOLE = PREFIX + "MonitorConsole"; //$NON-NLS-1$
 }

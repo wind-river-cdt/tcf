@@ -29,7 +29,10 @@ public class Messages extends NLS {
 
 	// **** Declare externalized string id's down here *****
 
-	public static String Console_name;
+	public static String ScriptPad_Console_name;
+
+	public static String Monitor_Console_name;
+	public static String Monitor_Console_name_with_peer;
 
 	public static String ScriptPad_error_title;
 	public static String ScriptPad_error_openFile;

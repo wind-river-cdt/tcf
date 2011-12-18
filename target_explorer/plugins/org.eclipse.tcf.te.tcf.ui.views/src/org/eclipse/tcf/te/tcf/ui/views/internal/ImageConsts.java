@@ -61,7 +61,12 @@ public interface ImageConsts {
     // ***** The image constants *****
 
     /**
-     * The key to access the Script Pad console view image.
+     * The key to access the Script Pad console image.
      */
     public static final String SCRIPT_PAD_CONSOLE = "ScriptPadConsole"; //$NON-NLS-1$
+
+    /**
+     * The key to access the Monitor console image.
+     */
+    public static final String MONITOR_CONSOLE = "MonitorConsole"; //$NON-NLS-1$
 }
