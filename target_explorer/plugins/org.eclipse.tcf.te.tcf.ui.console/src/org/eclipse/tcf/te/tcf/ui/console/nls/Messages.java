@@ -31,4 +31,18 @@ public class Messages extends NLS {
 
 	public static String PageParticipant_command_remove_label;
 	public static String PageParticipant_command_remove_tooltip;
+
+	public static String PreferencesPage_label;
+	public static String PreferencesPage_fieldEditor_fixedWidth;
+	public static String PreferencesPage_fieldEditor_width;
+	public static String PreferencesPage_fieldEditor_limitOutput;
+	public static String PreferencesPage_fieldEditor_bufferSize;
+	public static String PreferencesPage_fieldEditor_showOnOutput;
+
+	public static String PreferencesPage_group_colorSettings;
+	public static String PreferencesPage_color_command;
+	public static String PreferencesPage_color_commandResponse;
+	public static String PreferencesPage_color_event;
+	public static String PreferencesPage_color_progress;
+	public static String PreferencesPage_color_error;
 }

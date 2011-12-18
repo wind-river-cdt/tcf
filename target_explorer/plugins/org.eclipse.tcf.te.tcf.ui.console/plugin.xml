@@ -34,6 +34,16 @@
       </initializer>
    </extension>
 
+<!-- Preference page contributions -->
+   <extension point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.tcf.te.ui.preferences.general"
+            class="org.eclipse.tcf.te.tcf.ui.console.internal.preferences.PreferencesPage"
+            id="org.eclipse.tcf.te.ui.preferences.tcf.console"
+            name="%preference.page.name">
+      </page>
+   </extension>
+
 <!-- UI Themes contributions -->
    <extension point="org.eclipse.ui.themes">
       <themeElementCategory
