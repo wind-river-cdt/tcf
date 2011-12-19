@@ -21,7 +21,9 @@
                <with variable="selection">
                   <count value="1"/>
                   <iterate operator="and" ifEmpty="false">
-                     <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                     <test
+                           property="org.eclipse.tcf.te.runtime.services.hasService"
+                           value="org.eclipse.tcf.te.runtime.services.interfaces.IPropertiesAccessService"/>
                   </iterate>
                </with>
             </enablement>

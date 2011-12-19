@@ -147,10 +147,12 @@ public abstract class AbstractServiceManager {
 		/**
 		 * Check whether this proxy holds a service that is suitable for the given type.
 		 *
-		 * @param serviceType The service type
-		 * @return
+		 * @param serviceType The service type. Must not be <code>null</code>.
+		 * @return <code>True</code> if the proxy holds a suitable service, <code>false</code> otherwise.
 		 */
 		protected boolean isMatching(Class<? extends IService> serviceType) {
+			Assert.isNotNull(serviceType);
+
 			if (service != null) {
 				return serviceType.isInstance(service);
 			}
@@ -160,6 +162,36 @@ public abstract class AbstractServiceManager {
 				}
 				for (Class<? extends IService> type : serviceTypes) {
 					if (type.equals(serviceType)) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+
+		/**
+		 * Check whether this proxy holds a service that is suitable for the given type.
+		 *
+		 * @param serviceTypeName The service type name. Must not be <code>null</code>.
+		 * @return <code>True</code> if the proxy holds a suitable service, <code>false</code> otherwise.
+		 */
+		protected boolean isMatching(String serviceTypeName) {
+			Assert.isNotNull(serviceTypeName);
+
+			if (service != null) {
+				Class<?>[] interfaces = service.getClass().getInterfaces();
+				for (Class<?> interfaze : interfaces) {
+					if (serviceTypeName.equals(interfaze.getName())) {
+						return true;
+					}
+				}
+			}
+			else if (configElement != null) {
+				if (serviceTypeName.equals(clazz)) {
+					return true;
+				}
+				for (Class<? extends IService> type : serviceTypes) {
+					if (serviceTypeName.equals(type.getName())) {
 						return true;
 					}
 				}
@@ -360,6 +392,32 @@ public abstract class AbstractServiceManager {
 		Assert.isNotNull(id);
 		services.put(id, proxy);
 	}
+
+	/**
+	 * Returns if or if not a service contribution for the given service context, implementing the
+	 * given service type, exist.
+	 *
+	 * @param context The service context or <code>null</code>.
+	 * @param serviceTypeName The name of a service type the service should at least implement or extend.
+	 *
+	 * @return <code>True</code> if a matching service contribution exist, <code>false</code> otherwise.
+	 */
+	public boolean hasService(Object context, String serviceTypeName) {
+		Assert.isNotNull(serviceTypeName);
+
+		// Get all service contributions
+		Collection<ServiceProxy> proxies = services.values();
+		if (proxies != null && !proxies.isEmpty()) {
+			for (ServiceProxy proxy : proxies) {
+				if (proxy.isMatching(serviceTypeName) && proxy.isEnabled(context)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
 
 	/**
 	 * Loads the contributed services into proxies (lazy loading!!) and adds them to this manager;
