@@ -17,7 +17,6 @@ import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.services.IFileSystem.IFileHandle;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
-import org.eclipse.tcf.te.tcf.filesystem.internal.utils.Rendezvous;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 
 /**
@@ -44,7 +43,6 @@ public class FSCreateFile extends FSCreate {
 		String path = folder.getLocation(true);
 		if (!path.endsWith("/")) path += "/"; //$NON-NLS-1$//$NON-NLS-2$
 		path += name;
-		final Rendezvous rendezvous = new Rendezvous();
 		final FileSystemException[] errors = new FileSystemException[1];
 		// Open the file.
 		final IFileHandle[] handles = new IFileHandle[1];
@@ -53,15 +51,8 @@ public class FSCreateFile extends FSCreate {
 			public void doneOpen(IToken token, FileSystemException error, IFileHandle hdl) {
 				errors[0] = error;
 				handles[0] = hdl;
-				rendezvous.arrive();
 			}
 		});
-		try {
-			rendezvous.waiting(5000L);
-		}
-		catch (InterruptedException e) {
-			throw new TCFFileSystemException(Messages.TcfURLConnection_OpenFileTimeout);
-		}
 		if (errors[0] != null) {
 			TCFFileSystemException exception = new TCFFileSystemException(errors[0].toString());
 			exception.initCause(errors[0]);
@@ -70,19 +61,11 @@ public class FSCreateFile extends FSCreate {
 		if (handles[0] == null) {
 			throw new TCFFileSystemException(Messages.TcfURLConnection_NoFileHandleReturned);
 		}
-		rendezvous.reset();
 		service.close(handles[0], new DoneClose() {
 			@Override
 			public void doneClose(IToken token, FileSystemException error) {
-				rendezvous.arrive();
 			}
 		});
-		try {
-			rendezvous.waiting(5000L);
-		}
-		catch (InterruptedException e) {
-			throw new TCFFileSystemException(Messages.TcfURLConnection_CloseFileTimeout);
-		}
 	}
 
 	/*

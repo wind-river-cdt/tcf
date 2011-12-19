@@ -21,7 +21,6 @@ import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
-import org.eclipse.tcf.te.tcf.filesystem.internal.utils.Rendezvous;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 
@@ -59,7 +58,7 @@ public abstract class FSCreate extends FSOperation {
 		IChannel channel = null;
 		try {
 			channel = openChannel(folder.peerNode.getPeer());
-			IFileSystem service = getFileSystem(channel);
+			IFileSystem service = getBlockingFileSystem(channel);
 			if (service != null) {
 				if (!folder.childrenQueried) {
 					// If the children of folder is not queried, load it first.
@@ -104,7 +103,6 @@ public abstract class FSCreate extends FSOperation {
 	private void refresh(final IFileSystem service) throws TCFFileSystemException {
 		if (node != null) {
 			final TCFFileSystemException[] errors = new TCFFileSystemException[1];
-			final Rendezvous rendezvous = new Rendezvous();
 			String path = node.getLocation(true);
 			service.stat(path, new DoneStat() {
 				@Override
@@ -117,17 +115,8 @@ public abstract class FSCreate extends FSOperation {
 						                .bind(Messages.StateManager_CannotGetFileStatMessage, new Object[] { node.name, error });
 						errors[0] = new TCFFileSystemException(message, error);
 					}
-					rendezvous.arrive();
 				}
 			});
-			try {
-				rendezvous.waiting(5000L);
-			}
-			catch (InterruptedException e) {
-				String message = NLS
-				                .bind(Messages.StateManager_CannotGetFileStateMessage2, new Object[] { node.name, e });
-				errors[0] = new TCFFileSystemException(message, e);
-			}
 			if (errors[0] != null) {
 				throw errors[0];
 			}

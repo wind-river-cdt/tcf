@@ -54,7 +54,7 @@ public class FSRefresh extends FSOperation {
 			try {
 				channel = openChannel(node.peerNode.getPeer());
 				if (channel != null) {
-					IFileSystem service = getFileSystem(channel);
+					IFileSystem service = getBlockingFileSystem(channel);
 					if (service != null) {
 						refresh(node, service);
 					}

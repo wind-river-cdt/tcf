@@ -14,8 +14,6 @@ import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.DoneMkDir;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
-import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
-import org.eclipse.tcf.te.tcf.filesystem.internal.utils.Rendezvous;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 
 /**
@@ -42,7 +40,6 @@ public class FSCreateFolder extends FSCreate {
 		String path = folder.getLocation(true);
 		if (!path.endsWith("/")) path += "/"; //$NON-NLS-1$//$NON-NLS-2$
 		path += name;
-		final Rendezvous rendezvous = new Rendezvous();
 		final FileSystemException[] errors = new FileSystemException[1];
 		service.mkdir(path, null, new DoneMkDir() {
 			@Override
@@ -50,15 +47,8 @@ public class FSCreateFolder extends FSCreate {
 				if (error != null) {
 					errors[0] = error;
 				}
-				rendezvous.arrive();
 			}
 		});
-		try {
-			rendezvous.waiting(5000L);
-		}
-		catch (InterruptedException e) {
-			throw new TCFFileSystemException(Messages.TcfURLConnection_OpenFileTimeout);
-		}
 		if (errors[0] != null) {
 			TCFFileSystemException exception = new TCFFileSystemException(errors[0].toString());
 			exception.initCause(errors[0]);

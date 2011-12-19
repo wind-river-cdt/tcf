@@ -13,11 +13,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.eclipse.tcf.protocol.IToken;
-import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.DoneRead;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
-import org.eclipse.tcf.te.tcf.filesystem.internal.utils.Rendezvous;
 
 /**
  * The TCF input stream returned by {@link TcfURLConnection#getInputStream()}.
@@ -130,9 +128,7 @@ public class TcfInputStream extends InputStream {
 	 * remember it for read() to check.
 	 */
 	private void readBlock() {
-		final Rendezvous rendezvous = new Rendezvous();
-		IFileSystem service = connection.handle.getService();
-		service.read(connection.handle, position, chunk_size, new DoneRead() {
+		connection.service.read(connection.handle, position, chunk_size, new DoneRead() {
 			@Override
 			public void doneRead(IToken token, FileSystemException error, byte[] data, boolean eof) {
 				if (error != null) {
@@ -146,16 +142,8 @@ public class TcfInputStream extends InputStream {
 				if (buffer != null)
 					position += buffer.length;
 				offset = 0;
-				// Rendezvous
-				rendezvous.arrive();
 			}
 		});
-		// Waiting for reading.
-		try {
-			rendezvous.waiting(timeout);
-		} catch (InterruptedException e) {
-			ERROR = new IOException(Messages.TcfInputStream_ReadTimeout);
-		}
 	}
 
 	/*

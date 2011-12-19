@@ -28,7 +28,6 @@ import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFChannelException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation;
-import org.eclipse.tcf.te.tcf.filesystem.internal.utils.Rendezvous;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 
@@ -66,6 +65,8 @@ public class TcfURLConnection extends URLConnection {
 	IChannel channel;
 	// The file's handle
 	IFileHandle handle;
+	// The file service
+	IFileSystem service;
 
 	/**
 	 * Create a TCF URL Connection using the specified url. The format of this
@@ -150,9 +151,8 @@ public class TcfURLConnection extends URLConnection {
 			throw new IOException(e.getLocalizedMessage());
 		}
 		if (channel != null) {
-			IFileSystem service = FSOperation.getFileSystem(channel);
+			service = FSOperation.getBlockingFileSystem(channel);
 			if (service != null) {
-				final Rendezvous rendezvous = new Rendezvous();
 				final FileSystemException[] errors = new FileSystemException[1];
 				// Open the file.
 				int open_flag = 0;
@@ -165,15 +165,8 @@ public class TcfURLConnection extends URLConnection {
 					public void doneOpen(IToken token, FileSystemException error, IFileHandle hdl) {
 						errors[0] = error;
 						handle = hdl;
-						// Rendezvous
-						rendezvous.arrive();
 					}
 				});
-				try {
-					rendezvous.waiting(openTimeout);
-				} catch (InterruptedException e) {
-					throw new IOException(Messages.TcfURLConnection_OpenFileTimeout);
-				}
 				if (errors[0] != null) {
 					IOException exception = new IOException(errors[0].toString());
 					exception.initCause(errors[0]);
@@ -242,19 +235,11 @@ public class TcfURLConnection extends URLConnection {
 	public synchronized void closeStream(Closeable stream) throws IOException {
 		boolean shouldClose = shouldCloseFileHandle(stream);
 		if (shouldClose) {
-			final Rendezvous rendezvous = new Rendezvous();
-			IFileSystem service = handle.getService();
 			service.close(handle, new DoneClose() {
 				@Override
 				public void doneClose(IToken token, FileSystemException error) {
-					rendezvous.arrive();
 				}
 			});
-			try {
-				rendezvous.waiting(closeTimeout);
-			} catch (InterruptedException e) {
-				throw new IOException(Messages.TcfURLConnection_CloseFileTimeout);
-			}
 			Tcf.getChannelManager().closeChannel(channel);
 		}
 	}

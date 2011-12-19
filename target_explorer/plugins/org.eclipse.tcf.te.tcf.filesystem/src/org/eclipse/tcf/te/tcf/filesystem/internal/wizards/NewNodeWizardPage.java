@@ -45,7 +45,6 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemExcept
 import org.eclipse.tcf.te.tcf.filesystem.internal.help.IContextHelpIds;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation;
-import org.eclipse.tcf.te.tcf.filesystem.internal.utils.Rendezvous;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.ui.controls.BaseEditBrowseTextControl;
@@ -459,7 +458,7 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 			channel = FSOperation.openChannel(folder.peerNode.getPeer());
 			if (!existsByStat()) return null;
 		}
-		IFileSystem service = FSOperation.getFileSystem(channel);
+		IFileSystem service = FSOperation.getBlockingFileSystem(channel);
 		List<FSTreeNode> list = new FSOperation().getChildren(folder, service);
 		return list.toArray(new FSTreeNode[list.size()]);
 	}
@@ -472,26 +471,19 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 	 * @throws TCFFileSystemException Thrown during  lstat call.
 	 */
 	private boolean existsByStat() throws TCFFileSystemException {
-	    IFileSystem service = FSOperation.getFileSystem(channel);
+	    IFileSystem service = FSOperation.getBlockingFileSystem(channel);
 	    String text = folderControl.getEditFieldControlText();
 	    String path = text.trim();
 	    final boolean[] result = new boolean[1];
 	    result[0] = true;
-	    final Rendezvous rendezvous = new Rendezvous();
 	    service.lstat(path, new IFileSystem.DoneStat() {
 	    	@Override
 	    	public void doneStat(IToken token, FileSystemException error, FileAttrs attrs) {
 	    		if(error!=null && error.getStatus()==IFileSystem.STATUS_NO_SUCH_FILE) {
 	    			result[0] = false;
 	    		}
-	    		rendezvous.arrive();
 	    	}
 	    });
-	    try{
-	    	rendezvous.waiting(5000L);
-	    }catch(InterruptedException e) {
-	    	throw new TCFFileSystemException(Messages.NewNodeWizardPage_LstatTimedout);
-	    }
 	    return result[0];
     }
 

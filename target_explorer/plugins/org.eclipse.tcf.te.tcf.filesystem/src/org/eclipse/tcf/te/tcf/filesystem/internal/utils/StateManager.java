@@ -68,10 +68,9 @@ public class StateManager {
 		try {
 			channel = FSOperation.openChannel(node.peerNode.getPeer());
 			if (channel != null) {
-				IFileSystem service = FSOperation.getFileSystem(channel);
+				IFileSystem service = FSOperation.getBlockingFileSystem(channel);
 				if (service != null) {
 					final TCFFileSystemException[] errors = new TCFFileSystemException[1];
-					final Rendezvous rendezvous = new Rendezvous();
 					String path = node.getLocation(true);
 					service.stat(path, new DoneStat() {
 						@Override
@@ -82,15 +81,8 @@ public class StateManager {
 								String message = NLS.bind(Messages.StateManager_CannotGetFileStatMessage, new Object[]{node.name, error});
 								errors[0] = new TCFFileSystemException(message, error);
 							}
-							rendezvous.arrive();
 						}
 					});
-					try {
-						rendezvous.waiting(5000L);
-					} catch (InterruptedException e) {
-						String message = NLS.bind(Messages.StateManager_CannotGetFileStateMessage2, new Object[]{node.name, e});
-						errors[0] = new TCFFileSystemException(message, e);
-					}
 					if (errors[0] != null) {
 						throw errors[0];
 					}
@@ -116,10 +108,9 @@ public class StateManager {
 		try {
 			channel = FSOperation.openChannel(node.peerNode.getPeer());
 			if (channel != null) {
-				IFileSystem service = FSOperation.getFileSystem(channel);
+				IFileSystem service = FSOperation.getBlockingFileSystem(channel);
 				if (service != null) {
 					final TCFFileSystemException[] errors = new TCFFileSystemException[1];
-					final Rendezvous rendezvous = new Rendezvous();
 					String path = node.getLocation(true);
 					service.setstat(path, attrs, new DoneSetStat() {
 						@Override
@@ -130,15 +121,8 @@ public class StateManager {
 								String message = NLS.bind(Messages.StateManager_CannotSetFileStateMessage, new Object[] { node.name, error });
 								errors[0] = new TCFFileSystemException(message, error);
 							}
-							rendezvous.arrive();
 						}
 					});
-					try {
-						rendezvous.waiting(5000L);
-					} catch (InterruptedException e) {
-						String message = NLS.bind(Messages.StateManager_CannotSetFileStateMessage2, new Object[] { node.name, e });
-						errors[0] = new TCFFileSystemException(message, e);
-					}
 					if (errors[0] != null) {
 						throw errors[0];
 					}

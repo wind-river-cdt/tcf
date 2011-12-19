@@ -13,11 +13,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import org.eclipse.tcf.protocol.IToken;
-import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.DoneWrite;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
-import org.eclipse.tcf.te.tcf.filesystem.internal.utils.Rendezvous;
 
 /**
  * The TCF output stream returned by {@link TcfURLConnection#getOutputStream()}.
@@ -112,9 +110,7 @@ public class TcfOutputStream extends OutputStream {
 	@Override
 	public void flush() throws IOException {
 		if (offset > 0) {
-			final Rendezvous rendezvous = new Rendezvous();
-			IFileSystem service = connection.handle.getService();
-			service.write(connection.handle, position, buffer, 0, offset, new DoneWrite() {
+			connection.service.write(connection.handle, position, buffer, 0, offset, new DoneWrite() {
 				@Override
 				public void doneWrite(IToken token, FileSystemException error) {
 					if (error != null) {
@@ -122,15 +118,8 @@ public class TcfOutputStream extends OutputStream {
 					}
 					position += offset;
 					offset = 0;
-					rendezvous.arrive();
 				}
 			});
-			// Waiting for writing.
-			try {
-				rendezvous.waiting(timeout);
-			} catch (InterruptedException e) {
-				ERROR = new IOException(Messages.TcfOutputStream_WriteTimeout);
-			}
 		}
 	}
 

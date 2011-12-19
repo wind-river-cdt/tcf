@@ -36,7 +36,9 @@ import org.eclipse.tcf.services.IFileSystem.DoneRemove;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.services.IFileSystem.IFileHandle;
 import org.eclipse.tcf.te.tcf.core.Tcf;
+import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel;
+import org.eclipse.tcf.te.tcf.core.utils.BlockingCallProxy;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.internal.ImageConsts;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFChannelException;
@@ -45,7 +47,6 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemExcept
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.CacheManager;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.PersistenceManager;
-import org.eclipse.tcf.te.tcf.filesystem.internal.utils.Rendezvous;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.ui.IEditorInput;
@@ -180,10 +181,11 @@ public class FSOperation {
 	 * @return The channel or null if the operation fails.
 	 */
 	public static IChannel openChannel(final IPeer peer) throws TCFChannelException {
-		final Rendezvous rendezvous = new Rendezvous();
+		IChannelManager channelManager = Tcf.getChannelManager();
+		channelManager = BlockingCallProxy.newInstance(IChannelManager.class, channelManager);
 		final TCFChannelException[] errors = new TCFChannelException[1];
 		final IChannel[] channels = new IChannel[1];
-		Tcf.getChannelManager().openChannel(peer, false, new DoneOpenChannel() {
+		channelManager.openChannel(peer, false, new DoneOpenChannel() {
 			@Override
 			public void doneOpenChannel(Throwable error, IChannel channel) {
 				if (error != null) {
@@ -199,16 +201,8 @@ public class FSOperation {
 				else {
 					channels[0] = channel;
 				}
-				rendezvous.arrive();
 			}
 		});
-		try {
-			rendezvous.waiting(5000L);
-		}
-		catch (InterruptedException e) {
-			String message = NLS.bind(Messages.OpeningChannelFailureMessage, peer.getID(), e.getLocalizedMessage());
-			errors[0] = new TCFChannelException(message, e);
-		}
 		if (errors[0] != null) {
 			throw errors[0];
 		}
@@ -216,22 +210,30 @@ public class FSOperation {
 	}
 
 	/**
-	 * Get the file system service from the channel.
+	 * Get a blocking file system service from the channel. The 
+	 * returned file system service is a service that delegates the 
+	 * method call to the file system proxy. If the method returns
+	 * asynchronously with a callback, it will block the call until
+	 * the callback returns.
+	 * <p>
+	 * <em>Note: All the method of the returned file system 
+	 * service must be called outside of the dispatching thread.</em>
 	 * 
-	 * @param channel The tcf channel.
-	 * @return The file system service.
+	 * @param channel The channel to get the file system service.
+	 * @return The blocking file system service.
 	 */
-	public static IFileSystem getFileSystem(final IChannel channel) {
+	public static IFileSystem getBlockingFileSystem(final IChannel channel) {
 		if(Protocol.isDispatchThread()) {
-			return channel.getRemoteService(IFileSystem.class);
+			IFileSystem service = channel.getRemoteService(IFileSystem.class);
+			return BlockingCallProxy.newInstance(IFileSystem.class, service);
 		}
-		final IFileSystem[] result = new IFileSystem[1];
+		final IFileSystem[] service = new IFileSystem[1];
 		Protocol.invokeAndWait(new Runnable(){
 			@Override
             public void run() {
-				result[0] = getFileSystem(channel);
+				service[0] = getBlockingFileSystem(channel);
             }});
-		return result[0];
+		return service[0];
 	}
 
 	/**
@@ -285,7 +287,7 @@ public class FSOperation {
 		IChannel channel = null;
 		try {
 			channel = openChannel(node.peerNode.getPeer());
-			IFileSystem service = getFileSystem(channel);
+			IFileSystem service = getBlockingFileSystem(channel);
 			if (service != null) {
 				return getChildren(node, service);
 			}
@@ -348,7 +350,6 @@ public class FSOperation {
 	protected List<FSTreeNode> queryChildren(final FSTreeNode node, final IFileSystem service) throws TCFFileSystemException {
 		final TCFFileSystemException[] errors = new TCFFileSystemException[1];
 		final IFileHandle[] handles = new IFileHandle[1];
-		final Rendezvous rendezvous = new Rendezvous();
 		try {
 			String dir = node.getLocation(true);
 			service.opendir(dir, new DoneOpen() {
@@ -361,16 +362,8 @@ public class FSOperation {
 					else {
 						handles[0] = handle;
 					}
-					rendezvous.arrive();
 				}
 			});
-			try {
-				rendezvous.waiting(50000L);
-			}
-			catch (InterruptedException e) {
-				String message = NLS.bind(Messages.FSOperation_CannotOpenDir, node.name, Messages.FSOperation_TimedOutWhenOpening);
-				errors[0] = new TCFFileSystemException(message);
-			}
 			if (errors[0] != null) {
 				throw errors[0];
 			}
@@ -378,7 +371,6 @@ public class FSOperation {
 			final List<FSTreeNode> children = new ArrayList<FSTreeNode>();
 			final boolean[] eofs = new boolean[1];
 			while (!eofs[0]) {
-				rendezvous.reset();
 				service.readdir(handles[0], new DoneReadDir() {
 					@Override
 					public void doneReadDir(IToken token, FileSystemException error, DirEntry[] entries, boolean eof) {
@@ -399,34 +391,19 @@ public class FSOperation {
 							String message = NLS.bind(Messages.FSOperation_CannotReadDir, node.name, error);
 							errors[0] = new TCFFileSystemException(message, error);
 						}
-						rendezvous.arrive();
 					}
 				});
-				try {
-					rendezvous.waiting(5000L);
-				}
-				catch (InterruptedException e) {
-					String message = NLS.bind(Messages.FSOperation_CannotReadDir, node.name, Messages.FSOperation_TimedOutWhenOpening);
-					errors[0] = new TCFFileSystemException(message);
-				}
 				if (errors[0] != null) throw errors[0];
 			}
 			return children;
 		}
 		finally {
 			if (handles[0] != null) {
-				rendezvous.reset();
 				service.close(handles[0], new IFileSystem.DoneClose() {
 					@Override
 					public void doneClose(IToken token, FileSystemException error) {
-						rendezvous.arrive();
 					}
 				});
-				try {
-					rendezvous.waiting(5000L);
-				}
-				catch (InterruptedException e) {
-				}
 			}
 		}
 	}
@@ -517,7 +494,6 @@ public class FSOperation {
 	 */
 	protected void mkdir(IFileSystem service, final FSTreeNode node) throws TCFFileSystemException {
 		final TCFFileSystemException[] errors = new TCFFileSystemException[1];
-		final Rendezvous rendezvous = new Rendezvous();
 		String path = node.getLocation(true);
 		service.mkdir(path, node.attr, new DoneMkDir() {
 			@Override
@@ -527,16 +503,8 @@ public class FSOperation {
 					                .bind(Messages.FSOperation_CannotCreateDirectory, new Object[] { node.name, error });
 					errors[0] = new TCFFileSystemException(message, error);
 				}
-				rendezvous.arrive();
 			}
 		});
-		try {
-			rendezvous.waiting(5000L);
-		}
-		catch (InterruptedException e) {
-			String message = NLS.bind(Messages.FSOperation_CannotCreateDirectory, node.name, Messages.FSOperation_TimedOutWhenOpening);
-			errors[0] = new TCFFileSystemException(message);
-		}
 		if (errors[0] != null) {
 			throw errors[0];
 		}
@@ -659,7 +627,6 @@ public class FSOperation {
 		// Do the actual deleting.
 		String path = node.getLocation(true);
 		final TCFFileSystemException[] errors = new TCFFileSystemException[1];
-		final Rendezvous rendezvous = new Rendezvous();
 		service.remove(path, new DoneRemove() {
 			@Override
 			public void doneRemove(IToken token, FileSystemException error) {
@@ -670,16 +637,8 @@ public class FSOperation {
 					String message = NLS.bind(Messages.FSDelete_CannotRemoveFile, node.name, error);
 					errors[0] = new TCFFileSystemException(message, error);
 				}
-				rendezvous.arrive();
 			}
 		});
-		try {
-			rendezvous.waiting(5000L);
-		}
-		catch (InterruptedException e) {
-			String message = NLS.bind(Messages.FSDelete_CannotRemoveFile, node.name, Messages.FSOperation_TimedOutWhenOpening);
-			errors[0] = new TCFFileSystemException(message);
-		}
 		if (errors[0] != null) {
 			throw errors[0];
 		}
@@ -696,7 +655,6 @@ public class FSOperation {
 		// Do the actual deleting.
 		String path = node.getLocation(true);
 		final TCFFileSystemException[] errors = new TCFFileSystemException[1];
-		final Rendezvous rendezvous = new Rendezvous();
 		service.rmdir(path, new DoneRemove() {
 			@Override
 			public void doneRemove(IToken token, FileSystemException error) {
@@ -707,16 +665,8 @@ public class FSOperation {
 					String message = NLS.bind(Messages.FSDelete_CannotRemoveFile, node.name, error);
 					errors[0] = new TCFFileSystemException(message, error);
 				}
-				rendezvous.arrive();
 			}
 		});
-		try {
-			rendezvous.waiting(5000L);
-		}
-		catch (InterruptedException e) {
-			String message = NLS.bind(Messages.FSDelete_CannotRemoveFile, node.name, Messages.FSOperation_TimedOutWhenOpening);
-			errors[0] = new TCFFileSystemException(message);
-		}
 		if (errors[0] != null) {
 			throw errors[0];
 		}

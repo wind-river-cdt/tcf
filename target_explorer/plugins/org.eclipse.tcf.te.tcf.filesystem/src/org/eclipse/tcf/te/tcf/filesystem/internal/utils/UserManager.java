@@ -63,10 +63,9 @@ public class UserManager {
 	 * @return The user account information or null if it fails.
 	 */
 	private UserAccount getUserByChannel(final IChannel channel) throws TCFFileSystemException {
-		IFileSystem service = FSOperation.getFileSystem(channel);
+		IFileSystem service = FSOperation.getBlockingFileSystem(channel);
 		if (service != null) {
 			final TCFFileSystemException[] errors = new TCFFileSystemException[1];
-			final Rendezvous rendezvous = new Rendezvous();
 			final UserAccount[] accounts = new UserAccount[1];
 			service.user(new DoneUser() {
 				@Override
@@ -77,15 +76,8 @@ public class UserManager {
 						String message = NLS.bind(Messages.UserManager_CannotGetUserAccountMessage, channel.getRemotePeer().getID());
 						errors[0] = new TCFFileSystemException(message, error);
 					}
-					rendezvous.arrive();
 				}
 			});
-			try {
-				rendezvous.waiting(5000L);
-			} catch (InterruptedException e) {
-				String message = NLS.bind(Messages.UserManager_CannotGetUserAccountMessage2, channel.getRemotePeer().getID());
-				errors[0] = new TCFFileSystemException(message, e);
-			}
 			if (errors[0] != null) {
 				throw errors[0];
 			}

@@ -7,7 +7,7 @@
  * Contributors:
  * William Chen (Wind River)- [345387]Open the remote files with a proper editor
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.filesystem.internal.utils;
+package org.eclipse.tcf.te.tcf.core.utils;
 
 /**
  * A helper class used to synchronize producer and consumer threads. It is used

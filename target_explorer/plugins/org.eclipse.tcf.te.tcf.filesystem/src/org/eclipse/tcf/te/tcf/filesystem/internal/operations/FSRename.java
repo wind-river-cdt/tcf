@@ -26,7 +26,6 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemExcept
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.CacheManager;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.PersistenceManager;
-import org.eclipse.tcf.te.tcf.filesystem.internal.utils.Rendezvous;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.ui.PlatformUI;
@@ -62,7 +61,7 @@ public class FSRename extends FSOperation {
 		try {
 			channel = openChannel(node.peerNode.getPeer());
 			if (channel != null) {
-				IFileSystem service = getFileSystem(channel);
+				IFileSystem service = getBlockingFileSystem(channel);
 				if (service != null) {
 					renameNode(service);
 				}
@@ -97,7 +96,6 @@ public class FSRename extends FSOperation {
 		String dst_path = node.getLocation(true);
 		node.name = oldName;
 		final TCFFileSystemException[] errors = new TCFFileSystemException[1];
-		final Rendezvous rendezvous = new Rendezvous();
 		service.rename(src_path, dst_path, new DoneRename() {
 			@Override
 			public void doneRename(IToken token, FileSystemException error) {
@@ -123,16 +121,8 @@ public class FSRename extends FSOperation {
 					node.name = newName;
 					FSModel.getInstance().addNode(node);
 				}
-				rendezvous.arrive();
 			}
 		});
-		try {
-			rendezvous.waiting(5000L);
-		}
-		catch (InterruptedException e) {
-			String message = NLS.bind(Messages.FSRename_CannotRename, node.name, Messages.FSOperation_TimedOutWhenOpening);
-			errors[0] = new TCFFileSystemException(message);
-		}
 		if (errors[0] != null) {
 			throw errors[0];
 		}

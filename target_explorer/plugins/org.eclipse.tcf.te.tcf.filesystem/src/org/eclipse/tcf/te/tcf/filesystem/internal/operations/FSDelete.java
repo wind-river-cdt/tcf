@@ -34,7 +34,6 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.ImageConsts;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
-import org.eclipse.tcf.te.tcf.filesystem.internal.utils.Rendezvous;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.StateManager;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
@@ -70,7 +69,7 @@ public class FSDelete extends FSOperation {
 				try {
 					channel = openChannel(head.peerNode.getPeer());
 					if (channel != null) {
-						IFileSystem service = getFileSystem(channel);
+						IFileSystem service = getBlockingFileSystem(channel);
 						if (service != null) {
 							monitor.beginTask(Messages.FSDelete_PrepareToDelete, IProgressMonitor.UNKNOWN);
 							monitor.worked(1);
@@ -166,7 +165,6 @@ public class FSDelete extends FSOperation {
 	 */
 	private void removeFolder(IFileSystem service, final FSTreeNode node) throws TCFFileSystemException {
 		final TCFFileSystemException[] errors = new TCFFileSystemException[1];
-		final Rendezvous rendezvous = new Rendezvous();
 		String path = node.getLocation(true);
 		service.rmdir(path, new DoneRemove() {
 			@Override
@@ -178,16 +176,8 @@ public class FSDelete extends FSOperation {
 					String message = NLS.bind(Messages.FSDelete_CannotRemoveFolder, node.name, error);
 					errors[0] = new TCFFileSystemException(message, error);
 				}
-				rendezvous.arrive();
 			}
 		});
-		try {
-			rendezvous.waiting(5000L);
-		}
-		catch (InterruptedException e) {
-			String message = NLS.bind(Messages.FSDelete_CannotRemoveFolder, node.name, Messages.FSOperation_TimedOutWhenOpening);
-			errors[0] = new TCFFileSystemException(message);
-		}
 		if (errors[0] != null) {
 			throw errors[0];
 		}
