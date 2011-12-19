@@ -42,7 +42,7 @@ public class Factory {
 			IConsoleManager manager = ConsolePlugin.getDefault().getConsoleManager();
 			// Add the console to the manager if not yet done
 			if (!isConsoleAlreadyAdded(console)) manager.addConsoles(new IConsole[] {console});
-			// Show the console view with the TCF communication monitor console
+			// Show the console view with the monitor console
 			manager.showConsoleView(console);
 		}
 
@@ -86,6 +86,11 @@ public class Factory {
 			console = new Console(peer);
 			// And store the new console in the map
 			CONSOLES.put(peer, console);
+		}
+
+		// Add the console to the manager if not yet done
+		if (console != null && !isConsoleAlreadyAdded(console)) {
+			ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] {console});
 		}
 
 		return console;

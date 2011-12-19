@@ -16,11 +16,11 @@
 
 <!-- Service contributions -->
    <extension point="org.eclipse.tcf.te.runtime.services.services">
-      <genericServices>
-         <service class="org.eclipse.tcf.te.runtime.persistence.services.PersistenceService">
-            <serviceType class="org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistenceService"/>
-         </service>
-      </genericServices>
+      <service
+            class="org.eclipse.tcf.te.runtime.persistence.services.PersistenceService"
+            id="org.eclipse.tcf.te.runtime.services.persistence">
+         <serviceType class="org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistenceService"/>
+      </service>
    </extension>
 
 </plugin>

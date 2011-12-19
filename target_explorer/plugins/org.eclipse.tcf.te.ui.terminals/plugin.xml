@@ -63,11 +63,11 @@
 
 <!-- Service contributions -->
    <extension point="org.eclipse.tcf.te.runtime.services.services">
-      <genericServices>
-         <service class="org.eclipse.tcf.te.ui.terminals.services.TerminalService">
-            <serviceType class="org.eclipse.tcf.te.runtime.services.interfaces.ITerminalService"/>
-         </service>
-      </genericServices>
+      <service
+            class="org.eclipse.tcf.te.ui.terminals.services.TerminalService"
+            id="org.eclipse.tcf.te.runtime.services.terminal">
+         <serviceType class="org.eclipse.tcf.te.runtime.services.interfaces.ITerminalService"/>
+      </service>
    </extension>
    
 <!-- Terminal connector type contributions -->

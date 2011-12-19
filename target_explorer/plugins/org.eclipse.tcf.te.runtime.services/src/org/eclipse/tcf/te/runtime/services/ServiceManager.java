@@ -16,9 +16,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.tcf.te.runtime.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.runtime.services.interfaces.IService;
 import org.eclipse.tcf.te.runtime.services.nls.Messages;
-import org.eclipse.tcf.te.runtime.activator.CoreBundleActivator;
 import org.osgi.framework.Bundle;
 
 /**
@@ -61,7 +61,7 @@ public class ServiceManager extends AbstractServiceManager<IService> {
 	 * @return The service or <code>null</code>.
 	 */
 	public <V extends IService> V getService(Class<V> serviceType, boolean unique) {
-		return (V)super.getService("", serviceType, unique); //$NON-NLS-1$
+		return (V)super.getService(null, serviceType, unique);
 	}
 
 	/**
@@ -78,7 +78,7 @@ public class ServiceManager extends AbstractServiceManager<IService> {
 	 * @return The service or <code>null</code>.
 	 */
 	public <V extends IService> V getService(Class<V> serviceType) {
-		return (V)super.getService("", serviceType); //$NON-NLS-1$
+		return (V)super.getService(null, serviceType);
 	}
 
 	/* (non-Javadoc)
@@ -95,33 +95,9 @@ public class ServiceManager extends AbstractServiceManager<IService> {
 					IConfigurationElement[] configElements = extension.getConfigurationElements();
 					if (configElements != null) {
 						for (IConfigurationElement configElement : configElements) {
-							// Determine the unique id to bind the service contributions to.
-							String id = null;
-
-							if ("connectionTypeServices".equals(configElement.getName())) { //$NON-NLS-1$
-								id = configElement.getAttribute("connectionTypeId"); //$NON-NLS-1$
-
-								// For a connection type service declaration, the connection type id is mandatory
-								if (id == null || "".equals(id)) { //$NON-NLS-1$
-									IStatus status = new Status(IStatus.WARNING, CoreBundleActivator.getUniqueIdentifier(),
-																NLS.bind(Messages.ServiceManager_warning_skippedConnectionTypeService, configElement.getDeclaringExtension().getNamespaceIdentifier()));
-									Platform.getLog(CoreBundleActivator.getContext().getBundle()).log(status);
-									continue;
-								}
-							}
-							else if ("genericServices".equals(configElement.getName())) { //$NON-NLS-1$
-								id = configElement.getAttribute("id"); //$NON-NLS-1$
-							}
-
-							// Normalize the id
-							if (id == null) id = ""; //$NON-NLS-1$
-
-							// Get the service contributions
-							IConfigurationElement[] services = configElement.getChildren("service"); //$NON-NLS-1$
-							// Process the service contributions
-							for (IConfigurationElement service : services) {
-								ServiceProxy proxy = getServiceProxy(service);
-								IConfigurationElement[] serviceTypes = service.getChildren("serviceType"); //$NON-NLS-1$
+							if ("service".equals(configElement.getName())) { //$NON-NLS-1$
+								ServiceProxy proxy = getServiceProxy(configElement);
+								IConfigurationElement[] serviceTypes = configElement.getChildren("serviceType"); //$NON-NLS-1$
 								if (serviceTypes != null && serviceTypes.length > 0) {
 									for (IConfigurationElement serviceType : serviceTypes) {
 										try {
@@ -142,16 +118,12 @@ public class ServiceManager extends AbstractServiceManager<IService> {
 										}
 										catch (Exception e) {
 											IStatus status = new Status(IStatus.WARNING, CoreBundleActivator.getUniqueIdentifier(),
-																		NLS.bind(Messages.ServiceManager_warning_failedToLoadServiceType, serviceType.getAttribute("class"), service.getAttribute("class")), e); //$NON-NLS-1$ //$NON-NLS-2$
+																		NLS.bind(Messages.ServiceManager_warning_failedToLoadServiceType, serviceType.getAttribute("class"), configElement.getAttribute("class")), e); //$NON-NLS-1$ //$NON-NLS-2$
 											Platform.getLog(CoreBundleActivator.getContext().getBundle()).log(status);
 										}
 									}
 								}
-								if (!addService(id, proxy)) {
-									IStatus status = new Status(IStatus.WARNING, CoreBundleActivator.getUniqueIdentifier(),
-																NLS.bind(Messages.ServiceManager_warning_failedToBindService, proxy.clazz, id), null);
-									Platform.getLog(CoreBundleActivator.getContext().getBundle()).log(status);
-								}
+								addService(proxy);
 							}
 						}
 					}

@@ -31,5 +31,4 @@ public class Messages extends NLS {
 
 	public static String ServiceManager_warning_skippedConnectionTypeService;
 	public static String ServiceManager_warning_failedToLoadServiceType;
-	public static String ServiceManager_warning_failedToBindService;
 }

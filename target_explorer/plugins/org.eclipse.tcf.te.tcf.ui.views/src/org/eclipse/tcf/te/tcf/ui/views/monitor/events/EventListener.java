@@ -11,6 +11,7 @@ package org.eclipse.tcf.te.tcf.ui.views.monitor.events;
 
 import java.util.EventObject;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.te.tcf.log.core.events.MonitorEvent;
 import org.eclipse.tcf.te.tcf.ui.views.monitor.console.Console;
@@ -40,17 +41,19 @@ public class EventListener extends AbstractEventListener {
 				case CLOSE:
 					// Channel close messages are logged only if there is an error
 					if (message != null && message.text != null && !message.text.contains("(error=null)")) { //$NON-NLS-1$
-						Console console = Factory.showConsole((IPeer)monitorEvent.getSource(), true);
-						if (console != null) {
-							// Message type 'R' is an unknown type and will lead to print the
-							// message text using the error color.
-							console.appendMessage('R', message.text);
-						}
+						// Get the console
+						Console console = Factory.getConsole((IPeer)monitorEvent.getSource(), true);
+						Assert.isNotNull(console);
+						// Message type 'R' is an unknown type and will lead to print the
+						// message text using the error color.
+						console.appendMessage('R', message.text);
 					}
 					break;
 				case ACTIVITY:
-					Console console = Factory.showConsole((IPeer)monitorEvent.getSource(), true);
-					if (console != null && message != null) {
+					if (message != null) {
+						// Get the console
+						Console console = Factory.getConsole((IPeer)monitorEvent.getSource(), true);
+						Assert.isNotNull(console);
 						console.appendMessage(message.type, message.text);
 					}
 					break;

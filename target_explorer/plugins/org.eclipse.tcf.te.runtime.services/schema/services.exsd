@@ -7,8 +7,12 @@
       </appinfo>
       <documentation>
          This extension point is used to contribute services.
+&lt;p&gt;
+If a enablement expression is specified, the service context is passed in as default variable for evaluation. The service context is not expected to be iteratable or countable. Service contributions without a enablement expression are always enabled and are considered for any service context, including &quot;null&quot;.
       </documentation>
    </annotation>
+
+   <include schemaLocation="schema://org.eclipse.core.expressions/schema/expressionLanguage.exsd"/>
 
    <element name="extension">
       <annotation>
@@ -18,8 +22,7 @@
       </annotation>
       <complexType>
          <sequence>
-            <element ref="connectionTypeServices" minOccurs="0" maxOccurs="unbounded"/>
-            <element ref="genericServices" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="service" minOccurs="1" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -48,39 +51,6 @@
       </complexType>
    </element>
 
-   <element name="connectionTypeServices">
-      <complexType>
-         <sequence>
-            <element ref="service" minOccurs="1" maxOccurs="unbounded"/>
-         </sequence>
-         <attribute name="connectionTypeId" type="string" use="required">
-            <annotation>
-               <documentation>
-                  The unique id of the connection type contribution.
-               </documentation>
-               <appinfo>
-                  <meta.attribute kind="identifier" basedOn="org.eclipse.tcf.te.core.connectionTypes/connectionType/@id"/>
-               </appinfo>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
-
-   <element name="genericServices">
-      <complexType>
-         <sequence>
-            <element ref="service" minOccurs="1" maxOccurs="unbounded"/>
-         </sequence>
-         <attribute name="id" type="string">
-            <annotation>
-               <documentation>
-                  An optional unique id to bind the service to. If no id is specified, the service contribution is added to the list of global unbound services.
-               </documentation>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
-
    <element name="service">
       <annotation>
          <documentation>
@@ -90,6 +60,7 @@
       <complexType>
          <sequence>
             <element ref="class" minOccurs="0" maxOccurs="1"/>
+            <element ref="enablement" minOccurs="0" maxOccurs="1"/>
             <element ref="serviceType" minOccurs="0" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="class" type="string">
@@ -102,6 +73,13 @@ The service implementation class must be specified either by the class attribute
                <appinfo>
                   <meta.attribute kind="java" basedOn="org.eclipse.tcf.te.runtime.services.AbstractService:org.eclipse.tcf.te.runtime.interfaces.services.IService"/>
                </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The unique id of the service contribution.
+               </documentation>
             </annotation>
          </attribute>
          <attribute name="plugin" type="string">

@@ -15,7 +15,7 @@ package org.eclipse.tcf.te.runtime.services.interfaces;
 public interface IService {
 
 	/**
-	 * Sets the id this service is registered to.
+	 * Sets the service contribution id.
 	 * <p>
 	 * <b>Note:</b> Once set to a non-null value, the service id cannot be changed anymore.
 	 *
@@ -24,7 +24,7 @@ public interface IService {
 	public void setId(String id);
 
 	/**
-	 * Returns the id this service is registered to.
+	 * Returns the service contribution id.
 	 *
 	 * @return The id or <code>null</code> if the service id is not yet set.
 	 */
