@@ -71,6 +71,8 @@
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.ui.views</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.core</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.core.scripting</module>
+	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.debug.core</module>
+	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.debug.ui</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.filesystem</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.locator</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.log.core</module>

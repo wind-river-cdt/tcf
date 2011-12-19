@@ -37,6 +37,20 @@
          unpack="false"/>
 
    <plugin
+         id="org.eclipse.tcf.te.tcf.debug.core.source"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.tcf.te.tcf.debug.ui.source"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
          id="org.eclipse.tcf.te.tcf.filesystem.source"
          download-size="0"
          install-size="0"
