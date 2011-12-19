@@ -25,7 +25,7 @@ import org.osgi.framework.Bundle;
  * Common service manager implementation, handling the extension point
  * <code>org.eclipse.tcf.te.runtime.services</code>.
  */
-public class ServiceManager extends AbstractServiceManager<IService> {
+public class ServiceManager extends AbstractServiceManager {
 	/*
 	 * Thread save singleton instance creation.
 	 */
@@ -60,8 +60,8 @@ public class ServiceManager extends AbstractServiceManager<IService> {
 	 * @param serviceType The service type the service should at least implement or extend.
 	 * @return The service or <code>null</code>.
 	 */
-	public <V extends IService> V getService(Class<V> serviceType, boolean unique) {
-		return (V)super.getService(null, serviceType, unique);
+	public <V extends IService> V getService(Class<? extends V> serviceType, boolean unique) {
+		return super.getService(null, serviceType, unique);
 	}
 
 	/**
@@ -77,8 +77,8 @@ public class ServiceManager extends AbstractServiceManager<IService> {
 	 * @param serviceType The service type the service should at least implement or extend.
 	 * @return The service or <code>null</code>.
 	 */
-	public <V extends IService> V getService(Class<V> serviceType) {
-		return (V)super.getService(null, serviceType);
+	public <V extends IService> V getService(Class<? extends V> serviceType) {
+		return super.getService(null, serviceType);
 	}
 
 	/* (non-Javadoc)

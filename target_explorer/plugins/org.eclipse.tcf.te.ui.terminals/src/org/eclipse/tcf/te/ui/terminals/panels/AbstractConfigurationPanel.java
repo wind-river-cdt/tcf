@@ -9,13 +9,13 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.terminals.panels;
 
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Map;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.tcf.protocol.IPeer;
-import org.eclipse.tcf.protocol.Protocol;
-import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.runtime.services.ServiceManager;
+import org.eclipse.tcf.te.runtime.services.interfaces.IPropertiesAccessService;
+import org.eclipse.tcf.te.runtime.services.interfaces.constants.IPropertiesAccessServiceConstants;
 import org.eclipse.tcf.te.ui.controls.BaseDialogPageControl;
 import org.eclipse.tcf.te.ui.controls.panels.AbstractWizardConfigurationPanel;
 import org.eclipse.tcf.te.ui.terminals.interfaces.IConfigurationPanel;
@@ -56,30 +56,22 @@ public abstract class AbstractConfigurationPanel extends AbstractWizardConfigura
 	/**
      * Returns the host name or IP from the current selection.
      *
-     * @return The host name or IP.
+     * @return The host name or IP, or <code>null</code>.
      */
     public String getSelectionHost() {
     	ISelection selection = getSelection();
-    	final AtomicReference<String> result = new AtomicReference<String>();
     	if (selection instanceof IStructuredSelection && !selection.isEmpty()) {
     		Object element = ((IStructuredSelection) selection).getFirstElement();
-    		if (element instanceof IPeerModel) {
-    			final IPeerModel peerModel = (IPeerModel) element;
-    			if (Protocol.isDispatchThread()) {
-    				result.set(peerModel.getPeer().getAttributes().get(IPeer.ATTR_IP_HOST));
-    			}
-    			else {
-    				Protocol.invokeAndWait(new Runnable() {
-    					@Override
-    					public void run() {
-    						result.set(peerModel.getPeer().getAttributes().get(IPeer.ATTR_IP_HOST));
-    					}
-    				});
+    		IPropertiesAccessService service = ServiceManager.getInstance().getService(element, IPropertiesAccessService.class);
+    		if (service != null) {
+    			Map<String, String> props = service.getTargetAddress(element);
+    			if (props != null && props.containsKey(IPropertiesAccessServiceConstants.PROP_ADDRESS)) {
+    				return props.get(IPropertiesAccessServiceConstants.PROP_ADDRESS);
     			}
     		}
     	}
-    
-    	return result.get();
+
+    	return null;
     }
 
 }

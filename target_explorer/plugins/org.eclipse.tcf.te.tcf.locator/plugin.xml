@@ -41,4 +41,19 @@
          <adapter type="org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistable"/>
       </factory>
    </extension>
+   
+<!-- Service contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.services.services">
+      <service
+            class="org.eclipse.tcf.te.tcf.locator.internal.services.PropertiesAccessService"
+            id="org.eclipse.tcf.te.runtime.services.tcf.propertiesAccess">
+         <serviceType
+               bundleId="org.eclipse.tcf.te.runtime.services"
+               class="org.eclipse.tcf.te.runtime.services.interfaces.IPropertiesAccessService"/>
+         <enablement>
+            <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+         </enablement>
+      </service>
+   </extension>
+
 </plugin>
