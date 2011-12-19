@@ -38,6 +38,21 @@ public class ScriptEvent extends EventObject {
         	this.type = type;
         	this.text = text;
         }
+
+        /* (non-Javadoc)
+         * @see java.lang.Object#toString()
+         */
+        @Override
+        public String toString() {
+        	StringBuilder buffer = new StringBuilder(getClass().getName());
+        	buffer.append(": type = '"); //$NON-NLS-1$
+        	buffer.append(type);
+        	buffer.append("', text = '"); //$NON-NLS-1$
+        	buffer.append(text);
+        	buffer.append("'"); //$NON-NLS-1$
+
+            return buffer.toString();
+        }
 	}
 
 
