@@ -20,7 +20,7 @@
             icon="icons/obj16/rootNode_obj.gif"
             id="org.eclipse.tcf.te.tcf.ui.navigator.content"
             labelProvider="org.eclipse.tcf.te.tcf.ui.navigator.LabelProvider"
-            name="Dynamic Target Discovery (TCF)"
+            name="Dynamic Target Discovery"
             priority="normal">
             <enablement>
                <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
