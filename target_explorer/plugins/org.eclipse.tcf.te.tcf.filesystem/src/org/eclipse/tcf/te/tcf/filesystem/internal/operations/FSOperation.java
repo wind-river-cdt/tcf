@@ -290,7 +290,7 @@ public class FSOperation {
 			if (service != null) {
 				return getChildren(node, service);
 			}
-			String message = NLS.bind(Messages.FSOperation_NoFileSystemError, node.peerNode.getPeer().getID());
+			String message = NLS.bind(Messages.FSOperation_NoFileSystemError, node.peerNode.getPeerId());
 			throw new TCFFileSystemException(message);
 		}
 		finally {

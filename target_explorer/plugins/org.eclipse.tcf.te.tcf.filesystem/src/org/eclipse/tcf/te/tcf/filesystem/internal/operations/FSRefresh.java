@@ -59,7 +59,7 @@ public class FSRefresh extends FSOperation {
 						refresh(node, service);
 					}
 					else {
-						String message = NLS.bind(Messages.FSOperation_NoFileSystemError, node.peerNode.getPeer().getID());
+						String message = NLS.bind(Messages.FSOperation_NoFileSystemError, node.peerNode.getPeerId());
 						throw new TCFFileSystemException(message);
 					}
 				}

@@ -351,7 +351,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 	 */
 	public URL getLocationURL() {
 		try {
-			String id = peerNode.getPeer().getID();
+			String id = peerNode.getPeerId();
 			String path = getLocation(true);
 			String location = TcfURLConnection.PROTOCOL_SCHEMA + ":/" + id + (path.startsWith("/") ? path : "/" + path); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			return new URL(location);

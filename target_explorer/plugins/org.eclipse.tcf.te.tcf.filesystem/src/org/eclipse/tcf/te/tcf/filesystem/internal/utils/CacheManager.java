@@ -89,7 +89,7 @@ public class CacheManager {
 	 */
 	public IPath getCachePath(FSTreeNode node) {
         File location = getCacheRoot();
-		String agentId = node.peerNode.getPeer().getID();
+		String agentId = node.peerNode.getPeerId();
 		// Use Math.abs to avoid negative hash value.
 		String agent = agentId.replace(':', PATH_ESCAPE_CHAR);
 		IPath agentDir = new Path(location.getAbsolutePath()).append(agent);
@@ -225,7 +225,7 @@ public class CacheManager {
 									PersistenceManager.getInstance().setBaseTimestamp(node.getLocationURL(), node.attr.mtime);
 									file.setLastModified(node.attr.mtime);
 									if (!node.isWritable()) file.setReadOnly();
-									FSModel.getFSModel(node.peerNode).fireNodeStateChanged(node);		
+									FSModel.getFSModel(node.peerNode).fireNodeStateChanged(node);
 								}
 							}
 						});
@@ -399,7 +399,7 @@ public class CacheManager {
 								File file = getCacheFile(node);
 								file.setLastModified(node.attr.mtime);
 							}
-							FSModel.getFSModel(node.peerNode).fireNodeStateChanged(node);		
+							FSModel.getFSModel(node.peerNode).fireNodeStateChanged(node);
 						}
 					});
 				}

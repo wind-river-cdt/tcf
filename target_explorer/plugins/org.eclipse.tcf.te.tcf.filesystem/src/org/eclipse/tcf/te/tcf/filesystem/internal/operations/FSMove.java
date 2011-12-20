@@ -87,7 +87,7 @@ public class FSMove extends FSOperation {
 							}
 						}
 						else {
-							String message = NLS.bind(Messages.FSOperation_NoFileSystemError, head.peerNode.getPeer().getID());
+							String message = NLS.bind(Messages.FSOperation_NoFileSystemError, head.peerNode.getPeerId());
 							throw new TCFFileSystemException(message);
 						}
 					}

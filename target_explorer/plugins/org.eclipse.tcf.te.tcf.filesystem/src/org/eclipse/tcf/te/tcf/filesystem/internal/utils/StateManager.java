@@ -87,7 +87,7 @@ public class StateManager {
 						throw errors[0];
 					}
 				}else{
-					String message = NLS.bind(Messages.StateManager_TCFNotProvideFSMessage, node.peerNode.getPeer().getID());
+					String message = NLS.bind(Messages.StateManager_TCFNotProvideFSMessage, node.peerNode.getPeerId());
 					throw new TCFFileSystemException(message);
 				}
 			}
@@ -127,7 +127,7 @@ public class StateManager {
 						throw errors[0];
 					}
 				} else {
-					String message = NLS.bind(Messages.StateManager_TCFNotProvideFSMessage2, node.peerNode.getPeer().getID());
+					String message = NLS.bind(Messages.StateManager_TCFNotProvideFSMessage2, node.peerNode.getPeerId());
 					throw new TCFFileSystemException(message);
 				}
 			}

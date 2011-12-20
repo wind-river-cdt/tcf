@@ -62,8 +62,8 @@ public class ClipboardPropertyTester extends PropertyTester {
 				}
 				if (hovered.isDirectory() && hovered.isWritable() && (moving || copying)) {
 					FSTreeNode head = nodes.get(0);
-					String hid = head.peerNode.getPeer().getID();
-					String tid = hovered.peerNode.getPeer().getID();
+					String hid = head.peerNode.getPeerId();
+					String tid = hovered.peerNode.getPeerId();
 					if (hid.equals(tid)) {
 						for (FSTreeNode node : nodes) {
 							if (moving && node.parent == hovered || node.isAncestorOf(hovered)) {

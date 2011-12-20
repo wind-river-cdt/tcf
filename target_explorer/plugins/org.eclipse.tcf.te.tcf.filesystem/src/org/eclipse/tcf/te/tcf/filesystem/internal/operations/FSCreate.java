@@ -40,7 +40,7 @@ public abstract class FSCreate extends FSOperation {
 
 	/**
 	 * Create an FSCreate instance with the specified folder and the name of the new node.
-	 * 
+	 *
 	 * @param folder The folder in which the new node is going to be created.
 	 * @param name The new node's name.
 	 */
@@ -70,8 +70,7 @@ public abstract class FSCreate extends FSOperation {
 				FSModel.getFSModel(folder.peerNode).fireNodeStateChanged(folder);
 			}
 			else {
-				String message = NLS.bind(Messages.FSOperation_NoFileSystemError, folder.peerNode
-				                .getPeer().getID());
+				String message = NLS.bind(Messages.FSOperation_NoFileSystemError, folder.peerNode.getPeerId());
 				throw new TCFFileSystemException(message);
 			}
 		}
@@ -87,7 +86,7 @@ public abstract class FSCreate extends FSOperation {
 
 	/**
 	 * Get the error message generated during creating.
-	 * 
+	 *
 	 * @return The error message.
 	 */
 	public String getError() {
@@ -96,7 +95,7 @@ public abstract class FSCreate extends FSOperation {
 
 	/**
 	 * Refresh new node's stat using the file system service.
-	 * 
+	 *
 	 * @param service The file system service.
 	 * @throws TCFFileSystemException Thrown when refreshing the new node's stat.
 	 */
@@ -125,7 +124,7 @@ public abstract class FSCreate extends FSOperation {
 
 	/**
 	 * Add the new node to the folder and its FSModel.
-	 * 
+	 *
 	 * @param service The file system service to be used.
 	 * @throws TCFFileSystemException Thrown when adding.
 	 */
@@ -158,22 +157,22 @@ public abstract class FSCreate extends FSOperation {
 	/**
 	 * Get the new node's type, either "FSFileNode" or "FSDirNode". Note <b>it is not possible for a
 	 * new node with "FSRootDirNode".</b>
-	 * 
+	 *
 	 * @return The new node's type.
 	 */
 	protected abstract String getNodeType();
 
 	/**
 	 * Create the node in the target system.
-	 * 
+	 *
 	 * @param service The file system service used to create the new node.
 	 * @throws TCFFileSystemException Thrown when creating the node.
 	 */
 	protected abstract void create(IFileSystem service) throws TCFFileSystemException;
-	
+
 	/**
 	 * Get the node that is created by this operation.
-	 * 
+	 *
 	 * @return the node created.
 	 */
 	public FSTreeNode getNode() {
