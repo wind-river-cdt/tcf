@@ -78,7 +78,7 @@ public class FSRename extends FSOperation {
 		}
 		finally {
 			if (channel != null) Tcf.getChannelManager().closeChannel(channel);
-			FSModel.getInstance().fireNodeStateChanged(node);
+			FSModel.getFSModel(node.peerNode).fireNodeStateChanged(node);
 		}
 		return false;
 	}
@@ -119,7 +119,6 @@ public class FSRename extends FSOperation {
 						file.delete();
 					}
 					node.name = newName;
-					FSModel.getInstance().addNode(node);
 				}
 			}
 		});

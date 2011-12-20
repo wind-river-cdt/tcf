@@ -21,6 +21,7 @@ import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.DoneUser;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.te.tcf.core.Tcf;
+import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.internal.UserAccount;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
@@ -34,7 +35,7 @@ import org.eclipse.ui.PlatformUI;
  */
 public class UserManager {
 	// The key to save and retrieve the user account in a peer model.
-	private static final String USER_ACCOUNT_KEY = "user.account"; //$NON-NLS-1$
+	/* default */ static final String USER_ACCOUNT_KEY = UIPlugin.getUniqueIdentifier()+".user.account"; //$NON-NLS-1$
 
 	// The singleton fInstance.
 	private static UserManager instance;

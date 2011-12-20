@@ -27,19 +27,31 @@ public class TargetPropertyTester extends PropertyTester {
 		if(receiver instanceof IPeerModel) {
 			final IPeerModel peerModel = (IPeerModel) receiver;
 			if(property.equals("isWindows")) { //$NON-NLS-1$
-				final String[] osName = new String[1];
-				if(Protocol.isDispatchThread()) {
-					osName[0] = peerModel.getStringProperty("OSName"); //$NON-NLS-1$
-				} else {
-					Protocol.invokeAndWait(new Runnable(){
-						@Override
-                        public void run() {
-							osName[0] = peerModel.getStringProperty("OSName"); //$NON-NLS-1$
-                        }});
-				}
-				return osName[0] == null ? false : (osName[0].startsWith("Windows")); //$NON-NLS-1$
+				return isWindows(peerModel);
 			}
 		}
 		return false;
 	}
+	
+	/**
+	 * Test if the target represented by the peer model is a windows target.
+	 * 
+	 * @param peerModel The peer model of the target.
+	 * @return true if it is a windows target.
+	 */
+	public static boolean isWindows(final IPeerModel peerModel) {
+		final String[] osName = new String[1];
+		if (Protocol.isDispatchThread()) {
+			osName[0] = peerModel.getStringProperty("OSName"); //$NON-NLS-1$
+		}
+		else {
+			Protocol.invokeAndWait(new Runnable() {
+				@Override
+				public void run() {
+					osName[0] = peerModel.getStringProperty("OSName"); //$NON-NLS-1$
+				}
+			});
+		}
+		return osName[0] == null ? false : (osName[0].startsWith("Windows")); //$NON-NLS-1$
+	}	
 }

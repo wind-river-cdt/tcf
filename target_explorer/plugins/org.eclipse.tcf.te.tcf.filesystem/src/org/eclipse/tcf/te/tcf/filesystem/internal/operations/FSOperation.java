@@ -47,7 +47,6 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemExcept
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.CacheManager;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.PersistenceManager;
-import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -334,7 +333,6 @@ public class FSOperation {
 			childNode.parent = node;
 			childNode.peerNode = node.peerNode;
 			current.add(childNode);
-			FSModel.getInstance().addNode(childNode);
 		}
 		node.childrenQueried = true;
 	}
@@ -561,7 +559,6 @@ public class FSOperation {
 		if (Protocol.isDispatchThread()) {
 			getChildren(folder, service).add(child);
 			child.parent = folder;
-			FSModel.getInstance().addNode(child);
 		}
 		else {
 			final TCFFileSystemException[] errors = new TCFFileSystemException[1];

@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.adapters;
 
-import java.net.URL;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -58,10 +57,9 @@ public class NodeStateFilter implements IActionFilter {
 			if (!cb.isEmpty()) {
 				int operation = cb.getOperation();
 				if (operation == FSClipboard.CUT) {
-					URL nodeURL = node.getLocationURL();
-					List<URL> files = cb.getFiles();
-					for (URL file : files) {
-						if (nodeURL.equals(file)) return true;
+					List<FSTreeNode> files = cb.getFiles();
+					for (FSTreeNode file : files) {
+						if (node == file) return true;
 					}
 				}
 			}

@@ -53,7 +53,7 @@ public class PreferencesInitializer extends AbstractPreferenceInitializer {
             public void propertyChange(PropertyChangeEvent event) {
 				if (event.getProperty().equals(TargetExplorerPreferencePage.PREF_AUTOSAVING)) {
 					// Refresh the tree nodes' decorations.
-					FSModel.getInstance().fireNodeStateChanged(null);
+					FSModel.notifyAllChanged();
 				}
             }});
 	}

@@ -40,7 +40,7 @@ public class PasteFilesHandler extends AbstractHandler {
 			// Get the files/folders from the clip board.
 			int operations = cb.getOperation();
 			IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getCurrentSelectionChecked(event);
-			List<FSTreeNode> nodes = cb.getTreeNodes();
+			List<FSTreeNode> nodes = cb.getFiles();
 			FSOperation operation = null;
 			if (operations == FSClipboard.CUT) {
 				FSTreeNode dest = (FSTreeNode) selection.getFirstElement();

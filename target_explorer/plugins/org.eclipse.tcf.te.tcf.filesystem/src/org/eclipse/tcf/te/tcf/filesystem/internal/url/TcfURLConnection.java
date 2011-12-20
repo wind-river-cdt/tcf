@@ -19,6 +19,7 @@ import java.net.URLConnection;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.DoneClose;
 import org.eclipse.tcf.services.IFileSystem.DoneOpen;
@@ -28,8 +29,6 @@ import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFChannelException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation;
-import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
-import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 
 /**
  * The URL connection returned by TCF stream service used to handler "tcf"
@@ -84,13 +83,11 @@ public class TcfURLConnection extends URLConnection {
 		path = url.getPath();
 		int slash = path.indexOf("/", 1); //$NON-NLS-1$
 		if (slash != -1){
+			String peerId = path.substring(1, slash);
+			peer = Protocol.getLocator().getPeers().get(peerId);
 			path = path.substring(slash);
 			if (path.matches("/[A-Za-z]:.*")) path = path.substring(1); //$NON-NLS-1$
 		}
-		//Get the peer using the peer id.
-		FSTreeNode node = FSModel.getInstance().getTreeNode(url);
-		if(node != null)
-			peer = node.peerNode.getPeer();
 		// Set default timeout.
 		setConnectTimeout(DEFAULT_CONNECT_TIMEOUT);
 		setOpenTimeout(DEFAULT_OPEN_TIMEOUT);

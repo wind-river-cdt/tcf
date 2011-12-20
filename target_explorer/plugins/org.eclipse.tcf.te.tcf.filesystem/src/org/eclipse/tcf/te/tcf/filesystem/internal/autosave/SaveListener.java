@@ -35,14 +35,11 @@ import org.eclipse.ui.handlers.HandlerUtil;
 public class SaveListener implements IExecutionListener {
 	// Dirty node that should be committed or merged.
 	private FSTreeNode dirtyNode;
-	// The file system fModel.
-	private FSModel model;
 
 	/**
 	 * Create a SaveListener listening to command "SAVE".
 	 */
 	public SaveListener() {
-		this.model = FSModel.getInstance();
 	}
 
 	/* (non-Javadoc)
@@ -55,7 +52,7 @@ public class SaveListener implements IExecutionListener {
 				CacheManager.getInstance().upload(new FSTreeNode[]{dirtyNode}, false);
 			}
 			else {
-				FSModel.getInstance().fireNodeStateChanged(dirtyNode);
+				FSModel.getFSModel(dirtyNode.peerNode).fireNodeStateChanged(dirtyNode);
 			}
 		}
 	}
@@ -74,7 +71,7 @@ public class SaveListener implements IExecutionListener {
 				IFileStore store = EFS.getStore(uri);
 				File localFile = store.toLocalFile(0, new NullProgressMonitor());
 				if (localFile != null) {
-					dirtyNode = model.getTreeNode(localFile.toString());
+					dirtyNode = FSModel.getTreeNode(localFile.toString());
 				}
 			}catch(CoreException e){
 			}

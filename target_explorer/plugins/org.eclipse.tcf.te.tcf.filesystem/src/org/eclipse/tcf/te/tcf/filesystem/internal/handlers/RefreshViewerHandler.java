@@ -33,8 +33,7 @@ public class RefreshViewerHandler extends AbstractHandler {
 		IEditorInput editorInput = HandlerUtil.getActiveEditorInputChecked(event);
 		IPeerModel peer = (IPeerModel) editorInput.getAdapter(IPeerModel.class);
 		if (peer != null) {
-			String peerId = peer.getPeer().getID();
-			FSTreeNode root = FSModel.getInstance().getRoot(peerId);
+			FSTreeNode root = FSModel.getFSModel(peer).getRoot();
 			if (root != null) {
 				FSRefresh op = new FSRefresh(root);
 				op.doit();

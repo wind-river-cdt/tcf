@@ -45,8 +45,7 @@ import org.eclipse.ui.PlatformUI;
  * from a remote file system.
  */
 public class CacheManager {
-	// The agent directory's prefixed name.
-	private static final String WS_AGENT_DIR_PREFIX = "agent_"; //$NON-NLS-1$
+	public static final char PATH_ESCAPE_CHAR = '$';
 
 	// The default chunk size of the buffer used during downloading files.
 	private static final int DEFAULT_CHUNK_SIZE = 5 * 1024;
@@ -92,7 +91,7 @@ public class CacheManager {
         File location = getCacheRoot();
 		String agentId = node.peerNode.getPeer().getID();
 		// Use Math.abs to avoid negative hash value.
-		String agent = WS_AGENT_DIR_PREFIX + Math.abs(agentId.hashCode());
+		String agent = agentId.replace(':', PATH_ESCAPE_CHAR);
 		IPath agentDir = new Path(location.getAbsolutePath()).append(agent);
 		File agentDirFile = agentDir.toFile();
 		if (!agentDirFile.exists()) {
@@ -155,7 +154,7 @@ public class CacheManager {
 			return appendPathSegment(node, path, node.name);
 		}
 		if (node.isWindowsNode()) {
-			String name = node.name.substring(0, 1);
+			String name = node.name.replace(':', PATH_ESCAPE_CHAR);
 			return appendPathSegment(node, path, name);
 		}
 		return path;
@@ -226,7 +225,7 @@ public class CacheManager {
 									PersistenceManager.getInstance().setBaseTimestamp(node.getLocationURL(), node.attr.mtime);
 									file.setLastModified(node.attr.mtime);
 									if (!node.isWritable()) file.setReadOnly();
-									FSModel.getInstance().fireNodeStateChanged(node);		
+									FSModel.getFSModel(node.peerNode).fireNodeStateChanged(node);		
 								}
 							}
 						});
@@ -400,7 +399,7 @@ public class CacheManager {
 								File file = getCacheFile(node);
 								file.setLastModified(node.attr.mtime);
 							}
-							FSModel.getInstance().fireNodeStateChanged(node);		
+							FSModel.getFSModel(node.peerNode).fireNodeStateChanged(node);		
 						}
 					});
 				}

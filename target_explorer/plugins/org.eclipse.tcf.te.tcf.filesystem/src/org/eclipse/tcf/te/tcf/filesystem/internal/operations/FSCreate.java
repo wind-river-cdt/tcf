@@ -67,7 +67,7 @@ public abstract class FSCreate extends FSOperation {
 				create(service);
 				addNode(service);
 				refresh(service);
-				FSModel.getInstance().fireNodeStateChanged(folder);
+				FSModel.getFSModel(folder.peerNode).fireNodeStateChanged(folder);
 			}
 			else {
 				String message = NLS.bind(Messages.FSOperation_NoFileSystemError, folder.peerNode
@@ -137,7 +137,6 @@ public abstract class FSCreate extends FSOperation {
 			node.peerNode = folder.peerNode;
 			node.type = getNodeType();
 			getCurrentChildren(folder).add(node);
-			FSModel.getInstance().addNode(node);
 		}
 		else {
 			final TCFFileSystemException[] errors = new TCFFileSystemException[1];

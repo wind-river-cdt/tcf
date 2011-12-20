@@ -91,7 +91,7 @@ public class FSDelete extends FSOperation {
 				finally {
 					if (channel != null) Tcf.getChannelManager().closeChannel(channel);
 					// Refresh the file system tree.
-					FSModel.getInstance().fireNodeStateChanged(null);
+					FSModel.getFSModel(head.peerNode).fireNodeStateChanged(null);
 					monitor.done();
 				}
 			}

@@ -145,7 +145,7 @@ public class StateManager {
 	void commitNodeAttr(FSTreeNode node, FileAttrs attr){
 		node.attr = attr;
 		PersistenceManager.getInstance().setBaseTimestamp(node.getLocationURL(), attr.mtime);
-		FSModel.getInstance().fireNodeStateChanged(node);
+		FSModel.getFSModel(node.peerNode).fireNodeStateChanged(node);
 	}
 
 	/**

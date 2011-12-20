@@ -48,16 +48,12 @@ public class FSTreeContentProvider implements ITreeContentProvider, INodeStateLi
 	 */
 	protected final static Object[] NO_ELEMENTS = new Object[0];
 
-	/**
-	 * The file system model instance associated with this file system
-	 * tree content provider instance.
-	 */
-	/* package */ final static FSModel model = FSModel.getInstance();
-
 	/* package */ TreeViewer viewer = null;
+	
+	// The current input.
+	private IPeerModel input;
 
 	public FSTreeContentProvider(){
-		model.addNodeStateListener(this);
 	}
 
 	/* (non-Javadoc)
@@ -66,6 +62,13 @@ public class FSTreeContentProvider implements ITreeContentProvider, INodeStateLi
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		this.viewer = (TreeViewer) viewer;
+		if(input != null) {
+			FSModel.getFSModel(input).removeNodeStateListener(this);
+		}
+		input = (IPeerModel) newInput;
+		if(input != null) {
+			FSModel.getFSModel(input).addNodeStateListener(this);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -73,7 +76,9 @@ public class FSTreeContentProvider implements ITreeContentProvider, INodeStateLi
 	 */
 	@Override
 	public void dispose() {
-		model.removeNodeStateListener(this);
+		if (input != null) {
+			FSModel.getFSModel(input).removeNodeStateListener(this);
+		}
 	}
 
 	/**
@@ -119,24 +124,12 @@ public class FSTreeContentProvider implements ITreeContentProvider, INodeStateLi
 		// For the file system, we need the peer node
 		if (parentElement instanceof IPeerModel) {
 			final IPeerModel peerNode = (IPeerModel)parentElement;
-			final String peerId = peerNode.getPeer().getID();
-
 			// Get the file system model root node, if already stored
-			final FSTreeNode[] root = new FSTreeNode[1];
-			if (Protocol.isDispatchThread()) {
-				root[0] = model.getRoot(peerId);
-			} else {
-				Protocol.invokeAndWait(new Runnable() {
-					@Override
-					public void run() {
-						root[0] = model.getRoot(peerId);
-					}
-				});
-			}
+			final FSTreeNode root = FSModel.getFSModel(peerNode).getRoot();
 
 			// If the file system model root node hasn't been created, create
 			// and initialize the root node now.
-			if (root[0] == null) {
+			if (root == null) {
 				IPeer peer = peerNode.getPeer();
 				final int[] state = new int[1];
 				Protocol.invokeAndWait(new Runnable() {
@@ -158,7 +151,7 @@ public class FSTreeContentProvider implements ITreeContentProvider, INodeStateLi
 							rootNode.peerNode = peerNode;
 							rootNode.childrenQueried = false;
 							rootNode.childrenQueryRunning = true;
-							model.putRoot(peerId, rootNode);
+							FSModel.getFSModel(peerNode).setRoot(rootNode);
 
 							// Add a special "Pending..." node
 							FSTreeNode pendingNode = new FSTreeNode();
@@ -192,7 +185,7 @@ public class FSTreeContentProvider implements ITreeContentProvider, INodeStateLi
 													// Close the channel, not needed anymore
 													closeOpenChannel(channel);
 
-													FSTreeNode rootNode = model.getRoot(peerId);
+													FSTreeNode rootNode = FSModel.getFSModel(peerNode).getRoot();
 													if (rootNode != null && error == null) {
 
 														for (DirEntry entry : entries) {
@@ -201,7 +194,6 @@ public class FSTreeContentProvider implements ITreeContentProvider, INodeStateLi
 																node.parent = rootNode;
 																node.peerNode = rootNode.peerNode;
 																rootNode.getChildren().add(node);
-																model.addNode(node);
 															}
 														}
 
@@ -253,7 +245,7 @@ public class FSTreeContentProvider implements ITreeContentProvider, INodeStateLi
 				Protocol.invokeAndWait(new Runnable() {
 					@Override
 					public void run() {
-						candidates.addAll(root[0].getChildren());
+						candidates.addAll(root.getChildren());
 					}
 				});
 				children = candidates.toArray();
@@ -412,7 +404,6 @@ public class FSTreeContentProvider implements ITreeContentProvider, INodeStateLi
 									node.parent = parentNode;
 									node.peerNode = parentNode.peerNode;
 									parentNode.getChildren().add(node);
-									model.addNode(node);
 								}
 							}
 						}
@@ -546,23 +537,11 @@ public class FSTreeContentProvider implements ITreeContentProvider, INodeStateLi
 			}
 		}
 		else if (element instanceof IPeerModel) {
-			final String[] peerId = new String[1];
-			if (Protocol.isDispatchThread()) {
-				peerId[0] = ((IPeerModel)element).getPeer().getID();
-			} else {
-				Protocol.invokeAndWait(new Runnable() {
-					@Override
-					public void run() {
-						peerId[0] = ((IPeerModel)element).getPeer().getID();
-					}
-				});
-			}
-
 			// Get the root node for this peer model object.
 			// If null, true is returned as it means that the file system
 			// model hasn't been created yet and have to treat is as children
 			// not queried yet.
-			FSTreeNode root = peerId[0] != null ? model.getRoot(peerId[0]): null;
+			FSTreeNode root = FSModel.getFSModel(((IPeerModel)element)).getRoot();
 			hasChildren = root != null ? hasChildren(root) : true;
 		}
 		else {

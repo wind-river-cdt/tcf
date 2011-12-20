@@ -65,7 +65,7 @@ public class FSMove extends FSOperation {
 			// Clear the clip board.
 			UIPlugin.getDefault().getClipboard().clear();
 			// Refresh the file system tree.
-			FSModel.getInstance().fireNodeStateChanged(null);
+			FSModel.getFSModel(dest.peerNode).fireNodeStateChanged(null);
 			return true;
 		}
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
@@ -100,7 +100,7 @@ public class FSMove extends FSOperation {
 					UIPlugin.getDefault().getClipboard().clear();
 					if (channel != null) Tcf.getChannelManager().closeChannel(channel);
 					// Refresh the file system tree.
-					FSModel.getInstance().fireNodeStateChanged(null);
+					FSModel.getFSModel(dest.peerNode).fireNodeStateChanged(null);
 					monitor.done();
 				}
 			}

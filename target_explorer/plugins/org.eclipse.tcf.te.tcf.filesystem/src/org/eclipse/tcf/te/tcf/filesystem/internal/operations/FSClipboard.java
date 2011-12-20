@@ -9,11 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.operations;
 
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 
 /**
@@ -27,7 +24,7 @@ public class FSClipboard {
 	// The operation type, CUT, COPY or NONE.
 	private int operation;
 	// The currently selected files/folders.
-	private List<URL> files;
+	private List<FSTreeNode> files;
 
 	/**
 	 * Create a clip board instance.
@@ -59,7 +56,7 @@ public class FSClipboard {
 	 * 
 	 * @return The file/folder list using their location URLs.
 	 */
-	public List<URL> getFiles() {
+	public List<FSTreeNode> getFiles() {
 		return files;
 	}
 
@@ -68,7 +65,7 @@ public class FSClipboard {
 	 * 
 	 * @param files The file/folder nodes.
 	 */
-	public void cutFiles(List<URL> files) {
+	public void cutFiles(List<FSTreeNode> files) {
 		operation = CUT;
 		this.files = files;
 	}
@@ -78,7 +75,7 @@ public class FSClipboard {
 	 * 
 	 * @param files The file/folder nodes.
 	 */
-	public void copyFiles(List<URL> files) {
+	public void copyFiles(List<FSTreeNode> files) {
 		operation = COPY;
 		this.files = files;
 	}
@@ -90,13 +87,4 @@ public class FSClipboard {
 		operation = NONE;
 		this.files = null;
 	}
-
-	public List<FSTreeNode> getTreeNodes() {
-		List<FSTreeNode> nodes = new ArrayList<FSTreeNode>();
-		for (URL file : files) {
-			FSTreeNode node = FSModel.getInstance().getTreeNode(file);
-			nodes.add(node);
-		}
-	    return nodes;
-    }
 }

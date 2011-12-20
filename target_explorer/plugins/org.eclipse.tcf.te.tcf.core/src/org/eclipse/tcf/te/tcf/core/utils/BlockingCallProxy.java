@@ -67,7 +67,7 @@ import org.eclipse.tcf.protocol.Protocol;
  */
 public class BlockingCallProxy implements InvocationHandler {
 	// The default timeout waiting for blocked invocations.
-	private static final long DEFAULT_TIMEOUT = 5000L;
+	private static final long DEFAULT_TIMEOUT = 60000L;
 
 	/**
 	 * Create an instance of a proxy class for the specified interface that dispatches method

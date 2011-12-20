@@ -10,154 +10,323 @@
 package org.eclipse.tcf.te.tcf.filesystem.model;
 
 import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.PlatformObject;
+import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.jface.util.SafeRunnable;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IPeer;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.IFileSystem;
+import org.eclipse.tcf.te.runtime.utils.Host;
+import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.internal.events.INodeStateListener;
+import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
+import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSCreateRoot;
+import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation;
+import org.eclipse.tcf.te.tcf.filesystem.internal.testers.TargetPropertyTester;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.CacheManager;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.tcf.locator.model.Model;
 
 /**
  * The file system model implementation.
- * <p>
- * The file system model provides access to the file system
- * model root node per peer id.
  */
-public final class FSModel extends PlatformObject {
-	// Shared instance
-	private static final FSModel instance = new FSModel();
+public final class FSModel {
+	/* default */static final String FSMODEL_KEY = UIPlugin.getUniqueIdentifier() + ".file.system"; //$NON-NLS-1$
+	// All of the file system models used for global notification.
+	private static List<FSModel> allModels;
+
 	/**
-	 * Get the shared instance of File System model.
-	 * @return The File System Model.
+	 * Add a file system model to the list.
+	 * 
+	 * @param model The new file system model.
 	 */
-	public static FSModel getInstance(){
-		return instance;
+	private static void addModel(FSModel model) {
+		if (allModels == null) {
+			allModels = Collections.synchronizedList(new ArrayList<FSModel>());
+		}
+		allModels.add(model);
 	}
+
 	/**
-	 * The file system model root node cache. The keys
-	 * are the peer id's.
+	 * Notify all the file system model that the model has changed.
 	 */
-	private final Map<String, FSTreeNode> roots;
-	// The table mapping the local file to the fileNodes.
-	private Map<String, FSTreeNode> fileNodes;
-	// The table mapping the URL to the fileNodes.
-	private Map<URL, FSTreeNode> urlNodes;
+	public static void notifyAllChanged() {
+		if (allModels != null) {
+			for (FSModel model : allModels) {
+				model.fireNodeStateChanged(null);
+			}
+		}
+	}
+	
+	/**
+	 * Get the file system model of the peer model. If it does not
+	 * exist yet, create a new instance and store it.
+	 *  
+	 * @param peerModel The peer model
+	 * @return The file system model connected this peer model.
+	 */
+	public static FSModel getFSModel(final IPeerModel peerModel) {
+		if (peerModel != null) {
+			if (Protocol.isDispatchThread()) {
+				FSModel model = (FSModel) peerModel.getProperty(FSMODEL_KEY);
+				if (model == null) {
+					model = new FSModel();
+					peerModel.setProperty(FSMODEL_KEY, model);
+				}
+				return model;
+			}
+			final FSModel[] result = new FSModel[1];
+			Protocol.invokeAndWait(new Runnable() {
+				@Override
+				public void run() {
+					result[0] = getFSModel(peerModel);
+				}
+			});
+			return result[0];
+		}
+		return null;
+	}
+
 	// Node state listeners.
 	private List<INodeStateListener> listeners;
+	// The root node of the peer model
+	private FSTreeNode root;
 
 	/**
 	 * Create a File System Model.
 	 */
 	private FSModel() {
-		roots = Collections.synchronizedMap(new HashMap<String, FSTreeNode>());
-		fileNodes = Collections.synchronizedMap(new HashMap<String, FSTreeNode>());
-		urlNodes = Collections.synchronizedMap(new HashMap<URL, FSTreeNode>());
 		listeners = Collections.synchronizedList(new ArrayList<INodeStateListener>());
-	}
-	/**
-	 * Returns the file system model root node for the peer identified
-	 * by the given peer id.
-	 *
-	 * @param peerId The peer id. Must not be <code>null</code>.
-	 * @return The file system model root node or <code>null</code> if not found.
-	 */
-	public FSTreeNode getRoot(String peerId) {
-		Assert.isNotNull(peerId);
-		return roots.get(peerId);
+		addModel(this);
 	}
 
 	/**
-	 * Stores the given file system model root node for the peer identified
-	 * by the given peer id. If the node is <code>null</code>, a previously
-	 * stored file system model root node is removed.
-	 *
-	 * @param peerId The peer id. Must not be <code>null</code>.
-	 * @param node The file system model root node or <code>null</code>.
+	 * Get the root node of the peer model.
+	 * 
+	 * @return The root node.
 	 */
-	public void putRoot(String peerId, FSTreeNode node) {
-		Assert.isNotNull(peerId);
-		if (node != null) roots.put(peerId, node);
-		else roots.remove(peerId);
+	public FSTreeNode getRoot() {
+		return root;
 	}
 
 	/**
-	 * Dispose the file system model instance.
+	 * Set the root node of the peer model.
+	 * 
+	 * @param root The root node
 	 */
-	public void dispose() {
-		roots.clear();
-		fileNodes.clear();
-		urlNodes.clear();
+	public void setRoot(FSTreeNode root) {
+		this.root = root;
 	}
 
 	/**
-	 * Called to add an FSTreeNode to the two maps, i.e., the location-node map and
-	 * the cache-location map.
-	 * @param node The FSTreeNode to be added.
-	 */
-	public void addNode(FSTreeNode node){
-		File cacheFile = CacheManager.getInstance().getCacheFile(node);
-		fileNodes.put(cacheFile.getAbsolutePath(), node);
-		urlNodes.put(node.getLocationURL(), node);
-	}
-
-	/**
-	 * Get the FSTreeNode given its local file's path.
-	 *
-	 * @param path The local file's path.
-	 * @return The FSTreeNode
-	 */
-	public FSTreeNode getTreeNode(String path) {
-		return fileNodes.get(path);
-	}
-
-	/**
-	 * Get the FSTreeNode given its URL location
-	 * @param location the FSTreeNode's location
-	 * @return the FSTreeNode
-	 */
-	public FSTreeNode getTreeNode(URL location){
-		return urlNodes.get(location);
-	}
-
-	/**
-	 * Add an INodeStateListener to the File System model if it is not
-	 * in the listener list yet.
-	 *
+	 * Add an INodeStateListener to the File System model if it is not in the listener list yet.
+	 * 
 	 * @param listener The INodeStateListener to be added.
 	 */
-	public void addNodeStateListener(INodeStateListener listener){
-		if(!listeners.contains(listener)){
+	public void addNodeStateListener(INodeStateListener listener) {
+		if (!listeners.contains(listener)) {
 			listeners.add(listener);
 		}
 	}
 
 	/**
-	 * Remove the INodeStateListener from the File System model if it
-	 * exists in the listener list.
-	 *
+	 * Remove the INodeStateListener from the File System model if it exists in the listener list.
+	 * 
 	 * @param listener The INodeStateListener to be removed.
 	 */
-	public void removeNodeStateListener(INodeStateListener listener){
-		if(listeners.contains(listener)){
+	public void removeNodeStateListener(INodeStateListener listener) {
+		if (listeners.contains(listener)) {
 			listeners.remove(listener);
 		}
 	}
 
 	/**
 	 * Fire a node state changed event with the specified node.
-	 *
+	 * 
 	 * @param node The node whose state has changed.
 	 */
-	public void fireNodeStateChanged(FSTreeNode node){
-		synchronized(listeners){
-			for(INodeStateListener listener:listeners){
+	public void fireNodeStateChanged(FSTreeNode node) {
+		synchronized (listeners) {
+			for (INodeStateListener listener : listeners) {
 				listener.stateChanged(node);
 			}
 		}
+	}
+
+	/**
+	 * Get the corresponding FSTreeNode based on the path of the local cache file.
+	 * 
+	 * @param filePath The local cache's file path.
+	 * @return The FSTreeNode. 
+	 */
+	public static FSTreeNode getTreeNode(String filePath) {
+		String cache_root = CacheManager.getInstance().getCacheRoot().getAbsolutePath();
+		if (filePath.startsWith(cache_root)) {
+			filePath = filePath.substring(cache_root.length() + 1);
+			int slash = filePath.indexOf(File.separator);
+			if (slash != -1) {
+				String peerId = filePath.substring(0, slash);
+				peerId = peerId.replace(CacheManager.PATH_ESCAPE_CHAR, ':');
+				Map<String, IPeerModel> peers = (Map<String, IPeerModel>) Model.getModel().getAdapter(Map.class);
+				IPeerModel peer = peers.get(peerId);
+				if (peer != null) {
+					boolean hostWindows = Host.isWindowsHost();
+					boolean windows = TargetPropertyTester.isWindows(peer);
+					filePath = filePath.substring(slash + 1);
+					if (hostWindows) {
+						if (windows) {
+							slash = filePath.indexOf(File.separator);
+							if (slash != -1) {
+								String disk = filePath.substring(0, slash);
+								filePath = filePath.substring(slash + 1);
+								disk = disk.replace(CacheManager.PATH_ESCAPE_CHAR, ':');
+								filePath = disk + File.separator + filePath;
+							}
+						}
+						else {
+							filePath = "/" + filePath.replace('\\', '/'); //$NON-NLS-1$
+						}
+					}
+					else {
+						if (windows) {
+							slash = filePath.indexOf(File.separator);
+							if (slash != -1) {
+								String disk = filePath.substring(0, slash);
+								filePath = filePath.substring(slash + 1);
+								disk = disk.replace(CacheManager.PATH_ESCAPE_CHAR, ':');
+								filePath = disk + File.separator + filePath;
+							}
+							filePath = filePath.replace(File.separatorChar, '\\');
+						}
+						else {
+							filePath = "/" + filePath; //$NON-NLS-1$
+						}
+					}
+					return findTreeNode(peer, filePath);
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Find the tree node in the peer's file system tree.
+	 * 
+	 * @param peer The peer model.
+	 * @param path The relative path to the cache file.
+	 * @return The FSTreeNode corresponding to this file.
+	 */
+	public static FSTreeNode findTreeNode(final IPeerModel peer, final String path) {
+		FSModel fsModel = getFSModel(peer);
+		FSTreeNode root = fsModel.getRoot();
+		if (root == null) {
+			FSCreateRoot fsRoot = new FSCreateRoot(peer);
+			root = fsRoot.create();
+			fsModel.setRoot(root);
+		}
+		Object[] elements = FSOperation.getCurrentChildren(root).toArray();
+		if (elements != null && elements.length != 0 && path.length() != 0) {
+			final FSTreeNode[] children = new FSTreeNode[elements.length];
+			System.arraycopy(elements, 0, children, 0, elements.length);
+			final FSTreeNode[] result = new FSTreeNode[1];
+			SafeRunner.run(new SafeRunnable() {
+				@Override
+				public void run() throws Exception {
+					result[0] = findPath(peer.getPeer(), children, path);
+				}
+			});
+			return result[0];
+		}
+		return null;
+	}
+
+	/**
+	 * Search the path in the children list. If it exists, then search the children of the found
+	 * node recursively until the whole path is found. Or else return null.
+	 * 
+	 * @param children The children nodes to search the path.
+	 * @param path The path to be searched.
+	 * @return The leaf node that has the searched path.
+	 * @throws TCFException Thrown during searching.
+	 */
+	static FSTreeNode findPath(IPeer peer, FSTreeNode[] children, String path) throws TCFException {
+		Assert.isTrue(children != null && children.length != 0);
+		Assert.isTrue(path != null && path.length() != 0);
+		FSTreeNode node = children[0];
+		String osPathSep = node.isWindowsNode() ? "\\" : "/"; //$NON-NLS-1$ //$NON-NLS-2$
+		int delim = path.indexOf(osPathSep);
+		String segment = null;
+		if (delim != -1) {
+			segment = path.substring(0, delim);
+			path = path.substring(delim + 1);
+			if (node.isRoot()) {
+				// If it is root directory, the name ends with the path separator.
+				segment += osPathSep;
+			}
+		}
+		else {
+			segment = path;
+			path = null;
+		}
+		node = findPathSeg(children, segment);
+		if (path == null || path.trim().length() == 0) {
+			// The end of the path.
+			return node;
+		}
+		else if (node != null) {
+			if (node.isDirectory()) {
+				children = getUpdatedChildren(peer, node);
+			}
+			else {
+				children = null;
+			}
+			if (children != null && children.length != 0) {
+				return findPath(peer, children, path);
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Get the updated children of the directory node. If the node is already updated, i.e., its
+	 * children are queried, then return its current children. If the node is not yet queried, then
+	 * query its children before getting its children.
+	 * 
+	 * @param folder The directory node.
+	 * @return The nodes of the updated children.
+	 * @throws TCFException Thrown during updating.
+	 */
+	static private FSTreeNode[] getUpdatedChildren(IPeer peer, final FSTreeNode folder) throws TCFException {
+		if (folder.childrenQueried) {
+			List<FSTreeNode> list = FSOperation.getCurrentChildren(folder);
+			return list.toArray(new FSTreeNode[list.size()]);
+		}
+		IChannel channel = FSOperation.openChannel(folder.peerNode.getPeer());
+		IFileSystem service = FSOperation.getBlockingFileSystem(channel);
+		List<FSTreeNode> list = new FSOperation().getChildren(folder, service);
+		return list.toArray(new FSTreeNode[list.size()]);
+	}
+
+	/**
+	 * Find in the children array the node that has the specified name.
+	 * 
+	 * @param children The children array in which to find the node.
+	 * @param name The name of the node to be searched.
+	 * @return The node that has the specified name.
+	 */
+	static private FSTreeNode findPathSeg(FSTreeNode[] children, String name) {
+		for (FSTreeNode child : children) {
+			if (child.isWindowsNode()) {
+				if (child.name.equalsIgnoreCase(name)) return child;
+			}
+			else if (child.name.equals(name)) return child;
+		}
+		return null;
 	}
 }

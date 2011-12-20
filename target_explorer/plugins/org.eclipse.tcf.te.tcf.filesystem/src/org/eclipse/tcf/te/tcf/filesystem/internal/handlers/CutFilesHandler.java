@@ -9,8 +9,6 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.handlers;
 
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -34,16 +32,15 @@ public class CutFilesHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		FSClipboard cb = UIPlugin.getDefault().getClipboard();
-		List<URL> files = new ArrayList<URL>();
 		IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getCurrentSelection(event);
-		List<FSTreeNode> nodes = selection.toList();
-		for (FSTreeNode node : nodes) {
-			files.add(node.getLocationURL());
+		if (!selection.isEmpty()) {
+			List<FSTreeNode> nodes = selection.toList();
+			// Cut these files to the clip board.
+			cb.cutFiles(nodes);
+			// Refresh the file system tree to display the decorations of the cut nodes.
+			FSTreeNode node = (FSTreeNode) selection.getFirstElement();
+			FSModel.getFSModel(node.peerNode).fireNodeStateChanged(null);
 		}
-		// Cut these files to the clip board.
-		cb.cutFiles(files);
-		// Refresh the file system tree to display the decorations of the cut nodes.
-		FSModel.getInstance().fireNodeStateChanged(null);
 		return null;
 	}
 }

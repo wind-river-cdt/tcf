@@ -38,7 +38,7 @@ public class ClipboardPropertyTester extends PropertyTester {
 		if (property.equals("canPaste")) { //$NON-NLS-1$
 			FSClipboard cb = UIPlugin.getDefault().getClipboard();
 			if (!cb.isEmpty()) {
-				List<FSTreeNode> nodes = cb.getTreeNodes();
+				List<FSTreeNode> nodes = cb.getFiles();
 				int operation = cb.getOperation();
 				boolean moving = operation == FSClipboard.CUT;
 				boolean copying = operation == FSClipboard.COPY;

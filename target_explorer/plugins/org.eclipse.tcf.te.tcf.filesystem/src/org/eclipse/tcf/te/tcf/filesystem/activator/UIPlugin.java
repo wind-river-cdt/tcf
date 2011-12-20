@@ -27,7 +27,6 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.autosave.SaveListener;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSClipboard;
 import org.eclipse.tcf.te.tcf.filesystem.internal.url.TcfURLConnection;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.PersistenceManager;
-import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.ui.jface.images.AbstractImageDescriptor;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.PlatformUI;
@@ -124,7 +123,6 @@ public class UIPlugin extends AbstractUIPlugin {
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		PersistenceManager.getInstance().dispose();
-		FSModel.getInstance().dispose();
 		if (regURLStreamHandlerService != null) {
 			// When URL stream handler service is unregistered, any URL related operation will be invalid. 			
 			regURLStreamHandlerService.unregister();

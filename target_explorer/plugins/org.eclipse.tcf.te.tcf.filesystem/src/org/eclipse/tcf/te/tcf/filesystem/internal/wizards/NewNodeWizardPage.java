@@ -9,12 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.wizards;
 
-import java.util.List;
-
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.DecoratingLabelProvider;
 import org.eclipse.jface.viewers.ILabelDecorator;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -30,21 +26,13 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.tcf.protocol.IChannel;
-import org.eclipse.tcf.protocol.IToken;
-import org.eclipse.tcf.services.IFileSystem;
-import org.eclipse.tcf.services.IFileSystem.FileAttrs;
-import org.eclipse.tcf.services.IFileSystem.FileSystemException;
-import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeContentProvider;
 import org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeViewerSorter;
 import org.eclipse.tcf.te.tcf.filesystem.interfaces.IUIConstants;
 import org.eclipse.tcf.te.tcf.filesystem.internal.columns.FSTreeElementLabelProvider;
-import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
-import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.help.IContextHelpIds;
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
-import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation;
+import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.ui.controls.BaseEditBrowseTextControl;
@@ -67,12 +55,8 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 	private BaseEditBrowseTextControl nameControl;
 	// The control for the user to enter the parent directory
 	private BaseEditBrowseTextControl folderControl;
-	// The content provider used to populate the file tree.
-	private FSTreeContentProvider contentProvider;
 	// The viewer of the file tree displaying the file system.
 	private TreeViewer treeViewer;
-	// The shared channel created during validation.
-	private IChannel channel;
 
 	/**
 	 * Create an instance page with the specified page name.
@@ -184,7 +168,7 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 		data.heightHint = 193;
 		data.widthHint = 450;
 		treeViewer.getTree().setLayoutData(data);
-		treeViewer.setContentProvider(contentProvider = new FSTreeContentProvider());
+		treeViewer.setContentProvider(new FSTreeContentProvider());
 		treeViewer.setLabelProvider(createDecoratingLabelProvider(new FSTreeElementLabelProvider(treeViewer)));
 		treeViewer.setComparator(new FSTreeViewerSorter());
 		ViewerFilter folderFilter = new ViewerFilter() {
@@ -369,137 +353,8 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 		if (peer == null) return null;
 		final String text = folderControl.getEditFieldControlText();
 		if (text != null) {
-			final String path = text.trim();
-			Object[] elements = contentProvider.getChildren(peer);
-			if (elements != null && elements.length != 0 && path.length() != 0) {
-				final FSTreeNode[] children = new FSTreeNode[elements.length];
-				System.arraycopy(elements, 0, children, 0, elements.length);
-				final FSTreeNode[] result = new FSTreeNode[1];
-				SafeRunner.run(new SafeRunnable(){
-					@Override
-                    public void run() throws Exception {
-						result[0] = findPath(children, path);
-                    }
-				});
-				if (channel != null) {
-					Tcf.getChannelManager().closeChannel(channel);
-					channel = null;
-				}
-				return result[0];
-			}
-		}
-		return null;
-	}
-	
-	/**
-	 * Search the path in the children list. If it exists, then search
-	 * the children of the found node recursively until the whole
-	 * path is found. Or else return null.
-	 * 
-	 * @param children The children nodes to search the path.
-	 * @param path The path to be searched.
-	 * @return The leaf node that has the searched path.
-	 * @throws TCFException Thrown during searching.
-	 */
-	FSTreeNode findPath(FSTreeNode[] children, String path) throws TCFException {
-		Assert.isTrue(children != null && children.length != 0);
-		Assert.isTrue(path != null && path.length() != 0);
-		FSTreeNode node = children[0];
-		String pathSep = node.isWindowsNode() ? "\\" : "/"; //$NON-NLS-1$ //$NON-NLS-2$
-		int delim = path.indexOf(pathSep);
-		String segment = null;
-		if (delim != -1) {
-			segment = path.substring(0, delim);
-			path = path.substring(delim + 1);
-			if(node.isRoot()) {
-				// If it is root directory, the name ends with the path separator.
-				segment += pathSep;
-			}
-		}
-		else {
-			segment = path;
-			path = null;
-		}
-		node = findPathSeg(children, segment);
-		if (path == null || path.trim().length() == 0) {
-			// The end of the path.
-			return node;
-		}
-		else if (node != null) {
-			if (node.isDirectory()) {
-				children = getUpdatedChildren(node);
-			}
-			else {
-				children = null;
-			}
-			if (children != null && children.length != 0) {
-				return findPath(children, path);
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Get the updated children of the directory node. If the node is
-	 * already updated, i.e., its children are queried, then return its
-	 * current children. If the node is not yet queried, then query its
-	 * children before getting its children.
-	 * 
-	 * @param folder The directory node.
-	 * @return The nodes of the updated children.
-	 * @throws TCFException Thrown during updating.
-	 */
-	private FSTreeNode[] getUpdatedChildren(final FSTreeNode folder) throws TCFException {
-		if (folder.childrenQueried) {
-			List<FSTreeNode> list = FSOperation.getCurrentChildren(folder);
-			return list.toArray(new FSTreeNode[list.size()]);
-		}
-		if (channel == null) {
-			channel = FSOperation.openChannel(folder.peerNode.getPeer());
-			if (!existsByStat()) return null;
-		}
-		IFileSystem service = FSOperation.getBlockingFileSystem(channel);
-		List<FSTreeNode> list = new FSOperation().getChildren(folder, service);
-		return list.toArray(new FSTreeNode[list.size()]);
-	}
-
-	/**
-	 * Check if the input path exists by calling lstat. If the path does not
-	 * exists, then it will save the effort to search directory by directory. 
-	 * 
-	 * @return true the input path exists or else false.
-	 * @throws TCFFileSystemException Thrown during  lstat call.
-	 */
-	private boolean existsByStat() throws TCFFileSystemException {
-	    IFileSystem service = FSOperation.getBlockingFileSystem(channel);
-	    String text = folderControl.getEditFieldControlText();
-	    String path = text.trim();
-	    final boolean[] result = new boolean[1];
-	    result[0] = true;
-	    service.lstat(path, new IFileSystem.DoneStat() {
-	    	@Override
-	    	public void doneStat(IToken token, FileSystemException error, FileAttrs attrs) {
-	    		if(error!=null && error.getStatus()==IFileSystem.STATUS_NO_SUCH_FILE) {
-	    			result[0] = false;
-	    		}
-	    	}
-	    });
-	    return result[0];
-    }
-
-	/**
-	 * Find in the children array the node that has the specified name.
-	 * 
-	 * @param children The children array in which to find the node.
-	 * @param name The name of the node to be searched.
-	 * @return The node that has the specified name.
-	 */
-	private FSTreeNode findPathSeg(FSTreeNode[] children, String name) {
-		for (FSTreeNode child : children) {
-			if (child.isWindowsNode()) {
-				if (child.name.equalsIgnoreCase(name)) return child;
-			}
-			else if (child.name.equals(name)) return child;
+			String path = text.trim();
+			return FSModel.findTreeNode(peer, path);
 		}
 		return null;
 	}

@@ -39,13 +39,10 @@ import org.eclipse.ui.handlers.HandlerUtil;
 public class SaveAllListener implements IExecutionListener {
 	// Dirty nodes that should be saved and synchronized.
 	private List<FSTreeNode> fDirtyNodes;
-	// The file system fModel storing the existing FSTreeNodes.
-	private FSModel fModel;
 	/**
 	 * Create the listener listening to command "SAVE ALL".
 	 */
 	public SaveAllListener() {
-		this.fModel = FSModel.getInstance();
 		this.fDirtyNodes = new ArrayList<FSTreeNode>();
 	}
 
@@ -59,7 +56,8 @@ public class SaveAllListener implements IExecutionListener {
 				CacheManager.getInstance().upload(fDirtyNodes.toArray(new FSTreeNode[fDirtyNodes.size()]), false);
 			}
 			else {
-				FSModel.getInstance().fireNodeStateChanged(null);
+				FSTreeNode dirtyNode = fDirtyNodes.get(0);
+				FSModel.getFSModel(dirtyNode.peerNode).fireNodeStateChanged(null);
 			}
 		}
 	}
@@ -98,7 +96,7 @@ public class SaveAllListener implements IExecutionListener {
 				File localFile = store.toLocalFile(0, new NullProgressMonitor());
 				if (localFile != null) {
 					// Get the file's mapped FSTreeNode.
-					FSTreeNode node = fModel.getTreeNode(localFile.toString());
+					FSTreeNode node = FSModel.getTreeNode(localFile.toString());
 					return node;
 				}
 			}catch(CoreException e){}
