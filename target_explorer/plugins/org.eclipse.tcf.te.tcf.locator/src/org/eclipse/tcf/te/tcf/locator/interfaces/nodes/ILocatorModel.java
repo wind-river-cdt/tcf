@@ -3,13 +3,16 @@
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.locator.interfaces.nodes;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.services.ILocator;
 import org.eclipse.tcf.te.tcf.locator.interfaces.IModelListener;
 import org.eclipse.tcf.te.tcf.locator.interfaces.IScanner;
@@ -75,6 +78,22 @@ public interface ILocatorModel extends IAdaptable {
 	public IPeerModel[] getPeers();
 
 	/**
+	 * Returns an unmodifiable list of known children for the given parent peer.
+	 *
+	 * @param parentPeerID The parent peer id. Must not be <code>null</code>.
+	 * @return The child list.
+	 */
+	public List<IPeerModel> getChildren(String parentPeerID);
+
+	/**
+	 * Sets the list of known children for the given parent peer.
+	 *
+	 * @param parentPeerID The parent peer id. Must not be <code>null</code>.
+	 * @param children The list of children or <code>null</code> to remove the parent peer.
+	 */
+	public void setChildren(String parentPeerID, List<IPeerModel> children);
+
+	/**
 	 * Returns the scanner instance being associated with the
 	 * locator model.
 	 *
@@ -105,12 +124,22 @@ public interface ILocatorModel extends IAdaptable {
 	public <V extends ILocatorModelService> V getService(Class<V> serviceInterface);
 
 	/**
-	 * Validate the given peer model if or if not it can be added
-	 * to the locator model as new peer node.
+	 * Validate the given peer model if or if not it can be added to the locator model as new peer
+	 * node.
 	 *
 	 * @param node The peer model. Must not be <code>null</code>.
 	 * @return The peer node if it allowed add it to the model, or <code>null</code> if not.
 	 */
 	public IPeerModel validatePeerNodeForAdd(IPeerModel node);
+
+	/**
+	 * Validate the given peer model if or if not it can be added to the locator model as new child
+	 * peer node for the given parent peer.
+	 *
+	 * @parentPeer The parent peer. Must not be <code>null</code>.
+	 * @param node The peer model. Must not be <code>null</code>.
+	 * @return The peer node if it allowed add it to the model, or <code>null</code> if not.
+	 */
+	public IPeerModel validatePeerNodeForAdd(IPeer parentPeer, IPeerModel node);
 
 }

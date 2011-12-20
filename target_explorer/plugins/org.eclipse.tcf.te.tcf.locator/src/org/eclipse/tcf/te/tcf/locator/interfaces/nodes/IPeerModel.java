@@ -27,6 +27,8 @@ public interface IPeerModel extends IPropertiesContainer {
 
 	/**
 	 * Returns the parent locator model instance.
+	 * <p>
+	 * This method may be called from any thread.
 	 *
 	 * @return The parent locator model instance.
 	 */
@@ -34,8 +36,19 @@ public interface IPeerModel extends IPropertiesContainer {
 
 	/**
 	 * Returns the native {@link IPeer} object.
+	 * <p>
+	 * This method may be called from any thread.
 	 *
 	 * @return The native {@link IPeer} instance.
 	 */
 	public IPeer getPeer();
+
+	/**
+	 * Returns the peer id.
+	 * <p>
+	 * This method may be called from any thread.
+	 *
+	 * @return The peer id.
+	 */
+	public String getPeerId();
 }

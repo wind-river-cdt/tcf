@@ -9,15 +9,19 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.locator.services;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.tcf.locator.interfaces.IModelListener;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
+import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelLookupService;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelUpdateService;
 
 
@@ -41,11 +45,11 @@ public class LocatorModelUpdateService extends AbstractLocatorModelService imple
 	@Override
 	public void add(final IPeerModel peer) {
 		Assert.isNotNull(peer);
-		Assert.isTrue(Protocol.isDispatchThread());
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 
 		Map<String, IPeerModel> peers = (Map<String, IPeerModel>)getLocatorModel().getAdapter(Map.class);
 		Assert.isNotNull(peers);
-		peers.put(peer.getPeer().getID(), peer);
+		peers.put(peer.getPeerId(), peer);
 
 		final IModelListener[] listeners = getLocatorModel().getListener();
 		if (listeners.length > 0) {
@@ -66,11 +70,13 @@ public class LocatorModelUpdateService extends AbstractLocatorModelService imple
 	@Override
 	public void remove(final IPeerModel peer) {
 		Assert.isNotNull(peer);
-		Assert.isTrue(Protocol.isDispatchThread());
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 
 		Map<String, IPeerModel> peers = (Map<String, IPeerModel>)getLocatorModel().getAdapter(Map.class);
 		Assert.isNotNull(peers);
-		peers.remove(peer.getPeer().getID());
+		peers.remove(peer.getPeerId());
+
+		getLocatorModel().setChildren(peer.getPeerId(), null);
 
 		final IModelListener[] listeners = getLocatorModel().getListener();
 		if (listeners.length > 0) {
@@ -91,7 +97,7 @@ public class LocatorModelUpdateService extends AbstractLocatorModelService imple
 	@Override
 	public void updatePeerServices(IPeerModel peerNode, Collection<String> localServices, Collection<String> remoteServices) {
 		Assert.isNotNull(peerNode);
-		Assert.isTrue(Protocol.isDispatchThread());
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 
 		peerNode.setProperty(IPeerModelProperties.PROP_LOCAL_SERVICES, localServices != null ? makeString(localServices) : null);
 		peerNode.setProperty(IPeerModelProperties.PROP_REMOTE_SERVICES, remoteServices != null ? makeString(remoteServices) : null);
@@ -110,5 +116,75 @@ public class LocatorModelUpdateService extends AbstractLocatorModelService imple
 		buffer = buffer.replaceAll("\\[", "").replaceAll("\\]", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 		return buffer.trim();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelUpdateService#addChild(org.eclipse.tcf.protocol.IPeer, org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel)
+	 */
+	@Override
+	public void addChild(IPeer parent, IPeerModel child) {
+		Assert.isNotNull(parent);
+		Assert.isNotNull(child);
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+
+		// Determine the peer id of the parent
+		String parentId = parent.getID();
+		Assert.isNotNull(parentId);
+		final IPeerModel parentNode = getLocatorModel().getService(ILocatorModelLookupService.class).lkupPeerModelById(parentId);
+		Assert.isNotNull(parentNode);
+
+		// Get the list of existing children
+		List<IPeerModel> children = new ArrayList<IPeerModel>(getLocatorModel().getChildren(parentId));
+		if (!children.contains(child)) {
+			children.add(child);
+			getLocatorModel().setChildren(parentId, children);
+		}
+
+		final IModelListener[] listeners = getLocatorModel().getListener();
+		if (listeners.length > 0) {
+			Protocol.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					for (IModelListener listener : listeners) {
+						listener.peerModelChanged(getLocatorModel(), parentNode);
+					}
+				}
+			});
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelUpdateService#removeChild(org.eclipse.tcf.protocol.IPeer, org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel)
+	 */
+	@Override
+	public void removeChild(IPeer parent, IPeerModel child) {
+		Assert.isNotNull(parent);
+		Assert.isNotNull(child);
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+
+		// Determine the peer id of the parent
+		String parentId = parent.getID();
+		Assert.isNotNull(parentId);
+		final IPeerModel parentNode = getLocatorModel().getService(ILocatorModelLookupService.class).lkupPeerModelById(parentId);
+		Assert.isNotNull(parentNode);
+
+		// Get the list of existing children
+		List<IPeerModel> children = new ArrayList<IPeerModel>(getLocatorModel().getChildren(parentId));
+		if (children.contains(child)) {
+			children.remove(child);
+			getLocatorModel().setChildren(parentId, children);
+		}
+
+		final IModelListener[] listeners = getLocatorModel().getListener();
+		if (listeners.length > 0) {
+			Protocol.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					for (IModelListener listener : listeners) {
+						listener.peerModelChanged(getLocatorModel(), parentNode);
+					}
+				}
+			});
+		}
 	}
 }

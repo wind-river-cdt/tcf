@@ -3,7 +3,7 @@
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
@@ -11,6 +11,7 @@ package org.eclipse.tcf.te.tcf.locator.interfaces.services;
 
 import java.util.Collection;
 
+import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 
 
@@ -44,4 +45,20 @@ public interface ILocatorModelUpdateService extends ILocatorModelService {
 	 * @param remoteServices The list of remote service names or <code>null</code>.
 	 */
 	public void updatePeerServices(IPeerModel peerNode, Collection<String> localServices, Collection<String> remoteServices);
+
+	/**
+	 * Adds the given child peer to the parent peer.
+	 *
+	 * @param parent The parent peer. Must not be <code>null</code>.
+	 * @param child The child peer model object. Must not be <code>null</code>.
+	 */
+	public void addChild(IPeer parent, IPeerModel child);
+
+	/**
+	 * Removes the given child peer from the parent peer.
+	 *
+	 * @param parent The parent peer. Must not be <code>null</code>.
+	 * @param child The child peer model object. Must not be <code>null</code>.
+	 */
+	public void removeChild(IPeer parent, IPeerModel child);
 }

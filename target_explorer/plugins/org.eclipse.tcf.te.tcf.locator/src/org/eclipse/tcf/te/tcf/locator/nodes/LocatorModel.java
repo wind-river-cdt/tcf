@@ -10,6 +10,7 @@
 package org.eclipse.tcf.te.tcf.locator.nodes;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +56,8 @@ public class LocatorModel extends PlatformObject implements ILocatorModel {
 
 	// The list of known peers
 	private final Map<String, IPeerModel> peers = new HashMap<String, IPeerModel>();
+	// The list of "proxied" peers per proxy peer id
+	private final Map<String, List<IPeerModel>> peerChildren = new HashMap<String, List<IPeerModel>>();
 
 	// Reference to the scanner
 	private IScanner scanner = null;
@@ -91,7 +94,7 @@ public class LocatorModel extends PlatformObject implements ILocatorModel {
 	@Override
 	public void addListener(IModelListener listener) {
 		Assert.isNotNull(listener);
-		Assert.isTrue(Protocol.isDispatchThread());
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 
 		if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITracing.ID_TRACE_LOCATOR_MODEL)) {
 			CoreBundleActivator.getTraceHandler().trace("LocatorModel.addListener( " + listener + " )", ITracing.ID_TRACE_LOCATOR_MODEL, this); //$NON-NLS-1$ //$NON-NLS-2$
@@ -106,7 +109,7 @@ public class LocatorModel extends PlatformObject implements ILocatorModel {
 	@Override
 	public void removeListener(IModelListener listener) {
 		Assert.isNotNull(listener);
-		Assert.isTrue(Protocol.isDispatchThread());
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 
 		if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITracing.ID_TRACE_LOCATOR_MODEL)) {
 			CoreBundleActivator.getTraceHandler().trace("LocatorModel.removeListener( " + listener + " )", ITracing.ID_TRACE_LOCATOR_MODEL, this); //$NON-NLS-1$ //$NON-NLS-2$
@@ -128,7 +131,7 @@ public class LocatorModel extends PlatformObject implements ILocatorModel {
 	 */
 	@Override
 	public void dispose() {
-		Assert.isTrue(Protocol.isDispatchThread());
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 
 		if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITracing.ID_TRACE_LOCATOR_MODEL)) {
 			CoreBundleActivator.getTraceHandler().trace("LocatorModel.dispose()", ITracing.ID_TRACE_LOCATOR_MODEL, this); //$NON-NLS-1$
@@ -187,6 +190,41 @@ public class LocatorModel extends PlatformObject implements ILocatorModel {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel#getChildren(java.lang.String)
+	 */
+	@Override
+    public List<IPeerModel> getChildren(String parentPeerID) {
+		Assert.isNotNull(parentPeerID);
+
+		if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITracing.ID_TRACE_LOCATOR_MODEL)) {
+			CoreBundleActivator.getTraceHandler().trace("LocatorModel.getChildren( " + parentPeerID + " )", ITracing.ID_TRACE_LOCATOR_MODEL, this); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
+		List<IPeerModel> children = peerChildren.get(parentPeerID);
+		if (children == null) children = Collections.emptyList();
+		return Collections.unmodifiableList(children);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel#setChildren(java.lang.String, java.util.List)
+	 */
+	@Override
+    public void setChildren(String parentPeerID, List<IPeerModel> children) {
+		Assert.isNotNull(parentPeerID);
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+
+		if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITracing.ID_TRACE_LOCATOR_MODEL)) {
+			CoreBundleActivator.getTraceHandler().trace("LocatorModel.setChildren( " + parentPeerID + ", " + children + " )", ITracing.ID_TRACE_LOCATOR_MODEL, this); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		}
+
+		if (children == null || children.size() == 0) {
+			peerChildren.remove(parentPeerID);
+		} else {
+			peerChildren.put(parentPeerID, new ArrayList<IPeerModel>(children));
+		}
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
 	 */
 	@Override
@@ -241,7 +279,7 @@ public class LocatorModel extends PlatformObject implements ILocatorModel {
 	 * <b>Note:</b> This method is not intended to be call from clients.
 	 */
 	public void checkLocatorListener() {
-		Assert.isTrue(Protocol.isDispatchThread());
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 		Assert.isNotNull(Protocol.getLocator());
 
 		if (locatorListener == null) {
@@ -321,7 +359,7 @@ public class LocatorModel extends PlatformObject implements ILocatorModel {
 	@Override
 	public IPeerModel validatePeerNodeForAdd(IPeerModel node) {
 		Assert.isNotNull(node);
-		Assert.isTrue(Protocol.isDispatchThread());
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 
 		// Get the peer from the peer node
 		IPeer peer = node.getPeer();
@@ -377,7 +415,7 @@ public class LocatorModel extends PlatformObject implements ILocatorModel {
 					if (peerPort.equals(previousPeerPort))  {
 						if (canonical != null && canonical.equals(peerIP) && !canonical.equals(previousPeerIP)) {
 							// Remove the old node and replace it with the new new
-							peers.remove(previousNode.getPeer().getID());
+							peers.remove(previousNode.getPeerId());
 							fireListener(previousNode, false);
 
 							if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITracing.ID_TRACE_LOCATOR_MODEL)) {
@@ -387,7 +425,7 @@ public class LocatorModel extends PlatformObject implements ILocatorModel {
 						} else if (loopback != null && loopback.equals(peerIP) && !loopback.equals(previousPeerIP)
 								&& (canonical == null || !canonical.equals(previousPeerIP))) {
 							// Remove the old node and replace it with the new new
-							peers.remove(previousNode.getPeer().getID());
+							peers.remove(previousNode.getPeerId());
 							fireListener(previousNode, false);
 
 							if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITracing.ID_TRACE_LOCATOR_MODEL)) {
@@ -415,6 +453,48 @@ public class LocatorModel extends PlatformObject implements ILocatorModel {
 					}
 				}
 			}
+		}
+
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel#validatePeerNodeForAdd(org.eclipse.tcf.protocol.IPeer, org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel)
+	 */
+	@Override
+	public IPeerModel validatePeerNodeForAdd(IPeer parentPeer, IPeerModel node) {
+		Assert.isNotNull(parentPeer);
+		Assert.isNotNull(node);
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+
+		// Get the peer from the peer node
+		IPeer peer = node.getPeer();
+
+		if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITracing.ID_TRACE_LOCATOR_MODEL)) {
+			CoreBundleActivator.getTraceHandler().trace("LocatorModel.validatePeerNodeForAdd( " + parentPeer.getID() + ", " + (peer != null ? peer.getID() : null) + " )", ITracing.ID_TRACE_LOCATOR_MODEL, this); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		}
+
+		IPeerModel result = node;
+
+		// If the child peer represents the same agent as the parent peer,
+		// drop the child peer
+		if (parentPeer.getAgentID() != null && parentPeer.getAgentID().equals(peer.getAgentID())) {
+			result = null;
+		}
+		// If the child peer's IP address appears to be the address of the
+		// localhost, drop the child peer
+		else if (peer.getAttributes().get(IPeer.ATTR_IP_HOST) != null && IPAddressUtil.getInstance().isLocalHost(peer.getAttributes().get(IPeer.ATTR_IP_HOST))) {
+			result = null;
+		}
+		// If the child peer's IP address and port are the same as the parent's
+		// IP address and port, drop the child node
+		if (parentPeer.getAttributes().get(IPeer.ATTR_IP_HOST) != null && parentPeer.getAttributes().get(IPeer.ATTR_IP_HOST).equals(peer.getAttributes().get(IPeer.ATTR_IP_HOST))) {
+			String parentPort = parentPeer.getAttributes().get(IPeer.ATTR_IP_PORT);
+			if (parentPort == null) parentPort = "1534"; //$NON-NLS-1$
+			String port = peer.getAttributes().get(IPeer.ATTR_IP_PORT);
+			if (port == null) port = "1534"; //$NON-NLS-1$
+
+			if (parentPort.equals(port)) result = null;
 		}
 
 		return result;

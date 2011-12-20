@@ -9,12 +9,17 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.ui.navigator;
 
+import java.util.List;
+
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.tcf.locator.interfaces.IModelListener;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerRedirector;
+import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelLookupService;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelRefreshService;
 import org.eclipse.tcf.te.tcf.locator.model.Model;
 import org.eclipse.tcf.te.ui.views.interfaces.IRoot;
@@ -46,6 +51,13 @@ public class ContentProviderDelegate implements ITreeContentProvider {
 		if (parentElement instanceof ILocatorModel) {
 			children = ((ILocatorModel)parentElement).getPeers();
 		}
+		// If it is a peer model itself, get the child peers
+		else if (parentElement instanceof IPeerModel) {
+			List<IPeerModel> candidates = Model.getModel().getChildren(((IPeerModel)parentElement).getPeerId());
+			if (candidates != null && candidates.size() > 0) {
+				children = candidates.toArray();
+			}
+		}
 
 		return children;
 	}
@@ -57,6 +69,13 @@ public class ContentProviderDelegate implements ITreeContentProvider {
 	public Object getParent(Object element) {
 		// If it is a peer model node, return the parent locator model
 		if (element instanceof IPeerModel) {
+			// If it is a peer redirector, return the parent peer model
+			if (((IPeerModel)element).getPeer() instanceof IPeerRedirector) {
+				IPeer parentPeer =  ((IPeerRedirector)((IPeerModel)element).getPeer()).getParent();
+				if (parentPeer != null) {
+					return ((IPeerModel)element).getModel().getService(ILocatorModelLookupService.class).lkupPeerModelById(parentPeer.getID());
+				}
+			}
 			return ((IPeerModel)element).getModel();
 		}
 		return null;
@@ -71,6 +90,10 @@ public class ContentProviderDelegate implements ITreeContentProvider {
 
 		if (element instanceof ILocatorModel) {
 			hasChildren = ((ILocatorModel)element).getPeers().length > 0;
+		}
+		else if (element instanceof IPeerModel) {
+			List<IPeerModel> children = Model.getModel().getChildren(((IPeerModel)element).getPeerId());
+			hasChildren = children != null && children.size() > 0;
 		}
 
 		return hasChildren;

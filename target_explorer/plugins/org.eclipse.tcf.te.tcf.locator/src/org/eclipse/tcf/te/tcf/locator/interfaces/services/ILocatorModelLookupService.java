@@ -25,12 +25,31 @@ public interface ILocatorModelLookupService extends ILocatorModelService {
 	public IPeerModel lkupPeerModelById(String id);
 
 	/**
-	 * Lookup matching peer model instances for the given agent id.
+	 * Lookup the peer model for the given peer id from the peers child list of
+	 * the peer identified by the given parent id.
+	 *
+	 * @param parentId The parent peer id. Must not be <code>null</code>.
+	 * @param id The peer id. Must not be <code>null</code>.
+	 * @return The peer model instance, or <code>null</code> if the peer model cannot be found.
+	 */
+	public IPeerModel lkupPeerModelById(String parentId, String id);
+
+	/**
+	 * Lookup the matching peer model instances for the given agent id.
 	 *
 	 * @param agentId The agent id. Must not be <code>null</code>.
 	 * @return The peer model instances, or an empty list if the given agent id could not be matched.
 	 */
 	public IPeerModel[] lkupPeerModelByAgentId(String agentId);
+
+	/**
+	 * Lookup the matching peer model instances for the given agent id.
+	 *
+	 * @param parentId The parent peer id. Must not be <code>null</code>.
+	 * @param agentId The agent id. Must not be <code>null</code>.
+	 * @return The peer model instances, or an empty list if the given agent id could not be matched.
+	 */
+	public IPeerModel[] lkupPeerModelByAgentId(String parentId, String agentId);
 
 	/**
 	 * Lookup matching peer model instances which supports the listed local and remote services.

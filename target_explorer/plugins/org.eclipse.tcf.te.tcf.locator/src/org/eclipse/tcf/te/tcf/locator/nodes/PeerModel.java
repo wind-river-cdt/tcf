@@ -31,8 +31,8 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
 public class PeerModel extends PropertiesContainer implements IPeerModel, IWorkingSetElement {
 	// Reference to the parent locator model
 	private final ILocatorModel parentModel;
-	// Reference to the element id (cached for performance optimization)
-	private String elementId;
+	// Reference to the peer id (cached for performance optimization)
+	private String peerId;
 
 	/**
 	 * Constructor.
@@ -60,9 +60,9 @@ public class PeerModel extends PropertiesContainer implements IPeerModel, IWorki
 		// constructor.
 		setProperty(IPeerModelProperties.PROP_INSTANCE, peer);
 
-		// Initialize the element id
-		elementId = peer.getID();
-		Assert.isNotNull(elementId);
+		// Initialize the peer id
+		peerId = peer.getID();
+		Assert.isNotNull(peerId);
 
 		// Enable change events
 		setChangeEventsEnabled(true);
@@ -97,7 +97,15 @@ public class PeerModel extends PropertiesContainer implements IPeerModel, IWorki
 	 */
 	@Override
 	public String getElementId() {
-		return elementId;
+		return peerId;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel#getPeerId()
+	 */
+	@Override
+	public String getPeerId() {
+	    return peerId;
 	}
 
 	/* (non-Javadoc)
@@ -153,20 +161,18 @@ public class PeerModel extends PropertiesContainer implements IPeerModel, IWorki
 	public String toString() {
 		final StringBuilder buffer = new StringBuilder(getClass().getSimpleName());
 
-		if (Protocol.isDispatchThread()) {
-			IPeer peer = getPeer();
-			buffer.append(": id=" + peer.getID()); //$NON-NLS-1$
-			buffer.append(", name=" + peer.getName()); //$NON-NLS-1$
-		} else {
-			Protocol.invokeAndWait(new Runnable() {
-				@Override
-				public void run() {
-					IPeer peer = getPeer();
-					buffer.append(": id=" + peer.getID()); //$NON-NLS-1$
-					buffer.append(", name=" + peer.getName()); //$NON-NLS-1$
-				}
-			});
-		}
+		Runnable runnable = new Runnable() {
+			@Override
+			public void run() {
+				IPeer peer = getPeer();
+				buffer.append(": id=" + peer.getID()); //$NON-NLS-1$
+				buffer.append(", name=" + peer.getName()); //$NON-NLS-1$
+			}
+		};
+
+		if (Protocol.isDispatchThread()) runnable.run();
+		else Protocol.invokeAndWait(runnable);
+
 		buffer.append(", " + super.toString()); //$NON-NLS-1$
 		return buffer.toString();
 	}
@@ -177,7 +183,7 @@ public class PeerModel extends PropertiesContainer implements IPeerModel, IWorki
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof PeerModel) {
-			return getElementId().equals(((PeerModel)obj).getElementId());
+			return getPeerId().equals(((PeerModel)obj).getPeerId());
 		}
 	    return super.equals(obj);
 	}
@@ -187,7 +193,7 @@ public class PeerModel extends PropertiesContainer implements IPeerModel, IWorki
 	 */
 	@Override
 	public int hashCode() {
-	    return getElementId().hashCode();
+	    return getPeerId().hashCode();
 	}
 
 	/* (non-Javadoc)
@@ -222,8 +228,8 @@ public class PeerModel extends PropertiesContainer implements IPeerModel, IWorki
 		Assert.isNotNull(getPeer());
 
 		// New properties applied. Update the element id
-		elementId = getPeer().getID();
-		Assert.isNotNull(elementId);
+		peerId = getPeer().getID();
+		Assert.isNotNull(peerId);
 
 		if (changeEventsEnabled()) {
 			final IModelListener[] listeners = parentModel.getListener();
@@ -252,8 +258,8 @@ public class PeerModel extends PropertiesContainer implements IPeerModel, IWorki
 
 		// If the peer instance changed, update the element id
 		if (IPeerModelProperties.PROP_INSTANCE.equals(key)) {
-			elementId = getPeer().getID();
-			Assert.isNotNull(elementId);
+			peerId = getPeer().getID();
+			Assert.isNotNull(peerId);
 		}
 
 		// Notify registered listeners that the peer changed. Property
