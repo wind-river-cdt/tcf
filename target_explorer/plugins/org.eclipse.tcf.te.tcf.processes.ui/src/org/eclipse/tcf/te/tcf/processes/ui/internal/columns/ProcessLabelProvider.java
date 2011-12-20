@@ -30,10 +30,7 @@ public class ProcessLabelProvider extends TreeColumnLabelProvider {
 			ProcessesTreeNode node = (ProcessesTreeNode) element;
 			String name = node.name;
 			if (name == null) name = "System"; //$NON-NLS-1$
-			int slash = name.lastIndexOf("/"); //$NON-NLS-1$
-			if (slash == -1) slash = name.lastIndexOf("\\"); //$NON-NLS-1$
-			if (slash == -1) return name;
-			return name.substring(slash + 1);
+			return name;
 		}
 		return super.getText(element);
 	}
