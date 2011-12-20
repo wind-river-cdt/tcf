@@ -9,6 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.core.utils;
 
+import java.util.concurrent.TimeoutException;
+
 /**
  * A helper class used to synchronize producer and consumer threads. It is used
  * to join a thread with its asynchronous call backs or listeners. Usually it is
@@ -74,9 +76,9 @@ public class Rendezvous {
 	 * another thread or until it is timed out.
 	 * 
 	 * @param timeout The timeout time.
-	 * @throws InterruptedException The waiting has timed out.
+	 * @throws TimeoutException The waiting has timed out.
 	 */
-	public synchronized void waiting(long timeout) throws InterruptedException {
+	public synchronized void waiting(long timeout) throws TimeoutException {
 		long now = System.currentTimeMillis();
 		while (!arrived && (timeout <= 0 || System.currentTimeMillis() - now < timeout)) {
 			try {
@@ -85,7 +87,7 @@ public class Rendezvous {
 			}
 		}
 		if (!arrived)
-			throw new InterruptedException();
+			throw new TimeoutException();
 	}
 	
 	/**
@@ -94,7 +96,7 @@ public class Rendezvous {
 	 * 
 	 * @throws InterruptedException The waiting has timed out.
 	 */
-	public synchronized void waiting() throws InterruptedException {
+	public synchronized void waiting() throws TimeoutException {
 		waiting(0);
 	}
 

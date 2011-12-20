@@ -12,7 +12,6 @@ package org.eclipse.tcf.te.tcf.core.utils;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.concurrent.TimeoutException;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.protocol.Protocol;
@@ -79,7 +78,7 @@ public class BlockingCallProxy implements InvocationHandler {
 	 * @return The proxy instance.
 	 */
 	public static <T> T newInstance(Class<T> proxyInterface, T delegate) {
-		return newInstance(proxyInterface, new DefaultProxyDescriptor(proxyInterface), delegate);
+		return newInstance(proxyInterface, DefaultProxyDescriptor.getProxyDescriptor(proxyInterface), delegate);
 	}
 
 	/**
@@ -204,12 +203,7 @@ public class BlockingCallProxy implements InvocationHandler {
 	private Object directCall(Method method, Object[] args, Rendezvous rendezvous) throws Throwable {
 		Object ret = method.invoke(delegate, args);
 		if (rendezvous != null) {
-			try {
-				rendezvous.waiting(timeout);
-			}
-			catch (InterruptedException e) {
-				throw new TimeoutException();
-			}
+			rendezvous.waiting(timeout);
 		}
 		return ret;
 	}
@@ -239,12 +233,7 @@ public class BlockingCallProxy implements InvocationHandler {
 			}
 		});
 		if (rendezvous != null) {
-			try {
-				rendezvous.waiting(timeout);
-			}
-			catch (InterruptedException e) {
-				throw new TimeoutException();
-			}
+			rendezvous.waiting(timeout);
 		}
 		if (exceptions[0] != null) throw exceptions[0];
 		return returns[0];

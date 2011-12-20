@@ -22,6 +22,29 @@ import java.util.Map;
  * @see IProxyDescriptor
  */
 class DefaultProxyDescriptor implements IProxyDescriptor {
+	// Descriptor cache to store known proxy descriptors.
+	private static Map<Class<?>, IProxyDescriptor> descriptorCache;
+
+	/**
+	 * Get a default proxy descriptor from the cache using the class as the key.
+	 * If no such proxy descriptor is found, then create a default proxy descriptor for it
+	 * and cache it.
+	 * 
+	 * @param proxyInterface The proxy interface.
+	 * @return A default proxy descriptor for the proxy interface.
+	 */
+	public static IProxyDescriptor getProxyDescriptor(Class<?> proxyInterface) {
+		if(descriptorCache == null) {
+			descriptorCache = Collections.synchronizedMap(new HashMap<Class<?>, IProxyDescriptor>());
+		}
+		IProxyDescriptor descriptor = descriptorCache.get(proxyInterface);
+		if(descriptor == null) {
+			descriptor = new DefaultProxyDescriptor(proxyInterface);
+			descriptorCache.put(proxyInterface, descriptor);
+		}
+		return descriptor;
+	}
+
 	// The callback map used to identify the proxy methods.
 	private Map<Method, Integer> callbacks;
 	/**
@@ -29,7 +52,7 @@ class DefaultProxyDescriptor implements IProxyDescriptor {
 	 * 
 	 * @param proxyInterface The proxy interface.
 	 */
-	public DefaultProxyDescriptor(Class<?> proxyInterface) {
+	private DefaultProxyDescriptor(Class<?> proxyInterface) {
 		callbacks = Collections.synchronizedMap(new HashMap<Method, Integer>());
 		Method[] methods = proxyInterface.getDeclaredMethods();
 		if(methods != null && methods.length > 0) {
