@@ -236,7 +236,6 @@ public class TCFNodePropertySource implements IPropertySource {
                     if (!display.isDisposed()) {
                         display.asyncExec(new Runnable() {
                             public void run() {
-                                System.out.println("" + System.currentTimeMillis());
                                 for (IWorkbenchWindow window : PlatformUI.getWorkbench().getWorkbenchWindows()) {
                                     IWorkbenchPart active_part = window.getActivePage().getActivePart();
                                     if (active_part instanceof IDebugView) {
