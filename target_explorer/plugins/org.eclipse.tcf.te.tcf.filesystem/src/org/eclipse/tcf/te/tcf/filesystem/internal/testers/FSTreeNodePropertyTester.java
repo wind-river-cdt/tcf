@@ -86,6 +86,8 @@ public class FSTreeNodePropertyTester extends PropertyTester {
 			return node.isExecutable();
 		} else if (property.equals("isRoot")) { //$NON-NLS-1$
 			return node.isRoot();
+		} else if (property.equals("isSystemRoot")) { //$NON-NLS-1$
+			return node.isSystemRoot();
 		} else if (property.equals("isWindows")) { //$NON-NLS-1$
 			return node.isWindowsNode();
 		} else if (property.equals("isReadOnly")) { //$NON-NLS-1$
