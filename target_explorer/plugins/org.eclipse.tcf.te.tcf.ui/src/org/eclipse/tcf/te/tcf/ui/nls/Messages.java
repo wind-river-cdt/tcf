@@ -91,6 +91,8 @@ public class Messages extends NLS {
 	public static String NewTargetWizardPage_section_transportType;
 	public static String NewTargetWizardPage_section_attributes;
 
+	public static String RemotePeerDiscoveryRootNode_label;
+
 	public static String PeerIdControl_label;
 	public static String PeerNameControl_label;
 

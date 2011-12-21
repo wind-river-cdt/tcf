@@ -66,6 +66,11 @@ public interface ImageConsts {
     public static final String PEER = "PeerObject"; //$NON-NLS-1$
 
     /**
+     * The key to access the base remote peer discover root node object image.
+     */
+    public static final String DISCOVERY_ROOT = "RemotePeerDiscoverRootNodeObject"; //$NON-NLS-1$
+
+    /**
      * The key to access the target object gold overlay image.
      */
     public static final String GOLD_OVR = "GoldOverlay"; //$NON-NLS-1$

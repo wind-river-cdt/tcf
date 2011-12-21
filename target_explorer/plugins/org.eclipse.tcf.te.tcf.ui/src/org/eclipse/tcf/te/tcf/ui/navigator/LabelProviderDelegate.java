@@ -18,7 +18,9 @@ import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.ui.internal.ImageConsts;
+import org.eclipse.tcf.te.tcf.ui.navigator.ContentProviderDelegate.RemotePeerDiscoveryRootNode;
 import org.eclipse.tcf.te.tcf.ui.navigator.images.PeerImageDescriptor;
+import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.jface.images.AbstractImageDescriptor;
 
 
@@ -52,6 +54,8 @@ public class LabelProviderDelegate extends LabelProvider implements ILabelDecora
 			if (label != null && !"".equals(label.trim())) { //$NON-NLS-1$
 				return label;
 			}
+		} else if (element instanceof RemotePeerDiscoveryRootNode) {
+			return Messages.RemotePeerDiscoveryRootNode_label;
 		}
 
 		return ""; //$NON-NLS-1$
@@ -64,6 +68,9 @@ public class LabelProviderDelegate extends LabelProvider implements ILabelDecora
 	public Image getImage(Object element) {
 		if (element instanceof IPeerModel) {
 			return UIPlugin.getImage(ImageConsts.PEER);
+		}
+		if (element instanceof RemotePeerDiscoveryRootNode) {
+			return UIPlugin.getImage(ImageConsts.DISCOVERY_ROOT);
 		}
 
 		return super.getImage(element);
