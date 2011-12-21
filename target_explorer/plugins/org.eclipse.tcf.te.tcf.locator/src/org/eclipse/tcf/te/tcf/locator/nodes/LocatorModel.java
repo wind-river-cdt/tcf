@@ -475,11 +475,62 @@ public class LocatorModel extends PlatformObject implements ILocatorModel {
 		final IPeerModel parent = node.getParentNode();
 		if (parent == null) return null;
 
-		return doValidateChildPeerNodeForAdd(parent, node);
+		return validateChildPeerNodeForAdd(parent, node);
+	}
+
+	/**
+	 * Validates the given child peer model node in relation to the given parent peer model node
+	 * hierarchy.
+	 * <p>
+	 * The method is recursive.
+	 *
+	 * @param parent The parent model node. Must not be <code>null</code>.
+	 * @param node The child model node. Must not be <code>null</code>.
+	 *
+	 * @return The validated child peer model node, or <code>null</code>.
+	 */
+	protected IPeerModel validateChildPeerNodeForAdd(IPeerModel parent, IPeerModel node) {
+		Assert.isNotNull(parent);
+		Assert.isNotNull(node);
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+
+		if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITracing.ID_TRACE_LOCATOR_MODEL)) {
+			CoreBundleActivator.getTraceHandler().trace("LocatorModel.validateChildPeerNodeForAdd( " + parent.getPeerId() + ", " + node.getPeerId() + " )", ITracing.ID_TRACE_LOCATOR_MODEL, this); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		}
+
+		// Validate against the given parent
+		if (doValidateChildPeerNodeForAdd(parent, node) == null) {
+			return null;
+		}
+
+		// If the parent node is child node by itself, validate the
+		// child node against the parent parent node.
+		if (parent.getParentNode() != null) {
+			IPeerModel parentParentNode = parent.getParentNode();
+			if (doValidateChildPeerNodeForAdd(parentParentNode, node) == null) {
+				return null;
+			}
+
+			// And validate the child node against all child nodes of the parent parent.
+			List<IPeerModel> childrenList = getChildren(parentParentNode.getPeerId());
+			IPeerModel[] children = childrenList.toArray(new IPeerModel[childrenList.size()]);
+			for (IPeerModel parentParentChild : children) {
+				if (node.equals(parentParentChild) || parent.equals(parentParentChild)) {
+					return null;
+				}
+				if (doValidateChildPeerNodeForAdd(parentParentChild, node) == null) {
+					return null;
+				}
+			}
+		}
+
+		return node;
 	}
 
 	/**
 	 * Validates the given child peer model node in relation to the given parent peer model node.
+	 * <p>
+	 * The method is non-recursive.
 	 *
 	 * @param parent The parent model node. Must not be <code>null</code>.
 	 * @param node The child model node. Must not be <code>null</code>.
@@ -524,11 +575,6 @@ public class LocatorModel extends PlatformObject implements ILocatorModel {
 			if (port == null) port = "1534"; //$NON-NLS-1$
 
 			if (parentPort.equals(port)) return null;
-		}
-		// If the parent node is child node by itself, validate the
-		// child node against the parent parent node.
-		if (parent.getParentNode() != null) {
-			return doValidateChildPeerNodeForAdd(parent.getParentNode(), node);
 		}
 
 		return node;
