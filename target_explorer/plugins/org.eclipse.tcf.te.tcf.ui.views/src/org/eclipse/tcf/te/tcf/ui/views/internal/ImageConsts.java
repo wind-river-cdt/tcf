@@ -58,6 +58,12 @@ public interface ImageConsts {
      */
     public final static String  IMAGE_DIR_ETOOL = "etool16/"; //$NON-NLS-1$
 
+    /**
+     * The directory where to load view related images from, relative to
+     * the image root directory.
+     */
+    public final static String  IMAGE_DIR_EVIEW = "eview16/"; //$NON-NLS-1$
+
     // ***** The image constants *****
 
     /**
