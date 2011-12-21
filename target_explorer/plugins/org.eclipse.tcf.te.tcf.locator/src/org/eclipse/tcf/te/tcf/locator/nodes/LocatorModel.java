@@ -459,45 +459,79 @@ public class LocatorModel extends PlatformObject implements ILocatorModel {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel#validatePeerNodeForAdd(org.eclipse.tcf.protocol.IPeer, org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel)
+	 * @see org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel#validateChildPeerNodeForAdd(org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel)
 	 */
 	@Override
-	public IPeerModel validatePeerNodeForAdd(IPeer parentPeer, IPeerModel node) {
-		Assert.isNotNull(parentPeer);
+	public IPeerModel validateChildPeerNodeForAdd(final IPeerModel node) {
 		Assert.isNotNull(node);
 		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+
+		if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITracing.ID_TRACE_LOCATOR_MODEL)) {
+			CoreBundleActivator.getTraceHandler().trace("LocatorModel.validateChildPeerNodeForAdd( " + node.getPeerId() + " )", ITracing.ID_TRACE_LOCATOR_MODEL, this); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
+		// Determine the parent node. If null, the child node is invalid
+		// and cannot be added
+		final IPeerModel parent = node.getParentNode();
+		if (parent == null) return null;
+
+		return doValidateChildPeerNodeForAdd(parent, node);
+	}
+
+	/**
+	 * Validates the given child peer model node in relation to the given parent peer model node.
+	 *
+	 * @param parent The parent model node. Must not be <code>null</code>.
+	 * @param node The child model node. Must not be <code>null</code>.
+	 *
+	 * @return The validated child peer model node, or <code>null</code>.
+	 */
+	protected IPeerModel doValidateChildPeerNodeForAdd(IPeerModel parent, IPeerModel node) {
+		Assert.isNotNull(parent);
+		Assert.isNotNull(node);
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+
+		if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITracing.ID_TRACE_LOCATOR_MODEL)) {
+			CoreBundleActivator.getTraceHandler().trace("LocatorModel.doValidateChildPeerNodeForAdd( " + parent.getPeerId() + ", " + node.getPeerId() + " )", ITracing.ID_TRACE_LOCATOR_MODEL, this); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		}
+
+		// If the child node is already visible as root node, drop the child node
+		if (getService(ILocatorModelLookupService.class).lkupPeerModelById(node.getPeerId()) != null) {
+			return null;
+		}
 
 		// Get the peer from the peer node
 		IPeer peer = node.getPeer();
 
-		if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITracing.ID_TRACE_LOCATOR_MODEL)) {
-			CoreBundleActivator.getTraceHandler().trace("LocatorModel.validatePeerNodeForAdd( " + parentPeer.getID() + ", " + (peer != null ? peer.getID() : null) + " )", ITracing.ID_TRACE_LOCATOR_MODEL, this); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		}
-
-		IPeerModel result = node;
-
 		// If the child peer represents the same agent as the parent peer,
 		// drop the child peer
-		if (parentPeer.getAgentID() != null && parentPeer.getAgentID().equals(peer.getAgentID())) {
-			result = null;
+		String parentAgentID = parent.getPeer().getAgentID();
+		if (parentAgentID != null && parentAgentID.equals(peer.getAgentID())) {
+			return null;
 		}
 		// If the child peer's IP address appears to be the address of the
 		// localhost, drop the child peer
-		else if (peer.getAttributes().get(IPeer.ATTR_IP_HOST) != null && IPAddressUtil.getInstance().isLocalHost(peer.getAttributes().get(IPeer.ATTR_IP_HOST))) {
-			result = null;
+		if (peer.getAttributes().get(IPeer.ATTR_IP_HOST) != null && IPAddressUtil.getInstance().isLocalHost(peer.getAttributes().get(IPeer.ATTR_IP_HOST))) {
+			return null;
 		}
 		// If the child peer's IP address and port are the same as the parent's
 		// IP address and port, drop the child node
-		if (parentPeer.getAttributes().get(IPeer.ATTR_IP_HOST) != null && parentPeer.getAttributes().get(IPeer.ATTR_IP_HOST).equals(peer.getAttributes().get(IPeer.ATTR_IP_HOST))) {
-			String parentPort = parentPeer.getAttributes().get(IPeer.ATTR_IP_PORT);
+		Map<String, String> parentPeerAttributes = parent.getPeer().getAttributes();
+		if (parentPeerAttributes.get(IPeer.ATTR_IP_HOST) != null && parentPeerAttributes.get(IPeer.ATTR_IP_HOST).equals(peer.getAttributes().get(IPeer.ATTR_IP_HOST))) {
+			String parentPort = parentPeerAttributes.get(IPeer.ATTR_IP_PORT);
 			if (parentPort == null) parentPort = "1534"; //$NON-NLS-1$
 			String port = peer.getAttributes().get(IPeer.ATTR_IP_PORT);
 			if (port == null) port = "1534"; //$NON-NLS-1$
 
-			if (parentPort.equals(port)) result = null;
+			if (parentPort.equals(port)) return null;
+		}
+		// If the parent node is child node by itself, validate the
+		// child node against the parent parent node.
+		if (parent.getParentNode() != null) {
+			return doValidateChildPeerNodeForAdd(parent.getParentNode(), node);
 		}
 
-		return result;
+		return node;
 	}
 
 	/**

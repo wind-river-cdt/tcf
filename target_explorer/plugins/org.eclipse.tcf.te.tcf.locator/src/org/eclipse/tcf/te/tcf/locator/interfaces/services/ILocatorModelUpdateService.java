@@ -11,7 +11,6 @@ package org.eclipse.tcf.te.tcf.locator.interfaces.services;
 
 import java.util.Collection;
 
-import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 
 
@@ -21,9 +20,9 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 public interface ILocatorModelUpdateService extends ILocatorModelService {
 
 	/**
-	 * Adds the given peer to the list of know peers. A previous
-	 * mapping to a peer model with the same id as the given
-	 * peer model is overwritten.
+	 * Adds the given peer to the list of know peers.
+	 * <p>
+	 * A previous mapping to a peer model with the same id as the given peer model is overwritten.
 	 *
 	 * @param peer The peer model object. Must not be <code>null</code>.
 	 */
@@ -48,17 +47,25 @@ public interface ILocatorModelUpdateService extends ILocatorModelService {
 
 	/**
 	 * Adds the given child peer to the parent peer.
+	 * <p>
+	 * <b>Note:</b> The parent peer node is determined by calling {@link IPeerModel#getParentNode()}.
+	 *              The call has to return a non-null value, otherwise {@link #addChild(IPeerModel)}
+	 *              will do nothing.
 	 *
-	 * @param parent The parent peer. Must not be <code>null</code>.
+	 * @param parent The parent peer model node. Must not be <code>null</code>.
 	 * @param child The child peer model object. Must not be <code>null</code>.
 	 */
-	public void addChild(IPeer parent, IPeerModel child);
+	public void addChild(IPeerModel child);
 
 	/**
 	 * Removes the given child peer from the parent peer.
+	 * <p>
+	 * <b>Note:</b> The parent peer node is determined by calling {@link IPeerModel#getParentNode()}.
+	 *              The call has to return a non-null value, otherwise {@link #removeChild(IPeerModel)}
+	 *              will do nothing.
 	 *
-	 * @param parent The parent peer. Must not be <code>null</code>.
+	 * @param parent The parent peer model node. Must not be <code>null</code>.
 	 * @param child The child peer model object. Must not be <code>null</code>.
 	 */
-	public void removeChild(IPeer parent, IPeerModel child);
+	public void removeChild(IPeerModel child);
 }

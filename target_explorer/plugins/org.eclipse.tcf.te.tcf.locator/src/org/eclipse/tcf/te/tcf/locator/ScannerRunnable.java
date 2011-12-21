@@ -41,7 +41,7 @@ public class ScannerRunnable implements Runnable, IChannel.IChannelListener {
 	// Reference to the parent model scanner
 	private final IScanner parentScanner;
 	// Reference to the peer model node to update
-	private final IPeerModel peerNode;
+	/* default */ final IPeerModel peerNode;
 	// Reference to the channel
 	/* default */ IChannel channel = null;
 	// Mark if the used channel is a shared channel instance
@@ -165,16 +165,19 @@ public class ScannerRunnable implements Runnable, IChannel.IChannelListener {
 									if (peerNode == null) {
 										// Not yet known -> add it
 										peerNode = new PeerModel(model, peer);
+										peerNode.setParentNode(ScannerRunnable.this.peerNode);
 										// Validate the peer node before adding
-										peerNode = model.validatePeerNodeForAdd(parentPeer, peerNode);
+										peerNode = model.validateChildPeerNodeForAdd(peerNode);
 										if (peerNode != null) {
 											// Add the child peer node to model
-											model.getService(ILocatorModelUpdateService.class).addChild(parentPeer, peerNode);
+											model.getService(ILocatorModelUpdateService.class).addChild(peerNode);
 											// And schedule for immediate status update
 											Runnable runnable = new ScannerRunnable(getParentScanner(), peerNode);
 											Protocol.invokeLater(runnable);
 										}
 									} else {
+										// The parent node should be set and match
+										Assert.isTrue(peerNode.getParentNode() != null && peerNode.getParentNode().equals(ScannerRunnable.this.peerNode));
 										// Peer node found, update the peer instance
 										peerNode.setProperty(IPeerModelProperties.PROP_INSTANCE, peer);
 										// And remove it from the old child list
@@ -185,7 +188,7 @@ public class ScannerRunnable implements Runnable, IChannel.IChannelListener {
 		                        // Everything left in the old child list is not longer known to the remote peer
 		                        for (IPeerModel child : oldChildren) {
 		                        	// Remove the child peer node from the model
-									model.getService(ILocatorModelUpdateService.class).removeChild(parentPeer, child);
+									model.getService(ILocatorModelUpdateService.class).removeChild(child);
 		                        }
 		                    }
 

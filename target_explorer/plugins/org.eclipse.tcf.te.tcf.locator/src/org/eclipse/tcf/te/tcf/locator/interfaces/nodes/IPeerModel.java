@@ -51,4 +51,18 @@ public interface IPeerModel extends IPropertiesContainer {
 	 * @return The peer id.
 	 */
 	public String getPeerId();
+
+	/**
+	 * Sets the parent peer model node.
+	 *
+	 * @param node The parent peer model node or <code>null</code>.
+	 */
+	public void setParentNode(IPeerModel node);
+
+	/**
+	 * Returns the parent peer model node.
+	 *
+	 * @return The parent peer model node or <code>null</code>.
+	 */
+	public IPeerModel getParentNode();
 }

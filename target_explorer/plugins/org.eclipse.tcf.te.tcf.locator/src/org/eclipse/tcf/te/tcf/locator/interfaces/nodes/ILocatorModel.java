@@ -12,7 +12,6 @@ package org.eclipse.tcf.te.tcf.locator.interfaces.nodes;
 import java.util.List;
 
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.services.ILocator;
 import org.eclipse.tcf.te.tcf.locator.interfaces.IModelListener;
 import org.eclipse.tcf.te.tcf.locator.interfaces.IScanner;
@@ -133,13 +132,16 @@ public interface ILocatorModel extends IAdaptable {
 	public IPeerModel validatePeerNodeForAdd(IPeerModel node);
 
 	/**
-	 * Validate the given peer model if or if not it can be added to the locator model as new child
-	 * peer node for the given parent peer.
+	 * Validate the given child peer model node if or if not it can be added to the locator model
+	 * as new child peer node for the associated parent peer model node.
+	 * <p>
+	 * <b>Note:</b> The parent peer node is determined by calling {@link IPeerModel#getParentNode()}.
+	 *              The call has to return a non-null value, otherwise {@link #validateChildPeerNodeForAdd(IPeerModel)}
+	 *              will do nothing.
 	 *
-	 * @parentPeer The parent peer. Must not be <code>null</code>.
 	 * @param node The peer model. Must not be <code>null</code>.
 	 * @return The peer node if it allowed add it to the model, or <code>null</code> if not.
 	 */
-	public IPeerModel validatePeerNodeForAdd(IPeer parentPeer, IPeerModel node);
+	public IPeerModel validateChildPeerNodeForAdd(IPeerModel node);
 
 }

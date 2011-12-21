@@ -30,30 +30,23 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
  */
 public class PeerModel extends PropertiesContainer implements IPeerModel, IWorkingSetElement {
 	// Reference to the parent locator model
-	private final ILocatorModel parentModel;
+	private final ILocatorModel model;
+	// Reference to the parent peer model node
+	private IPeerModel node;
 	// Reference to the peer id (cached for performance optimization)
 	private String peerId;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param parent The parent locator model. Must not be <code>null</code>.
-	 */
-	public PeerModel(ILocatorModel parent) {
-		this(parent, null);
-	}
-
-	/**
-	 * Constructor.
-	 *
-	 * @param parent The parent locator model. Must not be <code>null</code>.
+	 * @param model The parent locator model. Must not be <code>null</code>.
 	 * @param peer The peer or <code>null</code>.
 	 */
-	public PeerModel(ILocatorModel parent, IPeer peer) {
+	public PeerModel(ILocatorModel model, IPeer peer) {
 		super();
 
-		Assert.isNotNull(parent);
-		parentModel = parent;
+		Assert.isNotNull(model);
+		this.model = model;
 
 		// Set the default properties before enabling the change events.
 		// The properties changed listeners should not be called from the
@@ -109,6 +102,24 @@ public class PeerModel extends PropertiesContainer implements IPeerModel, IWorki
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel#setParentNode(org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel)
+	 */
+	@Override
+	public void setParentNode(IPeerModel node) {
+		Assert.isTrue(checkThreadAccess(), "Illegal Thread Access"); //$NON-NLS-1$
+		this.node = node;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel#getParentNode()
+	 */
+	@Override
+	public IPeerModel getParentNode() {
+		Assert.isTrue(checkThreadAccess(), "Illegal Thread Access"); //$NON-NLS-1$
+	    return node;
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
 	 */
 	@Override
@@ -143,7 +154,7 @@ public class PeerModel extends PropertiesContainer implements IPeerModel, IWorki
 		Assert.isTrue(checkThreadAccess(), "Illegal Thread Access"); //$NON-NLS-1$
 
 		if (adapter.isAssignableFrom(ILocatorModel.class)) {
-			return parentModel;
+			return model;
 		}
 
 		Object peer = getProperty(IPeerModelProperties.PROP_INSTANCE);
@@ -232,14 +243,14 @@ public class PeerModel extends PropertiesContainer implements IPeerModel, IWorki
 		Assert.isNotNull(peerId);
 
 		if (changeEventsEnabled()) {
-			final IModelListener[] listeners = parentModel.getListener();
+			final IModelListener[] listeners = model.getListener();
 			if (listeners.length > 0) {
 				Protocol.invokeLater(new Runnable() {
 					@Override
 					@SuppressWarnings("synthetic-access")
 					public void run() {
 						for (IModelListener listener : listeners) {
-							listener.peerModelChanged(parentModel, PeerModel.this);
+							listener.peerModelChanged(model, PeerModel.this);
 						}
 					}
 				});
@@ -265,14 +276,14 @@ public class PeerModel extends PropertiesContainer implements IPeerModel, IWorki
 		// Notify registered listeners that the peer changed. Property
 		// changes for property slots ending with ".silent" are suppressed.
 		if (changeEventsEnabled() && !key.endsWith(".silent")) { //$NON-NLS-1$
-			final IModelListener[] listeners = parentModel.getListener();
+			final IModelListener[] listeners = model.getListener();
 			if (listeners.length > 0) {
 				Protocol.invokeLater(new Runnable() {
 					@Override
 					@SuppressWarnings("synthetic-access")
 					public void run() {
 						for (IModelListener listener : listeners) {
-							listener.peerModelChanged(parentModel, PeerModel.this);
+							listener.peerModelChanged(model, PeerModel.this);
 						}
 					}
 				});
