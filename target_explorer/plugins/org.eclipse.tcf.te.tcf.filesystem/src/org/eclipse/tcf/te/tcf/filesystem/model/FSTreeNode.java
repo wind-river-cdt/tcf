@@ -109,8 +109,12 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 			clone.parent = parent;
 			clone.peerNode = peerNode;
 			clone.type = type;
-			Map<String, Object> attributes = new HashMap<String, Object>(attr.attributes);
-			clone.attr = new IFileSystem.FileAttrs(attr.flags, attr.size, attr.uid, attr.gid, attr.permissions, attr.atime, attr.mtime, attributes);
+			if (attr != null) {
+				Map<String, Object> attributes = new HashMap<String, Object>(attr.attributes);
+				clone.attr = new IFileSystem.FileAttrs(attr.flags, attr.size, attr.uid, attr.gid, attr.permissions, attr.atime, attr.mtime, attributes);
+			} else {
+				clone.attr = null;
+			}
 			return clone;
 		}
 		final Object[] objects = new Object[1];
