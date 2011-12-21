@@ -11,7 +11,6 @@ package org.eclipse.tcf.te.tcf.processes.ui.controls;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
@@ -170,12 +169,7 @@ public class ProcessesTreeContentProvider implements ITreeContentProvider {
 																			if (node != null) {
 																				node.parent = rootNode;
 																				rootNode.children.add(node);
-																				PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-																					@Override
-				                                                                    public void run() {
-																						if (viewer != null) viewer.refresh();
-																					}
-																				});																				
+																				refreshViewer();
 																			}
 																		}
 																	}
@@ -189,13 +183,7 @@ public class ProcessesTreeContentProvider implements ITreeContentProvider {
 																// Reset the children query marker
 																rootNode.childrenQueryRunning = false;
 																rootNode.childrenQueried = true;
-
-																PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-																	@Override
-                                                                    public void run() {
-																		if (viewer != null) viewer.refresh();
-																	}
-																});
+																refreshViewer();
 															}
 														});
 													}
@@ -234,6 +222,14 @@ public class ProcessesTreeContentProvider implements ITreeContentProvider {
 		return children;
 	}
 
+	/* default */ void refreshViewer() {
+		PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+			@Override
+            public void run() {
+				if (viewer != null && !viewer.getControl().isDisposed()) viewer.refresh();
+			}
+		});
+	}
 	/**
 	 * Query the children of the given process context.
 	 *
@@ -285,13 +281,7 @@ public class ProcessesTreeContentProvider implements ITreeContentProvider {
 										// Reset the children query marker
 										parentNode.childrenQueryRunning = false;
 										parentNode.childrenQueried = true;
-
-										PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-											@Override
-                                            public void run() {
-												if (viewer instanceof StructuredViewer) ((StructuredViewer)viewer).refresh(parentNode);
-											}
-										});
+										refreshViewer();
 									}
 								});
 							}

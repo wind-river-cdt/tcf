@@ -82,8 +82,8 @@ public class FSTreeContentProvider implements ITreeContentProvider, INodeStateLi
 		if(input != null) {
 			FSModel.getFSModel(input).removeNodeStateListener(this);
 		}
-		input = (IPeerModel) newInput;
-		if(input != null) {
+		if (newInput instanceof IPeerModel) {
+			input = (IPeerModel) newInput;
 			FSModel.getFSModel(input).addNodeStateListener(this);
 		}
 	}
