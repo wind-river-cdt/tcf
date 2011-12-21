@@ -16,9 +16,10 @@ import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.util.LocalSelectionTransfer;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -49,7 +50,7 @@ import org.eclipse.ui.part.MultiPageSelectionProvider;
 /**
  * File system browser control.
  */
-public class FSTreeControl extends AbstractTreeControl implements ISelectionChangedListener, IDoubleClickListener, FocusListener {
+public class FSTreeControl extends AbstractTreeControl implements ISelectionChangedListener, FocusListener {
 
 	/**
 	 * Constructor.
@@ -87,7 +88,6 @@ public class FSTreeControl extends AbstractTreeControl implements ISelectionChan
 
 		Tree tree = viewer.getTree();
 		tree.addFocusListener(this);
-		viewer.addDoubleClickListener(this);
 		//Add DnD support.
 	    int operations = DND.DROP_COPY | DND.DROP_MOVE | DND.DROP_LINK;
 		Transfer[] transferTypes = {LocalSelectionTransfer.getTransfer()};
@@ -147,37 +147,40 @@ public class FSTreeControl extends AbstractTreeControl implements ISelectionChan
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IDoubleClickListener#doubleClick(org.eclipse.jface.viewers.DoubleClickEvent)
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.trees.AbstractTreeControl#doubleClick(org.eclipse.jface.viewers.DoubleClickEvent)
 	 */
 	@Override
-	public void doubleClick(DoubleClickEvent event) {
+	public void doubleClick(final DoubleClickEvent event) {
 		// If an handled and enabled command is registered for the ICommonActionConstants.OPEN
 		// retargetable action id, redirect the double click handling to the command handler.
 		//
 		// Note: The default tree node expansion must be re-implemented in the active handler!
 		ICommandService service = (ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class);
-		Command command = service != null ? service.getCommand(ICommonActionConstants.OPEN) : null;
+		final Command command = service != null ? service.getCommand(ICommonActionConstants.OPEN) : null;
 		if (command != null && command.isDefined() && command.isEnabled()) {
-			try {
-				ISelection selection = event.getSelection();
-				EvaluationContext ctx = new EvaluationContext(null, selection);
-				ctx.addVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME, selection);
-				ctx.addVariable(ISources.ACTIVE_MENU_SELECTION_NAME, selection);
-				ctx.addVariable(ISources.ACTIVE_WORKBENCH_WINDOW_NAME, PlatformUI.getWorkbench().getActiveWorkbenchWindow());
-				IWorkbenchPart part = getParentPart();
-				if (part != null) {
-					IWorkbenchPartSite site = part.getSite();
-					ctx.addVariable(ISources.ACTIVE_PART_ID_NAME, site.getId());
-					ctx.addVariable(ISources.ACTIVE_PART_NAME, part);
-					ctx.addVariable(ISources.ACTIVE_SITE_NAME, site);
-					ctx.addVariable(ISources.ACTIVE_SHELL_NAME, site.getShell());
-				}
-				ExecutionEvent executionEvent = new ExecutionEvent(command, Collections.EMPTY_MAP, part, ctx);
-				command.executeWithChecks(executionEvent);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			SafeRunner.run(new SafeRunnable(){
+				@Override
+                public void run() throws Exception {
+					ISelection selection = event.getSelection();
+					EvaluationContext ctx = new EvaluationContext(null, selection);
+					ctx.addVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME, selection);
+					ctx.addVariable(ISources.ACTIVE_MENU_SELECTION_NAME, selection);
+					ctx.addVariable(ISources.ACTIVE_WORKBENCH_WINDOW_NAME, PlatformUI.getWorkbench().getActiveWorkbenchWindow());
+					IWorkbenchPart part = getParentPart();
+					if (part != null) {
+						IWorkbenchPartSite site = part.getSite();
+						ctx.addVariable(ISources.ACTIVE_PART_ID_NAME, site.getId());
+						ctx.addVariable(ISources.ACTIVE_PART_NAME, part);
+						ctx.addVariable(ISources.ACTIVE_SITE_NAME, site);
+						ctx.addVariable(ISources.ACTIVE_SHELL_NAME, site.getShell());
+					}
+					ExecutionEvent executionEvent = new ExecutionEvent(command, Collections.EMPTY_MAP, part, ctx);
+					command.executeWithChecks(executionEvent);
+                }});
+		} else {
+			super.doubleClick(event);
 		}
 	}
 

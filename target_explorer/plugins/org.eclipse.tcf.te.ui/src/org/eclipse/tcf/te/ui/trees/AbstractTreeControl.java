@@ -27,9 +27,12 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelDecorator;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -65,7 +68,7 @@ import org.eclipse.ui.menus.IMenuService;
 /**
  * Abstract tree control implementation.
  */
-public abstract class AbstractTreeControl extends WorkbenchPartControl implements SelectionListener{
+public abstract class AbstractTreeControl extends WorkbenchPartControl implements SelectionListener, IDoubleClickListener {
 	// Reference to the tree viewer instance
 	private TreeViewer viewer;
 	// Reference to the selection changed listener
@@ -194,6 +197,8 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 			viewer.addSelectionChangedListener(selectionChangedListener);
 		}
 		
+		viewer.addDoubleClickListener(this);
+
 		// Set the help context.
 		String helpContextId = getHelpId();
 		if (helpContextId != null) {
@@ -707,5 +712,23 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 */
 	@Override
     public void widgetDefaultSelected(SelectionEvent e) {
+	}
+
+	/**
+	 * Listens to the double-click event of the tree and expand or collapse
+	 * the tree by default. Subclass may override this method to invoke certain
+	 * command.
+	 * 
+	 * @param event the double click event
+	 * @see org.eclipse.jface.viewers.IDoubleClickListener#doubleClick(DoubleClickEvent)
+	 */
+	@Override
+    public void doubleClick(DoubleClickEvent event) {
+		IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+		Object element = selection.getFirstElement();
+		TreeViewer viewer = (TreeViewer) getViewer();
+		if (viewer.isExpandable(element)) {
+			viewer.setExpandedState(element, !viewer.getExpandedState(element));
+		}
 	}
 }
