@@ -478,7 +478,10 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * @return The tree viewer layout data instance.
 	 */
 	protected Object doCreateTreeViewerLayoutData(TreeViewer viewer) {
-		return new GridData(GridData.FILL_BOTH);
+	    GridData data = new GridData(GridData.FILL_BOTH);
+	    data.widthHint = 0;
+	    data.heightHint = 0;
+	    return data;
 	}
 
 	/**

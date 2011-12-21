@@ -102,7 +102,10 @@ public class ProcessExplorerEditorPage extends AbstractEditorPage {
 		}
 		// Set the title to the section
 		section.setText(title);
-		section.setLayoutData(new GridData(GridData.FILL_BOTH));
+		GridData data = new GridData(GridData.FILL_BOTH);
+		data.widthHint = 0;
+		data.heightHint = 0;
+		section.setLayoutData(data);
 
 		// Create the client area
 		Composite client = toolkit.getFormToolkit().createComposite(section);
