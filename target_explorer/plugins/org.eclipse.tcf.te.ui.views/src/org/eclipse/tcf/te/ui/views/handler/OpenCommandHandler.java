@@ -48,19 +48,18 @@ public class OpenCommandHandler extends AbstractHandler {
 			Object element = ((IStructuredSelection)selection).getFirstElement();
 			if (viewer.isExpandable(element)) {
 				viewer.setExpandedState(element, !viewer.getExpandedState(element));
-			} else {
-				// Node is not an expandable node, forward to the properties action.
-				ICommandService service = (ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class);
-				Command command = service != null ? service.getCommand(ActionFactory.PROPERTIES.getCommandId()) : null;
-				if (command != null && command.isDefined() && command.isEnabled()) {
-					try {
-						command.executeWithChecks(event);
-					} catch (Exception e) {
-						// If the platform is in debug mode, we print the exception to the log view
-						if (Platform.inDebugMode()) {
-							IStatus status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), e.getLocalizedMessage(), e);
-							UIPlugin.getDefault().getLog().log(status);
-						}
+			} 
+			// Node is not an expandable node, forward to the properties action.
+			ICommandService service = (ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class);
+			Command command = service != null ? service.getCommand(ActionFactory.PROPERTIES.getCommandId()) : null;
+			if (command != null && command.isDefined() && command.isEnabled()) {
+				try {
+					command.executeWithChecks(event);
+				} catch (Exception e) {
+					// If the platform is in debug mode, we print the exception to the log view
+					if (Platform.inDebugMode()) {
+						IStatus status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), e.getLocalizedMessage(), e);
+						UIPlugin.getDefault().getLog().log(status);
 					}
 				}
 			}

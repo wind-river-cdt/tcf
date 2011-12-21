@@ -562,9 +562,16 @@
                   <with variable="selection">
                      <count value="1"/>
                      <iterate operator="and" ifEmpty="false">
-                        <instanceof
-                              value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
-                        </instanceof>
+                        <and>
+                           <instanceof
+                                 value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                           </instanceof>
+                           <not>
+                              <test
+                                    property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isSystemRoot">
+                              </test>
+                           </not>
+                        </and>
                      </iterate>
                   </with>
                </visibleWhen>
@@ -581,9 +588,16 @@
                   <with variable="selection">
                      <count value="1"/>
                      <iterate operator="and" ifEmpty="false">
-                        <instanceof
-                              value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
-                        </instanceof>
+                        <and>
+                           <instanceof
+                                 value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                           </instanceof>
+                           <not>
+                              <test
+                                    property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isSystemRoot">
+                              </test>
+                           </not>
+                        </and>
                      </iterate>
                   </with>
                </visibleWhen>
@@ -996,7 +1010,16 @@
             id="org.eclipse.tcf.te.tcf.filesystem.pages.basic"
             name="%GeneralInformationPage.name">
          <enabledWhen>
-            <instanceof value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode"/>
+            <and>
+               <instanceof
+                     value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+               </instanceof>
+               <not>
+                  <test
+                        property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isSystemRoot">
+                  </test>
+               </not>
+            </and>
          </enabledWhen>
       </page>
    </extension>
@@ -1007,7 +1030,7 @@
             class="org.eclipse.tcf.te.tcf.filesystem.internal.testers.FSTreeNodePropertyTester"
             id="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode"
             namespace="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode"
-            properties="isFile,isDirectory,isBinaryFile,isReadable,isWritable,isExecutable,isRoot,isReadOnly,isHidden,isWindows,testParent,getCacheState"
+            properties="isFile,isDirectory,isBinaryFile,isReadable,isWritable,isExecutable,isRoot,isReadOnly,isHidden,isWindows,testParent,getCacheState,isSystemRoot"
             type="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
       </propertyTester>
       <propertyTester
