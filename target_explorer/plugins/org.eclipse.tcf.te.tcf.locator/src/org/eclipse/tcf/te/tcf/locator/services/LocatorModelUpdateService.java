@@ -130,8 +130,6 @@ public class LocatorModelUpdateService extends AbstractLocatorModelService imple
 		// Determine the peer id of the parent
 		String parentId = parent.getID();
 		Assert.isNotNull(parentId);
-		final IPeerModel parentNode = getLocatorModel().getService(ILocatorModelLookupService.class).lkupPeerModelById(parentId);
-		Assert.isNotNull(parentNode);
 
 		// Get the list of existing children
 		List<IPeerModel> children = new ArrayList<IPeerModel>(getLocatorModel().getChildren(parentId));
@@ -140,16 +138,20 @@ public class LocatorModelUpdateService extends AbstractLocatorModelService imple
 			getLocatorModel().setChildren(parentId, children);
 		}
 
-		final IModelListener[] listeners = getLocatorModel().getListener();
-		if (listeners.length > 0) {
-			Protocol.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					for (IModelListener listener : listeners) {
-						listener.peerModelChanged(getLocatorModel(), parentNode);
+		// Notify listeners if the parent node exist
+		final IPeerModel parentNode = getLocatorModel().getService(ILocatorModelLookupService.class).lkupPeerModelById(parentId);
+		if (parentNode != null) {
+			final IModelListener[] listeners = getLocatorModel().getListener();
+			if (listeners.length > 0) {
+				Protocol.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						for (IModelListener listener : listeners) {
+							listener.peerModelChanged(getLocatorModel(), parentNode);
+						}
 					}
-				}
-			});
+				});
+			}
 		}
 	}
 
@@ -165,8 +167,6 @@ public class LocatorModelUpdateService extends AbstractLocatorModelService imple
 		// Determine the peer id of the parent
 		String parentId = parent.getID();
 		Assert.isNotNull(parentId);
-		final IPeerModel parentNode = getLocatorModel().getService(ILocatorModelLookupService.class).lkupPeerModelById(parentId);
-		Assert.isNotNull(parentNode);
 
 		// Get the list of existing children
 		List<IPeerModel> children = new ArrayList<IPeerModel>(getLocatorModel().getChildren(parentId));
@@ -175,16 +175,20 @@ public class LocatorModelUpdateService extends AbstractLocatorModelService imple
 			getLocatorModel().setChildren(parentId, children);
 		}
 
-		final IModelListener[] listeners = getLocatorModel().getListener();
-		if (listeners.length > 0) {
-			Protocol.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					for (IModelListener listener : listeners) {
-						listener.peerModelChanged(getLocatorModel(), parentNode);
+		// Notify listeners if the parent node exist
+		final IPeerModel parentNode = getLocatorModel().getService(ILocatorModelLookupService.class).lkupPeerModelById(parentId);
+		if (parentNode != null) {
+			final IModelListener[] listeners = getLocatorModel().getListener();
+			if (listeners.length > 0) {
+				Protocol.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						for (IModelListener listener : listeners) {
+							listener.peerModelChanged(getLocatorModel(), parentNode);
+						}
 					}
-				}
-			});
+				});
+			}
 		}
 	}
 }
