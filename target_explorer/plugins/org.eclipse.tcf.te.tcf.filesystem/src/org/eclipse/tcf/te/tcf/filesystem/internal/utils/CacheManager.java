@@ -154,7 +154,9 @@ public class CacheManager {
 			return appendPathSegment(node, path, node.name);
 		}
 		if (node.isWindowsNode()) {
-			String name = node.name.replace(':', PATH_ESCAPE_CHAR);
+			String name = node.name;
+			name = name.substring(0, name.length()-1);
+			name = name.replace(':', PATH_ESCAPE_CHAR);
 			return appendPathSegment(node, path, name);
 		}
 		return path;
