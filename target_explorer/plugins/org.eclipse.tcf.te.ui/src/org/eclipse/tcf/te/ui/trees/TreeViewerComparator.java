@@ -49,9 +49,11 @@ public class TreeViewerComparator extends ViewerComparator {
 		}
 		if (treeColumn != null && !treeColumn.isDisposed()) {
 			ColumnDescriptor column = (ColumnDescriptor) treeColumn.getData();
-            Comparator comparator = column.getComparator();
-			if (comparator != null) {
-				return inverter * comparator.compare(e1, e2);
+			if (column != null) {
+				Comparator comparator = column.getComparator();
+				if (comparator != null) {
+					return inverter * comparator.compare(e1, e2);
+				}
 			}
 		}
 		return inverter * super.compare(viewer, e1, e2);

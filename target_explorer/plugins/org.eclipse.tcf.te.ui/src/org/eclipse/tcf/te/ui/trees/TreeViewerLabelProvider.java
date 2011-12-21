@@ -35,16 +35,18 @@ public class TreeViewerLabelProvider extends LabelProvider implements ITableLabe
 	}
 	
 	/**
-	 * Get the specific column's ContextColumn object.
+	 * Get the specific column's ColumnDescriptor object.
+	 * <b>NOTE:</b> <em>The returned descriptor might be null, if the column is the
+	 * padding column on linux host.</em>
 	 * 
 	 * @param columnIndex the column index.
-	 * @return The ContextColumn object describing the column.
+	 * @return The ColumnDescriptor object describing the column.
 	 */
 	private ColumnDescriptor getColumn(int columnIndex) {
 		Tree tree = viewer.getTree();
 		TreeColumn column = tree.getColumn(columnIndex);
-		ColumnDescriptor context = (ColumnDescriptor) column.getData();
-		return context;
+		ColumnDescriptor descriptor = (ColumnDescriptor) column.getData();
+		return descriptor;
 	}
 
 	/* (non-Javadoc)
@@ -69,9 +71,11 @@ public class TreeViewerLabelProvider extends LabelProvider implements ITableLabe
 	@Override
 	public Image getColumnImage(Object element, int columnIndex) {
 		ColumnDescriptor column = getColumn(columnIndex);
-		ILabelProvider labelProvider = column.getLabelProvider();
-		if(labelProvider != null) {
-			return labelProvider.getImage(element);
+		if (column != null) {
+			ILabelProvider labelProvider = column.getLabelProvider();
+			if (labelProvider != null) {
+				return labelProvider.getImage(element);
+			}
 		}
 		return null;
 	}
@@ -82,9 +86,11 @@ public class TreeViewerLabelProvider extends LabelProvider implements ITableLabe
 	@Override
 	public String getColumnText(Object element, int columnIndex) {
 		ColumnDescriptor column = getColumn(columnIndex);
-		ILabelProvider labelProvider = column.getLabelProvider();
-		if(labelProvider != null) {
-			return labelProvider.getText(element);
+		if (column != null) {
+			ILabelProvider labelProvider = column.getLabelProvider();
+			if (labelProvider != null) {
+				return labelProvider.getText(element);
+			}
 		}
 		return ""; //$NON-NLS-1$
 	}

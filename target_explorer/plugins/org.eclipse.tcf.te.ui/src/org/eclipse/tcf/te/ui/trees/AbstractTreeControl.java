@@ -51,6 +51,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.tcf.te.runtime.utils.Host;
 import org.eclipse.tcf.te.ui.WorkbenchPartControl;
 import org.eclipse.tcf.te.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.forms.CustomFormToolkit;
@@ -379,12 +380,19 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 		for(ColumnDescriptor visibleColumn : visibleColumns) {
 			createTreeColumn(visibleColumn, true);
 		}
+		if(!Host.isWindowsHost()) {
+			Tree tree = viewer.getTree();
+			TreeColumn column = new TreeColumn(tree, SWT.LEFT);
+			column.setWidth(1);
+		}
 		// Set the default sort column to the first column (the tree column).
 		Assert.isTrue(viewer.getTree().getColumnCount() > 0);
 		TreeColumn treeColumn = viewer.getTree().getColumn(0);
-		viewer.getTree().setSortColumn(treeColumn);
 		ColumnDescriptor column = (ColumnDescriptor) treeColumn.getData();
-		viewer.getTree().setSortDirection(column.isAscending() ? SWT.UP : SWT.DOWN);
+		if (column != null) {
+			viewer.getTree().setSortColumn(treeColumn);
+			viewer.getTree().setSortDirection(column.isAscending() ? SWT.UP : SWT.DOWN);
+		}
 	}
 
 	/**
@@ -433,7 +441,9 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 			for(int i=0;i<orders.length;i++) {
 				TreeColumn treeColumn = treeColumns[orders[i]];
 				ColumnDescriptor column = (ColumnDescriptor) treeColumn.getData();
-				column.setOrder(i);
+				if (column != null) {
+					column.setOrder(i);
+				}
 			}
 		}
 	}
@@ -697,13 +707,15 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
     public void widgetSelected(SelectionEvent e) {
 		Assert.isTrue(e.getSource() instanceof TreeColumn);
 		TreeColumn treeColumn = (TreeColumn) e.getSource();
-		viewer.getTree().setSortColumn(treeColumn);
 		ColumnDescriptor column = (ColumnDescriptor) treeColumn.getData();
-		column.setAscending(!column.isAscending());
-		viewer.getTree().setSortDirection(column.isAscending() ? SWT.UP : SWT.DOWN);
-		Object[] expandedElements = viewer.getExpandedElements();
-		viewer.refresh();
-		viewer.setExpandedElements(expandedElements);
+		if (column != null) {
+			viewer.getTree().setSortColumn(treeColumn);
+			column.setAscending(!column.isAscending());
+			viewer.getTree().setSortDirection(column.isAscending() ? SWT.UP : SWT.DOWN);
+			Object[] expandedElements = viewer.getExpandedElements();
+			viewer.refresh();
+			viewer.setExpandedElements(expandedElements);
+		}
     }
 
 	/*
