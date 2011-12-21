@@ -33,12 +33,12 @@ public interface ImageConsts {
      * relative to the image root directory.
      */
     public final static String  IMAGE_DIR_OBJ32 = "obj32/"; //$NON-NLS-1$
-    
+
     /**
      * The directory where to load the decorator image from.
      */
     public final static String IMAGE_DIR_OVR = "ovr/"; //$NON-NLS-1$
-    
+
     // ***** The image constants *****
 
     /**
@@ -47,31 +47,36 @@ public interface ImageConsts {
     public static final String FOLDER = "Folder"; //$NON-NLS-1$
 
     /**
-     * The key to access the base folder object image.
+     * The key to access the base root node object image.
+     */
+    public static final String ROOT = "Root"; //$NON-NLS-1$
+
+    /**
+     * The key to access the base root folder object image (closed).
      */
     public static final String ROOT_DRIVE = "RootDrive"; //$NON-NLS-1$
 
     /**
-     * The key to access the base folder object image.
+     * The key to access the base root folder object image (opened).
      */
     public static final String ROOT_DRIVE_OPEN = "RootDriveOpen"; //$NON-NLS-1$
-    
+
     /**
      * The key to access the image of compare editor.
      */
     public static final String COMPARE_EDITOR = "CompareEditor"; //$NON-NLS-1$
-    
+
     /**
      * The key to access the title image of "replace folder confirm" dialog.
      */
     public static final String REPLACE_FOLDER_CONFIRM = "ReplaceFolderConfirm"; //$NON-NLS-1$
-    
+
     /**
      * The key to access the title image of "confirm read only delete" dialog.
      */
     public static final String DELETE_READONLY_CONFIRM = "ConfirmReadOnlyDelete"; //$NON-NLS-1$
-    
-	/** 
+
+	/**
 	 * The key to access the banner image of the advanced attributes dialog.
 	 */
 	public static final String BANNER_IMAGE = "BannerImage"; //$NON-NLS-1$

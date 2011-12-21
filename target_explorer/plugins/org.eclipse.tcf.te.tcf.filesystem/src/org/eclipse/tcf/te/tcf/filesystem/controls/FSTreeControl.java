@@ -102,7 +102,7 @@ public class FSTreeControl extends AbstractTreeControl implements ISelectionChan
 	 */
 	@Override
 	protected ITreeContentProvider doCreateTreeViewerContentProvider(TreeViewer viewer) {
-		return new FSTreeContentProvider();
+		return new FSTreeContentProvider(false);
 	}
 
 	/* (non-Javadoc)
@@ -224,5 +224,5 @@ public class FSTreeControl extends AbstractTreeControl implements ISelectionChan
 	@Override
     protected String getViewerId() {
 	    return IUIConstants.ID_TREE_VIEWER_FS;
-    }	
+    }
 }

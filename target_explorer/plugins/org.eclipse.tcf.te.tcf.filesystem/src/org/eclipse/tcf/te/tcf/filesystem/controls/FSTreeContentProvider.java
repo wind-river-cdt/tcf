@@ -12,6 +12,7 @@ package org.eclipse.tcf.te.tcf.filesystem.controls;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
@@ -49,11 +50,27 @@ public class FSTreeContentProvider implements ITreeContentProvider, INodeStateLi
 	protected final static Object[] NO_ELEMENTS = new Object[0];
 
 	/* package */ TreeViewer viewer = null;
-	
+
 	// The current input.
 	private IPeerModel input;
 
-	public FSTreeContentProvider(){
+	// Flag to control if the file system root node is visible
+	private final boolean rootNodeVisible;
+
+	/**
+	 * Constructor.
+	 */
+	public FSTreeContentProvider() {
+		this(true);
+	}
+
+	/**
+	 * Constructor.
+	 *
+	 * @param rootNodeVisible If <code>true</code>, the file system root node is visible.
+	 */
+	public FSTreeContentProvider(boolean rootNodeVisible) {
+		this.rootNodeVisible = rootNodeVisible;
 	}
 
 	/* (non-Javadoc)
@@ -139,116 +156,29 @@ public class FSTreeContentProvider implements ITreeContentProvider, INodeStateLi
 					}
 				});
 				if (peer != null && IPeerModelProperties.STATE_ERROR != state[0] && IPeerModelProperties.STATE_NOT_REACHABLE != state[0]) {
-					final List<FSTreeNode> candidates = new ArrayList<FSTreeNode>();
+					final AtomicReference<FSTreeNode> rootNode = new AtomicReference<FSTreeNode>();
 					// Create the root node and the initial pending node.
 					// This must happen in the TCF dispatch thread.
 					Protocol.invokeAndWait(new Runnable() {
 						@Override
 						public void run() {
 							// The root node
-							FSTreeNode rootNode = new FSTreeNode();
-							rootNode.type = "FSRootNode"; //$NON-NLS-1$
-							rootNode.peerNode = peerNode;
-							rootNode.childrenQueried = false;
-							rootNode.childrenQueryRunning = true;
-							FSModel.getFSModel(peerNode).setRoot(rootNode);
+							FSTreeNode node = new FSTreeNode();
+							node.type = "FSRootNode"; //$NON-NLS-1$
+							node.peerNode = peerNode;
+							node.childrenQueried = false;
+							node.childrenQueryRunning = false;
+							node.name = org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages.FSTreeNodeContentProvider_rootNode_label;
+							FSModel.getFSModel(peerNode).setRoot(node);
 
-							// Add a special "Pending..." node
-							FSTreeNode pendingNode = new FSTreeNode();
-							pendingNode.name = Messages.PendingOperation_label;
-							pendingNode.type ="FSPendingNode"; //$NON-NLS-1$
-							pendingNode.parent = rootNode;
-							pendingNode.peerNode = rootNode.peerNode;
-							rootNode.getChildren().add(pendingNode);
-
-							candidates.addAll(rootNode.getChildren());
+							rootNode.set(node);
 						}
 					});
 
-					children = candidates.toArray();
-
-					Tcf.getChannelManager().openChannel(peer, false, new IChannelManager.DoneOpenChannel() {
-						@Override
-						public void doneOpenChannel(final Throwable error, final IChannel channel) {
-							Assert.isTrue(Protocol.isDispatchThread());
-
-							if (channel != null) {
-								final IFileSystem service = channel.getRemoteService(IFileSystem.class);
-								if (service != null) {
-
-									Protocol.invokeLater(new Runnable() {
-										@Override
-										public void run() {
-											service.roots(new IFileSystem.DoneRoots() {
-												@Override
-												public void doneRoots(IToken token, FileSystemException error, DirEntry[] entries) {
-													// Close the channel, not needed anymore
-													closeOpenChannel(channel);
-
-													FSTreeNode rootNode = FSModel.getFSModel(peerNode).getRoot();
-													if (rootNode != null && error == null) {
-
-														for (DirEntry entry : entries) {
-															FSTreeNode node = createNodeFromDirEntry(entry, true);
-															if (node != null) {
-																node.parent = rootNode;
-																node.peerNode = rootNode.peerNode;
-																rootNode.getChildren().add(node);
-															}
-														}
-
-														// Find the pending node and remove it from the child list
-														Iterator<FSTreeNode> iterator = rootNode.getChildren().iterator();
-														while (iterator.hasNext()) {
-															FSTreeNode candidate = iterator.next();
-															if (Messages.PendingOperation_label.equals(candidate.name)) {
-																iterator.remove();
-																break;
-															}
-														}
-
-														// Reset the children query markers
-														rootNode.childrenQueryRunning = false;
-														rootNode.childrenQueried = true;
-													}
-
-													PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-														@Override
-														public void run() {
-															if (viewer != null) viewer.refresh();
-														}
-													});
-												}
-											});
-										}
-									});
-
-									PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-										@Override
-										public void run() {
-											if (viewer != null) viewer.refresh();
-										}
-									});
-								} else {
-									// The file system service is not available for this peer.
-									// --> Close the just opened channel
-									closeOpenChannel(channel);
-								}
-							}
-						}
-					});
+					children = rootNodeVisible ? new Object[] { rootNode.get() } : getChildren(rootNode.get());
 				}
 			} else {
-				// Get possible children
-				// This must happen in the TCF dispatch thread.
-				final List<FSTreeNode> candidates = new ArrayList<FSTreeNode>();
-				Protocol.invokeAndWait(new Runnable() {
-					@Override
-					public void run() {
-						candidates.addAll(root.getChildren());
-					}
-				});
-				children = candidates.toArray();
+				children = rootNodeVisible ? new Object[] { root }  : getChildren(root);
 			}
 		} else if (parentElement instanceof FSTreeNode) {
 			final FSTreeNode node = (FSTreeNode)parentElement;
@@ -263,76 +193,15 @@ public class FSTreeContentProvider implements ITreeContentProvider, INodeStateLi
 				}
 			});
 			children = candidates.toArray();
+
 			// No children -> check for "childrenQueried" property. If false, trigger the query.
-			if (children.length == 0 && !node.childrenQueried && node.type.endsWith("DirNode")) { //$NON-NLS-1$
-				candidates.clear();
-				// Add a special "Pending..." node
-				// This must happen in the TCF dispatch thread.
-				Protocol.invokeAndWait(new Runnable() {
-					@Override
-					public void run() {
-						FSTreeNode pendingNode = new FSTreeNode();
-						pendingNode.name = Messages.PendingOperation_label;
-						pendingNode.type ="FSPendingNode"; //$NON-NLS-1$
-						pendingNode.parent = node;
-						pendingNode.peerNode = node.peerNode;
-						node.getChildren().add(pendingNode);
+			if (children.length == 0 && !node.childrenQueried) {
 
-						candidates.addAll(node.getChildren());
-					}
-				});
-				children = candidates.toArray();
-
-				if (!node.childrenQueryRunning && node.peerNode != null) {
-					node.childrenQueryRunning = true;
-					final String absName = getEntryAbsoluteName(node);
-
-					if (absName != null) {
-						// Open a channel to the peer and query the children
-						Tcf.getChannelManager().openChannel(node.peerNode.getPeer(), false, new IChannelManager.DoneOpenChannel() {
-							@Override
-							public void doneOpenChannel(final Throwable error, final IChannel channel) {
-								Assert.isTrue(Protocol.isDispatchThread());
-
-								if (channel != null && channel.getState() == IChannel.STATE_OPEN) {
-									final IFileSystem service = channel.getRemoteService(IFileSystem.class);
-									if (service != null) {
-
-										Protocol.invokeLater(new Runnable() {
-											@Override
-											public void run() {
-												service.opendir(absName, new IFileSystem.DoneOpen() {
-													@Override
-													public void doneOpen(IToken token, FileSystemException error, final IFileHandle handle) {
-														if (error == null) {
-															// Read the directory content until finished
-															readdir(channel, service, handle, node);
-														} else {
-															// In case of an error, we are done here
-															node.childrenQueryRunning = false;
-															node.childrenQueried = true;
-														}
-													}
-												});
-											}
-										});
-									} else {
-										// No file system service available
-										node.childrenQueryRunning = false;
-										node.childrenQueried = true;
-									}
-								} else {
-									// Channel failed to open
-									node.childrenQueryRunning = false;
-									node.childrenQueried = true;
-								}
-							}
-						});
-					} else {
-						// No absolute name
-						node.childrenQueryRunning = false;
-						node.childrenQueried = true;
-					}
+				if (node.type.endsWith("RootNode")) { //$NON-NLS-1$
+					children = getRootNodeChildren(node);
+				}
+				else if (node.type.endsWith("DirNode")) { //$NON-NLS-1$
+					children = getDirNodeChildren(node);
 				}
 			}
 		}
@@ -347,6 +216,209 @@ public class FSTreeContentProvider implements ITreeContentProvider, INodeStateLi
 		return children;
 	}
 
+	/**
+	 * Queries the children for the root node.
+	 *
+	 * @param rootNode The root node. Must not be <code>null</code>.
+	 * @return The children list.
+	 */
+	protected Object[] getRootNodeChildren(final FSTreeNode rootNode) {
+		Assert.isNotNull(rootNode);
+
+		Object[] children = NO_ELEMENTS;
+
+		// Get the peer node from the root node
+		final IPeerModel peerNode = rootNode.peerNode;
+		Assert.isNotNull(peerNode);
+
+		// The child query should not be marked running at this point
+		Assert.isTrue(!rootNode.childrenQueryRunning);
+		rootNode.childrenQueryRunning = true;
+
+		final List<FSTreeNode> candidates = new ArrayList<FSTreeNode>();
+		// Create the initial pending node.
+		// This must happen in the TCF dispatch thread.
+		Protocol.invokeAndWait(new Runnable() {
+			@Override
+			public void run() {
+				// Add a special "Pending..." node
+				FSTreeNode pendingNode = new FSTreeNode();
+				pendingNode.name = Messages.PendingOperation_label;
+				pendingNode.type ="FSPendingNode"; //$NON-NLS-1$
+				pendingNode.parent = rootNode;
+				pendingNode.peerNode = rootNode.peerNode;
+				rootNode.getChildren().add(pendingNode);
+
+				candidates.addAll(rootNode.getChildren());
+			}
+		});
+
+		children = candidates.toArray();
+
+		Tcf.getChannelManager().openChannel(peerNode.getPeer(), false, new IChannelManager.DoneOpenChannel() {
+			@Override
+			public void doneOpenChannel(final Throwable error, final IChannel channel) {
+				Assert.isTrue(Protocol.isDispatchThread());
+
+				if (channel != null) {
+					final IFileSystem service = channel.getRemoteService(IFileSystem.class);
+					if (service != null) {
+
+						Protocol.invokeLater(new Runnable() {
+							@Override
+							public void run() {
+								service.roots(new IFileSystem.DoneRoots() {
+									@Override
+									public void doneRoots(IToken token, FileSystemException error, DirEntry[] entries) {
+										// Close the channel, not needed anymore
+										closeOpenChannel(channel);
+
+										FSTreeNode rootNode = FSModel.getFSModel(peerNode).getRoot();
+										if (rootNode != null && error == null) {
+
+											for (DirEntry entry : entries) {
+												FSTreeNode node = createNodeFromDirEntry(entry, true);
+												if (node != null) {
+													node.parent = rootNode;
+													node.peerNode = rootNode.peerNode;
+													rootNode.getChildren().add(node);
+												}
+											}
+
+											// Find the pending node and remove it from the child list
+											Iterator<FSTreeNode> iterator = rootNode.getChildren().iterator();
+											while (iterator.hasNext()) {
+												FSTreeNode candidate = iterator.next();
+												if (Messages.PendingOperation_label.equals(candidate.name)) {
+													iterator.remove();
+													break;
+												}
+											}
+
+											// Reset the children query markers
+											rootNode.childrenQueryRunning = false;
+											rootNode.childrenQueried = true;
+										}
+
+										PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+											@Override
+											public void run() {
+												if (viewer != null) viewer.refresh();
+											}
+										});
+									}
+								});
+							}
+						});
+
+						PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+							@Override
+							public void run() {
+								if (viewer != null) viewer.refresh();
+							}
+						});
+					} else {
+						// The file system service is not available for this peer.
+						// --> Close the just opened channel
+						closeOpenChannel(channel);
+					}
+				}
+			}
+		});
+
+		return children;
+	}
+
+	/**
+	 * Queries the children for a directory node.
+	 *
+	 * @param node The directory node. Must not be <code>null</code>.
+	 * @return The children list.
+	 */
+	protected Object[] getDirNodeChildren(final FSTreeNode node) {
+		Assert.isNotNull(node);
+
+		Object[] children = NO_ELEMENTS;
+
+		// Get the peer node from the root node
+		final IPeerModel peerNode = node.peerNode;
+		Assert.isNotNull(peerNode);
+
+		// The child query should not be marked running at this point
+		Assert.isTrue(!node.childrenQueryRunning);
+		node.childrenQueryRunning = true;
+
+		final List<FSTreeNode> candidates = new ArrayList<FSTreeNode>();
+		// Create the initial pending node.
+		// This must happen in the TCF dispatch thread.
+		Protocol.invokeAndWait(new Runnable() {
+			@Override
+			public void run() {
+				// Add a special "Pending..." node
+				FSTreeNode pendingNode = new FSTreeNode();
+				pendingNode.name = Messages.PendingOperation_label;
+				pendingNode.type ="FSPendingNode"; //$NON-NLS-1$
+				pendingNode.parent = node;
+				pendingNode.peerNode = node.peerNode;
+				node.getChildren().add(pendingNode);
+
+				candidates.addAll(node.getChildren());
+			}
+		});
+
+		children = candidates.toArray();
+
+		final String absName = getEntryAbsoluteName(node);
+
+		if (absName != null) {
+			// Open a channel to the peer and query the children
+			Tcf.getChannelManager().openChannel(node.peerNode.getPeer(), false, new IChannelManager.DoneOpenChannel() {
+				@Override
+				public void doneOpenChannel(final Throwable error, final IChannel channel) {
+					Assert.isTrue(Protocol.isDispatchThread());
+
+					if (channel != null && channel.getState() == IChannel.STATE_OPEN) {
+						final IFileSystem service = channel.getRemoteService(IFileSystem.class);
+						if (service != null) {
+
+							Protocol.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									service.opendir(absName, new IFileSystem.DoneOpen() {
+										@Override
+										public void doneOpen(IToken token, FileSystemException error, final IFileHandle handle) {
+											if (error == null) {
+												// Read the directory content until finished
+												readdir(channel, service, handle, node);
+											} else {
+												// In case of an error, we are done here
+												node.childrenQueryRunning = false;
+												node.childrenQueried = true;
+											}
+										}
+									});
+								}
+							});
+						} else {
+							// No file system service available
+							node.childrenQueryRunning = false;
+							node.childrenQueried = true;
+						}
+					} else {
+						// Channel failed to open
+						node.childrenQueryRunning = false;
+						node.childrenQueried = true;
+					}
+				}
+			});
+		} else {
+			// No absolute name
+			node.childrenQueryRunning = false;
+			node.childrenQueried = true;
+		}
+
+		return children;
+	}
 	/**
 	 * Adapt the specified element to a IPeerModel.
 	 *

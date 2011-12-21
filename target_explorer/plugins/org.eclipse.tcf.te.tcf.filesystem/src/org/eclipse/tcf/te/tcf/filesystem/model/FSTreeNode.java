@@ -154,7 +154,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -167,7 +167,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 	 * <p>
 	 * <b>Note:</b> This method must be called from within the TCF event
 	 * dispatch thread only!
-	 * 
+	 *
 	 * @return The children list storage object.
 	 */
 	public final List<FSTreeNode> getChildren() {
@@ -177,7 +177,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
@@ -192,7 +192,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
@@ -205,7 +205,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 
 	/**
 	 * Return if the node is a Windows file/folder node.
-	 * 
+	 *
 	 * @return true if it is a Windows node, or else false.
 	 */
 	public boolean isWindowsNode() {
@@ -216,7 +216,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 
 	/**
 	 * Return if the node is a file.
-	 * 
+	 *
 	 * @return true if it is a file, or else false.
 	 */
 	public boolean isFile() {
@@ -225,7 +225,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 
 	/**
 	 * Return if the node is a directory.
-	 * 
+	 *
 	 * @return true if it is a directory, or else false.
 	 */
 	public boolean isDirectory() {
@@ -234,7 +234,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 
 	/**
 	 * Return if the attribute specified by the mask bit is turned on.
-	 * 
+	 *
 	 * @param bit
 	 *            The attribute's mask bit.
 	 * @return true if it is on, or else false.
@@ -246,7 +246,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Set the attribute specified by the mask bit to on or off.
 	 * @param bit The attribute's mask bit.
@@ -273,7 +273,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 
 	/**
 	 * Return if this file/folder is hidden.
-	 * 
+	 *
 	 * @return true if it is hidden, or else false.
 	 */
 	public boolean isHidden() {
@@ -290,7 +290,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 
 	/**
 	 * Return if this file/folder is read-only.
-	 * 
+	 *
 	 * @return true if it is read-only, or else false.
 	 */
 	public boolean isReadOnly() {
@@ -308,7 +308,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 	/**
 	 * Get the location of a file/folder node using the format of the file
 	 * system's platform.
-	 * 
+	 *
 	 * @param node
 	 *            The file/folder node.
 	 * @return The location of the file/folder.
@@ -319,7 +319,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 
 	/**
 	 * Get the location of a file/folder.
-	 * 
+	 *
 	 * @param cross
 	 *            If the format is cross-platform.
 	 * @return The path to the file/folder.
@@ -335,7 +335,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 		}
 		String pLoc = parent.getLocation(cross);
 		if(parent.isRoot()) {
-			return pLoc + name; 
+			return pLoc + name;
 		}
 		String pathSep = (!cross && isWindowsNode()) ? "\\" : "/"; //$NON-NLS-1$ //$NON-NLS-2$
 		return pLoc + pathSep + name;
@@ -345,7 +345,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 	 * Get the URL of the file or folder. The URL's format is created in the
 	 * following way: tcf:///<TCF_AGENT_ID>/remote/path/to/the/resource... See
 	 * {@link TcfURLConnection#TcfURLConnection(URL)}
-	 * 
+	 *
 	 * @return The URL of the file/folder.
 	 * @throws MalformedURLException
 	 */
@@ -363,16 +363,16 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 
 	/**
 	 * If this node is a root node.
-	 * 
+	 *
 	 * @return true if this node is a root node.
 	 */
 	public boolean isRoot() {
-		return type.endsWith("FSRootDirNode"); //$NON-NLS-1$
+		return type.endsWith("FSRootDirNode") || type.endsWith("FSRootNode"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
 	 * If this node is the system root.
-	 * 
+	 *
 	 * @return true if this node is the system root.
 	 */
 	public boolean isSystemRoot() {
@@ -381,7 +381,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 
 	/**
 	 * If this file is readable.
-	 * 
+	 *
 	 * @return true if it is readable.
 	 */
 	public boolean isReadable() {
@@ -400,7 +400,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 
 	/**
 	 * If the agent is the owner of this file/folder.
-	 * 
+	 *
 	 * @return true if the agent is the owner of this file/folder.
 	 */
 	public boolean isAgentOwner() {
@@ -413,7 +413,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 
 	/**
 	 * If this file is writable.
-	 * 
+	 *
 	 * @return true if it is writable.
 	 */
 	public boolean isWritable() {
@@ -432,7 +432,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 
 	/**
 	 * If this file is executable.
-	 * 
+	 *
 	 * @return true if it is executable.
 	 */
 	public boolean isExecutable() {
@@ -461,7 +461,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 
 	/**
 	 * Test if this file is a windows system file.
-	 * 
+	 *
 	 * @return true if it is a windows system file.
 	 */
 	public boolean isSystem() {
@@ -470,7 +470,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 
 	/**
 	 * Get the type label of the file for displaying purpose.
-	 * 
+	 *
 	 * @return The type label text.
 	 */
 	public String getFileType() {
@@ -478,13 +478,13 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 			return ""; //$NON-NLS-1$
 		}
 		if (isRoot()) {
-			return Messages.FSTreeNode_TypeLocalDisk; 
+			return Messages.FSTreeNode_TypeLocalDisk;
 		}
 		if (isDirectory()) {
-			return Messages.FSTreeNode_TypeFileFolder; 
+			return Messages.FSTreeNode_TypeFileFolder;
 		}
 		if (isSystem()) {
-			return Messages.FSTreeNode_TypeSystemFile; 
+			return Messages.FSTreeNode_TypeSystemFile;
 		}
 		IContentType contentType = Platform.getContentTypeManager().findContentTypeFor(name);
 		if (contentType != null) {

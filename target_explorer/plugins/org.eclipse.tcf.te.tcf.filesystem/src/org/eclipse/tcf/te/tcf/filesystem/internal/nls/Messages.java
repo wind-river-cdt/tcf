@@ -133,7 +133,7 @@ public class Messages extends NLS {
 	public static String DeleteFilesHandler_DeleteMultipleFilesConfirmation;
 	public static String DeleteFilesHandler_DeleteOneFileConfirmation;
 	public static String DeleteFilesHandler_ConfirmDialogTitle;
-	
+
 	public static String GeneralInformationPage_Accessed;
 	public static String GeneralInformationPage_Advanced;
 	public static String GeneralInformationPage_Attributes;
@@ -157,6 +157,7 @@ public class Messages extends NLS {
 
 	public static String FSFolderSelectionDialog_MoveDialogMessage;
 	public static String FSFolderSelectionDialog_MoveDialogTitle;
+
 	public static String FSTreeControl_column_name_label;
 	public static String FSTreeControl_column_size_label;
 	public static String FSTreeControl_column_modified_label;
@@ -165,6 +166,9 @@ public class Messages extends NLS {
 	public static String FSTreeNode_TypeFileFolder;
 	public static String FSTreeNode_TypeLocalDisk;
 	public static String FSTreeNode_TypeSystemFile;
+
+	public static String FSTreeNodeContentProvider_rootNode_label;
+
 	public static String FSOpenFileDialog_message;
 	public static String FSOpenFileDialog_title;
 	public static String FSOperation_CopyNOfFile;
@@ -315,5 +319,5 @@ public class Messages extends NLS {
 	public static String NewFolderWizardPage_NewFolderWizardPageNameLabel;
 	public static String NewFolderWizardPage_NewFolderWizardPageTitle;
 	public static String NewNodeWizardPage_LstatTimedout;
-	public static String NewNodeWizardPage_PromptFolderLabel;	
+	public static String NewNodeWizardPage_PromptFolderLabel;
 }

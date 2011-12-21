@@ -52,7 +52,7 @@ public class UIPlugin extends AbstractUIPlugin {
 	private IExecutionListener saveAllListener;
 	// The shared instance of Clipboard
 	private FSClipboard clipboard;
-	
+
 	/**
 	 * The constructor
 	 */
@@ -102,10 +102,10 @@ public class UIPlugin extends AbstractUIPlugin {
 		ICommandService commandService = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
 		if (commandService != null) {
 			saveListener = new SaveListener();
-			Command saveCmd = commandService.getCommand(IWorkbenchCommandConstants.FILE_SAVE); 
+			Command saveCmd = commandService.getCommand(IWorkbenchCommandConstants.FILE_SAVE);
 			saveCmd.addExecutionListener(saveListener);
 			saveAllListener = new SaveAllListener();
-			Command saveAllCmd = commandService.getCommand(IWorkbenchCommandConstants.FILE_SAVE_ALL); 
+			Command saveAllCmd = commandService.getCommand(IWorkbenchCommandConstants.FILE_SAVE_ALL);
 			saveAllCmd.addExecutionListener(saveAllListener);
 		}
 	}
@@ -124,16 +124,16 @@ public class UIPlugin extends AbstractUIPlugin {
 	public void stop(BundleContext context) throws Exception {
 		PersistenceManager.getInstance().dispose();
 		if (regURLStreamHandlerService != null) {
-			// When URL stream handler service is unregistered, any URL related operation will be invalid. 			
+			// When URL stream handler service is unregistered, any URL related operation will be invalid.
 			regURLStreamHandlerService.unregister();
 			regURLStreamHandlerService = null;
 		}
 		// Remove the two execution listeners.
 		ICommandService commandService = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
 		if (commandService != null) {
-			Command saveCmd = commandService.getCommand(IWorkbenchCommandConstants.FILE_SAVE); 
+			Command saveCmd = commandService.getCommand(IWorkbenchCommandConstants.FILE_SAVE);
 			saveCmd.removeExecutionListener(saveListener);
-			Command saveAllCmd = commandService.getCommand(IWorkbenchCommandConstants.FILE_SAVE_ALL); 
+			Command saveAllCmd = commandService.getCommand(IWorkbenchCommandConstants.FILE_SAVE_ALL);
 			saveAllCmd.removeExecutionListener(saveAllListener);
 		}
 		clipboard = null;
@@ -149,6 +149,8 @@ public class UIPlugin extends AbstractUIPlugin {
 		URL url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OBJ + "folder.gif"); //$NON-NLS-1$
 		registry.put(ImageConsts.FOLDER, ImageDescriptor.createFromURL(url));
 
+		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OBJ + "root.gif"); //$NON-NLS-1$
+		registry.put(ImageConsts.ROOT, ImageDescriptor.createFromURL(url));
 		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OBJ + "rootdrive.gif"); //$NON-NLS-1$
 		registry.put(ImageConsts.ROOT_DRIVE, ImageDescriptor.createFromURL(url));
 		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OBJ + "rootdriveopen.gif"); //$NON-NLS-1$
@@ -207,5 +209,5 @@ public class UIPlugin extends AbstractUIPlugin {
 		}
 
 		return image;
-	}	
+	}
 }

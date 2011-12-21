@@ -24,7 +24,7 @@ public class HiddenFilesViewerFilter extends ViewerFilter {
 	@Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
 		// The element needs to be a tree node, but not a root node
-		if (element instanceof FSTreeNode && !"FSRootDirNode".equals(((FSTreeNode)element).type)) { //$NON-NLS-1$
+		if (element instanceof FSTreeNode && !((FSTreeNode)element).isRoot()) {
 			FSTreeNode node = (FSTreeNode) element;
 			if(node.isWindowsNode()) {
 				return !node.isHidden();

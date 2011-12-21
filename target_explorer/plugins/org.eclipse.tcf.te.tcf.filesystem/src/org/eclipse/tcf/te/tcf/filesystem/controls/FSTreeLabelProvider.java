@@ -64,7 +64,7 @@ public class FSTreeLabelProvider extends LabelProvider implements ITableLabelPro
 
 	/**
 	 * Set the parent viewer who will use this label provider for rendering.
-	 * 
+	 *
 	 * @param viewer The parent tree viewer.
 	 */
 	public void setParentViewer(TreeViewer viewer) {
@@ -111,7 +111,10 @@ public class FSTreeLabelProvider extends LabelProvider implements ITableLabelPro
 
 			if (element instanceof FSTreeNode) {
 				FSTreeNode node = (FSTreeNode)element;
-				if ("FSRootDirNode".equals(node.type)) {//$NON-NLS-1$
+				if ("FSRootNode".equals(node.type)) { //$NON-NLS-1$
+					return UIPlugin.getImage(ImageConsts.ROOT);
+				}
+				else if ("FSRootDirNode".equals(node.type)) {//$NON-NLS-1$
 					return (isExpanded && hasChildren(node))  ? UIPlugin.getImage(ImageConsts.ROOT_DRIVE_OPEN) : UIPlugin.getImage(ImageConsts.ROOT_DRIVE);
 				} else if ("FSDirNode".equals(node.type)) { //$NON-NLS-1$
 					return (isExpanded && hasChildren(node)) ? PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER) : UIPlugin.getImage(ImageConsts.FOLDER);
@@ -168,8 +171,8 @@ public class FSTreeLabelProvider extends LabelProvider implements ITableLabelPro
 		if (element instanceof FSTreeNode) {
 			FSTreeNode node = (FSTreeNode)element;
 			if (node.type != null && node.type.startsWith("FS")) { //$NON-NLS-1$
-				// Pending nodes does not have column texts at all
-				if (node.type.endsWith("PendingNode")) return ""; //$NON-NLS-1$ //$NON-NLS-2$
+				// Pending and root nodes does not have column texts at all
+				if (node.type.endsWith("PendingNode") || node.type.endsWith("RootNode")) return ""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 				boolean isDirNode = node.type.endsWith("DirNode"); //$NON-NLS-1$
 				switch (columnIndex) {

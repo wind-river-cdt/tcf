@@ -43,7 +43,7 @@ public class FSTreeElementLabelProvider extends TreeColumnLabelProvider {
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param viewer The tree viewer or <code>null</code>.
 	 */
 	public FSTreeElementLabelProvider(TreeViewer viewer) {
@@ -64,7 +64,7 @@ public class FSTreeElementLabelProvider extends TreeColumnLabelProvider {
 
 	/**
 	 * Returns the parent tree viewer instance.
-	 * 
+	 *
 	 * @return The parent tree viewer or <code>null</code>.
 	 */
 	private TreeViewer getViewer() {
@@ -93,7 +93,10 @@ public class FSTreeElementLabelProvider extends TreeColumnLabelProvider {
 			boolean isExpanded = getViewer().getExpandedState(element);
 			if (element instanceof FSTreeNode) {
 				FSTreeNode node = (FSTreeNode) element;
-				if ("FSRootDirNode".equals(node.type)) {//$NON-NLS-1$
+				if ("FSRootNode".equals(node.type)) { //$NON-NLS-1$
+					return UIPlugin.getImage(ImageConsts.ROOT);
+				}
+				else if ("FSRootDirNode".equals(node.type)) {//$NON-NLS-1$
 					return (isExpanded && hasChildren(node)) ? UIPlugin
 					                .getImage(ImageConsts.ROOT_DRIVE_OPEN) : UIPlugin
 					                .getImage(ImageConsts.ROOT_DRIVE);
@@ -125,7 +128,7 @@ public class FSTreeElementLabelProvider extends TreeColumnLabelProvider {
 
 	/**
 	 * If the specified folder has children.
-	 * 
+	 *
 	 * @param folder The folder node.
 	 * @return true if it has children.
 	 */
