@@ -21,6 +21,7 @@ import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
 import org.eclipse.tcf.te.ui.views.internal.editor.EditorInput;
 import org.eclipse.tcf.te.ui.views.nls.Messages;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
@@ -52,13 +53,16 @@ public class PropertiesCommandHandler extends AbstractHandler {
 					// Create the editor input object
 					IEditorInput input = new EditorInput(element);
 					// Check for the Target Explorer editor already opened
-					try {
-						// Opens the Target Explorer properties editor
-						page.openEditor(input, IUIConstants.ID_EDITOR);
-					} catch (PartInitException e) {
-						IStatus status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(),
-						                            Messages.PropertiesCommandHandler_error_initPartFailed, e);
-						UIPlugin.getDefault().getLog().log(status);
+					IEditorReference[] references = page.findEditors(input, IUIConstants.ID_EDITOR, IWorkbenchPage.MATCH_INPUT);
+					if (references.length == 0) {
+						try {
+							// Opens the Target Explorer properties editor
+							page.openEditor(input, IUIConstants.ID_EDITOR);
+						} catch (PartInitException e) {
+							IStatus status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(),
+							                            Messages.PropertiesCommandHandler_error_initPartFailed, e);
+							UIPlugin.getDefault().getLog().log(status);
+						}
 					}
 				}
 			}
