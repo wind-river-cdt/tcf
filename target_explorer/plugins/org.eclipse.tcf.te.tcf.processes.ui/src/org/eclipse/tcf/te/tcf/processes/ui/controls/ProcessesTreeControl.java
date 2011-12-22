@@ -42,7 +42,7 @@ public class ProcessesTreeControl extends AbstractTreeControl {
 	 */
 	@Override
 	protected ITreeContentProvider doCreateTreeViewerContentProvider(TreeViewer viewer) {
-		return new ProcessesTreeContentProvider();
+		return new ProcessesTreeContentProvider(false);
 	}
 
 	/* (non-Javadoc)

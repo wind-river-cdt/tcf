@@ -13,6 +13,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessesTreeNode;
 import org.eclipse.tcf.te.tcf.processes.ui.interfaces.ImageConsts;
+import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.trees.TreeColumnLabelProvider;
 
 /**
@@ -28,8 +29,11 @@ public class ProcessLabelProvider extends TreeColumnLabelProvider {
 	public String getText(Object element) {
 		if (element instanceof ProcessesTreeNode) {
 			ProcessesTreeNode node = (ProcessesTreeNode) element;
+			if(node.type.equals("ProcRootNode")) { //$NON-NLS-1$
+				return Messages.ProcessLabelProvider_RootNodeLabel;
+			}
 			String name = node.name;
-			if (name == null) name = "System"; //$NON-NLS-1$
+			if (name == null) name = Messages.ProcessLabelProvider_NullNameNodeLabel; 
 			return name;
 		}
 		return super.getText(element);

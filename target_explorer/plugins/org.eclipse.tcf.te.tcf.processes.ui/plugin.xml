@@ -135,5 +135,46 @@
          </column>
       </viewer>
    </extension>
+   <extension
+         point="org.eclipse.ui.navigator.navigatorContent">
+      <navigatorContent
+            activeByDefault="false"
+            contentProvider="org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessesTreeContentProvider"
+            icon="icons/obj16/process.gif"
+            id="org.eclipse.tcf.te.tcf.processes.ui.navigator.content"
+            labelProvider="org.eclipse.tcf.te.tcf.processes.ui.internal.columns.ProcessLabelProvider"
+            name="%navigatorContent.name"
+            priority="normal">
+         <triggerPoints>
+            <instanceof
+                  value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel">
+            </instanceof>
+            <test
+                  property="org.eclipse.tcf.te.tcf.locator.hasRemoteService"
+                  value="SysMonitor">
+            </test>
+         </triggerPoints>
+         <possibleChildren>
+            <instanceof
+                  value="org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessesTreeNode">
+            </instanceof>
+         </possibleChildren>
+         <commonSorter
+               class="org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessesViewerSorter">
+         </commonSorter>
+      </navigatorContent>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.viewer">
+      <viewerContentBinding
+            viewerId="org.eclipse.tcf.te.ui.views.TargetExplorer">
+         <includes>
+            <contentExtension
+                  isRoot="false"
+                  pattern="org.eclipse.tcf.te.tcf.processes.ui.navigator.*">
+            </contentExtension>
+         </includes>
+      </viewerContentBinding>
+   </extension>
 
 </plugin>

@@ -37,6 +37,10 @@ public class Messages extends NLS {
 	public static String ProcessesTreeControl_column_state_label;
 	public static String ProcessesTreeControl_column_user_label;
 
+	public static String ProcessLabelProvider_NullNameNodeLabel;
+
+	public static String ProcessLabelProvider_RootNodeLabel;
+
 	public static String ProcessSelectionDialog_title;
 
 	public static String LaunchObjectDialog_title;

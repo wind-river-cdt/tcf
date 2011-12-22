@@ -16,13 +16,11 @@ import org.eclipse.jface.viewers.ILabelDecorator;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessesTreeContentProvider;
 import org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessesTreeNode;
-import org.eclipse.tcf.te.tcf.processes.ui.internal.columns.ProcessComparator;
+import org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessesViewerSorter;
 import org.eclipse.tcf.te.tcf.processes.ui.internal.columns.ProcessLabelProvider;
 import org.eclipse.tcf.te.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.interfaces.IUIConstants;
@@ -47,7 +45,7 @@ public class ProcessSelectionDialog extends ElementTreeSelectionDialog {
 	 * @param parentShell The parent shell.
 	 */
 	public ProcessSelectionDialog(Shell parentShell) {
-		this(parentShell, new ProcessLabelProvider(), new ProcessesTreeContentProvider());
+		this(parentShell, new ProcessLabelProvider(), new ProcessesTreeContentProvider(false));
 	}
 
 	/**
@@ -63,16 +61,7 @@ public class ProcessSelectionDialog extends ElementTreeSelectionDialog {
 		this.labelProvider = labelProvider;
 		this.setAllowMultiple(false);
 		this.setStatusLineAboveButtons(false);
-		this.setComparator(new ViewerComparator(){
-			private ProcessComparator comparator = new ProcessComparator();
-			@Override
-			public int compare(Viewer viewer, Object e1, Object e2) {
-				if (e1 instanceof ProcessesTreeNode && e2 instanceof ProcessesTreeNode) {
-					return comparator.compare((ProcessesTreeNode) e1, (ProcessesTreeNode) e2);
-				}
-				return super.compare(viewer, e1, e2);
-			}
-		});
+		this.setComparator(new ProcessesViewerSorter());
 		this.setValidator(new ISelectionStatusValidator() {
 			@Override
 			public IStatus validate(Object[] selection) {

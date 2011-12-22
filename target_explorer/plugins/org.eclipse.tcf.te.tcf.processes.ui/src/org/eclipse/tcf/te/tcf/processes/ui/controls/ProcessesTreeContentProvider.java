@@ -38,9 +38,18 @@ public class ProcessesTreeContentProvider implements ITreeContentProvider {
 
 	private IChannel channel = null;
 	private ISysMonitor service = null;
+	// Flag to control if the file system root node is visible
+	private final boolean rootNodeVisible;
 
 	/* default */ Viewer viewer = null;
 
+	public ProcessesTreeContentProvider() {
+		this(true);
+	}
+	
+	public ProcessesTreeContentProvider(boolean rootVisible) {
+		this.rootNodeVisible = rootVisible;
+	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
 	 */
@@ -202,7 +211,7 @@ public class ProcessesTreeContentProvider implements ITreeContentProvider {
 					dispose();
 				}
 			} else if (rootNode != null && rootNode.childrenQueried) {
-				children = rootNode.children.toArray();
+				children = rootNodeVisible ? new Object[]{rootNode} : rootNode.children.toArray();
 			}
 		} else if (parentElement instanceof ProcessesTreeNode) {
 			ProcessesTreeNode node = (ProcessesTreeNode)parentElement;
