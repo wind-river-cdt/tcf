@@ -15,6 +15,7 @@ import java.util.UUID;
 
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.tcf.services.ISysMonitor;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 
 /**
  * Representation of a file system tree node.
@@ -86,6 +87,11 @@ public final class ProcessesTreeNode extends PlatformObject {
 	 * Flag to mark once the children query is running
 	 */
 	public boolean childrenQueryRunning = false;
+
+	/**
+	 * The peer node the process node is associated with.
+	 */
+	public IPeerModel peerNode;
 
 	/*
 	 * (non-Javadoc)

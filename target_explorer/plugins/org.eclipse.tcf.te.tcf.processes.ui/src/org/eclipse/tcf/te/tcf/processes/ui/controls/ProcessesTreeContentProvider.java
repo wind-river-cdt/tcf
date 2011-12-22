@@ -9,18 +9,21 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.processes.ui.controls;
 
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.tcf.protocol.IChannel;
-import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
-import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
+import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.nls.Messages;
 import org.eclipse.ui.PlatformUI;
 
@@ -28,285 +31,245 @@ import org.eclipse.ui.PlatformUI;
  * Processes tree control content provider implementation.
  */
 public class ProcessesTreeContentProvider implements ITreeContentProvider {
+	/* default */static final String PROCESS_ROOT_KEY = UIPlugin.getUniqueIdentifier() + ".process.root"; //$NON-NLS-1$
 	/**
 	 * Static reference to the return value representing no elements.
 	 */
 	protected final static Object[] NO_ELEMENTS = new Object[0];
 
-	/* default */ IPeerModel peerNode = null;
-	private ProcessesTreeNode rootNode = null;
-
-	private IChannel channel = null;
-	private ISysMonitor service = null;
 	// Flag to control if the file system root node is visible
 	private final boolean rootNodeVisible;
 
-	/* default */ Viewer viewer = null;
+	/* default */Viewer viewer = null;
 
+	/**
+	 * Create an instance with the rootNodeVisible set to true.
+	 */
 	public ProcessesTreeContentProvider() {
 		this(true);
 	}
-	
+
+	/**
+	 * Create an instance specifying if the rootNodeVisible is true.
+	 * 
+	 * @param rootVisible true if the root is visible.
+	 */
 	public ProcessesTreeContentProvider(boolean rootVisible) {
 		this.rootNodeVisible = rootVisible;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
 	 */
 	@Override
-    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		this.viewer = viewer;
-		if (oldInput != null && newInput == null) {
-			closeOpenChannel();
-		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
 	 */
 	@Override
-    public void dispose() {
-		closeOpenChannel();
+	public void dispose() {
 	}
 
-	/**
-	 * Close the open communication channel and set back the node references.
-	 */
-	protected void closeOpenChannel() {
-		if (channel != null) {
-			Tcf.getChannelManager().closeChannel(channel);
-			channel = null;
-			service = null;
-		}
-
-		peerNode = null;
-		rootNode = null;
-	}
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getElements(java.lang.Object)
 	 */
 	@Override
-    public Object[] getElements(Object inputElement) {
+	public Object[] getElements(Object inputElement) {
 		return getChildren(inputElement);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
 	 */
 	@Override
-    public Object getParent(Object element) {
+	public Object getParent(Object element) {
 		if (element instanceof ProcessesTreeNode) {
-			return ((ProcessesTreeNode)element).parent;
+			return ((ProcessesTreeNode) element).parent;
 		}
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/**
+	 * Get the root node stored in the peer model.
+	 * 
+	 * @param peerModel The target's peer model.
+	 * @return The root node representing the processes.
+	 */
+	/* default */ ProcessesTreeNode getProcessRoot(final IPeerModel peerModel) {
+		if (peerModel != null) {
+			if (Protocol.isDispatchThread()) {
+				ProcessesTreeNode root = (ProcessesTreeNode) peerModel.getProperty(PROCESS_ROOT_KEY);
+				if (root == null) {
+					root = new ProcessesTreeNode();
+					root.peerNode = peerModel;
+					root.type = "ProcRootNode"; //$NON-NLS-1$
+					root.childrenQueried = false;
+					root.childrenQueryRunning = false;
+					peerModel.setProperty(PROCESS_ROOT_KEY, root);
+				}
+				return root;
+			}
+			final AtomicReference<ProcessesTreeNode> reference = new AtomicReference<ProcessesTreeNode>();
+			Protocol.invokeAndWait(new Runnable() {
+				@Override
+				public void run() {
+					reference.set(getProcessRoot(peerModel));
+				}
+			});
+			return reference.get();
+		}
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
 	 */
 	@Override
-    public Object[] getChildren(Object parentElement) {
+	public Object[] getChildren(Object parentElement) {
 		Assert.isNotNull(parentElement);
-
-		Object[] children = NO_ELEMENTS;
 
 		// For the file system, we need the peer node
 		if (parentElement instanceof IPeerModel) {
-			// Is it the same peer node we have seen before?
-			if (peerNode == null || peerNode != null && !peerNode.equals(parentElement)) {
-				// Remember the peer node
-				peerNode = (IPeerModel)parentElement;
-
-				// If we still have a channel open, for now, we just close the old channel
-				if (channel != null) {
-					Tcf.getChannelManager().closeChannel(channel);
-					channel = null;
-				}
-
-				IPeer peer = peerNode.getPeer();
-				final int[] state = new int[1];
-				Protocol.invokeAndWait(new Runnable() {
-					@Override
-                    public void run() {
-						state[0] = peerNode.getIntProperty(IPeerModelProperties.PROP_STATE);
-					}
-				});
-				if (peer != null && IPeerModelProperties.STATE_ERROR != state[0] && IPeerModelProperties.STATE_NOT_REACHABLE != state[0]) {
-					ProcessesTreeNode pendingNode = new ProcessesTreeNode();
-					pendingNode.name = Messages.PendingOperation_label;
-					pendingNode.type ="ProcPendingNode"; //$NON-NLS-1$
-
-					children = new Object[] { pendingNode };
-
-					Tcf.getChannelManager().openChannel(peer, false, new IChannelManager.DoneOpenChannel() {
-						@Override
-                        @SuppressWarnings("synthetic-access")
-						public void doneOpenChannel(Throwable error, IChannel channel) {
-							Assert.isTrue(Protocol.isDispatchThread());
-
-							if (channel != null) {
-								ProcessesTreeContentProvider.this.channel = channel;
-
-								service = channel.getRemoteService(ISysMonitor.class);
-								if (service != null) {
-									rootNode = new ProcessesTreeNode();
-									rootNode.type = "ProcRootNode"; //$NON-NLS-1$
-									rootNode.childrenQueried = false;
-									rootNode.childrenQueryRunning = true;
-
-									Protocol.invokeLater(new Runnable() {
-										@Override
-                                        public void run() {
-											service.getChildren(null, new ISysMonitor.DoneGetChildren() {
-												/* (non-Javadoc)
-												 * @see org.eclipse.tcf.services.ISysMonitor.DoneGetChildren#doneGetChildren(org.eclipse.tcf.protocol.IToken, java.lang.Exception, java.lang.String[])
-												 */
-												@Override
-                                                public void doneGetChildren(IToken token, Exception error, String[] context_ids) {
-													if (rootNode != null) {
-														if (error == null && context_ids != null && context_ids.length > 0) {
-															for (String contextId : context_ids) {
-																service.getContext(contextId, new ISysMonitor.DoneGetContext() {
-																	/* (non-Javadoc)
-																	 * @see org.eclipse.tcf.services.ISysMonitor.DoneGetContext#doneGetContext(org.eclipse.tcf.protocol.IToken, java.lang.Exception, org.eclipse.tcf.services.ISysMonitor.SysMonitorContext)
-																	 */
-																	@Override
-                                                                    public void doneGetContext(IToken token, Exception error, ISysMonitor.SysMonitorContext context) {
-																		if (error == null &&  context != null) {
-																			ProcessesTreeNode node = createNodeFromSysMonitorContext(context);
-																			if (node != null) {
-																				node.parent = rootNode;
-																				rootNode.children.add(node);
-																				refreshViewer();
-																			}
-																		}
-																	}
-																});
-															}
-														}
-
-														Protocol.invokeLater(new Runnable() {
-															@Override
-                                                            public void run() {
-																// Reset the children query marker
-																rootNode.childrenQueryRunning = false;
-																rootNode.childrenQueried = true;
-																refreshViewer();
-															}
-														});
-													}
-												}
-											});
-										}
-									});
-								} else {
-									// TCF file system service is not available, close the just opened channel
-									closeOpenChannel();
-								}
-							}
-						}
-					});
-				} else {
-					dispose();
-				}
-			} else if (rootNode != null && rootNode.childrenQueried) {
-				children = rootNodeVisible ? new Object[]{rootNode} : rootNode.children.toArray();
+			final IPeerModel peerModel = (IPeerModel) parentElement;
+			final ProcessesTreeNode root = getProcessRoot(peerModel);
+			if (rootNodeVisible) {
+				return new Object[] { root };
 			}
-		} else if (parentElement instanceof ProcessesTreeNode) {
-			ProcessesTreeNode node = (ProcessesTreeNode)parentElement;
-			// Get possible children
-			children = node.children.toArray();
-			// No children -> check for "childrenQueried" property. If false, trigger the query.
-			if (children.length == 0 && !node.childrenQueried) {
-				ProcessesTreeNode pendingNode = new ProcessesTreeNode();
-				pendingNode.name = Messages.PendingOperation_label;
-				pendingNode.type ="ProcPendingNode"; //$NON-NLS-1$
-
-				children = new Object[] { pendingNode };
+			return getChildren(root);
+		}
+		else if (parentElement instanceof ProcessesTreeNode) {
+			ProcessesTreeNode node = (ProcessesTreeNode) parentElement;
+			if (node.childrenQueried) {
+				return node.children.toArray();
+			}
+			if (!node.childrenQueryRunning) {
 				doGetChildrenForProcessContext(node);
 			}
+			ProcessesTreeNode pendingNode = new ProcessesTreeNode();
+			pendingNode.name = Messages.PendingOperation_label;
+			pendingNode.type = "ProcPendingNode"; //$NON-NLS-1$
+			return new Object[] { pendingNode };
 		}
-
-		return children;
+		return NO_ELEMENTS;
 	}
 
-	/* default */ void refreshViewer() {
+	/**
+	 * Refresh the viewer that displays the processes.
+	 */
+	/* default */void refreshViewer() {
 		PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
 			@Override
-            public void run() {
+			public void run() {
 				if (viewer != null && !viewer.getControl().isDisposed()) viewer.refresh();
 			}
 		});
 	}
+	
+	/**
+	 * The callback handler that handles the result of service.getContext.
+	 */
+	class SysDoneGetContext implements ISysMonitor.DoneGetContext {
+		private IChannel channel;
+		private ProcessesTreeNode parentNode;
+		private Iterator<String> iterator;
+		private ISysMonitor service;
+		public SysDoneGetContext(IChannel channel, ISysMonitor service, Iterator<String> iterator, ProcessesTreeNode parentNode) {
+			this.channel = channel;
+			this.service = service;
+			this.iterator = iterator;
+			this.parentNode = parentNode;
+		}
+        @Override
+        public void doneGetContext(IToken token, Exception error, ISysMonitor.SysMonitorContext context) {
+            if (error == null && context != null) {
+                ProcessesTreeNode childNode = createNodeFromSysMonitorContext(context);
+                childNode.parent = parentNode;
+                childNode.peerNode = parentNode.peerNode;
+                parentNode.children.add(childNode);
+            }
+            if(iterator.hasNext()) {
+            	String contextId = iterator.next();
+            	service.getContext(contextId, this);
+            } else {
+                parentNode.childrenQueryRunning = false;
+                parentNode.childrenQueried = true;
+                Tcf.getChannelManager().closeChannel(channel);
+                refreshViewer();
+            }
+        }
+	}
+	
+	/**
+	 * The callback handler that handles the result of service.getChildren.
+	 */
+	class SysDoneGetChildren implements ISysMonitor.DoneGetChildren {
+		IChannel channel;
+		ISysMonitor service;
+		ProcessesTreeNode parentNode;
+		public SysDoneGetChildren(IChannel channel, ISysMonitor service, ProcessesTreeNode parentNode) {
+			this.channel = channel;
+			this.service = service;
+			this.parentNode = parentNode;
+		}
+        @Override
+        public void doneGetChildren(IToken token, Exception error, String[] context_ids) {
+            if (error == null && context_ids != null && context_ids.length > 0) {
+            	final Iterator<String> iterator = Arrays.asList(context_ids).iterator();
+            	String contextId = iterator.next();
+                service.getContext(contextId, new SysDoneGetContext(channel, service, iterator, parentNode));
+        	} else {
+                parentNode.childrenQueryRunning = false;
+                parentNode.childrenQueried = true;
+                Tcf.getChannelManager().closeChannel(channel);
+                refreshViewer();
+        	}
+        }		
+	}
+	
+	/**
+	 * The callback handler that handles the event when the channel opens.
+	 */
+	class SysDoneOpenChannel implements IChannelManager.DoneOpenChannel {
+		ProcessesTreeNode parentNode;
+		public SysDoneOpenChannel(ProcessesTreeNode parentNode) {
+			this.parentNode = parentNode;
+		}
+		@Override
+        public void doneOpenChannel(Throwable error, final IChannel channel) {
+			Assert.isTrue(Protocol.isDispatchThread());
+			if (error == null && channel != null) {
+				final ISysMonitor service = channel.getRemoteService(ISysMonitor.class);
+				if (service != null) {
+					service.getChildren(parentNode.id, new SysDoneGetChildren(channel, service, parentNode));
+				}
+			}
+        }
+	}
+
 	/**
 	 * Query the children of the given process context.
-	 *
-	 * @param node The process context node. Must be not <code>null</code>.
+	 * 
+	 * @param parentNode The process context node. Must be not <code>null</code>.
 	 */
-	protected void doGetChildrenForProcessContext(ProcessesTreeNode node) {
-		Assert.isNotNull(node);
-
-		if (!node.childrenQueryRunning) {
-			final ProcessesTreeNode parentNode = node;
-
-			final String parentId = node.id;
-			if (parentId != null && service != null) {
-				parentNode.childrenQueryRunning = true;
-
-				Protocol.invokeLater(new Runnable() {
-					@Override
-                    @SuppressWarnings("synthetic-access")
-					public void run() {
-						service.getChildren(parentId, new ISysMonitor.DoneGetChildren() {
-							/* (non-Javadoc)
-							 * @see org.eclipse.tcf.services.IProcesses.DoneGetChildren#doneGetChildren(org.eclipse.tcf.protocol.IToken, java.lang.Exception, java.lang.String[])
-							 */
-							@Override
-                            public void doneGetChildren(IToken token, Exception error, String[] context_ids) {
-								if (error == null && context_ids != null && context_ids.length > 0) {
-									for (String contextId : context_ids) {
-										service.getContext(contextId, new ISysMonitor.DoneGetContext() {
-											/* (non-Javadoc)
-											 * @see org.eclipse.tcf.services.ISysMonitor.DoneGetContext#doneGetContext(org.eclipse.tcf.protocol.IToken, java.lang.Exception, org.eclipse.tcf.services.ISysMonitor.SysMonitorContext)
-											 */
-											@Override
-                                            public void doneGetContext(IToken token, Exception error, ISysMonitor.SysMonitorContext context) {
-												if (error == null && context != null) {
-													ProcessesTreeNode node = createNodeFromSysMonitorContext(context);
-													if (node != null) {
-														node.parent = parentNode;
-														parentNode.children.add(node);
-													}
-												}
-											}
-										});
-									}
-								}
-
-								Protocol.invokeLater(new Runnable() {
-									@Override
-                                    public void run() {
-										// Reset the children query marker
-										parentNode.childrenQueryRunning = false;
-										parentNode.childrenQueried = true;
-										refreshViewer();
-									}
-								});
-							}
-						});
-					}
-				});
-			}
-		}
-
+	protected void doGetChildrenForProcessContext(final ProcessesTreeNode parentNode) {
+		Assert.isNotNull(parentNode);
+		parentNode.childrenQueryRunning = true;
+		Tcf.getChannelManager().openChannel(parentNode.peerNode.getPeer(), false, new SysDoneOpenChannel(parentNode));
 	}
 
 	/**
 	 * Creates a node from the given system monitor context.
-	 *
+	 * 
 	 * @param context The system monitor context. Must be not <code>null</code>.
-	 *
+	 * 
 	 * @return The node.
 	 */
 	protected ProcessesTreeNode createNodeFromSysMonitorContext(ISysMonitor.SysMonitorContext context) {
@@ -327,26 +290,26 @@ public class ProcessesTreeContentProvider implements ITreeContentProvider {
 		node.state = context.getState();
 		node.username = context.getUserName();
 
-		doGetChildrenForProcessContext(node);
-
 		return node;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
 	 */
 	@Override
-    public boolean hasChildren(Object element) {
+	public boolean hasChildren(Object element) {
 		Assert.isNotNull(element);
 
 		boolean hasChildren = false;
 
 		// No children yet and the element is a process node
 		if (element instanceof ProcessesTreeNode) {
-			ProcessesTreeNode node = (ProcessesTreeNode)element;
+			ProcessesTreeNode node = (ProcessesTreeNode) element;
 			if (!node.childrenQueried || node.childrenQueryRunning) {
 				hasChildren = true;
-			} else if (node.childrenQueried) {
+			}
+			else if (node.childrenQueried) {
 				hasChildren = node.children.size() > 0;
 			}
 		}
