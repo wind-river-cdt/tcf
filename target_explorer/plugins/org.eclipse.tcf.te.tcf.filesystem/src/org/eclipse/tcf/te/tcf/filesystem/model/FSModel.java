@@ -65,6 +65,19 @@ public final class FSModel {
 	}
 	
 	/**
+	 * Remove the listener from the models.
+	 * 
+	 * @param listener The listener.
+	 */
+	public static void removeAllListener(INodeStateListener listener) {
+		if (allModels != null) {
+			for (FSModel model : allModels) {
+				model.removeNodeStateListener(listener);
+			}
+		}
+	}
+
+	/**
 	 * Get the file system model of the peer model. If it does not
 	 * exist yet, create a new instance and store it.
 	 *  

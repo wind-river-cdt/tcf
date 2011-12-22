@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.IToken;
@@ -31,32 +30,27 @@ import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.services.IFileSystem.IFileHandle;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
-import org.eclipse.tcf.te.tcf.filesystem.internal.events.INodeStateListener;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
 import org.eclipse.tcf.te.ui.nls.Messages;
-import org.eclipse.ui.PlatformUI;
 
 
 /**
  * File system tree content provider implementation.
  */
-public class FSTreeContentProvider implements ITreeContentProvider, INodeStateListener {
+public class FSTreeContentProvider implements ITreeContentProvider {
+
 	/**
 	 * Static reference to the return value representing no elements.
 	 */
 	protected final static Object[] NO_ELEMENTS = new Object[0];
 
-	/* package */ TreeViewer viewer = null;
-
-	// The current input.
-	private IPeerModel input;
-
 	// Flag to control if the file system root node is visible
 	private final boolean rootNodeVisible;
 
+	/* default */ FSTreeNodeStateListener nodeStateListener;
 	/**
 	 * Constructor.
 	 */
@@ -78,14 +72,7 @@ public class FSTreeContentProvider implements ITreeContentProvider, INodeStateLi
 	 */
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		this.viewer = (TreeViewer) viewer;
-		if(input != null) {
-			FSModel.getFSModel(input).removeNodeStateListener(this);
-		}
-		if (newInput instanceof IPeerModel) {
-			input = (IPeerModel) newInput;
-			FSModel.getFSModel(input).addNodeStateListener(this);
-		}
+		this.nodeStateListener = new FSTreeNodeStateListener((TreeViewer) viewer);
 	}
 
 	/* (non-Javadoc)
@@ -93,9 +80,7 @@ public class FSTreeContentProvider implements ITreeContentProvider, INodeStateLi
 	 */
 	@Override
 	public void dispose() {
-		if (input != null) {
-			FSModel.getFSModel(input).removeNodeStateListener(this);
-		}
+		FSModel.removeAllListener(nodeStateListener);
 	}
 
 	/**
@@ -142,7 +127,8 @@ public class FSTreeContentProvider implements ITreeContentProvider, INodeStateLi
 		if (parentElement instanceof IPeerModel) {
 			final IPeerModel peerNode = (IPeerModel)parentElement;
 			// Get the file system model root node, if already stored
-			final FSTreeNode root = FSModel.getFSModel(peerNode).getRoot();
+			final FSModel fsModel = FSModel.getFSModel(peerNode);
+			final FSTreeNode root = fsModel.getRoot();
 
 			// If the file system model root node hasn't been created, create
 			// and initialize the root node now.
@@ -169,7 +155,9 @@ public class FSTreeContentProvider implements ITreeContentProvider, INodeStateLi
 							node.childrenQueried = false;
 							node.childrenQueryRunning = false;
 							node.name = org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages.FSTreeNodeContentProvider_rootNode_label;
-							FSModel.getFSModel(peerNode).setRoot(node);
+
+							fsModel.setRoot(node);
+							fsModel.addNodeStateListener(nodeStateListener);
 
 							rootNode.set(node);
 						}
@@ -298,25 +286,13 @@ public class FSTreeContentProvider implements ITreeContentProvider, INodeStateLi
 											// Reset the children query markers
 											rootNode.childrenQueryRunning = false;
 											rootNode.childrenQueried = true;
+											FSModel.getFSModel(rootNode.peerNode).fireNodeStateChanged(rootNode);
 										}
-
-										PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-											@Override
-											public void run() {
-												if (viewer != null) viewer.refresh();
-											}
-										});
 									}
 								});
 							}
 						});
-
-						PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-							@Override
-							public void run() {
-								if (viewer != null) viewer.refresh();
-							}
-						});
+						FSModel.getFSModel(rootNode.peerNode).fireNodeStateChanged(rootNode);
 					} else {
 						// The file system service is not available for this peer.
 						// --> Close the just opened channel
@@ -499,12 +475,7 @@ public class FSTreeContentProvider implements ITreeContentProvider, INodeStateLi
 							readdir(channel, service, handle, parentNode);
 						}
 
-						PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-							@Override
-							public void run() {
-								if (!viewer.getTree().isDisposed()) viewer.refresh(parentNode);
-							}
-						});
+						FSModel.getFSModel(parentNode.peerNode).fireNodeStateChanged(parentNode);
 					}
 				});
 			}
@@ -624,35 +595,5 @@ public class FSTreeContentProvider implements ITreeContentProvider, INodeStateLi
 		}
 
 		return hasChildren;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.events.INodeStateListener#stateChanged(org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode)
-	 */
-	@Override
-	public void stateChanged(final FSTreeNode node) {
-		// Make sure that this node is inside of this viewer.
-		Display display = PlatformUI.getWorkbench().getDisplay();
-		if (display.getThread() == Thread.currentThread()) {
-			if (node != null) {
-				if (node.isSystemRoot()) {
-					viewer.refresh();
-				}
-				else {
-					viewer.refresh(node);
-				}
-			}
-			else {
-				//Refresh the whole tree.
-				viewer.refresh();
-			}
-		} else {
-			display.asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					stateChanged(node);
-				}
-			});
-		}
 	}
 }
