@@ -12,11 +12,12 @@ package org.eclipse.tcf.te.tcf.processes.ui.controls;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.tcf.te.tcf.processes.ui.internal.columns.ProcessComparator;
+import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 
 /**
  * The common sorter for the process contribution to the target explorer.
  */
-public class ProcessesViewerSorter extends ViewerSorter {
+public class ProcessViewerSorter extends ViewerSorter {
 	private ProcessComparator comparator = new ProcessComparator();
 
 	/*
@@ -26,8 +27,8 @@ public class ProcessesViewerSorter extends ViewerSorter {
 	 */
 	@Override
 	public int compare(Viewer viewer, Object e1, Object e2) {
-		if (e1 instanceof ProcessesTreeNode && e2 instanceof ProcessesTreeNode) {
-			return comparator.compare((ProcessesTreeNode) e1, (ProcessesTreeNode) e2);
+		if (e1 instanceof ProcessTreeNode && e2 instanceof ProcessTreeNode) {
+			return comparator.compare((ProcessTreeNode) e1, (ProcessTreeNode) e2);
 		}
 		return super.compare(viewer, e1, e2);
 	}

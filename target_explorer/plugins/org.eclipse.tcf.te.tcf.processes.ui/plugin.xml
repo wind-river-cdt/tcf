@@ -139,7 +139,7 @@
          point="org.eclipse.ui.navigator.navigatorContent">
       <navigatorContent
             activeByDefault="false"
-            contentProvider="org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessesTreeContentProvider"
+            contentProvider="org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessTreeContentProvider"
             icon="icons/obj16/process.gif"
             id="org.eclipse.tcf.te.tcf.processes.ui.navigator.content"
             labelProvider="org.eclipse.tcf.te.tcf.processes.ui.internal.columns.ProcessLabelProvider"
@@ -156,11 +156,11 @@
          </triggerPoints>
          <possibleChildren>
             <instanceof
-                  value="org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessesTreeNode">
+                  value="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
             </instanceof>
          </possibleChildren>
          <commonSorter
-               class="org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessesViewerSorter">
+               class="org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessViewerSorter">
          </commonSorter>
       </navigatorContent>
    </extension>

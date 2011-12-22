@@ -17,14 +17,14 @@ import org.eclipse.tcf.te.ui.trees.AbstractTreeControl;
 import org.eclipse.ui.IWorkbenchPart;
 
 /**
- * Processes tree control.
+ * Process tree control.
  */
-public class ProcessesTreeControl extends AbstractTreeControl {
+public class ProcessTreeControl extends AbstractTreeControl {
 
 	/**
 	 * Constructor.
 	 */
-	public ProcessesTreeControl() {
+	public ProcessTreeControl() {
 		super();
 	}
 
@@ -33,7 +33,7 @@ public class ProcessesTreeControl extends AbstractTreeControl {
 	 *
 	 * @param parentPart The parent workbench part this control is embedded in or <code>null</code>.
 	 */
-	public ProcessesTreeControl(IWorkbenchPart parentPart) {
+	public ProcessTreeControl(IWorkbenchPart parentPart) {
 		super(parentPart);
 	}
 
@@ -42,7 +42,7 @@ public class ProcessesTreeControl extends AbstractTreeControl {
 	 */
 	@Override
 	protected ITreeContentProvider doCreateTreeViewerContentProvider(TreeViewer viewer) {
-		return new ProcessesTreeContentProvider(false);
+		return new ProcessTreeContentProvider(false);
 	}
 
 	/* (non-Javadoc)

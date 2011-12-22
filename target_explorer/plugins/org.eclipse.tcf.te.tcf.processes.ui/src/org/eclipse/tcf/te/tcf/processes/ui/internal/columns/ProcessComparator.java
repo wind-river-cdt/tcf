@@ -13,19 +13,19 @@ import java.util.Comparator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessesTreeNode;
+import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 
 /**
  * The comparator for the tree column "name".
  */
-public class ProcessComparator implements Comparator<ProcessesTreeNode> {
+public class ProcessComparator implements Comparator<ProcessTreeNode> {
 
 	/*
 	 * (non-Javadoc)
 	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 	 */
 	@Override
-	public int compare(ProcessesTreeNode node1, ProcessesTreeNode node2) {
+	public int compare(ProcessTreeNode node1, ProcessTreeNode node2) {
 		if (node1 == null && node2 == null) return 0;
 		if (node1 != null && node2 == null) return 1;
 		if (node1 == null && node2 != null) return -1;

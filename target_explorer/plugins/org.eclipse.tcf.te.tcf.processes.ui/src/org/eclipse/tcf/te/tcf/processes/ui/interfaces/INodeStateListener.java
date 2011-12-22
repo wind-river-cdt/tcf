@@ -7,23 +7,20 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.processes.ui.internal.columns;
-
-import java.util.Comparator;
+package org.eclipse.tcf.te.tcf.processes.ui.interfaces;
 
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 
 /**
- * The comparator for the tree column "PPID".
+ * An INodeStateListener is a listener interface. Classes that implement this 
+ * interface serve as a listener processing the event that a node state has changed.
+ *
  */
-public class PPIDComparator implements Comparator<ProcessTreeNode> {
-
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+public interface INodeStateListener {
+	/**
+	 * Fired when the state of the specified ProcessTreeNode has changed.
+	 *  
+	 * @param node The ProcessTreeNode whose state has changed.
 	 */
-	@Override
-	public int compare(ProcessTreeNode o1, ProcessTreeNode o2) {
-		return o1.ppid == o2.ppid ? 0 : (o1.ppid < o2.ppid ? -1 : 1);
-	}
+	void stateChanged(ProcessTreeNode node);
 }

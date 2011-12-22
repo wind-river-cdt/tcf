@@ -18,10 +18,10 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessesTreeContentProvider;
-import org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessesTreeNode;
-import org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessesViewerSorter;
+import org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessTreeContentProvider;
+import org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessViewerSorter;
 import org.eclipse.tcf.te.tcf.processes.ui.internal.columns.ProcessLabelProvider;
+import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 import org.eclipse.tcf.te.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.interfaces.IUIConstants;
 import org.eclipse.tcf.te.ui.trees.FilterDescriptor;
@@ -36,7 +36,7 @@ import org.eclipse.ui.dialogs.ISelectionStatusValidator;
  * Process selection dialog.
  */
 public class ProcessSelectionDialog extends ElementTreeSelectionDialog {
-	// Label provider used by the file system tree.
+	// Label provider used by the process tree.
 	private ProcessLabelProvider labelProvider;
 
 	/**
@@ -45,7 +45,7 @@ public class ProcessSelectionDialog extends ElementTreeSelectionDialog {
 	 * @param parentShell The parent shell.
 	 */
 	public ProcessSelectionDialog(Shell parentShell) {
-		this(parentShell, new ProcessLabelProvider(), new ProcessesTreeContentProvider(false));
+		this(parentShell, new ProcessLabelProvider(), new ProcessTreeContentProvider(false));
 	}
 
 	/**
@@ -61,7 +61,7 @@ public class ProcessSelectionDialog extends ElementTreeSelectionDialog {
 		this.labelProvider = labelProvider;
 		this.setAllowMultiple(false);
 		this.setStatusLineAboveButtons(false);
-		this.setComparator(new ProcessesViewerSorter());
+		this.setComparator(new ProcessViewerSorter());
 		this.setValidator(new ISelectionStatusValidator() {
 			@Override
 			public IStatus validate(Object[] selection) {
@@ -122,7 +122,7 @@ public class ProcessSelectionDialog extends ElementTreeSelectionDialog {
 		if (selection == null || selection.length == 0) {
 			return error;
 		}
-		if (!(selection[0] instanceof ProcessesTreeNode)) {
+		if (!(selection[0] instanceof ProcessTreeNode)) {
 			return error;
 		}
 		return new Status(IStatus.OK, pluginId, null);

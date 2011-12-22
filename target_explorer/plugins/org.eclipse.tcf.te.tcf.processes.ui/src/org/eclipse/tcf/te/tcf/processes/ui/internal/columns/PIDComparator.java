@@ -11,19 +11,19 @@ package org.eclipse.tcf.te.tcf.processes.ui.internal.columns;
 
 import java.util.Comparator;
 
-import org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessesTreeNode;
+import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 
 /**
  * The comparator for the tree column "PID".
  */
-public class PIDComparator implements Comparator<ProcessesTreeNode> {
+public class PIDComparator implements Comparator<ProcessTreeNode> {
 
 	/*
 	 * (non-Javadoc)
 	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 	 */
 	@Override
-	public int compare(ProcessesTreeNode o1, ProcessesTreeNode o2) {
+	public int compare(ProcessTreeNode o1, ProcessTreeNode o2) {
 		return o1.pid == o2.pid ? 0 : (o1.pid < o2.pid ? -1 : 1);
 	}
 }

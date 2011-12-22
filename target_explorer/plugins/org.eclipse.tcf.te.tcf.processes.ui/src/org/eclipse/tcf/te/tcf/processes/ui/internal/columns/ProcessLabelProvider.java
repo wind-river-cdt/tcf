@@ -11,8 +11,8 @@ package org.eclipse.tcf.te.tcf.processes.ui.internal.columns;
 
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
-import org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessesTreeNode;
 import org.eclipse.tcf.te.tcf.processes.ui.interfaces.ImageConsts;
+import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.trees.TreeColumnLabelProvider;
 
@@ -27,8 +27,8 @@ public class ProcessLabelProvider extends TreeColumnLabelProvider {
 	 */
 	@Override
 	public String getText(Object element) {
-		if (element instanceof ProcessesTreeNode) {
-			ProcessesTreeNode node = (ProcessesTreeNode) element;
+		if (element instanceof ProcessTreeNode) {
+			ProcessTreeNode node = (ProcessTreeNode) element;
 			if(node.type.equals("ProcRootNode")) { //$NON-NLS-1$
 				return Messages.ProcessLabelProvider_RootNodeLabel;
 			}
@@ -45,7 +45,7 @@ public class ProcessLabelProvider extends TreeColumnLabelProvider {
 	 */
 	@Override
 	public Image getImage(Object element) {
-		if (element instanceof ProcessesTreeNode) {
+		if (element instanceof ProcessTreeNode) {
 			return UIPlugin.getImage(ImageConsts.OBJ_Process);
 		}
 		return super.getImage(element);

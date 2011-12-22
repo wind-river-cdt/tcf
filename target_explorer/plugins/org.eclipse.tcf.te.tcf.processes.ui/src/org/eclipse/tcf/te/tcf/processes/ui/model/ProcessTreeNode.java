@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.processes.ui.controls;
+package org.eclipse.tcf.te.tcf.processes.ui.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,9 +18,9 @@ import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 
 /**
- * Representation of a file system tree node.
+ * Representation of a process tree node.
  */
-public final class ProcessesTreeNode extends PlatformObject {
+public final class ProcessTreeNode extends PlatformObject {
 	private final UUID uuid = UUID.randomUUID();
 
 	/**
@@ -71,12 +71,12 @@ public final class ProcessesTreeNode extends PlatformObject {
 	/**
 	 * The tree node parent.
 	 */
-	public ProcessesTreeNode parent = null;
+	public ProcessTreeNode parent = null;
 
 	/**
 	 * The tree node children.
 	 */
-	public List<ProcessesTreeNode> children = new ArrayList<ProcessesTreeNode>();
+	public List<ProcessTreeNode> children = new ArrayList<ProcessTreeNode>();
 
 	/**
 	 * Flag to mark once the children of the node got queried
@@ -108,8 +108,8 @@ public final class ProcessesTreeNode extends PlatformObject {
 	 */
 	@Override
 	public final boolean equals(Object obj) {
-		if (obj instanceof ProcessesTreeNode) {
-			return uuid.equals(((ProcessesTreeNode) obj).uuid);
+		if (obj instanceof ProcessTreeNode) {
+			return uuid.equals(((ProcessTreeNode) obj).uuid);
 		}
 		return super.equals(obj);
 	}

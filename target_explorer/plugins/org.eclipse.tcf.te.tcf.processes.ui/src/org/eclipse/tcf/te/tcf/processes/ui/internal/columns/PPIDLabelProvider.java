@@ -10,7 +10,7 @@
 package org.eclipse.tcf.te.tcf.processes.ui.internal.columns;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessesTreeNode;
+import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 import org.eclipse.tcf.te.ui.trees.TreeColumnLabelProvider;
 
 /**
@@ -24,8 +24,8 @@ public class PPIDLabelProvider extends TreeColumnLabelProvider {
 	 */
 	@Override
 	public String getText(Object element) {
-		Assert.isTrue(element instanceof ProcessesTreeNode);
-		ProcessesTreeNode node = (ProcessesTreeNode) element;
+		Assert.isTrue(element instanceof ProcessTreeNode);
+		ProcessTreeNode node = (ProcessTreeNode) element;
 		// Pending nodes does not have column texts at all
 		if (node.type.endsWith("PendingNode")) return ""; //$NON-NLS-1$ //$NON-NLS-2$
 		String ppid = Long.toString(node.ppid);

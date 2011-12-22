@@ -11,19 +11,19 @@ package org.eclipse.tcf.te.tcf.processes.ui.internal.columns;
 
 import java.util.Comparator;
 
-import org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessesTreeNode;
+import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 
 /**
  * The comparator for the tree column "user".
  */
-public class UserComparator implements Comparator<ProcessesTreeNode> {
+public class UserComparator implements Comparator<ProcessTreeNode> {
 
 	/*
 	 * (non-Javadoc)
 	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 	 */
 	@Override
-	public int compare(ProcessesTreeNode o1, ProcessesTreeNode o2) {
+	public int compare(ProcessTreeNode o1, ProcessTreeNode o2) {
 		if (o1.username == null) {
 			if (o2.username == null) return 0;
 			return -1;

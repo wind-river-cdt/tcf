@@ -13,7 +13,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessesTreeControl;
+import org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessTreeControl;
 import org.eclipse.tcf.te.tcf.processes.ui.internal.help.IContextHelpIds;
 import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.forms.CustomFormToolkit;
@@ -29,7 +29,7 @@ import org.eclipse.ui.forms.widgets.TableWrapData;
  */
 public class ProcessExplorerEditorPage extends AbstractEditorPage {
 	// The references to the pages subcontrol's (needed for disposal)
-	private ProcessesTreeControl treeControl;
+	private ProcessTreeControl treeControl;
 
 	// Reference to the form toolkit instance
 	private CustomFormToolkit toolkit = null;
@@ -128,8 +128,8 @@ public class ProcessExplorerEditorPage extends AbstractEditorPage {
 	 *
 	 * @return The new tree control.
 	 */
-	protected ProcessesTreeControl doCreateTreeControl() {
-		return new ProcessesTreeControl(this);
+	protected ProcessTreeControl doCreateTreeControl() {
+		return new ProcessTreeControl(this);
 	}
 
 	/**
@@ -137,7 +137,7 @@ public class ProcessExplorerEditorPage extends AbstractEditorPage {
 	 *
 	 * @return The associated tree control or <code>null</code>.
 	 */
-	protected final ProcessesTreeControl getTreeControl() {
+	protected final ProcessTreeControl getTreeControl() {
 		return treeControl;
 	}
 }
