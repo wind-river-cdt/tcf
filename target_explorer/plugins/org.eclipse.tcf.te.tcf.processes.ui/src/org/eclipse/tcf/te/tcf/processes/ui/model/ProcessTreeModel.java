@@ -10,10 +10,10 @@
 package org.eclipse.tcf.te.tcf.processes.ui.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
@@ -178,33 +178,64 @@ public final class ProcessTreeModel {
 	 * The callback handler that handles the result of service.getContext.
 	 */
 	class SysDoneGetContext implements ISysMonitor.DoneGetContext {
+		private String contextId;
 		private IChannel channel;
 		private ProcessTreeNode parentNode;
-		private Iterator<String> iterator;
-		private ISysMonitor service;
-		public SysDoneGetContext(IChannel channel, ISysMonitor service, Iterator<String> iterator, ProcessTreeNode parentNode) {
+		private Map<String, Boolean> status;
+		public SysDoneGetContext(String contextId, IChannel channel, Map<String, Boolean> status, ProcessTreeNode parentNode) {
+			this.contextId = contextId;
 			this.channel = channel;
-			this.service = service;
-			this.iterator = iterator;
 			this.parentNode = parentNode;
+			this.status = status;
 		}
+		
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.tcf.services.ISysMonitor.DoneGetContext#doneGetContext(org.eclipse.tcf.protocol.IToken, java.lang.Exception, org.eclipse.tcf.services.ISysMonitor.SysMonitorContext)
+		 */
         @Override
-        public void doneGetContext(IToken token, Exception error, ISysMonitor.SysMonitorContext context) {
-            if (error == null && context != null) {
-                ProcessTreeNode childNode = createNodeForContext(context);
-                childNode.parent = parentNode;
-                childNode.peerNode = parentNode.peerNode;
-                parentNode.children.add(childNode);
-        		fireNodeStateChanged(parentNode);
-            }
-            if(iterator.hasNext()) {
-            	String contextId = iterator.next();
-            	service.getContext(contextId, this);
-            } else {
-                parentNode.childrenQueryRunning = false;
-                parentNode.childrenQueried = true;
-                Tcf.getChannelManager().closeChannel(channel);
-            }
+		public void doneGetContext(IToken token, Exception error, ISysMonitor.SysMonitorContext context) {
+			if (error == null && context != null) {
+				ProcessTreeNode childNode = createNodeForContext(context);
+				childNode.parent = parentNode;
+				childNode.peerNode = parentNode.peerNode;
+				parentNode.children.add(childNode);
+				setAndCheckStatus();
+				fireNodeStateChanged(parentNode);
+			}
+		}
+
+        /**
+         * Set the complete flag for this context id and check if
+         * all tasks have completed. 
+         */
+        private void setAndCheckStatus() {
+        	synchronized(status) {
+        		status.put(contextId, Boolean.TRUE);
+        		if(isAllComplete()){
+					parentNode.childrenQueryRunning = false;
+					parentNode.childrenQueried = true;
+					Tcf.getChannelManager().closeChannel(channel);
+        		}
+        	}
+        }
+        
+        /**
+         * Check if all tasks have completed by checking
+         * the status entries. 
+         * 
+         * @return true if all of them are marked finished.
+         */
+        private boolean isAllComplete() {
+			synchronized (status) {
+				for (String id : status.keySet()) {
+					Boolean bool = status.get(id);
+					if (!bool.booleanValue()) {
+						return false;
+					}
+				}
+				return true;
+			}
         }
         
     	/**
@@ -248,18 +279,39 @@ public final class ProcessTreeModel {
 			this.service = service;
 			this.parentNode = parentNode;
 		}
+		
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.tcf.services.ISysMonitor.DoneGetChildren#doneGetChildren(org.eclipse.tcf.protocol.IToken, java.lang.Exception, java.lang.String[])
+		 */
         @Override
         public void doneGetChildren(IToken token, Exception error, String[] context_ids) {
             if (error == null && context_ids != null && context_ids.length > 0) {
-            	final Iterator<String> iterator = Arrays.asList(context_ids).iterator();
-            	String contextId = iterator.next();
-                service.getContext(contextId, new SysDoneGetContext(channel, service, iterator, parentNode));
+            	Map<String, Boolean> status = createStatusMap(context_ids);
+				for (String contextId : context_ids) {
+					service.getContext(contextId, new SysDoneGetContext(contextId, channel, status, parentNode));
+				}
         	} else {
                 parentNode.childrenQueryRunning = false;
                 parentNode.childrenQueried = true;
                 Tcf.getChannelManager().closeChannel(channel);
         		fireNodeStateChanged(parentNode);
         	}
+        }
+
+        /**
+         * Create and initialize a status map with all the context ids and completion status
+         * set to false.
+         * 
+         * @param context_ids All the context ids.
+         * @return A map with initial values
+         */
+		private Map<String, Boolean> createStatusMap(String[] context_ids) {
+	        Map<String, Boolean> status = new HashMap<String, Boolean>();
+	        for (String contextId : context_ids) {
+	        	status.put(contextId, Boolean.FALSE);
+	        }
+	        return status;
         }		
 	}
 	
@@ -271,6 +323,11 @@ public final class ProcessTreeModel {
 		public SysDoneOpenChannel(ProcessTreeNode parentNode) {
 			this.parentNode = parentNode;
 		}
+		
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel#doneOpenChannel(java.lang.Throwable, org.eclipse.tcf.protocol.IChannel)
+		 */
 		@Override
         public void doneOpenChannel(Throwable error, final IChannel channel) {
 			Assert.isTrue(Protocol.isDispatchThread());
