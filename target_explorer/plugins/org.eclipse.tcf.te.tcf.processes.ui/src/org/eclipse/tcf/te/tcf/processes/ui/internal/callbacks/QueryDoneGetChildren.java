@@ -56,8 +56,8 @@ public class QueryDoneGetChildren implements ISysMonitor.DoneGetChildren {
     	} else {
             parentNode.childrenQueryRunning = false;
             parentNode.childrenQueried = true;
-            Tcf.getChannelManager().closeChannel(channel);
     		model.fireNodeStateChanged(parentNode);
+            Tcf.getChannelManager().closeChannel(channel);
     	}
     }
 

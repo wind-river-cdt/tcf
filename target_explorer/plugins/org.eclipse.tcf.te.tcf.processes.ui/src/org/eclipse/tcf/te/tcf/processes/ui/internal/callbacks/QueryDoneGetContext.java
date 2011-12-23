@@ -57,7 +57,6 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext {
 			childNode.parent = parentNode;
 			childNode.peerNode = parentNode.peerNode;
 			parentNode.children.add(childNode);
-			model.fireNodeStateChanged(parentNode);
 		}
 		setAndCheckStatus();
 	}
@@ -72,6 +71,7 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext {
     		if(isAllComplete()){
 				parentNode.childrenQueryRunning = false;
 				parentNode.childrenQueried = true;
+				model.fireNodeStateChanged(parentNode);
 				Tcf.getChannelManager().closeChannel(channel);
     		}
     	}

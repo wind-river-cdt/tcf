@@ -80,7 +80,6 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext {
 			}
 			else parentNode.children.add(childNode);
 			newNodes.add(childNode);
-			model.fireNodeStateChanged(parentNode);
 		}
 		setAndCheckStatus();
 	}
@@ -165,6 +164,7 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext {
                 	}
                 }
 				if (queue.isEmpty()) {
+					model.fireNodeStateChanged(parentNode);
 					Tcf.getChannelManager().closeChannel(channel);
 					if(callback != null) {
 						callback.run();

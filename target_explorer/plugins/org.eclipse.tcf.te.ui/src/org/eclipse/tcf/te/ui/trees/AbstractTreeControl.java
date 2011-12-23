@@ -223,7 +223,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 		viewer.getTree().setHeaderVisible(true);
 		updateFilters();
 		new TreeViewerHeaderMenu(this).create();
-		configFilterAction.setEnabled(filterDescriptors != null);
+		configFilterAction.setEnabled(filterDescriptors != null && filterDescriptors.length > 0);
 	}
 
 	/**

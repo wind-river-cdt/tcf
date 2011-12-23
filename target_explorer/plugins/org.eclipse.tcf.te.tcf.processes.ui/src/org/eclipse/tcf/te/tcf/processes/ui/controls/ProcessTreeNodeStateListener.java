@@ -11,9 +11,9 @@ package org.eclipse.tcf.te.tcf.processes.ui.controls;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.tcf.te.tcf.processes.ui.interfaces.INodeStateListener;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * The node state listener that listens to the state change event of the process tree
@@ -39,22 +39,26 @@ public class ProcessTreeNodeStateListener implements INodeStateListener {
 	@Override
 	public void stateChanged(final ProcessTreeNode node) {
 		// Make sure that this node is inside of this viewer.
-		Display display = PlatformUI.getWorkbench().getDisplay();
-		if (display.getThread() == Thread.currentThread()) {
-			if (node != null && node.id != null) {
-				viewer.refresh(node);
+		Tree tree = viewer.getTree();
+		if (!tree.isDisposed()) {
+			Display display = tree.getDisplay();
+			if (display.getThread() == Thread.currentThread()) {
+				if (node != null && node.id != null) {
+					viewer.refresh(node);
+				}
+				else {
+					// Refresh the whole tree.
+					viewer.refresh();
+				}
 			}
 			else {
-				//Refresh the whole tree.
-				viewer.refresh();
+				display.asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						stateChanged(node);
+					}
+				});
 			}
-		} else {
-			display.asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					stateChanged(node);
-				}
-			});
 		}
 	}
 }

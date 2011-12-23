@@ -68,8 +68,8 @@ public class RefreshDoneGetChildren implements ISysMonitor.DoneGetChildren {
             parentNode.childrenQueryRunning = false;
             parentNode.childrenQueried = true;
             parentNode.children.clear();
-    		model.fireNodeStateChanged(parentNode);
 			if (queue.isEmpty()) {
+	    		model.fireNodeStateChanged(parentNode);
 				Tcf.getChannelManager().closeChannel(channel);
 				if(callback != null) {
 					callback.run();
