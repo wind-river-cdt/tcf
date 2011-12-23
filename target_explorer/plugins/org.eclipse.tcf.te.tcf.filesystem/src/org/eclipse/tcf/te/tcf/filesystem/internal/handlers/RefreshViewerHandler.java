@@ -12,6 +12,11 @@ package org.eclipse.tcf.te.tcf.filesystem.internal.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSRefresh;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
@@ -33,10 +38,17 @@ public class RefreshViewerHandler extends AbstractHandler {
 		IEditorInput editorInput = HandlerUtil.getActiveEditorInputChecked(event);
 		IPeerModel peer = (IPeerModel) editorInput.getAdapter(IPeerModel.class);
 		if (peer != null) {
-			FSTreeNode root = FSModel.getFSModel(peer).getRoot();
+			final FSTreeNode root = FSModel.getFSModel(peer).getRoot();
 			if (root != null) {
-				FSRefresh op = new FSRefresh(root);
-				op.doit();
+				Job job = new Job(Messages.RefreshViewerHandler_RefreshJobTitle) {
+					@Override
+					protected IStatus run(IProgressMonitor monitor) {
+						FSRefresh op = new FSRefresh(root);
+						op.doit();
+						return Status.OK_STATUS;
+					}
+				};
+				job.schedule();
 			}
 		}
 		return null;

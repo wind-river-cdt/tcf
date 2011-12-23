@@ -230,6 +230,8 @@ public class Messages extends NLS {
 	public static String PermissionsGroup_UserPermissions;
 	public static String PermissionsGroup_Writable;
 
+	public static String RefreshDirectoryHandler_RefreshJobTitle;
+	public static String RefreshViewerHandler_RefreshJobTitle;
 	public static String RemoteTypedElement_GettingRemoteContent;
 	public static String RenameFilesHandler_PromptNewName;
 	public static String RenameFilesHandler_RenamePromptMessage;

@@ -13,7 +13,13 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSRefresh;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -32,10 +38,17 @@ public class RefreshDirectoryHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getCurrentSelectionChecked(event);
 		Assert.isTrue(selection.size() == 1);
-		FSTreeNode node = (FSTreeNode) selection.getFirstElement();
+		final FSTreeNode node = (FSTreeNode) selection.getFirstElement();
 		if(node.childrenQueried) {
-			FSRefresh refresh = new FSRefresh(node);
-			refresh.doit();
+			Job job = new Job(NLS.bind(Messages.RefreshDirectoryHandler_RefreshJobTitle, node.name)) {
+				@Override
+				protected IStatus run(IProgressMonitor monitor) {
+					FSRefresh refresh = new FSRefresh(node);
+					refresh.doit();
+					return Status.OK_STATUS;
+				}
+			};
+			job.schedule();
 		}
 		return null;
 	}
