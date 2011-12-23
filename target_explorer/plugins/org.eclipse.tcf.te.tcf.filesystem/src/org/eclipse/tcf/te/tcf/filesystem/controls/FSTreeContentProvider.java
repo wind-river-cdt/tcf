@@ -128,6 +128,7 @@ public class FSTreeContentProvider implements ITreeContentProvider {
 			final IPeerModel peerNode = (IPeerModel)parentElement;
 			// Get the file system model root node, if already stored
 			final FSModel fsModel = FSModel.getFSModel(peerNode);
+			fsModel.addNodeStateListener(nodeStateListener);
 			final FSTreeNode root = fsModel.getRoot();
 
 			// If the file system model root node hasn't been created, create
@@ -157,7 +158,6 @@ public class FSTreeContentProvider implements ITreeContentProvider {
 							node.name = org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages.FSTreeNodeContentProvider_rootNode_label;
 
 							fsModel.setRoot(node);
-							fsModel.addNodeStateListener(nodeStateListener);
 
 							rootNode.set(node);
 						}

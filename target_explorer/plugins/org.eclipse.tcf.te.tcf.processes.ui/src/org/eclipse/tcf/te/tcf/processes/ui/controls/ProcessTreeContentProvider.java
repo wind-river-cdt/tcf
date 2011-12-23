@@ -14,7 +14,8 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
-import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeModel;
+import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
+import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModelManager;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 import org.eclipse.tcf.te.ui.nls.Messages;
 
@@ -63,7 +64,7 @@ public class ProcessTreeContentProvider implements ITreeContentProvider {
 	 */
 	@Override
 	public void dispose() {
-		ProcessTreeModel.removeAllListener(nodeStateListener);
+		ProcessModelManager.getInstance().removeListener(nodeStateListener);
 	}
 
 	/*
@@ -97,10 +98,10 @@ public class ProcessTreeContentProvider implements ITreeContentProvider {
 
 		if (parentElement instanceof IPeerModel) {
 			final IPeerModel peerModel = (IPeerModel) parentElement;
-			final ProcessTreeModel model = ProcessTreeModel.getProcessTreeModel(peerModel);
+			final ProcessModel model = ProcessModelManager.getInstance().getProcessModel(peerModel);
+			model.addNodeStateListener(nodeStateListener);
 			if(model.getRoot() == null) {
 				model.createRoot(peerModel);
-				model.addNodeStateListener(nodeStateListener);
 			}
 			if (rootNodeVisible) {
 				return new Object[] { model.getRoot() };
@@ -110,10 +111,10 @@ public class ProcessTreeContentProvider implements ITreeContentProvider {
 		else if (parentElement instanceof ProcessTreeNode) {
 			ProcessTreeNode node = (ProcessTreeNode) parentElement;
 			if (!node.childrenQueried && !node.childrenQueryRunning) {
-				final ProcessTreeModel model = ProcessTreeModel.getProcessTreeModel(node.peerNode);
+				final ProcessModel model = ProcessModelManager.getInstance().getProcessModel(node.peerNode);
 				model.queryChildren(node);
 			}
-			if(node.children.isEmpty()) {
+			if(!node.childrenQueried && node.children.isEmpty()) {
 				ProcessTreeNode pendingNode = new ProcessTreeNode();
 				pendingNode.name = Messages.PendingOperation_label;
 				pendingNode.type = "ProcPendingNode"; //$NON-NLS-1$
