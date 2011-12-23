@@ -28,4 +28,6 @@ public interface ImageConsts {
 	// ***** The image constants *****
 
 	public static final String OBJ_Process = "OBJ_Process"; //$NON-NLS-1$
+	
+	public static final String OBJ_Process_Root = "OBJ_Process_Root"; //$NON-NLS-1$
 }

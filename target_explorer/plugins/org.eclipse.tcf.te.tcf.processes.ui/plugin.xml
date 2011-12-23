@@ -56,6 +56,16 @@
                </visibleWhen>
          </command>
       </menuContribution>
+      <menuContribution
+            locationURI="toolbar:org.eclipse.tcf.te.ui.controls.menu.processes?after=additions">
+         <command
+               commandId="org.eclipse.tcf.te.tcf.processes.ui.command.refresh"
+               icon="icons/obj16/refresh.gif"
+               label="%command.refresh.label"
+               style="push"
+               tooltip="%command.refresh.tooltip">
+         </command>
+      </menuContribution>
    </extension>
 
 <!-- Processes command contributions -->
@@ -66,6 +76,12 @@
             id="org.eclipse.tcf.te.tcf.processes.ui.command.launch"
             name="%Processes.command.launch.name">
       </command>
+      <command
+            categoryId="org.eclipse.tcf.te.tcf.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.tcf.processes.ui.command_Refresh"
+            id="org.eclipse.tcf.te.tcf.processes.ui.command.refresh"
+            name="%command.refresh.name">
+      </command>
    </extension>
 
 <!-- Processes handler contributions -->
@@ -73,6 +89,10 @@
       <handler
             class="org.eclipse.tcf.te.tcf.processes.ui.internal.handler.LaunchProcessesCommandHandler"
             commandId="org.eclipse.tcf.te.tcf.processes.ui.command.launch">
+      </handler>
+      <handler
+            class="org.eclipse.tcf.te.tcf.processes.ui.internal.handler.RefreshProcessListHandler"
+            commandId="org.eclipse.tcf.te.tcf.processes.ui.command.refresh">
       </handler>
    </extension>
    <extension

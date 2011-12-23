@@ -75,6 +75,8 @@ public class UIPlugin extends AbstractUIPlugin {
 	protected void initializeImageRegistry(ImageRegistry registry) {
 		URL url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OBJ + "process.gif"); //$NON-NLS-1$
 		registry.put(ImageConsts.OBJ_Process, ImageDescriptor.createFromURL(url));
+		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OBJ + "process_root.png"); //$NON-NLS-1$
+		registry.put(ImageConsts.OBJ_Process_Root, ImageDescriptor.createFromURL(url));
 	}
 
 	/**

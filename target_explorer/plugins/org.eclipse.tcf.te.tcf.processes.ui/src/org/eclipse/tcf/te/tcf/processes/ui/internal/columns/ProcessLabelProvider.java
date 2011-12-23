@@ -46,6 +46,10 @@ public class ProcessLabelProvider extends TreeColumnLabelProvider {
 	@Override
 	public Image getImage(Object element) {
 		if (element instanceof ProcessTreeNode) {
+			ProcessTreeNode node = (ProcessTreeNode) element;
+			if(node.type.equals("ProcRootNode")) { //$NON-NLS-1$
+				return UIPlugin.getImage(ImageConsts.OBJ_Process_Root);
+			}
 			return UIPlugin.getImage(ImageConsts.OBJ_Process);
 		}
 		return super.getImage(element);
