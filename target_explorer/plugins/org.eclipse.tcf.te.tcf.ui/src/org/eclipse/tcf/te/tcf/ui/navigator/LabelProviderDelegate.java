@@ -97,22 +97,25 @@ public class LabelProviderDelegate extends LabelProvider implements ILabelDecora
 	 * @see org.eclipse.jface.viewers.ILabelDecorator#decorateText(java.lang.String, java.lang.Object)
 	 */
 	@Override
-	public String decorateText(String text, Object element) {
+	public String decorateText(final String text, final Object element) {
 		if (element instanceof IPeerModel) {
 			String label = text;
 
-			final IPeer peer = ((IPeerModel)element).getPeer();
 			final StringBuilder builder = new StringBuilder(label != null && !"".equals(label.trim()) ? label.trim() : "<noname>"); //$NON-NLS-1$ //$NON-NLS-2$
-			if (Protocol.isDispatchThread()) {
-				doDecorateText(builder, peer);
-			} else {
-				Protocol.invokeAndWait(new Runnable() {
-					@Override
-					public void run() {
-						doDecorateText(builder, peer);
-					}
-				});
-			}
+
+			Runnable runnable = new Runnable() {
+				@Override
+				public void run() {
+					IPeer peer = ((IPeerModel)element).getPeer();
+					String dnsName = ((IPeerModel)element).getStringProperty("dns.name.transient"); //$NON-NLS-1$
+
+					doDecorateText(builder, peer, dnsName);
+				}
+			};
+
+			if (Protocol.isDispatchThread()) runnable.run();
+			else Protocol.invokeAndWait(runnable);
+
 			label = builder.toString();
 
 			if (label != null && !"".equals(label.trim()) && !"<noname>".equals(label.trim())) { //$NON-NLS-1$ //$NON-NLS-2$
@@ -129,8 +132,9 @@ public class LabelProviderDelegate extends LabelProvider implements ILabelDecora
 	 *
 	 * @param builder The string builder to decorate. Must not be <code>null</code>.
 	 * @param peer The peer. Must not be <code>null</code>.
+	 * @param dnsName The peers DNS name or <code>null</code>.
 	 */
-	/* default */ void doDecorateText(StringBuilder builder, IPeer peer) {
+	/* default */ void doDecorateText(StringBuilder builder, IPeer peer, String dnsName) {
 		Assert.isNotNull(builder);
 		Assert.isNotNull(peer);
 		Assert.isTrue(Protocol.isDispatchThread());
@@ -140,7 +144,7 @@ public class LabelProviderDelegate extends LabelProvider implements ILabelDecora
 
 		if (ip != null && !"".equals(ip.trim())) { //$NON-NLS-1$
 			builder.append(" ["); //$NON-NLS-1$
-			builder.append(ip.trim());
+			builder.append(dnsName != null && !"".equals(dnsName.trim()) ? dnsName.trim() : ip.trim()); //$NON-NLS-1$
 
 			if (port != null && !"".equals(port.trim()) && !"1534".equals(port.trim())) { //$NON-NLS-1$ //$NON-NLS-2$
 				builder.append(":"); //$NON-NLS-1$
