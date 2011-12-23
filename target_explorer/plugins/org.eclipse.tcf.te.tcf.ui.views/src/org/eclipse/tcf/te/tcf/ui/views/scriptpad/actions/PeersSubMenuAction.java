@@ -92,6 +92,11 @@ public class PeersSubMenuAction extends Action implements IMenuCreator, IViewAct
     @Override
     public void init(IViewPart view) {
     	this.view = view;
+    	// If the action proxy is already set, it means that the init(IAction)
+    	// has been called before. Re-trigger the action enablement.
+    	if (actionProxy != null) {
+    		listener.locatorModelChanged(Model.getModel(), null, false);
+    	}
     }
 
     /* (non-Javadoc)
