@@ -36,4 +36,5 @@ public class Messages extends NLS {
 	public static String ScriptLauncher_error_illegalIndex;
 	public static String ScriptLauncher_error_parsingScript;
 	public static String ScriptLauncher_error_executionFailed;
+	public static String ScriptLauncher_error_serviceNotAvailable;
 }

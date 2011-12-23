@@ -317,28 +317,35 @@ public class ScriptLauncher extends PlatformObject implements IScriptLauncher {
 		Token token = tokens[index];
 
 		IService service = channel.getRemoteService(token.getServiceName());
-		new Command(channel, service, token.getCommandName(), token.getArguments()) {
+		if (service != null) {
+			new Command(channel, service, token.getCommandName(), token.getArguments()) {
 
-			@Override
-			public void done(Exception error, Object[] args) {
-				if (error == null) {
-					// Execute the next token
-					int nextIndex = index + 1;
-					if (nextIndex == tokens.length) {
-						// All tokens executed
-						invokeCallback(Status.OK_STATUS, null);
+				@Override
+				public void done(Exception error, Object[] args) {
+					if (error == null) {
+						// Execute the next token
+						int nextIndex = index + 1;
+						if (nextIndex == tokens.length) {
+							// All tokens executed
+							invokeCallback(Status.OK_STATUS, null);
+						} else {
+							executeToken(tokens, nextIndex);
+						}
 					} else {
-						executeToken(tokens, nextIndex);
+						// Stop the execution
+						IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
+										NLS.bind(Messages.ScriptLauncher_error_parsingScript, error.getLocalizedMessage()),
+										error);
+						invokeCallback(status, null);
 					}
-				} else {
-					// Stop the execution
-					IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
-									NLS.bind(Messages.ScriptLauncher_error_parsingScript, error.getLocalizedMessage()),
-									error);
-					invokeCallback(status, null);
 				}
-			}
-		};
+			};
+		} else {
+			IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
+										NLS.bind(Messages.ScriptLauncher_error_serviceNotAvailable, token.getServiceName(), channel.getRemotePeer().getID()),
+										null);
+			invokeCallback(status, null);
+		}
 	}
 
 	/**

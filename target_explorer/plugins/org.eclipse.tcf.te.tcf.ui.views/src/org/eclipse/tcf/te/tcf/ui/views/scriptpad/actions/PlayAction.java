@@ -21,9 +21,14 @@ import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
+import org.eclipse.tcf.te.runtime.statushandler.StatusHandlerManager;
+import org.eclipse.tcf.te.runtime.statushandler.interfaces.IStatusHandler;
+import org.eclipse.tcf.te.runtime.statushandler.interfaces.IStatusHandlerConstants;
 import org.eclipse.tcf.te.tcf.core.scripting.interfaces.IScriptLauncherProperties;
 import org.eclipse.tcf.te.tcf.core.scripting.launcher.ScriptLauncher;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.tcf.ui.views.help.IContextHelpIds;
+import org.eclipse.tcf.te.tcf.ui.views.nls.Messages;
 import org.eclipse.tcf.te.tcf.ui.views.scriptpad.ScriptPad;
 import org.eclipse.ui.IActionDelegate2;
 import org.eclipse.ui.IPropertyListener;
@@ -130,6 +135,18 @@ public class PlayAction extends Action implements IViewActionDelegate, IActionDe
 		    		boolean enabled = false;
 		    		if (PlayAction.this.view instanceof ScriptPad) enabled = ((ScriptPad)PlayAction.this.view).getPeerModel() != null;
 		    		actionProxy.setEnabled(enabled && !running);
+
+		    		if (status != null && (status.getSeverity() == IStatus.ERROR || status.getSeverity() == IStatus.WARNING)) {
+		    			IStatusHandler[] handler = StatusHandlerManager.getInstance().getHandler(view);
+		    			if (handler != null && handler.length > 0) {
+		    				IPropertiesContainer data = new PropertiesContainer();
+		    				data.setProperty(IStatusHandlerConstants.PROPERTY_TITLE, Messages.ScriptPad_error_title);
+		    				data.setProperty(IStatusHandlerConstants.PROPERTY_CONTEXT_HELP_ID, IContextHelpIds.SCRIPT_PAD_ERROR_PLAY_FAILED);
+		    				data.setProperty(IStatusHandlerConstants.PROPERTY_CALLER, view);
+
+		    				handler[0].handleStatus(status, data, null);
+		    			}
+		    		}
         		}
         	});
     	}
