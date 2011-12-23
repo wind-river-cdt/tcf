@@ -32,10 +32,6 @@ public class ProcessModel {
 	private ProcessTreeNode root;
 	// The polling interval
 	/* default */long interval = 5 * 1000;
-	// The task for polling
-	/* default */TimerTask pollingTask;
-	// The timer for polling
-	/* default */Timer pollingTimer;
 
 	/**
 	 * Create a File System Model.
@@ -65,23 +61,23 @@ public class ProcessModel {
 		root.childrenQueried = false;
 		root.childrenQueryRunning = false;
 		this.root = root;
-		startPolling();
+		schedulePolling();
 	}
 
 	/**
-	 * Start the periodical polling.
+	 * Schedule the periodical polling.
 	 */
-	private void startPolling() {
-	    pollingTask = new TimerTask(){
+	void schedulePolling() {
+	    TimerTask pollingTask = new TimerTask(){
 			@Override
 	        public void run() {
 				refresh(new Runnable(){
 					@Override
 	                public void run() {
-				        pollingTimer.schedule(pollingTask, interval);
+				        schedulePolling();
 	                }});
 	        }};
-	    pollingTimer = new Timer();
+	    Timer pollingTimer = new Timer();
         pollingTimer.schedule(pollingTask, interval);
     }
 
