@@ -54,7 +54,7 @@ public class PeerAction extends Action {
      */
     @Override
     public void run() {
-    	setChecked(!isChecked());
+    	setChecked(true);
 
     	// Pass on the selected peer model to the parent view
     	if (view instanceof ScriptPad) {

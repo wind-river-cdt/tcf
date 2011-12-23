@@ -71,6 +71,7 @@ import org.eclipse.tcf.te.tcf.ui.views.scriptpad.actions.CopyAction;
 import org.eclipse.tcf.te.tcf.ui.views.scriptpad.actions.CutAction;
 import org.eclipse.tcf.te.tcf.ui.views.scriptpad.actions.DeleteAction;
 import org.eclipse.tcf.te.tcf.ui.views.scriptpad.actions.PasteAction;
+import org.eclipse.tcf.te.tcf.ui.views.scriptpad.actions.PeerAction;
 import org.eclipse.tcf.te.tcf.ui.views.scriptpad.actions.SelectAllAction;
 import org.eclipse.tcf.te.ui.swt.DisplayUtil;
 import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
@@ -96,7 +97,7 @@ public class ScriptPad extends ViewPart implements ISelectionProvider, Selection
 	private final List<ISelectionChangedListener> listeners = new ArrayList<ISelectionChangedListener>();
 
 	// Reference to the selected peer model
-	private IPeerModel peerModel;
+	/* default */ IPeerModel peerModel;
 
 	// References to the global action handlers
 	private CutAction cutHandler;
@@ -386,12 +387,25 @@ public class ScriptPad extends ViewPart implements ISelectionProvider, Selection
 	 * Update the head label
 	 */
 	protected void updateHeadLabel() {
+		StringBuilder label = new StringBuilder();
+
 		if (fileLoaded == null) {
-			SWTControlUtil.setText(head, ""); //$NON-NLS-1$
+			label.append("<no file>"); //$NON-NLS-1$
 		} else {
 			IPath path = new Path(fileLoaded);
-			SWTControlUtil.setText(head, path.lastSegment() + " - " + path.removeLastSegments(1).toOSString()); //$NON-NLS-1$
+			label.append(path.lastSegment());
 		}
+
+		label.append(" - "); //$NON-NLS-1$
+
+		if (peerModel == null) {
+			label.append("<no peer>"); //$NON-NLS-1$
+		} else {
+			PeerAction action = new PeerAction(this, peerModel);
+			label.append(action.getText());
+		}
+
+		SWTControlUtil.setText(head, label.toString());
 	}
 
 	/* (non-Javadoc)
@@ -417,6 +431,8 @@ public class ScriptPad extends ViewPart implements ISelectionProvider, Selection
 	 */
 	public void setPeerModel(IPeerModel peerModel) {
 		this.peerModel = peerModel;
+		// Update the head label
+		updateHeadLabel();
 		// Update the action bars
 		getViewSite().getActionBars().updateActionBars();
 		// Fire a property change (in the UI Thread)
