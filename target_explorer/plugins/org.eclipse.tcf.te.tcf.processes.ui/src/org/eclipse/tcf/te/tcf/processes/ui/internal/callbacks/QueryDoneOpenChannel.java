@@ -14,7 +14,6 @@ import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
-import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 
 /**
@@ -23,8 +22,6 @@ import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 public class QueryDoneOpenChannel implements IChannelManager.DoneOpenChannel {
 	// The parent node to be queried.
 	ProcessTreeNode parentNode;
-	// The process model it is associated with.
-	ProcessModel model;
 
 	/**
 	 * Create an instance with a process model and a parent node.
@@ -32,8 +29,7 @@ public class QueryDoneOpenChannel implements IChannelManager.DoneOpenChannel {
 	 * @param model The process model.
 	 * @param parentNode The parent node to be queried.
 	 */
-	public QueryDoneOpenChannel(ProcessModel model, ProcessTreeNode parentNode) {
-		this.model = model;
+	public QueryDoneOpenChannel(ProcessTreeNode parentNode) {
 		this.parentNode = parentNode;
 	}
 	
@@ -47,7 +43,7 @@ public class QueryDoneOpenChannel implements IChannelManager.DoneOpenChannel {
 		if (error == null && channel != null) {
 			ISysMonitor service = channel.getRemoteService(ISysMonitor.class);
 			if (service != null) {
-				service.getChildren(parentNode.id, new QueryDoneGetChildren(model, channel, service, parentNode));
+				service.getChildren(parentNode.id, new QueryDoneGetChildren(channel, service, parentNode));
 			}
 		}
     }

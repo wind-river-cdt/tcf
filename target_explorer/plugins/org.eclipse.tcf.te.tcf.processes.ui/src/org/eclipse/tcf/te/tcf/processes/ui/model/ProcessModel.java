@@ -9,32 +9,58 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.processes.ui.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
-import org.eclipse.tcf.te.tcf.processes.ui.interfaces.INodeStateListener;
 import org.eclipse.tcf.te.tcf.processes.ui.internal.callbacks.QueryDoneOpenChannel;
 import org.eclipse.tcf.te.tcf.processes.ui.internal.callbacks.RefreshDoneOpenChannel;
 import org.eclipse.tcf.te.tcf.processes.ui.internal.preferences.IPreferenceConsts;
+import org.eclipse.tcf.te.ui.interfaces.IPropertyChangeProvider;
 
 /**
  * The process tree model implementation.
  */
 public class ProcessModel {
-	// Node state listeners.
-	private List<INodeStateListener> listeners;
-	// Property Change Listeners
-	private List<IPropertyChangeListener> propertyChangeListeners;
+	/* default */static final String PROCESS_ROOT_KEY = UIPlugin.getUniqueIdentifier() + ".process.root"; //$NON-NLS-1$
+
+	/**
+	 * Get the process model stored in the peer model.
+	 * If there's no process model yet, create a new process model. 
+	 * 
+	 * @param peerModel The target's peer model.
+	 * @return The process model representing the process.
+	 */
+	public static ProcessModel getProcessModel(final IPeerModel peerModel) {
+		if (peerModel != null) {
+			if (Protocol.isDispatchThread()) {
+				ProcessModel model = (ProcessModel) peerModel.getProperty(PROCESS_ROOT_KEY);
+				if (model == null) {
+					model = new ProcessModel(peerModel);
+					peerModel.setProperty(PROCESS_ROOT_KEY, model);
+				}
+				return model;
+			}
+			final AtomicReference<ProcessModel> reference = new AtomicReference<ProcessModel>();
+			Protocol.invokeAndWait(new Runnable() {
+				@Override
+				public void run() {
+					reference.set(getProcessModel(peerModel));
+				}
+			});
+			return reference.get();
+		}
+		return null;
+	}
+	
 	// The root node of the peer model
 	private ProcessTreeNode root;
 	// The polling interval in seconds. If it is zero, then stop polling periodically.
@@ -43,13 +69,13 @@ public class ProcessModel {
 	/* default */Timer pollingTimer;
 	// The flag to indicate if the polling has been stopped.
 	/* default */boolean stopped;
+	private IPeerModel peerModel;
 
 	/**
 	 * Create a File System Model.
 	 */
 	ProcessModel(IPeerModel peerModel) {
-		this.listeners = Collections.synchronizedList(new ArrayList<INodeStateListener>());
-		this.propertyChangeListeners = Collections.synchronizedList(new ArrayList<IPropertyChangeListener>());
+		this.peerModel = peerModel;
 	}
 
 	/**
@@ -76,14 +102,38 @@ public class ProcessModel {
 		startPolling();
 	}
 
+	/**
+	 * Start the periodical polling.
+	 */
 	public void startPolling() {
-	    stopped = false;
+	    setStopped(false);
 	    pollingTimer = new Timer();
 		schedulePolling();
     }
-	
+
+	/**
+	 * Set the status of the polling and 
+	 * fire a property change event.
+	 * 
+	 * @param stopped if the polling should be stopped.
+	 */
+	void setStopped(boolean stopped) {
+		if(this.stopped != stopped) {
+			boolean old = this.stopped;
+			this.stopped = stopped;
+			Boolean oldValue = Boolean.valueOf(old);
+			Boolean newValue = Boolean.valueOf(stopped);
+			PropertyChangeEvent event = new PropertyChangeEvent(peerModel, "stopped", oldValue, newValue); //$NON-NLS-1$
+			IPropertyChangeProvider provider = (IPropertyChangeProvider) peerModel.getAdapter(IPropertyChangeProvider.class);
+			provider.firePropertyChange(event);
+		}
+    }
+
+	/**
+	 * Stop the periodical polling.
+	 */
 	public void stopPolling() {
-		stopped = true;
+		setStopped(true);
 	}
 
 	/**
@@ -110,8 +160,7 @@ public class ProcessModel {
     }
 	
 	/**
-	 * Set new interval. If the new interval is zero,
-	 * then stop scheduling periodically.
+	 * Set new interval. 
 	 * 
 	 * @param interval The new interval.
 	 */
@@ -119,56 +168,15 @@ public class ProcessModel {
 		this.interval = interval;
 	}
 
+	/**
+	 * Get the current interval.
+	 * 
+	 * @return the current interval.
+	 */
 	public long getInterval() {
 		return interval;
 	}
-	
-	public void addPropertyChangeListener(IPropertyChangeListener listener) {
-		if(!propertyChangeListeners.contains(listener)) {
-			propertyChangeListeners.add(listener);
-		}
-	}
-	
-	public void removePropertyChangeListener(IPropertyChangeListener listener) {
-		if(propertyChangeListeners.contains(listener)) {
-			propertyChangeListeners.remove(listener);
-		}
-	}
-	/**
-	 * Add an INodeStateListener to the File System model if it is not in the listener list yet.
-	 * 
-	 * @param listener The INodeStateListener to be added.
-	 */
-	public void addNodeStateListener(INodeStateListener listener) {
-		if (!listeners.contains(listener)) {
-			listeners.add(listener);
-		}
-	}
 
-	/**
-	 * Remove the INodeStateListener from the File System model if it exists in the listener list.
-	 * 
-	 * @param listener The INodeStateListener to be removed.
-	 */
-	public void removeNodeStateListener(INodeStateListener listener) {
-		if (listeners.contains(listener)) {
-			listeners.remove(listener);
-		}
-	}
-
-	/**
-	 * Fire a node state changed event with the specified node.
-	 * 
-	 * @param node The node whose state has changed.
-	 */
-	public void fireNodeStateChanged(ProcessTreeNode node) {
-		synchronized (listeners) {
-			for (INodeStateListener listener : listeners) {
-				listener.stateChanged(node);
-			}
-		}
-	}
-	
 	/**
 	 * Query the children of the given process context.
 	 * 
@@ -177,7 +185,7 @@ public class ProcessModel {
 	public void queryChildren(ProcessTreeNode parentNode) {
 		Assert.isNotNull(parentNode);
 		parentNode.childrenQueryRunning = true;
-		Tcf.getChannelManager().openChannel(parentNode.peerNode.getPeer(), false, new QueryDoneOpenChannel(this, parentNode));
+		Tcf.getChannelManager().openChannel(parentNode.peerNode.getPeer(), false, new QueryDoneOpenChannel(parentNode));
 	}
 
 	/**
@@ -190,7 +198,7 @@ public class ProcessModel {
 	public void refresh(ProcessTreeNode parentNode, Runnable callback) {
 		Assert.isNotNull(parentNode);
 		parentNode.childrenQueryRunning = true;
-		Tcf.getChannelManager().openChannel(parentNode.peerNode.getPeer(), false, new RefreshDoneOpenChannel(this, callback, parentNode));
+		Tcf.getChannelManager().openChannel(parentNode.peerNode.getPeer(), false, new RefreshDoneOpenChannel(callback, parentNode));
 	}
 
 	/**
@@ -228,11 +236,17 @@ public class ProcessModel {
 		}
 	}
 	
-	public void updateMRU(int seconds) {
+	/**
+	 * Update the most recently  used interval adding 
+	 * a new interval.
+	 * 
+	 * @param interval The new interval.
+	 */
+	public void addMRUInterval(int interval){
         IPreferenceStore prefStore = UIPlugin.getDefault().getPreferenceStore();
         String mruList = prefStore.getString(IPreferenceConsts.PREF_INTERVAL_MRU_LIST);
         if (mruList == null || mruList.trim().length() == 0) {
-        	mruList = "" + seconds; //$NON-NLS-1$
+        	mruList = "" + interval; //$NON-NLS-1$
         }else{
         	StringTokenizer st = new StringTokenizer(mruList, ":"); //$NON-NLS-1$
         	int maxCount = prefStore.getInt(IPreferenceConsts.PREF_INTERVAL_MRU_COUNT);
@@ -241,7 +255,7 @@ public class ProcessModel {
         		String token = st.nextToken();
         		try {
         			int s = Integer.parseInt(token);
-        			if(s == seconds ) {
+        			if(s == interval ) {
         				found = true;
         				break;
         			}
@@ -250,7 +264,7 @@ public class ProcessModel {
         		}
         	}
         	if(!found) {
-        		mruList = mruList + ":" + seconds; //$NON-NLS-1$
+        		mruList = mruList + ":" + interval; //$NON-NLS-1$
         		st = new StringTokenizer(mruList, ":"); //$NON-NLS-1$
         		if(st.countTokens() > maxCount) {
         			int comma = mruList.indexOf(":"); //$NON-NLS-1$
@@ -263,8 +277,22 @@ public class ProcessModel {
         prefStore.setValue(IPreferenceConsts.PREF_INTERVAL_MRU_LIST, mruList);
     }
 
+	/**
+	 * If the polling has been stopped.
+	 * 
+	 * @return true if it is stopped.
+	 */
 	public boolean isRefreshStopped() {
 	    return stopped;
     }
+	
+	/**
+	 * Get the peer model associated with this model.
+	 * 
+	 * @return The peer model.
+	 */
+	IPeerModel getPeerModel() {
+		return peerModel;
+	}
 }	
 

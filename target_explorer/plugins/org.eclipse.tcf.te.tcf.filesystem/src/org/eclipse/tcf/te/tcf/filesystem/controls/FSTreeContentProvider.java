@@ -18,7 +18,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
@@ -49,8 +48,6 @@ public class FSTreeContentProvider implements ITreeContentProvider {
 
 	// Flag to control if the file system root node is visible
 	private final boolean rootNodeVisible;
-
-	/* default */ FSTreeNodeStateListener nodeStateListener;
 	/**
 	 * Constructor.
 	 */
@@ -72,7 +69,6 @@ public class FSTreeContentProvider implements ITreeContentProvider {
 	 */
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		this.nodeStateListener = new FSTreeNodeStateListener((TreeViewer) viewer);
 	}
 
 	/* (non-Javadoc)
@@ -80,7 +76,6 @@ public class FSTreeContentProvider implements ITreeContentProvider {
 	 */
 	@Override
 	public void dispose() {
-		FSModel.removeAllListener(nodeStateListener);
 	}
 
 	/**
@@ -128,7 +123,6 @@ public class FSTreeContentProvider implements ITreeContentProvider {
 			final IPeerModel peerNode = (IPeerModel)parentElement;
 			// Get the file system model root node, if already stored
 			final FSModel fsModel = FSModel.getFSModel(peerNode);
-			fsModel.addNodeStateListener(nodeStateListener);
 			final FSTreeNode root = fsModel.getRoot();
 
 			// If the file system model root node hasn't been created, create
@@ -286,13 +280,13 @@ public class FSTreeContentProvider implements ITreeContentProvider {
 											// Reset the children query markers
 											rootNode.childrenQueryRunning = false;
 											rootNode.childrenQueried = true;
-											FSModel.getFSModel(rootNode.peerNode).fireNodeStateChanged(rootNode);
+											rootNode.firePropertyChange();
 										}
 									}
 								});
 							}
 						});
-						FSModel.getFSModel(rootNode.peerNode).fireNodeStateChanged(rootNode);
+						rootNode.firePropertyChange();
 					} else {
 						// The file system service is not available for this peer.
 						// --> Close the just opened channel
@@ -475,7 +469,7 @@ public class FSTreeContentProvider implements ITreeContentProvider {
 							readdir(channel, service, handle, parentNode);
 						}
 
-						FSModel.getFSModel(parentNode.peerNode).fireNodeStateChanged(parentNode);
+						parentNode.firePropertyChange();
 					}
 				});
 			}

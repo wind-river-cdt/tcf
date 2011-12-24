@@ -26,7 +26,6 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemExcept
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.CacheManager;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.PersistenceManager;
-import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.ui.PlatformUI;
 /**
@@ -78,7 +77,7 @@ public class FSRename extends FSOperation {
 		}
 		finally {
 			if (channel != null) Tcf.getChannelManager().closeChannel(channel);
-			FSModel.getFSModel(node.peerNode).fireNodeStateChanged(node);
+			node.firePropertyChange();
 		}
 		return false;
 	}

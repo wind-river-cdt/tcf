@@ -11,11 +11,9 @@ package org.eclipse.tcf.te.tcf.processes.ui.controls;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
-import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModelManager;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 import org.eclipse.tcf.te.ui.nls.Messages;
 
@@ -30,8 +28,6 @@ public class ProcessTreeContentProvider implements ITreeContentProvider {
 
 	// Flag to control if the process root node is visible
 	private final boolean rootNodeVisible;
-
-	/* default */ ProcessTreeNodeStateListener nodeStateListener;
 
 	/**
 	 * Create an instance with the rootNodeVisible set to true.
@@ -55,7 +51,6 @@ public class ProcessTreeContentProvider implements ITreeContentProvider {
 	 */
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		this.nodeStateListener = new ProcessTreeNodeStateListener((TreeViewer) viewer);
 	}
 
 	/*
@@ -64,7 +59,6 @@ public class ProcessTreeContentProvider implements ITreeContentProvider {
 	 */
 	@Override
 	public void dispose() {
-		ProcessModelManager.getInstance().removeListener(nodeStateListener);
 	}
 
 	/*
@@ -98,8 +92,7 @@ public class ProcessTreeContentProvider implements ITreeContentProvider {
 
 		if (parentElement instanceof IPeerModel) {
 			final IPeerModel peerModel = (IPeerModel) parentElement;
-			final ProcessModel model = ProcessModelManager.getInstance().getProcessModel(peerModel);
-			model.addNodeStateListener(nodeStateListener);
+			final ProcessModel model = ProcessModel.getProcessModel(peerModel);
 			if(model.getRoot() == null) {
 				model.createRoot(peerModel);
 			}
@@ -111,7 +104,7 @@ public class ProcessTreeContentProvider implements ITreeContentProvider {
 		else if (parentElement instanceof ProcessTreeNode) {
 			ProcessTreeNode node = (ProcessTreeNode) parentElement;
 			if (!node.childrenQueried && !node.childrenQueryRunning) {
-				final ProcessModel model = ProcessModelManager.getInstance().getProcessModel(node.peerNode);
+				final ProcessModel model = ProcessModel.getProcessModel(node.peerNode);
 				model.queryChildren(node);
 			}
 			if(!node.childrenQueried && node.children.isEmpty()) {

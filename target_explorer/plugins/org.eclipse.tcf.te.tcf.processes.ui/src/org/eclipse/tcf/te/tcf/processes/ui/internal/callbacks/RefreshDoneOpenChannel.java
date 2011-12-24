@@ -17,7 +17,6 @@ import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
-import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 
 /**
@@ -28,14 +27,11 @@ public class RefreshDoneOpenChannel implements IChannelManager.DoneOpenChannel {
 	ProcessTreeNode parentNode;
 	// The callback to be called when refresh is done.
 	Runnable callback;
-	// The process model it is associated with.
-	ProcessModel model;
 	
 	/**
 	 * Create an instance with the specified field parameters.
 	 */
-	public RefreshDoneOpenChannel(ProcessModel model, Runnable callback, ProcessTreeNode parentNode) {
-		this.model = model;
+	public RefreshDoneOpenChannel(Runnable callback, ProcessTreeNode parentNode) {
 		this.callback = callback;
 		this.parentNode = parentNode;
 	}
@@ -51,7 +47,7 @@ public class RefreshDoneOpenChannel implements IChannelManager.DoneOpenChannel {
 			ISysMonitor service = channel.getRemoteService(ISysMonitor.class);
 			if (service != null) {
 				Queue<ProcessTreeNode> queue = new ConcurrentLinkedQueue<ProcessTreeNode>();
-				service.getChildren(parentNode.id, new RefreshDoneGetChildren(callback, model, queue, channel, service, parentNode));
+				service.getChildren(parentNode.id, new RefreshDoneGetChildren(callback, queue, channel, service, parentNode));
 			}
 		}
     }

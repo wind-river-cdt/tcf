@@ -2089,5 +2089,15 @@
             </activation>
          </filter>
       </viewer>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"
+            class="org.eclipse.tcf.te.tcf.filesystem.internal.adapters.PropertyChangeProviderAdapterFactory">
+         <adapter
+               type="org.eclipse.tcf.te.ui.interfaces.IPropertyChangeProvider">
+         </adapter>
+      </factory>
    </extension>   
 </plugin>

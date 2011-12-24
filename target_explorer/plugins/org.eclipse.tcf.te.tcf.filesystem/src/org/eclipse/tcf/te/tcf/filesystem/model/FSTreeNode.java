@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.te.tcf.filesystem.interfaces.IWindowsFileAttributes;
@@ -33,6 +34,7 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.internal.url.TcfURLConnection;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.UserManager;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.ui.interfaces.IPropertyChangeProvider;
 
 /**
  * Representation of a file system tree node.
@@ -499,5 +501,14 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 			return Messages.GeneralInformationPage_UnknownFileType;
 		}
 		return name.substring(lastDot + 1).toUpperCase() + " " + Messages.FSTreeNode_TypeFile; //$NON-NLS-1$
+    }
+
+	/**
+	 * Fire a property change event for the node.
+	 */
+	public void firePropertyChange() {
+		IPropertyChangeProvider provider = (IPropertyChangeProvider) peerNode.getAdapter(IPropertyChangeProvider.class);
+		PropertyChangeEvent event = new PropertyChangeEvent(this, "state", null, null); //$NON-NLS-1$
+		provider.firePropertyChange(event);
     }
 }

@@ -52,7 +52,7 @@ public class SaveListener implements IExecutionListener {
 				CacheManager.getInstance().upload(new FSTreeNode[]{dirtyNode}, false);
 			}
 			else {
-				FSModel.getFSModel(dirtyNode.peerNode).fireNodeStateChanged(dirtyNode);
+				dirtyNode.firePropertyChange();
 			}
 		}
 	}

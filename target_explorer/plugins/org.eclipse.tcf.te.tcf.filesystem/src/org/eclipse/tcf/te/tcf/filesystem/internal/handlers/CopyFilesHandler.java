@@ -17,7 +17,6 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSClipboard;
-import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.ui.handlers.HandlerUtil;
 /**
@@ -38,7 +37,7 @@ public class CopyFilesHandler extends AbstractHandler {
 			cb.copyFiles(nodes);
 			// Refresh the file system tree to display the decorations of the cut nodes.
 			FSTreeNode node = (FSTreeNode) selection.getFirstElement();
-			FSModel.getFSModel(node.peerNode).fireNodeStateChanged(null);
+			node.firePropertyChange();
 		}
 		return null;
 	}

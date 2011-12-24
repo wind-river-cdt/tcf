@@ -1,3 +1,12 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * This program and the accompanying materials are made available under the terms
+ * of the Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ * Wind River Systems - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.tcf.te.tcf.processes.ui.internal.handler;
 
 import java.util.ArrayList;
@@ -14,7 +23,6 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.processes.ui.internal.preferences.IPreferenceConsts;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
-import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModelManager;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.CompoundContributionItem;
@@ -55,7 +63,7 @@ public class ConfigIntervalDynamicContribution extends CompoundContributionItem 
         public void run() {
 			if (isChecked()) {
 				this.model.setInterval(seconds);
-				model.updateMRU(seconds);
+				model.addMRUInterval(seconds);
 			}
         }
 	}
@@ -66,7 +74,7 @@ public class ConfigIntervalDynamicContribution extends CompoundContributionItem 
 		IPeerModel peer = (IPeerModel) editorInput.getAdapter(IPeerModel.class);
 		List<IContributionItem> items = new ArrayList<IContributionItem>();
 		if (peer != null) {
-			ProcessModel pModel = ProcessModelManager.getInstance().getProcessModel(peer);
+			ProcessModel pModel = ProcessModel.getProcessModel(peer);
 			IPreferenceStore prefStore = UIPlugin.getDefault().getPreferenceStore();
 			String mruList = prefStore.getString(IPreferenceConsts.PREF_INTERVAL_MRU_LIST);
 			if (mruList != null) {

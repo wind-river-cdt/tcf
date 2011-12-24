@@ -19,14 +19,19 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelDecorator;
@@ -48,6 +53,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
@@ -55,6 +61,7 @@ import org.eclipse.tcf.te.runtime.utils.Host;
 import org.eclipse.tcf.te.ui.WorkbenchPartControl;
 import org.eclipse.tcf.te.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.forms.CustomFormToolkit;
+import org.eclipse.tcf.te.ui.interfaces.IPropertyChangeProvider;
 import org.eclipse.tcf.te.ui.interfaces.ImageConsts;
 import org.eclipse.tcf.te.ui.nls.Messages;
 import org.eclipse.ui.IDecoratorManager;
@@ -69,7 +76,7 @@ import org.eclipse.ui.menus.IMenuService;
 /**
  * Abstract tree control implementation.
  */
-public abstract class AbstractTreeControl extends WorkbenchPartControl implements SelectionListener, IDoubleClickListener {
+public abstract class AbstractTreeControl extends WorkbenchPartControl implements SelectionListener, IDoubleClickListener, IPropertyChangeListener {
 	// Reference to the tree viewer instance
 	private TreeViewer viewer;
 	// Reference to the selection changed listener
@@ -82,6 +89,8 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	private TreeViewerState viewerState;
 	// The action to configure the filters.
 	private ConfigFilterAction configFilterAction;
+	// The tool bar manager
+	private ToolBarManager toolbarManager;
 
 	/**
 	 * Constructor.
@@ -178,7 +187,9 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 			@Override
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 				if (method.getName().equals("inputChanged")) { //$NON-NLS-1$
-					onInputChanged(args[2]);
+					onInputChanged(args[1], args[2]);
+				} else if(method.getName().equals("dispose")) { //$NON-NLS-1$
+					onContentProviderDisposed();
 				}
 				return method.invoke(contentProvider, args);
 			}
@@ -211,9 +222,13 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * Handle the event when the new input is set. Get the viewer's state
 	 * and update the state of the viewer's columns and filters.
 	 * 
+	 * @param oldInput the old input.
 	 * @param newInput The new input.
 	 */
-	void onInputChanged(Object newInput) {
+	void onInputChanged(Object oldInput, Object newInput) {
+		if(oldInput != null) {
+			uninstallPropertyChangeListener(oldInput);
+		}
 		columns = doCreateViewerColumns(newInput, viewer);
 		filterDescriptors = doCreateFilterDescriptors(newInput, viewer);
 		if (isStatePersistent()) {
@@ -224,7 +239,73 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 		updateFilters();
 		new TreeViewerHeaderMenu(this).create();
 		configFilterAction.setEnabled(filterDescriptors != null && filterDescriptors.length > 0);
+		if(newInput != null) {
+			installPropertyChangeListener(newInput);
+		}
 	}
+	
+	/**
+	 * Handle the event when the content provider is disposed.
+	 * Un-install the property change listener that has been added
+	 * to the input.
+	 * 
+	 * @param oldInput the old input.
+	 * @param newInput The new input.
+	 */
+	void onContentProviderDisposed() {
+		Object input = viewer.getInput();
+		if(input != null) {
+			uninstallPropertyChangeListener(input);
+		}
+	}
+	
+	/**
+	 * Uninstall the property change listener from the specified input.
+	 * 
+	 * @param input The input of the tree viewer.
+	 */
+	private void uninstallPropertyChangeListener(Object input) {
+	    IPropertyChangeProvider provider = getPropertyChangeProvider(input);
+		if(provider != null) {
+			provider.removePropertyChangeListener(this);
+		}
+	}
+	
+	/**
+	 * Install the property change listener to the input of the tree viewer.
+	 * 
+	 * @param input The input of the tree viewer.
+	 */
+	private void installPropertyChangeListener(Object input) {
+	    IPropertyChangeProvider provider = getPropertyChangeProvider(input);
+		if(provider != null) {
+			provider.addPropertyChangeListener(this);
+		}
+    }
+
+	/***
+	 * Get a property change provider from the input of the tree viewer.
+	 * If the input is an instance of IPropertyChangeProvider, then return
+	 * the input. If the input can be adapted to a IPropertyChangeProvider,
+	 * then return the adapted object.
+	 * 
+	 * @param input The input of the tree viewer.
+	 * @return A property provider or null.
+	 */
+	private IPropertyChangeProvider getPropertyChangeProvider(Object input) {
+	    IPropertyChangeProvider provider = null;
+		if(input instanceof IPropertyChangeProvider) {
+			provider = (IPropertyChangeProvider) input;
+		}else{
+			if(input instanceof IAdaptable) {
+				provider = (IPropertyChangeProvider)((IAdaptable)input).getAdapter(IPropertyChangeProvider.class);
+			}
+			if(provider == null) {
+				provider = (IPropertyChangeProvider) Platform.getAdapterManager().getAdapter(input, IPropertyChangeProvider.class);
+			}
+		}
+	    return provider;
+    }
 
 	/**
 	 * Update the viewer state using the states from the viewerState which
@@ -597,7 +678,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 			return;
 		}
 
-		ToolBarManager toolbarManager = new ToolBarManager(SWT.FLAT | SWT.HORIZONTAL | SWT.RIGHT);
+		toolbarManager = new ToolBarManager(SWT.FLAT | SWT.HORIZONTAL | SWT.RIGHT);
 		// create the toolbar items
 		createToolBarItems(toolbarManager);
 		if (getParentPart() != null && getParentPart().getSite() != null && getContextMenuId() != null) {
@@ -741,6 +822,31 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 		TreeViewer viewer = (TreeViewer) getViewer();
 		if (viewer.isExpandable(element)) {
 			viewer.setExpandedState(element, !viewer.getExpandedState(element));
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
+	 */
+	@Override
+	public void propertyChange(final PropertyChangeEvent event) {
+		Tree tree = viewer.getTree();
+		Display display = tree.getDisplay();
+		if (display.getThread() == Thread.currentThread()) {
+			IContributionItem[] items = toolbarManager.getItems();
+			for (IContributionItem item : items) {
+				item.update();
+			}
+			viewer.refresh();
+		}
+		else {
+			display.asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					propertyChange(event);
+				}
+			});
 		}
 	}
 }

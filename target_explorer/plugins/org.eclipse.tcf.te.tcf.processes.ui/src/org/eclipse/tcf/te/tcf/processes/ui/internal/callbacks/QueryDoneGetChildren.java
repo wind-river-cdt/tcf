@@ -16,7 +16,6 @@ import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.te.tcf.core.Tcf;
-import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 
 /**
@@ -29,14 +28,11 @@ public class QueryDoneGetChildren implements ISysMonitor.DoneGetChildren {
 	ISysMonitor service;
 	// The parent node to be queried.
 	ProcessTreeNode parentNode;
-	// The process model it is associated with.
-	ProcessModel model;
 	
 	/**
 	 * Create an instance with the field parameters.
 	 */
-	public QueryDoneGetChildren(ProcessModel model, IChannel channel, ISysMonitor service, ProcessTreeNode parentNode) {
-		this.model = model;
+	public QueryDoneGetChildren(IChannel channel, ISysMonitor service, ProcessTreeNode parentNode) {
 		this.channel = channel;
 		this.service = service;
 		this.parentNode = parentNode;
@@ -51,12 +47,12 @@ public class QueryDoneGetChildren implements ISysMonitor.DoneGetChildren {
         if (error == null && context_ids != null && context_ids.length > 0) {
         	Map<String, Boolean> status = createStatusMap(context_ids);
 			for (String contextId : context_ids) {
-				service.getContext(contextId, new QueryDoneGetContext(model, contextId, channel, status, parentNode));
+				service.getContext(contextId, new QueryDoneGetContext(contextId, channel, status, parentNode));
 			}
     	} else {
             parentNode.childrenQueryRunning = false;
             parentNode.childrenQueried = true;
-    		model.fireNodeStateChanged(parentNode);
+			parentNode.firePropertyChanged();
             Tcf.getChannelManager().closeChannel(channel);
     	}
     }

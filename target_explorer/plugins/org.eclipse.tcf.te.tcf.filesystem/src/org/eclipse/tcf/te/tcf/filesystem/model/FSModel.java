@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
@@ -24,7 +25,6 @@ import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.te.runtime.utils.Host;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
-import org.eclipse.tcf.te.tcf.filesystem.internal.events.INodeStateListener;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSCreateRoot;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation;
@@ -32,6 +32,7 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.testers.TargetPropertyTester;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.CacheManager;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.model.Model;
+import org.eclipse.tcf.te.ui.interfaces.IPropertyChangeProvider;
 
 /**
  * The file system model implementation.
@@ -59,20 +60,9 @@ public final class FSModel {
 	public static void notifyAllChanged() {
 		if (allModels != null) {
 			for (FSModel model : allModels) {
-				model.fireNodeStateChanged(null);
-			}
-		}
-	}
-	
-	/**
-	 * Remove the listener from the models.
-	 * 
-	 * @param listener The listener.
-	 */
-	public static void removeAllListener(INodeStateListener listener) {
-		if (allModels != null) {
-			for (FSModel model : allModels) {
-				model.removeNodeStateListener(listener);
+				IPropertyChangeProvider provider = (IPropertyChangeProvider) model.peerModel.getAdapter(IPropertyChangeProvider.class);
+				PropertyChangeEvent event = new PropertyChangeEvent(model.peerModel, "state", null, null); //$NON-NLS-1$
+				provider.firePropertyChange(event);
 			}
 		}
 	}
@@ -89,7 +79,7 @@ public final class FSModel {
 			if (Protocol.isDispatchThread()) {
 				FSModel model = (FSModel) peerModel.getProperty(FSMODEL_KEY);
 				if (model == null) {
-					model = new FSModel();
+					model = new FSModel(peerModel);
 					peerModel.setProperty(FSMODEL_KEY, model);
 				}
 				return model;
@@ -106,16 +96,14 @@ public final class FSModel {
 		return null;
 	}
 
-	// Node state listeners.
-	private List<INodeStateListener> listeners;
 	// The root node of the peer model
 	private FSTreeNode root;
-
+	private IPeerModel peerModel;
 	/**
 	 * Create a File System Model.
 	 */
-	private FSModel() {
-		listeners = Collections.synchronizedList(new ArrayList<INodeStateListener>());
+	private FSModel(IPeerModel peerModel) {
+		this.peerModel = peerModel;
 		addModel(this);
 	}
 
@@ -135,41 +123,6 @@ public final class FSModel {
 	 */
 	public void setRoot(FSTreeNode root) {
 		this.root = root;
-	}
-
-	/**
-	 * Add an INodeStateListener to the File System model if it is not in the listener list yet.
-	 * 
-	 * @param listener The INodeStateListener to be added.
-	 */
-	public void addNodeStateListener(INodeStateListener listener) {
-		if (!listeners.contains(listener)) {
-			listeners.add(listener);
-		}
-	}
-
-	/**
-	 * Remove the INodeStateListener from the File System model if it exists in the listener list.
-	 * 
-	 * @param listener The INodeStateListener to be removed.
-	 */
-	public void removeNodeStateListener(INodeStateListener listener) {
-		if (listeners.contains(listener)) {
-			listeners.remove(listener);
-		}
-	}
-
-	/**
-	 * Fire a node state changed event with the specified node.
-	 * 
-	 * @param node The node whose state has changed.
-	 */
-	public void fireNodeStateChanged(FSTreeNode node) {
-		synchronized (listeners) {
-			for (INodeStateListener listener : listeners) {
-				listener.stateChanged(node);
-			}
-		}
 	}
 
 	/**
