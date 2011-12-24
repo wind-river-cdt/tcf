@@ -117,7 +117,7 @@ public class ProcessTreeContentProvider implements ITreeContentProvider {
 			if(!node.childrenQueried && node.children.isEmpty()) {
 				ProcessTreeNode pendingNode = new ProcessTreeNode();
 				pendingNode.name = Messages.PendingOperation_label;
-				pendingNode.type = "ProcPendingNode"; //$NON-NLS-1$
+				pendingNode.type = "ProcPendingNode";  //$NON-NLS-1$
 				return new Object[] { pendingNode };
 			}
 			return node.children.toArray();

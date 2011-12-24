@@ -59,12 +59,45 @@
       <menuContribution
             locationURI="toolbar:org.eclipse.tcf.te.ui.controls.menu.processes?after=additions">
          <command
+               commandId="org.eclipse.tcf.te.tcf.processes.ui.command.startPolling"
+               icon="icons/obj16/run_refresh.png"
+               label="Start Polling"
+               style="push"
+               tooltip="Start Polling">
+         </command>
+         <command
+               commandId="org.eclipse.tcf.te.tcf.processes.ui.command.stopPolling"
+               icon="icons/obj16/stop_refresh.gif"
+               label="Stop Polling"
+               style="push"
+               tooltip="Stop Polling">
+         </command>
+         <command
                commandId="org.eclipse.tcf.te.tcf.processes.ui.command.refresh"
                icon="icons/obj16/refresh.gif"
                label="%command.refresh.label"
                style="push"
                tooltip="%command.refresh.tooltip">
          </command>
+         <command
+               commandId="org.eclipse.tcf.te.tcf.processes.ui.command.refreshInterval"
+               icon="icons/obj16/refresh_interval.png"
+               id="org.eclipse.tcf.te.tcf.processes.ui.menu.refreshInterval"
+               label="Config Refresh Interval"
+               style="pulldown"
+               tooltip="Config Refresh Interval">
+         </command>
+         <separator
+               name="refreshing_group"
+               visible="true">
+         </separator>
+      </menuContribution>
+      <menuContribution
+            locationURI="menu:org.eclipse.tcf.te.tcf.processes.ui.menu.refreshInterval">
+         <dynamic
+               class="org.eclipse.tcf.te.tcf.processes.ui.internal.handler.ConfigIntervalDynamicContribution"
+               id="org.eclipse.tcf.te.tcf.processes.ui.menu.refreshIntervalDynamic">
+         </dynamic>
       </menuContribution>
    </extension>
 
@@ -82,6 +115,24 @@
             id="org.eclipse.tcf.te.tcf.processes.ui.command.refresh"
             name="%command.refresh.name">
       </command>
+      <command
+            categoryId="org.eclipse.tcf.te.tcf.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.tcf.processes.ui.command_RefreshInterval"
+            id="org.eclipse.tcf.te.tcf.processes.ui.command.refreshInterval"
+            name="Config Refresh Interval">
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.te.tcf.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.tcf.processes.ui.command_StartPolling"
+            id="org.eclipse.tcf.te.tcf.processes.ui.command.startPolling"
+            name="Start Polling">
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.te.tcf.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.tcf.processes.ui.command_StopPolling"
+            id="org.eclipse.tcf.te.tcf.processes.ui.command.stopPolling"
+            name="Stop Polling">
+      </command>
    </extension>
 
 <!-- Processes handler contributions -->
@@ -93,6 +144,46 @@
       <handler
             class="org.eclipse.tcf.te.tcf.processes.ui.internal.handler.RefreshProcessListHandler"
             commandId="org.eclipse.tcf.te.tcf.processes.ui.command.refresh">
+      </handler>
+      <handler
+            class="org.eclipse.tcf.te.tcf.processes.ui.internal.handler.ConfigRefreshIntervalHandler"
+            commandId="org.eclipse.tcf.te.tcf.processes.ui.command.refreshInterval">
+         <enabledWhen>
+            <with
+                  variable="activeEditorInput">
+               <not>
+                  <test
+                        property="org.eclipse.tcf.te.tcf.processes.ui.editorInput.isRefreshStopped">
+                  </test>
+               </not>
+            </with>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tcf.te.tcf.processes.ui.internal.handler.StartPollingHandler"
+            commandId="org.eclipse.tcf.te.tcf.processes.ui.command.startPolling">
+         <enabledWhen>
+            <with
+                  variable="activeEditorInput">
+               <test
+                     property="org.eclipse.tcf.te.tcf.processes.ui.editorInput.isRefreshStopped">
+               </test>
+            </with>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tcf.te.tcf.processes.ui.internal.handler.StopPollingHandler"
+            commandId="org.eclipse.tcf.te.tcf.processes.ui.command.stopPolling">
+         <enabledWhen>
+            <with
+                  variable="activeEditorInput">
+               <not>
+                  <test
+                        property="org.eclipse.tcf.te.tcf.processes.ui.editorInput.isRefreshStopped">
+                  </test>
+               </not>
+            </with>
+         </enabledWhen>
       </handler>
    </extension>
    <extension
@@ -195,6 +286,19 @@
             </contentExtension>
          </includes>
       </viewerContentBinding>
+   </extension>
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.eclipse.tcf.te.tcf.processes.ui.internal.preferences.PreferencesInitializer"/>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.eclipse.tcf.te.tcf.processes.ui.internal.testers.EditorInputPropertyTester"
+            id="org.eclipse.tcf.te.tcf.processes.ui.editorInput"
+            namespace="org.eclipse.tcf.te.tcf.processes.ui.editorInput"
+            properties="isRefreshStopped"
+            type="org.eclipse.ui.IEditorInput">
+      </propertyTester>
    </extension>
 
 </plugin>

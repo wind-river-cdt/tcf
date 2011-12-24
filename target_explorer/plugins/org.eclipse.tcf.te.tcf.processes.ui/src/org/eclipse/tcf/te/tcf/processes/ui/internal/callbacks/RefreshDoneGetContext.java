@@ -212,7 +212,7 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext {
 		node.childrenQueryRunning = false;
 		node.context = context;
 		node.name = context.getFile();
-		node.type = "ProcNode"; //$NON-NLS-1$
+		node.type = "ProcNode";  //$NON-NLS-1$
 		node.id = context.getID();
 		node.pid = context.getPID();
 		node.ppid = context.getPPID();
