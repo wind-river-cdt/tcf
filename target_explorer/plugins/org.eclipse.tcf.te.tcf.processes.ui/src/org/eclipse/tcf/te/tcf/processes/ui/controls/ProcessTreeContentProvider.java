@@ -10,12 +10,16 @@
 package org.eclipse.tcf.te.tcf.processes.ui.controls;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.tcf.te.tcf.filesystem.controls.CommonViewerListener;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
+import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 import org.eclipse.tcf.te.ui.nls.Messages;
+import org.eclipse.ui.navigator.CommonViewer;
 
 /**
  * Process tree control content provider implementation.
@@ -28,6 +32,7 @@ public class ProcessTreeContentProvider implements ITreeContentProvider {
 
 	// Flag to control if the process root node is visible
 	private final boolean rootNodeVisible;
+	private IPropertyChangeListener commonViewerListener;
 
 	/**
 	 * Create an instance with the rootNodeVisible set to true.
@@ -51,6 +56,12 @@ public class ProcessTreeContentProvider implements ITreeContentProvider {
 	 */
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+		if(viewer instanceof CommonViewer) {
+			// This content provider is a navigator content extension.
+			commonViewerListener = new CommonViewerListener((CommonViewer) viewer);
+		} else {
+			commonViewerListener = null;
+		}
 	}
 
 	/*
@@ -91,8 +102,12 @@ public class ProcessTreeContentProvider implements ITreeContentProvider {
 		Assert.isNotNull(parentElement);
 
 		if (parentElement instanceof IPeerModel) {
-			final IPeerModel peerModel = (IPeerModel) parentElement;
-			final ProcessModel model = ProcessModel.getProcessModel(peerModel);
+			IPeerModel peerModel = (IPeerModel) parentElement;
+			IViewerInput viewerInput = (IViewerInput) peerModel.getAdapter(IViewerInput.class);
+			if(viewerInput != null && commonViewerListener != null) {
+				viewerInput.addPropertyChangeListener(commonViewerListener);
+			}
+			ProcessModel model = ProcessModel.getProcessModel(peerModel);
 			if(model.getRoot() == null) {
 				model.createRoot(peerModel);
 			}
@@ -104,7 +119,7 @@ public class ProcessTreeContentProvider implements ITreeContentProvider {
 		else if (parentElement instanceof ProcessTreeNode) {
 			ProcessTreeNode node = (ProcessTreeNode) parentElement;
 			if (!node.childrenQueried && !node.childrenQueryRunning) {
-				final ProcessModel model = ProcessModel.getProcessModel(node.peerNode);
+				ProcessModel model = ProcessModel.getProcessModel(node.peerNode);
 				model.queryChildren(node);
 			}
 			if(!node.childrenQueried && node.children.isEmpty()) {

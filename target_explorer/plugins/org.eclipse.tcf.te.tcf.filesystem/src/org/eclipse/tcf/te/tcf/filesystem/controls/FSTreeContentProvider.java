@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.tcf.protocol.IChannel;
@@ -33,7 +34,9 @@ import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
+import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 import org.eclipse.tcf.te.ui.nls.Messages;
+import org.eclipse.ui.navigator.CommonViewer;
 
 
 /**
@@ -48,6 +51,8 @@ public class FSTreeContentProvider implements ITreeContentProvider {
 
 	// Flag to control if the file system root node is visible
 	private final boolean rootNodeVisible;
+	private IPropertyChangeListener commonViewerListener;
+
 	/**
 	 * Constructor.
 	 */
@@ -69,6 +74,12 @@ public class FSTreeContentProvider implements ITreeContentProvider {
 	 */
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+		if(viewer instanceof CommonViewer) {
+			// This content provider is a navigator content extension.
+			commonViewerListener = new CommonViewerListener((CommonViewer) viewer);
+		} else {
+			commonViewerListener = null;
+		}
 	}
 
 	/* (non-Javadoc)
@@ -121,6 +132,10 @@ public class FSTreeContentProvider implements ITreeContentProvider {
 		// For the file system, we need the peer node
 		if (parentElement instanceof IPeerModel) {
 			final IPeerModel peerNode = (IPeerModel)parentElement;
+			IViewerInput viewerInput = (IViewerInput) peerNode.getAdapter(IViewerInput.class);
+			if(viewerInput != null && commonViewerListener != null) {
+				viewerInput.addPropertyChangeListener(commonViewerListener);
+			}
 			// Get the file system model root node, if already stored
 			final FSModel fsModel = FSModel.getFSModel(peerNode);
 			final FSTreeNode root = fsModel.getRoot();

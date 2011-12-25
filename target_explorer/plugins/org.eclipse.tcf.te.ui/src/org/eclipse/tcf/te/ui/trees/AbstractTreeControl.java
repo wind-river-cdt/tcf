@@ -293,18 +293,21 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * @return A viewer input or null.
 	 */
 	private IViewerInput getViewerInput(Object input) {
-	    IViewerInput viewerInput = null;
-		if(input instanceof IViewerInput) {
-			viewerInput = (IViewerInput) input;
-		}else{
-			if(input instanceof IAdaptable) {
-				viewerInput = (IViewerInput)((IAdaptable)input).getAdapter(IViewerInput.class);
+		IViewerInput viewerInput = null;
+		if (input != null) {
+			if (input instanceof IViewerInput) {
+				viewerInput = (IViewerInput) input;
 			}
-			if(viewerInput == null) {
-				viewerInput = (IViewerInput) Platform.getAdapterManager().getAdapter(input, IViewerInput.class);
+			else {
+				if (input instanceof IAdaptable) {
+					viewerInput = (IViewerInput) ((IAdaptable) input).getAdapter(IViewerInput.class);
+				}
+				if (viewerInput == null) {
+					viewerInput = (IViewerInput) Platform.getAdapterManager().getAdapter(input, IViewerInput.class);
+				}
 			}
 		}
-	    return viewerInput;
+		return viewerInput;
     }
 
 	/**
