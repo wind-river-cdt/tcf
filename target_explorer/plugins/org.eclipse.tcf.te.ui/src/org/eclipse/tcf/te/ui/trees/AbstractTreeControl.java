@@ -61,7 +61,7 @@ import org.eclipse.tcf.te.runtime.utils.Host;
 import org.eclipse.tcf.te.ui.WorkbenchPartControl;
 import org.eclipse.tcf.te.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.forms.CustomFormToolkit;
-import org.eclipse.tcf.te.ui.interfaces.IPropertyChangeProvider;
+import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 import org.eclipse.tcf.te.ui.interfaces.ImageConsts;
 import org.eclipse.tcf.te.ui.nls.Messages;
 import org.eclipse.ui.IDecoratorManager;
@@ -265,7 +265,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * @param input The input of the tree viewer.
 	 */
 	private void uninstallPropertyChangeListener(Object input) {
-	    IPropertyChangeProvider provider = getPropertyChangeProvider(input);
+	    IViewerInput provider = getViewerInput(input);
 		if(provider != null) {
 			provider.removePropertyChangeListener(this);
 		}
@@ -277,31 +277,31 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * @param input The input of the tree viewer.
 	 */
 	private void installPropertyChangeListener(Object input) {
-	    IPropertyChangeProvider provider = getPropertyChangeProvider(input);
+	    IViewerInput provider = getViewerInput(input);
 		if(provider != null) {
 			provider.addPropertyChangeListener(this);
 		}
     }
 
 	/***
-	 * Get a property change provider from the input of the tree viewer.
-	 * If the input is an instance of IPropertyChangeProvider, then return
-	 * the input. If the input can be adapted to a IPropertyChangeProvider,
+	 * Get the viewer input from the input of the tree viewer.
+	 * If the input is an instance of IViewerInput, then return
+	 * the input. If the input can be adapted to a IViewerInput,
 	 * then return the adapted object.
 	 * 
 	 * @param input The input of the tree viewer.
-	 * @return A property provider or null.
+	 * @return A viewer input or null.
 	 */
-	private IPropertyChangeProvider getPropertyChangeProvider(Object input) {
-	    IPropertyChangeProvider provider = null;
-		if(input instanceof IPropertyChangeProvider) {
-			provider = (IPropertyChangeProvider) input;
+	private IViewerInput getViewerInput(Object input) {
+	    IViewerInput provider = null;
+		if(input instanceof IViewerInput) {
+			provider = (IViewerInput) input;
 		}else{
 			if(input instanceof IAdaptable) {
-				provider = (IPropertyChangeProvider)((IAdaptable)input).getAdapter(IPropertyChangeProvider.class);
+				provider = (IViewerInput)((IAdaptable)input).getAdapter(IViewerInput.class);
 			}
 			if(provider == null) {
-				provider = (IPropertyChangeProvider) Platform.getAdapterManager().getAdapter(input, IPropertyChangeProvider.class);
+				provider = (IViewerInput) Platform.getAdapterManager().getAdapter(input, IViewerInput.class);
 			}
 		}
 	    return provider;
@@ -314,19 +314,22 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * @param newInput The new input of the viewer.
 	 */
 	private void updateViewerState(Object newInput) {
-	    String inputId = ViewerStateManager.getInputId(newInput);
-	    if (inputId != null) {
-	    	inputId = getViewerId() + "." + inputId; //$NON-NLS-1$
-	    	viewerState = ViewerStateManager.getInstance().getViewerState(inputId);
-	    	if (viewerState == null) {
-	    		viewerState = ViewerStateManager.createViewerState(columns, filterDescriptors);
-	    		ViewerStateManager.getInstance().putViewerState(inputId, viewerState);
-	    	}
-	    	else {
-	    		viewerState.updateColumnDescriptor(columns);
-	    		viewerState.updateFilterDescriptor(filterDescriptors);
-	    	}
-	    }
+		IViewerInput viewerInput = getViewerInput(newInput);
+		if (viewerInput != null) {
+			String inputId = viewerInput.getInputId();
+			if (inputId != null) {
+				inputId = getViewerId() + "." + inputId; //$NON-NLS-1$
+				viewerState = ViewerStateManager.getInstance().getViewerState(inputId);
+				if (viewerState == null) {
+					viewerState = ViewerStateManager.createViewerState(columns, filterDescriptors);
+					ViewerStateManager.getInstance().putViewerState(inputId, viewerState);
+				}
+				else {
+					viewerState.updateColumnDescriptor(columns);
+					viewerState.updateFilterDescriptor(filterDescriptors);
+				}
+			}
+		}
     }
 
 	/**

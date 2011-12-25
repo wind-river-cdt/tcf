@@ -6,12 +6,15 @@ import java.util.List;
 
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.tcf.te.ui.interfaces.IPropertyChangeProvider;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 
-public class PeerModelPropertyChangeProvider implements IPropertyChangeProvider {
+public class PeerModelViewerInput implements IViewerInput {
 	// Property Change Listeners
 	private List<IPropertyChangeListener> propertyChangeListeners;
-	public PeerModelPropertyChangeProvider() {
+	private IPeerModel peerModel;
+	public PeerModelViewerInput(IPeerModel peerModel) {
+		this.peerModel = peerModel;
 		this.propertyChangeListeners = Collections.synchronizedList(new ArrayList<IPropertyChangeListener>());
 	}
 	
@@ -35,4 +38,9 @@ public class PeerModelPropertyChangeProvider implements IPropertyChangeProvider 
 			propertyChangeListeners.remove(listener);
 		}
 	}
+
+	@Override
+    public String getInputId() {
+	    return peerModel.getPeerId();
+    }
 }

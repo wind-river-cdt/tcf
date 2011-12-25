@@ -2094,9 +2094,9 @@
          point="org.eclipse.core.runtime.adapters">
       <factory
             adaptableType="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.adapters.PropertyChangeProviderAdapterFactory">
+            class="org.eclipse.tcf.te.tcf.filesystem.internal.adapters.ViewerInputAdapterFactory">
          <adapter
-               type="org.eclipse.tcf.te.ui.interfaces.IPropertyChangeProvider">
+               type="org.eclipse.tcf.te.ui.interfaces.IViewerInput">
          </adapter>
       </factory>
    </extension>   

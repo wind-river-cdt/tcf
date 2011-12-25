@@ -20,11 +20,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.util.SafeRunnable;
-import org.eclipse.tcf.te.runtime.interfaces.workingsets.IWorkingSetElement;
 import org.eclipse.tcf.te.ui.activator.UIPlugin;
+import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 
@@ -47,23 +48,6 @@ public class ViewerStateManager {
 			instance = new ViewerStateManager();
 		}
 		return instance;
-	}
-
-	/**
-	 * Get the input's unique id.
-	 * 
-	 * @param input The input value.
-	 * @return The id of the input.
-	 */
-	static String getInputId(Object input) {
-		if (input != null) {
-			if (input instanceof IWorkingSetElement) {
-				return ((IWorkingSetElement) input).getElementId();
-			}
-			IWorkingSetElement element = (IWorkingSetElement) Platform.getAdapterManager().getAdapter(input, IWorkingSetElement.class);
-			if (element != null) return element.getElementId();
-		}
-		return null;
 	}
 
 	// The map to store the viewers' states.
@@ -91,8 +75,9 @@ public class ViewerStateManager {
 			TreeViewerExtension viewerExtension = new TreeViewerExtension(viewerId);
 			FilterDescriptor[] filterDescriptors = viewerExtension.parseFilters(input);
 			if (filterDescriptors != null) {
-				String inputId = getInputId(input);
-				if (inputId != null) {
+				IViewerInput viewerInput = getViewerInput(input);
+				if(viewerInput != null) {
+					String inputId =viewerInput.getInputId();
 					inputId = viewerId + "." + inputId; //$NON-NLS-1$
 					TreeViewerState viewerState = getViewerState(inputId);
 					if (viewerState != null) {
@@ -104,7 +89,30 @@ public class ViewerStateManager {
 		}
 		return null;
 	}
-
+	
+	/***
+	 * Get the viewer input from the input of the tree viewer.
+	 * If the input is an instance of IViewerInput, then return
+	 * the input. If the input can be adapted to a IViewerInput,
+	 * then return the adapted object.
+	 * 
+	 * @param input The input of the tree viewer.
+	 * @return A viewer input or null.
+	 */
+	private IViewerInput getViewerInput(Object input) {
+	    IViewerInput provider = null;
+		if(input instanceof IViewerInput) {
+			provider = (IViewerInput) input;
+		}else{
+			if(input instanceof IAdaptable) {
+				provider = (IViewerInput)((IAdaptable)input).getAdapter(IViewerInput.class);
+			}
+			if(provider == null) {
+				provider = (IViewerInput) Platform.getAdapterManager().getAdapter(input, IViewerInput.class);
+			}
+		}
+	    return provider;
+    }
 	/**
 	 * Put the viewer state with its input id into the map.
 	 * 

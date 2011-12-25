@@ -34,7 +34,7 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.internal.url.TcfURLConnection;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.UserManager;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
-import org.eclipse.tcf.te.ui.interfaces.IPropertyChangeProvider;
+import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 
 /**
  * Representation of a file system tree node.
@@ -507,7 +507,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 	 * Fire a property change event for the node.
 	 */
 	public void firePropertyChange() {
-		IPropertyChangeProvider provider = (IPropertyChangeProvider) peerNode.getAdapter(IPropertyChangeProvider.class);
+		IViewerInput provider = (IViewerInput) peerNode.getAdapter(IViewerInput.class);
 		PropertyChangeEvent event = new PropertyChangeEvent(this, "state", null, null); //$NON-NLS-1$
 		provider.firePropertyChange(event);
     }

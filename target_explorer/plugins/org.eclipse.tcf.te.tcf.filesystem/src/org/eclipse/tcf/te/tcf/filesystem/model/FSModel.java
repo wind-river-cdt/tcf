@@ -32,7 +32,7 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.testers.TargetPropertyTester;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.CacheManager;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.model.Model;
-import org.eclipse.tcf.te.ui.interfaces.IPropertyChangeProvider;
+import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 
 /**
  * The file system model implementation.
@@ -60,7 +60,7 @@ public final class FSModel {
 	public static void notifyAllChanged() {
 		if (allModels != null) {
 			for (FSModel model : allModels) {
-				IPropertyChangeProvider provider = (IPropertyChangeProvider) model.peerModel.getAdapter(IPropertyChangeProvider.class);
+				IViewerInput provider = (IViewerInput) model.peerModel.getAdapter(IViewerInput.class);
 				PropertyChangeEvent event = new PropertyChangeEvent(model.peerModel, "state", null, null); //$NON-NLS-1$
 				provider.firePropertyChange(event);
 			}

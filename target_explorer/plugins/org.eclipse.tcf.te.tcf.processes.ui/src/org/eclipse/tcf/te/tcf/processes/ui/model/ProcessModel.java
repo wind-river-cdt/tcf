@@ -24,7 +24,7 @@ import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.processes.ui.internal.callbacks.QueryDoneOpenChannel;
 import org.eclipse.tcf.te.tcf.processes.ui.internal.callbacks.RefreshDoneOpenChannel;
 import org.eclipse.tcf.te.tcf.processes.ui.internal.preferences.IPreferenceConsts;
-import org.eclipse.tcf.te.ui.interfaces.IPropertyChangeProvider;
+import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 
 /**
  * The process tree model implementation.
@@ -124,7 +124,7 @@ public class ProcessModel {
 			Boolean oldValue = Boolean.valueOf(old);
 			Boolean newValue = Boolean.valueOf(stopped);
 			PropertyChangeEvent event = new PropertyChangeEvent(peerModel, "stopped", oldValue, newValue); //$NON-NLS-1$
-			IPropertyChangeProvider provider = (IPropertyChangeProvider) peerModel.getAdapter(IPropertyChangeProvider.class);
+			IViewerInput provider = (IViewerInput) peerModel.getAdapter(IViewerInput.class);
 			provider.firePropertyChange(event);
 		}
     }

@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
-import org.eclipse.tcf.te.ui.interfaces.IPropertyChangeProvider;
+import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 
 /**
  * Representation of a process tree node.
@@ -129,7 +129,7 @@ public final class ProcessTreeNode extends PlatformObject {
 	 * Fire a property change event.
 	 */
 	public void firePropertyChanged() {
-		IPropertyChangeProvider  provider = (IPropertyChangeProvider) peerNode.getAdapter(IPropertyChangeProvider.class);
+		IViewerInput  provider = (IViewerInput) peerNode.getAdapter(IViewerInput.class);
 		PropertyChangeEvent event = new PropertyChangeEvent(this, "state", null, null); //$NON-NLS-1$
 		provider.firePropertyChange(event);
     }

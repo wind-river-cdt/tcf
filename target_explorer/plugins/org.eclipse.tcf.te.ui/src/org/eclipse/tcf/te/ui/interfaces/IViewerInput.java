@@ -13,8 +13,9 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 
 /**
- * A property change provider is an object which triggers a property change
- * event when one of its properties has changed. It has two methods,
+ * A viewer input is an input of the AbstractTreeControl.
+ * It triggers a property change event when one of its properties 
+ * has changed. It has two methods,
  * addPropertyChangeListener and removePropertyChangeListener to add
  * and remove property change listeners which are interested in the property
  * change.
@@ -26,8 +27,13 @@ import org.eclipse.jface.util.PropertyChangeEvent;
  * 
  * @see AbstractTreeControl
  */
-public interface IPropertyChangeProvider {
+public interface IViewerInput {
 
+	/**
+	 * Get the id of the input used to persist the state of the tree viewer
+	 * as the persistence id.
+	 */
+	String getInputId();
 	/**
 	 * Add a property change listener to the provider. When this listener
 	 * is already added, then it will not be added again.
