@@ -1,3 +1,12 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * This program and the accompanying materials are made available under the terms
+ * of the Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ * Wind River Systems - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.tcf.te.tcf.processes.ui.internal.dialogs;
 
 import org.eclipse.jface.dialogs.StatusDialog;
@@ -16,23 +25,41 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+/**
+ * The dialog to configure the refreshing interval of the process list.
+ */
 public class IntervalConfigDialog extends StatusDialog implements SelectionListener {
 
+	// The option to enter the interval value in a text field.
+	private Button button1;
+	// The option to enter the interval value in a combo field.
+	private Button button2;
+	// The combo viewer to input the interval value.
+	private ComboViewer comboViewer;
+	// The text field to enter the interval value.
+	private Text text;
+
+	/**
+	 * Constructor
+	 */
 	public IntervalConfigDialog(Shell parent) {
 	    super(parent);
     }
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.StatusDialog#configureShell(org.eclipse.swt.widgets.Shell)
+	 */
 	@Override
     protected void configureShell(Shell shell) {
 		shell.setText("Configure the refresh interval."); //$NON-NLS-1$
 		super.configureShell(shell);
     }
-
-	private Button button1;
-	private Button button2;
-	private ComboViewer comboViewer;
-	private Text text;
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
     protected Control createDialogArea(Composite parent) {
 	    Composite composite = (Composite) super.createDialogArea(parent);
@@ -69,6 +96,10 @@ public class IntervalConfigDialog extends StatusDialog implements SelectionListe
 	    return composite;
     }
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+	 */
 	@Override
     public void widgetSelected(SelectionEvent e) {
 		if(e.getSource() == button1) {
@@ -82,6 +113,10 @@ public class IntervalConfigDialog extends StatusDialog implements SelectionListe
 		}
     }
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
+	 */
 	@Override
     public void widgetDefaultSelected(SelectionEvent e) {
     }

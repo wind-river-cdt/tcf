@@ -17,7 +17,15 @@ import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.handlers.HandlerUtil;
 
+/**
+ * The handler to refresh the process list.
+ */
 public class RefreshProcessListHandler extends AbstractHandler {
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IEditorInput editorInput = HandlerUtil.getActiveEditorInputChecked(event);

@@ -17,8 +17,15 @@ import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.handlers.HandlerUtil;
 
+/**
+ * The handler to stop the periodical polling in the process monitor.
+ */
 public class StopPollingHandler extends AbstractHandler {
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IEditorInput editorInput = HandlerUtil.getActiveEditorInputChecked(event);
