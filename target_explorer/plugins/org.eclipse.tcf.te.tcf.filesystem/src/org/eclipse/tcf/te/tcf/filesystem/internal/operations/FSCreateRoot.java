@@ -33,7 +33,7 @@ public class FSCreateRoot extends FSOperation {
 
 	/**
 	 * Create an instance using the peer model.
-	 * 
+	 *
 	 * @param peerModel The peer model.
 	 */
 	public FSCreateRoot(IPeerModel peerModel) {
@@ -42,7 +42,7 @@ public class FSCreateRoot extends FSOperation {
 
 	/**
 	 * Create the file system's root node.
-	 * 
+	 *
 	 * @return The root file system node.
 	 */
 	public FSTreeNode create() {
@@ -65,7 +65,7 @@ public class FSCreateRoot extends FSOperation {
 
 	/**
 	 * Create the root node instance.
-	 * 
+	 *
 	 * @return The root node instance.
 	 */
 	FSTreeNode createRootNode() {
@@ -78,9 +78,9 @@ public class FSCreateRoot extends FSOperation {
 
 	/**
 	 * Query the root file system node's children nodes.
-	 * 
+	 *
 	 * @param rootNode The root file system node.
-	 * @throws TCFChannelException Thrown when openning a channel.
+	 * @throws TCFChannelException Thrown when opening a channel.
 	 */
 	/* default */void queryRootNodes(final FSTreeNode rootNode) throws TCFChannelException {
 		rootNode.childrenQueried = false;

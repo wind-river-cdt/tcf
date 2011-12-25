@@ -26,7 +26,7 @@ public class FSCreateFile extends FSCreate {
 
 	/**
 	 * Create an instance to create a file with the name in the folder.
-	 * 
+	 *
 	 * @param folder The folder in which the file is to be created.
 	 * @param name The new file's name.
 	 */
@@ -41,7 +41,7 @@ public class FSCreateFile extends FSCreate {
 	@Override
 	protected void create(IFileSystem service) throws TCFFileSystemException {
 		String path = folder.getLocation(true);
-		if (!path.endsWith("/")) path += "/"; //$NON-NLS-1$//$NON-NLS-2$
+		if (!path.endsWith("/")) path += "/"; //$NON-NLS-1$ //$NON-NLS-2$
 		path += name;
 		final FileSystemException[] errors = new FileSystemException[1];
 		// Open the file.

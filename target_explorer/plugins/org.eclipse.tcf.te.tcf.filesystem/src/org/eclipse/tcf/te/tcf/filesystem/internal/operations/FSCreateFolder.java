@@ -23,7 +23,7 @@ public class FSCreateFolder extends FSCreate {
 
 	/**
 	 * Create an instance to create a folder with the name in the folder.
-	 * 
+	 *
 	 * @param folder The folder in which the new folder is to be created.
 	 * @param name The name of the new folder.
 	 */
@@ -38,7 +38,7 @@ public class FSCreateFolder extends FSCreate {
 	@Override
 	protected void create(IFileSystem service) throws TCFFileSystemException {
 		String path = folder.getLocation(true);
-		if (!path.endsWith("/")) path += "/"; //$NON-NLS-1$//$NON-NLS-2$
+		if (!path.endsWith("/")) path += "/"; //$NON-NLS-1$ //$NON-NLS-2$
 		path += name;
 		final FileSystemException[] errors = new FileSystemException[1];
 		service.mkdir(path, null, new DoneMkDir() {
