@@ -35,12 +35,14 @@ import org.eclipse.tcf.te.tcf.locator.ScannerRunnable;
 import org.eclipse.tcf.te.tcf.locator.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
 import org.eclipse.tcf.te.tcf.locator.interfaces.preferences.IPreferenceKeys;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelLookupService;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelRefreshService;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelUpdateService;
 import org.eclipse.tcf.te.tcf.locator.nodes.LocatorModel;
 import org.eclipse.tcf.te.tcf.locator.nodes.PeerModel;
+import org.eclipse.tcf.te.tcf.locator.nodes.PeerRedirector;
 
 
 /**
@@ -141,6 +143,8 @@ public class LocatorModelRefreshService extends AbstractLocatorModelService impl
 		if (roots.length > 0) {
 			// The map of peers created from the static definitions
 			Map<String, IPeer> peers = new HashMap<String, IPeer>();
+			// The list of peer attributes with postponed peer instance creation
+			List<Map<String, String>> postponed = new ArrayList<Map<String,String>>();
 			// Process the root locations
 			for (File root : roots) {
 				// List all "*.ini" files within the root location
@@ -214,16 +218,64 @@ public class LocatorModelRefreshService extends AbstractLocatorModelService impl
 								}
 							}
 
-							// Construct the peer from the attributes
-							IPeer peer = new TransientPeer(attrs);
-							// Add the constructed peer to the peers map
-							peers.put(peer.getID(), peer);
+							// If the redirect property is not set, create the peer right away
+							if (properties.get(IPeerModelProperties.PROP_REDIRECT_PROXY) == null) {
+								// Construct the peer from the attributes
+								IPeer peer = new TransientPeer(attrs);
+								// Add the constructed peer to the peers map
+								peers.put(peer.getID(), peer);
+							} else {
+								// Try to get the peer proxy
+								String proxyId = properties.getProperty(IPeerModelProperties.PROP_REDIRECT_PROXY);
+								IPeer proxy = peers.get(proxyId);
+								if (proxy == null) {
+									IPeerModel peerModel = model.getService(ILocatorModelLookupService.class).lkupPeerModelById(proxyId);
+									if (peerModel != null) proxy = peerModel.getPeer();
+								}
+
+								if (proxy != null) {
+									// Construct the peer redirector
+									PeerRedirector redirector = new PeerRedirector(proxy, attrs);
+									// Add the redirector to the peers map
+									peers.put(redirector.getID(), redirector);
+								} else {
+									// Postpone peer creation
+									postponed.add(attrs);
+								}
+							}
 						} catch (IOException e) {
 							/* ignored on purpose */
 						}
 					}
 				}
 			}
+
+			// Process postponed peers if there are any
+			if (!postponed.isEmpty()) {
+				for (Map<String, String> attrs : postponed) {
+					String proxyId = attrs.get(IPeerModelProperties.PROP_REDIRECT_PROXY);
+					IPeer proxy = proxyId != null ? peers.get(proxyId) : null;
+					if (proxy == null) {
+						IPeerModel peerModel = model.getService(ILocatorModelLookupService.class).lkupPeerModelById(proxyId);
+						if (peerModel != null) proxy = peerModel.getPeer();
+					}
+
+					if (proxy != null) {
+						// Construct the peer redirector
+						PeerRedirector redirector = new PeerRedirector(proxy, attrs);
+						// Add the redirector to the peers map
+						peers.put(redirector.getID(), redirector);
+					} else {
+						// Proxy not available -> reset redirection
+						attrs.remove(IPeerModelProperties.PROP_REDIRECT_PROXY);
+						// Construct the peer from the attributes
+						IPeer peer = new TransientPeer(attrs);
+						// Add the constructed peer to the peers map
+						peers.put(peer.getID(), peer);
+					}
+				}
+			}
+
 			// Process the read peers
 			if (!peers.isEmpty()) processPeers(peers, oldChildren, model);
 		}

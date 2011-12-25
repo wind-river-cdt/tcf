@@ -129,12 +129,19 @@ public class Messages extends NLS {
 	public static String PeerAttributesTablePart_edit_title;
 	public static String PeerAttributesTablePart_edit_message;
 
-	public static String DeleteCommandHandler_error_title;
-	public static String DeleteCommandHandler_error_deleteFailed;
+	public static String DeleteHandler_error_title;
+	public static String DeleteHandler_error_deleteFailed;
 
 	public static String AgentSelectionDialog_dialogTitle;
 	public static String AgentSelectionDialog_title;
 	public static String AgentSelectionDialog_message;
+
+	public static String RedirectHandler_error_title;
+	public static String RedirectHandler_error_deleteFailed;
+
+	public static String RedirectAgentSelectionDialog_dialogTitle;
+	public static String RedirectAgentSelectionDialog_title;
+	public static String RedirectAgentSelectionDialog_message;
 
 	public static String LoggingPreferencePage_label;
 	public static String LoggingPreferencePage_enabled_label;

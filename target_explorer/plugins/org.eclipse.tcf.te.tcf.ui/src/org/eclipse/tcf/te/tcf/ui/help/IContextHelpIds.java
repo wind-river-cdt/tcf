@@ -48,4 +48,9 @@ public interface IContextHelpIds {
 	 * Delete command handler: Delete operation failed.
 	 */
 	public final static String MESSAGE_DELETE_FAILED = PREFIX + ".status.messageDeleteFailed"; //$NON-NLS-1$
+
+	/**
+	 * Redirect command handler: Redirect operation failed.
+	 */
+	public final static String MESSAGE_REDIRECT_FAILED = PREFIX + ".status.messageRedirectFailed"; //$NON-NLS-1$
 }

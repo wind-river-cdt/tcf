@@ -20,9 +20,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.tcf.protocol.Protocol;
-import org.eclipse.tcf.te.tcf.ui.activator.UIPlugin;
-import org.eclipse.tcf.te.tcf.ui.help.IContextHelpIds;
-import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistenceService;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
@@ -34,12 +31,15 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelRefreshService;
 import org.eclipse.tcf.te.tcf.locator.model.Model;
+import org.eclipse.tcf.te.tcf.ui.activator.UIPlugin;
+import org.eclipse.tcf.te.tcf.ui.help.IContextHelpIds;
+import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
  * TCF static peers delete command handler implementation.
  */
-public class DeleteCommandHandler extends AbstractHandler {
+public class DeleteHandler extends AbstractHandler {
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
@@ -59,13 +59,12 @@ public class DeleteCommandHandler extends AbstractHandler {
 					} catch (IOException e) {
 						// Create the status
 						IStatus status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(),
-													Messages.DeleteCommandHandler_error_deleteFailed, e);
+													Messages.DeleteHandler_error_deleteFailed, e);
 
 						// Fill in the status handler custom data
 						IPropertiesContainer data = new PropertiesContainer();
-						data.setProperty(IStatusHandlerConstants.PROPERTY_TITLE, Messages.DeleteCommandHandler_error_title);
+						data.setProperty(IStatusHandlerConstants.PROPERTY_TITLE, Messages.DeleteHandler_error_title);
 						data.setProperty(IStatusHandlerConstants.PROPERTY_CONTEXT_HELP_ID, IContextHelpIds.MESSAGE_DELETE_FAILED);
-						data.setProperty(IStatusHandlerConstants.PROPERTY_DONT_ASK_AGAIN_ID, IContextHelpIds.MESSAGE_DELETE_FAILED);
 						data.setProperty(IStatusHandlerConstants.PROPERTY_CALLER, this);
 
 						// Get the status handler

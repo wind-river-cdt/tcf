@@ -20,6 +20,7 @@
                   <insertionPoint name="group.open" separator="true"/>
                   <insertionPoint name="group.openWith"/>
                   <insertionPoint name="group.connect" separator="true"/>
+                  <insertionPoint name="group.redirect" separator="true"/>
                   <insertionPoint name="group.symbols" separator="true"/>
                   <insertionPoint name="group.symbols.rd"/>
                   <insertionPoint name="group.symbols.loadunload"/>

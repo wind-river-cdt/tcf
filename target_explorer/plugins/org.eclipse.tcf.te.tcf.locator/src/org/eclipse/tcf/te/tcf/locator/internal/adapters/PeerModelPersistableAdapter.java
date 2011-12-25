@@ -101,7 +101,11 @@ public class PeerModelPersistableAdapter implements IPersistable {
 		Map<String, Object> result = null;
 		if (attributes.get() != null) {
 			result = new HashMap<String, Object>();
-			result.putAll(attributes.get());
+			for (String key : attributes.get().keySet()) {
+				if (!key.endsWith(".transient")) { //$NON-NLS-1$
+					result.put(key, attributes.get().get(key));
+				}
+			}
 		}
 
 		return result;

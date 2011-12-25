@@ -104,31 +104,31 @@
 <!-- Processes command contributions -->
    <extension point="org.eclipse.ui.commands">
       <command
-            categoryId="org.eclipse.tcf.te.tcf.ui.commands.category"
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
             helpContextId="org.eclipse.tcf.te.tcf.processes.ui.command_Launch"
             id="org.eclipse.tcf.te.tcf.processes.ui.command.launch"
             name="%Processes.command.launch.name">
       </command>
       <command
-            categoryId="org.eclipse.tcf.te.tcf.ui.commands.category"
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
             helpContextId="org.eclipse.tcf.te.tcf.processes.ui.command_Refresh"
             id="org.eclipse.tcf.te.tcf.processes.ui.command.refresh"
             name="%command.refresh.name">
       </command>
       <command
-            categoryId="org.eclipse.tcf.te.tcf.ui.commands.category"
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
             helpContextId="org.eclipse.tcf.te.tcf.processes.ui.command_RefreshInterval"
             id="org.eclipse.tcf.te.tcf.processes.ui.command.refreshInterval"
             name="Config Refresh Interval">
       </command>
       <command
-            categoryId="org.eclipse.tcf.te.tcf.ui.commands.category"
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
             helpContextId="org.eclipse.tcf.te.tcf.processes.ui.command_StartPolling"
             id="org.eclipse.tcf.te.tcf.processes.ui.command.startPolling"
             name="Start Polling">
       </command>
       <command
-            categoryId="org.eclipse.tcf.te.tcf.ui.commands.category"
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
             helpContextId="org.eclipse.tcf.te.tcf.processes.ui.command_StopPolling"
             id="org.eclipse.tcf.te.tcf.processes.ui.command.stopPolling"
             name="Stop Polling">

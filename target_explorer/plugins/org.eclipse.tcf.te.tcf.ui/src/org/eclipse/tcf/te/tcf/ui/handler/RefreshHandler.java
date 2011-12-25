@@ -28,7 +28,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 /**
  * TCF refresh command handler.
  */
-public class RefreshCommandHandler extends AbstractHandler {
+public class RefreshHandler extends AbstractHandler {
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)

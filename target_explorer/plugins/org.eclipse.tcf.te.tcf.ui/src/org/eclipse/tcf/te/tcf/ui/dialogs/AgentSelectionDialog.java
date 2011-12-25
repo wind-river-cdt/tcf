@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -31,13 +32,13 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.tcf.protocol.Protocol;
-import org.eclipse.tcf.te.tcf.ui.help.IContextHelpIds;
-import org.eclipse.tcf.te.tcf.ui.navigator.LabelProviderDelegate;
-import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelLookupService;
 import org.eclipse.tcf.te.tcf.locator.model.Model;
+import org.eclipse.tcf.te.tcf.ui.help.IContextHelpIds;
+import org.eclipse.tcf.te.tcf.ui.navigator.LabelProviderDelegate;
+import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.jface.dialogs.CustomTitleAreaDialog;
 import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
 
@@ -83,6 +84,17 @@ public class AgentSelectionDialog extends CustomTitleAreaDialog {
 	    return true;
 	}
 
+	/**
+	 * Returns whether the dialog shall support multi selection or not.
+	 * <p>
+	 * The default implementation returns <code>true</code>.
+	 *
+	 * @return <code>True</code> if multi selection is supported, <code>false</code> otherwise.
+	 */
+	protected boolean supportsMultiSelection() {
+		return true;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.ui.jface.dialogs.CustomTitleAreaDialog#createDialogArea(org.eclipse.swt.widgets.Composite)
 	 */
@@ -95,7 +107,7 @@ public class AgentSelectionDialog extends CustomTitleAreaDialog {
 		setDefaultMessage(getDefaultMessage(), IMessageProvider.NONE);
 
 	    // Create the table viewer
-	    viewer = new TableViewer(top, SWT.MULTI | SWT.BORDER);
+	    viewer = new TableViewer(top, (supportsMultiSelection() ? SWT.MULTI : SWT.SINGLE) | SWT.BORDER);
 
 	    // Configure the table
 	    Table table = viewer.getTable();
@@ -121,6 +133,9 @@ public class AgentSelectionDialog extends CustomTitleAreaDialog {
 	    	}
 	    };
 	    viewer.setLabelProvider(new DecoratingLabelProvider(labelProvider, labelProvider));
+
+	    // Subclasses may customize the viewer before setting the input
+	    configureTableViewer(viewer);
 
 	    // The content to show is static. Do the filtering manually so that
 	    // we can disable the OK Button if the dialog would not show any content.
@@ -152,6 +167,19 @@ public class AgentSelectionDialog extends CustomTitleAreaDialog {
 
 	    return buttonBar;
 	}
+
+	/**
+	 * Configure the table viewer.
+	 * <p>
+	 * The default implementation does nothing. Subclasses may overwrite this
+	 * method to customize the table viewer before the input gets set.
+	 *
+	 * @param viewer The table viewer. Must not be <code>null</code>.
+	 */
+	protected void configureTableViewer(TableViewer viewer) {
+		Assert.isNotNull(viewer);
+	}
+
 	/**
 	 * Returns the dialog title.
 	 *

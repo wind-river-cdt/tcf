@@ -71,29 +71,34 @@ public interface ImageConsts {
     public static final String DISCOVERY_ROOT = "RemotePeerDiscoverRootNodeObject"; //$NON-NLS-1$
 
     /**
-     * The key to access the target object gold overlay image.
+     * The key to access the peer object gold overlay image.
      */
     public static final String GOLD_OVR = "GoldOverlay"; //$NON-NLS-1$
 
     /**
-     * The key to access the target object green overlay image.
+     * The key to access the peer object green overlay image.
      */
     public static final String GREEN_OVR = "GreenOverlay"; //$NON-NLS-1$
 
     /**
-     * The key to access the target object grey overlay image.
+     * The key to access the peer object grey overlay image.
      */
     public static final String GREY_OVR = "GreyOverlay"; //$NON-NLS-1$
 
     /**
-     * The key to access the target object red overlay image.
+     * The key to access the peer object red overlay image.
      */
     public static final String RED_OVR = "RedOverlay"; //$NON-NLS-1$
 
     /**
-     * The key to access the target object red X overlay image.
+     * The key to access the peer object red X overlay image.
      */
     public static final String RED_X_OVR = "RedXOverlay"; //$NON-NLS-1$
+
+    /**
+     * The key to access the peer object redirect overlay image.
+     */
+    public static final String REDIRECT_OVR = "RedirectOverlay"; //$NON-NLS-1$
 
     /**
      * The key to access the base run action image.

@@ -3,7 +3,7 @@
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
@@ -31,6 +31,11 @@ public interface IPeerModelProperties {
 	 * Property: The list of known remote service names.
 	 */
 	public static final String PROP_REMOTE_SERVICES = "services.remote"; //$NON-NLS-1$
+
+	/**
+	 * Property: The redirection proxy peer id.
+	 */
+	public static final String PROP_REDIRECT_PROXY = "redirect.proxy"; //$NON-NLS-1$
 
 	/**
 	 * Property: The peer state.

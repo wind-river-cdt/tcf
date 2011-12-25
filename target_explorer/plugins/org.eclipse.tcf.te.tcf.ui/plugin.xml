@@ -46,7 +46,6 @@
    </extension>
 
 <!-- New target wizard contributions -->
-
    <extension point="org.eclipse.tcf.te.ui.newWizards">
       <category
             id="org.eclipse.tcf.te.tcf.ui.newWizards.category"
@@ -144,26 +143,51 @@
             </visibleWhen>
          </command>
       </menuContribution>
+
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.TargetExplorer#Popup?after=group.redirect">
+         <command
+               commandId="org.eclipse.tcf.te.tcf.ui.command.redirect"
+               helpContextId="org.eclipse.tcf.te.tcf.ui.command_Redirect"
+               id="org.eclipse.tcf.te.tcf.ui.commands.redirect"
+               label="%command.redirect.label"
+               style="push"
+               tooltip="%command.redirect.tooltip">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <count value="+"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <and>
+                        <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                        <test property="org.eclipse.tcf.te.tcf.locator.isStaticPeer" value="true"/>
+                     </and>                        
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <separator name="operationsGroupMarker" visible="true"/>
+      </menuContribution>
    </extension>
 
 <!-- Command contributions -->
    <extension point="org.eclipse.ui.commands">
-      <category
-            id="org.eclipse.tcf.te.tcf.ui.commands.category"
-            name="%command.category.name">
-      </category>
       <command
-            categoryId="org.eclipse.tcf.te.tcf.ui.commands.category"
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
             helpContextId="org.eclipse.tcf.te.tcf.ui.command_Refresh"
             id="org.eclipse.tcf.te.tcf.ui.command.refresh"
             name="%command.refresh.name">
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.tcf.ui.command_Redirect"
+            id="org.eclipse.tcf.te.tcf.ui.command.redirect"
+            name="%command.redirect.name">
       </command>
    </extension>
 
 <!-- Handler contributions -->
    <extension point="org.eclipse.ui.handlers">
       <handler
-            class="org.eclipse.tcf.te.tcf.ui.handler.RefreshCommandHandler"
+            class="org.eclipse.tcf.te.tcf.ui.handler.RefreshHandler"
             commandId="org.eclipse.tcf.te.tcf.ui.command.refresh">
             <activeWhen>
                <reference definitionId="te.expressions.tcf.peerModel.handlerActivation"/>
@@ -171,11 +195,27 @@
       </handler>
       
       <handler
-            class="org.eclipse.tcf.te.tcf.ui.handler.DeleteCommandHandler"
+            class="org.eclipse.tcf.te.tcf.ui.handler.DeleteHandler"
             commandId="org.eclipse.ui.edit.delete">
             <activeWhen>
                <reference definitionId="te.expressions.tcf.peerModel.handlerActivation"/>
             </activeWhen>
+      </handler>
+      
+      <handler
+            class="org.eclipse.tcf.te.tcf.ui.handler.RedirectHandler"
+            commandId="org.eclipse.tcf.te.tcf.ui.command.redirect">
+            <activeWhen>
+               <reference definitionId="te.expressions.tcf.peerModel.handlerActivation"/>
+            </activeWhen>
+            <enabledWhen>
+               <with variable="selection">
+                  <count value="1"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                  </iterate>
+               </with>
+            </enabledWhen>
       </handler>
    </extension>
 

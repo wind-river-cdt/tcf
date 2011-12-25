@@ -123,7 +123,11 @@ public class MapPersistableAdapter implements IPersistable {
 		if (data instanceof Map) {
 			// Convert into a String/Object map to pass it on to the persistence delegates
 			result = new LinkedHashMap<String, Object>();
-			for (String key : ((Map<String, String>) data).keySet()) result.put(key, ((Map<String, String>) data).get(key));
+			for (String key : ((Map<String, String>) data).keySet()) {
+				if (!key.endsWith(".transient")) { //$NON-NLS-1$
+					result.put(key, ((Map<String, String>) data).get(key));
+				}
+			}
 		}
 
 		return result;

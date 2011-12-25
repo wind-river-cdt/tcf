@@ -5,7 +5,7 @@
 <!-- Console command contributions -->
    <extension point="org.eclipse.ui.commands">
       <command
-            categoryId="org.eclipse.tcf.te.tcf.ui.commands.category"
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
             helpContextId="org.eclipse.tcf.te.tcf.ui.console.command_Remove"
             id="org.eclipse.tcf.te.tcf.ui.console.command.remove"
             name="%command.remove.name">
