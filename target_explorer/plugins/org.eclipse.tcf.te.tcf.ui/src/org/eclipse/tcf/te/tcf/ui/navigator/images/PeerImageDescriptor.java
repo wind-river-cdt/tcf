@@ -68,9 +68,17 @@ public class PeerImageDescriptor extends AbstractImageDescriptor {
 		Assert.isTrue(Protocol.isDispatchThread());
 
 		state = node.getIntProperty(IPeerModelProperties.PROP_STATE);
-		redirected = node.getPeer().getAttributes().get(IPeerModelProperties.PROP_REDIRECT_PROXY) != null;
+
+		String value = node.getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
+		boolean isStaticPeer = value != null && Boolean.parseBoolean(value.trim());
+		redirected = isStaticPeer ? node.getPeer().getAttributes().get(IPeerModelProperties.PROP_REDIRECT_PROXY) != null : false;
 	}
 
+	/**
+	 * Define the peer image descriptor key.
+	 *
+	 * @param hashCode The hash code of the base image.
+	 */
 	protected void defineKey(int hashCode) {
 		String key = "PMID:" +  //$NON-NLS-1$
 			hashCode + ":" + //$NON-NLS-1$
