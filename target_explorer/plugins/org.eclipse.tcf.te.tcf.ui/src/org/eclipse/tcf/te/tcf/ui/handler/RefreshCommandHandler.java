@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.ui.internal.handler;
+package org.eclipse.tcf.te.tcf.ui.handler;
 
 import java.util.ArrayList;
 import java.util.Iterator;

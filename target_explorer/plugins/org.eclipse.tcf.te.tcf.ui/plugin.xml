@@ -38,7 +38,7 @@
       </navigatorContent>
       <commonFilter
             activeByDefault="false"
-            class="org.eclipse.tcf.te.tcf.ui.internal.filter.UnreachablePeersFilter"
+            class="org.eclipse.tcf.te.tcf.ui.filter.UnreachablePeersFilter"
             id="org.eclipse.tcf.te.tcf.ui.navigator.UnreachablePeersFilter"
             name="%UnreachablePeersFilter.name"
             visibleInUI="true">
@@ -67,7 +67,7 @@
 <!-- Editor page contributions -->
    <extension point="org.eclipse.tcf.te.ui.views.editorPages">
       <editorPage
-            class="org.eclipse.tcf.te.tcf.ui.internal.editor.pages.NodePropertiesEditorPage"
+            class="org.eclipse.tcf.te.tcf.ui.editor.pages.NodePropertiesEditorPage"
             name="%NodePropertiesEditorPage.name"
             id="org.eclipse.tcf.te.tcf.ui.NodePropertiesEditorPage">
       </editorPage>
@@ -163,7 +163,7 @@
 <!-- Handler contributions -->
    <extension point="org.eclipse.ui.handlers">
       <handler
-            class="org.eclipse.tcf.te.tcf.ui.internal.handler.RefreshCommandHandler"
+            class="org.eclipse.tcf.te.tcf.ui.handler.RefreshCommandHandler"
             commandId="org.eclipse.tcf.te.tcf.ui.command.refresh">
             <activeWhen>
                <reference definitionId="te.expressions.tcf.peerModel.handlerActivation"/>
@@ -171,7 +171,7 @@
       </handler>
       
       <handler
-            class="org.eclipse.tcf.te.tcf.ui.internal.handler.DeleteCommandHandler"
+            class="org.eclipse.tcf.te.tcf.ui.handler.DeleteCommandHandler"
             commandId="org.eclipse.ui.edit.delete">
             <activeWhen>
                <reference definitionId="te.expressions.tcf.peerModel.handlerActivation"/>
