@@ -27,8 +27,8 @@ import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.services.IFileSystem.IFileHandle;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFChannelException;
-import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation;
+import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 
 /**
  * The URL connection returned by TCF stream service used to handler "tcf"

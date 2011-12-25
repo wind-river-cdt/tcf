@@ -8,7 +8,7 @@
  * Wind River Systems - initial API and implementation
  * William Chen (Wind River) - [345384] Provide property pages for remote file system nodes
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.filesystem.internal.nls;
+package org.eclipse.tcf.te.tcf.filesystem.nls;
 
 import java.lang.reflect.Field;
 
@@ -20,7 +20,7 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 
 	// The plug-in resource bundle name
-	private static final String BUNDLE_NAME = "org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.eclipse.tcf.te.tcf.filesystem.nls.Messages"; //$NON-NLS-1$
 
 	/**
 	 * Static constructor.

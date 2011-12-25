@@ -18,7 +18,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tcf.te.tcf.ui.internal.help.IContextHelpIds;
+import org.eclipse.tcf.te.tcf.ui.help.IContextHelpIds;
 import org.eclipse.tcf.te.tcf.ui.tables.NodePropertiesContentProvider;
 import org.eclipse.tcf.te.tcf.ui.tables.NodePropertiesLabelProvider;
 import org.eclipse.tcf.te.tcf.ui.tables.NodePropertiesViewerComparator;

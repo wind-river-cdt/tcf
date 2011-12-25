@@ -9,7 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.wizards;
 
-import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
+import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 
 /**
  * The wizard page to create a new file in the file system of Target Explorer.

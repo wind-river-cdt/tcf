@@ -149,7 +149,7 @@ public class FSTreeContentProvider implements ITreeContentProvider {
 							node.peerNode = peerNode;
 							node.childrenQueried = false;
 							node.childrenQueryRunning = false;
-							node.name = org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages.FSTreeNodeContentProvider_rootNode_label;
+							node.name = org.eclipse.tcf.te.tcf.filesystem.nls.Messages.FSTreeNodeContentProvider_rootNode_label;
 
 							fsModel.setRoot(node);
 

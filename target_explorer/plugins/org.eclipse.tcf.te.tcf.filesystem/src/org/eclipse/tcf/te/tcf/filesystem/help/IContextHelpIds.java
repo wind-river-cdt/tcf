@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.filesystem.internal.help;
+package org.eclipse.tcf.te.tcf.filesystem.help;
 
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 

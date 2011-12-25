@@ -38,7 +38,7 @@ import org.eclipse.tcf.te.tcf.filesystem.dialogs.FSOpenFileDialog;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.processes.core.interfaces.launcher.IProcessLauncher;
-import org.eclipse.tcf.te.tcf.processes.ui.internal.help.IContextHelpIds;
+import org.eclipse.tcf.te.tcf.processes.ui.help.IContextHelpIds;
 import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.jface.dialogs.CustomTrayDialog;
 import org.eclipse.tcf.te.ui.swt.SWTControlUtil;

@@ -28,8 +28,13 @@ import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.dialogs.TimeTriggeredProgressMonitorDialog;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
+<<<<<<< HEAD
 import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
+=======
+import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
+>>>>>>> f0e27bf... Target Explorer: Do some package structure clean-up to get an consistent layout in all plug-in's
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
+import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 import org.eclipse.ui.PlatformUI;
 
 /**

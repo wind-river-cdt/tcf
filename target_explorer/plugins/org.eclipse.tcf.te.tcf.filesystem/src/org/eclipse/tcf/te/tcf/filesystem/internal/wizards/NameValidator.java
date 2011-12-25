@@ -16,9 +16,9 @@ import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.tcf.te.tcf.filesystem.internal.celleditor.FSCellValidator;
-import org.eclipse.tcf.te.tcf.filesystem.internal.nls.Messages;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
+import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 import org.eclipse.tcf.te.ui.controls.validator.Validator;
 
 /**

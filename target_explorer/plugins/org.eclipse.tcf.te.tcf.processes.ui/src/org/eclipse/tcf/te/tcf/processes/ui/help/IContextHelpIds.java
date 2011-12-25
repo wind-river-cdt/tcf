@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.processes.ui.internal.help;
+package org.eclipse.tcf.te.tcf.processes.ui.help;
 
 import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
 

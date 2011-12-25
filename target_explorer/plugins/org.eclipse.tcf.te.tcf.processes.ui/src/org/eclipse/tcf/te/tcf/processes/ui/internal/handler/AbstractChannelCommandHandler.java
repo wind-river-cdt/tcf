@@ -31,7 +31,7 @@ import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
-import org.eclipse.tcf.te.tcf.processes.ui.internal.help.IContextHelpIds;
+import org.eclipse.tcf.te.tcf.processes.ui.help.IContextHelpIds;
 import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.swt.DisplayUtil;
 import org.eclipse.ui.handlers.HandlerUtil;

@@ -28,11 +28,11 @@ Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: org.eclipse.tcf.te.tcf.ui.activator;x-internal:=true,
  org.eclipse.tcf.te.tcf.ui.dialogs,
+ org.eclipse.tcf.te.tcf.ui.help;x-internal:=true,
  org.eclipse.tcf.te.tcf.ui.internal;x-internal:=true,
  org.eclipse.tcf.te.tcf.ui.internal.editor.pages;x-internal:=true,
  org.eclipse.tcf.te.tcf.ui.internal.filter;x-internal:=true,
  org.eclipse.tcf.te.tcf.ui.internal.handler;x-internal:=true,
- org.eclipse.tcf.te.tcf.ui.internal.help;x-internal:=true,
  org.eclipse.tcf.te.tcf.ui.navigator,
  org.eclipse.tcf.te.tcf.ui.navigator.images,
  org.eclipse.tcf.te.tcf.ui.nls;x-internal:=true,

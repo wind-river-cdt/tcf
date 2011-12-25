@@ -23,7 +23,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tcf.protocol.IPeer;
-import org.eclipse.tcf.te.tcf.ui.internal.help.IContextHelpIds;
+import org.eclipse.tcf.te.tcf.ui.help.IContextHelpIds;
 import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.tcf.ui.wizards.controls.CustomTransportPanel;
 import org.eclipse.tcf.te.tcf.ui.wizards.controls.PeerAttributesTablePart;
