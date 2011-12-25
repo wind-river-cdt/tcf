@@ -24,7 +24,7 @@ public class IntervalConfigDialog extends StatusDialog implements SelectionListe
 
 	@Override
     protected void configureShell(Shell shell) {
-		shell.setText("Configure the refresh interval.");
+		shell.setText("Configure the refresh interval."); //$NON-NLS-1$
 		super.configureShell(shell);
     }
 
@@ -37,7 +37,7 @@ public class IntervalConfigDialog extends StatusDialog implements SelectionListe
     protected Control createDialogArea(Composite parent) {
 	    Composite composite = (Composite) super.createDialogArea(parent);
 	    Label label = new Label(composite, SWT.NONE);
-	    label.setText("Configure the frequency to refresh the process list:");
+	    label.setText("Configure the frequency to refresh the process list:"); //$NON-NLS-1$
 	    Composite comp1 = new Composite(composite, SWT.NONE);
 	    GridData data = new GridData(SWT.FILL, SWT.CENTER, true, false);
 	    comp1.setLayoutData(data);
@@ -45,12 +45,12 @@ public class IntervalConfigDialog extends StatusDialog implements SelectionListe
 	    layout.horizontalSpacing = 0;
 	    comp1.setLayout(layout);
 	    button1 = new Button(comp1, SWT.RADIO);
-	    button1.setText("Refresh the process list every");
+	    button1.setText("Refresh the process list every"); //$NON-NLS-1$
 	    button1.addSelectionListener(this);
 	    text = new Text(comp1, SWT.SINGLE | SWT.BORDER);
 	    text.setTextLimit(Text.LIMIT);
 	    label = new Label(comp1, SWT.NONE);
-	    label.setText(" seconds.");
+	    label.setText(" seconds."); //$NON-NLS-1$
 	    Composite comp2 = new Composite(composite, SWT.NONE);
 	    data = new GridData(SWT.FILL, SWT.CENTER, true, false);
 	    comp2.setLayoutData(data);
@@ -58,14 +58,14 @@ public class IntervalConfigDialog extends StatusDialog implements SelectionListe
 	    layout.horizontalSpacing = 0;
 	    comp2.setLayout(layout);
 	    button2 = new Button(comp2, SWT.RADIO);
-	    button2.setText("Refresh the process list in a ");
+	    button2.setText("Refresh the process list in a "); //$NON-NLS-1$
 	    button2.addSelectionListener(this);
 	    comboViewer = new ComboViewer(comp2, SWT.READ_ONLY);
 	    comboViewer.setContentProvider(ArrayContentProvider.getInstance());
 	    comboViewer.setLabelProvider(new LabelProvider());
-	    comboViewer.setInput(new String[]{"Fast", "Normal", "Slow"});
+	    comboViewer.setInput(new String[]{"Fast", "Normal", "Slow"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	    label = new Label(comp2, SWT.NONE);
-	    label.setText(" pace.");
+	    label.setText(" pace."); //$NON-NLS-1$
 	    return composite;
     }
 
