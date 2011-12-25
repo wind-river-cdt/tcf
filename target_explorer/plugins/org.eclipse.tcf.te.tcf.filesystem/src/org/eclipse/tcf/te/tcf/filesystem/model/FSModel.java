@@ -60,9 +60,9 @@ public final class FSModel {
 	public static void notifyAllChanged() {
 		if (allModels != null) {
 			for (FSModel model : allModels) {
-				IViewerInput provider = (IViewerInput) model.peerModel.getAdapter(IViewerInput.class);
+				IViewerInput viewerInput = (IViewerInput) model.peerModel.getAdapter(IViewerInput.class);
 				PropertyChangeEvent event = new PropertyChangeEvent(model.peerModel, "state", null, null); //$NON-NLS-1$
-				provider.firePropertyChange(event);
+				viewerInput.firePropertyChange(event);
 			}
 		}
 	}

@@ -124,8 +124,8 @@ public class ProcessModel {
 			Boolean oldValue = Boolean.valueOf(old);
 			Boolean newValue = Boolean.valueOf(stopped);
 			PropertyChangeEvent event = new PropertyChangeEvent(peerModel, "stopped", oldValue, newValue); //$NON-NLS-1$
-			IViewerInput provider = (IViewerInput) peerModel.getAdapter(IViewerInput.class);
-			provider.firePropertyChange(event);
+			IViewerInput viewerInput = (IViewerInput) peerModel.getAdapter(IViewerInput.class);
+			viewerInput.firePropertyChange(event);
 		}
     }
 

@@ -265,9 +265,9 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * @param input The input of the tree viewer.
 	 */
 	private void uninstallPropertyChangeListener(Object input) {
-	    IViewerInput provider = getViewerInput(input);
-		if(provider != null) {
-			provider.removePropertyChangeListener(this);
+	    IViewerInput viewerInput = getViewerInput(input);
+		if(viewerInput != null) {
+			viewerInput.removePropertyChangeListener(this);
 		}
 	}
 	
@@ -277,9 +277,9 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * @param input The input of the tree viewer.
 	 */
 	private void installPropertyChangeListener(Object input) {
-	    IViewerInput provider = getViewerInput(input);
-		if(provider != null) {
-			provider.addPropertyChangeListener(this);
+	    IViewerInput viewerInput = getViewerInput(input);
+		if(viewerInput != null) {
+			viewerInput.addPropertyChangeListener(this);
 		}
     }
 
@@ -293,18 +293,18 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * @return A viewer input or null.
 	 */
 	private IViewerInput getViewerInput(Object input) {
-	    IViewerInput provider = null;
+	    IViewerInput viewerInput = null;
 		if(input instanceof IViewerInput) {
-			provider = (IViewerInput) input;
+			viewerInput = (IViewerInput) input;
 		}else{
 			if(input instanceof IAdaptable) {
-				provider = (IViewerInput)((IAdaptable)input).getAdapter(IViewerInput.class);
+				viewerInput = (IViewerInput)((IAdaptable)input).getAdapter(IViewerInput.class);
 			}
-			if(provider == null) {
-				provider = (IViewerInput) Platform.getAdapterManager().getAdapter(input, IViewerInput.class);
+			if(viewerInput == null) {
+				viewerInput = (IViewerInput) Platform.getAdapterManager().getAdapter(input, IViewerInput.class);
 			}
 		}
-	    return provider;
+	    return viewerInput;
     }
 
 	/**

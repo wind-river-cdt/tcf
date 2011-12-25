@@ -100,18 +100,18 @@ public class ViewerStateManager {
 	 * @return A viewer input or null.
 	 */
 	private IViewerInput getViewerInput(Object input) {
-	    IViewerInput provider = null;
+	    IViewerInput viewerInput = null;
 		if(input instanceof IViewerInput) {
-			provider = (IViewerInput) input;
+			viewerInput = (IViewerInput) input;
 		}else{
 			if(input instanceof IAdaptable) {
-				provider = (IViewerInput)((IAdaptable)input).getAdapter(IViewerInput.class);
+				viewerInput = (IViewerInput)((IAdaptable)input).getAdapter(IViewerInput.class);
 			}
-			if(provider == null) {
-				provider = (IViewerInput) Platform.getAdapterManager().getAdapter(input, IViewerInput.class);
+			if(viewerInput == null) {
+				viewerInput = (IViewerInput) Platform.getAdapterManager().getAdapter(input, IViewerInput.class);
 			}
 		}
-	    return provider;
+	    return viewerInput;
     }
 	/**
 	 * Put the viewer state with its input id into the map.

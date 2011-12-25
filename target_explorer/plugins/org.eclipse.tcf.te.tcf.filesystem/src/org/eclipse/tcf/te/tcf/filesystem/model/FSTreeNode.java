@@ -507,8 +507,8 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 	 * Fire a property change event for the node.
 	 */
 	public void firePropertyChange() {
-		IViewerInput provider = (IViewerInput) peerNode.getAdapter(IViewerInput.class);
+		IViewerInput viewerInput = (IViewerInput) peerNode.getAdapter(IViewerInput.class);
 		PropertyChangeEvent event = new PropertyChangeEvent(this, "state", null, null); //$NON-NLS-1$
-		provider.firePropertyChange(event);
+		viewerInput.firePropertyChange(event);
     }
 }
