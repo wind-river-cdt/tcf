@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
+import org.eclipse.tcf.te.tcf.locator.nodes.PeerRedirector;
 
 
 
@@ -85,6 +86,11 @@ public class MyPropertyTester extends PropertyTester {
 			String value = node.getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
 			boolean isStaticPeer = value != null && Boolean.parseBoolean(value.trim());
 			if (expectedValue instanceof Boolean) return ((Boolean)expectedValue).booleanValue() == isStaticPeer;
+		}
+
+		if ("isRedirected".equals(property)) { //$NON-NLS-1$
+			boolean isRedirected = node.getPeer() instanceof PeerRedirector;
+			if (expectedValue instanceof Boolean) return ((Boolean)expectedValue).booleanValue() == isRedirected;
 		}
 
 		return false;

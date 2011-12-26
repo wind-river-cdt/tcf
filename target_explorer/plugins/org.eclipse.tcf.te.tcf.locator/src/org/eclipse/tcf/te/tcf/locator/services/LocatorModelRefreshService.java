@@ -278,6 +278,24 @@ public class LocatorModelRefreshService extends AbstractLocatorModelService impl
 
 			// Process the read peers
 			if (!peers.isEmpty()) processPeers(peers, oldChildren, model);
+
+			// Scan the peers for redirected ones ... and set up the peer model association
+			for (String peerId : peers.keySet()) {
+				IPeer peer = peers.get(peerId);
+				if (!(peer instanceof PeerRedirector)) continue;
+
+				// Get the peers peer model object
+				IPeerModel peerModel = model.getService(ILocatorModelLookupService.class).lkupPeerModelById(peerId);
+				Assert.isNotNull(peerModel);
+
+				// The peer is a peer redirector -> get the proxy peer id and proxy peer model
+				String proxyPeerId = ((PeerRedirector)peer).getParent().getID();
+				IPeerModel proxy = model.getService(ILocatorModelLookupService.class).lkupPeerModelById(proxyPeerId);
+				Assert.isNotNull(proxy);
+
+				peerModel.setParentNode(proxy);
+				model.getService(ILocatorModelUpdateService.class).addChild(peerModel);
+			}
 		}
 	}
 
@@ -292,8 +310,8 @@ public class LocatorModelRefreshService extends AbstractLocatorModelService impl
 
 		// Check on the peers root locations preference setting
 		String roots = Platform.getPreferencesService().getString(CoreBundleActivator.getUniqueIdentifier(),
-																 IPreferenceKeys.PREF_STATIC_PEERS_ROOT_LOCATIONS,
-																 null, null);
+																  IPreferenceKeys.PREF_STATIC_PEERS_ROOT_LOCATIONS,
+																  null, null);
 		// If set, split it in its single components
 		if (roots != null) {
 			String[] candidates = roots.split(File.pathSeparator);

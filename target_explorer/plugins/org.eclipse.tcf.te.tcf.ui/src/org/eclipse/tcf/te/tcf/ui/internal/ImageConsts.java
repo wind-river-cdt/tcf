@@ -96,11 +96,6 @@ public interface ImageConsts {
     public static final String RED_X_OVR = "RedXOverlay"; //$NON-NLS-1$
 
     /**
-     * The key to access the peer object redirect overlay image.
-     */
-    public static final String REDIRECT_OVR = "RedirectOverlay"; //$NON-NLS-1$
-
-    /**
      * The key to access the base run action image.
      */
     public static final String RUN_ENABLED = "RunEnabled"; //$NON-NLS-1$

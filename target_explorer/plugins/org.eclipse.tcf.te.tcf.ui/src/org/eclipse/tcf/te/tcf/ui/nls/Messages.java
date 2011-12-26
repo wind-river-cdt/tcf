@@ -83,6 +83,8 @@ public class Messages extends NLS {
 	public static String NodePropertiesLabelProvider_services_local;
 	public static String NodePropertiesLabelProvider_services_remote;
 
+	public static String NodePropertiesLabelProvider_redirect_proxy;
+
 	public static String NewTargetWizard_windowTitle;
 	public static String NewTargetWizard_error_savePeer;
 
@@ -137,11 +139,14 @@ public class Messages extends NLS {
 	public static String AgentSelectionDialog_message;
 
 	public static String RedirectHandler_error_title;
-	public static String RedirectHandler_error_deleteFailed;
+	public static String RedirectHandler_error_redirectFailed;
 
 	public static String RedirectAgentSelectionDialog_dialogTitle;
 	public static String RedirectAgentSelectionDialog_title;
 	public static String RedirectAgentSelectionDialog_message;
+
+	public static String ResetRedirectHandler_error_title;
+	public static String ResetRedirectHandler_error_resetRedirectFailed;
 
 	public static String LoggingPreferencePage_label;
 	public static String LoggingPreferencePage_enabled_label;

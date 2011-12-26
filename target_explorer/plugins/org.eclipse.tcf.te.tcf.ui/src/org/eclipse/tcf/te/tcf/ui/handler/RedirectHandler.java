@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -39,13 +40,17 @@ import org.eclipse.tcf.te.runtime.statushandler.interfaces.IStatusHandlerConstan
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelRefreshService;
+import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelUpdateService;
 import org.eclipse.tcf.te.tcf.locator.model.Model;
 import org.eclipse.tcf.te.tcf.locator.nodes.PeerRedirector;
 import org.eclipse.tcf.te.tcf.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.ui.dialogs.RedirectAgentSelectionDialog;
 import org.eclipse.tcf.te.tcf.ui.help.IContextHelpIds;
 import org.eclipse.tcf.te.tcf.ui.nls.Messages;
+import org.eclipse.tcf.te.ui.swt.DisplayUtil;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.ui.navigator.CommonNavigator;
 
 /**
  * Redirect peer command handler implementation.
@@ -56,7 +61,7 @@ public class RedirectHandler extends AbstractHandler {
 	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
 	 */
 	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
+	public Object execute(final ExecutionEvent event) throws ExecutionException {
 		// Determine the peer selected in Target Explorer tree
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
 		if (selection instanceof IStructuredSelection && !selection.isEmpty()) {
@@ -100,44 +105,18 @@ public class RedirectHandler extends AbstractHandler {
 							Protocol.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									// Get the peer attributes
-									Map<String, String> attributes = new HashMap<String, String>();
-									attributes.putAll(peerModel.getPeer().getAttributes());
-									// Set the redirection
-									attributes.put(IPeerModelProperties.PROP_REDIRECT_PROXY, proxy.getPeerId());
+									redirect(peerModel, proxy);
 
-									try {
-										IPersistenceService persistenceService = ServiceManager.getInstance().getService(IPersistenceService.class);
-										if (persistenceService == null) throw new IOException("Persistence service instance unavailable."); //$NON-NLS-1$
-										persistenceService.write(attributes);
-
-										// Create a peer redirector
-										PeerRedirector redirector = new PeerRedirector(proxy.getPeer(), attributes);
-										// And update the instance
-										peerModel.setProperty(IPeerModelProperties.PROP_INSTANCE, redirector);
-
-										// Trigger a refresh of the locator model in a later dispatch cycle
-										Protocol.invokeLater(new Runnable() {
-											@Override
-                                            public void run() {
-												Model.getModel().getService(ILocatorModelRefreshService.class).refresh();
+									DisplayUtil.safeAsyncExec(new Runnable() {
+										@Override
+										public void run() {
+											IWorkbenchPart part = HandlerUtil.getActivePart(event);
+											if (part instanceof CommonNavigator) {
+												CommonNavigator navigator = (CommonNavigator)part;
+												navigator.selectReveal(new StructuredSelection(peerModel));
 											}
-										});
-									} catch (IOException e) {
-										// Create the status
-										IStatus status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(),
-																	Messages.RedirectHandler_error_deleteFailed, e);
-
-										// Fill in the status handler custom data
-										IPropertiesContainer data = new PropertiesContainer();
-										data.setProperty(IStatusHandlerConstants.PROPERTY_TITLE, Messages.RedirectHandler_error_title);
-										data.setProperty(IStatusHandlerConstants.PROPERTY_CONTEXT_HELP_ID, IContextHelpIds.MESSAGE_DELETE_FAILED);
-										data.setProperty(IStatusHandlerConstants.PROPERTY_CALLER, this);
-
-										// Get the status handler
-										IStatusHandler[] handler = StatusHandlerManager.getInstance().getHandler(peerModel);
-										if (handler.length > 0) handler[0].handleStatus(status, data, null);
-									}
+										}
+									});
 								}
 							});
 						}
@@ -150,4 +129,60 @@ public class RedirectHandler extends AbstractHandler {
 		return null;
 	}
 
+	/**
+	 * Redirect the communication to the given peer through the given proxy.
+	 * <p>
+	 * The method must be called from within the TCF dispatch thread.
+	 *
+	 * @param peerModel The peer to redirect. Must not be <code>null</code>.
+	 * @param proxy The proxy. Must not be <code>null</code>
+	 */
+	public void redirect(IPeerModel peerModel, IPeerModel proxy) {
+		Assert.isNotNull(peerModel);
+		Assert.isNotNull(proxy);
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+
+		// Get the peer attributes
+		Map<String, String> attributes = new HashMap<String, String>();
+		attributes.putAll(peerModel.getPeer().getAttributes());
+		// Set the redirection
+		attributes.put(IPeerModelProperties.PROP_REDIRECT_PROXY, proxy.getPeerId());
+
+		try {
+			IPersistenceService persistenceService = ServiceManager.getInstance().getService(IPersistenceService.class);
+			if (persistenceService == null) throw new IOException("Persistence service instance unavailable."); //$NON-NLS-1$
+			persistenceService.write(attributes);
+
+			// Create a peer redirector
+			PeerRedirector redirector = new PeerRedirector(proxy.getPeer(), attributes);
+			// And update the instance
+			peerModel.setProperty(IPeerModelProperties.PROP_INSTANCE, redirector);
+
+			// Associate proxy (parent) and peer model (child)
+			peerModel.setParentNode(proxy);
+			Model.getModel().getService(ILocatorModelUpdateService.class).addChild(peerModel);
+
+			// Trigger a refresh of the locator model in a later dispatch cycle
+			Protocol.invokeLater(new Runnable() {
+				@Override
+                public void run() {
+					Model.getModel().getService(ILocatorModelRefreshService.class).refresh();
+				}
+			});
+		} catch (IOException e) {
+			// Create the status
+			IStatus status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(),
+										Messages.RedirectHandler_error_redirectFailed, e);
+
+			// Fill in the status handler custom data
+			IPropertiesContainer data = new PropertiesContainer();
+			data.setProperty(IStatusHandlerConstants.PROPERTY_TITLE, Messages.RedirectHandler_error_title);
+			data.setProperty(IStatusHandlerConstants.PROPERTY_CONTEXT_HELP_ID, IContextHelpIds.MESSAGE_REDIRECT_FAILED);
+			data.setProperty(IStatusHandlerConstants.PROPERTY_CALLER, this);
+
+			// Get the status handler
+			IStatusHandler[] handler = StatusHandlerManager.getInstance().getHandler(peerModel);
+			if (handler.length > 0) handler[0].handleStatus(status, data, null);
+		}
+	}
 }

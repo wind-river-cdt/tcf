@@ -23,7 +23,10 @@
             name="Dynamic Target Discovery"
             priority="normal">
             <enablement>
-               <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+               <or>
+                  <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                  <instanceof value="org.eclipse.tcf.te.tcf.ui.navigator.nodes.PeerRedirectorGroupNode"/>
+               </or>
             </enablement>
             <commonSorter
                   class="org.eclipse.tcf.te.ui.trees.TreeViewerSorter"
@@ -42,6 +45,13 @@
             id="org.eclipse.tcf.te.tcf.ui.navigator.UnreachablePeersFilter"
             name="%UnreachablePeersFilter.name"
             visibleInUI="true">
+      </commonFilter>
+      <commonFilter
+            activeByDefault="true"
+            class="org.eclipse.tcf.te.tcf.ui.filter.RedirectPeersFilter"
+            id="org.eclipse.tcf.te.tcf.ui.navigator.RedirectPeersFilter"
+            name="%RedirectPeersFilter.name"
+            visibleInUI="false">
       </commonFilter>
    </extension>
 
@@ -164,7 +174,26 @@
                </with>
             </visibleWhen>
          </command>
-         <separator name="operationsGroupMarker" visible="true"/>
+
+         <command
+               commandId="org.eclipse.tcf.te.tcf.ui.command.resetredirect"
+               helpContextId="org.eclipse.tcf.te.tcf.ui.command_ResetRedirect"
+               id="org.eclipse.tcf.te.tcf.ui.commands.resetredirect"
+               label="%command.resetredirect.label"
+               style="push"
+               tooltip="%command.resetredirect.tooltip">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <count value="+"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <and>
+                        <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                        <test property="org.eclipse.tcf.te.tcf.locator.isStaticPeer" value="true"/>
+                     </and>                        
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
       </menuContribution>
    </extension>
 
@@ -181,6 +210,12 @@
             helpContextId="org.eclipse.tcf.te.tcf.ui.command_Redirect"
             id="org.eclipse.tcf.te.tcf.ui.command.redirect"
             name="%command.redirect.name">
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.tcf.ui.command_ResetRedirect"
+            id="org.eclipse.tcf.te.tcf.ui.command.resetredirect"
+            name="%command.resetredirect.name">
       </command>
    </extension>
 
@@ -212,7 +247,29 @@
                <with variable="selection">
                   <count value="1"/>
                   <iterate operator="and" ifEmpty="false">
-                     <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                     <and>
+                        <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                        <test property="org.eclipse.tcf.te.tcf.locator.isRedirected" value="false"/>
+                     </and>
+                  </iterate>
+               </with>
+            </enabledWhen>
+      </handler>
+      
+      <handler
+            class="org.eclipse.tcf.te.tcf.ui.handler.ResetRedirectHandler"
+            commandId="org.eclipse.tcf.te.tcf.ui.command.resetredirect">
+            <activeWhen>
+               <reference definitionId="te.expressions.tcf.peerModel.handlerActivation"/>
+            </activeWhen>
+            <enabledWhen>
+               <with variable="selection">
+                  <count value="1"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <and>
+                        <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                        <test property="org.eclipse.tcf.te.tcf.locator.isRedirected" value="true"/>
+                     </and>
                   </iterate>
                </with>
             </enabledWhen>

@@ -12,8 +12,8 @@ package org.eclipse.tcf.te.tcf.ui.navigator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.tcf.protocol.IPeer;
@@ -25,6 +25,7 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerRedirector;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelLookupService;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelRefreshService;
 import org.eclipse.tcf.te.tcf.locator.model.Model;
+import org.eclipse.tcf.te.tcf.ui.navigator.nodes.PeerRedirectorGroupNode;
 import org.eclipse.tcf.te.ui.views.interfaces.IRoot;
 import org.eclipse.ui.navigator.CommonViewer;
 
@@ -38,43 +39,8 @@ public class ContentProviderDelegate implements ITreeContentProvider {
 	// The locator model listener instance
 	/* default */ IModelListener modelListener = null;
 
-	/**
-	 * Internal helper class representing the root node of remotely
-	 * discovered peers.
-	 */
-	protected static class RemotePeerDiscoveryRootNode {
-		final String peerId;
-
-		/**
-         * Constructor.
-         */
-        public RemotePeerDiscoveryRootNode(String peerId) {
-        	Assert.isNotNull(peerId);
-        	this.peerId = peerId;
-        }
-
-        /* (non-Javadoc)
-         * @see java.lang.Object#equals(java.lang.Object)
-         */
-        @Override
-        public boolean equals(Object obj) {
-        	if (obj instanceof RemotePeerDiscoveryRootNode) {
-        		return peerId.equals(((RemotePeerDiscoveryRootNode)obj).peerId);
-        	}
-            return super.equals(obj);
-        }
-
-        /* (non-Javadoc)
-         * @see java.lang.Object#hashCode()
-         */
-        @Override
-        public int hashCode() {
-            return peerId.hashCode();
-        }
-	}
-
 	// Internal map of RemotePeerDiscoverRootNodes per peer id
-	private final Map<String, RemotePeerDiscoveryRootNode> roots = new HashMap<String, RemotePeerDiscoveryRootNode>();
+	private final Map<String, PeerRedirectorGroupNode> roots = new HashMap<String, PeerRedirectorGroupNode>();
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
@@ -97,9 +63,9 @@ public class ContentProviderDelegate implements ITreeContentProvider {
 			String parentPeerId = ((IPeerModel)parentElement).getPeerId();
 			List<IPeerModel> candidates = Model.getModel().getChildren(parentPeerId);
 			if (candidates != null && candidates.size() > 0) {
-				RemotePeerDiscoveryRootNode rootNode = roots.get(parentPeerId);
+				PeerRedirectorGroupNode rootNode = roots.get(parentPeerId);
 				if (rootNode == null) {
-					rootNode = new RemotePeerDiscoveryRootNode(parentPeerId);
+					rootNode = new PeerRedirectorGroupNode(parentPeerId);
 					roots.put(parentPeerId, rootNode);
 				}
 				children = new Object[] { rootNode };
@@ -109,8 +75,8 @@ public class ContentProviderDelegate implements ITreeContentProvider {
 		}
 		// If it is a remote peer discover root node, return the children
 		// for the associated peer id.
-		else if (parentElement instanceof RemotePeerDiscoveryRootNode) {
-			List<IPeerModel> candidates = Model.getModel().getChildren(((RemotePeerDiscoveryRootNode)parentElement).peerId);
+		else if (parentElement instanceof PeerRedirectorGroupNode) {
+			List<IPeerModel> candidates = Model.getModel().getChildren(((PeerRedirectorGroupNode)parentElement).peerId);
 			if (candidates != null && candidates.size() > 0) {
 				children = candidates.toArray();
 			}
@@ -123,18 +89,29 @@ public class ContentProviderDelegate implements ITreeContentProvider {
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
 	 */
 	@Override
-	public Object getParent(Object element) {
+	public Object getParent(final Object element) {
 		// If it is a peer model node, return the parent locator model
 		if (element instanceof IPeerModel) {
 			// If it is a peer redirector, return the parent remote peer discover root node
 			if (((IPeerModel)element).getPeer() instanceof IPeerRedirector) {
 				IPeer parentPeer =  ((IPeerRedirector)((IPeerModel)element).getPeer()).getParent();
-				return roots.get(parentPeer.getID());
+				String parentPeerId = parentPeer.getID();
+				if (!roots.containsKey(parentPeerId)) roots.put(parentPeer.getID(), new PeerRedirectorGroupNode(parentPeerId));
+				return roots.get(parentPeerId);
 			}
-			return ((IPeerModel)element).getModel();
-		} else if (element instanceof RemotePeerDiscoveryRootNode) {
+		} else if (element instanceof PeerRedirectorGroupNode) {
 			// Return the parent peer model node
-			return Model.getModel().getService(ILocatorModelLookupService.class).lkupPeerModelById(((RemotePeerDiscoveryRootNode)element).peerId);
+			final AtomicReference<IPeerModel> parent = new AtomicReference<IPeerModel>();
+			Runnable runnable = new Runnable() {
+				@Override
+				public void run() {
+					parent.set(Model.getModel().getService(ILocatorModelLookupService.class).lkupPeerModelById(((PeerRedirectorGroupNode)element).peerId));
+				}
+			};
+			if (Protocol.isDispatchThread()) runnable.run();
+			else Protocol.invokeAndWait(runnable);
+
+			return parent.get();
 		}
 		return null;
 	}
@@ -153,8 +130,8 @@ public class ContentProviderDelegate implements ITreeContentProvider {
 			List<IPeerModel> children = Model.getModel().getChildren(((IPeerModel)element).getPeerId());
 			hasChildren = children != null && children.size() > 0;
 		}
-		else if (element instanceof RemotePeerDiscoveryRootNode) {
-			List<IPeerModel> children = Model.getModel().getChildren(((RemotePeerDiscoveryRootNode)element).peerId);
+		else if (element instanceof PeerRedirectorGroupNode) {
+			List<IPeerModel> children = Model.getModel().getChildren(((PeerRedirectorGroupNode)element).peerId);
 			hasChildren = children != null && children.size() > 0;
 		}
 

@@ -17,8 +17,8 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
+import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.tables.properties.NodePropertiesTableTableNode;
 
 
@@ -76,6 +76,8 @@ public class NodePropertiesLabelProvider extends LabelProvider implements ITable
 					label = Messages.NodePropertiesLabelProvider_services_local;
 				} else if (IPeerModelProperties.PROP_REMOTE_SERVICES.equals(label)) {
 					label = Messages.NodePropertiesLabelProvider_services_remote;
+				} else if (IPeerModelProperties.PROP_REDIRECT_PROXY.equals(label)) {
+					label = Messages.NodePropertiesLabelProvider_redirect_proxy;
 				} else if (columnIndex == 1 && IPeerModelProperties.PROP_STATE.equals(((NodePropertiesTableTableNode)element).name)) {
 					label = Messages.getString("NodePropertiesLabelProvider_state_" + label.replace('-', '_')); //$NON-NLS-1$
 				}

@@ -31,7 +31,6 @@ public class PeerImageDescriptor extends AbstractImageDescriptor {
 
 	// Flags representing the object states to decorate
 	private int state;
-	private boolean redirected;
 
 	/**
 	 * Constructor.
@@ -68,10 +67,6 @@ public class PeerImageDescriptor extends AbstractImageDescriptor {
 		Assert.isTrue(Protocol.isDispatchThread());
 
 		state = node.getIntProperty(IPeerModelProperties.PROP_STATE);
-
-		String value = node.getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
-		boolean isStaticPeer = value != null && Boolean.parseBoolean(value.trim());
-		redirected = isStaticPeer ? node.getPeer().getAttributes().get(IPeerModelProperties.PROP_REDIRECT_PROXY) != null : false;
 	}
 
 	/**
@@ -82,8 +77,7 @@ public class PeerImageDescriptor extends AbstractImageDescriptor {
 	protected void defineKey(int hashCode) {
 		String key = "PMID:" +  //$NON-NLS-1$
 			hashCode + ":" + //$NON-NLS-1$
-			state + ":" + //$NON-NLS-1$
-			redirected;
+			state;
 
 		setDecriptorKey(key);
 	}
@@ -103,10 +97,6 @@ public class PeerImageDescriptor extends AbstractImageDescriptor {
 		}
 		else if (state == IPeerModelProperties.STATE_ERROR) { /* not connected, error */
 			drawBottomRight(ImageConsts.RED_X_OVR);
-		}
-
-		if (redirected) {
-			drawTopRight(ImageConsts.REDIRECT_OVR);
 		}
 	}
 

@@ -53,4 +53,9 @@ public interface IContextHelpIds {
 	 * Redirect command handler: Redirect operation failed.
 	 */
 	public final static String MESSAGE_REDIRECT_FAILED = PREFIX + ".status.messageRedirectFailed"; //$NON-NLS-1$
+
+	/**
+	 * Reset redirect command handler: Reset redirect operation failed.
+	 */
+	public final static String MESSAGE_RESET_REDIRECT_FAILED = PREFIX + ".status.messageResetRedirectFailed"; //$NON-NLS-1$
 }
