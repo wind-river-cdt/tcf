@@ -56,4 +56,26 @@ public class Messages extends NLS {
 	public static String LaunchProcessesCommandHandler_error_title;
 
 	public static String AbstractChannelCommandHandler_statusDialog_title;
+
+	public static String IntervalConfigDialog_BiggerThanZero;
+
+	public static String IntervalConfigDialog_ChoiceOneLabel;
+
+	public static String IntervalConfigDialog_ChoiceTwoLabel;
+
+	public static String IntervalConfigDialog_DialogMessage;
+
+	public static String IntervalConfigDialog_DialogTitle;
+
+	public static String IntervalConfigDialog_InvalidNumber;
+
+	public static String IntervalConfigDialog_NonEmpty;
+
+	public static String IntervalConfigDialog_SECOND_ABBR;
+
+	public static String IntervalConfigDialog_SECONDS;
+
+	public static String IntervalConfigDialog_SelectSpeed;
+
+	public static String IntervalConfigDialog_SPEED;
 }

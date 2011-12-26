@@ -64,7 +64,7 @@ public class ProcessModel {
 	// The root node of the peer model
 	private ProcessTreeNode root;
 	// The polling interval in seconds. If it is zero, then stop polling periodically.
-	/* default */long interval = 5;
+	/* default */int interval = 5;
 	// The timer to schedule polling task.
 	/* default */Timer pollingTimer;
 	// The flag to indicate if the polling has been stopped.
@@ -164,7 +164,8 @@ public class ProcessModel {
 	 * 
 	 * @param interval The new interval.
 	 */
-	public void setInterval(long interval) {
+	public void setInterval(int interval) {
+		Assert.isTrue(interval > 0);
 		this.interval = interval;
 	}
 
@@ -173,7 +174,7 @@ public class ProcessModel {
 	 * 
 	 * @return the current interval.
 	 */
-	public long getInterval() {
+	public int getInterval() {
 		return interval;
 	}
 

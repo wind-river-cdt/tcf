@@ -27,19 +27,38 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.CompoundContributionItem;
 
+/**
+ * The dynamic contribution class to create a drop down menu of interval configuration.
+ */
 public class ConfigIntervalDynamicContribution extends CompoundContributionItem {
 
+	/**
+	 * The action to allow a most recently used interval to be selected.
+	 */
 	class MRUAction extends Action {
+		// The process model.
 		private ProcessModel model;
+		// The interval of this most recently used item.
 		private int seconds;
-		public MRUAction(ProcessModel aModel, int s) {
-			super("" + s + " S", AS_RADIO_BUTTON);  //$NON-NLS-1$//$NON-NLS-2$
-			this.seconds = s;
-			this.model = aModel;
-			if(aModel.getInterval() == seconds) {
+		/**
+		 * Constructor
+		 * 
+		 * @param model The process model.
+		 * @param seconds The interval time.
+		 */
+		public MRUAction(ProcessModel model, int seconds) {
+			super("" + seconds + " S", AS_RADIO_BUTTON);  //$NON-NLS-1$//$NON-NLS-2$
+			this.seconds = seconds;
+			this.model = model;
+			if(model.getInterval() == seconds) {
 				setChecked(true);
 			}
 		}
+		
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.jface.action.Action#run()
+		 */
 		@Override
         public void run() {
 			if (isChecked()) {
@@ -48,17 +67,35 @@ public class ConfigIntervalDynamicContribution extends CompoundContributionItem 
         }
 	}
 
+	/**
+	 * The action to allow a speed grade to be selected.
+	 */
 	class GradeAction extends Action {
+		// The process model.
 		private ProcessModel model;
+		// The interval time represented by this grade.
 		private int seconds;
-		public GradeAction(ProcessModel aModel, String name, int s) {
-			super(name, AS_RADIO_BUTTON);
-			this.model = aModel;
-			this.seconds = s;
-			if(aModel.getInterval() == seconds) {
+
+		/**
+		 * Constructor
+		 * 
+		 * @param model The process model.
+		 * @param name The grade name.
+		 * @param seconds The interval time.
+		 */
+		public GradeAction(ProcessModel model, String name, int seconds) {
+			super(name+" ("+seconds+" s)", AS_RADIO_BUTTON);  //$NON-NLS-1$//$NON-NLS-2$
+			this.model = model;
+			this.seconds = seconds;
+			if(model.getInterval() == seconds) {
 				setChecked(true);
 			}
 		}
+		
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.jface.action.Action#run()
+		 */
 		@Override
         public void run() {
 			if (isChecked()) {
@@ -68,12 +105,17 @@ public class ConfigIntervalDynamicContribution extends CompoundContributionItem 
         }
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.actions.CompoundContributionItem#getContributionItems()
+	 */
 	@Override
 	protected IContributionItem[] getContributionItems() {
 		IEditorInput editorInput = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput();
 		IPeerModel peer = (IPeerModel) editorInput.getAdapter(IPeerModel.class);
 		List<IContributionItem> items = new ArrayList<IContributionItem>();
 		if (peer != null) {
+			// Add the most recently used actions.
 			ProcessModel pModel = ProcessModel.getProcessModel(peer);
 			IPreferenceStore prefStore = UIPlugin.getDefault().getPreferenceStore();
 			String mruList = prefStore.getString(IPreferenceConsts.PREF_INTERVAL_MRU_LIST);
@@ -102,6 +144,8 @@ public class ConfigIntervalDynamicContribution extends CompoundContributionItem 
 					items.add(new Separator("MRU")); //$NON-NLS-1$
 				}
 			}
+			
+			// Add the speed grade actions.
 			String grades = prefStore.getString(IPreferenceConsts.PREF_INTERVAL_GRADES);
 			Assert.isNotNull(grades);
 			StringTokenizer st = new StringTokenizer(grades, "|"); //$NON-NLS-1$

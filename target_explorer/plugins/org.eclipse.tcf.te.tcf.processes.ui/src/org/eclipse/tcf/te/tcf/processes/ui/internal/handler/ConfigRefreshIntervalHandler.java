@@ -14,7 +14,10 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.processes.ui.internal.dialogs.IntervalConfigDialog;
+import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
@@ -24,14 +27,22 @@ public class ConfigRefreshIntervalHandler extends AbstractHandler {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 * @see
+	 * org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
 	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		Shell parent = HandlerUtil.getActiveShellChecked(event);
-		IntervalConfigDialog dialog = new IntervalConfigDialog(parent);
-		if(dialog.open() == Window.OK) {
-			
+		IEditorInput editorInput = HandlerUtil.getActiveEditorInputChecked(event);
+		IPeerModel peer = (IPeerModel) editorInput.getAdapter(IPeerModel.class);
+		if (peer != null) {
+			Shell parent = HandlerUtil.getActiveShellChecked(event);
+			IntervalConfigDialog dialog = new IntervalConfigDialog(parent);
+			if (dialog.open() == Window.OK) {
+				int interval = dialog.getResult();
+				ProcessModel processModel = ProcessModel.getProcessModel(peer);
+				processModel.setInterval(interval);
+				processModel.addMRUInterval(interval);
+			}
 		}
 		return null;
 	}
