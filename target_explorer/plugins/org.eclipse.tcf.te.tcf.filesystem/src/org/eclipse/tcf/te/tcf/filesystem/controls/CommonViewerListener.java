@@ -39,17 +39,19 @@ public class CommonViewerListener implements IPropertyChangeListener {
 	@Override
     public void propertyChange(final PropertyChangeEvent event) {
 		Tree tree = viewer.getTree();
-		Display display = tree.getDisplay();
-		if (display.getThread() == Thread.currentThread()) {
-			viewer.refresh();
-		}
-		else {
-			display.asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					propertyChange(event);
-				}
-			});
+		if (!tree.isDisposed()) {
+			Display display = tree.getDisplay();
+			if (display.getThread() == Thread.currentThread()) {
+				viewer.refresh();
+			}
+			else {
+				display.asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						propertyChange(event);
+					}
+				});
+			}
 		}
     }
 }
