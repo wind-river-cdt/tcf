@@ -15,7 +15,7 @@ import org.eclipse.tcf.te.runtime.model.nls.Messages;
 /**
  * An immutable model node to visualize a pending operation.
  */
-public final class PendingOperationModelNode extends MessageModelNode {
+public class PendingOperationModelNode extends MessageModelNode {
 
 	/**
 	 * Constructor.
