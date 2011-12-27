@@ -1,3 +1,12 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * This program and the accompanying materials are made available under the terms
+ * of the Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ * Wind River Systems - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.tcf.te.tcf.processes.ui.internal.preferences;
 
 import java.util.ArrayList;
@@ -52,15 +61,27 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
 
+/**
+ * The preference page for Process Monitor. 
+ */
 public class ProcessPreferencePage extends PreferencePage implements IWorkbenchPreferencePage, IPreferenceConsts {
 
+	// The table to configure the refreshing grades.
 	TableViewer gradesTable;
+	// The button to add a grade.
 	Button addButton;
+	// The button to edit a grade.
 	Button editButton;
+	// The button to remove a grade.
 	Button removeButton;
+	// The text field to enter the maximum count of MRU
 	Text mruCountText;
+	// The currently edited grades.
 	List<IntervalGrade> grades;
 
+	/**
+	 * Constructor.
+	 */
 	public ProcessPreferencePage() {
 		setDescription(Messages.ProcessPreferencePage_PageDescription);
 	}
@@ -75,6 +96,10 @@ public class ProcessPreferencePage extends PreferencePage implements IWorkbenchP
 		                .setHelp(getControl(), UIPlugin.getUniqueIdentifier() + ".preferencePage"); //$NON-NLS-1$
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	protected Control createContents(Composite parent) {
 		Font font = parent.getFont();
@@ -88,7 +113,18 @@ public class ProcessPreferencePage extends PreferencePage implements IWorkbenchP
 		layout.numColumns = 2;
 		composite.setLayout(layout);
 		composite.setFont(font);
-		Composite mruGroup = new Composite(composite, SWT.NONE);
+		createMRUField(composite);
+		createTable(composite);
+		createButtons(composite);
+		return composite;
+	}
+
+	/**
+	 * Creates the field to edit the maximum MRU count.
+	 */
+	private void createMRUField(Composite composite) {
+	    GridLayout layout;
+	    Composite mruGroup = new Composite(composite, SWT.NONE);
 		GridData data = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		data.horizontalSpan = 2;
 		mruGroup.setLayoutData(data);
@@ -97,7 +133,6 @@ public class ProcessPreferencePage extends PreferencePage implements IWorkbenchP
 		layout.marginWidth = 0;
 		layout.numColumns = 2;
 		mruGroup.setLayout(layout);
-		mruGroup.setFont(font);
 		Label label = new Label(mruGroup, SWT.NONE);
 		label.setText(Messages.ProcessPreferencePage_MRUCountLabel);
 		mruCountText = new Text(mruGroup, SWT.BORDER | SWT.SINGLE);
@@ -113,10 +148,7 @@ public class ProcessPreferencePage extends PreferencePage implements IWorkbenchP
 				validateInput();
 			}
 		});
-		createTable(composite);
-		createButtons(composite);
-		return composite;
-	}
+    }
 
 	/**
 	 * Validate the current input and update the button and the error message.
@@ -149,6 +181,12 @@ public class ProcessPreferencePage extends PreferencePage implements IWorkbenchP
 		}
 	}
 
+	/**
+	 * Check if the current input is valid and return a status to
+	 * describe the validity.
+	 * 
+	 * @return The checking result.
+	 */
 	private IStatus isInputValid() {
 		String txt = mruCountText.getText();
 		if (txt == null || txt.trim().length() == 0) {
@@ -168,8 +206,9 @@ public class ProcessPreferencePage extends PreferencePage implements IWorkbenchP
 	}
 
 	/**
-	 * Creates and configures the table containing launch configuration variables and their
-	 * associated value.
+	 * Creates and configures the table containing the grades of refreshing the process list.
+	 * 
+	 * @param parent the composite in which the table should be created
 	 */
 	private void createTable(Composite parent) {
 		Font font = parent.getFont();
@@ -237,6 +276,9 @@ public class ProcessPreferencePage extends PreferencePage implements IWorkbenchP
 		gradesTable.setLabelProvider(new GradeLabelProvider());
 	}
 
+	/**
+	 * Create a push button.
+	 */
 	Button createPushButton(Composite parent, String label, Image image) {
 		Button button = new Button(parent, SWT.PUSH);
 		button.setFont(parent.getFont());
@@ -252,6 +294,9 @@ public class ProcessPreferencePage extends PreferencePage implements IWorkbenchP
 		return button;
 	}
 
+	/**
+	 * Set the button's dimension hint.
+	 */
 	void setButtonDimensionHint(Button button) {
 		Assert.isNotNull(button);
 		Object gd = button.getLayoutData();
@@ -261,6 +306,9 @@ public class ProcessPreferencePage extends PreferencePage implements IWorkbenchP
 		}
 	}
 
+	/**
+	 * Get the button's width hint.
+	 */
 	int getButtonWidthHint(Button button) {
 		/* button.setFont(JFaceResources.getDialogFont()); */
 		PixelConverter converter = new PixelConverter(button);
@@ -269,7 +317,7 @@ public class ProcessPreferencePage extends PreferencePage implements IWorkbenchP
 	}
 
 	/**
-	 * Creates the new/edit/remove buttons for the variable table
+	 * Creates the new/edit/remove buttons for the grade table
 	 * 
 	 * @param parent the composite in which the buttons should be created
 	 */
@@ -311,6 +359,9 @@ public class ProcessPreferencePage extends PreferencePage implements IWorkbenchP
 		removeButton.setEnabled(false);
 	}
 
+	/**
+	 * Handle the pressed event of the add button.
+	 */
 	void handleAddButtonPressed() {
 		NewSpeedGradeDialog dialog = new NewSpeedGradeDialog(getShell());
 		dialog.setGrades(grades);
@@ -322,6 +373,9 @@ public class ProcessPreferencePage extends PreferencePage implements IWorkbenchP
 		validateInput();
 	}
 
+	/**
+	 * Handle the pressed event of the edit button.
+	 */
 	void handleEditButtonPressed() {
 		IStructuredSelection selection = (IStructuredSelection) gradesTable.getSelection();
 		IntervalGrade grade = (IntervalGrade) selection.getFirstElement();
@@ -338,7 +392,7 @@ public class ProcessPreferencePage extends PreferencePage implements IWorkbenchP
 	}
 
 	/**
-	 * Remove the selection variables.
+	 * Remove the selection grade.
 	 */
 	void handleRemoveButtonPressed() {
 		IStructuredSelection selection = (IStructuredSelection) gradesTable.getSelection();
@@ -370,6 +424,10 @@ public class ProcessPreferencePage extends PreferencePage implements IWorkbenchP
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
+	 */
 	@Override
     public void init(IWorkbench workbench) {
 	}
@@ -387,15 +445,31 @@ public class ProcessPreferencePage extends PreferencePage implements IWorkbenchP
 		super.performDefaults();
 	}
 
+	/**
+	 * A content provider that accepts a list as the input and return an array
+	 * as the children.
+	 */
 	class ListContentProvider implements IStructuredContentProvider {
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+		 */
 		@Override
 		public void dispose() {
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+		 */
 		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+		 */
 		@Override
 		public Object[] getElements(Object inputElement) {
 			if (inputElement instanceof List<?>) {
@@ -436,12 +510,23 @@ public class ProcessPreferencePage extends PreferencePage implements IWorkbenchP
 		return grades;
 	}
 
+	/**
+	 * The table label provider to display refreshing grades in the table. 
+	 */
 	class GradeLabelProvider extends LabelProvider implements ITableLabelProvider {
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object, int)
+		 */
 		@Override
         public Image getColumnImage(Object element, int columnIndex) {
 			return null;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object, int)
+		 */
 		@Override
         public String getColumnText(Object element, int columnIndex) {
 			if (element instanceof IntervalGrade) {
