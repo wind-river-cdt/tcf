@@ -61,16 +61,16 @@
          <command
                commandId="org.eclipse.tcf.te.tcf.processes.ui.command.startPolling"
                icon="icons/obj16/run_refresh.png"
-               label="Start Polling"
+               label="%command.startPolling.label"
                style="push"
-               tooltip="Start Polling">
+               tooltip="%command.startPolling.tooltip">
          </command>
          <command
                commandId="org.eclipse.tcf.te.tcf.processes.ui.command.stopPolling"
                icon="icons/obj16/stop_refresh.gif"
-               label="Stop Polling"
+               label="%command.stopPolling.label"
                style="push"
-               tooltip="Stop Polling">
+               tooltip="%command.stopPolling.tooltip">
          </command>
          <command
                commandId="org.eclipse.tcf.te.tcf.processes.ui.command.refresh"
@@ -83,9 +83,9 @@
                commandId="org.eclipse.tcf.te.tcf.processes.ui.command.refreshInterval"
                icon="icons/obj16/refresh_interval.png"
                id="org.eclipse.tcf.te.tcf.processes.ui.menu.refreshInterval"
-               label="Config Refresh Interval"
+               label="%command.configure.label"
                style="pulldown"
-               tooltip="Config Refresh Interval">
+               tooltip="%command.configure.tooltip">
          </command>
          <separator
                name="refreshing_group"
@@ -119,19 +119,19 @@
             categoryId="org.eclipse.tcf.te.ui.commands.category"
             helpContextId="org.eclipse.tcf.te.tcf.processes.ui.command_RefreshInterval"
             id="org.eclipse.tcf.te.tcf.processes.ui.command.refreshInterval"
-            name="Config Refresh Interval">
+            name="%command.configure.name">
       </command>
       <command
             categoryId="org.eclipse.tcf.te.ui.commands.category"
             helpContextId="org.eclipse.tcf.te.tcf.processes.ui.command_StartPolling"
             id="org.eclipse.tcf.te.tcf.processes.ui.command.startPolling"
-            name="Start Polling">
+            name="%command.startPolling.label.1">
       </command>
       <command
             categoryId="org.eclipse.tcf.te.ui.commands.category"
             helpContextId="org.eclipse.tcf.te.tcf.processes.ui.command_StopPolling"
             id="org.eclipse.tcf.te.tcf.processes.ui.command.stopPolling"
-            name="Stop Polling">
+            name="%command.stopPolling.label.1">
       </command>
    </extension>
 
@@ -299,6 +299,15 @@
             properties="isRefreshStopped"
             type="org.eclipse.ui.IEditorInput">
       </propertyTester>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.tcf.te.ui.preferences.general"
+            class="org.eclipse.tcf.te.tcf.processes.ui.internal.preferences.ProcessPreferencePage"
+            id="org.eclipse.tcf.te.ui.preferences.tcf.process"
+            name="%page.process.name">
+      </page>
    </extension>
 
 </plugin>

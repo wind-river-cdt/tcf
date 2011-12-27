@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.processes.ui.internal.preferences.IPreferenceConsts;
+import org.eclipse.tcf.te.tcf.processes.ui.model.IntervalGrade;
 import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
 
 /**
@@ -173,8 +174,8 @@ public class IntervalConfigDialog extends StatusDialog implements SelectionListe
 			result = Integer.parseInt(txt);
 		}else if(button2.getSelection()) {
 			IStructuredSelection selection = (IStructuredSelection) comboViewer.getSelection();
-			Grade grade = (Grade) selection.getFirstElement();
-			result = grade.seconds;
+			IntervalGrade grade = (IntervalGrade) selection.getFirstElement();
+			result = grade.getValue();
 		}
 	    super.okPressed();
     }
@@ -214,20 +215,12 @@ public class IntervalConfigDialog extends StatusDialog implements SelectionListe
 	class GradeLabelProvider extends LabelProvider {
 		@Override
         public String getText(Object element) {
-			if(element instanceof Grade) {
-				Grade grade = (Grade) element;
-				return grade.name + " ("+grade.seconds+" "+Messages.IntervalConfigDialog_SECOND_ABBR+")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			if(element instanceof IntervalGrade) {
+				IntervalGrade grade = (IntervalGrade) element;
+				return grade.getName() + " ("+grade.getValue()+" "+Messages.IntervalConfigDialog_SECOND_ABBR+")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 	        return super.getText(element);
         }
-	}
-	
-	/**
-	 * A construct to describe a speed grade including its name and the interval time.
-	 */
-	class Grade {
-		String name;
-		int seconds;
 	}
 
 	/**
@@ -235,8 +228,8 @@ public class IntervalConfigDialog extends StatusDialog implements SelectionListe
 	 * 
 	 * @return The current speed grades.
 	 */
-	Grade[] getGrades(){
-		List<Grade> gradeList = new ArrayList<Grade>();
+	IntervalGrade[] getGrades(){
+		List<IntervalGrade> gradeList = new ArrayList<IntervalGrade>();
         IPreferenceStore prefStore = UIPlugin.getDefault().getPreferenceStore();
 		String grades = prefStore.getString(IPreferenceConsts.PREF_INTERVAL_GRADES);
 		Assert.isNotNull(grades);
@@ -249,16 +242,13 @@ public class IntervalConfigDialog extends StatusDialog implements SelectionListe
 			try{
 				int seconds = Integer.parseInt(value);
 				if(seconds > 0) {
-					Grade grade = new Grade();
-					grade.name = name;
-					grade.seconds = seconds;
-					gradeList.add(grade);
+					gradeList.add(new IntervalGrade(name, seconds));
 				}
 			}
 			catch (NumberFormatException nfe) {
 			}
 		}
-		return gradeList.toArray(new Grade[gradeList.size()]);
+		return gradeList.toArray(new IntervalGrade[gradeList.size()]);
     }
 
 	/*

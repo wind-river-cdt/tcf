@@ -41,6 +41,28 @@ public class Messages extends NLS {
 
 	public static String ProcessLabelProvider_RootNodeLabel;
 
+	public static String ProcessPreferencePage_BiggerThanZero;
+
+	public static String ProcessPreferencePage_DefineMoreThanOne;
+
+	public static String ProcessPreferencePage_EditButtonLabel;
+
+	public static String ProcessPreferencePage_InvalidNumber;
+
+	public static String ProcessPreferencePage_MaxMRUCount;
+
+	public static String ProcessPreferencePage_MRUCountLabel;
+
+	public static String ProcessPreferencePage_NameLabel;
+
+	public static String ProcessPreferencePage_NewButtonLabel;
+
+	public static String ProcessPreferencePage_PageDescription;
+
+	public static String ProcessPreferencePage_RemoveButtonLabel;
+
+	public static String ProcessPreferencePage_ValueLabel;
+
 	public static String ProcessSelectionDialog_title;
 
 	public static String LaunchObjectDialog_title;
@@ -56,6 +78,16 @@ public class Messages extends NLS {
 	public static String LaunchProcessesCommandHandler_error_title;
 
 	public static String AbstractChannelCommandHandler_statusDialog_title;
+
+	public static String EditSpeedGradeDialog_DialogMessage;
+
+	public static String EditSpeedGradeDialog_DialogTitle;
+
+	public static String EditSpeedGradeDialog_GradeSameValue;
+
+	public static String EditSpeedGradeDialog_NameLabel;
+
+	public static String EditSpeedGradeDialog_ValueLabel;
 
 	public static String IntervalConfigDialog_BiggerThanZero;
 
@@ -78,4 +110,18 @@ public class Messages extends NLS {
 	public static String IntervalConfigDialog_SelectSpeed;
 
 	public static String IntervalConfigDialog_SPEED;
+
+	public static String NewSpeedGradeDialog_DialogMessage;
+
+	public static String NewSpeedGradeDialog_DialogTitle;
+
+	public static String NewSpeedGradeDialog_EnterName;
+
+	public static String NewSpeedGradeDialog_GradeExists;
+
+	public static String NewSpeedGradeDialog_GradeSameValue;
+
+	public static String NewSpeedGradeDialog_NameLabel;
+
+	public static String NewSpeedGradeDialog_ValueLabel;
 }
