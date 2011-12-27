@@ -47,6 +47,9 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.navigator.ICommonActionConstants;
+import org.eclipse.ui.views.properties.IPropertySheetPage;
+import org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor;
+import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 
 /**
@@ -55,7 +58,7 @@ import org.eclipse.ui.navigator.ICommonActionConstants;
  * The view is based on the Eclipse Common Navigator framework.
  */
 @SuppressWarnings("restriction")
-public class View extends CommonNavigator {
+public class View extends CommonNavigator implements ITabbedPropertySheetPageContributor{
 	// The view root mode
 	private int rootMode = IUIConstants.MODE_NORMAL;
 
@@ -303,4 +306,25 @@ public class View extends CommonNavigator {
 		return result;
 
 	}
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.navigator.CommonNavigator#getAdapter(java.lang.Class)
+     */
+	@Override
+    public Object getAdapter(Class adapter) {
+		if(adapter == IPropertySheetPage.class) {
+			return new TabbedPropertySheetPage(this);
+		}
+	    return super.getAdapter(adapter);
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor#getContributorId()
+	 */
+	@Override
+    public String getContributorId() {
+	    return IUIConstants.TABBED_PROPERETIES_CONTRIBUTOR_ID;
+    }
 }

@@ -299,5 +299,14 @@
             type="java.lang.Object">
       </propertyTester>
    </extension>
+   <extension
+         point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
+      <propertyContributor
+            contributorId="org.eclipse.tcf.te.ui">
+         <propertyCategory
+               category="target_explorer">
+         </propertyCategory>
+      </propertyContributor>
+   </extension>
 
 </plugin>

@@ -2099,5 +2099,30 @@
                type="org.eclipse.tcf.te.ui.interfaces.IViewerInput">
          </adapter>
       </factory>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+      <propertyTabs
+            contributorId="org.eclipse.tcf.te.ui">
+         <propertyTab
+               category="target_explorer"
+               id="org.eclipse.tcf.te.tcf.filesystem.propertytab.general"
+               label="General">
+         </propertyTab>
+      </propertyTabs>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views.properties.tabbed.propertySections">
+      <propertySections
+            contributorId="org.eclipse.tcf.te.ui">
+         <propertySection
+               class="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.BasicFolderSection"
+               id="org.eclipse.tcf.te.tcf.filesystem.propertysection.folder.basic"
+               tab="org.eclipse.tcf.te.tcf.filesystem.propertytab.general">
+            <input
+                  type="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+            </input>
+         </propertySection>
+      </propertySections>
    </extension>   
 </plugin>

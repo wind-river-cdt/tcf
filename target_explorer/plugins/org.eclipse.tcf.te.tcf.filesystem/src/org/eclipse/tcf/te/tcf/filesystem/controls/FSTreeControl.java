@@ -134,18 +134,27 @@ public class FSTreeControl extends AbstractTreeControl implements ISelectionChan
 	 */
 	@Override
 	public void selectionChanged(SelectionChangedEvent event) {
-		IWorkbenchPart parent = getParentPart();
+		propagateSelection();
+	}
+
+	/**
+	 * Propagate the current selection to the editor's selection provider.
+	 */
+	private void propagateSelection() {
+	    IWorkbenchPart parent = getParentPart();
 		if (parent != null) {
 			IWorkbenchPartSite site = parent.getSite();
 			if (site != null) {
+				ISelection selection = getViewer().getSelection();
 				ISelectionProvider selectionProvider = site.getSelectionProvider();
+				selectionProvider.setSelection(selection);
 				if (selectionProvider instanceof MultiPageSelectionProvider) {
-					// Propagate the selection event to update the selection context.
-					((MultiPageSelectionProvider) selectionProvider).fireSelectionChanged(event);
+					SelectionChangedEvent changedEvent = new SelectionChangedEvent(selectionProvider, selection);
+					((MultiPageSelectionProvider) selectionProvider).firePostSelectionChanged(changedEvent);
 				}
 			}
 		}
-	}
+    }
 
 	/*
 	 * (non-Javadoc)
@@ -190,14 +199,7 @@ public class FSTreeControl extends AbstractTreeControl implements ISelectionChan
 	 */
 	@Override
     public void focusGained(FocusEvent e) {
-		IWorkbenchPart parent = getParentPart();
-		if (parent != null) {
-			IWorkbenchPartSite site = parent.getSite();
-			if (site != null) {
-				ISelectionProvider selectionProvider = site.getSelectionProvider();
-				selectionProvider.setSelection(getViewer().getSelection());
-			}
-		}
+		propagateSelection();
     }
 
 	/*

@@ -35,4 +35,9 @@ public interface IUIConstants {
 	 * Root nodes are whatever is contributed to the view.
 	 */
 	public static final int MODE_NORMAL = 1;
+	
+	/**
+	 * The tabbed properties contributor id for Target Explorer
+	 */
+	public static final String TABBED_PROPERETIES_CONTRIBUTOR_ID = "org.eclipse.tcf.te.ui";  //$NON-NLS-1$
 }

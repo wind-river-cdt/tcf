@@ -15,6 +15,7 @@ import org.eclipse.tcf.te.ui.views.extensions.EditorPageBinding;
 import org.eclipse.tcf.te.ui.views.extensions.EditorPageBindingExtensionPointManager;
 import org.eclipse.tcf.te.ui.views.extensions.EditorPageExtensionPointManager;
 import org.eclipse.tcf.te.ui.views.interfaces.IEditorPage;
+import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IMemento;
@@ -24,12 +25,15 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.editor.IFormPage;
+import org.eclipse.ui.views.properties.IPropertySheetPage;
+import org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor;
+import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 
 /**
  * Details editor.
  */
-public class Editor extends FormEditor implements IPersistableEditor {
+public class Editor extends FormEditor implements IPersistableEditor,  ITabbedPropertySheetPageContributor {
 
 	// The reference to an memento to restore once the editor got activated
 	private IMemento mementoToRestore;
@@ -204,6 +208,9 @@ public class Editor extends FormEditor implements IPersistableEditor {
 	 */
 	@Override
 	public Object getAdapter(Class adapter) {
+		if(adapter == IPropertySheetPage.class) {
+			return new TabbedPropertySheetPage(this);
+		}
 		// We pass on the adapt request to the currently active page
 		Object adapterInstance = getActivePageInstance() != null ? getActivePageInstance().getAdapter(adapter) : null;
 		if (adapterInstance == null) {
@@ -212,4 +219,13 @@ public class Editor extends FormEditor implements IPersistableEditor {
 		}
 		return adapterInstance;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor#getContributorId()
+	 */
+	@Override
+    public String getContributorId() {
+	    return IUIConstants.TABBED_PROPERETIES_CONTRIBUTOR_ID;
+    }
 }
