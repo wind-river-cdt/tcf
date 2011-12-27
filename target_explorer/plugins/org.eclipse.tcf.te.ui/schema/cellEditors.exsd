@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.eclipse.tcf.te.ui.views" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="org.eclipse.tcf.te.ui" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.eclipse.tcf.te.ui.views" id="cellEditors" name="Common Viewer Cell Editors"/>
+         <meta.schema plugin="org.eclipse.tcf.te.ui" id="cellEditors" name="Tree Viewer Cell Editors"/>
       </appinfo>
       <documentation>
-         This extension point is used to declare the cell editor factories in Target Explorer view.
+         This extension point is used to declare the cell editor factories in Target Explorer tree viewers.
       </documentation>
    </annotation>
 
@@ -56,28 +56,19 @@
          </documentation>
       </annotation>
       <complexType>
-         <sequence>
-            <element ref="activation"/>
-         </sequence>
-         <attribute name="viewerId" type="string" use="required">
-            <annotation>
-               <documentation>
-                  The id of the common viewer that this cell editor factory contributes to. If the viewer is in a common navigator then the id must match the navigator&apos;s id defined in its &lt;b&gt;org.eclipse.ui.views&lt;/b&gt; extension.
-               </documentation>
-               <appinfo>
-                  <meta.attribute kind="identifier" basedOn="org.eclipse.ui.navigator.viewer/viewer/@viewerId"/>
-               </appinfo>
-            </annotation>
-         </attribute>
+            <sequence>
+               <element ref="activation"/>
+               <element ref="viewer" minOccurs="1" maxOccurs="unbounded"/>
+            </sequence>
          <attribute name="editorFactory" type="string" use="required">
             <annotation>
                <documentation>
-                  The class that implements &lt;code&gt;org.eclipse.tcf.te.ui.views.interfaces.IViewerCellEditorFactory&lt;/code&gt;.
+                  The class that implements &lt;code&gt;org.eclipse.tcf.te.ui.interfaces.IViewerCellEditorFactory&lt;/code&gt;.
 &lt;p&gt;
 The cell editor factory implementation class must be specified either by the &quot;editorFactory&quot; attribute!
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.tcf.te.ui.views.interfaces.IViewerCellEditorFactory"/>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.tcf.te.ui.interfaces.IViewerCellEditorFactory"/>
                </appinfo>
             </annotation>
          </attribute>
@@ -106,6 +97,23 @@ The cell editor factory implementation class must be specified either by the &qu
             <element ref="iterate"/>
             <element ref="reference"/>
          </choice>
+      </complexType>
+   </element>
+
+   <element name="viewer">
+      <annotation>
+         <documentation>
+            The id of the tree viewer that the cell editor contributes to.It could be the common viewer of a common navigator. It could be an instance of AbstractTreeControl. If the viewer is in a common navigator then the viewerId must match the navigator&apos;s id defined in its &lt;b&gt;org.eclipse.ui.views&lt;/b&gt; extension.If the viewer is an instance of AbstractTreeControl, then the viewerId must match the viewerId defined in its &lt;b&gt;org.eclipse.tcf.te.ui.viewers&lt;/b&gt; extension.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="viewerId" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The viewer id of the tree that this cell editor factory contributes to. If the viewer is in a common navigator then the viewerId must match the navigator&apos;s id defined in its &lt;b&gt;org.eclipse.ui.views&lt;/b&gt; extension.If the viewer is an instance of AbstractTreeControl, then the viewerId must match the viewerId defined in its &lt;b&gt;org.eclipse.tcf.te.ui.viewers&lt;/b&gt; extension.
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 
@@ -161,7 +169,7 @@ The cell editor factory implementation class must be specified either by the &qu
          <meta.section type="apiinfo"/>
       </appinfo>
       <documentation>
-         Plug-ins that want to extend this extension point, the referenced class must implement &lt;samp&gt;org.eclipse.tcf.te.ui.views.interfaces.IViewerCellEditorFactory&lt;/samp&gt; interface.
+         Plug-ins that want to extend this extension point, the referenced class must implement &lt;samp&gt;org.eclipse.tcf.te.ui.interfaces.IViewerCellEditorFactory&lt;/samp&gt; interface.
 &lt;p&gt;
 In the &quot;activation&quot; element, the evaluation context has two variables: &quot;selection&quot; and &quot;event&quot;.
 &quot;selection&quot; stores the currently selected elements in the viewer. &quot;event&quot; is the event that

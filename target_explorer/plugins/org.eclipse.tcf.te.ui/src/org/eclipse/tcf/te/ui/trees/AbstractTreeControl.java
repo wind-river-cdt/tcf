@@ -18,9 +18,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
@@ -32,14 +36,21 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.util.SafeRunnable;
+import org.eclipse.jface.viewers.ColumnViewerEditor;
+import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelDecorator;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.TreeViewerEditor;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -48,6 +59,8 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Cursor;
@@ -65,18 +78,23 @@ import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 import org.eclipse.tcf.te.ui.interfaces.ImageConsts;
 import org.eclipse.tcf.te.ui.nls.Messages;
 import org.eclipse.ui.IDecoratorManager;
+import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.menus.IMenuService;
+import org.eclipse.ui.part.MultiPageSelectionProvider;
 
 
 /**
  * Abstract tree control implementation.
  */
-public abstract class AbstractTreeControl extends WorkbenchPartControl implements SelectionListener, IDoubleClickListener, IPropertyChangeListener {
+public abstract class AbstractTreeControl extends WorkbenchPartControl implements SelectionListener, 
+								IDoubleClickListener, IPropertyChangeListener, ISelectionChangedListener, FocusListener {
 	// Reference to the tree viewer instance
 	private TreeViewer viewer;
 	// Reference to the selection changed listener
@@ -204,6 +222,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 		viewer.getTree().setLayoutData(doCreateTreeViewerLayoutData(viewer));
 
 		// Attach the selection changed listener
+		viewer.addSelectionChangedListener(this);
 		selectionChangedListener = doCreateTreeViewerSelectionChangedListener(viewer);
 		if (selectionChangedListener != null) {
 			viewer.addSelectionChangedListener(selectionChangedListener);
@@ -216,6 +235,11 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 		if (helpContextId != null) {
 			PlatformUI.getWorkbench().getHelpSystem().setHelp(viewer.getTree(), helpContextId);
 		}
+		Tree tree = viewer.getTree();
+		tree.addFocusListener(this);
+		// Define an editor activation strategy for the common viewer so as to be invoked only programmatically.
+		ColumnViewerEditorActivationStrategy activationStrategy = new ViewViewerEditorActivationStrategy(getViewerId(), viewer);
+		TreeViewerEditor.create(viewer, null, activationStrategy, ColumnViewerEditor.DEFAULT);
 	}
 	
 	/**
@@ -822,14 +846,57 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * @see org.eclipse.jface.viewers.IDoubleClickListener#doubleClick(DoubleClickEvent)
 	 */
 	@Override
-    public void doubleClick(DoubleClickEvent event) {
-		IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-		Object element = selection.getFirstElement();
-		TreeViewer viewer = (TreeViewer) getViewer();
-		if (viewer.isExpandable(element)) {
-			viewer.setExpandedState(element, !viewer.getExpandedState(element));
+    public void doubleClick(final DoubleClickEvent event) {
+		// If an handled and enabled command is registered for the ICommonActionConstants.OPEN
+		// retargetable action id, redirect the double click handling to the command handler.
+		//
+		// Note: The default tree node expansion must be re-implemented in the active handler!
+		String commandId = getDoubleClickCommandId();
+		Command cmd = null;
+		if(commandId != null) {
+			ICommandService service = (ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class);
+			cmd = service != null ? service.getCommand(commandId) : null;
+		}
+		if (cmd != null && cmd.isDefined() && cmd.isEnabled()) {
+			final Command command = cmd;
+			SafeRunner.run(new SafeRunnable(){
+				@Override
+                public void run() throws Exception {
+					ISelection selection = event.getSelection();
+					EvaluationContext ctx = new EvaluationContext(null, selection);
+					ctx.addVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME, selection);
+					ctx.addVariable(ISources.ACTIVE_MENU_SELECTION_NAME, selection);
+					ctx.addVariable(ISources.ACTIVE_WORKBENCH_WINDOW_NAME, PlatformUI.getWorkbench().getActiveWorkbenchWindow());
+					IWorkbenchPart part = getParentPart();
+					if (part != null) {
+						IWorkbenchPartSite site = part.getSite();
+						ctx.addVariable(ISources.ACTIVE_PART_ID_NAME, site.getId());
+						ctx.addVariable(ISources.ACTIVE_PART_NAME, part);
+						ctx.addVariable(ISources.ACTIVE_SITE_NAME, site);
+						ctx.addVariable(ISources.ACTIVE_SHELL_NAME, site.getShell());
+					}
+					ExecutionEvent executionEvent = new ExecutionEvent(command, Collections.EMPTY_MAP, part, ctx);
+					command.executeWithChecks(executionEvent);
+                }});
+		} else {
+			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+			Object element = selection.getFirstElement();
+			TreeViewer viewer = (TreeViewer) getViewer();
+			if (viewer.isExpandable(element)) {
+				viewer.setExpandedState(element, !viewer.getExpandedState(element));
+			}
 		}
 	}
+
+	/**
+	 * Get the id of the command invoked when the tree is double-clicked.
+	 * If the id is null, then no command is invoked.
+	 * 
+	 * @return The double-click command id.
+	 */
+	protected String getDoubleClickCommandId() {
+	    return null;
+    }
 
 	/*
 	 * (non-Javadoc)
@@ -857,4 +924,48 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 			}
 		}
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.swt.events.FocusListener#focusGained(org.eclipse.swt.events.FocusEvent)
+	 */
+	@Override
+    public void focusGained(FocusEvent e) {
+		propagateSelection();
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.swt.events.FocusListener#focusLost(org.eclipse.swt.events.FocusEvent)
+	 */
+	@Override
+    public void focusLost(FocusEvent e) {
+    }
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
+	 */
+	@Override
+	public void selectionChanged(SelectionChangedEvent event) {
+		propagateSelection();
+	}
+
+	/**
+	 * Propagate the current selection to the editor's selection provider.
+	 */
+	private void propagateSelection() {
+	    IWorkbenchPart parent = getParentPart();
+		if (parent != null) {
+			IWorkbenchPartSite site = parent.getSite();
+			if (site != null) {
+				ISelection selection = getViewer().getSelection();
+				ISelectionProvider selectionProvider = site.getSelectionProvider();
+				selectionProvider.setSelection(selection);
+				if (selectionProvider instanceof MultiPageSelectionProvider) {
+					SelectionChangedEvent changedEvent = new SelectionChangedEvent(selectionProvider, selection);
+					((MultiPageSelectionProvider) selectionProvider).firePostSelectionChanged(changedEvent);
+				}
+			}
+		}
+    }	
 }

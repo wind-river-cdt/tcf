@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.ui.views.internal;
+package org.eclipse.tcf.te.ui.trees;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,12 +28,12 @@ import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.tcf.te.ui.views.interfaces.IViewerCellEditorFactory;
+import org.eclipse.tcf.te.ui.interfaces.IViewerCellEditorFactory;
 
 /**
  * <code>ViewViewerEditorActivationStratgy</code> is a subclass of
  * <code>ColumnViewerEditorActivationStrategy</code> that parses the extensions of
- * "org.eclipse.tcf.te.ui.views.cellEditors" for Target Explorer, creating a map of
+ * "org.eclipse.tcf.te.ui.cellEditors" for Target Explorer, creating a map of
  * <code>IViewerCellEditorFactory</code> with the activation expressions. When requested to judge if
  * a <code>ColumnViewerEditorActivationEvent</code> triggers the cell editing in method
  * <code>isEditorActivationEvent</code>, it traverses the map and finds an appropriate cell editor
@@ -43,7 +43,7 @@ import org.eclipse.tcf.te.ui.views.interfaces.IViewerCellEditorFactory;
  */
 public class ViewViewerEditorActivationStrategy extends ColumnViewerEditorActivationStrategy {
 	// The extension point id.
-	private static final String EXTENSION_POINT_ID = "org.eclipse.tcf.te.ui.views.cellEditors"; //$NON-NLS-1$
+	private static final String EXTENSION_POINT_ID = "org.eclipse.tcf.te.ui.cellEditors"; //$NON-NLS-1$
 	// The common viewer's id.
 	String viewerId;
 	// The common viewer to add editing support.
@@ -122,12 +122,27 @@ public class ViewViewerEditorActivationStrategy extends ColumnViewerEditorActiva
 		for (IConfigurationElement configuration : configurations) {
 			String name = configuration.getName();
 			if ("cellEditor".equals(name)) { //$NON-NLS-1$
-				String viewerId = configuration.getAttribute("viewerId"); //$NON-NLS-1$
-				if (this.viewerId.equals(viewerId)) {
+				if (isApplicable(configuration)) {
 					addFactory(configuration);
 				}
 			}
 		}
+	}
+	
+	/**
+	 * If the configuration has a contribution viewer that has the same id with the specified viewerId.
+	 * 
+	 * @param configuration The cellEditor element.
+	 * @return true if it has a specified viewer element.
+	 */
+	private boolean isApplicable(IConfigurationElement configuration) {
+		IConfigurationElement[] children = configuration.getChildren("viewer"); //$NON-NLS-1$
+		for(IConfigurationElement child : children) {
+			String viewerId = child.getAttribute("viewerId"); //$NON-NLS-1$
+			if(this.viewerId.equals(viewerId))
+				return true;
+		}
+		return false;
 	}
 
 	/**

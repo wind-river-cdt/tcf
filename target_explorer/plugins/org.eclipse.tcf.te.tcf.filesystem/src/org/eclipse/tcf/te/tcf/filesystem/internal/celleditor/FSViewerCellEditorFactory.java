@@ -10,21 +10,15 @@
 package org.eclipse.tcf.te.tcf.filesystem.internal.celleditor;
 
 import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.ColumnViewerEditor;
-import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
-import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
 import org.eclipse.jface.viewers.ICellModifier;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.TreeViewerEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.RenameFilesHandler;
-import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
-import org.eclipse.tcf.te.ui.views.interfaces.IViewerCellEditorFactory;
+import org.eclipse.tcf.te.ui.interfaces.IViewerCellEditorFactory;
 
 /**
  * FSViewerCellEditorFactory implements <code>IViewerCellEditorFactory</code> to add 
@@ -44,37 +38,6 @@ public class FSViewerCellEditorFactory implements IViewerCellEditorFactory, Focu
 	 * Create an instance.
 	 */
 	public FSViewerCellEditorFactory() {
-	}
-	
-	/**
-	 * Add the editing support for the specified tree viewer using the cell editing configuration
-	 * from this factory.
-	 * 
-	 * @param viewer The tree viewer to which the editing support is added.
-	 */
-	public void addEditingSupport(final TreeViewer viewer) {
-		// Initialize the tree viewer.
-		init(viewer);
-		// Define an editor activation strategy for the common viewer so as to be invoked only programmatically.
-		ColumnViewerEditorActivationStrategy activationStrategy = new ColumnViewerEditorActivationStrategy(viewer) {
-			@Override
-			protected boolean isEditorActivationEvent(ColumnViewerEditorActivationEvent event) {
-				// Activated only when a single FSTreeNode is selected and invoked programmatically.
-				IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
-				boolean singleSelect = selection.size() == 1;
-				if(singleSelect && event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC){
-					Object object = selection.getFirstElement();
-					return object instanceof FSTreeNode;
-				}
-				return false;
-			}
-		};
-		TreeViewerEditor.create(viewer, null, activationStrategy, ColumnViewerEditor.DEFAULT);
-
-		// Set the column properties, the cell editor, and the modifier.
-		viewer.setColumnProperties(getColumnProperties());
-		viewer.setCellEditors(getCellEditors());
-		viewer.setCellModifier(getCellModifier());
 	}
 
 	/*

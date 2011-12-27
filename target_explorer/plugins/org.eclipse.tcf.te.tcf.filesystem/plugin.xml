@@ -1954,23 +1954,36 @@
    </extension>
 
 <!-- CellEditor factory contributions -->   
-   <extension point="org.eclipse.tcf.te.ui.views.cellEditors">
+   <extension point="org.eclipse.tcf.te.ui.cellEditors">
       <cellEditor
-            editorFactory="org.eclipse.tcf.te.tcf.filesystem.internal.celleditor.FSViewerCellEditorFactory"
-            viewerId="org.eclipse.tcf.te.ui.views.TargetExplorer">
+            editorFactory="org.eclipse.tcf.te.tcf.filesystem.internal.celleditor.FSViewerCellEditorFactory">
          <activation>
             <and>
-               <with variable="selection">
-                  <count value="1"/>
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
                   <iterate>
-                     <instanceof value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode"/>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                     </instanceof>
                   </iterate>
                </with>
-               <with variable="event">
-                  <test property="org.eclipse.tcf.te.tcf.filesystem.propertytester.event.isEditorActivation"/>
+               <with
+                     variable="event">
+                  <test
+                        property="org.eclipse.tcf.te.tcf.filesystem.propertytester.event.isEditorActivation">
+                  </test>
                </with>
             </and>
          </activation>
+         <viewer
+               viewerId="org.eclipse.tcf.te.ui.views.TargetExplorer">
+         </viewer>
+         <viewer
+               viewerId="org.eclipse.tcf.te.ui.controls.viewer.fs">
+         </viewer>
       </cellEditor>
    </extension>
 
