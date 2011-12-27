@@ -56,10 +56,10 @@
          </documentation>
       </annotation>
       <complexType>
-            <sequence>
-               <element ref="activation"/>
-               <element ref="viewer" minOccurs="1" maxOccurs="unbounded"/>
-            </sequence>
+         <sequence>
+            <element ref="activation"/>
+            <element ref="viewer" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
          <attribute name="editorFactory" type="string" use="required">
             <annotation>
                <documentation>
@@ -131,12 +131,10 @@ The cell editor factory implementation class must be specified either by the &qu
          <meta.section type="examples"/>
       </appinfo>
       <documentation>
-         &lt;pre&gt;
-   &lt;extension
-         point=&quot;org.eclipse.tcf.te.ui.views.cellEditors&quot;&gt;
+         &lt;pre&gt;   
+   &lt;extension point=&quot;org.eclipse.tcf.te.ui.cellEditors&quot;&gt;
       &lt;cellEditor
-            editorFactory=&quot;org.eclipse.tcf.te.tcf.filesystem.controls.FSViewerCellEditorFactory&quot;
-            viewerId=&quot;org.eclipse.tcf.te.ui.views.TargetExplorer&quot;&gt;
+            editorFactory=&quot;org.eclipse.tcf.te.tcf.filesystem.internal.celleditor.FSViewerCellEditorFactory&quot;&gt;
          &lt;activation&gt;
             &lt;and&gt;
                &lt;with
@@ -158,6 +156,12 @@ The cell editor factory implementation class must be specified either by the &qu
                &lt;/with&gt;
             &lt;/and&gt;
          &lt;/activation&gt;
+         &lt;viewer
+               viewerId=&quot;org.eclipse.tcf.te.ui.views.TargetExplorer&quot;&gt;
+         &lt;/viewer&gt;
+         &lt;viewer
+               viewerId=&quot;org.eclipse.tcf.te.ui.controls.viewer.fs&quot;&gt;
+         &lt;/viewer&gt;
       &lt;/cellEditor&gt;
    &lt;/extension&gt;
 &lt;/pre&gt;
