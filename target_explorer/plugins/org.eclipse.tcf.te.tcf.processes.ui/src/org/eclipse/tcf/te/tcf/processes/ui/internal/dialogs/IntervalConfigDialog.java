@@ -108,6 +108,9 @@ public class IntervalConfigDialog extends StatusDialog implements SelectionListe
 	    text = new Text(comp1, SWT.SINGLE | SWT.BORDER);
 	    text.setTextLimit(Text.LIMIT);
 	    text.addModifyListener(this);
+	    data = new GridData();
+	    data.widthHint = 70;
+	    text.setLayoutData(data);
 	    
 	    label = new Label(comp1, SWT.NONE);
 	    label.setText(Messages.IntervalConfigDialog_SECONDS);
@@ -128,7 +131,10 @@ public class IntervalConfigDialog extends StatusDialog implements SelectionListe
 	    comboViewer.setLabelProvider(new GradeLabelProvider());
 	    comboViewer.setInput(getGrades());
 	    comboViewer.addSelectionChangedListener(this);
-	    
+	    data = new GridData();
+	    data.widthHint = 70;
+	    comboViewer.getCombo().setLayoutData(data);
+
 	    label = new Label(comp2, SWT.NONE);
 	    label.setText(Messages.IntervalConfigDialog_SPEED);
 	    return composite;

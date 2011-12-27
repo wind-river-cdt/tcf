@@ -112,58 +112,86 @@ public class ConfigIntervalDynamicContribution extends CompoundContributionItem 
 	@Override
 	protected IContributionItem[] getContributionItems() {
 		IEditorInput editorInput = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput();
-		IPeerModel peer = (IPeerModel) editorInput.getAdapter(IPeerModel.class);
+		IPeerModel peerModel = (IPeerModel) editorInput.getAdapter(IPeerModel.class);
 		List<IContributionItem> items = new ArrayList<IContributionItem>();
-		if (peer != null) {
-			// Add the most recently used actions.
-			ProcessModel pModel = ProcessModel.getProcessModel(peer);
-			IPreferenceStore prefStore = UIPlugin.getDefault().getPreferenceStore();
-			String mruList = prefStore.getString(IPreferenceConsts.PREF_INTERVAL_MRU_LIST);
-			if (mruList != null) {
-				StringTokenizer st = new StringTokenizer(mruList, ":"); //$NON-NLS-1$
-				int maxCount = prefStore.getInt(IPreferenceConsts.PREF_INTERVAL_MRU_COUNT);
-				int count = 0;
-				List<Integer> mru = new ArrayList<Integer>();
-				while (st.hasMoreTokens()) {
-					String token = st.nextToken();
-					try {
-						int seconds = Integer.parseInt(token);
-						if (seconds > 0) {
-							mru.add(Integer.valueOf(seconds));
-							count ++;
-							if (count >= maxCount) break;
-						}
-					}
-					catch (NumberFormatException nfe) {
-					}
-				}
-				if(count > 0) {
-					for(int seconds : mru) {
-						items.add(new ActionContributionItem(new MRUAction(pModel, seconds)));
-					}
-					items.add(new Separator("MRU")); //$NON-NLS-1$
-				}
+		if (peerModel != null) {
+			ProcessModel model = ProcessModel.getProcessModel(peerModel);
+			List<IContributionItem> groupItems = createGradeActions(model);
+			if(!groupItems.isEmpty()) {
+				items.addAll(groupItems);
 			}
-			
-			// Add the speed grade actions.
-			String grades = prefStore.getString(IPreferenceConsts.PREF_INTERVAL_GRADES);
-			Assert.isNotNull(grades);
-			StringTokenizer st = new StringTokenizer(grades, "|"); //$NON-NLS-1$
-			while(st.hasMoreTokens()) {
-				String token = st.nextToken();
-				StringTokenizer st2 = new StringTokenizer(token, ":"); //$NON-NLS-1$
-				String name = st2.nextToken();
-				String value = st2.nextToken();
-				try{
-					int seconds = Integer.parseInt(value);
-					if(seconds > 0) {
-						items.add(new ActionContributionItem(new GradeAction(pModel, name, seconds)));
-					}
-				}
-				catch (NumberFormatException nfe) {
-				}
+			groupItems = createMRUActions(model);
+			if(!groupItems.isEmpty()) {
+	    		items.add(new Separator("MRU")); //$NON-NLS-1$
+				items.addAll(groupItems);
 			}
 		}
 		return items.toArray(new IContributionItem[items.size()]);
 	}
+	
+	/**
+	 * Create and return the speed grade actions.
+	 * 
+	 * @param model The current process model.
+	 * @return The grade action list.
+	 */
+	private List<IContributionItem> createGradeActions(ProcessModel model) {
+		List<IContributionItem> items = new ArrayList<IContributionItem>();
+		IPreferenceStore prefStore = UIPlugin.getDefault().getPreferenceStore();
+	    String grades = prefStore.getString(IPreferenceConsts.PREF_INTERVAL_GRADES);
+	    Assert.isNotNull(grades);
+	    StringTokenizer st = new StringTokenizer(grades, "|"); //$NON-NLS-1$
+	    while(st.hasMoreTokens()) {
+	    	String token = st.nextToken();
+	    	StringTokenizer st2 = new StringTokenizer(token, ":"); //$NON-NLS-1$
+	    	String name = st2.nextToken();
+	    	String value = st2.nextToken();
+	    	try{
+	    		int seconds = Integer.parseInt(value);
+	    		if(seconds > 0) {
+	    			items.add(new ActionContributionItem(new GradeAction(model, name, seconds)));
+	    		}
+	    	}
+	    	catch (NumberFormatException nfe) {
+	    	}
+	    }
+	    return items;
+    }
+
+	/**
+	 * Create and return the most recently used actions.
+	 * 
+	 * @param model The current process model.
+	 * @return The MRU action list.
+	 */
+	private List<IContributionItem> createMRUActions(ProcessModel model) {
+		List<IContributionItem> items = new ArrayList<IContributionItem>();
+		IPreferenceStore prefStore = UIPlugin.getDefault().getPreferenceStore();
+	    String mruList = prefStore.getString(IPreferenceConsts.PREF_INTERVAL_MRU_LIST);
+	    if (mruList != null) {
+	    	StringTokenizer st = new StringTokenizer(mruList, ":"); //$NON-NLS-1$
+	    	int maxCount = prefStore.getInt(IPreferenceConsts.PREF_INTERVAL_MRU_COUNT);
+	    	int count = 0;
+	    	List<Integer> mru = new ArrayList<Integer>();
+	    	while (st.hasMoreTokens()) {
+	    		String token = st.nextToken();
+	    		try {
+	    			int seconds = Integer.parseInt(token);
+	    			if (seconds > 0) {
+	    				mru.add(Integer.valueOf(seconds));
+	    				count ++;
+	    				if (count >= maxCount) break;
+	    			}
+	    		}
+	    		catch (NumberFormatException nfe) {
+	    		}
+	    	}
+	    	if(count > 0) {
+	    		for(int seconds : mru) {
+	    			items.add(new ActionContributionItem(new MRUAction(model, seconds)));
+	    		}
+	    	}
+	    }
+	    return items;
+    }
 }
