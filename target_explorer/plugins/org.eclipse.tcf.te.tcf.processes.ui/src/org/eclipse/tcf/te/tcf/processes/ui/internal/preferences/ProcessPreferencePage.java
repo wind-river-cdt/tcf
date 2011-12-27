@@ -137,7 +137,7 @@ public class ProcessPreferencePage extends PreferencePage implements IWorkbenchP
 		label.setText(Messages.ProcessPreferencePage_MRUCountLabel);
 		mruCountText = new Text(mruGroup, SWT.BORDER | SWT.SINGLE);
 		IPreferenceStore prefStore = UIPlugin.getDefault().getPreferenceStore();
-		int maxCount = prefStore.getInt(IPreferenceConsts.PREF_INTERVAL_MRU_COUNT);
+		int maxCount = prefStore.getInt(PREF_INTERVAL_MRU_COUNT);
 		mruCountText.setText("" + maxCount); //$NON-NLS-1$
 		data = new GridData();
 		data.widthHint = 50;
@@ -204,6 +204,33 @@ public class ProcessPreferencePage extends PreferencePage implements IWorkbenchP
 		}
 		return Status.OK_STATUS;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.preference.PreferencePage#performOk()
+	 */
+	@Override
+    public boolean performOk() {
+		IPreferenceStore prefStore = UIPlugin.getDefault().getPreferenceStore();
+		String countText = mruCountText.getText().trim();
+		try{
+			int count = Integer.parseInt(countText);
+			prefStore.setValue(PREF_INTERVAL_MRU_COUNT, count);
+		} catch (NumberFormatException nfe){
+		}
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < grades.size(); i++) {
+			IntervalGrade grade = grades.get(i);
+			if(i > 0) {
+				builder.append('|');
+			}
+			builder.append(grade.getName());
+			builder.append(':');
+			builder.append(grade.getValue());
+		}
+		prefStore.setValue(PREF_INTERVAL_GRADES, builder.toString());
+	    return true;
+    }
 
 	/**
 	 * Creates and configures the table containing the grades of refreshing the process list.
@@ -488,7 +515,7 @@ public class ProcessPreferencePage extends PreferencePage implements IWorkbenchP
 		if (grades == null) {
 			grades = new ArrayList<IntervalGrade>();
 			IPreferenceStore prefStore = UIPlugin.getDefault().getPreferenceStore();
-			String gradestr = prefStore.getString(IPreferenceConsts.PREF_INTERVAL_GRADES);
+			String gradestr = prefStore.getString(PREF_INTERVAL_GRADES);
 			Assert.isNotNull(gradestr);
 			StringTokenizer st = new StringTokenizer(gradestr, "|"); //$NON-NLS-1$
 			while (st.hasMoreTokens()) {
