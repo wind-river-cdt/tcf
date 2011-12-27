@@ -23,4 +23,8 @@ public interface IPreferenceConsts {
 	String PREF_INTERVAL_MRU_LIST = "PrefIntervalMRUList"; //$NON-NLS-1$
 	// The default count of the most recently used intervals.
 	int DEFAULT_INTERVAL_MRU_COUNT = 3;
+	// The key to access the last selected interval.
+	String PREF_LAST_INTERVAL = "PrefLastInterval"; //$NON-NLS-1$
+	// The default last selected interval value.
+	int DEFAULT_LAST_INTERVAL = 5;
 }

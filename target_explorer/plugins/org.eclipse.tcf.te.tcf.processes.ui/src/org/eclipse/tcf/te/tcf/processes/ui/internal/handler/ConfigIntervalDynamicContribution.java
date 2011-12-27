@@ -30,7 +30,7 @@ import org.eclipse.ui.actions.CompoundContributionItem;
 /**
  * The dynamic contribution class to create a drop down menu of interval configuration.
  */
-public class ConfigIntervalDynamicContribution extends CompoundContributionItem {
+public class ConfigIntervalDynamicContribution extends CompoundContributionItem implements IPreferenceConsts {
 
 	/**
 	 * The action to allow a most recently used interval to be selected.
@@ -138,7 +138,7 @@ public class ConfigIntervalDynamicContribution extends CompoundContributionItem 
 	private List<IContributionItem> createGradeActions(ProcessModel model) {
 		List<IContributionItem> items = new ArrayList<IContributionItem>();
 		IPreferenceStore prefStore = UIPlugin.getDefault().getPreferenceStore();
-	    String grades = prefStore.getString(IPreferenceConsts.PREF_INTERVAL_GRADES);
+	    String grades = prefStore.getString(PREF_INTERVAL_GRADES);
 	    Assert.isNotNull(grades);
 	    StringTokenizer st = new StringTokenizer(grades, "|"); //$NON-NLS-1$
 	    while(st.hasMoreTokens()) {
@@ -167,10 +167,10 @@ public class ConfigIntervalDynamicContribution extends CompoundContributionItem 
 	private List<IContributionItem> createMRUActions(ProcessModel model) {
 		List<IContributionItem> items = new ArrayList<IContributionItem>();
 		IPreferenceStore prefStore = UIPlugin.getDefault().getPreferenceStore();
-	    String mruList = prefStore.getString(IPreferenceConsts.PREF_INTERVAL_MRU_LIST);
+	    String mruList = prefStore.getString(PREF_INTERVAL_MRU_LIST);
 	    if (mruList != null) {
 	    	StringTokenizer st = new StringTokenizer(mruList, ":"); //$NON-NLS-1$
-	    	int maxCount = prefStore.getInt(IPreferenceConsts.PREF_INTERVAL_MRU_COUNT);
+	    	int maxCount = prefStore.getInt(PREF_INTERVAL_MRU_COUNT);
 	    	int count = 0;
 	    	List<Integer> mru = new ArrayList<Integer>();
 	    	while (st.hasMoreTokens()) {

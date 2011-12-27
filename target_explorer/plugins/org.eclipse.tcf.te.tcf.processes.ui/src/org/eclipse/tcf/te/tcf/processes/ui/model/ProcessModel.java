@@ -29,7 +29,7 @@ import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 /**
  * The process tree model implementation.
  */
-public class ProcessModel {
+public class ProcessModel implements IPreferenceConsts{
 	/* default */static final String PROCESS_ROOT_KEY = UIPlugin.getUniqueIdentifier() + ".process.root"; //$NON-NLS-1$
 
 	/**
@@ -64,7 +64,7 @@ public class ProcessModel {
 	// The root node of the peer model
 	private ProcessTreeNode root;
 	// The polling interval in seconds. If it is zero, then stop polling periodically.
-	/* default */int interval = 5;
+	/* default */int interval;
 	// The timer to schedule polling task.
 	/* default */Timer pollingTimer;
 	// The flag to indicate if the polling has been stopped.
@@ -156,6 +156,11 @@ public class ProcessModel {
 					}
 				});
 	        }};
+	    if(interval == 0) {
+	    	// Interval has not yet been initialized.
+	    	IPreferenceStore prefStore = UIPlugin.getDefault().getPreferenceStore();
+	    	interval = prefStore.getInt(PREF_LAST_INTERVAL);
+	    }
         pollingTimer.schedule(pollingTask, interval * 1000);
     }
 	
@@ -166,7 +171,11 @@ public class ProcessModel {
 	 */
 	public void setInterval(int interval) {
 		Assert.isTrue(interval > 0);
-		this.interval = interval;
+		if (this.interval != interval) {
+			this.interval = interval;
+			IPreferenceStore prefStore = UIPlugin.getDefault().getPreferenceStore();
+			prefStore.setValue(PREF_LAST_INTERVAL, interval);
+		}
 	}
 
 	/**
@@ -245,12 +254,12 @@ public class ProcessModel {
 	 */
 	public void addMRUInterval(int interval){
         IPreferenceStore prefStore = UIPlugin.getDefault().getPreferenceStore();
-        String mruList = prefStore.getString(IPreferenceConsts.PREF_INTERVAL_MRU_LIST);
+        String mruList = prefStore.getString(PREF_INTERVAL_MRU_LIST);
         if (mruList == null || mruList.trim().length() == 0) {
         	mruList = "" + interval; //$NON-NLS-1$
         }else{
         	StringTokenizer st = new StringTokenizer(mruList, ":"); //$NON-NLS-1$
-        	int maxCount = prefStore.getInt(IPreferenceConsts.PREF_INTERVAL_MRU_COUNT);
+        	int maxCount = prefStore.getInt(PREF_INTERVAL_MRU_COUNT);
         	boolean found = false;
         	while (st.hasMoreTokens()) {
         		String token = st.nextToken();
@@ -275,7 +284,7 @@ public class ProcessModel {
         		}
         	}
         }
-        prefStore.setValue(IPreferenceConsts.PREF_INTERVAL_MRU_LIST, mruList);
+        prefStore.setValue(PREF_INTERVAL_MRU_LIST, mruList);
     }
 
 	/**

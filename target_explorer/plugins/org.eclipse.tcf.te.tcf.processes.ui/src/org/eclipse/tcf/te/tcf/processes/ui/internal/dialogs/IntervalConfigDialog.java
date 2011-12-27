@@ -47,7 +47,7 @@ import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
 /**
  * The dialog to configure the refreshing interval of the process list.
  */
-public class IntervalConfigDialog extends StatusDialog implements SelectionListener, ModifyListener, ISelectionChangedListener {
+public class IntervalConfigDialog extends StatusDialog implements SelectionListener, ModifyListener, ISelectionChangedListener, IPreferenceConsts {
 	// The option to enter the interval value in a text field.
 	private Button button1;
 	// The option to enter the interval value in a combo field.
@@ -236,7 +236,7 @@ public class IntervalConfigDialog extends StatusDialog implements SelectionListe
 	IntervalGrade[] getGrades(){
 		List<IntervalGrade> gradeList = new ArrayList<IntervalGrade>();
         IPreferenceStore prefStore = UIPlugin.getDefault().getPreferenceStore();
-		String grades = prefStore.getString(IPreferenceConsts.PREF_INTERVAL_GRADES);
+		String grades = prefStore.getString(PREF_INTERVAL_GRADES);
 		Assert.isNotNull(grades);
 		StringTokenizer st = new StringTokenizer(grades, "|"); //$NON-NLS-1$
 		while(st.hasMoreTokens()) {
