@@ -145,7 +145,7 @@ public class IntervalConfigDialog extends StatusDialog implements SelectionListe
 		if(button1.getSelection()) {
 			String txt = text.getText();
 			if(txt == null || txt.trim().length() == 0) {
-				return new Status(IStatus.INFO, pluginId, Messages.IntervalConfigDialog_NonEmpty);
+				return new Status(IStatus.CANCEL, pluginId, null);
 			}
 			try{
             	int interval = Integer.parseInt(txt.trim());
@@ -157,7 +157,7 @@ public class IntervalConfigDialog extends StatusDialog implements SelectionListe
 		}else if(button2.getSelection()) {
 			ISelection selection = comboViewer.getSelection();
 			if(selection.isEmpty()) {
-				return new Status(IStatus.INFO, pluginId, Messages.IntervalConfigDialog_SelectSpeed);
+				return new Status(IStatus.CANCEL, pluginId, null);
 			}
 		}
 		return Status.OK_STATUS;
@@ -205,7 +205,6 @@ public class IntervalConfigDialog extends StatusDialog implements SelectionListe
 	 */
 	private void validateInput() {
 		IStatus status = isInputValid();
-		updateButtonsEnableState(status);
 		updateStatus(status);
 	}
 

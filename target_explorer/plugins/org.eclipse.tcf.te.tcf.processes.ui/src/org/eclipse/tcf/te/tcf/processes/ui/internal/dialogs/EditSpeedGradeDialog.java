@@ -133,7 +133,7 @@ public class EditSpeedGradeDialog extends StatusDialog implements ModifyListener
 		String pluginId = UIPlugin.getUniqueIdentifier();
 		String txt = valueText.getText();
 		if (txt == null || txt.trim().length() == 0) {
-			return new Status(IStatus.INFO, pluginId, Messages.IntervalConfigDialog_NonEmpty);
+			return new Status(IStatus.CANCEL, pluginId, null);
 		}
 		try {
 			int interval = Integer.parseInt(txt.trim());

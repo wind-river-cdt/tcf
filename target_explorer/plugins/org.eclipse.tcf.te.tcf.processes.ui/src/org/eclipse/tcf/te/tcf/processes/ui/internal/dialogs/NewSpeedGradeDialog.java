@@ -129,14 +129,14 @@ public class NewSpeedGradeDialog extends StatusDialog implements ModifyListener 
 		String pluginId = UIPlugin.getUniqueIdentifier();
 		String name = nameText.getText();
 		if (name == null || name.trim().length() == 0) {
-			return new Status(IStatus.INFO, pluginId, Messages.NewSpeedGradeDialog_EnterName);
+			return new Status(IStatus.CANCEL, pluginId, null);
 		}
 		if (nameExists(name)) {
 			return new Status(IStatus.ERROR, pluginId, NLS.bind(Messages.NewSpeedGradeDialog_GradeExists, name));
 		}
 		String txt = valueText.getText();
 		if (txt == null || txt.trim().length() == 0) {
-			return new Status(IStatus.INFO, pluginId, Messages.IntervalConfigDialog_NonEmpty);
+			return new Status(IStatus.CANCEL, pluginId, null);
 		}
 		try {
 			int interval = Integer.parseInt(txt.trim());
