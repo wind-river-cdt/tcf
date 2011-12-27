@@ -137,6 +137,13 @@ public class IntervalConfigDialog extends StatusDialog implements SelectionListe
 
 	    label = new Label(comp2, SWT.NONE);
 	    label.setText(Messages.IntervalConfigDialog_SPEED);
+	    
+	    button1.setSelection(true);
+    	// Interval has not yet been initialized.
+    	IPreferenceStore prefStore = UIPlugin.getDefault().getPreferenceStore();
+    	int interval = prefStore.getInt(PREF_LAST_INTERVAL);
+    	text.setText(""+interval); //$NON-NLS-1$
+    	
 	    return composite;
     }
 	
