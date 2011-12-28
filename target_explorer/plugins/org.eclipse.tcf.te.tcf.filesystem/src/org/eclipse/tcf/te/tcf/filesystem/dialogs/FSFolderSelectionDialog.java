@@ -76,7 +76,7 @@ public class FSFolderSelectionDialog extends ElementTreeSelectionDialog {
 	 * @param parentShell The parent shell.
 	 */
 	public FSFolderSelectionDialog(Shell parentShell) {
-		this(parentShell, new FSTreeElementLabelProvider(), new FSTreeContentProvider(false));
+		this(parentShell, new FSTreeElementLabelProvider(), new FSTreeContentProvider());
 	}
 
 	/**

@@ -19,9 +19,11 @@
          </appinfo>
       </annotation>
       <complexType>
-         <sequence>
-            <element ref="viewer" minOccurs="1" maxOccurs="unbounded"/>
-         </sequence>
+         <choice minOccurs="1" maxOccurs="unbounded">
+            <element ref="viewer"/>
+            <element ref="columnContribution"/>
+            <element ref="filterContribution"/>
+         </choice>
          <attribute name="point" type="string" use="required">
             <annotation>
                <documentation>
@@ -56,19 +58,110 @@
          </documentation>
       </annotation>
       <complexType>
-         <choice>
-            <sequence>
-               <element ref="column" minOccurs="1" maxOccurs="unbounded"/>
-            </sequence>
-            <sequence>
-               <element ref="filter" minOccurs="1" maxOccurs="unbounded"/>
-            </sequence>
-         </choice>
-         <attribute name="viewerId" type="string" use="required">
+         <sequence>
+            <element ref="creation" minOccurs="0" maxOccurs="1"/>
+            <element ref="dragSupport" minOccurs="0" maxOccurs="1"/>
+            <element ref="dropSupport" minOccurs="0" maxOccurs="1"/>
+         </sequence>
+         <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
                   The viewer&apos;s id which uniquely defines a single tree viewer.
                </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="contentProvider" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The content provider of the tree viewer.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.jface.viewers.ITreeContentProvider"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="persistent" type="boolean">
+            <annotation>
+               <documentation>
+                  If the state of the tree viewer is persistent. The state includes its columns selected, filters selected, etc.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="autoExpandLevel" type="string">
+            <annotation>
+               <documentation>
+                  The auto expand level of the tree viewer when it is first displayed.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="menuId" type="string">
+            <annotation>
+               <documentation>
+                  The context menu id of the tree viewer.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="doubleClickCommand" type="string">
+            <annotation>
+               <documentation>
+                  The command invoked when double clicked.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.ui.commands/command/@id"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="helpId" type="string">
+            <annotation>
+               <documentation>
+                  The help id of the tree viewer.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="columnContribution">
+      <annotation>
+         <documentation>
+            The root of the column contributions.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="column" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="viewerId" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The id of the tree viewer which the columns declared contribute to.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.tcf.te.ui.viewers/viewer/@id"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="filterContribution">
+      <annotation>
+         <documentation>
+            The root of the filter contributions.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="filter" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="viewerId" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The id of the tree viewer which the filters declared contribute to.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.tcf.te.ui.viewers/viewer/@id"/>
+               </appinfo>
             </annotation>
          </attribute>
       </complexType>
@@ -293,6 +386,184 @@
       </complexType>
    </element>
 
+   <element name="creation">
+      <annotation>
+         <documentation>
+            The creation flag of the tree viewer.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="style" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+      </complexType>
+   </element>
+
+   <element name="dragSupport">
+      <annotation>
+         <documentation>
+            The drag support added to the tree viewer.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="operations"/>
+            <element ref="transferTypes"/>
+         </sequence>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  A drag source listener that implements &lt;samp&gt;org.eclipse.swt.dndDragSourceListener&lt;/samp&gt;. This listener should have a one-parameter constructor. The only parameter is the tree viewer that the drag source listener is added to.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.swt.dnd.DragSourceListener"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="dropSupport">
+      <annotation>
+         <documentation>
+            The drop support added to the tree viewer.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="operations"/>
+            <element ref="transferTypes"/>
+         </sequence>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  A drop target listener that implements &lt;samp&gt;org.eclipse.swt.dnd.DropTargetListener&lt;/samp&gt;. This listener should have a one-parameter constructor. The only parameter is the tree viewer that the drop target listener is added to.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.swt.dnd.DropTargetListener"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="operations">
+      <annotation>
+         <documentation>
+            The DND operations supported.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="operation" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+      </complexType>
+   </element>
+
+   <element name="transferTypes">
+      <annotation>
+         <documentation>
+            The DND transfer types supported.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="transferType" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+      </complexType>
+   </element>
+
+   <element name="style">
+      <annotation>
+         <documentation>
+            A creation style declaration.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="name" use="required">
+            <annotation>
+               <documentation>
+                  The name of the style including SWT.NONE, SWT.SINGLE, SWT&gt;MULTI, SWT.CHECK, SWT.FULL_SELECTION, SWT.VIRTUAL, SWT.NO_SCROLL.
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="SWT.NONE">
+                  </enumeration>
+                  <enumeration value="SWT.SINGLE">
+                  </enumeration>
+                  <enumeration value="SWT.MULTI">
+                  </enumeration>
+                  <enumeration value="SWT.CHECK">
+                  </enumeration>
+                  <enumeration value="SWT.FULL_SELECTION">
+                  </enumeration>
+                  <enumeration value="SWT.VIRTUAL">
+                  </enumeration>
+                  <enumeration value="SWT.NO_SCROLL">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="operation">
+      <annotation>
+         <documentation>
+            A DND operation declaration.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="name" use="required">
+            <annotation>
+               <documentation>
+                  The name of the operation including DND.DROP_COPY, DND.DROP_MOVE,DND.DROP_LINK.
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="DND.DROP_COPY">
+                  </enumeration>
+                  <enumeration value="DND.DROP_MOVE">
+                  </enumeration>
+                  <enumeration value="DND.DROP_LINK">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="transferType">
+      <annotation>
+         <documentation>
+            A transfer type declaration.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="name">
+            <annotation>
+               <documentation>
+                  The name of the transfer type including TextInstance, ImageTransfer, FileTransfer and LocalSelectionTransfer.
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="TextTransfer">
+                  </enumeration>
+                  <enumeration value="ImageTransfer">
+                  </enumeration>
+                  <enumeration value="FileTransfer">
+                  </enumeration>
+                  <enumeration value="LocalSelectionTransfer">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+      </complexType>
+   </element>
+
    <annotation>
       <appinfo>
          <meta.section type="since"/>
@@ -308,10 +579,43 @@
       </appinfo>
       <documentation>
          &lt;pre&gt;
-   &lt;extension
-         point=&quot;org.eclipse.tcf.te.ui.viewers&quot;&gt;
-      &lt;viewer
-            viewerId=&quot;org.eclipse.tcf.te.ui.controls.viewer.fs&quot;&gt;
+   &lt;extension point=&quot;org.eclipse.tcf.te.ui.viewers&quot;&gt;
+       &lt;viewer
+             autoExpandLevel=&quot;0&quot;
+             contentProvider=&quot;org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeContentProvider&quot;
+             doubleClickCommand=&quot;org.eclipse.ui.navigator.Open&quot;
+             helpId=&quot;org.eclipse.tcf.te.tcf.filesystem.FSExplorerEditorPage&quot;
+             id=&quot;org.eclipse.tcf.te.ui.controls.viewer.fs&quot;
+             menuId=&quot;org.eclipse.tcf.te.ui.controls.menu.fs&quot;
+             persistent=&quot;true&quot;&gt;
+          &lt;creation&gt;
+             &lt;style name=&quot;SWT.FULL_SELECTION&quot; /&gt;
+             &lt;style name=&quot;SWT.MULTI&quot; /&gt;
+          &lt;/creation&gt;
+          &lt;dragSupport
+                class=&quot;org.eclipse.tcf.te.tcf.filesystem.internal.dnd.FSDragSourceListener&quot;&gt;
+             &lt;operations&gt;
+             	&lt;operation name=&quot;DND.DROP_COPY&quot; /&gt;
+             	&lt;operation name=&quot;DND.DROP_MOVE&quot; /&gt;
+             	&lt;operation name=&quot;DND.DROP_LINK&quot; /&gt;
+             &lt;/operations&gt;
+             &lt;transferTypes&gt;
+             	&lt;transferType name =&quot;LocalSelectionTransfer&quot; /&gt;
+			 &lt;/transferTypes&gt;
+          &lt;/dragSupport&gt;
+          &lt;dropSupport
+                class=&quot;org.eclipse.tcf.te.tcf.filesystem.internal.dnd.FSDropTargetListener&quot;&gt;
+             &lt;operations&gt;
+             	&lt;operation name=&quot;DND.DROP_COPY&quot; /&gt;
+             	&lt;operation name=&quot;DND.DROP_MOVE&quot; /&gt;
+             	&lt;operation name=&quot;DND.DROP_LINK&quot; /&gt;
+             &lt;/operations&gt;
+             &lt;transferTypes&gt;
+             	&lt;transferType name =&quot;LocalSelectionTransfer&quot; /&gt;
+			 &lt;/transferTypes&gt;
+          &lt;/dropSupport&gt;
+      &lt;/viewer&gt;
+      &lt;columnContribution viewerId=&quot;org.eclipse.tcf.te.ui.controls.viewer.fs&quot;&gt;
          &lt;column
                alignment=&quot;SWT.LEFT&quot;
                comparator=&quot;org.eclipse.tcf.te.tcf.filesystem.internal.columns.FSTreeElementComparator&quot;
@@ -372,9 +676,9 @@
                visible=&quot;false&quot;
                width=&quot;120&quot;&gt;
          &lt;/column&gt;
-      &lt;/viewer&gt;
-      &lt;viewer
-            viewerId=&quot;org.eclipse.tcf.te.ui.controls.viewer.fs&quot;&gt;
+      &lt;/columnContribution&gt;
+      
+      &lt;filterContribution viewerId=&quot;org.eclipse.tcf.te.ui.controls.viewer.fs&quot;&gt;
          &lt;filter
                class=&quot;org.eclipse.tcf.te.tcf.filesystem.filters.HiddenFilesViewerFilter&quot;
                description=&quot;%filter.description.hidden&quot;
@@ -391,16 +695,13 @@
                image=&quot;icons/obj16/system_file_filter.png&quot;
                name=&quot;%filter.name.system&quot;&gt;
             &lt;activation&gt;
-               &lt;with
-                     variable=&quot;input&quot;&gt;
-                  &lt;test
-                        property=&quot;org.eclipse.tcf.te.tcf.filesystem.propertytester.peer.isWindows&quot;&gt;
-                  &lt;/test&gt;
+               &lt;with variable=&quot;input&quot;&gt;
+                  &lt;test property=&quot;org.eclipse.tcf.te.tcf.filesystem.propertytester.peer.isWindows&quot;/&gt;
                &lt;/with&gt;
             &lt;/activation&gt;
          &lt;/filter&gt;
-      &lt;/viewer&gt;
-   &lt;/extension&gt;   
+      &lt;/filterContribution&gt;
+   &lt;/extension&gt;
 &lt;/pre&gt;
       </documentation>
    </annotation>

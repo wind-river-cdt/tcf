@@ -58,7 +58,7 @@
       <complexType>
          <sequence>
             <element ref="activation"/>
-            <element ref="viewer" minOccurs="1" maxOccurs="unbounded"/>
+            <element ref="contributeTo" minOccurs="1" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="editorFactory" type="string" use="required">
             <annotation>
@@ -100,10 +100,10 @@ The cell editor factory implementation class must be specified either by the &qu
       </complexType>
    </element>
 
-   <element name="viewer">
+   <element name="contributeTo">
       <annotation>
          <documentation>
-            The id of the tree viewer that the cell editor contributes to.It could be the common viewer of a common navigator. It could be an instance of AbstractTreeControl. If the viewer is in a common navigator then the viewerId must match the navigator&apos;s id defined in its &lt;b&gt;org.eclipse.ui.views&lt;/b&gt; extension.If the viewer is an instance of AbstractTreeControl, then the viewerId must match the viewerId defined in its &lt;b&gt;org.eclipse.tcf.te.ui.viewers&lt;/b&gt; extension.
+            The cell editor&apos;s contribution to a tree viewer.It could be the common viewer of a common navigator. It could be an instance of AbstractTreeControl. If the viewer is in a common navigator then the viewerId must match the navigator&apos;s id defined in its &lt;b&gt;org.eclipse.ui.views&lt;/b&gt; extension.If the viewer is an instance of AbstractTreeControl, then the viewerId must match the viewerId defined in its &lt;b&gt;org.eclipse.tcf.te.ui.viewers&lt;/b&gt; extension.
          </documentation>
       </annotation>
       <complexType>
@@ -156,12 +156,12 @@ The cell editor factory implementation class must be specified either by the &qu
                &lt;/with&gt;
             &lt;/and&gt;
          &lt;/activation&gt;
-         &lt;viewer
+         &lt;contributeTo
                viewerId=&quot;org.eclipse.tcf.te.ui.views.TargetExplorer&quot;&gt;
-         &lt;/viewer&gt;
-         &lt;viewer
+         &lt;/contributeTo&gt;
+         &lt;contributeTo
                viewerId=&quot;org.eclipse.tcf.te.ui.controls.viewer.fs&quot;&gt;
-         &lt;/viewer&gt;
+         &lt;/contributeTo&gt;
       &lt;/cellEditor&gt;
    &lt;/extension&gt;
 &lt;/pre&gt;

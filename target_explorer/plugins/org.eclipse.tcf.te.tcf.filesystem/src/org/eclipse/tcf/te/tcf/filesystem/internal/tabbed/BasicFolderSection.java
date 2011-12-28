@@ -1,3 +1,12 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * This program and the accompanying materials are made available under the terms
+ * of the Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ * Wind River Systems - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.tabbed;
 
 import org.eclipse.core.runtime.Assert;
@@ -13,14 +22,24 @@ import org.eclipse.ui.views.properties.tabbed.AbstractPropertySection;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
+/**
+ * The section that displays the basic information of a folder.
+ */
 public class BasicFolderSection extends AbstractPropertySection {
+	// The folder node.
 	private FSTreeNode folder;
 	private Label labelText;
 
+	/**
+	 * Constructor.
+	 */
 	public BasicFolderSection() {
-		System.out.println();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#createControls(org.eclipse.swt.widgets.Composite, org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage)
+	 */
 	@Override
 	public void createControls(Composite parent, TabbedPropertySheetPage aTabbedPropertySheetPage) {
 		super.createControls(parent, aTabbedPropertySheetPage);
@@ -35,6 +54,10 @@ public class BasicFolderSection extends AbstractPropertySection {
 		labelText.setLayoutData(data);
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#setInput(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+	 */
 	 @Override
     public void setInput(IWorkbenchPart part, ISelection selection) {
          super.setInput(part, selection);
@@ -44,6 +67,10 @@ public class BasicFolderSection extends AbstractPropertySection {
          this.folder = (FSTreeNode) input;
      }
 	 
+	 /*
+	  * (non-Javadoc)
+	  * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#refresh()
+	  */
 	 @Override
     public void refresh() {
          labelText.setText(folder.name);

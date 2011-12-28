@@ -238,7 +238,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 		Tree tree = viewer.getTree();
 		tree.addFocusListener(this);
 		// Define an editor activation strategy for the common viewer so as to be invoked only programmatically.
-		ColumnViewerEditorActivationStrategy activationStrategy = new ViewViewerEditorActivationStrategy(getViewerId(), viewer);
+		ColumnViewerEditorActivationStrategy activationStrategy = new TreeViewerEditorActivationStrategy(getViewerId(), viewer);
 		TreeViewerEditor.create(viewer, null, activationStrategy, ColumnViewerEditor.DEFAULT);
 	}
 	

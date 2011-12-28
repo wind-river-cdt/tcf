@@ -29,7 +29,7 @@ import org.eclipse.jface.viewers.TreeViewerEditor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tcf.te.ui.trees.ViewViewerEditorActivationStrategy;
+import org.eclipse.tcf.te.ui.trees.TreeViewerEditorActivationStrategy;
 import org.eclipse.tcf.te.ui.views.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.views.interfaces.IRoot;
 import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
@@ -155,7 +155,7 @@ public class View extends CommonNavigator implements ITabbedPropertySheetPageCon
 	protected CommonViewer createCommonViewerObject(Composite parent) {
 		ViewViewer viewer = new ViewViewer(getViewSite().getId(), parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		// Define an editor activation strategy for the common viewer so as to be invoked only programmatically.
-		ColumnViewerEditorActivationStrategy activationStrategy = new ViewViewerEditorActivationStrategy(getSite().getId(), viewer);
+		ColumnViewerEditorActivationStrategy activationStrategy = new TreeViewerEditorActivationStrategy(getSite().getId(), viewer);
 		TreeViewerEditor.create(viewer, null, activationStrategy, ColumnViewerEditor.DEFAULT);
 		return viewer;
 	}

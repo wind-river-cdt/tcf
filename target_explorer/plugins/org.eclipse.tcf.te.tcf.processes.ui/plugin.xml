@@ -5,7 +5,7 @@
 <!-- Target Explorer Details Editor page contributions -->
    <extension point="org.eclipse.tcf.te.ui.views.editorPages">
       <editorPage
-            class="org.eclipse.tcf.te.tcf.processes.ui.internal.explorer.ProcessExplorerEditorPage"
+            class="org.eclipse.tcf.te.ui.views.editor.TreeViewerExplorerEditorPage:org.eclipse.tcf.te.ui.controls.viewer.processes"
             name="%ProcessExplorerEditorPage.name"
             id="org.eclipse.tcf.te.tcf.processes.ui.ProcessExplorerEditorPage">
       </editorPage>
@@ -189,7 +189,15 @@
    <extension
          point="org.eclipse.tcf.te.ui.viewers">
       <viewer
-            viewerId="org.eclipse.tcf.te.ui.controls.viewer.processes">
+            autoExpandLevel="0"
+            contentProvider="org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessTreeContentProvider"
+            helpId="org.eclipse.tcf.te.tcf.processes.ui.ProcessExplorerEditorPage"
+            id="org.eclipse.tcf.te.ui.controls.viewer.processes"
+            menuId="org.eclipse.tcf.te.ui.controls.menu.processes"
+            persistent="true">
+      </viewer>
+      <columnContribution
+      		viewerId="org.eclipse.tcf.te.ui.controls.viewer.processes">
          <column
                comparator="org.eclipse.tcf.te.tcf.processes.ui.internal.columns.ProcessComparator"
                id="name"
@@ -244,13 +252,13 @@
                visible="true"
                width="100">
          </column>
-      </viewer>
+      </columnContribution>
    </extension>
    <extension
          point="org.eclipse.ui.navigator.navigatorContent">
       <navigatorContent
             activeByDefault="false"
-            contentProvider="org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessTreeContentProvider"
+            contentProvider="org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessNavigatorContentProvider"
             icon="icons/obj16/process.gif"
             id="org.eclipse.tcf.te.tcf.processes.ui.navigator.content"
             labelProvider="org.eclipse.tcf.te.tcf.processes.ui.internal.columns.ProcessLabelProvider"

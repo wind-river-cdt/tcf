@@ -47,7 +47,7 @@ public class FSOpenFileDialog extends ElementTreeSelectionDialog {
 	 * @param parentShell The parent shell.
 	 */
 	public FSOpenFileDialog(Shell parentShell) {
-		this(parentShell, new FSTreeElementLabelProvider(), new FSTreeContentProvider(false));
+		this(parentShell, new FSTreeElementLabelProvider(), new FSTreeContentProvider());
 	}
 
 	/**

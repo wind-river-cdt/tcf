@@ -9,11 +9,13 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.trees;
 
+import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.expressions.EvaluationResult;
@@ -27,11 +29,21 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.util.SafeRunnable;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DragSourceListener;
+import org.eclipse.swt.dnd.DropTargetListener;
+import org.eclipse.swt.dnd.FileTransfer;
+import org.eclipse.swt.dnd.ImageTransfer;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.graphics.Image;
+import org.osgi.framework.Bundle;
 
 /**
  * The implementation of the tree viewer extension which is used to parse
@@ -53,7 +65,87 @@ public class TreeViewerExtension {
 	public TreeViewerExtension(String viewerId) {
 		this.viewerId = viewerId;
 	}
+
+	/**
+	 * Parse the viewer extensions and return the descriptor of the tree viewer.
+	 * 
+	 * @return The viewer descriptor.
+	 */
+	public ViewerDescriptor parseViewer() {
+		Assert.isNotNull(viewerId);
+		IExtensionRegistry registry = Platform.getExtensionRegistry();
+		IExtensionPoint extensionPoint = registry.getExtensionPoint(EXTENSION_POINT_ID);
+		IConfigurationElement[] configurations = extensionPoint.getConfigurationElements();
+		for (IConfigurationElement configuration : configurations) {
+			String name = configuration.getName();
+			if ("viewer".equals(name)) { //$NON-NLS-1$
+				String id = configuration.getAttribute("id"); //$NON-NLS-1$
+				if (viewerId.equals(id)) {
+					return createViewerDescriptor(configuration);
+				}
+			}
+		}
+		return null;
+	}
 	
+	/**
+	 * Create a viewer descriptor from the given configuration element.
+	 * 
+	 * @param configuration The configuration element that defines the viewer.
+	 * @return The viewer descriptor.
+	 */
+	private ViewerDescriptor createViewerDescriptor(final IConfigurationElement configuration) {
+		final ViewerDescriptor descriptor = new ViewerDescriptor();
+		IConfigurationElement[] children = configuration.getChildren("creation"); //$NON-NLS-1$
+		if (children != null && children.length > 0) {
+			Assert.isTrue(children.length == 1);
+			descriptor.setStyleConfig(children[0]);
+		}
+		children = configuration.getChildren("dragSupport"); //$NON-NLS-1$
+		if (children != null && children.length > 0) {
+			Assert.isTrue(children.length == 1);
+			descriptor.setDragConfig(children[0]);
+		}
+		children = configuration.getChildren("dropSupport"); //$NON-NLS-1$
+		if (children != null && children.length > 0) {
+			Assert.isTrue(children.length == 1);
+			descriptor.setDropConfig(children[0]);
+		}
+		SafeRunner.run(new SafeRunnable() {
+			@Override
+			public void run() throws Exception {
+				ITreeContentProvider contentProvider = (ITreeContentProvider) configuration.createExecutableExtension("contentProvider"); //$NON-NLS-1$
+				descriptor.setContentProvider(contentProvider);
+			}
+		});
+		String value = configuration.getAttribute("persistent"); //$NON-NLS-1$
+		if (value != null) {
+			descriptor.setPersistent(Boolean.valueOf(value).booleanValue());
+		}
+		value = configuration.getAttribute("autoExpandLevel"); //$NON-NLS-1$
+		if (value != null) {
+			try {
+				int level = Integer.parseInt(value);
+				descriptor.setAutoExpandLevel(level);
+			}
+			catch (NumberFormatException nfe) {
+			}
+		}
+		value = configuration.getAttribute("menuId"); //$NON-NLS-1$
+		if (value != null) {
+			descriptor.setMenuId(value);
+		}
+		value = configuration.getAttribute("doubleClickCommand"); //$NON-NLS-1$
+		if (value != null) {
+			descriptor.setDoubleClickCommand(value);
+		}
+		value = configuration.getAttribute("helpId"); //$NON-NLS-1$
+		if (value != null) {
+			descriptor.setHelpId(value);
+		}
+		return descriptor;
+	}
+
 	/**
 	 * Parse the column declarations of this extension point and return the 
 	 * column descriptors.
@@ -70,7 +162,7 @@ public class TreeViewerExtension {
 		IConfigurationElement[] configurations = extensionPoint.getConfigurationElements();
 		for (IConfigurationElement configuration : configurations) {
 			String name = configuration.getName();
-			if ("viewer".equals(name)) { //$NON-NLS-1$
+			if ("columnContribution".equals(name)) { //$NON-NLS-1$
 				String aViewerId = configuration.getAttribute("viewerId"); //$NON-NLS-1$
 				if (viewerId.equals(aViewerId)) {
 					IConfigurationElement[] children = configuration.getChildren("column"); //$NON-NLS-1$
@@ -100,7 +192,7 @@ public class TreeViewerExtension {
 		IConfigurationElement[] configurations = extensionPoint.getConfigurationElements();
 		for (IConfigurationElement configuration : configurations) {
 			String name = configuration.getName();
-			if ("viewer".equals(name)) { //$NON-NLS-1$
+			if ("filterContribution".equals(name)) { //$NON-NLS-1$
 				String aViewerId = configuration.getAttribute("viewerId"); //$NON-NLS-1$
 				if (viewerId.equals(aViewerId)) {
 					IConfigurationElement[] children = configuration.getChildren("filter"); //$NON-NLS-1$
@@ -197,6 +289,13 @@ public class TreeViewerExtension {
 		}
 	}
 	
+	/**
+	 * If the specified configuration element is activated under the current input.
+	 * 
+	 * @param input The input object.
+	 * @param configuration The configuration element that defines the activation element.
+	 * @return true if it is activated.
+	 */
 	private boolean isElementActivated(Object input, final IConfigurationElement configuration) {
 		IConfigurationElement[] children = configuration.getChildren("activation"); //$NON-NLS-1$
 		if(children == null || children.length == 0)
@@ -220,6 +319,7 @@ public class TreeViewerExtension {
 		});
 		return result[0];
 	}
+
 	/**
 	 * Initialize the column descriptor by reading the attributes from the configuration element.
 	 * 
@@ -248,11 +348,11 @@ public class TreeViewerExtension {
 		}
 		attribute = configuration.getAttribute("style"); //$NON-NLS-1$
 		if (attribute != null) {
-			column.setStyle(parseSWTAttribute(attribute));
+			column.setStyle(parseAlignment(attribute));
 		}
 		attribute = configuration.getAttribute("alignment"); //$NON-NLS-1$
 		if (attribute != null) {
-			column.setAlignment(parseSWTAttribute(attribute));
+			column.setAlignment(parseAlignment(attribute));
 		}
 		attribute = configuration.getAttribute("width"); //$NON-NLS-1$
 		if (attribute != null) {
@@ -287,21 +387,209 @@ public class TreeViewerExtension {
 	}
 
 	/**
-	 * Parse the alignment/style attribute from a string to integer value.
+	 * Parse the alignment attribute from a string to integer value.
 	 * 
 	 * @param attribute The attribute value.
 	 * @return The alignment/style value.
 	 */
-	private int parseSWTAttribute(String attribute) {
-		if (attribute.equals("SWT.LEFT")) { //$NON-NLS-1$
+	private int parseAlignment(String attribute) {
+		if ("SWT.LEFT".equals(attribute)) { //$NON-NLS-1$
 			return SWT.LEFT;
 		}
-		else if (attribute.equals("SWT.RIGHT")) { //$NON-NLS-1$
+		else if ("SWT.RIGHT".equals(attribute)) { //$NON-NLS-1$
 			return SWT.RIGHT;
 		}
-		else if (attribute.equals("SWT.CENTER")) { //$NON-NLS-1$
+		else if ("SWT.CENTER".equals(attribute)) { //$NON-NLS-1$
 			return SWT.CENTER;
 		}
-		return SWT.LEFT;
+		return SWT.NONE;
 	}
+	
+	/**
+	 * Parse the style name from a string to integer value.
+	 * 
+	 * @param attribute The attribute value.
+	 * @return The alignment/style value.
+	 */
+	private int parseStyleName(String name) {
+		if ("SWT.NONE".equals(name)) { //$NON-NLS-1$
+			return SWT.NONE;
+		}
+		else if ("SWT.SINGLE".equals(name)) { //$NON-NLS-1$
+			return SWT.SINGLE;
+		}
+		else if ("SWT.MULTI".equals(name)) { //$NON-NLS-1$
+			return SWT.MULTI;
+		}
+		else if ("SWT.CHECK".equals(name)) { //$NON-NLS-1$
+			return SWT.CHECK;
+		}
+		else if ("SWT.FULL_SELECTION".equals(name)) { //$NON-NLS-1$
+			return SWT.FULL_SELECTION;
+		}
+		else if ("SWT.VIRTUAL".equals(name)) { //$NON-NLS-1$
+			return SWT.VIRTUAL;
+		}
+		else if ("SWT.NO_SCROLL".equals(name)) { //$NON-NLS-1$
+			return SWT.NO_SCROLL;
+		}
+		return SWT.NONE;
+	}
+	
+	/**
+	 * Parse the DND operation style and return a operation.
+	 * 
+	 * @param name The name of the DND operation.
+	 * @return an integer that represents the operation.
+	 */
+	private int parseDndOp(String name) {
+		if("DND.DROP_COPY".equals(name)) { //$NON-NLS-1$
+			return DND.DROP_COPY;
+		}
+		else if("DND.DROP_MOVE".equals(name)) { //$NON-NLS-1$
+			return DND.DROP_MOVE;
+		}
+		else if("DND.DROP_LINK".equals(name)) { //$NON-NLS-1$
+			return DND.DROP_LINK;
+		}
+		return 0;	
+	}
+	
+	/**
+	 * Parse and calculate the style from the give configuration element.
+	 * 
+	 * @param configuration The configuration element that defines the styles.
+	 * @return An integer that represents the defined styles.
+	 */
+	public int parseStyle(IConfigurationElement configuration) {
+		IConfigurationElement[] children = configuration.getChildren();
+		int style = SWT.NONE;
+		for(IConfigurationElement child : children) {
+			String name = child.getAttribute("name"); //$NON-NLS-1$
+			style |= parseStyleName(name);
+		}
+	    return style;
+    }
+
+	/**
+	 * Parse the DND operation including DROP_COPY,
+	 * DROP_MOVE, DROP_LINK
+	 * 
+	 * @param configuration The configuration element in which the DND operation is defined.
+	 * @return The operations.
+	 */
+	public int parseDnd(IConfigurationElement configuration) {
+		IConfigurationElement[] children = configuration.getChildren("operations"); //$NON-NLS-1$
+		Assert.isTrue(children != null && children.length == 1);
+		children = children[0].getChildren();
+		int operations = 0;
+		for(IConfigurationElement child : children) {
+			String name = child.getAttribute("name"); //$NON-NLS-1$
+			operations |= parseDndOp(name);
+		}
+	    return operations;
+    }
+
+	/**
+	 * Parse the transfer type from the give configuration element.
+	 * 
+	 * @param configuration The configuration element.
+	 * @return An array of transfer object that represents the transfer types.
+	 */
+	public Transfer[] parseTransferTypes(IConfigurationElement configuration) {
+		List<Transfer> transferTypes = new ArrayList<Transfer>();
+		IConfigurationElement[] children = configuration.getChildren("transferTypes"); //$NON-NLS-1$
+		Assert.isTrue(children != null && children.length == 1);
+		children = children[0].getChildren();
+		for(IConfigurationElement child : children) {
+			String name = child.getAttribute("name"); //$NON-NLS-1$
+			Transfer transfer = parseTransferType(name);
+			if (transfer != null) transferTypes.add(transfer);
+		}
+	    return transferTypes.toArray(new Transfer[transferTypes.size()]);
+    }
+
+	/**
+	 * Translate the transfer type from this element.
+	 * 
+	 * @param name The attribute name.
+	 * @return The transfer instance.
+	 */
+	private Transfer parseTransferType(String name) {
+		if("TextTransfer".equals(name)) { //$NON-NLS-1$
+			return TextTransfer.getInstance();
+		}
+		if("ImageTransfer".equals(name)) { //$NON-NLS-1$
+			return ImageTransfer.getInstance();
+		}
+		if("FileTransfer".equals(name)) { //$NON-NLS-1$
+			return FileTransfer.getInstance();
+		}
+		if("LocalSelectionTransfer".equals(name)) { //$NON-NLS-1$
+			return LocalSelectionTransfer.getTransfer();
+		}
+	    return null;
+    }
+
+	/**
+	 * Parse a DragSourceListener and return its instance.
+	 * 
+	 * @param viewer The tree viewer to create an element. 
+	 * @param configuration The configuration that wraps the instance.
+	 * @return The drag source listener created.
+	 */
+	public DragSourceListener parseDragSourceListener(final TreeViewer viewer, final IConfigurationElement configuration) {
+		final AtomicReference<DragSourceListener> reference = new AtomicReference<DragSourceListener>();
+		SafeRunner.run(new SafeRunnable(){
+			@Override
+            public void run() throws Exception {
+				reference.set((DragSourceListener) createExecutableExtension(DragSourceListener.class, viewer, configuration));
+            }});
+	    return reference.get();
+    }
+	
+	/**
+	 * Create an executable instance from the given configuration element, with the tree viewer
+	 * as the constructor parameter.
+	 * 
+	 * @param aInterface The interface of the element should implement.
+	 * @param viewer The tree viewer to be passed
+	 * @param configuration The configuration element.
+	 * @return The object created.
+	 * @throws Exception
+	 */
+	Object createExecutableExtension(Class<?> aInterface, TreeViewer viewer, IConfigurationElement configuration) throws Exception{
+		String classname = configuration.getAttribute("class"); //$NON-NLS-1$
+		Assert.isNotNull(classname);
+		String contributorId = configuration.getContributor().getName();
+		Bundle bundle = Platform.getBundle(contributorId);
+		Assert.isNotNull(bundle);
+		Class<?> clazz = bundle.loadClass(classname);
+		Assert.isTrue(aInterface.isAssignableFrom(clazz));
+		try {
+			Constructor<?> constructor = clazz.getConstructor(TreeViewer.class);
+			return constructor.newInstance(viewer);
+		}
+		catch (NoSuchMethodException e) {
+			Constructor<?> constructor = clazz.getConstructor();
+			return constructor.newInstance();
+		}
+	}
+
+	/**
+	 * Parse a DropTargetListener and return its instance.
+	 * 
+	 * @param viewer The tree viewer to create an element. 
+	 * @param configuration The configuration that wraps the instance.
+	 * @return The drop target listener created.
+	 */
+	public DropTargetListener parseDropTargetListener(final TreeViewer viewer, final IConfigurationElement configuration) {
+		final AtomicReference<DropTargetListener> reference = new AtomicReference<DropTargetListener>();
+		SafeRunner.run(new SafeRunnable(){
+			@Override
+            public void run() throws Exception {
+				reference.set((DropTargetListener) createExecutableExtension(DropTargetListener.class, viewer, configuration));
+            }});
+	    return reference.get();
+   }
 }

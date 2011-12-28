@@ -31,7 +31,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.tcf.te.ui.interfaces.IViewerCellEditorFactory;
 
 /**
- * <code>ViewViewerEditorActivationStratgy</code> is a subclass of
+ * <code>TreeViewerEditorActivationStrategy</code> is a subclass of
  * <code>ColumnViewerEditorActivationStrategy</code> that parses the extensions of
  * "org.eclipse.tcf.te.ui.cellEditors" for Target Explorer, creating a map of
  * <code>IViewerCellEditorFactory</code> with the activation expressions. When requested to judge if
@@ -41,7 +41,7 @@ import org.eclipse.tcf.te.ui.interfaces.IViewerCellEditorFactory;
  * support to Target Explorer viewer with it and return true to activate the cell editing. If no
  * such a factory is found, then return false to deactivate the cell editing.
  */
-public class ViewViewerEditorActivationStrategy extends ColumnViewerEditorActivationStrategy {
+public class TreeViewerEditorActivationStrategy extends ColumnViewerEditorActivationStrategy {
 	// The extension point id.
 	private static final String EXTENSION_POINT_ID = "org.eclipse.tcf.te.ui.cellEditors"; //$NON-NLS-1$
 	// The common viewer's id.
@@ -57,7 +57,7 @@ public class ViewViewerEditorActivationStrategy extends ColumnViewerEditorActiva
 	 * @param viewerId
 	 * @param viewer
 	 */
-	public ViewViewerEditorActivationStrategy(String viewerId, TreeViewer viewer) {
+	public TreeViewerEditorActivationStrategy(String viewerId, TreeViewer viewer) {
 		super(viewer);
 		Assert.isNotNull(viewerId);
 		this.viewerId = viewerId;
@@ -136,7 +136,7 @@ public class ViewViewerEditorActivationStrategy extends ColumnViewerEditorActiva
 	 * @return true if it has a specified viewer element.
 	 */
 	private boolean isApplicable(IConfigurationElement configuration) {
-		IConfigurationElement[] children = configuration.getChildren("viewer"); //$NON-NLS-1$
+		IConfigurationElement[] children = configuration.getChildren("contributeTo"); //$NON-NLS-1$
 		for(IConfigurationElement child : children) {
 			String viewerId = child.getAttribute("viewerId"); //$NON-NLS-1$
 			if(this.viewerId.equals(viewerId))

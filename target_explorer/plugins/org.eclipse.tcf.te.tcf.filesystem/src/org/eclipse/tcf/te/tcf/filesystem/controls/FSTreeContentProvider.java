@@ -17,9 +17,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.IToken;
@@ -34,75 +31,14 @@ import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
-import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 import org.eclipse.tcf.te.ui.nls.Messages;
-import org.eclipse.ui.navigator.CommonViewer;
+import org.eclipse.tcf.te.ui.trees.TreeContentProvider;
 
 
 /**
  * File system tree content provider implementation.
  */
-public class FSTreeContentProvider implements ITreeContentProvider {
-
-	/**
-	 * Static reference to the return value representing no elements.
-	 */
-	protected final static Object[] NO_ELEMENTS = new Object[0];
-
-	// Flag to control if the file system root node is visible
-	private final boolean rootNodeVisible;
-	private IPropertyChangeListener commonViewerListener;
-
-	/**
-	 * Constructor.
-	 */
-	public FSTreeContentProvider() {
-		this(true);
-	}
-
-	/**
-	 * Constructor.
-	 *
-	 * @param rootNodeVisible If <code>true</code>, the file system root node is visible.
-	 */
-	public FSTreeContentProvider(boolean rootNodeVisible) {
-		this.rootNodeVisible = rootNodeVisible;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
-	 */
-	@Override
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		if(viewer instanceof CommonViewer) {
-			// This content provider is a navigator content extension.
-			commonViewerListener = new CommonViewerListener((CommonViewer) viewer);
-		} else {
-			commonViewerListener = null;
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
-	 */
-	@Override
-	public void dispose() {
-	}
-
-	/**
-	 * Close the open communication channel.
-	 */
-	protected void closeOpenChannel(final IChannel channel) {
-		if (channel != null) Tcf.getChannelManager().closeChannel(channel);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getElements(java.lang.Object)
-	 */
-	@Override
-	public Object[] getElements(Object inputElement) {
-		return getChildren(inputElement);
-	}
+public class FSTreeContentProvider extends TreeContentProvider {
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
@@ -119,7 +55,7 @@ public class FSTreeContentProvider implements ITreeContentProvider {
 		}
 		return null;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
 	 */
@@ -132,10 +68,7 @@ public class FSTreeContentProvider implements ITreeContentProvider {
 		// For the file system, we need the peer node
 		if (parentElement instanceof IPeerModel) {
 			final IPeerModel peerNode = (IPeerModel)parentElement;
-			IViewerInput viewerInput = (IViewerInput) peerNode.getAdapter(IViewerInput.class);
-			if(viewerInput != null && commonViewerListener != null) {
-				viewerInput.addPropertyChangeListener(commonViewerListener);
-			}
+			installPropertyChangeListener(peerNode);
 			// Get the file system model root node, if already stored
 			final FSModel fsModel = FSModel.getFSModel(peerNode);
 			final FSTreeNode root = fsModel.getRoot();
@@ -172,10 +105,10 @@ public class FSTreeContentProvider implements ITreeContentProvider {
 						}
 					});
 
-					children = rootNodeVisible ? new Object[] { rootNode.get() } : getChildren(rootNode.get());
+					children = isRootNodeVisible() ? new Object[] { rootNode.get() } : getChildren(rootNode.get());
 				}
 			} else {
-				children = rootNodeVisible ? new Object[] { root }  : getChildren(root);
+				children = isRootNodeVisible()  ? new Object[] { root }  : getChildren(root);
 			}
 		} else if (parentElement instanceof FSTreeNode) {
 			final FSTreeNode node = (FSTreeNode)parentElement;
@@ -268,7 +201,7 @@ public class FSTreeContentProvider implements ITreeContentProvider {
 									@Override
 									public void doneRoots(IToken token, FileSystemException error, DirEntry[] entries) {
 										// Close the channel, not needed anymore
-										closeOpenChannel(channel);
+										 Tcf.getChannelManager().closeChannel(channel);
 
 										FSTreeNode rootNode = FSModel.getFSModel(peerNode).getRoot();
 										if (rootNode != null && error == null) {
@@ -305,7 +238,7 @@ public class FSTreeContentProvider implements ITreeContentProvider {
 					} else {
 						// The file system service is not available for this peer.
 						// --> Close the just opened channel
-						closeOpenChannel(channel);
+						 Tcf.getChannelManager().closeChannel(channel);
 					}
 				}
 			}
@@ -448,7 +381,7 @@ public class FSTreeContentProvider implements ITreeContentProvider {
 							service.close(handle, new IFileSystem.DoneClose() {
 								@Override
 								public void doneClose(IToken token, FileSystemException error) {
-									closeOpenChannel(channel);
+									 Tcf.getChannelManager().closeChannel(channel);
 								}
 							});
 						}

@@ -45,7 +45,7 @@ public class ProcessSelectionDialog extends ElementTreeSelectionDialog {
 	 * @param parentShell The parent shell.
 	 */
 	public ProcessSelectionDialog(Shell parentShell) {
-		this(parentShell, new ProcessLabelProvider(), new ProcessTreeContentProvider(false));
+		this(parentShell, new ProcessLabelProvider(), new ProcessTreeContentProvider());
 	}
 
 	/**

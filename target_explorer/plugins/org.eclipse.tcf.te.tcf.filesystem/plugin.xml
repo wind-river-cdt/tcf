@@ -20,7 +20,7 @@
    <extension point="org.eclipse.ui.navigator.navigatorContent">
       <navigatorContent
             activeByDefault="false"
-            contentProvider="org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeContentProvider"
+            contentProvider="org.eclipse.tcf.te.tcf.filesystem.controls.FSNavigatorContentProvider"
             icon="icons/obj16/rootdrive.gif"
             id="org.eclipse.tcf.te.tcf.filesystem.navigator.content"
             labelProvider="org.eclipse.tcf.te.tcf.filesystem.internal.columns.FSTreeElementLabelProvider"
@@ -99,7 +99,7 @@
 <!-- Editor page contributions -->
    <extension point="org.eclipse.tcf.te.ui.views.editorPages">
       <editorPage
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.explorer.FSExplorerEditorPage"
+            class="org.eclipse.tcf.te.ui.views.editor.TreeViewerExplorerEditorPage:org.eclipse.tcf.te.ui.controls.viewer.fs"
             name="%FSExplorerEditorPage.name"
             id="org.eclipse.tcf.te.tcf.filesystem.FSExplorerEditorPage">
       </editorPage>
@@ -1978,12 +1978,12 @@
                </with>
             </and>
          </activation>
-         <viewer
+         <contributeTo
                viewerId="org.eclipse.tcf.te.ui.views.TargetExplorer">
-         </viewer>
-         <viewer
+         </contributeTo>
+         <contributeTo
                viewerId="org.eclipse.tcf.te.ui.controls.viewer.fs">
-         </viewer>
+         </contributeTo>
       </cellEditor>
    </extension>
 
@@ -2016,7 +2016,42 @@
    </extension>
    
    <extension point="org.eclipse.tcf.te.ui.viewers">
-      <viewer viewerId="org.eclipse.tcf.te.ui.controls.viewer.fs">
+       <viewer
+             autoExpandLevel="0"
+             contentProvider="org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeContentProvider"
+             doubleClickCommand="org.eclipse.ui.navigator.Open"
+             helpId="org.eclipse.tcf.te.tcf.filesystem.FSExplorerEditorPage"
+             id="org.eclipse.tcf.te.ui.controls.viewer.fs"
+             menuId="org.eclipse.tcf.te.ui.controls.menu.fs"
+             persistent="true">
+          <creation>
+             <style name="SWT.FULL_SELECTION" />
+             <style name="SWT.MULTI" />
+          </creation>
+          <dragSupport
+                class="org.eclipse.tcf.te.tcf.filesystem.internal.dnd.FSDragSourceListener">
+             <operations>
+             	<operation name="DND.DROP_COPY" />
+             	<operation name="DND.DROP_MOVE" />
+             	<operation name="DND.DROP_LINK" />
+             </operations>
+             <transferTypes>
+             	<transferType name ="LocalSelectionTransfer" />
+			 </transferTypes>
+          </dragSupport>
+          <dropSupport
+                class="org.eclipse.tcf.te.tcf.filesystem.internal.dnd.FSDropTargetListener">
+             <operations>
+             	<operation name="DND.DROP_COPY" />
+             	<operation name="DND.DROP_MOVE" />
+             	<operation name="DND.DROP_LINK" />
+             </operations>
+             <transferTypes>
+             	<transferType name ="LocalSelectionTransfer" />
+			 </transferTypes>
+          </dropSupport>
+      </viewer>
+      <columnContribution viewerId="org.eclipse.tcf.te.ui.controls.viewer.fs">
          <column
                alignment="SWT.LEFT"
                comparator="org.eclipse.tcf.te.tcf.filesystem.internal.columns.FSTreeElementComparator"
@@ -2077,9 +2112,9 @@
                visible="false"
                width="120">
          </column>
-      </viewer>
+      </columnContribution>
       
-      <viewer viewerId="org.eclipse.tcf.te.ui.controls.viewer.fs">
+      <filterContribution viewerId="org.eclipse.tcf.te.ui.controls.viewer.fs">
          <filter
                class="org.eclipse.tcf.te.tcf.filesystem.filters.HiddenFilesViewerFilter"
                description="%filter.description.hidden"
@@ -2101,7 +2136,7 @@
                </with>
             </activation>
          </filter>
-      </viewer>
+      </filterContribution>
    </extension>
    <extension
          point="org.eclipse.core.runtime.adapters">
