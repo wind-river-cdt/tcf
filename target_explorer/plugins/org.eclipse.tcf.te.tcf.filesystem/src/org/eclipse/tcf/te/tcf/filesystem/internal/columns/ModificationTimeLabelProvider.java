@@ -12,13 +12,13 @@ package org.eclipse.tcf.te.tcf.filesystem.internal.columns;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
-import org.eclipse.tcf.te.ui.trees.TreeColumnLabelProvider;
 
 /**
  * The label provider for the tree column "Date Modified".
  */
-public class ModificationTimeLabelProvider extends TreeColumnLabelProvider {
+public class ModificationTimeLabelProvider extends LabelProvider {
 	// The date formatter.
 	private static final SimpleDateFormat DATE_MODIFIED_FORMAT = new SimpleDateFormat("M/d/yyyy h:mm aa"); //$NON-NLS-1$
 

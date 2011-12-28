@@ -251,8 +251,8 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 		if(oldInput != null) {
 			uninstallPropertyChangeListener(oldInput);
 		}
-		columns = doCreateViewerColumns(newInput, viewer);
-		filterDescriptors = doCreateFilterDescriptors(newInput, viewer);
+		columns = doCreateViewerColumns(newInput);
+		filterDescriptors = doCreateFilterDescriptors(newInput);
 		if (isStatePersistent()) {
 			updateViewerState(newInput);
 		}
@@ -398,13 +398,12 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * Subclass may override it to provide its customized viewer columns. 
 	 * 
 	 * @param newInput the input when the columns are created.
-	 * @param viewer The tree viewer to create the columns for.
 	 * @return The tree viewer columns.
 	 */
-	protected ColumnDescriptor[] doCreateViewerColumns(Object newInput, TreeViewer viewer) {
+	protected ColumnDescriptor[] doCreateViewerColumns(Object newInput) {
 		if(columns == null) {
 			TreeViewerExtension viewerExtension = new TreeViewerExtension(getViewerId());
-			columns = viewerExtension.parseColumns(newInput, viewer);
+			columns = viewerExtension.parseColumns(newInput);
 		}
 		return columns;
 	}
@@ -414,10 +413,9 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * override it to provide its customized viewer filters. 
 	 * 
 	 * @param newInput the input when the filters are initialized.
-	 * @param viewer The tree viewer to create filters for.
 	 * @return The filter descriptors for the viewer.
 	 */
-	protected FilterDescriptor[] doCreateFilterDescriptors(Object newInput, TreeViewer viewer) {
+	protected FilterDescriptor[] doCreateFilterDescriptors(Object newInput) {
 		if(filterDescriptors == null) {
 			TreeViewerExtension viewerExtension = new TreeViewerExtension(getViewerId());
 			filterDescriptors = viewerExtension.parseFilters(newInput);

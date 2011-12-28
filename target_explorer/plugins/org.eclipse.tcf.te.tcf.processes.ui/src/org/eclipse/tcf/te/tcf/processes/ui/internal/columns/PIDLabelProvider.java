@@ -10,13 +10,13 @@
 package org.eclipse.tcf.te.tcf.processes.ui.internal.columns;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
-import org.eclipse.tcf.te.ui.trees.TreeColumnLabelProvider;
 
 /**
  * The label provider for the tree column "PID".
  */
-public class PIDLabelProvider extends TreeColumnLabelProvider {
+public class PIDLabelProvider extends LabelProvider {
 
 	/*
 	 * (non-Javadoc)

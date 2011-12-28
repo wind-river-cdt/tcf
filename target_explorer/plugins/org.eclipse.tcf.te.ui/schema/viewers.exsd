@@ -282,7 +282,7 @@
                   The label provider of the column.
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn="org.eclipse.tcf.te.ui.trees.TreeColumnLabelProvider:"/>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.jface.viewers.ILabelProvider"/>
                </appinfo>
             </annotation>
          </attribute>
@@ -595,24 +595,24 @@
           &lt;dragSupport
                 class=&quot;org.eclipse.tcf.te.tcf.filesystem.internal.dnd.FSDragSourceListener&quot;&gt;
              &lt;operations&gt;
-             	&lt;operation name=&quot;DND.DROP_COPY&quot; /&gt;
-             	&lt;operation name=&quot;DND.DROP_MOVE&quot; /&gt;
-             	&lt;operation name=&quot;DND.DROP_LINK&quot; /&gt;
+              &lt;operation name=&quot;DND.DROP_COPY&quot; /&gt;
+              &lt;operation name=&quot;DND.DROP_MOVE&quot; /&gt;
+              &lt;operation name=&quot;DND.DROP_LINK&quot; /&gt;
              &lt;/operations&gt;
              &lt;transferTypes&gt;
-             	&lt;transferType name =&quot;LocalSelectionTransfer&quot; /&gt;
-			 &lt;/transferTypes&gt;
+              &lt;transferType name =&quot;LocalSelectionTransfer&quot; /&gt;
+    &lt;/transferTypes&gt;
           &lt;/dragSupport&gt;
           &lt;dropSupport
                 class=&quot;org.eclipse.tcf.te.tcf.filesystem.internal.dnd.FSDropTargetListener&quot;&gt;
              &lt;operations&gt;
-             	&lt;operation name=&quot;DND.DROP_COPY&quot; /&gt;
-             	&lt;operation name=&quot;DND.DROP_MOVE&quot; /&gt;
-             	&lt;operation name=&quot;DND.DROP_LINK&quot; /&gt;
+              &lt;operation name=&quot;DND.DROP_COPY&quot; /&gt;
+              &lt;operation name=&quot;DND.DROP_MOVE&quot; /&gt;
+              &lt;operation name=&quot;DND.DROP_LINK&quot; /&gt;
              &lt;/operations&gt;
              &lt;transferTypes&gt;
-             	&lt;transferType name =&quot;LocalSelectionTransfer&quot; /&gt;
-			 &lt;/transferTypes&gt;
+              &lt;transferType name =&quot;LocalSelectionTransfer&quot; /&gt;
+    &lt;/transferTypes&gt;
           &lt;/dropSupport&gt;
       &lt;/viewer&gt;
       &lt;columnContribution viewerId=&quot;org.eclipse.tcf.te.ui.controls.viewer.fs&quot;&gt;
@@ -712,7 +712,7 @@
       </appinfo>
       <documentation>
          &lt;p&gt;
-In the &quot;column&quot; element, the class referenced by the attribute &quot;labelProvider&quot; must extend &lt;samp&gt;org.eclipse.tcf.te.ui.trees.TreeColumnLabelProvider&lt;/samp&gt; which provides the viewer as the parameter. The class referenced by the attribute &quot;comparator&quot; must implement &lt;samp&gt;java.util.Comparator&lt;/samp&gt; that compares the elements of the tree viewer.
+In the &quot;column&quot; element, the class referenced by the attribute &quot;labelProvider&quot; must implement &lt;samp&gt;org.eclipse.jface.viewers.ILabelProvider&lt;/samp&gt;. The class referenced by the attribute &quot;comparator&quot; must implement &lt;samp&gt;java.util.Comparator&lt;/samp&gt; that compares the elements of the tree viewer.
 &lt;p&gt;
 In the &quot;filter&quot; element, the class referenced by the attribute &quot;class&quot; must extend &lt;samp&gt;org.eclipse.jface.viewers.ViewerFilter&lt;/samp&gt;.
 &lt;p&gt;

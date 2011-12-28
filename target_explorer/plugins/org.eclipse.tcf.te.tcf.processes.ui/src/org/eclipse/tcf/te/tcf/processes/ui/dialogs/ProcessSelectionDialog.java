@@ -41,8 +41,6 @@ import org.eclipse.ui.dialogs.ISelectionStatusValidator;
  * Process selection dialog.
  */
 public class ProcessSelectionDialog extends ElementTreeSelectionDialog {
-	// Label provider used by the process tree.
-	private ProcessLabelProvider labelProvider;
 	// The common viewer listener
 	private IPropertyChangeListener viewerListener;
 
@@ -63,9 +61,8 @@ public class ProcessSelectionDialog extends ElementTreeSelectionDialog {
 	 * @param labelProvider The label provider.
 	 * @param contentProvider The content provider.
 	 */
-	private ProcessSelectionDialog(Shell parentShell, ProcessLabelProvider labelProvider, ITreeContentProvider contentProvider) {
+	private ProcessSelectionDialog(Shell parentShell, ILabelProvider labelProvider, ITreeContentProvider contentProvider) {
 		super(parentShell, createDecoratingLabelProvider(labelProvider), contentProvider);
-		this.labelProvider = labelProvider;
 		this.setAllowMultiple(false);
 		this.setStatusLineAboveButtons(false);
 		this.setComparator(new ProcessViewerSorter());
@@ -134,7 +131,6 @@ public class ProcessSelectionDialog extends ElementTreeSelectionDialog {
 	protected TreeViewer doCreateTreeViewer(Composite parent, int style) {
 		TreeViewer viewer = super.doCreateTreeViewer(parent, style);
 		viewer.getTree().setLinesVisible(false);
-		labelProvider.setViewer(viewer);
 		return viewer;
 	}
 

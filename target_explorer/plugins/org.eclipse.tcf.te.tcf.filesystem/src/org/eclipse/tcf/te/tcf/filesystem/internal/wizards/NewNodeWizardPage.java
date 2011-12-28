@@ -174,7 +174,7 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 		data.widthHint = 450;
 		treeViewer.getTree().setLayoutData(data);
 		treeViewer.setContentProvider(new FSTreeContentProvider());
-		treeViewer.setLabelProvider(createDecoratingLabelProvider(new FSTreeElementLabelProvider(treeViewer)));
+		treeViewer.setLabelProvider(createDecoratingLabelProvider(new FSTreeElementLabelProvider()));
 		treeViewer.setComparator(new FSTreeViewerSorter());
 		ViewerFilter folderFilter = new ViewerFilter() {
 			@Override

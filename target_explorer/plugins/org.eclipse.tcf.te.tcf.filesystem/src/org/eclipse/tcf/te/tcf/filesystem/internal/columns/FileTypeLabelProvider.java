@@ -9,13 +9,13 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.columns;
 
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
-import org.eclipse.tcf.te.ui.trees.TreeColumnLabelProvider;
 
 /**
  * The label provider for the tree column "type".
  */
-public class FileTypeLabelProvider extends TreeColumnLabelProvider {
+public class FileTypeLabelProvider extends LabelProvider {
 	
 	/*
 	 * (non-Javadoc)

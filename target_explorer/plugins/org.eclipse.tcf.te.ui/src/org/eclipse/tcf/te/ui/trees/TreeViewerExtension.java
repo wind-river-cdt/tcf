@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.util.SafeRunnable;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -151,10 +152,9 @@ public class TreeViewerExtension {
 	 * column descriptors.
 	 * 
 	 * @param input The input used to initialize the columns.
-	 * @param viewer The viewer used to initialize the columns.
 	 * @return The column descriptors from this extension point.
 	 */
-	public ColumnDescriptor[] parseColumns(Object input, TreeViewer viewer) {
+	public ColumnDescriptor[] parseColumns(Object input) {
 		Assert.isNotNull(viewerId);
 		List<ColumnDescriptor> columns = Collections.synchronizedList(new ArrayList<ColumnDescriptor>());
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
@@ -168,7 +168,7 @@ public class TreeViewerExtension {
 					IConfigurationElement[] children = configuration.getChildren("column"); //$NON-NLS-1$
 					if (children != null && children.length > 0) {
 						for (IConfigurationElement child : children) {
-							createColumnDescriptor(input, columns, child, viewer);
+							createColumnDescriptor(input, columns, child);
 						}
 					}
 				}
@@ -271,9 +271,8 @@ public class TreeViewerExtension {
 	 * @param input the new input.
 	 * @param columns The column descriptor.
 	 * @param configuration The configuration element to read the descriptor from.
-	 * @param viewer The tree viewer to add the column to.
 	 */
-	private void createColumnDescriptor(Object input, final List<ColumnDescriptor> columns, final IConfigurationElement configuration, final TreeViewer viewer) {
+	private void createColumnDescriptor(Object input, final List<ColumnDescriptor> columns, final IConfigurationElement configuration) {
 		if (isElementActivated(input, configuration)) {
 			String id = configuration.getAttribute("id"); //$NON-NLS-1$
 			Assert.isNotNull(id);
@@ -282,7 +281,7 @@ public class TreeViewerExtension {
 			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					initColumn(column, configuration, viewer);
+					initColumn(column, configuration);
 					column.setOrder(columns.size());
 				}
 			});
@@ -325,11 +324,10 @@ public class TreeViewerExtension {
 	 * 
 	 * @param column The column descriptor to be initialized.
 	 * @param configuration The configuration element.
-	 * @param viewer The tree viewer of the column.
 	 * @throws CoreException Thrown during parsing.
 	 */
 	@SuppressWarnings("rawtypes")
-	void initColumn(ColumnDescriptor column, IConfigurationElement configuration, TreeViewer viewer) throws CoreException {
+	void initColumn(ColumnDescriptor column, IConfigurationElement configuration) throws CoreException {
 		String name = configuration.getAttribute("name"); //$NON-NLS-1$
 		Assert.isNotNull(name);
 		column.setName(name);
@@ -371,9 +369,8 @@ public class TreeViewerExtension {
 		}
 		attribute = configuration.getAttribute("labelProvider"); //$NON-NLS-1$
 		if (attribute != null) {
-			TreeColumnLabelProvider labelProvider = (TreeColumnLabelProvider) configuration.createExecutableExtension("labelProvider"); //$NON-NLS-1$
+			ILabelProvider labelProvider = (ILabelProvider) configuration.createExecutableExtension("labelProvider"); //$NON-NLS-1$
 			if (labelProvider != null) {
-				labelProvider.setViewer(viewer);
 				column.setLabelProvider(labelProvider);
 			}
 		}

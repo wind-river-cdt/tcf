@@ -9,17 +9,17 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.processes.ui.internal.columns;
 
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.processes.ui.interfaces.ImageConsts;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
-import org.eclipse.tcf.te.ui.trees.TreeColumnLabelProvider;
 
 /**
  * The label provider for the tree column "name".
  */
-public class ProcessLabelProvider extends TreeColumnLabelProvider {
+public class ProcessLabelProvider extends LabelProvider {
 
 	/*
 	 * (non-Javadoc)

@@ -11,13 +11,13 @@ package org.eclipse.tcf.te.tcf.filesystem.internal.columns;
 
 import java.text.DecimalFormat;
 
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
-import org.eclipse.tcf.te.ui.trees.TreeColumnLabelProvider;
 
 /**
  * The label provider for the tree column "size".
  */
-public class SizeLabelProvider extends TreeColumnLabelProvider {
+public class SizeLabelProvider extends LabelProvider {
 	// The size formatter.
 	private static final DecimalFormat SIZE_FORMAT = new DecimalFormat();
 

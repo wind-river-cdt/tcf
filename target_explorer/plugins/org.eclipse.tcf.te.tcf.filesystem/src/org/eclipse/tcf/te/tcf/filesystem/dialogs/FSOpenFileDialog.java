@@ -43,8 +43,6 @@ import org.eclipse.ui.dialogs.ISelectionStatusValidator;
  * File system open file dialog.
  */
 public class FSOpenFileDialog extends ElementTreeSelectionDialog {
-	// Label provider used by the file system tree.
-	private FSTreeElementLabelProvider labelProvider;
 	// The common viewer listener
 	private IPropertyChangeListener viewerListener;
 
@@ -65,9 +63,8 @@ public class FSOpenFileDialog extends ElementTreeSelectionDialog {
 	 * @param labelProvider The label provider.
 	 * @param contentProvider The content provider.
 	 */
-	private FSOpenFileDialog(Shell parentShell, FSTreeElementLabelProvider labelProvider, ITreeContentProvider contentProvider) {
+	private FSOpenFileDialog(Shell parentShell, ILabelProvider labelProvider, ITreeContentProvider contentProvider) {
 		super(parentShell, createDecoratingLabelProvider(labelProvider), contentProvider);
-		this.labelProvider = labelProvider;
 		setTitle(Messages.FSOpenFileDialog_title);
 		setMessage(Messages.FSOpenFileDialog_message);
 		this.setAllowMultiple(false);
@@ -138,7 +135,6 @@ public class FSOpenFileDialog extends ElementTreeSelectionDialog {
 	protected TreeViewer doCreateTreeViewer(Composite parent, int style) {
 		TreeViewer viewer = super.doCreateTreeViewer(parent, style);
 		viewer.getTree().setLinesVisible(false);
-		labelProvider.setViewer(viewer);
 		return viewer;
 	}
 

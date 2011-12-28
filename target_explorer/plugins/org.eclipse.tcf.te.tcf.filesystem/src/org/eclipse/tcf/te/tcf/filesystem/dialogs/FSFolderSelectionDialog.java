@@ -70,8 +70,6 @@ import org.eclipse.ui.dialogs.ISelectionStatusValidator;
  * @see MoveFilesHandler
  */
 public class FSFolderSelectionDialog extends ElementTreeSelectionDialog {
-	// Label provider used by the file system tree.
-	private FSTreeElementLabelProvider labelProvider;
 	// The nodes that are being moved.
 	private List<FSTreeNode> movedNodes;
 	// The common viewer listener
@@ -94,9 +92,8 @@ public class FSFolderSelectionDialog extends ElementTreeSelectionDialog {
 	 * @param labelProvider The label provider.
 	 * @param contentProvider The content provider.
 	 */
-	private FSFolderSelectionDialog(Shell parentShell, FSTreeElementLabelProvider labelProvider, ITreeContentProvider contentProvider) {
+	private FSFolderSelectionDialog(Shell parentShell, ILabelProvider labelProvider, ITreeContentProvider contentProvider) {
 		super(parentShell, createDecoratingLabelProvider(labelProvider), contentProvider);
-		this.labelProvider = labelProvider;
 		setTitle(Messages.FSFolderSelectionDialog_MoveDialogTitle);
 		setMessage(Messages.FSFolderSelectionDialog_MoveDialogMessage);
 		this.setAllowMultiple(false);
@@ -187,7 +184,6 @@ public class FSFolderSelectionDialog extends ElementTreeSelectionDialog {
 	protected TreeViewer doCreateTreeViewer(Composite parent, int style) {
 		TreeViewer viewer = super.doCreateTreeViewer(parent, style);
 		viewer.getTree().setLinesVisible(false);
-		labelProvider.setViewer(viewer);
 		return viewer;
 	}
 
