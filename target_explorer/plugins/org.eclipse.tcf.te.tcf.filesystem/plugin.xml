@@ -1950,6 +1950,9 @@
          <adapter
                type="org.eclipse.ui.IActionFilter">
          </adapter>
+         <adapter
+               type="org.eclipse.jface.viewers.ILabelProvider">
+         </adapter>
       </factory>
    </extension>
 
@@ -2165,11 +2168,10 @@
             contributorId="org.eclipse.tcf.te.ui">
          <propertySection
                class="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.BasicFolderSection"
+               enablesFor="1"
+               filter="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.FolderFilter"
                id="org.eclipse.tcf.te.tcf.filesystem.propertysection.folder.basic"
                tab="org.eclipse.tcf.te.tcf.filesystem.propertytab.general">
-            <input
-                  type="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
-            </input>
          </propertySection>
       </propertySections>
    </extension>   

@@ -9,11 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.trees;
 
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 
 /**
  * The base tree content provider that defines several default methods.
@@ -48,33 +45,6 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 	 */
 	protected void installPropertyChangeListener(Object element) {
 	}
-
-	/***
-	 * Get the viewer input from the an element of the tree viewer.
-	 * If the element is an instance of IViewerInput, then return
-	 * the element. If the element can be adapted to a IViewerInput,
-	 * then return the adapted object.
-	 * 
-	 * @param element The given element to get a viewer input from.
-	 * @return A viewer input or null.
-	 */
-	protected IViewerInput getViewerInput(Object element) {
-		IViewerInput viewerInput = null;
-		if (element != null) {
-			if (element instanceof IViewerInput) {
-				viewerInput = (IViewerInput) element;
-			}
-			else {
-				if (element instanceof IAdaptable) {
-					viewerInput = (IViewerInput) ((IAdaptable) element).getAdapter(IViewerInput.class);
-				}
-				if (viewerInput == null) {
-					viewerInput = (IViewerInput) Platform.getAdapterManager().getAdapter(element, IViewerInput.class);
-				}
-			}
-		}
-		return viewerInput;
-    }
 
 	/**
 	 * If the root node of the tree is visible.

@@ -7,13 +7,13 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.processes.ui.controls;
+package org.eclipse.tcf.te.ui.trees;
 
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.ui.navigator.CommonViewer;
 
 /**
  * CommonViewerListener listens to the property change event from Target Explorer's
@@ -21,14 +21,14 @@ import org.eclipse.ui.navigator.CommonViewer;
  */
 public class CommonViewerListener implements IPropertyChangeListener {
 	// The common viewer of Target Explorer view.
-	private CommonViewer viewer;
+	private TreeViewer viewer;
 	
 	/***
 	 * Create an instance for the specified common viewer.
 	 * 
 	 * @param viewer The common viewer from Target Explorer view.
 	 */
-	public CommonViewerListener(CommonViewer viewer) {
+	public CommonViewerListener(TreeViewer viewer) {
 		this.viewer = viewer;
 	}
 

@@ -301,7 +301,8 @@
    <extension
          point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
       <propertyContributor
-            contributorId="org.eclipse.tcf.te.ui">
+            contributorId="org.eclipse.tcf.te.ui"
+            labelProvider="org.eclipse.tcf.te.ui.views.internal.PropertyContributorLabelProvider">
          <propertyCategory
                category="target_explorer">
          </propertyCategory>

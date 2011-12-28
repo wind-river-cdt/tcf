@@ -15,9 +15,11 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
-import org.eclipse.ui.navigator.CommonViewer;
+import org.eclipse.tcf.te.ui.trees.CommonViewerListener;
+import org.eclipse.tcf.te.ui.trees.ViewerStateManager;
 
 /**
  * Processes content provider for the common navigator of Target Explorer.
@@ -35,8 +37,8 @@ public class ProcessNavigatorContentProvider extends ProcessTreeContentProvider 
 	 */
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		Assert.isTrue(viewer instanceof CommonViewer);
-		commonViewerListener = new CommonViewerListener((CommonViewer) viewer);
+		Assert.isTrue(viewer instanceof TreeViewer);
+		commonViewerListener = new CommonViewerListener((TreeViewer) viewer);
 		viewerInputs = Collections.synchronizedSet(new HashSet<IViewerInput>());
 	}
 
@@ -66,7 +68,7 @@ public class ProcessNavigatorContentProvider extends ProcessTreeContentProvider 
 	 */
 	@Override
     protected void installPropertyChangeListener(Object element) {
-		IViewerInput viewerInput = getViewerInput(element);
+		IViewerInput viewerInput = ViewerStateManager.getViewerInput(element);
 		if(viewerInput != null && !viewerInputs.contains(viewerInput)) {
 			viewerInput.addPropertyChangeListener(commonViewerListener);
 			viewerInputs.add(viewerInput);

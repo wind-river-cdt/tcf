@@ -15,16 +15,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IAdapterFactory;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.tcf.te.tcf.filesystem.internal.columns.FSTreeElementLabelProvider;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.ui.IActionFilter;
 
 /**
  * The adapter factory of <code>FSTreeNode</code> over <code>IActionFilter</code>
  */
-@SuppressWarnings("rawtypes")
 public class NodeStateFilterFactory implements IAdapterFactory {
+	private static ILabelProvider nodeLabelProvider = new FSTreeElementLabelProvider();
 	// The ADAPTERS adapted by this factory.
-	private static Class[] ADAPTERS = {IActionFilter.class};
+	private static Class<?>[] ADAPTERS = {IActionFilter.class, ILabelProvider.class};
 	// The fFilters map caching fFilters for FS nodes.
 	private Map<FSTreeNode, NodeStateFilter> filters;
 
@@ -40,14 +42,19 @@ public class NodeStateFilterFactory implements IAdapterFactory {
 	 */
 	@Override
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
-		if(adaptableObject instanceof FSTreeNode && adapterType == IActionFilter.class){
-			FSTreeNode node = (FSTreeNode) adaptableObject;
-			NodeStateFilter filter = filters.get(node);
-			if(filter == null){
-				filter = new NodeStateFilter(node);
-				filters.put(node, filter);
+		if(adaptableObject instanceof FSTreeNode) {
+			if(adapterType == IActionFilter.class) {
+				FSTreeNode node = (FSTreeNode) adaptableObject;
+				NodeStateFilter filter = filters.get(node);
+				if(filter == null){
+					filter = new NodeStateFilter(node);
+					filters.put(node, filter);
+				}
+				return filter;
 			}
-			return filter;
+			else if(adapterType == ILabelProvider.class) {
+				return nodeLabelProvider;
+			}
 		}
 		return null;
 	}

@@ -22,8 +22,6 @@ import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -289,7 +287,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * @param input The input of the tree viewer.
 	 */
 	private void uninstallPropertyChangeListener(Object input) {
-	    IViewerInput viewerInput = getViewerInput(input);
+	    IViewerInput viewerInput = ViewerStateManager.getViewerInput(input);
 		if(viewerInput != null) {
 			viewerInput.removePropertyChangeListener(this);
 		}
@@ -301,37 +299,10 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * @param input The input of the tree viewer.
 	 */
 	private void installPropertyChangeListener(Object input) {
-	    IViewerInput viewerInput = getViewerInput(input);
+	    IViewerInput viewerInput = ViewerStateManager.getViewerInput(input);
 		if(viewerInput != null) {
 			viewerInput.addPropertyChangeListener(this);
 		}
-    }
-
-	/***
-	 * Get the viewer input from the input of the tree viewer.
-	 * If the input is an instance of IViewerInput, then return
-	 * the input. If the input can be adapted to a IViewerInput,
-	 * then return the adapted object.
-	 * 
-	 * @param input The input of the tree viewer.
-	 * @return A viewer input or null.
-	 */
-	private IViewerInput getViewerInput(Object input) {
-		IViewerInput viewerInput = null;
-		if (input != null) {
-			if (input instanceof IViewerInput) {
-				viewerInput = (IViewerInput) input;
-			}
-			else {
-				if (input instanceof IAdaptable) {
-					viewerInput = (IViewerInput) ((IAdaptable) input).getAdapter(IViewerInput.class);
-				}
-				if (viewerInput == null) {
-					viewerInput = (IViewerInput) Platform.getAdapterManager().getAdapter(input, IViewerInput.class);
-				}
-			}
-		}
-		return viewerInput;
     }
 
 	/**
@@ -341,7 +312,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * @param newInput The new input of the viewer.
 	 */
 	private void updateViewerState(Object newInput) {
-		IViewerInput viewerInput = getViewerInput(newInput);
+		IViewerInput viewerInput = ViewerStateManager.getViewerInput(newInput);
 		if (viewerInput != null) {
 			String inputId = viewerInput.getInputId();
 			if (inputId != null) {
