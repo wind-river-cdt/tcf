@@ -10,10 +10,11 @@
 package org.eclipse.tcf.te.tcf.ui.navigator;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.listener.ModelAdapter;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.navigator.CommonViewer;
 
 
@@ -44,12 +45,16 @@ public class ModelListener extends ModelAdapter {
 	@Override
 	public void locatorModelChanged(ILocatorModel model, IPeerModel peer, boolean added) {
 		if (parentModel.equals(model)) {
-			PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					viewer.refresh();
-				}
-			});
+			Tree tree = viewer.getTree();
+			if (tree != null && !tree.isDisposed()) {
+				Display display = tree.getDisplay();
+				display.asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						viewer.refresh();
+					}
+				});
+			}
 		}
 	}
 
@@ -59,14 +64,16 @@ public class ModelListener extends ModelAdapter {
 	@Override
 	public void peerModelChanged(final ILocatorModel model, final IPeerModel peer) {
 		if (parentModel.equals(model)) {
-			PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					if (viewer.getControl() != null && !viewer.getControl().isDisposed()) {
+			Tree tree = viewer.getTree();
+			if (tree != null && !tree.isDisposed()) {
+				Display display = tree.getDisplay();
+				display.asyncExec(new Runnable() {
+					@Override
+					public void run() {
 						viewer.refresh(peer);
 					}
-				}
-			});
+				});
+			}
 		}
 	}
 }
