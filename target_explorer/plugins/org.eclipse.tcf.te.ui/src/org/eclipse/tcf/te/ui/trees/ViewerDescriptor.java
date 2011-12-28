@@ -83,11 +83,11 @@ public class ViewerDescriptor {
 		this.autoExpandLevel = autoExpandLevel;
 	}
 
-	public String getMenuId() {
+	public String getContextMenuId() {
 		return menuId;
 	}
 
-	public void setMenuId(String menuId) {
+	public void setContextMenuId(String menuId) {
 		this.menuId = menuId;
 	}
 

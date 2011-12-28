@@ -133,7 +133,7 @@ public class TreeViewerExtension {
 		}
 		value = configuration.getAttribute("menuId"); //$NON-NLS-1$
 		if (value != null) {
-			descriptor.setMenuId(value);
+			descriptor.setContextMenuId(value);
 		}
 		value = configuration.getAttribute("doubleClickCommand"); //$NON-NLS-1$
 		if (value != null) {

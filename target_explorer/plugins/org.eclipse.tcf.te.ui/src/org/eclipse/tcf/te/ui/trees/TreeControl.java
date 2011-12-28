@@ -171,6 +171,6 @@ public class TreeControl extends AbstractTreeControl {
 	 */
 	@Override
 	protected String getContextMenuId() {
-		return viewerDescriptor.getHelpId();
+		return viewerDescriptor.getContextMenuId();
 	}
 }
