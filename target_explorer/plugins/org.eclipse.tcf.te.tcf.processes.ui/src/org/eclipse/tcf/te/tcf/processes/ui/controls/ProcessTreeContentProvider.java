@@ -92,4 +92,13 @@ public class ProcessTreeContentProvider extends TreeContentProvider {
 
 		return hasChildren;
 	}
+
+	/**
+	 * If the root node of the tree is visible.
+	 * 
+	 * @return true if it is visible.
+	 */
+	protected boolean isRootNodeVisible() {
+		return false;
+	}	
 }

@@ -11,14 +11,11 @@ package org.eclipse.tcf.te.tcf.filesystem.dialogs;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.DecoratingLabelProvider;
 import org.eclipse.jface.viewers.ILabelDecorator;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
@@ -28,8 +25,6 @@ import org.eclipse.tcf.te.tcf.filesystem.interfaces.IUIConstants;
 import org.eclipse.tcf.te.tcf.filesystem.internal.columns.FSTreeElementLabelProvider;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
-import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
-import org.eclipse.tcf.te.ui.trees.CommonViewerListener;
 import org.eclipse.tcf.te.ui.trees.FilterDescriptor;
 import org.eclipse.tcf.te.ui.trees.ViewerStateManager;
 import org.eclipse.ui.IDecoratorManager;
@@ -43,9 +38,6 @@ import org.eclipse.ui.dialogs.ISelectionStatusValidator;
  * File system open file dialog.
  */
 public class FSOpenFileDialog extends ElementTreeSelectionDialog {
-	// The common viewer listener
-	private IPropertyChangeListener viewerListener;
-
 	/**
 	 * Create an FSFolderSelectionDialog using the specified shell as the parent.
 	 * 
@@ -92,27 +84,6 @@ public class FSOpenFileDialog extends ElementTreeSelectionDialog {
 				if(descriptor.isEnabled()) addFilter(descriptor.getFilter());
 			}
 		}
-		IViewerInput viewerInput = ViewerStateManager.getViewerInput(input);
-		if(viewerInput != null) {
-			viewerListener = new CommonViewerListener(getTreeViewer());
-			viewerInput.addPropertyChangeListener(viewerListener);
-		}
-		getTreeViewer().getTree().addDisposeListener(new DisposeListener(){
-			@Override
-            public void widgetDisposed(DisposeEvent e) {
-				treeDisposed();
-            }});
-	}
-	
-	/**
-	 * Called when the tree is disposed to remove the viewer listener.
-	 */
-	void treeDisposed() {
-		Object input = getTreeViewer().getInput();
-		IViewerInput viewerInput = ViewerStateManager.getViewerInput(input);
-		if(viewerInput != null) {
-			viewerInput.removePropertyChangeListener(viewerListener);
-		}	            
 	}
 
 	/**

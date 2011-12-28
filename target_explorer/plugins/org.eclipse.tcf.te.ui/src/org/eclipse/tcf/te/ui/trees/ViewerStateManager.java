@@ -99,7 +99,7 @@ public class ViewerStateManager {
 	 * @param input The input of the tree viewer.
 	 * @return A viewer input or null.
 	 */
-	public static IViewerInput getViewerInput(Object input) {
+	static IViewerInput getViewerInput(Object input) {
 		IViewerInput viewerInput = null;
 		if (input != null) {
 			if (input instanceof IViewerInput) {

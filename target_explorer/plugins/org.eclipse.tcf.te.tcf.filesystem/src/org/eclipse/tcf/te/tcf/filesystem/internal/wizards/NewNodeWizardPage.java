@@ -11,7 +11,6 @@ package org.eclipse.tcf.te.tcf.filesystem.internal.wizards;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.DecoratingLabelProvider;
 import org.eclipse.jface.viewers.ILabelDecorator;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -38,8 +37,6 @@ import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.ui.controls.BaseEditBrowseTextControl;
 import org.eclipse.tcf.te.ui.forms.FormLayoutFactory;
-import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
-import org.eclipse.tcf.te.ui.trees.CommonViewerListener;
 import org.eclipse.tcf.te.ui.trees.FilterDescriptor;
 import org.eclipse.tcf.te.ui.trees.ViewerStateManager;
 import org.eclipse.tcf.te.ui.wizards.pages.AbstractValidatableWizardPage;
@@ -60,8 +57,6 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 	private BaseEditBrowseTextControl folderControl;
 	// The viewer of the file tree displaying the file system.
 	private TreeViewer treeViewer;
-	// The common viewer listener
-	private IPropertyChangeListener viewerListener;
 
 	/**
 	 * Create an instance page with the specified page name.
@@ -231,11 +226,6 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 				if (descriptor.isEnabled()) treeViewer.addFilter(descriptor.getFilter());
 			}
 		}
-		IViewerInput viewerInput = ViewerStateManager.getViewerInput(input);
-		if(viewerInput != null) {
-			viewerListener = new CommonViewerListener(treeViewer);
-			viewerInput.addPropertyChangeListener(viewerListener);
-		}
 	}
     
 	/**
@@ -327,11 +317,6 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 		if (nameControl != null) {
 			nameControl.dispose();
 			nameControl = null;
-		}
-		Object input = treeViewer.getInput();
-		IViewerInput viewerInput = ViewerStateManager.getViewerInput(input);
-		if(viewerInput != null) {
-			viewerInput.removePropertyChangeListener(viewerListener);
 		}
 		super.dispose();
 	}

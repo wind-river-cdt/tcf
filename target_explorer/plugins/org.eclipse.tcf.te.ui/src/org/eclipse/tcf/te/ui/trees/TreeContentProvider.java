@@ -9,8 +9,16 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.trees;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 
 /**
  * The base tree content provider that defines several default methods.
@@ -22,13 +30,21 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 	 */
 	protected final static Object[] NO_ELEMENTS = new Object[0];
 
+	// The listener to refresh the common viewer when properties change.
+	private IPropertyChangeListener commonViewerListener;
+	// The viewer inputs that have been added a property change listener.
+	private Set<IViewerInput> viewerInputs;
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
 	 */
 	@Override
-	public void dispose() {
-	}
+    public void dispose() {
+		for(IViewerInput viewerInput : viewerInputs) {
+			viewerInput.removePropertyChangeListener(commonViewerListener);
+		}
+    }
 
 	/*
 	 * (non-Javadoc)
@@ -36,6 +52,9 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 	 */
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+		Assert.isTrue(viewer instanceof TreeViewer);
+		commonViewerListener = new CommonViewerListener((TreeViewer) viewer);
+		viewerInputs = Collections.synchronizedSet(new HashSet<IViewerInput>());
 	}
 	
 	/**
@@ -43,17 +62,13 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 	 * 
 	 * @param element The element node.
 	 */
-	protected void installPropertyChangeListener(Object element) {
-	}
-
-	/**
-	 * If the root node of the tree is visible.
-	 * 
-	 * @return true if it is visible.
-	 */
-	protected boolean isRootNodeVisible() {
-		return false;
-	}
+    protected void installPropertyChangeListener(Object element) {
+		IViewerInput viewerInput = ViewerStateManager.getViewerInput(element);
+		if(viewerInput != null && !viewerInputs.contains(viewerInput)) {
+			viewerInput.addPropertyChangeListener(commonViewerListener);
+			viewerInputs.add(viewerInput);
+		}
+    }
 
 	/*
 	 * (non-Javadoc)
