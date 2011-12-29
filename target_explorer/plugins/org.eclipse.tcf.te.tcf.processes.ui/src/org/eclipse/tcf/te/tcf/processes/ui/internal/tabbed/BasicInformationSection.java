@@ -19,6 +19,7 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
+import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.views.tabbed.BaseTitledSection;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
@@ -28,12 +29,21 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  * The property section to display the basic information of a process.
  */
 public class BasicInformationSection extends BaseTitledSection {
+	// The process tree node to be displayed.
 	protected ProcessTreeNode node;
-	
+	// The text field for the name of the process.
 	protected Text nameText;
+	// The text field for the type of the process.
 	protected Text typeText;
+	// The text field for the state of the process.
 	protected Text stateText;
+	// The text field for the ownere of the process.
 	protected Text userText;
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.views.tabbed.BaseTitledSection#createControls(org.eclipse.swt.widgets.Composite, org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage)
+	 */
 	@Override
     public void createControls(Composite parent, TabbedPropertySheetPage aTabbedPropertySheetPage) {
 	    super.createControls(parent, aTabbedPropertySheetPage);
@@ -46,7 +56,7 @@ public class BasicInformationSection extends BaseTitledSection {
 		nameText.setLayoutData(data);
 		nameText.setEditable(false);
 
-		CLabel nameLabel = getWidgetFactory().createCLabel(composite, "Name:");
+		CLabel nameLabel = getWidgetFactory().createCLabel(composite, Messages.BasicInformationSection_Name);
 		data = new FormData();
 		data.left = new FormAttachment(0, 0);
 		data.right = new FormAttachment(nameText, -ITabbedPropertyConstants.HSPACE);
@@ -61,7 +71,7 @@ public class BasicInformationSection extends BaseTitledSection {
 		typeText.setLayoutData(data);
 		typeText.setEditable(false);
 
-		CLabel typeLabel = getWidgetFactory().createCLabel(composite, "Type:");
+		CLabel typeLabel = getWidgetFactory().createCLabel(composite, Messages.BasicInformationSection_Type);
 		data = new FormData();
 		data.left = new FormAttachment(0, 0);
 		data.right = new FormAttachment(typeText, -ITabbedPropertyConstants.HSPACE);
@@ -76,7 +86,7 @@ public class BasicInformationSection extends BaseTitledSection {
 		stateText.setLayoutData(data);
 		stateText.setEditable(false);
 
-		CLabel stateLabel = getWidgetFactory().createCLabel(composite, "State:");
+		CLabel stateLabel = getWidgetFactory().createCLabel(composite, Messages.BasicInformationSection_State);
 		data = new FormData();
 		data.left = new FormAttachment(0, 0);
 		data.right = new FormAttachment(stateText, -ITabbedPropertyConstants.HSPACE);
@@ -91,7 +101,7 @@ public class BasicInformationSection extends BaseTitledSection {
 		userText.setLayoutData(data);
 		userText.setEditable(false);
 
-		CLabel userLabel = getWidgetFactory().createCLabel(composite, "User:");
+		CLabel userLabel = getWidgetFactory().createCLabel(composite, Messages.BasicInformationSection_User);
 		data = new FormData();
 		data.left = new FormAttachment(0, 0);
 		data.right = new FormAttachment(userText, -ITabbedPropertyConstants.HSPACE);
@@ -99,6 +109,10 @@ public class BasicInformationSection extends BaseTitledSection {
 		userLabel.setLayoutData(data);
     }
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#setInput(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+	 */
 	@Override
     public void setInput(IWorkbenchPart part, ISelection selection) {
         super.setInput(part, selection);
@@ -108,17 +122,25 @@ public class BasicInformationSection extends BaseTitledSection {
         this.node = (ProcessTreeNode) input;
     }
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#refresh()
+	 */
 	@Override
     public void refresh() {
-		nameText.setText(node.name == null ? "System" : node.name);
-		typeText.setText(node.type);
-		stateText.setText(node.state == null ? "" : node.state);
-		userText.setText(node.username == null ? "" : node.username);
+		nameText.setText(node.name == null ? Messages.ProcessLabelProvider_RootNodeLabel : node.name);
+		typeText.setText(node.type == null ? "" : node.type); //$NON-NLS-1$
+		stateText.setText(node.state == null ? "" : node.state); //$NON-NLS-1$
+		userText.setText(node.username == null ? "" : node.username); //$NON-NLS-1$
     }
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.views.tabbed.BaseTitledSection#getText()
+	 */
 	@Override
 	protected String getText() {
-		return "Basic Information"; //$NON-NLS-1$
+		return Messages.BasicInformationSection_Title; 
 	}
 
 }

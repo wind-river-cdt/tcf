@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
+import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.views.tabbed.BaseTitledSection;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
@@ -29,11 +30,19 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  * The property section to display the memory usage of a process.
  */
 public class MemorySection extends BaseTitledSection {
+	// The context of the process selected.
 	protected ISysMonitor.SysMonitorContext context;
+	// The text field for the virtual memory size in bytes.
 	protected Text vsizeText;
+	// The text field for the virtual memory pages.
 	protected Text psizeText;
+	// The number of memory pages in process resident set.
 	protected Text rssText;
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.views.tabbed.BaseTitledSection#createControls(org.eclipse.swt.widgets.Composite, org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage)
+	 */
 	@Override
 	public void createControls(Composite parent, TabbedPropertySheetPage aTabbedPropertySheetPage) {
 		super.createControls(parent, aTabbedPropertySheetPage);
@@ -46,7 +55,7 @@ public class MemorySection extends BaseTitledSection {
 		vsizeText.setLayoutData(data);
 		vsizeText.setEditable(false);
 
-		CLabel vsizeTextLabel = getWidgetFactory().createCLabel(composite, "Virtual:");
+		CLabel vsizeTextLabel = getWidgetFactory().createCLabel(composite, Messages.MemorySection_VSize);
 		data = new FormData();
 		data.left = new FormAttachment(0, 0);
 		data.right = new FormAttachment(vsizeText, -ITabbedPropertyConstants.HSPACE);
@@ -61,7 +70,7 @@ public class MemorySection extends BaseTitledSection {
 		psizeText.setLayoutData(data);
 		psizeText.setEditable(false);
 
-		CLabel psizeTextLabel = getWidgetFactory().createCLabel(composite, "Pages:");
+		CLabel psizeTextLabel = getWidgetFactory().createCLabel(composite, Messages.MemorySection_PSize);
 		data = new FormData();
 		data.left = new FormAttachment(0, 0);
 		data.right = new FormAttachment(psizeText, -ITabbedPropertyConstants.HSPACE);
@@ -76,7 +85,7 @@ public class MemorySection extends BaseTitledSection {
 		rssText.setLayoutData(data);
 		rssText.setEditable(false);
 
-		CLabel rssTextLabel = getWidgetFactory().createCLabel(composite, "Resident:");
+		CLabel rssTextLabel = getWidgetFactory().createCLabel(composite, Messages.MemorySection_RSS);
 		data = new FormData();
 		data.left = new FormAttachment(0, 0);
 		data.right = new FormAttachment(rssText, -ITabbedPropertyConstants.HSPACE);
@@ -84,11 +93,19 @@ public class MemorySection extends BaseTitledSection {
 		rssTextLabel.setLayoutData(data);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.views.tabbed.BaseTitledSection#getText()
+	 */
 	@Override
 	protected String getText() {
-		return "Memory Usage"; //$NON-NLS-1$
+		return Messages.MemorySection_Title; 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#setInput(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+	 */
 	@Override
 	public void setInput(IWorkbenchPart part, ISelection selection) {
 		super.setInput(part, selection);
@@ -100,10 +117,14 @@ public class MemorySection extends BaseTitledSection {
 		context = node.context;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#refresh()
+	 */
 	@Override
 	public void refresh() {
 		vsizeText.setText("" + context.getVSize()); //$NON-NLS-1$
-		psizeText.setText("" + context.getPSize());
-		rssText.setText("" + context.getRSS());
+		psizeText.setText("" + context.getPSize()); //$NON-NLS-1$
+		rssText.setText("" + context.getRSS()); //$NON-NLS-1$
 	}
 }

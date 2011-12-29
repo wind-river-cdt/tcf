@@ -97,6 +97,36 @@ public class Messages extends NLS {
 
 	public static String BasicContextSection_WorkDir;
 
+	public static String BasicInformationSection_Name;
+
+	public static String BasicInformationSection_State;
+
+	public static String BasicInformationSection_Title;
+
+	public static String BasicInformationSection_Type;
+
+	public static String BasicInformationSection_User;
+
+	public static String ContextIDSection_ContextIDs;
+
+	public static String ContextIDSection_GroupID;
+
+	public static String ContextIDSection_ID;
+
+	public static String ContextIDSection_ParentID;
+
+	public static String ContextIDSection_PID;
+
+	public static String ContextIDSection_PPID;
+
+	public static String ContextIDSection_TracerPID;
+
+	public static String ContextIDSection_TTY_GRPID;
+
+	public static String ContextIDSection_UserGRPID;
+
+	public static String ContextIDSection_UserID;
+
 	public static String EditSpeedGradeDialog_DialogMessage;
 
 	public static String EditSpeedGradeDialog_DialogTitle;
@@ -106,6 +136,16 @@ public class Messages extends NLS {
 	public static String EditSpeedGradeDialog_NameLabel;
 
 	public static String EditSpeedGradeDialog_ValueLabel;
+
+	public static String IDSection_InternalID;
+
+	public static String IDSection_InternalPPID;
+
+	public static String IDSection_ParentID;
+
+	public static String IDSection_ProcessID;
+
+	public static String IDSection_Title;
 
 	public static String IntervalConfigDialog_BiggerThanZero;
 
@@ -128,6 +168,14 @@ public class Messages extends NLS {
 	public static String IntervalConfigDialog_SelectSpeed;
 
 	public static String IntervalConfigDialog_SPEED;
+
+	public static String MemorySection_PSize;
+
+	public static String MemorySection_RSS;
+
+	public static String MemorySection_Title;
+
+	public static String MemorySection_VSize;
 
 	public static String NewSpeedGradeDialog_DialogMessage;
 

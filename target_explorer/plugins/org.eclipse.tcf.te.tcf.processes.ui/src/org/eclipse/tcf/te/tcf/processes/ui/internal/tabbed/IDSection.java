@@ -19,6 +19,7 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
+import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.views.tabbed.BaseTitledSection;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
@@ -28,13 +29,21 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  * The property section to display the IDs of a process.
  */
 public class IDSection extends BaseTitledSection {
+	// The process tree node selected.
 	protected ProcessTreeNode node;
+	// The text field to display the process id.
 	protected Text pidText;
+	// The text field to display the parent process id.
 	protected Text ppidText;
+	// The  text field to display the internal process id.
 	protected Text ipidText;
+	// The text field to display the internal parent process id.
 	protected Text ippidText;
 
-	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.views.tabbed.BaseTitledSection#createControls(org.eclipse.swt.widgets.Composite, org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage)
+	 */
 	@Override
     public void createControls(Composite parent, TabbedPropertySheetPage aTabbedPropertySheetPage) {
 	    super.createControls(parent, aTabbedPropertySheetPage);
@@ -47,7 +56,7 @@ public class IDSection extends BaseTitledSection {
 		pidText.setLayoutData(data);
 		pidText.setEditable(false);
 
-		CLabel pidLabel = getWidgetFactory().createCLabel(composite, "Process ID:");
+		CLabel pidLabel = getWidgetFactory().createCLabel(composite, Messages.IDSection_ProcessID);
 		data = new FormData();
 		data.left = new FormAttachment(0, 0);
 		data.right = new FormAttachment(pidText, -ITabbedPropertyConstants.HSPACE);
@@ -62,7 +71,7 @@ public class IDSection extends BaseTitledSection {
 		ppidText.setLayoutData(data);
 		ppidText.setEditable(false);
 
-		CLabel ppidLabel = getWidgetFactory().createCLabel(composite, "Parent ID:");
+		CLabel ppidLabel = getWidgetFactory().createCLabel(composite, Messages.IDSection_ParentID);
 		data = new FormData();
 		data.left = new FormAttachment(0, 0);
 		data.right = new FormAttachment(ppidText, -ITabbedPropertyConstants.HSPACE);
@@ -77,7 +86,7 @@ public class IDSection extends BaseTitledSection {
 		ipidText.setLayoutData(data);
 		ipidText.setEditable(false);
 
-		CLabel ipidLabel = getWidgetFactory().createCLabel(composite, "Internal PID:");
+		CLabel ipidLabel = getWidgetFactory().createCLabel(composite, Messages.IDSection_InternalID);
 		data = new FormData();
 		data.left = new FormAttachment(0, 0);
 		data.right = new FormAttachment(ipidText, -ITabbedPropertyConstants.HSPACE);
@@ -92,7 +101,7 @@ public class IDSection extends BaseTitledSection {
 		ippidText.setLayoutData(data);
 		ippidText.setEditable(false);
 
-		CLabel ippidLabel = getWidgetFactory().createCLabel(composite, "InternalPPID:");
+		CLabel ippidLabel = getWidgetFactory().createCLabel(composite, Messages.IDSection_InternalPPID);
 		data = new FormData();
 		data.left = new FormAttachment(0, 0);
 		data.right = new FormAttachment(ippidText, -ITabbedPropertyConstants.HSPACE);
@@ -100,7 +109,10 @@ public class IDSection extends BaseTitledSection {
 		ippidLabel.setLayoutData(data);
     }
 
-
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#setInput(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+	 */
 	@Override
     public void setInput(IWorkbenchPart part, ISelection selection) {
         super.setInput(part, selection);
@@ -110,18 +122,24 @@ public class IDSection extends BaseTitledSection {
         this.node = (ProcessTreeNode) input;
     }
 
-
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#refresh()
+	 */
 	@Override
     public void refresh() {
-		pidText.setText(""+node.pid);
-		ppidText.setText(""+node.ppid);
-		ipidText.setText(node.id == null ? "" : node.id);
-		ippidText.setText(node.parentId == null ? "" : node.parentId);
+		pidText.setText(""+node.pid); //$NON-NLS-1$
+		ppidText.setText(""+node.ppid); //$NON-NLS-1$
+		ipidText.setText(node.id == null ? "" : node.id); //$NON-NLS-1$
+		ippidText.setText(node.parentId == null ? "" : node.parentId); //$NON-NLS-1$
     }
 
-
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.views.tabbed.BaseTitledSection#getText()
+	 */
 	@Override
 	protected String getText() {
-		return "Process IDs"; //$NON-NLS-1$
+		return Messages.IDSection_Title; 
 	}
 }
