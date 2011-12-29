@@ -191,15 +191,17 @@ public class RemoteHostAddressControl extends BaseEditBrowseTextControl {
 
 						try {
 							// Try to get the wizard container from the parent page
-							Class<?>[] paramTypes = new Class[0];
-							Object[] args = new Object[0];
-							Method method = parentPage.getClass().getMethod("getContainer", paramTypes); //$NON-NLS-1$
-							if (!method.isAccessible()) {
-								method.setAccessible(true);
-							}
-							Object result = method.invoke(parentPage, args);
-							if (result instanceof IWizardContainer) {
-								container = (IWizardContainer)result;
+							if (parentPage != null) {
+								Class<?>[] paramTypes = new Class[0];
+								Object[] args = new Object[0];
+								Method method = parentPage.getClass().getMethod("getContainer", paramTypes); //$NON-NLS-1$
+								if (!method.isAccessible()) {
+									method.setAccessible(true);
+								}
+								Object result = method.invoke(parentPage, args);
+								if (result instanceof IWizardContainer) {
+									container = (IWizardContainer)result;
+								}
 							}
 						} catch (Exception e) {
 							// If the object does not have a "getContainer()" method,

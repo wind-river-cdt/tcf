@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.locator;
 
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
@@ -269,8 +270,8 @@ public class ScannerRunnable implements Runnable, IChannel.IChannelListener {
 		// has been scheduled from is still active.
 		if (peerNode != null && (parentScanner == null || parentScanner != null && !parentScanner.isTerminated())) {
 			peerNode.setProperty(IPeerModelProperties.PROP_CHANNEL_REF_COUNTER, null);
-			peerNode.setProperty(IPeerModelProperties.PROP_STATE,
-			                  	 error instanceof SocketTimeoutException ? IPeerModelProperties.STATE_NOT_REACHABLE : IPeerModelProperties.STATE_ERROR);
+			boolean timeout = error instanceof SocketTimeoutException || (error instanceof ConnectException && error.getMessage() != null && error.getMessage().startsWith("Connection timed out:")); //$NON-NLS-1$
+			peerNode.setProperty(IPeerModelProperties.PROP_STATE, timeout ? IPeerModelProperties.STATE_NOT_REACHABLE : IPeerModelProperties.STATE_ERROR);
 			peerNode.setProperty(IPeerModelProperties.PROP_LAST_SCANNER_ERROR, error instanceof SocketTimeoutException ? null : error);
 		}
 	}

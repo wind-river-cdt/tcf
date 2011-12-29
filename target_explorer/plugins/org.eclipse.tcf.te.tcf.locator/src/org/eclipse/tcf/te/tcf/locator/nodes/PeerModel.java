@@ -9,8 +9,6 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.locator.nodes;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -205,28 +203,6 @@ public class PeerModel extends PropertiesContainer implements IPeerModel, IWorki
 	@Override
 	public int hashCode() {
 	    return getPeerId().hashCode();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.properties.PropertiesContainer#getProperties()
-	 */
-	@Override
-	public Map<String, Object> getProperties() {
-		Map<String, Object> properties = new HashMap<String, Object>(super.getProperties());
-		if (getPeer() != null) properties.putAll(getPeer().getAttributes());
-	    return Collections.unmodifiableMap(new HashMap<String, Object>(properties));
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.properties.PropertiesContainer#getProperty(java.lang.String)
-	 */
-	@Override
-	public Object getProperty(String key) {
-		Object property = super.getProperty(key);
-		if (property == null && getPeer() != null && getPeer().getAttributes().containsKey(key)) {
-			property = getPeer().getAttributes().get(key);
-		}
-		return property;
 	}
 
 	/* (non-Javadoc)

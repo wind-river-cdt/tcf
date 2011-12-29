@@ -20,13 +20,14 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tcf.protocol.IPeer;
-import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
+import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.controls.BaseDialogPageControl;
 import org.eclipse.tcf.te.ui.controls.BaseEditBrowseTextControl;
 import org.eclipse.tcf.te.ui.controls.panels.AbstractWizardConfigurationPanel;
 import org.eclipse.tcf.te.ui.controls.validator.RegexValidator;
 import org.eclipse.tcf.te.ui.controls.validator.Validator;
+import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
 import org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataWizardPage;
 import org.eclipse.tcf.te.ui.wizards.interfaces.IValidatableWizardPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -235,5 +236,15 @@ public class CustomTransportPanel extends AbstractWizardConfigurationPanel imple
 	public void doRestoreWidgetValues(IDialogSettings settings, String idPrefix) {
 		super.doRestoreWidgetValues(settings, idPrefix);
 		if (customTransportNameControl != null) customTransportNameControl.doRestoreWidgetValues(settings, idPrefix);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.controls.panels.AbstractWizardConfigurationPanel#setEnabled(boolean)
+	 */
+	@Override
+	public void setEnabled(boolean enabled) {
+		if (customTransportNameControl != null) {
+			SWTControlUtil.setEnabled(customTransportNameControl.getEditFieldControl(), enabled);
+		}
 	}
 }

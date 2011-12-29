@@ -46,6 +46,7 @@ import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.dialogs.NameValuePairDialog;
 import org.eclipse.tcf.te.ui.forms.parts.TablePart;
 import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
+import org.eclipse.tcf.te.ui.tables.TableViewerComparator;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
@@ -57,6 +58,9 @@ public class PeerAttributesTablePart extends TablePart implements IDisposable {
 
 	// A list of names which are banned from using
 	private String[] bannedNames;
+
+	// A flag to mark the table part "read-only"
+	/* default */ boolean readOnly;
 
 	/**
 	 * Peer attributes table table node implementation.
@@ -161,7 +165,7 @@ public class PeerAttributesTablePart extends TablePart implements IDisposable {
 			viewer.setCellModifier(new ICellModifier() {
 				@Override
 				public boolean canModify(Object element, String property) {
-				    return element instanceof TableNode;
+				    return element instanceof TableNode && !readOnly;
 				}
 				@Override
 				public Object getValue(Object element, String property) {
@@ -194,6 +198,9 @@ public class PeerAttributesTablePart extends TablePart implements IDisposable {
 			// Create and set content and label provider
 			viewer.setContentProvider(new ArrayContentProvider());
 			viewer.setLabelProvider(new TableLabelProvider());
+
+			// Configure the comparator
+			viewer.setComparator(new TableViewerComparator(viewer, (ITableLabelProvider)viewer.getLabelProvider()));
 
 			// Attach listeners
 			viewer.addSelectionChangedListener(new ISelectionChangedListener() {
@@ -240,8 +247,9 @@ public class PeerAttributesTablePart extends TablePart implements IDisposable {
 	protected void updateButtons() {
 		int selectionCount = getTableViewer().getTable().getSelectionCount();
 
-		SWTControlUtil.setEnabled(getButton(Messages.PeerAttributesTablePart_button_edit), selectionCount == 1);
-		SWTControlUtil.setEnabled(getButton(Messages.PeerAttributesTablePart_button_remove), selectionCount == 1);
+		SWTControlUtil.setEnabled(getButton(Messages.PeerAttributesTablePart_button_new), !readOnly);
+		SWTControlUtil.setEnabled(getButton(Messages.PeerAttributesTablePart_button_edit), selectionCount == 1 && !readOnly);
+		SWTControlUtil.setEnabled(getButton(Messages.PeerAttributesTablePart_button_remove), selectionCount == 1 && !readOnly);
 	}
 
 	/**
@@ -362,6 +370,32 @@ public class PeerAttributesTablePart extends TablePart implements IDisposable {
 	}
 
 	/**
+	 * Set the configured attributes to what is present in the given attributes map.
+	 * <p>
+	 * <b>Note:</b> If the given attributes map is <code>null</code> or empty, the table
+	 * will be effectively cleared.
+	 *
+	 * @param attributes The map of attributes, an empty map or <code>null</code>.
+	 */
+	public void setAttributes(Map<String, String> attributes) {
+		// Clear the old nodes
+		nodes.clear();
+
+		if (attributes != null && !attributes.isEmpty()) {
+			// Create the corresponding nodes for the given attributes
+			for (String key : attributes.keySet()) {
+				TableNode node = new TableNode();
+				node.name = key;
+				node.value = attributes.get(key);
+				nodes.add(node);
+			}
+		}
+
+		// Refresh the view
+		getTableViewer().setInput(nodes);
+	}
+
+	/**
 	 * Set a list of banned names.
 	 *
 	 * @param bannedNames The list of banned names or <code>null</code>.
@@ -377,5 +411,24 @@ public class PeerAttributesTablePart extends TablePart implements IDisposable {
 	 */
 	public final String[] getBannedNames() {
 		return bannedNames;
+	}
+
+	/**
+	 * Set the table part read-only state.
+	 *
+	 * @param readOnly <code>True</code> to set the table part read-only.
+	 */
+	public final void setReadOnly(boolean readOnly) {
+		this.readOnly = readOnly;
+		updateButtons();
+	}
+
+	/**
+	 * Returns the table part read-only state.
+	 *
+	 * @return <code>True</code> if the table part is read-only, <code>false</code> otherwise.
+	 */
+	public final boolean isReadOnly() {
+		return readOnly;
 	}
 }

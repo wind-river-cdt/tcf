@@ -76,17 +76,17 @@
 <!-- Editor page contributions -->
    <extension point="org.eclipse.tcf.te.ui.views.editorPages">
       <editorPage
-            class="org.eclipse.tcf.te.tcf.ui.editor.pages.NodePropertiesEditorPage"
-            name="%NodePropertiesEditorPage.name"
-            id="org.eclipse.tcf.te.tcf.ui.NodePropertiesEditorPage">
+            class="org.eclipse.tcf.te.tcf.ui.editor.OverviewEditorPage"
+            name="%OverviewEditorPage.name"
+            id="org.eclipse.tcf.te.tcf.ui.OverviewEditorPage">
       </editorPage>
    </extension>
 
 <!-- Editor page binding contributions -->
    <extension point="org.eclipse.tcf.te.ui.views.editorPageBindings">
       <editorPageBinding
-            id="org.eclipse.tcf.te.tcf.ui.binding.NodePropertiesEditorPage"
-            pageId="org.eclipse.tcf.te.tcf.ui.NodePropertiesEditorPage"
+            id="org.eclipse.tcf.te.tcf.ui.binding.OverviewEditorPage"
+            pageId="org.eclipse.tcf.te.tcf.ui.OverviewEditorPage"
             insertBefore="first">
          <enablement>
             <with variable="activeEditorInput">

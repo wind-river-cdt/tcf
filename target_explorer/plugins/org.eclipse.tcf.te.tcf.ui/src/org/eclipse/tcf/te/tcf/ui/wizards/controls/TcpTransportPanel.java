@@ -20,14 +20,15 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tcf.protocol.IPeer;
-import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
+import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.controls.BaseDialogPageControl;
 import org.eclipse.tcf.te.ui.controls.net.RemoteHostAddressControl;
 import org.eclipse.tcf.te.ui.controls.net.RemoteHostPortControl;
 import org.eclipse.tcf.te.ui.controls.panels.AbstractWizardConfigurationPanel;
 import org.eclipse.tcf.te.ui.controls.validator.NameOrIPValidator;
 import org.eclipse.tcf.te.ui.controls.validator.Validator;
+import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
 import org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataWizardPage;
 import org.eclipse.tcf.te.ui.wizards.interfaces.IValidatableWizardPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -307,5 +308,19 @@ public class TcpTransportPanel extends AbstractWizardConfigurationPanel implemen
 		super.doRestoreWidgetValues(settings, idPrefix);
 		if (addressControl != null) addressControl.doRestoreWidgetValues(settings, idPrefix);
 		if (portControl != null) portControl.doRestoreWidgetValues(settings, idPrefix);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.controls.panels.AbstractWizardConfigurationPanel#setEnabled(boolean)
+	 */
+	@Override
+	public void setEnabled(boolean enabled) {
+		if (addressControl != null) {
+			SWTControlUtil.setEnabled(addressControl.getEditFieldControl(), enabled);
+			SWTControlUtil.setEnabled(addressControl.getButtonControl(), enabled);
+		}
+		if (portControl != null) {
+			SWTControlUtil.setEnabled(portControl.getEditFieldControl(), enabled);
+		}
 	}
 }

@@ -1,0 +1,53 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * This program and the accompanying materials are made available under the terms
+ * of the Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ * Wind River Systems - initial API and implementation
+ *******************************************************************************/
+package org.eclipse.tcf.te.tcf.ui.editor.controls;
+
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.tcf.te.tcf.ui.editor.sections.GeneralInformationSection;
+import org.eclipse.tcf.te.tcf.ui.wizards.controls.PeerIdControl;
+import org.eclipse.tcf.te.ui.wizards.interfaces.IValidatableWizardPage;
+
+/**
+ * General information section peer id control implementation.
+ */
+public class InfoSectionPeerIdControl extends PeerIdControl {
+	// Reference to the parent general information section
+	private final GeneralInformationSection infoSection;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param infoSection The parent general information section. Must not be <code>null</code>.
+	 */
+	public InfoSectionPeerIdControl(GeneralInformationSection infoSection) {
+		super(null);
+
+		Assert.isNotNull(infoSection);
+		this.infoSection = infoSection;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.controls.BaseDialogPageControl#getValidatableWizardPage()
+	 */
+	@Override
+	public IValidatableWizardPage getValidatableWizardPage() {
+		return infoSection;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.controls.BaseEditBrowseTextControl#modifyText(org.eclipse.swt.events.ModifyEvent)
+	 */
+	@Override
+	public void modifyText(ModifyEvent e) {
+		super.modifyText(e);
+		infoSection.dataChanged(e);
+	}
+}
