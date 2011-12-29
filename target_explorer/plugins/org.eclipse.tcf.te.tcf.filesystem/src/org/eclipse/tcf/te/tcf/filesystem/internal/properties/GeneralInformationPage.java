@@ -66,7 +66,7 @@ public class GeneralInformationPage extends PropertyPage {
 		if (clone.isDirectory())
 			return Messages.GeneralInformationPage_Folder;
 		else if (clone.isFile()) {
-			IContentType contentType = ContentTypeHelper.getInstance().getContentType(node);
+			IContentType contentType = ContentTypeHelper.getInstance().getContentType(clone);
 			String contentTypeName = contentType == null ? Messages.GeneralInformationPage_UnknownFileType : contentType.getName();
 			return NLS.bind(Messages.GeneralInformationPage_File, contentTypeName);
 		} else

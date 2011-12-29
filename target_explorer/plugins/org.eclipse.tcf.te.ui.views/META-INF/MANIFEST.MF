@@ -33,5 +33,6 @@ Export-Package: org.eclipse.tcf.te.ui.views,
  org.eclipse.tcf.te.ui.views.listeners,
  org.eclipse.tcf.te.ui.views.nls;x-internal:=true,
  org.eclipse.tcf.te.ui.views.perspective,
+ org.eclipse.tcf.te.ui.views.tabbed,
  org.eclipse.tcf.te.ui.views.workingsets,
  org.eclipse.tcf.te.ui.views.workingsets.pages

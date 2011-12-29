@@ -2158,7 +2158,13 @@
          <propertyTab
                category="target_explorer"
                id="org.eclipse.tcf.te.tcf.filesystem.propertytab.general"
-               label="General">
+               label="%propertyTab.general.label">
+         </propertyTab>
+         <propertyTab
+               afterTab="org.eclipse.tcf.te.tcf.filesystem.propertytab.general"
+               category="target_explorer"
+               id="org.eclipse.tcf.te.tcf.filesystem.propertytab.advanced"
+               label="%propertyTab.advanced.label">
          </propertyTab>
       </propertyTabs>
    </extension>
@@ -2172,6 +2178,51 @@
                filter="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.FolderFilter"
                id="org.eclipse.tcf.te.tcf.filesystem.propertysection.folder.basic"
                tab="org.eclipse.tcf.te.tcf.filesystem.propertytab.general">
+         </propertySection>
+         <propertySection
+               class="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.BasicFileSection"
+               enablesFor="1"
+               filter="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.FileFilter"
+               id="org.eclipse.tcf.te.tcf.filesystem.propertysection.file.basic"
+               tab="org.eclipse.tcf.te.tcf.filesystem.propertytab.general">
+         </propertySection>
+         <propertySection
+               afterSection="org.eclipse.tcf.te.tcf.filesystem.propertysection.folder.basic,org.eclipse.tcf.te.tcf.filesystem.propertysection.file.basic"
+               class="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.WindowsAttributesSection"
+               enablesFor="1"
+               filter="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.WindowsFilter"
+               id="org.eclipse.tcf.te.tcf.filesystem.propertysection.windows.attributes"
+               tab="org.eclipse.tcf.te.tcf.filesystem.propertytab.general">
+         </propertySection>
+         <propertySection
+               afterSection="org.eclipse.tcf.te.tcf.filesystem.propertysection.folder.basic,org.eclipse.tcf.te.tcf.filesystem.propertysection.file.basic"
+               class="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.LinuxPermissionsSection"
+               enablesFor="1"
+               filter="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.LinuxFilter"
+               id="org.eclipse.tcf.te.tcf.filesystem.propertysection.linux.permissions"
+               tab="org.eclipse.tcf.te.tcf.filesystem.propertytab.general">
+         </propertySection>
+         <propertySection
+               class="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.WindowsFolderAISection"
+               enablesFor="1"
+               filter="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.WindowsFolderFilter"
+               id="org.eclipse.tcf.te.tcf.filesystem.propertysection.windows.folderAI"
+               tab="org.eclipse.tcf.te.tcf.filesystem.propertytab.advanced">
+         </propertySection>
+         <propertySection
+               class="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.WindowsFileAISection"
+               enablesFor="1"
+               filter="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.WindowsFileFilter"
+               id="org.eclipse.tcf.te.tcf.filesystem.propertysection.windows.fileAI"
+               tab="org.eclipse.tcf.te.tcf.filesystem.propertytab.advanced">
+         </propertySection>
+         <propertySection
+               afterSection="org.eclipse.tcf.te.tcf.filesystem.propertysection.windows.folderAI,"
+               class="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.WindowsAttributesCESection"
+               enablesFor="1"
+               filter="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.WindowsFilter"
+               id="org.eclipse.tcf.te.tcf.filesystem.propertysection.windows.attributesCE"
+               tab="org.eclipse.tcf.te.tcf.filesystem.propertytab.advanced">
          </propertySection>
       </propertySections>
    </extension>   

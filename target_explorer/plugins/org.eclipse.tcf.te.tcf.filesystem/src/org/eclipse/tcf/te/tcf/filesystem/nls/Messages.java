@@ -96,6 +96,7 @@ public class Messages extends NLS {
 	public static String AdvancedAttributesDialog_System;
 	public static String AdvancedAttributesDialog_Temporary;
 	public static String AdvancedAttributesDialog_Virtual;
+	public static String BasicFolderSection_BasicInfoText;
 
 	public static String CacheManager_Bytes;
 	public static String CacheManager_DowloadingFile;
@@ -174,6 +175,7 @@ public class Messages extends NLS {
 	public static String FSOperation_CopyNOfFile;
 	public static String FSOperation_CopyOfFile;
 
+	public static String LinuxPermissionsSection_Permissions;
 	public static String LocalTypedElement_SavingFile;
 
 	public static String OpenFileHandler_Cancel;
@@ -322,4 +324,5 @@ public class Messages extends NLS {
 	public static String NewFolderWizardPage_NewFolderWizardPageTitle;
 	public static String NewNodeWizardPage_LstatTimedout;
 	public static String NewNodeWizardPage_PromptFolderLabel;
+	public static String WindowsAttributesSection_Attributes;
 }
