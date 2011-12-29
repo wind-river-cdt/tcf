@@ -326,6 +326,6 @@ public class View extends CommonNavigator implements ITabbedPropertySheetPageCon
 	 */
 	@Override
     public String getContributorId() {
-	    return IUIConstants.TABBED_PROPERETIES_CONTRIBUTOR_ID;
+	    return IUIConstants.TABBED_PROPERTIES_CONTRIBUTOR_ID;
     }
 }

@@ -141,18 +141,22 @@ public class OverviewEditorPage extends AbstractCustomFormToolkitEditorPage {
 
 		infoSection = new GeneralInformationSection(getManagedForm(), panel);
 		infoSection.getSection().setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB, TableWrapData.TOP));
+		getManagedForm().addPart(infoSection);
 
 		transportSection = new TransportSection(getManagedForm(), (Composite)infoSection.getSection().getClient());
 		((GridData)transportSection.getSection().getLayoutData()).horizontalSpan = 2;
+		getManagedForm().addPart(transportSection);
 
 		servicesSection = new ServicesSection(getManagedForm(), panel);
 		TableWrapData layoutData = new TableWrapData(TableWrapData.FILL_GRAB, TableWrapData.TOP);
 		servicesSection.getSection().setLayoutData(layoutData);
+		getManagedForm().addPart(servicesSection);
 
 		attributesSection = new AttributesSection(getManagedForm(), panel);
 		layoutData = new TableWrapData(TableWrapData.FILL_GRAB, TableWrapData.FILL_GRAB);
 		layoutData.colspan = 2;
 		attributesSection.getSection().setLayoutData(layoutData);
+		getManagedForm().addPart(attributesSection);
 	}
 
 	/* (non-Javadoc)

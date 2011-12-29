@@ -31,12 +31,15 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 
 /**
- * Details editor.
+ * Properties editor implementation.
  */
-public class Editor extends FormEditor implements IPersistableEditor,  ITabbedPropertySheetPageContributor {
+public class Editor extends FormEditor implements IPersistableEditor, ITabbedPropertySheetPageContributor {
 
 	// The reference to an memento to restore once the editor got activated
 	private IMemento mementoToRestore;
+
+	// The editor event listener instance
+	private EditorEventListener listener;
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.forms.editor.FormEditor#addPages()
@@ -128,6 +131,22 @@ public class Editor extends FormEditor implements IPersistableEditor,  ITabbedPr
 
 		// Update the part name
 		if (!"".equals(input.getName())) setPartName(input.getName()); //$NON-NLS-1$
+
+		// Dispose an existing event listener instance
+		if (listener != null) { listener.dispose(); listener = null; }
+		// Create the event listener. The event listener does register itself.
+		listener = new EditorEventListener(this);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.forms.editor.FormEditor#dispose()
+	 */
+	@Override
+	public void dispose() {
+		// Dispose an existing event listener instance
+		if (listener != null) { listener.dispose(); listener = null; }
+
+	    super.dispose();
 	}
 
 	/* (non-Javadoc)
@@ -208,7 +227,7 @@ public class Editor extends FormEditor implements IPersistableEditor,  ITabbedPr
 	 */
 	@Override
 	public Object getAdapter(Class adapter) {
-		if(adapter == IPropertySheetPage.class) {
+		if (adapter == IPropertySheetPage.class) {
 			return new TabbedPropertySheetPage(this);
 		}
 		// We pass on the adapt request to the currently active page
@@ -220,12 +239,11 @@ public class Editor extends FormEditor implements IPersistableEditor,  ITabbedPr
 		return adapterInstance;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor#getContributorId()
 	 */
 	@Override
     public String getContributorId() {
-	    return IUIConstants.TABBED_PROPERETIES_CONTRIBUTOR_ID;
+	    return IUIConstants.TABBED_PROPERTIES_CONTRIBUTOR_ID;
     }
 }

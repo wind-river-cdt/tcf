@@ -232,6 +232,8 @@ public class PeerModel extends PropertiesContainer implements IPeerModel, IWorki
 				});
 			}
 		}
+
+		super.postSetProperties(properties);
 	}
 
 	/* (non-Javadoc)
@@ -265,5 +267,7 @@ public class PeerModel extends PropertiesContainer implements IPeerModel, IWorki
 				});
 			}
 		}
+
+		super.postSetProperty(key, value, oldValue);
 	}
 }

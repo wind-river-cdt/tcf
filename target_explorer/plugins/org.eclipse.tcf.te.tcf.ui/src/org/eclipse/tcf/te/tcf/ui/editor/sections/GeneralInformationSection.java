@@ -184,13 +184,6 @@ public class GeneralInformationSection extends AbstractSection implements IValid
 	 * @param node The peer node or <code>null</code>.
 	 */
 	public void setupData(final IPeerModel node) {
-		// If the passed in node is the same as the previous one,
-		// no need for updating the section widgets.
-		if ((node == null && od == null) || (node != null && node.equals(od))) {
-			updateEnablement();
-			return;
-		}
-
 		// Store a reference to the original data
 		od = node;
 		// Clean the original data copy

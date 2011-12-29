@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.locator.interfaces;
 
+import org.eclipse.tcf.te.runtime.interfaces.events.IEventListener;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 
@@ -36,6 +37,10 @@ public interface IModelListener {
 
 	/**
 	 * Invoked if the peer model properties have changed.
+	 * <p>
+	 * <b>Note:</b> This method is called in addition to the change events send out by the peer
+	 * model. If it is required to determine which property has changed in detail, register a
+	 * {@link IEventListener} instead.
 	 *
 	 * @param model The parent locator model.
 	 * @param peer The changed peer model.
