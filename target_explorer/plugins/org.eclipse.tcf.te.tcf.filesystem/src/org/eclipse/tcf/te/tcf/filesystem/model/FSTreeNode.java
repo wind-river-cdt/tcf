@@ -216,15 +216,15 @@ public final class FSTreeNode extends PlatformObject implements Cloneable{
 	 * @return true if it is a Windows node, or else false.
 	 */
 	public boolean isWindowsNode() {
+		if (peerNode != null) {
+			TargetPropertyTester tester = new TargetPropertyTester();
+			return tester.test(peerNode, "isWindows", null, null); //$NON-NLS-1$
+		}
 		if (attr != null) {
 			return attr.attributes != null && attr.attributes.containsKey(KEY_WIN32_ATTRS);
 		}
 		if (parent != null) {
 			return parent.isWindowsNode();
-		}
-		if (peerNode != null) {
-			TargetPropertyTester tester = new TargetPropertyTester();
-			return tester.test(peerNode, "isWindows", null, null); //$NON-NLS-1$
 		}
 		return false;
 	}
