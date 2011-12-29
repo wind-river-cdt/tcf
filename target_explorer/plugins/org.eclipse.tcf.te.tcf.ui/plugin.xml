@@ -20,7 +20,7 @@
             icon="icons/obj16/rootNode_obj.gif"
             id="org.eclipse.tcf.te.tcf.ui.navigator.content"
             labelProvider="org.eclipse.tcf.te.tcf.ui.navigator.LabelProvider"
-            name="Dynamic Target Discovery"
+            name="%navigatorContent.name"
             priority="normal">
             <enablement>
                <or>
@@ -298,4 +298,40 @@
          </and>
       </definition>
    </extension>
+   <extension
+         point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+      <propertyTabs
+            contributorId="org.eclipse.tcf.te.ui">
+         <propertyTab
+               category="target_explorer"
+               id="org.eclipse.tcf.te.ui.views.propertyTab.peer.general"
+               label="%propertyTab.general.label">
+         </propertyTab>
+      </propertyTabs>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views.properties.tabbed.propertySections">
+      <propertySections
+            contributorId="org.eclipse.tcf.te.ui">
+         <propertySection
+               class="org.eclipse.tcf.te.tcf.ui.internal.tabbed.PeerGeneralSection"
+               enablesFor="1"
+               id="org.eclipse.tcf.te.ui.views.propertysections.peer.general"
+               tab="org.eclipse.tcf.te.ui.views.propertyTab.peer.general">
+            <input
+                  type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel">
+            </input>
+         </propertySection>
+      </propertySections>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"
+            class="org.eclipse.tcf.te.tcf.ui.internal.adapters.PeerModelAdapterFactory">
+         <adapter
+               type="org.eclipse.jface.viewers.ILabelProvider">
+         </adapter>
+      </factory>
+   </extension>   
 </plugin>
