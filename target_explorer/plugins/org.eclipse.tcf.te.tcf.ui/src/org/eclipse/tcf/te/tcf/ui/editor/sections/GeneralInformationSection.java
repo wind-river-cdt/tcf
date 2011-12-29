@@ -9,6 +9,9 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.ui.editor.sections;
 
+import java.io.IOException;
+import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -21,12 +24,17 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.tcf.core.TransientPeer;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
+import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistableNodeProperties;
+import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistenceService;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
+import org.eclipse.tcf.te.runtime.services.ServiceManager;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
+import org.eclipse.tcf.te.tcf.locator.nodes.PeerRedirector;
 import org.eclipse.tcf.te.tcf.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.ui.editor.controls.InfoSectionPeerIdControl;
 import org.eclipse.tcf.te.tcf.ui.editor.controls.InfoSectionPeerNameControl;
@@ -179,7 +187,7 @@ public class GeneralInformationSection extends AbstractSection implements IValid
 	 * Initialize the page widgets based of the data from the given peer node.
 	 * <p>
 	 * This method may called multiple times during the lifetime of the page and
-	 * the given configuration node might be even <code>null</code>.
+	 * the given peer node might be even <code>null</code>.
 	 *
 	 * @param node The peer node or <code>null</code>.
 	 */
@@ -246,6 +254,59 @@ public class GeneralInformationSection extends AbstractSection implements IValid
 		updateEnablement();
 	}
 
+	/**
+	 * Stores the page widgets current values to the given peer node.
+	 * <p>
+	 * This method may called multiple times during the lifetime of the page and
+	 * the given peer node might be even <code>null</code>.
+	 *
+	 * @param node The GDB Remote configuration node or <code>null</code>.
+	 */
+	public void extractData(final IPeerModel node) {
+		// If no data is available, we are done
+		if (node == null) return;
+
+		// Extract the widget data into the working copy
+		if (idControl != null) {
+			wc.setProperty(IPeer.ATTR_ID, idControl.getEditFieldControlText());
+		}
+
+		if (nameControl != null) {
+			wc.setProperty(IPeer.ATTR_NAME, nameControl.getEditFieldControlText());
+		}
+
+		// Copy the working copy data back to the original properties container
+		Protocol.invokeAndWait(new Runnable() {
+			@Override
+			public void run() {
+				// To update the peer attributes, the peer needs to be recreated
+				IPeer oldPeer = node.getPeer();
+				// Create a write able copy of the peer attributes
+				Map<String, String> attributes = new HashMap<String, String>(oldPeer.getAttributes());
+				// Update the (managed) attributes from the working copy
+				attributes.put(IPeer.ATTR_NAME, wc.getStringProperty(IPeer.ATTR_NAME));
+				// Update the persistence storage URI (if set)
+				if (attributes.containsKey(IPersistableNodeProperties.PROPERTY_URI)) {
+					IPersistenceService persistenceService = ServiceManager.getInstance().getService(IPersistenceService.class);
+					if (persistenceService != null) {
+						URI uri = null;
+						try {
+							uri = persistenceService.getURI(attributes);
+						} catch (IOException e) { /* ignored on purpose */ }
+						if (uri != null) attributes.put(IPersistableNodeProperties.PROPERTY_URI, uri.toString());
+						else attributes.remove(IPersistableNodeProperties.PROPERTY_URI);
+					}
+				}
+				// Create the new peer
+				IPeer newPeer = oldPeer instanceof PeerRedirector ? new PeerRedirector(((PeerRedirector)oldPeer).getParent(), attributes) : new TransientPeer(attributes);
+				// Update the peer node instance (silently)
+				boolean changed = node.setChangeEventsEnabled(false);
+				node.setProperty(IPeerModelProperties.PROP_INSTANCE, newPeer);
+				if (changed) node.setChangeEventsEnabled(true);
+			}
+		});
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.IValidatableWizardPage#validatePage()
 	 */
@@ -279,6 +340,36 @@ public class GeneralInformationSection extends AbstractSection implements IValid
 
 		// Nothing to do if not on save or saving is not needed
 		if (!onSave || !needsSaving) return;
+
+		// Remember the old name
+		String oldName = odc.getStringProperty(IPeer.ATTR_NAME);
+		// Extract the data into the original data node
+		extractData(od);
+
+		// If the name changed, trigger a save of the data
+		if (!oldName.equals(wc.getStringProperty(IPeer.ATTR_NAME))) {
+			try {
+				// Get the persistence service
+				IPersistenceService persistenceService = ServiceManager.getInstance().getService(IPersistenceService.class);
+				if (persistenceService == null) throw new IOException("Persistence service instance unavailable."); //$NON-NLS-1$
+				// Remove the old persistence storage using the original data copy
+				persistenceService.delete(odc.getProperties());
+				// Save the peer node to the new persistence storage
+				persistenceService.write(od.getPeer().getAttributes());
+			} catch (IOException e) {
+				// Pass on to the editor page
+			}
+
+			Protocol.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					// Refresh the locator model
+					//od.getModel().getService(ILocatorModelRefreshService.class).refresh();
+					// Trigger a change event for the original data node
+					od.setProperties(od.getProperties());
+				}
+			});
+		}
 	}
 
 	/**

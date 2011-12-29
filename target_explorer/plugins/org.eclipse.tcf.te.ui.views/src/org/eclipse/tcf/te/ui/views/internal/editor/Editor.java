@@ -138,6 +138,21 @@ public class Editor extends FormEditor implements IPersistableEditor, ITabbedPro
 		listener = new EditorEventListener(this);
 	}
 
+	/**
+	 * Update the editor part name based on the current editor input.
+	 */
+	public void updatePartName() {
+		IEditorInput input = getEditorInput();
+		String oldPartName = getPartName();
+
+		if (input instanceof EditorInput) {
+			// Reset the editor input name to trigger recalculation
+			((EditorInput)input).name = null;
+			// If the name changed, apply the new name
+			if (!oldPartName.equals(input.getName())) setPartName(input.getName());
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.forms.editor.FormEditor#dispose()
 	 */

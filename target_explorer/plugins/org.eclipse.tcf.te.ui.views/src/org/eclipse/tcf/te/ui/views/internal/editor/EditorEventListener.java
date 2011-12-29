@@ -71,5 +71,8 @@ public class EditorEventListener extends AbstractEventListener implements IDispo
 		if (page instanceof IFormPage) {
 			((IFormPage)page).setActive(((IFormPage)page).isActive());
 		}
+
+		// Update the editor part name
+		editor.updatePartName();
 	}
 }

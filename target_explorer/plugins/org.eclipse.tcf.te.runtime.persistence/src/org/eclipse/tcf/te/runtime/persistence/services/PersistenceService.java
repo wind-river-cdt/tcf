@@ -124,4 +124,29 @@ public class PersistenceService extends AbstractService implements IPersistenceS
 		// Pass on to the delegate for deleting
 	    return delegate.delete(uri);
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistenceService#getURI(java.lang.Object)
+	 */
+	@Override
+	public URI getURI(Object data) throws IOException {
+		Assert.isNotNull(data);
+
+		// Determine the persistable element for the given data object
+		IPersistable persistable = data instanceof IPersistable ? (IPersistable)data : null;
+		// If the element isn't a persistable by itself, try to adapt the element
+		if (persistable == null) persistable = data instanceof IAdaptable ? (IPersistable) ((IAdaptable)data).getAdapter(IPersistable.class) : null;
+		if (persistable == null) persistable = (IPersistable) Platform.getAdapterManager().getAdapter(data, IPersistable.class);
+
+		// If the persistable could be still not determined, throw an IOException
+		if (persistable == null) throw new IOException("'data' must be adaptable to IPersistable."); //$NON-NLS-1$
+
+		// Determine the persistence delegate
+		IPersistenceDelegate delegate = persistable.getStorageID() != null ? PersistenceDelegateManager.getInstance().getDelegate(persistable.getStorageID(), false) : null;
+		// If the persistence delegate could not be determined, throw an IOException
+		if (delegate == null) throw new IOException("The persistence delegate for ID '" + persistable.getStorageID() + "' cannot be determined."); //$NON-NLS-1$ //$NON-NLS-2$
+
+		// Determine the URI
+		return persistable.getURI(data);
+	}
 }
