@@ -18,6 +18,7 @@
                   <insertionPoint name="group.expand"/>
                   <insertionPoint name="group.open" separator="true"/>
                   <insertionPoint name="group.openWith"/>
+                  <insertionPoint name="group.showIn"/>
                   <insertionPoint name="group.connect" separator="true"/>
                   <insertionPoint name="group.redirect" separator="true"/>
                   <insertionPoint name="group.symbols" separator="true"/>
