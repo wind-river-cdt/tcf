@@ -9,6 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.processes.ui.internal.columns;
 
+import java.io.File;
+
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
@@ -34,6 +36,8 @@ public class ProcessLabelProvider extends LabelProvider {
 			}
 			String name = node.name;
 			if (name == null) name = Messages.ProcessLabelProvider_NullNameNodeLabel; 
+			int slash = name.lastIndexOf(File.separator);
+			if (slash != -1) name = name.substring(slash + 1);
 			return name;
 		}
 		return super.getText(element);

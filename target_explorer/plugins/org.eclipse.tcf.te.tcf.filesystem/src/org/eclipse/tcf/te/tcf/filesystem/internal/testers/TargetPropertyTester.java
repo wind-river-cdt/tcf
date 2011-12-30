@@ -40,7 +40,18 @@ public class TargetPropertyTester extends PropertyTester {
 	 * @return true if it is a windows target.
 	 */
 	public static boolean isWindows(final IPeerModel peerModel) {
-		final String[] osName = new String[1];
+		final String osName = getOSName(peerModel);
+		return osName == null ? false : (osName.startsWith("Windows")); //$NON-NLS-1$
+	}
+	
+	/**
+	 * Get the OS name from the peer model.
+	 * 
+	 * @param peerModel The peer model.
+	 * @return OS name.
+	 */
+	public static String getOSName(final IPeerModel peerModel) {
+	    final String[] osName = new String[1];
 		if (Protocol.isDispatchThread()) {
 			osName[0] = peerModel.getStringProperty("OSName"); //$NON-NLS-1$
 		}
@@ -52,6 +63,6 @@ public class TargetPropertyTester extends PropertyTester {
 				}
 			});
 		}
-		return osName[0] == null ? false : (osName[0].startsWith("Windows")); //$NON-NLS-1$
-	}	
+	    return osName[0];
+    }	
 }

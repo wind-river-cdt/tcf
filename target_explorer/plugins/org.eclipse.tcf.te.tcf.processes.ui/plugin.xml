@@ -347,59 +347,47 @@
          <propertySection
                class="org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed.BasicInformationSection"
                enablesFor="1"
+               filter="org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed.ProcessFilter"
                id="org.eclipse.tcf.te.tcf.processes.ui.propertysection.general.basic"
                tab="org.eclipse.tcf.te.tcf.processes.ui.propertytab.general">
-            <input
-                  type="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
-            </input>
          </propertySection>
          <propertySection
                afterSection="org.eclipse.tcf.te.tcf.processes.ui.propertysection.general.basic"
                class="org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed.IDSection"
                enablesFor="1"
+               filter="org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed.ProcessFilter"
                id="org.eclipse.tcf.te.tcf.processes.ui.propertysection.general.id"
                tab="org.eclipse.tcf.te.tcf.processes.ui.propertytab.general">
-            <input
-                  type="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
-            </input>
          </propertySection>
          <propertySection
                class="org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed.BasicContextSection"
                enablesFor="1"
+               filter="org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed.ProcessFilter"
                id="org.eclipse.tcf.te.tcf.processes.ui.propertysection.context.basicContext"
                tab="org.eclipse.tcf.te.tcf.processes.ui.propertytab.context">
-            <input
-                  type="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
-            </input>
          </propertySection>
          <propertySection
                afterSection="org.eclipse.tcf.te.tcf.processes.ui.propertysection.context.basicContext"
                class="org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed.ContextIDSection"
                enablesFor="1"
+               filter="org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed.ProcessFilter"
                id="org.eclipse.tcf.te.tcf.processes.ui.propertysection.context.contextId"
                tab="org.eclipse.tcf.te.tcf.processes.ui.propertytab.context">
-            <input
-                  type="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
-            </input>
          </propertySection>
          <propertySection
                afterSection="org.eclipse.tcf.te.tcf.processes.ui.propertysection.context.contextId"
                class="org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed.MemorySection"
                enablesFor="1"
+               filter="org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed.ProcessFilter"
                id="org.eclipse.tcf.te.tcf.processes.ui.propertysection.context.memory"
                tab="org.eclipse.tcf.te.tcf.processes.ui.propertytab.context">
-            <input
-                  type="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
-            </input>
          </propertySection>
          <propertySection
                class="org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed.AdvancedPropertiesSection"
                enablesFor="1"
+               filter="org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed.ProcessFilter"
                id="org.eclipse.tcf.te.tcf.processes.ui.propertysection.advanced"
                tab="org.eclipse.tcf.te.tcf.processes.ui.propertytab.advanced">
-            <input
-                  type="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
-            </input>
          </propertySection>
       </propertySections>
    </extension>
