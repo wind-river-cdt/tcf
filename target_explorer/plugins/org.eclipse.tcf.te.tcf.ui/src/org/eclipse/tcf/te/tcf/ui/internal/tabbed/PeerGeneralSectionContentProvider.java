@@ -28,7 +28,7 @@ import org.eclipse.ui.forms.widgets.Section;
 
 
 /**
- * TCF node properties table content provider implementation.
+ * Peer properties general section table content provider implementation.
  */
 public class PeerGeneralSectionContentProvider implements IStructuredContentProvider {
 

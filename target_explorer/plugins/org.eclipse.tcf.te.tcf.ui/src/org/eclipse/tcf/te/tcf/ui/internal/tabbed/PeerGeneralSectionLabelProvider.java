@@ -18,7 +18,7 @@ import org.eclipse.tcf.te.ui.tables.properties.NodePropertiesTableTableNode;
 
 
 /**
- * TCF node properties table label provider implementation.
+ * Peer properties general section table label provider implementation.
  */
 public class PeerGeneralSectionLabelProvider extends LabelProvider implements ITableLabelProvider {
 	// Reference to the parent table viewer

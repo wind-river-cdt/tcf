@@ -51,7 +51,9 @@ public class ModelListener extends ModelAdapter {
 				display.asyncExec(new Runnable() {
 					@Override
 					public void run() {
-						viewer.refresh();
+						if (viewer.getTree() != null && !viewer.getTree().isDisposed()) {
+							viewer.refresh();
+						}
 					}
 				});
 			}
@@ -70,7 +72,9 @@ public class ModelListener extends ModelAdapter {
 				display.asyncExec(new Runnable() {
 					@Override
 					public void run() {
-						viewer.refresh(peer);
+						if (viewer.getTree() != null && !viewer.getTree().isDisposed()) {
+							viewer.refresh(peer);
+						}
 					}
 				});
 			}
