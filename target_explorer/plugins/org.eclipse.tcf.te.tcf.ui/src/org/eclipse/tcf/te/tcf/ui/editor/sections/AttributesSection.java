@@ -9,7 +9,10 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.ui.editor.sections;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -18,11 +21,16 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TypedEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tcf.core.TransientPeer;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
+import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistenceService;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
+import org.eclipse.tcf.te.runtime.services.ServiceManager;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
+import org.eclipse.tcf.te.tcf.locator.nodes.PeerRedirector;
 import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.tcf.ui.wizards.controls.PeerAttributesTablePart;
 import org.eclipse.tcf.te.ui.forms.parts.AbstractSection;
@@ -43,6 +51,8 @@ public class AttributesSection extends AbstractSection {
 	/* default */ IPeerModel od;
 	// Reference to a copy of the original data
 	/* default */ final IPropertiesContainer odc = new PropertiesContainer();
+	// Reference to the properties container representing the working copy for the section
+	/* default */ final IPropertiesContainer wc = new PropertiesContainer();
 
 	/*
 	 * The list of banned names for the table parts. Banned names are names the user is not allowed
@@ -114,7 +124,12 @@ public class AttributesSection extends AbstractSection {
 		Assert.isNotNull(client);
 		section.setClient(client);
 
-		tablePart = new PeerAttributesTablePart();
+		tablePart = new PeerAttributesTablePart() {
+			@Override
+			protected void onTableModified() {
+				dataChanged(null);
+			}
+		};
 		tablePart.setMinSize(SWTControlUtil.convertWidthInCharsToPixels(client, 20), SWTControlUtil.convertHeightInCharsToPixels(client, 6));
 		tablePart.setBannedNames(BANNED_NAMES);
 		tablePart.createControl(client, SWT.SINGLE | SWT.FULL_SELECTION, 2, toolkit);
@@ -156,6 +171,8 @@ public class AttributesSection extends AbstractSection {
 		od = node;
 		// Clean the original data copy
 		odc.clearProperties();
+		// Clean the working copy
+		wc.clearProperties();
 
 		// If no data is available, we are done
 		if (node == null) return;
@@ -167,6 +184,7 @@ public class AttributesSection extends AbstractSection {
 			public void run() {
 				Map<String, String> properties = node.getPeer().getAttributes();
 				for (String key : properties.keySet()) {
+					wc.setProperty(key, properties.get(key));
 					odc.setProperty(key, properties.get(key));
 				}
 			}
@@ -177,17 +195,21 @@ public class AttributesSection extends AbstractSection {
 		// Remove the filtered attributes from the original data and working copy in
 		// order to get an exact base to determine the dirty state of the section.
 		for (String filteredName : FILTERED_NAMES) {
+			wc.setProperty(filteredName, null);
 			odc.setProperty(filteredName, null);
 		}
 
 		// Remove all "*.transient" properties
 		for (String name : odc.getProperties().keySet()) {
-			if (name.endsWith(".transient")) odc.setProperty(name, null); //$NON-NLS-1$
+			if (name.endsWith(".silent") || name.endsWith(".transient")) { //$NON-NLS-1$ //$NON-NLS-2$
+				wc.setProperty(name, null);
+				odc.setProperty(name, null);
+			}
 		}
 
 		// Make a <String, String> map out of the remaining properties
 		Map<String, String> attributes = new HashMap<String, String>();
-		Map<String, Object> properties = odc.getProperties();
+		Map<String, Object> properties = wc.getProperties();
 		for (String key : properties.keySet()) {
 			attributes.put(key, properties.get(key).toString());
 		}
@@ -197,6 +219,70 @@ public class AttributesSection extends AbstractSection {
 
 		// Adjust the control enablement
 		updateEnablement();
+	}
+
+	/**
+	 * Stores the page widgets current values to the given peer node.
+	 * <p>
+	 * This method may called multiple times during the lifetime of the page and
+	 * the given peer node might be even <code>null</code>.
+	 *
+	 * @param node The GDB Remote configuration node or <code>null</code>.
+	 */
+	public void extractData(final IPeerModel node) {
+		// If no data is available, we are done
+		if (node == null) return;
+
+		// Extract the table part attributes into the working copy
+		// Properties not longer available in the table part attributes
+		// are removed.
+		Map<String, String> attributes = tablePart.getAttributes();
+		Map<String, Object> properties = wc.getProperties();
+		final List<String> removed = new ArrayList<String>();
+		for (String key : properties.keySet()) {
+			if (attributes.containsKey(key)) {
+				wc.setProperty(key, attributes.get(key));
+				attributes.remove(key);
+			} else {
+				wc.setProperty(key, null);
+				removed.add(key);
+			}
+		}
+		// Add all remaining (new) attributes
+		if (!attributes.isEmpty()) {
+			for (String key : attributes.keySet()) {
+				wc.setProperty(key, attributes.get(key));
+			}
+		}
+
+		// Copy the working copy data back to the original properties container
+		Protocol.invokeAndWait(new Runnable() {
+			@Override
+			public void run() {
+				// To update the peer attributes, the peer needs to be recreated
+				IPeer oldPeer = node.getPeer();
+				// Create a write able copy of the peer attributes
+				Map<String, String> attributes = new HashMap<String, String>(oldPeer.getAttributes());
+				// Update with the current configured attributes
+				for (String key : wc.getProperties().keySet()) {
+					String value = wc.getStringProperty(key);
+					if (value != null) {
+						attributes.put(key, value);
+					} else {
+						attributes.remove(key);
+					}
+				}
+				// Remove the disappeared properties
+				for (String key : removed) attributes.remove(key);
+
+				// Create the new peer
+				IPeer newPeer = oldPeer instanceof PeerRedirector ? new PeerRedirector(((PeerRedirector)oldPeer).getParent(), attributes) : new TransientPeer(attributes);
+				// Update the peer node instance (silently)
+				boolean changed = node.setChangeEventsEnabled(false);
+				node.setProperty(IPeerModelProperties.PROP_INSTANCE, newPeer);
+				if (changed) node.setChangeEventsEnabled(true);
+			}
+		});
 	}
 
 	/* (non-Javadoc)
@@ -211,6 +297,34 @@ public class AttributesSection extends AbstractSection {
 
 		// Nothing to do if not on save or saving is not needed
 		if (!onSave || !needsSaving) return;
+
+		// Extract the data into the original data node
+		extractData(od);
+
+		// If the working copy and the original data copy differs at this point,
+		// the data changed really and we have to write the peer to the persistence
+		// storage.
+		if (!odc.equals(wc)) {
+			try {
+				// Get the persistence service
+				IPersistenceService persistenceService = ServiceManager.getInstance().getService(IPersistenceService.class);
+				if (persistenceService == null) throw new IOException("Persistence service instance unavailable."); //$NON-NLS-1$
+				// Save the peer node to the new persistence storage
+				persistenceService.write(od.getPeer().getAttributes());
+			} catch (IOException e) {
+				// Pass on to the editor page
+			}
+
+			Protocol.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					// Refresh the locator model
+					//od.getModel().getService(ILocatorModelRefreshService.class).refresh();
+					// Trigger a change event for the original data node
+					od.setProperties(od.getProperties());
+				}
+			});
+		}
 	}
 
 	/**

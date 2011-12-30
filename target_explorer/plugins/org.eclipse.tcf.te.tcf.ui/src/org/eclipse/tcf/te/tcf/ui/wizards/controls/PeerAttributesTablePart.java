@@ -10,6 +10,7 @@
 package org.eclipse.tcf.te.tcf.ui.wizards.controls;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -191,6 +192,7 @@ public class PeerAttributesTablePart extends TablePart implements IDisposable {
 							((TableNode)element).value = value != null ? value.toString() : ""; //$NON-NLS-1$
 						}
 						viewer.setInput(nodes);
+						onTableModified();
 					}
 				}
 			});
@@ -248,8 +250,21 @@ public class PeerAttributesTablePart extends TablePart implements IDisposable {
 		int selectionCount = getTableViewer().getTable().getSelectionCount();
 
 		SWTControlUtil.setEnabled(getButton(Messages.PeerAttributesTablePart_button_new), !readOnly);
-		SWTControlUtil.setEnabled(getButton(Messages.PeerAttributesTablePart_button_edit), selectionCount == 1 && !readOnly);
-		SWTControlUtil.setEnabled(getButton(Messages.PeerAttributesTablePart_button_remove), selectionCount == 1 && !readOnly);
+
+		// Listed banned nodes are always read only
+		boolean banned = false;
+		if (selectionCount == 1) {
+			ISelection selection = getTableViewer().getSelection();
+			if (selection instanceof IStructuredSelection && !selection.isEmpty()) {
+				Object element = ((IStructuredSelection)selection).getFirstElement();
+				if (element instanceof TableNode) {
+					banned = Arrays.asList(bannedNames).contains(((TableNode)element).name);
+				}
+			}
+		}
+
+		SWTControlUtil.setEnabled(getButton(Messages.PeerAttributesTablePart_button_edit), selectionCount == 1 && !readOnly && !banned);
+		SWTControlUtil.setEnabled(getButton(Messages.PeerAttributesTablePart_button_remove), selectionCount == 1 && !readOnly && !banned);
 	}
 
 	/**
@@ -283,6 +298,7 @@ public class PeerAttributesTablePart extends TablePart implements IDisposable {
 			getTableViewer().setInput(nodes);
 			if (index < nodes.size()) getTableViewer().setSelection(new StructuredSelection(nodes.get(index)));
 			updateButtons();
+			onTableModified();
 		}
 	}
 
@@ -342,7 +358,14 @@ public class PeerAttributesTablePart extends TablePart implements IDisposable {
 			// Refresh the view
 			getTableViewer().setInput(nodes);
 			getTableViewer().setSelection(new StructuredSelection(node));
+			onTableModified();
 		}
+	}
+
+	/**
+	 * Signals the modification of the table.
+	 */
+	protected void onTableModified() {
 	}
 
 	/**
