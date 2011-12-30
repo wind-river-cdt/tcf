@@ -89,7 +89,16 @@ public class ProcessTreeContentProvider extends TreeContentProvider {
 				hasChildren = node.children.size() > 0;
 			}
 		}
-
+		else if (element instanceof IPeerModel) {
+			// Get the root node for this peer model object.
+			// If null, true is returned as it means that the file system
+			// model hasn't been created yet and have to treat is as children
+			// not queried yet.
+			IPeerModel peerModel = (IPeerModel) element;
+			ProcessModel model = ProcessModel.getProcessModel(peerModel);
+			ProcessTreeNode root = model.getRoot();
+			hasChildren = root != null ? hasChildren(root) : true;
+		}
 		return hasChildren;
 	}
 
