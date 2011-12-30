@@ -14,22 +14,15 @@ import java.text.DecimalFormat;
 import java.util.Date;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.tcf.te.tcf.filesystem.internal.utils.ContentTypeHelper;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 import org.eclipse.tcf.te.ui.views.tabbed.BaseTitledSection;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 /**
@@ -62,66 +55,10 @@ public class BasicFolderSection extends BaseTitledSection {
 	@Override
     public void createControls(Composite parent, TabbedPropertySheetPage aTabbedPropertySheetPage) {
 		super.createControls(parent, aTabbedPropertySheetPage);
-		
-		nameText = getWidgetFactory().createText(composite, ""); //$NON-NLS-1$
-		FormData data = new FormData();
-		data.left = new FormAttachment(0, STANDARD_LABEL_WIDTH);
-		data.right = new FormAttachment(100, 0);
-		data.top = new FormAttachment(0, ITabbedPropertyConstants.VSPACE);
-		nameText.setLayoutData(data);
-		nameText.setEditable(false);
-
-		CLabel nameLabel = getWidgetFactory().createCLabel(composite, Messages.GeneralInformationPage_Name);
-		data = new FormData();
-		data.left = new FormAttachment(0, 0);
-		data.right = new FormAttachment(nameText, -ITabbedPropertyConstants.HSPACE);
-		data.top = new FormAttachment(nameText, 0, SWT.CENTER);
-		nameLabel.setLayoutData(data);
-		
-		typeText = getWidgetFactory().createText(composite, ""); //$NON-NLS-1$
-		data = new FormData();
-		data.left = new FormAttachment(0, STANDARD_LABEL_WIDTH);
-		data.right = new FormAttachment(100, 0);
-		data.top = new FormAttachment(nameText, ITabbedPropertyConstants.VSPACE);
-		typeText.setLayoutData(data);
-		typeText.setEditable(false);
-
-		CLabel typeLabel = getWidgetFactory().createCLabel(composite, Messages.GeneralInformationPage_Type);
-		data = new FormData();
-		data.left = new FormAttachment(0, 0);
-		data.right = new FormAttachment(typeText, -ITabbedPropertyConstants.HSPACE);
-		data.top = new FormAttachment(typeText, 0, SWT.CENTER);
-		typeLabel.setLayoutData(data);
-		
-		locationText = getWidgetFactory().createText(composite, ""); //$NON-NLS-1$
-		data = new FormData();
-		data.left = new FormAttachment(0, STANDARD_LABEL_WIDTH);
-		data.right = new FormAttachment(100, 0);
-		data.top = new FormAttachment(typeText, ITabbedPropertyConstants.VSPACE);
-		locationText.setLayoutData(data);
-		locationText.setEditable(false);
-
-		CLabel locationLabel = getWidgetFactory().createCLabel(composite, Messages.GeneralInformationPage_Location);
-		data = new FormData();
-		data.left = new FormAttachment(0, 0);
-		data.right = new FormAttachment(locationText, -ITabbedPropertyConstants.HSPACE);
-		data.top = new FormAttachment(locationText, 0, SWT.CENTER);
-		locationLabel.setLayoutData(data);
-		
-		modifiedText = getWidgetFactory().createText(composite, ""); //$NON-NLS-1$
-		data = new FormData();
-		data.left = new FormAttachment(0, STANDARD_LABEL_WIDTH);
-		data.right = new FormAttachment(100, 0);
-		data.top = new FormAttachment(locationText, ITabbedPropertyConstants.VSPACE);
-		modifiedText.setLayoutData(data);
-		modifiedText.setEditable(false);
-
-		CLabel modifiedLabel = getWidgetFactory().createCLabel(composite, Messages.GeneralInformationPage_Modified);
-		data = new FormData();
-		data.left = new FormAttachment(0, 0);
-		data.right = new FormAttachment(modifiedText, -ITabbedPropertyConstants.HSPACE);
-		data.top = new FormAttachment(modifiedText, 0, SWT.CENTER);
-		modifiedLabel.setLayoutData(data);
+		nameText = createTextField(null, Messages.GeneralInformationPage_Name);
+		typeText = createTextField(nameText, Messages.GeneralInformationPage_Type);
+		locationText = createWrapTextField(typeText, Messages.GeneralInformationPage_Location);
+		modifiedText = createTextField(locationText, Messages.GeneralInformationPage_Modified);
     }
 
 	/*
@@ -145,10 +82,11 @@ public class BasicFolderSection extends BaseTitledSection {
 	@Override
     public void refresh() {
 		nameText.setText(clone.name);
-		typeText.setText(getNodeTypeLabel());
+		typeText.setText(clone.getFileType());
 		String location = clone.isRoot() ? Messages.GeneralInformationPage_Computer : clone.getLocation();
 		locationText.setText(location);
 		modifiedText.setText(getDateText(clone.attr.mtime));
+		super.refresh();
     }
 
 	/**
@@ -160,23 +98,6 @@ public class BasicFolderSection extends BaseTitledSection {
 	protected String getDateText(long time) {
 		return DATE_FORMAT.format(new Date(time));
 	}
-	
-	/**
-	 * Get the type of an FSTreeNode.
-	 * 
-	 * @return "folder" if it is a directory, "file" if is a file, or else defaults to node.type.
-	 */
-	protected String getNodeTypeLabel() {
-		if (clone.isDirectory()) {
-			return Messages.GeneralInformationPage_Folder;
-		}
-		else if (clone.isFile()) {
-			IContentType contentType = ContentTypeHelper.getInstance().getContentType(clone);
-			String contentTypeName = contentType == null ? Messages.GeneralInformationPage_UnknownFileType : contentType.getName();
-			return NLS.bind(Messages.GeneralInformationPage_File, contentTypeName);
-		}
-		else return clone.type;
-	}	 
 
 	/**
 	 * Get the string of the file size using using the formatter, SIZE_FORMAT.

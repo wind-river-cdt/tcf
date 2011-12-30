@@ -18,7 +18,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.SafeRunner;
-import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
@@ -32,7 +31,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.tcf.te.tcf.filesystem.internal.utils.ContentTypeHelper;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.StateManager;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
@@ -56,22 +54,6 @@ public class GeneralInformationPage extends PropertyPage {
 	Button btnHidden;
 	// The button of "Permissions"
 	Button[] btnPermissions;
-	/**
-	 * Get the type of an FSTreeNode.
-	 *
-	 * @return "folder" if it is a directory, "file" if is a file, or else
-	 *         defaults to node.type.
-	 */
-	protected String getNodeTypeLabel() {
-		if (clone.isDirectory())
-			return Messages.GeneralInformationPage_Folder;
-		else if (clone.isFile()) {
-			IContentType contentType = ContentTypeHelper.getInstance().getContentType(clone);
-			String contentTypeName = contentType == null ? Messages.GeneralInformationPage_UnknownFileType : contentType.getName();
-			return NLS.bind(Messages.GeneralInformationPage_File, contentTypeName);
-		} else
-			return clone.type;
-	}
 
 	/**
 	 * Create a horizontal separator between field sections.
@@ -382,7 +364,7 @@ public class GeneralInformationPage extends PropertyPage {
 		// Field "Name"
 		createField(Messages.GeneralInformationPage_Name, clone.name, page);
 		// Field "Type"
-		createField(Messages.GeneralInformationPage_Type, getNodeTypeLabel(), page);
+		createField(Messages.GeneralInformationPage_Type, clone.getFileType(), page);
 		// Field "Location"
 		String location = clone.type.endsWith("FSRootNode") //$NON-NLS-1$
 				|| clone.type.endsWith("FSRootDirNode") ? Messages.GeneralInformationPage_Computer //$NON-NLS-1$

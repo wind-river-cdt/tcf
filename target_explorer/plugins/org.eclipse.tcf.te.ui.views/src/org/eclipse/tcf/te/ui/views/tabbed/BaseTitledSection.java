@@ -9,9 +9,14 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.views.tabbed;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.views.properties.tabbed.AbstractPropertySection;
@@ -33,24 +38,126 @@ public abstract class BaseTitledSection extends AbstractPropertySection {
 	@Override
     public void createControls(Composite parent, TabbedPropertySheetPage aTabbedPropertySheetPage) {
 		super.createControls(parent, aTabbedPropertySheetPage);
-		Composite main = getWidgetFactory().createFlatFormComposite(parent);
-		
-		Section section = getWidgetFactory().createSection(main, ExpandableComposite.TITLE_BAR);
+		parent.setLayout(new FormLayout());
+
+		Section section = getWidgetFactory().createSection(parent, ExpandableComposite.TITLE_BAR);
 		section.setText(getText());
 		FormData data = new FormData();
-		data.left = new FormAttachment(0, 0);
-		data.right = new FormAttachment(100, 0);
-		data.top = new FormAttachment(0, ITabbedPropertyConstants.VSPACE);
+		data.left = new FormAttachment(0, ITabbedPropertyConstants.HMARGIN);
+		data.right = new FormAttachment(100, -ITabbedPropertyConstants.HMARGIN);
+		data.top = new FormAttachment(0, 2 * ITabbedPropertyConstants.VMARGIN);
 		section.setLayoutData(data);
-	
-		composite = getWidgetFactory().createFlatFormComposite(main);
+
+		composite = getWidgetFactory().createComposite(parent);
+		FormLayout layout = new FormLayout();
+		layout.spacing = ITabbedPropertyConstants.HMARGIN;
+		composite.setLayout(layout);
+
 		data = new FormData();
-		data.left = new FormAttachment(0, 0);
-		data.right = new FormAttachment(100, 0);
+		data.left = new FormAttachment(0, 2 * ITabbedPropertyConstants.HMARGIN);
+		data.right = new FormAttachment(100, -2 * ITabbedPropertyConstants.HMARGIN);
 		data.top = new FormAttachment(section, ITabbedPropertyConstants.VSPACE);
+		data.bottom = new FormAttachment(100, 0);
 		composite.setLayoutData(data);
-    }
+	}
 	
+	/**
+	 * Create a label for the control using the specified text.
+	 *  
+	 * @param control The control for which the label is created.
+	 * @param text The label text.
+	 */
+	protected void createLabel(Control control, String text) {
+		CLabel nameLabel = getWidgetFactory().createCLabel(composite, text);
+		FormData data = new FormData();
+		data.left = new FormAttachment(0, 0);
+		data.right = new FormAttachment(control, -ITabbedPropertyConstants.HSPACE);
+		data.top = new FormAttachment(control, 0, SWT.CENTER);
+		nameLabel.setLayoutData(data);
+	}
+	
+	/**
+	 * Create a text field and a label with the specified label
+	 * relative to the specified control. 
+	 * 
+	 * @param control The control relative to.
+	 * @param label The text of the label.
+	 * @return The new text created.
+	 */
+	protected Text createTextField(Control control, String label) {
+		Text text = createText(control);
+		createLabel(text, label);
+		return text;
+	}
+	
+	/**
+	 * Create a wrap text field and a label with the specified label
+	 * relative to the specified control.
+	 * 
+	 * @param control The control relative to.
+	 * @param label The text of the label.
+	 * @return The new wrap text created.
+	 */
+	protected Text createWrapTextField(Control control, String label) {
+		Text text = createWrapText(control);
+		createLabel(text, label);
+		return text;
+	}
+	
+	/**
+	 * Create a text field relative to the specified control.
+	 * 
+	 * @param control The control to layout the new text field.
+	 * @return The new text field created.
+	 */
+	private Text createText(Control control) {
+		Text text = getWidgetFactory().createText(composite, ""); //$NON-NLS-1$
+		FormData data = new FormData();
+		data.left = new FormAttachment(0, STANDARD_LABEL_WIDTH);
+		data.right = new FormAttachment(100, 0);
+		if (control == null) {
+			data.top = new FormAttachment(0, ITabbedPropertyConstants.VSPACE);
+		}
+		else {
+			data.top = new FormAttachment(control, ITabbedPropertyConstants.VSPACE);
+		}
+		text.setLayoutData(data);
+		text.setEditable(false);
+		return text;
+	}
+	
+	/**
+	 * Create a wrap text field relative to the specified control.
+	 * 
+	 * @param control The control to layout the new wrap text field.
+	 * @return The new wrap text field created.
+	 */
+	private Text createWrapText(Control control) {
+		Text text = getWidgetFactory().createText(composite, "", SWT.WRAP); //$NON-NLS-1$
+		FormData data = new FormData();
+		data.left = new FormAttachment(0, STANDARD_LABEL_WIDTH);
+		data.right = new FormAttachment(100, 0);
+		if (control == null) {
+			data.top = new FormAttachment(0, ITabbedPropertyConstants.VSPACE);
+		}
+		else {
+			data.top = new FormAttachment(control, ITabbedPropertyConstants.VSPACE);
+		}
+		data.width = 200;
+		text.setLayoutData(data);
+		text.setEditable(false);
+		return text;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#refresh()
+	 */
+	@Override
+    public void refresh() {
+		composite.layout();
+	}
+
 	/**
 	 * Get the text which is used as the title in the title bar of the section.
 	 * 

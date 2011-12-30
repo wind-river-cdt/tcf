@@ -12,17 +12,12 @@ package org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.views.tabbed.BaseTitledSection;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 /**
@@ -47,66 +42,10 @@ public class BasicInformationSection extends BaseTitledSection {
 	@Override
     public void createControls(Composite parent, TabbedPropertySheetPage aTabbedPropertySheetPage) {
 	    super.createControls(parent, aTabbedPropertySheetPage);
-		
-		nameText = getWidgetFactory().createText(composite, ""); //$NON-NLS-1$
-		FormData data = new FormData();
-		data.left = new FormAttachment(0, STANDARD_LABEL_WIDTH);
-		data.right = new FormAttachment(100, 0);
-		data.top = new FormAttachment(0, ITabbedPropertyConstants.VSPACE);
-		nameText.setLayoutData(data);
-		nameText.setEditable(false);
-
-		CLabel nameLabel = getWidgetFactory().createCLabel(composite, Messages.BasicInformationSection_Name);
-		data = new FormData();
-		data.left = new FormAttachment(0, 0);
-		data.right = new FormAttachment(nameText, -ITabbedPropertyConstants.HSPACE);
-		data.top = new FormAttachment(nameText, 0, SWT.CENTER);
-		nameLabel.setLayoutData(data);
-		
-		typeText = getWidgetFactory().createText(composite, ""); //$NON-NLS-1$
-		data = new FormData();
-		data.left = new FormAttachment(0, STANDARD_LABEL_WIDTH);
-		data.right = new FormAttachment(100, 0);
-		data.top = new FormAttachment(nameText, ITabbedPropertyConstants.VSPACE);
-		typeText.setLayoutData(data);
-		typeText.setEditable(false);
-
-		CLabel typeLabel = getWidgetFactory().createCLabel(composite, Messages.BasicInformationSection_Type);
-		data = new FormData();
-		data.left = new FormAttachment(0, 0);
-		data.right = new FormAttachment(typeText, -ITabbedPropertyConstants.HSPACE);
-		data.top = new FormAttachment(typeText, 0, SWT.CENTER);
-		typeLabel.setLayoutData(data);
-		
-		stateText = getWidgetFactory().createText(composite, ""); //$NON-NLS-1$
-		data = new FormData();
-		data.left = new FormAttachment(0, STANDARD_LABEL_WIDTH);
-		data.right = new FormAttachment(100, 0);
-		data.top = new FormAttachment(typeText, ITabbedPropertyConstants.VSPACE);
-		stateText.setLayoutData(data);
-		stateText.setEditable(false);
-
-		CLabel stateLabel = getWidgetFactory().createCLabel(composite, Messages.BasicInformationSection_State);
-		data = new FormData();
-		data.left = new FormAttachment(0, 0);
-		data.right = new FormAttachment(stateText, -ITabbedPropertyConstants.HSPACE);
-		data.top = new FormAttachment(stateText, 0, SWT.CENTER);
-		stateLabel.setLayoutData(data);
-		
-		userText = getWidgetFactory().createText(composite, ""); //$NON-NLS-1$
-		data = new FormData();
-		data.left = new FormAttachment(0, STANDARD_LABEL_WIDTH);
-		data.right = new FormAttachment(100, 0);
-		data.top = new FormAttachment(stateText, ITabbedPropertyConstants.VSPACE);
-		userText.setLayoutData(data);
-		userText.setEditable(false);
-
-		CLabel userLabel = getWidgetFactory().createCLabel(composite, Messages.BasicInformationSection_User);
-		data = new FormData();
-		data.left = new FormAttachment(0, 0);
-		data.right = new FormAttachment(userText, -ITabbedPropertyConstants.HSPACE);
-		data.top = new FormAttachment(userText, 0, SWT.CENTER);
-		userLabel.setLayoutData(data);
+		nameText = createWrapTextField(null, Messages.BasicInformationSection_Name);
+		typeText = createTextField(nameText, Messages.BasicInformationSection_Type);
+		stateText = createTextField(typeText, Messages.BasicInformationSection_State);
+		userText = createTextField(stateText, Messages.BasicInformationSection_User);
     }
 
 	/*
@@ -132,6 +71,7 @@ public class BasicInformationSection extends BaseTitledSection {
 		typeText.setText(node.type == null ? "" : node.type); //$NON-NLS-1$
 		stateText.setText(node.state == null ? "" : node.state); //$NON-NLS-1$
 		userText.setText(node.username == null ? "" : node.username); //$NON-NLS-1$
+		super.refresh();
     }
 
 	/*
