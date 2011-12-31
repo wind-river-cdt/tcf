@@ -232,6 +232,18 @@
                </visibleWhen>
          </command>
       </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.tcf.te.ui.views.TargetExplorer#Popup?after=group.showIn">
+         <menu
+               label="%menu.showIn.label">
+            <command
+                  commandId="org.eclipse.tcf.te.ui.views.command.ShowInProperties"
+                  icon="icons/eview16/prop_ps.gif"
+                  label="%menu.properties.label"
+                  style="push">
+            </command>
+         </menu>
+      </menuContribution>
    </extension>
 
 <!-- Command contributions -->
@@ -244,6 +256,12 @@
             helpContextId="org.eclipse.ui.navigator.Open"
             id="org.eclipse.ui.navigator.Open"
             name="%Command.open.name">
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.ui.views.command.help_ShowInProperties"
+            id="org.eclipse.tcf.te.ui.views.command.ShowInProperties"
+            name="%command.showInProperties.label">
       </command>
    </extension>
 
@@ -282,6 +300,18 @@
          <activeWhen>
             <with variable="activePartId">
                <equals value="org.eclipse.tcf.te.ui.views.TargetExplorer"/>
+            </with>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tcf.te.ui.views.handler.ShowInPropertiesHandler"
+            commandId="org.eclipse.tcf.te.ui.views.command.ShowInProperties">
+         <activeWhen>
+            <with
+                  variable="activePartId">
+               <equals
+                     value="org.eclipse.tcf.te.ui.views.TargetExplorer">
+               </equals>
             </with>
          </activeWhen>
       </handler>      
