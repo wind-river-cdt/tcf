@@ -28,7 +28,7 @@ import org.eclipse.tcf.services.ITerminals;
 import org.eclipse.tcf.services.ITerminals.TerminalContext;
 import org.eclipse.tcf.te.tcf.terminals.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.tcf.terminals.core.interfaces.launcher.ITerminalsContextAwareListener;
-import org.eclipse.tcf.te.tcf.terminals.core.internal.tracing.ITraceIds;
+import org.eclipse.tcf.te.tcf.terminals.core.interfaces.tracing.ITraceIds;
 import org.eclipse.tcf.te.tcf.terminals.core.nls.Messages;
 import org.eclipse.tcf.util.TCFTask;
 import org.eclipse.tcf.te.core.async.AsyncCallbackCollector;

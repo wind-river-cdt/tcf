@@ -13,13 +13,13 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.te.tcf.core.interfaces.listeners.IChannelStateChangeListener;
 import org.eclipse.tcf.te.tcf.locator.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.tcf.locator.interfaces.ITracing;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelLookupService;
-import org.eclipse.tcf.te.tcf.core.interfaces.listeners.IChannelStateChangeListener;
 
 
 /**
@@ -76,7 +76,9 @@ public class ChannelStateChangeListener implements IChannelStateChangeListener {
 					counter--;
 					if (counter < 0) counter = 0;
 					node.setProperty(IPeerModelProperties.PROP_CHANNEL_REF_COUNTER, counter);
-					if (counter == 0) node.setProperty(IPeerModelProperties.PROP_STATE, IPeerModelProperties.STATE_REACHABLE);
+					if (counter == 0 && node.isProperty(IPeerModelProperties.PROP_STATE, IPeerModelProperties.STATE_CONNECTED)) {
+						node.setProperty(IPeerModelProperties.PROP_STATE, IPeerModelProperties.STATE_REACHABLE);
+					}
 				}
 				break;
 		}

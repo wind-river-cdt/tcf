@@ -14,9 +14,9 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.tcf.core.Tcf;
+import org.eclipse.tcf.te.tcf.core.interfacesl.tracing.ITraceIds;
 import org.eclipse.tcf.te.tcf.core.internal.interfaces.IChannelOpenListener;
 import org.eclipse.tcf.te.tcf.core.internal.nls.Messages;
-import org.eclipse.tcf.te.tcf.core.internal.tracing.ITraceIds;
 import org.eclipse.tcf.te.tcf.core.internal.utils.LogUtils;
 
 

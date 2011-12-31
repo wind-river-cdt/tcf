@@ -9,6 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.ui.editor.sections;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -17,12 +19,20 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TypedEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tcf.core.TransientPeer;
+import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
+import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistenceService;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
+import org.eclipse.tcf.te.runtime.services.ServiceManager;
+import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.core.interfaces.ITransportTypes;
+import org.eclipse.tcf.te.tcf.locator.ScannerRunnable;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
+import org.eclipse.tcf.te.tcf.locator.nodes.PeerRedirector;
 import org.eclipse.tcf.te.tcf.ui.editor.controls.TransportSectionTypeControl;
 import org.eclipse.tcf.te.tcf.ui.editor.controls.TransportSectionTypePanelControl;
 import org.eclipse.tcf.te.tcf.ui.nls.Messages;
@@ -210,6 +220,96 @@ public class TransportSection extends AbstractSection implements IValidatableWiz
 		updateEnablement();
 	}
 
+	/**
+	 * Stores the page widgets current values to the given peer node.
+	 * <p>
+	 * This method may called multiple times during the lifetime of the page and
+	 * the given peer node might be even <code>null</code>.
+	 *
+	 * @param node The GDB Remote configuration node or <code>null</code>.
+	 */
+	public void extractData(final IPeerModel node) {
+		// If no data is available, we are done
+		if (node == null) return;
+
+		// Extract the transport type and transport attributes into the working copy
+		String transportType = transportTypeControl.getSelectedTransportType();
+		String oldTransportType = wc.getStringProperty(IPeer.ATTR_TRANSPORT_NAME);
+		if (transportType.equals(oldTransportType)) {
+			// Transport type hasn't changed, check the transport attributes
+			IWizardConfigurationPanel panel = transportTypePanelControl.getConfigurationPanel(transportType);
+			// Use a temporary properties container. Otherwise we cannot know here which data
+			// the panel is handling.
+			IPropertiesContainer temp = new PropertiesContainer();
+			if (panel instanceof ISharedDataWizardPage) ((ISharedDataWizardPage)panel).extractData(temp);
+
+			boolean changed = false;
+			for (String key : temp.getProperties().keySet()) {
+				changed |= !wc.isProperty(key, temp.getProperty(key));
+				if (changed) break;
+			}
+
+			// If the data has not changed too, we are done here
+			if (!changed) return;
+
+			// Copy the new data to the working copy
+			for (String key : temp.getProperties().keySet()) {
+				wc.setProperty(key, temp.getProperty(key));
+			}
+		} else {
+			// The transport type changed. This means that we have to remove
+			// the old transport attributes from the working copy first
+			IWizardConfigurationPanel panel = transportTypePanelControl.getConfigurationPanel(oldTransportType);
+			if (panel instanceof ISharedDataWizardPage) ((ISharedDataWizardPage)panel).removeData(wc);
+			// And now add the new transport attributes
+			panel = transportTypePanelControl.getConfigurationPanel(transportType);
+			if (panel instanceof ISharedDataWizardPage) ((ISharedDataWizardPage)panel).extractData(wc);
+		}
+
+		// Copy the working copy data back to the original properties container
+		Protocol.invokeAndWait(new Runnable() {
+			@Override
+			public void run() {
+				// To update the peer attributes, the peer needs to be recreated
+				IPeer oldPeer = node.getPeer();
+				// Create a write able copy of the peer attributes
+				Map<String, String> attributes = new HashMap<String, String>(oldPeer.getAttributes());
+				// Determine the removed attributes
+				for (String key : attributes.keySet()) {
+					if (wc.getProperty(key) == null) attributes.remove(key);
+				}
+				// Update with the current configured attributes
+				for (String key : wc.getProperties().keySet()) {
+					String value = wc.getStringProperty(key);
+					if (value != null) {
+						attributes.put(key, value);
+					} else {
+						attributes.remove(key);
+					}
+				}
+
+				// If there is still a open channel to the old peer, close it by force
+				IChannel channel = Tcf.getChannelManager().getChannel(oldPeer);
+				if (channel != null) channel.close();
+
+				// Create the new peer
+				IPeer newPeer = oldPeer instanceof PeerRedirector ? new PeerRedirector(((PeerRedirector)oldPeer).getParent(), attributes) : new TransientPeer(attributes);
+				// Update the peer node instance (silently)
+				boolean changed = node.setChangeEventsEnabled(false);
+				node.setProperty(IPeerModelProperties.PROP_INSTANCE, newPeer);
+				// As the transport changed, we have to reset the state back to "unknown"
+				// and clear out the services and DNS markers
+				node.setProperty(IPeerModelProperties.PROP_STATE, IPeerModelProperties.STATE_UNKNOWN);
+				node.setProperty(IPeerModelProperties.PROP_LOCAL_SERVICES, null);
+				node.setProperty(IPeerModelProperties.PROP_REMOTE_SERVICES, null);
+				node.setProperty("dns.name.transient", null); //$NON-NLS-1$
+				node.setProperty("dns.lastIP.transient", null); //$NON-NLS-1$
+				node.setProperty("dns.skip.transient", null); //$NON-NLS-1$
+				if (changed) node.setChangeEventsEnabled(true);
+			}
+		});
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.IValidatableWizardPage#validatePage()
 	 */
@@ -245,6 +345,37 @@ public class TransportSection extends AbstractSection implements IValidatableWiz
 
 		// Nothing to do if not on save or saving is not needed
 		if (!onSave || !needsSaving) return;
+		// Extract the data into the original data node
+		extractData(od);
+
+		// If the working copy and the original data copy differs at this point,
+		// the data changed really and we have to write the peer to the persistence
+		// storage.
+		if (!odc.equals(wc)) {
+			try {
+				// Get the persistence service
+				IPersistenceService persistenceService = ServiceManager.getInstance().getService(IPersistenceService.class);
+				if (persistenceService == null) throw new IOException("Persistence service instance unavailable."); //$NON-NLS-1$
+				// Save the peer node to the new persistence storage
+				persistenceService.write(od.getPeer().getAttributes());
+			} catch (IOException e) {
+				// Pass on to the editor page
+			}
+
+			Protocol.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					// Trigger a change event for the original data node
+					od.fireChangeEvent("properties", null, od.getProperties()); //$NON-NLS-1$
+					// And make sure the editor tabs are updated
+					od.fireChangeEvent("editor.refreshTab", Boolean.FALSE, Boolean.TRUE); //$NON-NLS-1$
+				}
+			});
+
+			// As the transport section changed, force a scan of the peer
+			ScannerRunnable runnable = new ScannerRunnable(null, od);
+			Protocol.invokeLater(runnable);
+		}
 	}
 
 	/**

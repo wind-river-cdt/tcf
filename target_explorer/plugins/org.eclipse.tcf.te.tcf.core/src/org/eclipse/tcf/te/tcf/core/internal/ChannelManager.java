@@ -25,8 +25,8 @@ import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.tcf.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
+import org.eclipse.tcf.te.tcf.core.interfacesl.tracing.ITraceIds;
 import org.eclipse.tcf.te.tcf.core.internal.nls.Messages;
-import org.eclipse.tcf.te.tcf.core.internal.tracing.ITraceIds;
 
 
 /**
@@ -102,16 +102,14 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 	 */
 	@Override
 	public void openChannel(final IPeer peer, final boolean forceNew, final DoneOpenChannel done) {
-		if (Protocol.isDispatchThread()) {
-			internalOpenChannel(peer, forceNew, done);
-		} else {
-			Protocol.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					internalOpenChannel(peer, forceNew, done);
-				}
-			});
-		}
+		Runnable runnable = new Runnable() {
+			@Override
+            public void run() {
+				internalOpenChannel(peer, forceNew, done);
+			}
+		};
+		if (Protocol.isDispatchThread()) runnable.run();
+		else Protocol.invokeLater(runnable);
 	}
 
 	/**
@@ -237,16 +235,14 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 	 */
 	@Override
 	public void openChannel(final Map<String, String> peerAttributes, final boolean forceNew, final DoneOpenChannel done) {
-		if (Protocol.isDispatchThread()) {
-			internalOpenChannel(peerAttributes, forceNew, done);
-		} else {
-			Protocol.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					internalOpenChannel(peerAttributes, forceNew, done);
-				}
-			});
-		}
+		Runnable runnable = new Runnable() {
+			@Override
+            public void run() {
+				internalOpenChannel(peerAttributes, forceNew, done);
+			}
+		};
+		if (Protocol.isDispatchThread()) runnable.run();
+		else Protocol.invokeLater(runnable);
 	}
 
 	/**
@@ -338,16 +334,14 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 	 */
 	@Override
 	public void closeChannel(final IChannel channel) {
-		if (Protocol.isDispatchThread()) {
-			internalCloseChannel(channel);
-		} else {
-			Protocol.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					internalCloseChannel(channel);
-				}
-			});
-		}
+		Runnable runnable = new Runnable() {
+			@Override
+            public void run() {
+				internalCloseChannel(channel);
+			}
+		};
+		if (Protocol.isDispatchThread()) runnable.run();
+		else Protocol.invokeLater(runnable);
 	}
 
 	/**
@@ -383,16 +377,16 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 				CoreBundleActivator.getTraceHandler().trace(NLS.bind(Messages.ChannelManager_closeChannel_closed_message, id),
 															0, ITraceIds.TRACE_CHANNEL_MANAGER, IStatus.INFO, this);
 			}
+
+			// Clean the reference counter and the channel map
+			refCounters.remove(id);
+			channels.remove(id);
 		} else {
 			if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITraceIds.TRACE_CHANNEL_MANAGER)) {
 				CoreBundleActivator.getTraceHandler().trace(NLS.bind(Messages.ChannelManager_closeChannel_inuse_message, id, counter.toString()),
 															0, ITraceIds.TRACE_CHANNEL_MANAGER, IStatus.INFO, this);
 			}
 		}
-
-		// Clean the reference counter and the channel map
-		refCounters.remove(id);
-		channels.remove(id);
 	}
 
 	/* (non-Javadoc)
@@ -400,16 +394,14 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 	 */
 	@Override
 	public void closeAll() {
-		if (Protocol.isDispatchThread()) {
-			internalCloseAll();
-		} else {
-			Protocol.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					internalCloseAll();
-				}
-			});
-		}
+		Runnable runnable = new Runnable() {
+			@Override
+            public void run() {
+				internalCloseAll();
+			}
+		};
+		if (Protocol.isDispatchThread()) runnable.run();
+		else Protocol.invokeLater(runnable);
 	}
 
 	/**

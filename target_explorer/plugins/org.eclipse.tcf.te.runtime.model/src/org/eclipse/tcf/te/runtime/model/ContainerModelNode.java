@@ -10,7 +10,6 @@
 package org.eclipse.tcf.te.runtime.model;
 
 import java.util.ArrayList;
-import java.util.EventObject;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.locks.Lock;
@@ -18,7 +17,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
-import org.eclipse.tcf.te.runtime.events.EventManager;
 import org.eclipse.tcf.te.runtime.model.interfaces.IContainerModelNode;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
 
@@ -129,9 +127,7 @@ public class ContainerModelNode extends ModelNode implements IContainerModelNode
 				childListLock.unlock();
 			}
 
-			EventObject event = newEvent(this, NOTIFY_ADDED, null, new IModelNode[] { node });
-			if (event != null) EventManager.getInstance().fireEvent(event);
-
+			fireChangeEvent(NOTIFY_ADDED, null, new IModelNode[] { node });
 			return true;
 		}
 		return false;
@@ -152,8 +148,7 @@ public class ContainerModelNode extends ModelNode implements IContainerModelNode
 		try { childListLock.lock(); removed = childList.remove(node); } finally { childListLock.unlock(); }
 		// Unlink the parent and fire the removed notification if the element got removed
 		if (removed) {
-			EventObject event = newEvent(this, NOTIFY_REMOVED, new IModelNode[] { node }, null);
-			if (event != null) EventManager.getInstance().fireEvent(event);
+			fireChangeEvent(NOTIFY_REMOVED, new IModelNode[] { node }, null);
 		}
 
 		return removed;
@@ -176,8 +171,7 @@ public class ContainerModelNode extends ModelNode implements IContainerModelNode
 		}
 
 		if (removed) {
-			EventObject event = newEvent(this, NOTIFY_REMOVED, children, null);
-			if (event != null) EventManager.getInstance().fireEvent(event);
+			fireChangeEvent(NOTIFY_REMOVED, children, null);
 		}
 
 		return removed;

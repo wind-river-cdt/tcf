@@ -230,7 +230,7 @@ public class GeneralInformationSection extends AbstractSection implements IValid
 
 		if (linkState != null && linkStateImage != null) {
 			String state = wc.getStringProperty(IPeerModelProperties.PROP_STATE);
-			linkState.setText(Messages.getString("GeneralInformationSection_state_" + (state != null ? state : "_1"))); //$NON-NLS-1$ //$NON-NLS-2$
+			linkState.setText(Messages.getString("GeneralInformationSection_state_" + (state != null ? state.replace('-', '_') : "_1"))); //$NON-NLS-1$ //$NON-NLS-2$
 
 			switch (wc.getIntProperty(IPeerModelProperties.PROP_STATE)) {
 			case 0:
@@ -363,10 +363,8 @@ public class GeneralInformationSection extends AbstractSection implements IValid
 			Protocol.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					// Refresh the locator model
-					//od.getModel().getService(ILocatorModelRefreshService.class).refresh();
 					// Trigger a change event for the original data node
-					od.setProperties(od.getProperties());
+					od.fireChangeEvent("properties", null, od.getProperties()); //$NON-NLS-1$
 				}
 			});
 		}

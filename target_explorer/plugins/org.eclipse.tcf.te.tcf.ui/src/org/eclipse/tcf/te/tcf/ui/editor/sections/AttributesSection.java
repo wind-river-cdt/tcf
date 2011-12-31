@@ -318,10 +318,8 @@ public class AttributesSection extends AbstractSection {
 			Protocol.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					// Refresh the locator model
-					//od.getModel().getService(ILocatorModelRefreshService.class).refresh();
 					// Trigger a change event for the original data node
-					od.setProperties(od.getProperties());
+					od.fireChangeEvent("properties", null, od.getProperties()); //$NON-NLS-1$
 				}
 			});
 		}

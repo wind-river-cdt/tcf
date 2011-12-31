@@ -32,11 +32,4 @@ public class ModelAdapter implements IModelListener {
 	public void locatorModelDisposed(ILocatorModel model) {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.locator.core.interfaces.IModelListener#peerModelChanged(org.eclipse.tcf.te.tcf.locator.core.interfaces.nodes.ILocatorModel, org.eclipse.tcf.te.tcf.locator.core.interfaces.nodes.IPeerModel)
-	 */
-	@Override
-	public void peerModelChanged(ILocatorModel model, IPeerModel peer) {
-	}
-
 }

@@ -12,11 +12,14 @@ package org.eclipse.tcf.te.ui.views.internal.editor;
 import java.util.EventObject;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.tcf.te.runtime.events.ChangeEvent;
 import org.eclipse.tcf.te.runtime.events.EventManager;
 import org.eclipse.tcf.te.runtime.interfaces.IDisposable;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.ui.events.AbstractEventListener;
+import org.eclipse.tcf.te.ui.views.activator.UIPlugin;
+import org.eclipse.tcf.te.ui.views.interfaces.tracing.ITraceIds;
 import org.eclipse.ui.forms.editor.IFormPage;
 
 /**
@@ -58,21 +61,46 @@ public class EditorEventListener extends AbstractEventListener implements IDispo
 	 */
 	@Override
 	public void eventFired(EventObject event) {
+		// Ignore everything not being a change event
+		if (!(event instanceof ChangeEvent)) return;
+
+		ChangeEvent changeEvent = (ChangeEvent)event;
+
+		if (UIPlugin.getTraceHandler().isSlotEnabled(0, ITraceIds.TRACE_EDITOR_EVENT_LISTENER)) {
+			UIPlugin.getTraceHandler().trace("Entered eventFired(...). eventId='" + changeEvent.getEventId() + "'" //$NON-NLS-1$ //$NON-NLS-2$
+												+ ", oldValue='" + changeEvent.getOldValue() + "'" //$NON-NLS-1$ //$NON-NLS-2$
+												+ ", newValue='" + changeEvent.getNewValue() + "'", //$NON-NLS-1$ //$NON-NLS-2$
+												0, ITraceIds.TRACE_EDITOR_EVENT_LISTENER,
+												IStatus.INFO, this);
+		}
+
 		// Get the event source
 		Object source = event.getSource();
 		// Double check with the parent editors input object
 		Object node = editor.getEditorInput() != null ? editor.getEditorInput().getAdapter(Object.class) : null;
 		// If the editor input cannot be determined or it does not match the event source
 		// --> return immediately
-		if (node == null || !node.equals(source)) return;
+		if (node == null || !node.equals(source)) {
+			if (UIPlugin.getTraceHandler().isSlotEnabled(0, ITraceIds.TRACE_EDITOR_EVENT_LISTENER)) {
+				UIPlugin.getTraceHandler().trace("Dropping out of eventFired(...). Event source does not match editor input.", //$NON-NLS-1$
+													0, ITraceIds.TRACE_EDITOR_EVENT_LISTENER,
+													IStatus.WARNING, this);
+			}
 
-		// Update the active page content by calling IFormPage#setActive(boolean)
-		Object page = editor.getSelectedPage();
-		if (page instanceof IFormPage) {
-			((IFormPage)page).setActive(((IFormPage)page).isActive());
+			return;
 		}
 
-		// Update the editor part name
-		editor.updatePartName();
+		if ("editor.refreshTab".equals(changeEvent.getEventId())) { //$NON-NLS-1$
+			editor.updatePageList();
+		} else {
+			// Update the active page content by calling IFormPage#setActive(boolean)
+			Object page = editor.getSelectedPage();
+			if (page instanceof IFormPage) {
+				((IFormPage)page).setActive(((IFormPage)page).isActive());
+			}
+
+			// Update the editor part name
+			editor.updatePartName();
+		}
 	}
 }

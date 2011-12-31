@@ -142,7 +142,9 @@ public class ServicesSection extends AbstractSection {
 			}
 		});
 
-		SWTControlUtil.setText(local, odc.getStringProperty(IPeerModelProperties.PROP_LOCAL_SERVICES));
-		SWTControlUtil.setText(remote, odc.getStringProperty(IPeerModelProperties.PROP_REMOTE_SERVICES));
+		String value = odc.getStringProperty(IPeerModelProperties.PROP_LOCAL_SERVICES);
+		SWTControlUtil.setText(local, value != null ? value : ""); //$NON-NLS-1$
+		value = odc.getStringProperty(IPeerModelProperties.PROP_REMOTE_SERVICES);
+		SWTControlUtil.setText(remote, value != null ? value : ""); //$NON-NLS-1$
 	}
 }

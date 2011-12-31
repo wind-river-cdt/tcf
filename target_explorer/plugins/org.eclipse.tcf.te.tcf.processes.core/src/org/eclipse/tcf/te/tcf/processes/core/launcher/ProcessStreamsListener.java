@@ -27,7 +27,7 @@ import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.IStreams;
 import org.eclipse.tcf.te.tcf.processes.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.tcf.processes.core.interfaces.launcher.IProcessContextAwareListener;
-import org.eclipse.tcf.te.tcf.processes.core.internal.tracing.ITraceIds;
+import org.eclipse.tcf.te.tcf.processes.core.interfaces.tracing.ITraceIds;
 import org.eclipse.tcf.te.tcf.processes.core.nls.Messages;
 import org.eclipse.tcf.util.TCFTask;
 import org.eclipse.tcf.te.core.async.AsyncCallbackCollector;

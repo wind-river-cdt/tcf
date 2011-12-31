@@ -17,7 +17,6 @@ import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.runtime.interfaces.workingsets.IWorkingSetElement;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
-import org.eclipse.tcf.te.tcf.locator.interfaces.IModelListener;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
@@ -218,21 +217,6 @@ public class PeerModel extends PropertiesContainer implements IPeerModel, IWorki
 		peerId = getPeer().getID();
 		Assert.isNotNull(peerId);
 
-		if (changeEventsEnabled()) {
-			final IModelListener[] listeners = model.getListener();
-			if (listeners.length > 0) {
-				Protocol.invokeLater(new Runnable() {
-					@Override
-					@SuppressWarnings("synthetic-access")
-					public void run() {
-						for (IModelListener listener : listeners) {
-							listener.peerModelChanged(model, PeerModel.this);
-						}
-					}
-				});
-			}
-		}
-
 		super.postSetProperties(properties);
 	}
 
@@ -249,23 +233,6 @@ public class PeerModel extends PropertiesContainer implements IPeerModel, IWorki
 		if (IPeerModelProperties.PROP_INSTANCE.equals(key)) {
 			peerId = getPeer().getID();
 			Assert.isNotNull(peerId);
-		}
-
-		// Notify registered listeners that the peer changed. Property
-		// changes for property slots ending with ".silent" are suppressed.
-		if (changeEventsEnabled() && !key.endsWith(".silent")) { //$NON-NLS-1$
-			final IModelListener[] listeners = model.getListener();
-			if (listeners.length > 0) {
-				Protocol.invokeLater(new Runnable() {
-					@Override
-					@SuppressWarnings("synthetic-access")
-					public void run() {
-						for (IModelListener listener : listeners) {
-							listener.peerModelChanged(model, PeerModel.this);
-						}
-					}
-				});
-			}
 		}
 
 		super.postSetProperty(key, value, oldValue);

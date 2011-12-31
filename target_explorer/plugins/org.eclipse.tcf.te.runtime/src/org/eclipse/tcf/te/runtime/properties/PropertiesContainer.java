@@ -143,12 +143,22 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 		return changeEventsEnabled;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer#fireChangeEvent(java.lang.String, java.lang.Object, java.lang.Object)
+	 */
+	@Override
+	public void fireChangeEvent(String key, Object oldValue, Object newValue) {
+		Assert.isNotNull(key);
+		EventObject event = newEvent(this, key, oldValue, newValue);
+		if (event != null) EventManager.getInstance().fireEvent(event);
+	}
+
 	/**
 	 * Creates a new property change notification event object. The event object is initialized
 	 * with the given parameter.
 	 * <p>
-	 * This method is typically called from {@link #setProperty(String, Object)} in case the
-	 * property changed it's value. <code>Null</code> is returned if no event should be fired.
+	 * This method is typically called from {@link #fireChangeEvent(String, Object, Object)}.
+	 * <code>Null</code> is returned if no event should be fired.
 	 *
 	 * @param source The source object. Must not be <code>null</code>.
 	 * @param key The property key. Must not be <code>null</code>.
@@ -157,7 +167,7 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 	 *
 	 * @return The new property change notification event instance or <code>null</code>.
 	 */
-	public final EventObject newEvent(Object source, String key, Object oldValue, Object newValue) {
+	private final EventObject newEvent(Object source, String key, Object oldValue, Object newValue) {
 		Assert.isNotNull(source);
 		Assert.isNotNull(key);
 
@@ -346,9 +356,14 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 		Assert.isTrue(checkThreadAccess(), "Illegal Thread Access"); //$NON-NLS-1$
 		Assert.isNotNull(properties);
 
-		this.properties.clear();
-		this.properties.putAll(properties);
+		// Change the properties only if they have changed really
+		if (this.properties.equals(properties)) return;
 
+		// Clear out all old properties
+		this.properties.clear();
+		// Apply everything from the given properties
+		this.properties.putAll(properties);
+		// And signal the change
 		postSetProperties(properties);
 	}
 
@@ -362,8 +377,7 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 		Assert.isTrue(checkThreadAccess(), "Illegal Thread Access"); //$NON-NLS-1$
 		Assert.isNotNull(properties);
 
-		EventObject event = newEvent(this, "properties", null, properties); //$NON-NLS-1$
-		if (event != null) EventManager.getInstance().fireEvent(event);
+		fireChangeEvent("properties", null, properties); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
@@ -459,8 +473,7 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 		Assert.isTrue(checkThreadAccess(), "Illegal Thread Access"); //$NON-NLS-1$
 		Assert.isNotNull(key);
 
-		EventObject event = newEvent(this, key, oldValue, value);
-		if (event != null) EventManager.getInstance().fireEvent(event);
+		fireChangeEvent(key, oldValue, value);
 	}
 
 	/* (non-Javadoc)

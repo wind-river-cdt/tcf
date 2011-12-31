@@ -14,6 +14,7 @@ import java.net.URL;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.tcf.te.runtime.tracing.TraceHandler;
 import org.eclipse.tcf.te.ui.views.interfaces.ImageConsts;
 import org.eclipse.tcf.te.ui.views.listeners.WorkbenchWindowListener;
 import org.eclipse.ui.IWindowListener;
@@ -26,9 +27,10 @@ import org.osgi.framework.BundleContext;
  * The activator class controls the plug-in life cycle
  */
 public class UIPlugin extends AbstractUIPlugin {
-
 	// The shared instance
 	private static UIPlugin plugin;
+	// The trace handler instance
+	private static TraceHandler traceHandler;
 
 	// The global window listener instance
 	private IWindowListener windowListener;
@@ -58,6 +60,18 @@ public class UIPlugin extends AbstractUIPlugin {
 		return null;
 	}
 
+	/**
+	 * Returns the bundles trace handler.
+	 *
+	 * @return The bundles trace handler.
+	 */
+	public static TraceHandler getTraceHandler() {
+		if (traceHandler == null) {
+			traceHandler = new TraceHandler(getUniqueIdentifier());
+		}
+		return traceHandler;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
@@ -83,6 +97,7 @@ public class UIPlugin extends AbstractUIPlugin {
 		}
 
 		plugin = null;
+		traceHandler = null;
 		super.stop(context);
 	}
 

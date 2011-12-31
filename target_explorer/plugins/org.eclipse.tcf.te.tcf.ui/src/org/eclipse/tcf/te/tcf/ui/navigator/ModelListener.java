@@ -59,25 +59,4 @@ public class ModelListener extends ModelAdapter {
 			}
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.locator.core.listener.ModelAdapter#peerModelChanged(org.eclipse.tcf.te.tcf.locator.core.interfaces.nodes.ILocatorModel, org.eclipse.tcf.te.tcf.locator.core.interfaces.nodes.IPeerModel)
-	 */
-	@Override
-	public void peerModelChanged(final ILocatorModel model, final IPeerModel peer) {
-		if (parentModel.equals(model)) {
-			Tree tree = viewer.getTree();
-			if (tree != null && !tree.isDisposed()) {
-				Display display = tree.getDisplay();
-				display.asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						if (viewer.getTree() != null && !viewer.getTree().isDisposed()) {
-							viewer.refresh(peer);
-						}
-					}
-				});
-			}
-		}
-	}
 }

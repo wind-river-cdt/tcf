@@ -16,6 +16,6 @@ Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: org.eclipse.tcf.te.tcf.terminals.core.activator;x-internal:=true,
  org.eclipse.tcf.te.tcf.terminals.core.interfaces.launcher,
- org.eclipse.tcf.te.tcf.terminals.core.internal.tracing;x-internal:=true,
+ org.eclipse.tcf.te.tcf.terminals.core.interfaces.tracing;x-internal:=true,
  org.eclipse.tcf.te.tcf.terminals.core.launcher,
  org.eclipse.tcf.te.tcf.terminals.core.nls;x-internal:=true

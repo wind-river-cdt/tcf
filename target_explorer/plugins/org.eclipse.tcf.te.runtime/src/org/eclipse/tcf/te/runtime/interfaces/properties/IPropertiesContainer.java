@@ -42,8 +42,20 @@ public interface IPropertiesContainer extends IAdaptable {
 	public boolean changeEventsEnabled();
 
 	/**
+	 * Fires a change event with the given parameter.
+	 *
+	 * @param key The property key. Must not be <code>null</code>.
+	 * @param oldValue The old properties value, or <code>null</code>.
+	 * @param newValue The new properties value, or <code>null</code>.
+	 */
+	public void fireChangeEvent(String key, Object oldValue, Object newValue);
+
+	/**
 	 * Set the properties from the given map. Calling this method
 	 * will overwrite all previous set properties.
+	 * <p>
+	 * <b>Note:</b> The method will have no effect if the given properties are the
+	 * same as the already set properties.
 	 *
 	 * @param properties The map of properties to set. Must not be <code>null</code>.
 	 */

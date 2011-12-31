@@ -22,7 +22,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.te.runtime.interfaces.IDisposable;
 import org.eclipse.tcf.te.runtime.services.interfaces.constants.ILineSeparatorConstants;
 import org.eclipse.tcf.te.ui.terminals.activator.UIPlugin;
-import org.eclipse.tcf.te.ui.terminals.internal.tracing.ITraceIds;
+import org.eclipse.tcf.te.ui.terminals.interfaces.tracing.ITraceIds;
 import org.eclipse.tcf.te.ui.terminals.nls.Messages;
 import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
 

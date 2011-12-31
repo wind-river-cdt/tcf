@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.terminals.core.internal.tracing;
+package org.eclipse.tcf.te.tcf.terminals.core.interfaces.tracing;
 
 /**
  * Core plug-in trace slot identifiers.

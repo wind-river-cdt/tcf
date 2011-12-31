@@ -2,6 +2,17 @@
 <?eclipse version="3.4"?>
 <plugin>
 
+<!-- Event listener contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.eventListeners">
+      <eventListener
+            class="org.eclipse.tcf.te.tcf.ui.navigator.EventListener">
+         <eventSourceType
+               bundleId="org.eclipse.tcf.te.tcf.locator"
+               class="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel">
+         </eventSourceType>
+      </eventListener>
+   </extension>
+
 <!-- Common navigator contributions -->
    <extension point="org.eclipse.ui.navigator.viewer">
       <viewerContentBinding viewerId="org.eclipse.tcf.te.ui.views.TargetExplorer">
