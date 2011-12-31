@@ -253,6 +253,16 @@
                width="100">
          </column>
       </columnContribution>
+      <filterContribution
+            viewerId="org.eclipse.tcf.te.ui.controls.viewer.processes">
+         <filter
+               class="org.eclipse.tcf.te.tcf.processes.ui.internal.filters.SingleThreadFilter"
+               description="For single thread processes the thread child is hidden. "
+               enabled="true"
+               id="org.eclipse.tcf.te.tcf.processes.ui.navigator.filter.singleThread"
+               name="Single Thread Filter">
+         </filter>
+      </filterContribution>
    </extension>
    <extension
          point="org.eclipse.ui.navigator.navigatorContent">
@@ -282,6 +292,13 @@
                class="org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessViewerSorter">
          </commonSorter>
       </navigatorContent>
+      <commonFilter
+            activeByDefault="true"
+            class="org.eclipse.tcf.te.tcf.processes.ui.internal.filters.SingleThreadFilter"
+            id="org.eclipse.tcf.te.tcf.processes.ui.navigator.filter.singleThread"
+            name="Single Thread Filter"
+            visibleInUI="true">
+      </commonFilter>
    </extension>
    <extension
          point="org.eclipse.ui.navigator.viewer">

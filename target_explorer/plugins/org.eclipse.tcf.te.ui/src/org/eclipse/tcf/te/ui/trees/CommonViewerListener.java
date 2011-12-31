@@ -42,7 +42,13 @@ public class CommonViewerListener implements IPropertyChangeListener {
 		if (!tree.isDisposed()) {
 			Display display = tree.getDisplay();
 			if (display.getThread() == Thread.currentThread()) {
-				viewer.refresh();
+				Object object = event.getSource();
+				if (object != null) {
+					viewer.refresh(object);
+				}
+				else {
+					viewer.refresh();
+				}
 			}
 			else {
 				display.asyncExec(new Runnable() {

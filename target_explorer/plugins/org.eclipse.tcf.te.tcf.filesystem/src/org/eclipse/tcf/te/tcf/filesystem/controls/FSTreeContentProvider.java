@@ -510,14 +510,7 @@ public class FSTreeContentProvider extends TreeContentProvider {
 				if (!node.childrenQueried || node.childrenQueryRunning) {
 					hasChildren = true;
 				} else if (node.childrenQueried) {
-					final boolean[] result = new boolean[1];
-					Protocol.invokeAndWait(new Runnable() {
-						@Override
-						public void run() {
-							result[0] = node.getChildren().size() > 0;
-						}
-					});
-					hasChildren = result[0];
+					hasChildren = super.hasChildren(element);
 				}
 			}
 		}
