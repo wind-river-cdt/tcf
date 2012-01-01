@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.ui.wizards.controls;
+package org.eclipse.tcf.te.tcf.ui.controls;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IDialogPage;
@@ -19,7 +19,6 @@ import org.eclipse.swt.events.TypedEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.controls.BaseDialogPageControl;
@@ -33,16 +32,16 @@ import org.eclipse.tcf.te.ui.wizards.interfaces.IValidatableWizardPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
- * Custom transport type panel implementation.
+ * Pipe transport type panel implementation.
  */
-public class CustomTransportPanel extends AbstractWizardConfigurationPanel implements ISharedDataWizardPage {
+public class PipeTransportPanel extends AbstractWizardConfigurationPanel implements ISharedDataWizardPage {
 
-	private CustomTransportNameControl customTransportNameControl;
+	private PipeNameControl pipeNameControl;
 
 	/**
-	 * Local custom transport name control implementation.
+	 * Local pipe name control implementation.
 	 */
-	protected class CustomTransportNameControl extends BaseEditBrowseTextControl {
+	protected class PipeNameControl extends BaseEditBrowseTextControl {
 
 		/**
 		 * Constructor.
@@ -50,12 +49,12 @@ public class CustomTransportPanel extends AbstractWizardConfigurationPanel imple
 		 * @param parentPage The parent dialog page this control is embedded in.
 		 *                   Might be <code>null</code> if the control is not associated with a page.
 		 */
-        public CustomTransportNameControl(IDialogPage parentPage) {
+        public PipeNameControl(IDialogPage parentPage) {
 	        super(parentPage);
 	        setIsGroup(false);
 	        setHasHistory(false);
 	        setHideBrowseButton(true);
-	        setEditFieldLabel(Messages.CustomTransportNameControl_label);
+	        setEditFieldLabel(Messages.PipeNameControl_label);
         }
 
         /* (non-Javadoc)
@@ -72,8 +71,8 @@ public class CustomTransportPanel extends AbstractWizardConfigurationPanel imple
         @Override
         protected void configureEditFieldValidator(Validator validator) {
         	if (validator instanceof RegexValidator) {
-        		validator.setMessageText(RegexValidator.INFO_MISSING_VALUE, Messages.CustomTransportNameControl_information_missingValue);
-        		validator.setMessageText(RegexValidator.ERROR_INVALID_VALUE, Messages.CustomTransportNameControl_error_invalidValue);
+        		validator.setMessageText(RegexValidator.INFO_MISSING_VALUE, Messages.PipeNameControl_information_missingValue);
+        		validator.setMessageText(RegexValidator.ERROR_INVALID_VALUE, Messages.PipeNameControl_error_invalidValue);
         	}
         }
 
@@ -82,7 +81,7 @@ public class CustomTransportPanel extends AbstractWizardConfigurationPanel imple
 		 */
 		@Override
 		public IValidatableWizardPage getValidatableWizardPage() {
-			return CustomTransportPanel.this.getParentControl().getValidatableWizardPage();
+			return PipeTransportPanel.this.getParentControl().getValidatableWizardPage();
 		}
 
 		/* (non-Javadoc)
@@ -91,8 +90,8 @@ public class CustomTransportPanel extends AbstractWizardConfigurationPanel imple
 		@Override
 		public void modifyText(ModifyEvent e) {
 			super.modifyText(e);
-			if (CustomTransportPanel.this.getParentControl() instanceof ModifyListener) {
-				((ModifyListener)CustomTransportPanel.this.getParentControl()).modifyText(e);
+			if (PipeTransportPanel.this.getParentControl() instanceof ModifyListener) {
+				((ModifyListener)PipeTransportPanel.this.getParentControl()).modifyText(e);
 			}
 		}
 	}
@@ -102,7 +101,7 @@ public class CustomTransportPanel extends AbstractWizardConfigurationPanel imple
 	 *
 	 * @param parentPageControl The parent control. Must not be <code>null</code>!
 	 */
-	public CustomTransportPanel(BaseDialogPageControl parentControl) {
+	public PipeTransportPanel(BaseDialogPageControl parentControl) {
 		super(parentControl);
 	}
 
@@ -111,7 +110,7 @@ public class CustomTransportPanel extends AbstractWizardConfigurationPanel imple
 	 */
 	@Override
 	public void dispose() {
-		if (customTransportNameControl != null) { customTransportNameControl.dispose(); customTransportNameControl = null; }
+		if (pipeNameControl != null) { pipeNameControl.dispose(); pipeNameControl = null; }
 	    super.dispose();
 	}
 
@@ -135,8 +134,8 @@ public class CustomTransportPanel extends AbstractWizardConfigurationPanel imple
 
 		setControl(panel);
 
-		customTransportNameControl = doCreateCustomTransportNameControl(getParentControl().getParentPage());
-		customTransportNameControl.setupPanel(panel);
+		pipeNameControl = doCreatePipeNameControl(getParentControl().getParentPage());
+		pipeNameControl.setupPanel(panel);
 	}
 
 	/**
@@ -145,8 +144,8 @@ public class CustomTransportPanel extends AbstractWizardConfigurationPanel imple
 	 * @param parentPage The parent dialog page or <code>null</code>.
 	 * @return The pipe name control instance.
 	 */
-	protected CustomTransportNameControl doCreateCustomTransportNameControl(IDialogPage parentPage) {
-		return new CustomTransportNameControl(parentPage);
+	protected PipeNameControl doCreatePipeNameControl(IDialogPage parentPage) {
+		return new PipeNameControl(parentPage);
 	}
 
 	/* (non-Javadoc)
@@ -157,8 +156,8 @@ public class CustomTransportPanel extends AbstractWizardConfigurationPanel imple
 		boolean valid = super.isValid();
 		if (!valid) return false;
 
-		valid = customTransportNameControl.isValid();
-		setMessage(customTransportNameControl.getMessage(), customTransportNameControl.getMessageType());
+		valid = pipeNameControl.isValid();
+		setMessage(pipeNameControl.getMessage(), pipeNameControl.getMessageType());
 
 		return valid;
 	}
@@ -172,9 +171,9 @@ public class CustomTransportPanel extends AbstractWizardConfigurationPanel imple
 
 		boolean isDirty = false;
 
-		if (customTransportNameControl != null) {
-			String CustomTransportName = customTransportNameControl.getEditFieldControlText();
-			if (CustomTransportName != null) isDirty |= !CustomTransportName.equals(data.getStringProperty(IPeer.ATTR_TRANSPORT_NAME));
+		if (pipeNameControl != null) {
+			String pipeName = pipeNameControl.getEditFieldControlText();
+			if (pipeName != null) isDirty |= !pipeName.equals(data.getStringProperty("PipeName")); //$NON-NLS-1$
 		}
 
 		return isDirty;
@@ -187,8 +186,8 @@ public class CustomTransportPanel extends AbstractWizardConfigurationPanel imple
 	public void setupData(IPropertiesContainer data) {
 		if (data == null) return;
 
-		if (customTransportNameControl != null) {
-			customTransportNameControl.setEditFieldControlText(data.getStringProperty(IPeer.ATTR_TRANSPORT_NAME));
+		if (pipeNameControl != null) {
+			pipeNameControl.setEditFieldControlText(data.getStringProperty("PipeName")); //$NON-NLS-1$
 		}
 	}
 
@@ -199,8 +198,9 @@ public class CustomTransportPanel extends AbstractWizardConfigurationPanel imple
 	public void extractData(IPropertiesContainer data) {
 		if (data == null) return;
 
-		if (customTransportNameControl != null) {
-			data.setProperty(IPeer.ATTR_TRANSPORT_NAME, customTransportNameControl.getEditFieldControlText());
+		if (pipeNameControl != null) {
+			String pipeName = pipeNameControl.getEditFieldControlText();
+			data.setProperty("PipeName", !"".equals(pipeName) ? pipeName : null); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
@@ -217,7 +217,7 @@ public class CustomTransportPanel extends AbstractWizardConfigurationPanel imple
 	@Override
 	public void removeData(IPropertiesContainer data) {
 		if (data == null) return;
-		data.setProperty(IPeer.ATTR_TRANSPORT_NAME, null);
+		data.setProperty("PipeName", null); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
@@ -226,7 +226,7 @@ public class CustomTransportPanel extends AbstractWizardConfigurationPanel imple
 	@Override
 	public void doSaveWidgetValues(IDialogSettings settings, String idPrefix) {
 		super.doSaveWidgetValues(settings, idPrefix);
-		if (customTransportNameControl != null) customTransportNameControl.doSaveWidgetValues(settings, idPrefix);
+		if (pipeNameControl != null) pipeNameControl.doSaveWidgetValues(settings, idPrefix);
 	}
 
 	/* (non-Javadoc)
@@ -235,7 +235,7 @@ public class CustomTransportPanel extends AbstractWizardConfigurationPanel imple
 	@Override
 	public void doRestoreWidgetValues(IDialogSettings settings, String idPrefix) {
 		super.doRestoreWidgetValues(settings, idPrefix);
-		if (customTransportNameControl != null) customTransportNameControl.doRestoreWidgetValues(settings, idPrefix);
+		if (pipeNameControl != null) pipeNameControl.doRestoreWidgetValues(settings, idPrefix);
 	}
 
 	/* (non-Javadoc)
@@ -243,8 +243,8 @@ public class CustomTransportPanel extends AbstractWizardConfigurationPanel imple
 	 */
 	@Override
 	public void setEnabled(boolean enabled) {
-		if (customTransportNameControl != null) {
-			SWTControlUtil.setEnabled(customTransportNameControl.getEditFieldControl(), enabled);
+		if (pipeNameControl != null) {
+			SWTControlUtil.setEnabled(pipeNameControl.getEditFieldControl(), enabled);
 		}
 	}
 }

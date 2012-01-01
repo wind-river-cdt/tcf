@@ -73,8 +73,10 @@
             name="%NewWizards.category.name">
       </category>
       <wizard
+            canFinishEarly="true"
             category="org.eclipse.tcf.te.tcf.ui.newWizards.category"
             class="org.eclipse.tcf.te.tcf.ui.wizards.NewTargetWizard"
+            hasPages="false"
             icon="icons/elcl16/newTarget_wiz.gif"
             id="org.eclipse.tcf.te.tcf.ui.wizards.NewTargetWizard"
             name="%NewTargetWizard.name">

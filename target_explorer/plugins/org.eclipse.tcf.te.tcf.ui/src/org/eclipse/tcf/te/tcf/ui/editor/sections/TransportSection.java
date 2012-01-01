@@ -10,7 +10,9 @@
 package org.eclipse.tcf.te.tcf.ui.editor.sections;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -33,13 +35,13 @@ import org.eclipse.tcf.te.tcf.locator.ScannerRunnable;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
 import org.eclipse.tcf.te.tcf.locator.nodes.PeerRedirector;
+import org.eclipse.tcf.te.tcf.ui.controls.CustomTransportPanel;
+import org.eclipse.tcf.te.tcf.ui.controls.PipeTransportPanel;
+import org.eclipse.tcf.te.tcf.ui.controls.TcpTransportPanel;
+import org.eclipse.tcf.te.tcf.ui.controls.TransportTypeControl;
 import org.eclipse.tcf.te.tcf.ui.editor.controls.TransportSectionTypeControl;
 import org.eclipse.tcf.te.tcf.ui.editor.controls.TransportSectionTypePanelControl;
 import org.eclipse.tcf.te.tcf.ui.nls.Messages;
-import org.eclipse.tcf.te.tcf.ui.wizards.controls.CustomTransportPanel;
-import org.eclipse.tcf.te.tcf.ui.wizards.controls.PipeTransportPanel;
-import org.eclipse.tcf.te.tcf.ui.wizards.controls.TcpTransportPanel;
-import org.eclipse.tcf.te.tcf.ui.wizards.controls.TransportTypeControl;
 import org.eclipse.tcf.te.ui.controls.interfaces.IWizardConfigurationPanel;
 import org.eclipse.tcf.te.ui.forms.parts.AbstractSection;
 import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
@@ -233,38 +235,21 @@ public class TransportSection extends AbstractSection implements IValidatableWiz
 		if (node == null) return;
 
 		// Extract the transport type and transport attributes into the working copy
+
+		// Set the transport type
 		String transportType = transportTypeControl.getSelectedTransportType();
-		String oldTransportType = wc.getStringProperty(IPeer.ATTR_TRANSPORT_NAME);
-		if (transportType.equals(oldTransportType)) {
-			// Transport type hasn't changed, check the transport attributes
-			IWizardConfigurationPanel panel = transportTypePanelControl.getConfigurationPanel(transportType);
-			// Use a temporary properties container. Otherwise we cannot know here which data
-			// the panel is handling.
-			IPropertiesContainer temp = new PropertiesContainer();
-			if (panel instanceof ISharedDataWizardPage) ((ISharedDataWizardPage)panel).extractData(temp);
+		wc.setProperty(IPeer.ATTR_TRANSPORT_NAME, transportType);
 
-			boolean changed = false;
-			for (String key : temp.getProperties().keySet()) {
-				changed |= !wc.isProperty(key, temp.getProperty(key));
-				if (changed) break;
-			}
+		// Get the transport type configuration panel
+		IWizardConfigurationPanel panel = transportTypePanelControl.getConfigurationPanel(transportType);
+		// Clean the old attributes from the working copy
+		if (panel instanceof ISharedDataWizardPage) ((ISharedDataWizardPage)panel).removeData(wc);
+		// Extract the new attributes into the working copy
+		if (panel instanceof ISharedDataWizardPage) ((ISharedDataWizardPage)panel).extractData(wc);
 
-			// If the data has not changed too, we are done here
-			if (!changed) return;
-
-			// Copy the new data to the working copy
-			for (String key : temp.getProperties().keySet()) {
-				wc.setProperty(key, temp.getProperty(key));
-			}
-		} else {
-			// The transport type changed. This means that we have to remove
-			// the old transport attributes from the working copy first
-			IWizardConfigurationPanel panel = transportTypePanelControl.getConfigurationPanel(oldTransportType);
-			if (panel instanceof ISharedDataWizardPage) ((ISharedDataWizardPage)panel).removeData(wc);
-			// And now add the new transport attributes
-			panel = transportTypePanelControl.getConfigurationPanel(transportType);
-			if (panel instanceof ISharedDataWizardPage) ((ISharedDataWizardPage)panel).extractData(wc);
-		}
+		// If the data has not changed compared to the original data copy,
+		// we are done here and return immediately
+		if (odc.equals(wc)) return;
 
 		// Copy the working copy data back to the original properties container
 		Protocol.invokeAndWait(new Runnable() {
@@ -275,9 +260,12 @@ public class TransportSection extends AbstractSection implements IValidatableWiz
 				// Create a write able copy of the peer attributes
 				Map<String, String> attributes = new HashMap<String, String>(oldPeer.getAttributes());
 				// Determine the removed attributes
+				List<String> removed = new ArrayList<String>();
 				for (String key : attributes.keySet()) {
-					if (wc.getProperty(key) == null) attributes.remove(key);
+					if (wc.getProperty(key) == null) removed.add(key);
 				}
+				// Clean out the removed attributes
+				for (String key : removed) attributes.remove(key);
 				// Update with the current configured attributes
 				for (String key : wc.getProperties().keySet()) {
 					String value = wc.getStringProperty(key);

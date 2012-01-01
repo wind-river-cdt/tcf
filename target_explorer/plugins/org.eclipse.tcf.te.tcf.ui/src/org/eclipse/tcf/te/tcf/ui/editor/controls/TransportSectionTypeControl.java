@@ -12,8 +12,8 @@ package org.eclipse.tcf.te.tcf.ui.editor.controls;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.tcf.te.tcf.ui.controls.TransportTypeControl;
 import org.eclipse.tcf.te.tcf.ui.editor.sections.TransportSection;
-import org.eclipse.tcf.te.tcf.ui.wizards.controls.TransportTypeControl;
 import org.eclipse.tcf.te.ui.wizards.interfaces.IValidatableWizardPage;
 
 /**

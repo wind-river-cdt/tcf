@@ -49,6 +49,13 @@ public interface IPeerModel extends IPropertiesContainer {
 	public String getPeerId();
 
 	/**
+	 * Returns if or if not the peer attributes are complete to open a channel to it.
+	 *
+	 * @return <code>True</code> if the peer attributes are complete, <code>false</code> otherwise.
+	 */
+	public boolean isComplete();
+
+	/**
 	 * Sets the parent peer model node.
 	 *
 	 * @param node The parent peer model node or <code>null</code>.

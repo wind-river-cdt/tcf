@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.ui.wizards.controls;
+package org.eclipse.tcf.te.tcf.ui.controls;
 
 import org.eclipse.jface.dialogs.IDialogPage;
 import org.eclipse.tcf.te.ui.controls.BaseWizardConfigurationPanelControl;

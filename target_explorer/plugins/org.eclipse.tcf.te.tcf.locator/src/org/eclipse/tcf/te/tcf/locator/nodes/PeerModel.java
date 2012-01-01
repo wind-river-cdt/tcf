@@ -117,6 +117,33 @@ public class PeerModel extends PropertiesContainer implements IPeerModel, IWorki
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel#isComplete()
+	 */
+	@Override
+	public boolean isComplete() {
+		Assert.isTrue(checkThreadAccess(), "Illegal Thread Access"); //$NON-NLS-1$
+
+		boolean complete = true;
+
+		// Determine the transport method
+		String transport = getPeer().getTransportName();
+		// If the transport is not set, the peer attributes are incomplete
+		if (transport == null) {
+			complete = false;
+		} else {
+			// For TCP or SSL transport, ATTR_IP_HOST must not be null.
+			String ip = getPeer().getAttributes().get(IPeer.ATTR_IP_HOST);
+			if (("TCP".equals(transport) || "SSL".equals(transport)) && ip == null) { //$NON-NLS-1$ //$NON-NLS-2$
+				complete = false;
+			}
+
+			// Pipe and Loop transport does not require additional attributes
+		}
+
+	    return complete;
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
 	 */
 	@Override

@@ -93,6 +93,7 @@ public class Messages extends NLS {
 	public static String AttributesSection_description;
 
 	public static String NewTargetWizard_windowTitle;
+	public static String NewTargetWizard_newPeer_name;
 	public static String NewTargetWizard_error_savePeer;
 
 	public static String NewTargetWizardPage_title;

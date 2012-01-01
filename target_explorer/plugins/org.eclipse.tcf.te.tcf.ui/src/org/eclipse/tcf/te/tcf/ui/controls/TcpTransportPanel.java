@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.ui.wizards.controls;
+package org.eclipse.tcf.te.tcf.ui.controls;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IDialogPage;
@@ -265,11 +265,13 @@ public class TcpTransportPanel extends AbstractWizardConfigurationPanel implemen
 		if (data == null) return;
 
 		if (addressControl != null) {
-			data.setProperty(IPeer.ATTR_IP_HOST, addressControl.getEditFieldControlText());
+			String host = addressControl.getEditFieldControlText();
+			data.setProperty(IPeer.ATTR_IP_HOST, !"".equals(host) ? host : null); //$NON-NLS-1$
 		}
 
 		if (portControl != null) {
-			data.setProperty(IPeer.ATTR_IP_PORT, portControl.getEditFieldControlText());
+			String port = portControl.getEditFieldControlText();
+			data.setProperty(IPeer.ATTR_IP_PORT, !"".equals(port) ? port : null); //$NON-NLS-1$
 		}
 	}
 

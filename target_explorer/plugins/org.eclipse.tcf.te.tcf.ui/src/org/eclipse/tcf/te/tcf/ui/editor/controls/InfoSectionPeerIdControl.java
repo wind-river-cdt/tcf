@@ -11,8 +11,8 @@ package org.eclipse.tcf.te.tcf.ui.editor.controls;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.tcf.te.tcf.ui.controls.PeerIdControl;
 import org.eclipse.tcf.te.tcf.ui.editor.sections.GeneralInformationSection;
-import org.eclipse.tcf.te.tcf.ui.wizards.controls.PeerIdControl;
 import org.eclipse.tcf.te.ui.wizards.interfaces.IValidatableWizardPage;
 
 /**

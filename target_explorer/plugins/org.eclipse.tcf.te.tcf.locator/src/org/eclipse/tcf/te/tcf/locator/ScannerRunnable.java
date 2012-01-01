@@ -83,7 +83,8 @@ public class ScannerRunnable implements Runnable, IChannel.IChannelListener {
 	public void run() {
 		// Remember the peer node state
 		oldState = peerNode.getIntProperty(IPeerModelProperties.PROP_STATE);
-		if (peerNode.getPeer() != null) {
+		// Do not open a channel to incomplete peer nodes
+		if (peerNode.isComplete() && peerNode.getPeer() != null) {
 			// Check if there is a shared channel available which is still in open state
 			channel = Tcf.getChannelManager().getChannel(peerNode.getPeer());
 			if (channel == null || channel.getState() != IChannel.STATE_OPEN) {
