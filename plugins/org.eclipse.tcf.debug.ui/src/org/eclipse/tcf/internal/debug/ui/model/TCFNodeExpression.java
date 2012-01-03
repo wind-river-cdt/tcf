@@ -299,9 +299,9 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
                 return false;
             }
             @Override
-            public void cancel() {
+            public void reset() {
                 if (isValid() && getData() != null) getData().dispose();
-                super.cancel();
+                super.reset();
             }
             @Override
             public void dispose() {
@@ -755,6 +755,22 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
                     case pointer:
                         s = "*";
                         if ((flags & ISymbols.SYM_FLAG_REFERENCE) != 0) s = "&";
+                        get_base_type = true;
+                        break;
+                    case member_pointer:
+                        {
+                            String id = type_symbol.getContainerID();
+                            if (id != null) {
+                                TCFDataCache<ISymbols.Symbol> cls_cache = model.getSymbolInfoCache(id);
+                                if (!cls_cache.validate(done)) return false;
+                                ISymbols.Symbol cls_data = cls_cache.getData();
+                                if (cls_data != null) {
+                                    String cls_name = cls_data.getName();
+                                    if (cls_name != null) s = cls_name + "::*";
+                                }
+                            }
+                            if (s == null) s = "::*";
+                        }
                         get_base_type = true;
                         break;
                     case array:
@@ -1236,6 +1252,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
                 break;
             case pointer:
             case function:
+            case member_pointer:
                 if (level == 0) {
                     bf.append("Oct: ", SWT.BOLD);
                     bf.append(toNumberString(8, type_class, data, offs, size, big_endian));
