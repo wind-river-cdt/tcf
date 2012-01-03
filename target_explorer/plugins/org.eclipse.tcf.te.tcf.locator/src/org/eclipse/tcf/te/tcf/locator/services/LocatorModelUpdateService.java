@@ -140,17 +140,7 @@ public class LocatorModelUpdateService extends AbstractLocatorModelService imple
 		}
 
 		// Notify listeners
-		final IModelListener[] listeners = getLocatorModel().getListener();
-		if (listeners.length > 0) {
-			Protocol.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					for (IModelListener listener : listeners) {
-						listener.peerModelChanged(getLocatorModel(), parent);
-					}
-				}
-			});
-		}
+		parent.fireChangeEvent("changed", null, children); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
@@ -177,16 +167,6 @@ public class LocatorModelUpdateService extends AbstractLocatorModelService imple
 		}
 
 		// Notify listeners
-		final IModelListener[] listeners = getLocatorModel().getListener();
-		if (listeners.length > 0) {
-			Protocol.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					for (IModelListener listener : listeners) {
-						listener.peerModelChanged(getLocatorModel(), parent);
-					}
-				}
-			});
-		}
+		parent.fireChangeEvent("changed", null, children); //$NON-NLS-1$
 	}
 }

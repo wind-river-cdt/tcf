@@ -18,6 +18,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 
 /**
@@ -34,6 +35,8 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 	private IPropertyChangeListener commonViewerListener;
 	// The viewer inputs that have been added a property change listener.
 	private Set<IViewerInput> viewerInputs;
+	// The viewer
+	private TreeViewer viewer;
 
 	/*
 	 * (non-Javadoc)
@@ -45,7 +48,26 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 			viewerInput.removePropertyChangeListener(commonViewerListener);
 		}
     }
-
+	
+	/**
+	 * Get the filtered children of the parent using the
+	 * filters registered in the viewer.
+	 * 
+	 * @param parent The parent element.
+	 * @return The children after filtering.
+	 */
+	private Object[] getFilteredChildren(Object parent) {
+		Object[] result = getChildren(parent);
+		ViewerFilter[] filters = viewer.getFilters();
+		if (filters != null) {
+			for (ViewerFilter filter : filters) {
+				Object[] filteredResult = filter.filter(viewer, parent, result);
+				result = filteredResult;
+			}
+		}
+		return result;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
@@ -53,7 +75,8 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		Assert.isTrue(viewer instanceof TreeViewer);
-		commonViewerListener = new CommonViewerListener((TreeViewer) viewer);
+		this.viewer = (TreeViewer) viewer; 
+		commonViewerListener = new CommonViewerListener(this.viewer);
 		viewerInputs = Collections.synchronizedSet(new HashSet<IViewerInput>());
 	}
 	
@@ -69,6 +92,16 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 			viewerInputs.add(viewerInput);
 		}
     }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
+     */
+	@Override
+	public boolean hasChildren(Object element) {
+		Object[] children = getFilteredChildren(element);
+		return children != null && children.length > 0;
+	}
 
 	/*
 	 * (non-Javadoc)

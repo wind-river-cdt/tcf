@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.core.AbstractChannel.TraceListener;
 import org.eclipse.tcf.protocol.IChannel;
-import org.eclipse.tcf.te.tcf.core.utils.JSONUtils;
+import org.eclipse.tcf.te.tcf.core.util.JSONUtils;
 import org.eclipse.tcf.te.tcf.log.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.tcf.log.core.events.MonitorEvent;
 import org.eclipse.tcf.te.tcf.log.core.interfaces.IPreferenceKeys;

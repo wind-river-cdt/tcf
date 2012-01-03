@@ -35,6 +35,11 @@ public interface IContextHelpIds {
 	 */
 	public final static String NODE_PROPERTIES_EDITOR_PAGE = PREFIX + "NodePropertiesEditorPage"; //$NON-NLS-1$
 
+	/**
+	 * Peer overview editor page.
+	 */
+	public final static String OVERVIEW_EDITOR_PAGE = PREFIX + "OverviewEditorPage"; //$NON-NLS-1$
+
 	// ***** Dialogs and Dialog Pages *****
 
 	/**

@@ -9,6 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.views.internal;
 
+import java.util.EventObject;
+
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tcf.te.runtime.events.EventManager;
@@ -20,10 +22,15 @@ import org.eclipse.ui.navigator.CommonViewerSorter;
  * Target Explorer common viewer implementation.
  */
 public class ViewViewer extends CommonViewer {
+	// Flag to mark the viewer silent. In silent mode, no
+	// ViewerContentChangeEvents are send.
+	private boolean silent = false;
 
 	/**
 	 * Constructor.
 	 *
+	 * @param view
+	 *            The common navigator based parent view. Must not be <code>null</code>.
 	 * @param viewerId
 	 *            An id tied to the extensions that is used to focus specific
 	 *            content to a particular instance of the Common Navigator
@@ -37,6 +44,29 @@ public class ViewViewer extends CommonViewer {
 		super(viewerId, parent, style);
 	}
 
+	/**
+	 * Fire the given event if the viewer is not in silent mode.
+	 *
+	 * @param event The event or <code>null</code>.
+	 */
+	private void fireEvent(EventObject event) {
+		if (!silent && event != null) {
+		    EventManager.getInstance().fireEvent(event);
+		}
+	}
+
+	/**
+	 * Sets the viewers event firing silent mode.
+	 *
+	 * @param silent <code>True</code> to stop firing change events, <code>false</code> otherwise.
+	 * @return <code>True</code> if the silent mode changed.
+	 */
+	public boolean setSilentMode(boolean silent) {
+		boolean changed = this.silent != silent;
+		this.silent = silent;
+		return changed;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.navigator.CommonViewer#add(java.lang.Object, java.lang.Object[])
 	 */
@@ -45,7 +75,7 @@ public class ViewViewer extends CommonViewer {
 	    super.add(parentElement, childElements);
 
 	    ViewerContentChangeEvent event = new ViewerContentChangeEvent(this, ViewerContentChangeEvent.ADD);
-	    EventManager.getInstance().fireEvent(event);
+	    fireEvent(event);
 	}
 
 	/* (non-Javadoc)
@@ -56,7 +86,7 @@ public class ViewViewer extends CommonViewer {
 	    super.remove(elements);
 
 	    ViewerContentChangeEvent event = new ViewerContentChangeEvent(this, ViewerContentChangeEvent.REMOVE);
-	    EventManager.getInstance().fireEvent(event);
+	    fireEvent(event);
 	}
 
 	/* (non-Javadoc)
@@ -67,18 +97,7 @@ public class ViewViewer extends CommonViewer {
 	    super.remove(parent, elements);
 
 	    ViewerContentChangeEvent event = new ViewerContentChangeEvent(this, ViewerContentChangeEvent.REMOVE);
-	    EventManager.getInstance().fireEvent(event);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.navigator.CommonViewer#refresh(java.lang.Object)
-	 */
-	@Override
-	public void refresh(Object element) {
-	    super.refresh(element);
-
-	    ViewerContentChangeEvent event = new ViewerContentChangeEvent(this, ViewerContentChangeEvent.REFRESH);
-	    EventManager.getInstance().fireEvent(event);
+	    fireEvent(event);
 	}
 
 	/* (non-Javadoc)
@@ -89,7 +108,7 @@ public class ViewViewer extends CommonViewer {
 	    super.refresh(element, updateLabels);
 
 	    ViewerContentChangeEvent event = new ViewerContentChangeEvent(this, ViewerContentChangeEvent.REFRESH);
-	    EventManager.getInstance().fireEvent(event);
+	    fireEvent(event);
 	}
 
 	/* (non-Javadoc)

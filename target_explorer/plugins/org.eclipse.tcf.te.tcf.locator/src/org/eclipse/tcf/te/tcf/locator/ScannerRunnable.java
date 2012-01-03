@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.locator;
 
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
@@ -48,6 +49,8 @@ public class ScannerRunnable implements Runnable, IChannel.IChannelListener {
 	/* default */ IChannel channel = null;
 	// Mark if the used channel is a shared channel instance
 	/* default */ boolean sharedChannel = false;
+	// The state of the peer node at the point of time the runnable starts execution
+	private int oldState = IPeerModelProperties.STATE_UNKNOWN;
 
 	/**
 	 * Constructor.
@@ -78,7 +81,10 @@ public class ScannerRunnable implements Runnable, IChannel.IChannelListener {
 	 */
 	@Override
 	public void run() {
-		if (peerNode != null && peerNode.getPeer() != null) {
+		// Remember the peer node state
+		oldState = peerNode.getIntProperty(IPeerModelProperties.PROP_STATE);
+		// Do not open a channel to incomplete peer nodes
+		if (peerNode.isComplete() && peerNode.getPeer() != null) {
 			// Check if there is a shared channel available which is still in open state
 			channel = Tcf.getChannelManager().getChannel(peerNode.getPeer());
 			if (channel == null || channel.getState() != IChannel.STATE_OPEN) {
@@ -107,12 +113,18 @@ public class ScannerRunnable implements Runnable, IChannel.IChannelListener {
 			channel.removeChannelListener(this);
 		}
 
+		// Turn off change notifications temporarily
+		boolean changed = peerNode.setChangeEventsEnabled(false);
+		// Flag to set for refreshing the editor tab list
+		boolean refreshEditorTabs = false;
+
 		// Set the peer state property
-		if (peerNode != null) {
-			int counter = peerNode.getIntProperty(IPeerModelProperties.PROP_CHANNEL_REF_COUNTER);
-			peerNode.setProperty(IPeerModelProperties.PROP_STATE, counter > 0 ? IPeerModelProperties.STATE_CONNECTED : IPeerModelProperties.STATE_REACHABLE);
-			peerNode.setProperty(IPeerModelProperties.PROP_LAST_SCANNER_ERROR, null);
-		}
+		int counter = peerNode.getIntProperty(IPeerModelProperties.PROP_CHANNEL_REF_COUNTER);
+		peerNode.setProperty(IPeerModelProperties.PROP_STATE, counter > 0 ? IPeerModelProperties.STATE_CONNECTED : IPeerModelProperties.STATE_REACHABLE);
+		peerNode.setProperty(IPeerModelProperties.PROP_LAST_SCANNER_ERROR, null);
+		// If the old state had been one of the error states before, and is now changed to
+		// either reachable or connected, the editor tabs needs refreshment.
+		refreshEditorTabs = oldState != IPeerModelProperties.STATE_CONNECTED && oldState != IPeerModelProperties.STATE_REACHABLE;
 
 		if (channel != null && channel.getState() == IChannel.STATE_OPEN) {
 			// Keep the channel open as long as the query for the remote peers is running.
@@ -126,12 +138,9 @@ public class ScannerRunnable implements Runnable, IChannel.IChannelListener {
 				// Get the remote services
 				Collection<String> remoteServices = new ArrayList<String>(channel.getRemoteServices());
 
-				// Get the update service
+				// Update the services
 				ILocatorModelUpdateService updateService = model.getService(ILocatorModelUpdateService.class);
-				if (updateService != null) {
-					// Update the services nodes
-					updateService.updatePeerServices(peerNode, localServices, remoteServices);
-				}
+				updateService.updatePeerServices(peerNode, localServices, remoteServices);
 
 				// Use the open channel to ask the remote peer what other peers it knows
 				ILocator locator = channel.getRemoteService(ILocator.class);
@@ -251,6 +260,16 @@ public class ScannerRunnable implements Runnable, IChannel.IChannelListener {
 			// And close the channel
 			if (!sharedChannel && !keepOpen) channel.close();
 		}
+
+		// Re-enable the change events a fire a "properties" change event
+		if (changed) {
+			peerNode.setChangeEventsEnabled(true);
+			peerNode.fireChangeEvent("properties", null, peerNode.getProperties()); //$NON-NLS-1$
+		}
+
+		if (refreshEditorTabs) {
+			peerNode.fireChangeEvent("editor.refreshTab", Boolean.FALSE, Boolean.TRUE); //$NON-NLS-1$
+		}
 	}
 
 	/* (non-Javadoc)
@@ -267,11 +286,38 @@ public class ScannerRunnable implements Runnable, IChannel.IChannelListener {
 
 		// Set the peer state property, if the scanner the runnable
 		// has been scheduled from is still active.
-		if (peerNode != null && (parentScanner == null || parentScanner != null && !parentScanner.isTerminated())) {
+		if (parentScanner == null || parentScanner != null && !parentScanner.isTerminated()) {
+			// Turn off change notifications temporarily
+			boolean changed = peerNode.setChangeEventsEnabled(false);
+
 			peerNode.setProperty(IPeerModelProperties.PROP_CHANNEL_REF_COUNTER, null);
-			peerNode.setProperty(IPeerModelProperties.PROP_STATE,
-			                  	 error instanceof SocketTimeoutException ? IPeerModelProperties.STATE_NOT_REACHABLE : IPeerModelProperties.STATE_ERROR);
+			boolean timeout = error instanceof SocketTimeoutException || (error instanceof ConnectException && error.getMessage() != null && error.getMessage().startsWith("Connection timed out:")); //$NON-NLS-1$
+			peerNode.setProperty(IPeerModelProperties.PROP_STATE, timeout ? IPeerModelProperties.STATE_NOT_REACHABLE : IPeerModelProperties.STATE_ERROR);
 			peerNode.setProperty(IPeerModelProperties.PROP_LAST_SCANNER_ERROR, error instanceof SocketTimeoutException ? null : error);
+
+			// Clear out previously determined services
+			ILocatorModel model = (ILocatorModel)peerNode.getAdapter(ILocatorModel.class);
+			if (model != null) {
+				ILocatorModelUpdateService updateService = model.getService(ILocatorModelUpdateService.class);
+				updateService.updatePeerServices(peerNode, null, null);
+			}
+
+			// Clean out DNS name detection
+			peerNode.setProperty("dns.name.transient", null); //$NON-NLS-1$
+			peerNode.setProperty("dns.lastIP.transient", null); //$NON-NLS-1$
+			peerNode.setProperty("dns.skip.transient", null); //$NON-NLS-1$
+
+			// Re-enable the change events a fire a "properties" change event
+			if (changed) {
+				peerNode.setChangeEventsEnabled(true);
+				peerNode.fireChangeEvent("properties", null, peerNode.getProperties()); //$NON-NLS-1$
+			}
+
+			// If the old state had been one of the reachable states before, and is now changed to
+			// either not reachable or error, the editor tabs needs refreshment.
+			if (oldState != IPeerModelProperties.STATE_NOT_REACHABLE && oldState != IPeerModelProperties.STATE_ERROR) {
+				peerNode.fireChangeEvent("editor.refreshTab", Boolean.FALSE, Boolean.TRUE); //$NON-NLS-1$
+			}
 		}
 	}
 

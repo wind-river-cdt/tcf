@@ -13,8 +13,7 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 
 /**
- * Interface for clients to implement that wishes to listen
- * to changes to the locator model.
+ * Interface for clients to implement that wishes to listen to changes to the locator model.
  */
 public interface IModelListener {
 
@@ -33,12 +32,4 @@ public interface IModelListener {
 	 * @param model The disposed locator model.
 	 */
 	public void locatorModelDisposed(ILocatorModel model);
-
-	/**
-	 * Invoked if the peer model properties have changed.
-	 *
-	 * @param model The parent locator model.
-	 * @param peer The changed peer model.
-	 */
-	public void peerModelChanged(ILocatorModel model, IPeerModel peer);
 }

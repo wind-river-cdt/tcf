@@ -54,14 +54,17 @@ public class ProcessTreeContentProvider extends TreeContentProvider {
 		}
 		else if (parentElement instanceof ProcessTreeNode) {
 			ProcessTreeNode node = (ProcessTreeNode) parentElement;
-			if (!node.childrenQueried && !node.childrenQueryRunning) {
-				ProcessModel model = ProcessModel.getProcessModel(node.peerNode);
-				model.queryChildren(node);
+			if(node.type.equals("ProcPendingNode")) {//$NON-NLS-1$
+				return NO_ELEMENTS;
 			}
-			if(!node.childrenQueried && node.children.isEmpty()) {
+			if (!node.childrenQueried) {
+				if (!node.childrenQueryRunning) {
+					ProcessModel model = ProcessModel.getProcessModel(node.peerNode);
+					model.queryChildren(node);
+				}
 				ProcessTreeNode pendingNode = new ProcessTreeNode();
 				pendingNode.name = Messages.PendingOperation_label;
-				pendingNode.type = "ProcPendingNode";  //$NON-NLS-1$
+				pendingNode.type = "ProcPendingNode"; //$NON-NLS-1$
 				return new Object[] { pendingNode };
 			}
 			return node.children.toArray();
@@ -85,11 +88,20 @@ public class ProcessTreeContentProvider extends TreeContentProvider {
 			if (!node.childrenQueried || node.childrenQueryRunning) {
 				hasChildren = true;
 			}
-			else if (node.childrenQueried) {
-				hasChildren = node.children.size() > 0;
+			else {
+				hasChildren = super.hasChildren(element);
 			}
 		}
-
+		else if (element instanceof IPeerModel) {
+			// Get the root node for this peer model object.
+			// If null, true is returned as it means that the file system
+			// model hasn't been created yet and have to treat is as children
+			// not queried yet.
+			IPeerModel peerModel = (IPeerModel) element;
+			ProcessModel model = ProcessModel.getProcessModel(peerModel);
+			ProcessTreeNode root = model.getRoot();
+			hasChildren = root != null ? hasChildren(root) : true;
+		}
 		return hasChildren;
 	}
 

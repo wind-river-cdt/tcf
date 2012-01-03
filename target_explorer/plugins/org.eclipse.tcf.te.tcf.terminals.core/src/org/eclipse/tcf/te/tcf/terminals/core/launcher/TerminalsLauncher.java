@@ -57,7 +57,7 @@ import org.eclipse.tcf.te.tcf.core.streams.StreamsDataReceiver;
 import org.eclipse.tcf.te.tcf.terminals.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.tcf.terminals.core.interfaces.launcher.ITerminalsContextAwareListener;
 import org.eclipse.tcf.te.tcf.terminals.core.interfaces.launcher.ITerminalsLauncher;
-import org.eclipse.tcf.te.tcf.terminals.core.internal.tracing.ITraceIds;
+import org.eclipse.tcf.te.tcf.terminals.core.interfaces.tracing.ITraceIds;
 import org.eclipse.tcf.te.tcf.terminals.core.nls.Messages;
 
 /**

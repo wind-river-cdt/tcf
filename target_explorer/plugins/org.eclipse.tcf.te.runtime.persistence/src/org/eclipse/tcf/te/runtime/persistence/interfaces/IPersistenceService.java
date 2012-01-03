@@ -10,6 +10,7 @@
 package org.eclipse.tcf.te.runtime.persistence.interfaces;
 
 import java.io.IOException;
+import java.net.URI;
 
 import org.eclipse.tcf.te.runtime.services.interfaces.IService;
 
@@ -54,4 +55,14 @@ public interface IPersistenceService extends IService {
 	 */
 	public boolean delete(Object data) throws IOException;
 
+	/**
+	 * Returns the persistence storage URI for the given data object. The persistence delegate to
+	 * use will be determined by adapting the given data object to an {@link IPersistable}.
+	 *
+	 * @param data The data object. Must not be <code>null</code>.
+	 * @return The URI or <code>null</code>.
+	 *
+	 * @throws IOException - if the operation fails
+	 */
+	public URI getURI(Object data) throws IOException;
 }

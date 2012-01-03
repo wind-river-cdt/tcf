@@ -27,7 +27,7 @@ import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.IStreams;
 import org.eclipse.tcf.te.tcf.processes.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.tcf.processes.core.interfaces.launcher.IProcessContextAwareListener;
-import org.eclipse.tcf.te.tcf.processes.core.internal.tracing.ITraceIds;
+import org.eclipse.tcf.te.tcf.processes.core.interfaces.tracing.ITraceIds;
 import org.eclipse.tcf.te.tcf.processes.core.nls.Messages;
 import org.eclipse.tcf.util.TCFTask;
 import org.eclipse.tcf.te.core.async.AsyncCallbackCollector;
@@ -35,7 +35,7 @@ import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.core.streams.StreamsDataProvider;
 import org.eclipse.tcf.te.tcf.core.streams.StreamsDataReceiver;
-import org.eclipse.tcf.te.tcf.core.utils.ExceptionUtils;
+import org.eclipse.tcf.te.tcf.core.util.ExceptionUtils;
 
 /**
  * Remote process streams listener implementation.

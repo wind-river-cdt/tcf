@@ -2122,7 +2122,7 @@
                class="org.eclipse.tcf.te.tcf.filesystem.filters.HiddenFilesViewerFilter"
                description="%filter.description.hidden"
                enabled="true"
-               id="org.eclipse.tcf.te.tcf.filesystem.filters.hiddenFiles"
+               id="org.eclipse.tcf.te.tcf.filesystem.navigator.filter.hiddenFiles"
                image="icons/obj16/hidden_file_filter.png"
                name="%filter.name.hidden">
          </filter>
@@ -2130,7 +2130,7 @@
                class="org.eclipse.tcf.te.tcf.filesystem.filters.SystemFilesViewerFilter"
                description="%filter.description.system"
                enabled="true"
-               id="org.eclipse.tcf.te.tcf.filesystem.filters.systemFiles"
+               id="org.eclipse.tcf.te.tcf.filesystem.navigator.filter.systemFiles"
                image="icons/obj16/system_file_filter.png"
                name="%filter.name.system">
             <activation>

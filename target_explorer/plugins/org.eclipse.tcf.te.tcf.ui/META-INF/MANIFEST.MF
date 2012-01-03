@@ -28,8 +28,9 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: org.eclipse.tcf.te.tcf.ui.activator;x-internal:=true,
+ org.eclipse.tcf.te.tcf.ui.controls,
  org.eclipse.tcf.te.tcf.ui.dialogs,
- org.eclipse.tcf.te.tcf.ui.editor.pages,
+ org.eclipse.tcf.te.tcf.ui.editor,
  org.eclipse.tcf.te.tcf.ui.filter,
  org.eclipse.tcf.te.tcf.ui.handler,
  org.eclipse.tcf.te.tcf.ui.help,
@@ -39,7 +40,4 @@ Export-Package: org.eclipse.tcf.te.tcf.ui.activator;x-internal:=true,
  org.eclipse.tcf.te.tcf.ui.navigator.nodes,
  org.eclipse.tcf.te.tcf.ui.nls,
  org.eclipse.tcf.te.tcf.ui.preferences,
- org.eclipse.tcf.te.tcf.ui.tables,
- org.eclipse.tcf.te.tcf.ui.wizards,
- org.eclipse.tcf.te.tcf.ui.wizards.controls,
- org.eclipse.tcf.te.tcf.ui.wizards.pages
+ org.eclipse.tcf.te.tcf.ui.wizards

@@ -9,8 +9,6 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.locator.nodes;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -19,7 +17,6 @@ import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.runtime.interfaces.workingsets.IWorkingSetElement;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
-import org.eclipse.tcf.te.tcf.locator.interfaces.IModelListener;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
@@ -120,6 +117,33 @@ public class PeerModel extends PropertiesContainer implements IPeerModel, IWorki
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel#isComplete()
+	 */
+	@Override
+	public boolean isComplete() {
+		Assert.isTrue(checkThreadAccess(), "Illegal Thread Access"); //$NON-NLS-1$
+
+		boolean complete = true;
+
+		// Determine the transport method
+		String transport = getPeer().getTransportName();
+		// If the transport is not set, the peer attributes are incomplete
+		if (transport == null) {
+			complete = false;
+		} else {
+			// For TCP or SSL transport, ATTR_IP_HOST must not be null.
+			String ip = getPeer().getAttributes().get(IPeer.ATTR_IP_HOST);
+			if (("TCP".equals(transport) || "SSL".equals(transport)) && ip == null) { //$NON-NLS-1$ //$NON-NLS-2$
+				complete = false;
+			}
+
+			// Pipe and Loop transport does not require additional attributes
+		}
+
+	    return complete;
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
 	 */
 	@Override
@@ -208,28 +232,6 @@ public class PeerModel extends PropertiesContainer implements IPeerModel, IWorki
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.properties.PropertiesContainer#getProperties()
-	 */
-	@Override
-	public Map<String, Object> getProperties() {
-		Map<String, Object> properties = new HashMap<String, Object>(super.getProperties());
-		if (getPeer() != null) properties.putAll(getPeer().getAttributes());
-	    return Collections.unmodifiableMap(new HashMap<String, Object>(properties));
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.properties.PropertiesContainer#getProperty(java.lang.String)
-	 */
-	@Override
-	public Object getProperty(String key) {
-		Object property = super.getProperty(key);
-		if (property == null && getPeer() != null && getPeer().getAttributes().containsKey(key)) {
-			property = getPeer().getAttributes().get(key);
-		}
-		return property;
-	}
-
-	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.runtime.properties.PropertiesContainer#postSetProperties(java.util.Map)
 	 */
 	@Override
@@ -242,20 +244,7 @@ public class PeerModel extends PropertiesContainer implements IPeerModel, IWorki
 		peerId = getPeer().getID();
 		Assert.isNotNull(peerId);
 
-		if (changeEventsEnabled()) {
-			final IModelListener[] listeners = model.getListener();
-			if (listeners.length > 0) {
-				Protocol.invokeLater(new Runnable() {
-					@Override
-					@SuppressWarnings("synthetic-access")
-					public void run() {
-						for (IModelListener listener : listeners) {
-							listener.peerModelChanged(model, PeerModel.this);
-						}
-					}
-				});
-			}
-		}
+		super.postSetProperties(properties);
 	}
 
 	/* (non-Javadoc)
@@ -273,21 +262,6 @@ public class PeerModel extends PropertiesContainer implements IPeerModel, IWorki
 			Assert.isNotNull(peerId);
 		}
 
-		// Notify registered listeners that the peer changed. Property
-		// changes for property slots ending with ".silent" are suppressed.
-		if (changeEventsEnabled() && !key.endsWith(".silent")) { //$NON-NLS-1$
-			final IModelListener[] listeners = model.getListener();
-			if (listeners.length > 0) {
-				Protocol.invokeLater(new Runnable() {
-					@Override
-					@SuppressWarnings("synthetic-access")
-					public void run() {
-						for (IModelListener listener : listeners) {
-							listener.peerModelChanged(model, PeerModel.this);
-						}
-					}
-				});
-			}
-		}
+		super.postSetProperty(key, value, oldValue);
 	}
 }

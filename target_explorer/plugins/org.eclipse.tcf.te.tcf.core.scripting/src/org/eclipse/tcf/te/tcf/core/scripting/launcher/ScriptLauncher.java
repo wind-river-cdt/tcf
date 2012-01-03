@@ -36,7 +36,7 @@ import org.eclipse.tcf.te.tcf.core.scripting.interfaces.IScriptLauncherPropertie
 import org.eclipse.tcf.te.tcf.core.scripting.nls.Messages;
 import org.eclipse.tcf.te.tcf.core.scripting.parser.Parser;
 import org.eclipse.tcf.te.tcf.core.scripting.parser.Token;
-import org.eclipse.tcf.te.tcf.core.utils.JSONUtils;
+import org.eclipse.tcf.te.tcf.core.util.JSONUtils;
 
 /**
  * Script launcher implementation.

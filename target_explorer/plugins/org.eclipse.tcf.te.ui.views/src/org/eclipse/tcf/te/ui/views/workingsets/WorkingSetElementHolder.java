@@ -10,8 +10,8 @@
 package org.eclipse.tcf.te.ui.views.workingsets;
 
 import org.eclipse.core.runtime.PlatformObject;
-import org.eclipse.tcf.te.ui.views.interfaces.workingsets.IWorkingSetNameIDs;
 import org.eclipse.tcf.te.runtime.interfaces.workingsets.IWorkingSetElement;
+import org.eclipse.tcf.te.ui.views.interfaces.workingsets.IWorkingSetNameIDs;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPersistableElement;
 
@@ -133,5 +133,47 @@ public final class WorkingSetElementHolder extends PlatformObject implements IPe
 			return element;
 		}
 		return super.getAdapter(adapter);
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		if (elementId != null) {
+			int hash = elementId.hashCode();
+			if (wsName != null) {
+				hash = hash << 16;
+				hash += wsName.hashCode();
+			}
+			return hash;
+		}
+		else if (wsName != null) {
+			return wsName.hashCode();
+		}
+
+	    return super.hashCode();
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		// Working set element holder are identical if the element id
+		// and working set name matches
+		if (obj instanceof WorkingSetElementHolder) {
+			boolean equal = true;
+
+			if (elementId == null) equal &= ((WorkingSetElementHolder)obj).elementId == null;
+			else equal &= elementId.equals(((WorkingSetElementHolder)obj).elementId);
+
+			if (wsName == null) equal &= ((WorkingSetElementHolder)obj).wsName == null;
+			else equal &= wsName.equals(((WorkingSetElementHolder)obj).wsName);
+
+			return equal;
+		}
+
+	    return super.equals(obj);
 	}
 }

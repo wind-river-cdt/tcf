@@ -10,17 +10,19 @@
 package org.eclipse.tcf.te.tcf.ui.wizards;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
-import org.eclipse.tcf.te.tcf.ui.nls.Messages;
-import org.eclipse.tcf.te.tcf.ui.wizards.pages.NewTargetWizardPage;
 import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistenceService;
 import org.eclipse.tcf.te.runtime.services.ServiceManager;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
@@ -28,6 +30,7 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelLookupService;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelRefreshService;
 import org.eclipse.tcf.te.tcf.locator.model.Model;
+import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.views.ViewsUtil;
 import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
 import org.eclipse.tcf.te.ui.wizards.AbstractWizard;
@@ -35,9 +38,11 @@ import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
 /**
- * New TCF target wizard implementation.
+ * New peer wizard implementation.
  */
 public class NewTargetWizard extends AbstractWizard implements INewWizard {
+	// Session wide new peer counter
+	private final static AtomicInteger counter = new AtomicInteger();
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench, org.eclipse.jface.viewers.IStructuredSelection)
@@ -49,59 +54,56 @@ public class NewTargetWizard extends AbstractWizard implements INewWizard {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.jface.wizard.Wizard#addPages()
-	 */
-	@Override
-	public void addPages() {
-		// Create and add the wizard pages
-		addPage(new NewTargetWizardPage());
-	}
-
-	/* (non-Javadoc)
 	 * @see org.eclipse.jface.wizard.Wizard#performFinish()
 	 */
 	@Override
 	public boolean performFinish() {
-		IWizardPage page = getPage(NewTargetWizardPage.class.getName());
-		if (page instanceof NewTargetWizardPage) {
-			// Trigger the saving of the widget history
-			((NewTargetWizardPage)page).saveWidgetValues();
-			// Get the peer attributes map from the page
-			final Map<String, String> peerAttributes = ((NewTargetWizardPage)page).getPeerAttributes();
-			if (peerAttributes != null) {
-				try {
-					// Save the new peer
-					IPersistenceService persistenceService = ServiceManager.getInstance().getService(IPersistenceService.class);
-					if (persistenceService == null) throw new IOException("Persistence service instance unavailable."); //$NON-NLS-1$
-					persistenceService.write(peerAttributes);
+		// Create the minimum set of peer attributes to create a new peer
+		final Map<String, String> peerAttributes = new HashMap<String, String>();
+		peerAttributes.put(IPeer.ATTR_ID, UUID.randomUUID().toString());
+		peerAttributes.put(IPeer.ATTR_NAME, NLS.bind(Messages.NewTargetWizard_newPeer_name, Integer.valueOf(counter.incrementAndGet())));
 
-					// Get the locator model
-					final ILocatorModel model = Model.getModel();
-					if (model != null) {
-						// Trigger a refresh of the model to read in the newly created static peer
-						final ILocatorModelRefreshService service = model.getService(ILocatorModelRefreshService.class);
-						if (service != null) {
-							Protocol.invokeLater(new Runnable() {
-								@Override
-								public void run() {
-									// Refresh the model now (must be executed within the TCF dispatch thread)
-									service.refresh();
+		try {
+			// Save the new peer
+			IPersistenceService persistenceService = ServiceManager.getInstance().getService(IPersistenceService.class);
+			if (persistenceService == null) throw new IOException("Persistence service instance unavailable."); //$NON-NLS-1$
+			persistenceService.write(peerAttributes);
 
-									// Get the peer model node from the model and select it in the tree
-									final IPeerModel peerNode = model.getService(ILocatorModelLookupService.class).lkupPeerModelById(peerAttributes.get(IPeer.ATTR_ID));
-									if (peerNode != null) {
-										ViewsUtil.setSelection(IUIConstants.ID_EXPLORER, new StructuredSelection(peerNode));
-									}
-								}
-							});
+			// Get the locator model
+			final ILocatorModel model = Model.getModel();
+			if (model != null) {
+				// Trigger a refresh of the model to read in the newly created static peer
+				final ILocatorModelRefreshService service = model.getService(ILocatorModelRefreshService.class);
+				if (service != null) {
+					Protocol.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							// Refresh the model now (must be executed within the TCF dispatch thread)
+							service.refresh();
+
+							// Get the peer model node from the model and select it in the tree
+							final IPeerModel peerNode = model.getService(ILocatorModelLookupService.class).lkupPeerModelById(peerAttributes.get(IPeer.ATTR_ID));
+							if (peerNode != null) {
+								// Refresh the viewer
+								ViewsUtil.refresh(IUIConstants.ID_EXPLORER);
+								// Create the selection
+								ISelection selection = new StructuredSelection(peerNode);
+								// Set the selection
+								ViewsUtil.setSelection(IUIConstants.ID_EXPLORER, selection);
+								// And open the properties on the selection
+								ViewsUtil.openProperties(selection);
+							}
 						}
-					}
-				} catch (IOException e) {
-					((NewTargetWizardPage)page).setMessage(NLS.bind(Messages.NewTargetWizard_error_savePeer, e.getLocalizedMessage()), IMessageProvider.ERROR);
-					getContainer().updateMessage();
-					return false;
+					});
 				}
 			}
+		} catch (IOException e) {
+			if (getContainer().getCurrentPage() instanceof WizardPage) {
+				String message = NLS.bind(Messages.NewTargetWizard_error_savePeer, e.getLocalizedMessage());
+				((WizardPage)getContainer().getCurrentPage()).setMessage(message, IMessageProvider.ERROR);
+				getContainer().updateMessage();
+			}
+			return false;
 		}
 
 		return true;

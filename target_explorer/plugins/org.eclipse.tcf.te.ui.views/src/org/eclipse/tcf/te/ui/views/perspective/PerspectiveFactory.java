@@ -58,6 +58,8 @@ public class PerspectiveFactory extends PlatformObject implements IPerspectiveFa
 			lowerRight.addView("org.eclipse.pde.runtime.LogView"); //$NON-NLS-1$
 		if (PlatformUI.getWorkbench().getViewRegistry().find("org.eclipse.ui.views.TaskList") != null) //$NON-NLS-1$
 			lowerRight.addPlaceholder("org.eclipse.ui.views.TaskList"); //$NON-NLS-1$
+		if (PlatformUI.getWorkbench().getViewRegistry().find("org.eclipse.ui.views.PropertySheet") != null) //$NON-NLS-1$
+			lowerRight.addPlaceholder("org.eclipse.ui.views.PropertySheet"); //$NON-NLS-1$
 
 		// place details view port to the right of editor area
 		IPlaceholderFolderLayout right = layout.createPlaceholderFolder("right", IPageLayout.RIGHT, 0.75f, editorArea); //$NON-NLS-1$

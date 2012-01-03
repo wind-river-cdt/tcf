@@ -9,6 +9,11 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.views.internal.editor;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.tcf.te.ui.views.extensions.EditorPageBinding;
@@ -31,12 +36,15 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 
 /**
- * Details editor.
+ * Properties editor implementation.
  */
-public class Editor extends FormEditor implements IPersistableEditor,  ITabbedPropertySheetPageContributor {
+public class Editor extends FormEditor implements IPersistableEditor, ITabbedPropertySheetPageContributor {
 
 	// The reference to an memento to restore once the editor got activated
 	private IMemento mementoToRestore;
+
+	// The editor event listener instance
+	private EditorEventListener listener;
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.forms.editor.FormEditor#addPages()
@@ -48,44 +56,7 @@ public class Editor extends FormEditor implements IPersistableEditor,  ITabbedPr
 		// Get all applicable editor page bindings
 		EditorPageBinding[] bindings = EditorPageBindingExtensionPointManager.getInstance().getApplicableEditorPageBindings(input);
 		for (EditorPageBinding binding : bindings) {
-			String pageId = binding.getPageId();
-			if (pageId != null) {
-				// Get the corresponding editor page instance
-				IEditorPage page = EditorPageExtensionPointManager.getInstance().getEditorPage(pageId, true);
-				if (page != null) {
-					try {
-						// Associate this editor with the page instance.
-						// This is typically done in the constructor, but we are
-						// utilizing a default constructor to instantiate the page.
-						page.initialize(this);
-
-						// Read in the "insertBefore" and "insertAfter" properties of the binding
-						String insertBefore = binding.getInsertBefore().trim();
-						String insertAfter = binding.getInsertAfter().trim();
-
-						// insertBefore will eclipse insertAfter is both is specified.
-						if (!"".equals(insertBefore)) { //$NON-NLS-1$
-							// If it is "first", we insert the page at index 0
-							if ("first".equalsIgnoreCase(insertBefore)) { //$NON-NLS-1$
-								addPage(0, page);
-							} else {
-								// Find the index of the page we shall insert this page before
-								int index = getIndexOf(insertBefore);
-								if (index != -1) addPage(index, page);
-								else addPage(page);
-							}
-						} else if (!"".equals(insertAfter) && !"last".equalsIgnoreCase(insertAfter)) { //$NON-NLS-1$ //$NON-NLS-2$
-							// Find the index of the page we shall insert this page after
-							int index = getIndexOf(insertAfter);
-							if (index != -1 && index + 1 < pages.size()) addPage(index + 1, page);
-							else addPage(page);
-						} else {
-							// And add the page to the editor as last page.
-							addPage(page);
-						}
-					} catch (PartInitException e) { /* ignored on purpose */ }
-				}
-			}
+			processPageBinding(binding);
 		}
 
 		if (mementoToRestore != null) {
@@ -97,6 +68,95 @@ public class Editor extends FormEditor implements IPersistableEditor,  ITabbedPr
 				}
 			}
 			mementoToRestore = null;
+		}
+	}
+
+	/**
+	 * Update the editor page list. Pages which are not longer valid
+	 * will be removed and pages now being valid gets added.
+	 */
+	public void updatePageList() {
+		// Get the editor input object
+		IEditorInput input = getEditorInput();
+		// Get all applicable editor page bindings
+		List<EditorPageBinding> bindings = new ArrayList<EditorPageBinding>(Arrays.asList(EditorPageBindingExtensionPointManager.getInstance().getApplicableEditorPageBindings(input)));
+		// Get a copy of the currently added pages
+		List<Object> oldPages = new ArrayList<Object>(Arrays.asList(pages.toArray()));
+		// Loop through the old pages and determine if the page is still applicable
+		Iterator<Object> iterator = oldPages.iterator();
+		while (iterator.hasNext()) {
+			Object element = iterator.next();
+			// Skip over pages not being a form page.
+			if (!(element instanceof IFormPage)) continue;
+			IFormPage page = (IFormPage)element;
+			// Find the corresponding page binding
+			EditorPageBinding binding = null;
+			for (EditorPageBinding candidate : bindings) {
+				if (candidate.getPageId().equals(page.getId())) {
+					binding = candidate;
+					break;
+				}
+			}
+			if (binding != null) {
+				// Found binding -> page is still applicable
+				bindings.remove(binding);
+			} else {
+				// No binding found -> page is not longer applicable
+				removePage(pages.indexOf(page));
+			}
+		}
+		// If the are remaining bindings left, this are new pages.
+		// --> Process them now
+		for (EditorPageBinding binding : bindings) {
+			processPageBinding(binding);
+		}
+	}
+
+	/**
+	 * Process the given editor page binding.
+	 *
+	 * @param binding The editor page binding. Must not be <code>null</code>.
+	 */
+	protected void processPageBinding(EditorPageBinding binding) {
+		Assert.isNotNull(binding);
+
+		String pageId = binding.getPageId();
+		if (pageId != null) {
+			// Get the corresponding editor page instance
+			IEditorPage page = EditorPageExtensionPointManager.getInstance().getEditorPage(pageId, true);
+			if (page != null) {
+				try {
+					// Associate this editor with the page instance.
+					// This is typically done in the constructor, but we are
+					// utilizing a default constructor to instantiate the page.
+					page.initialize(this);
+
+					// Read in the "insertBefore" and "insertAfter" properties of the binding
+					String insertBefore = binding.getInsertBefore().trim();
+					String insertAfter = binding.getInsertAfter().trim();
+
+					// insertBefore will eclipse insertAfter is both is specified.
+					if (!"".equals(insertBefore)) { //$NON-NLS-1$
+						// If it is "first", we insert the page at index 0
+						if ("first".equalsIgnoreCase(insertBefore)) { //$NON-NLS-1$
+							addPage(0, page);
+						} else {
+							// Find the index of the page we shall insert this page before
+							int index = getIndexOf(insertBefore);
+							if (index != -1) addPage(index, page);
+							else addPage(page);
+						}
+					} else if (!"".equals(insertAfter) && !"last".equalsIgnoreCase(insertAfter)) { //$NON-NLS-1$ //$NON-NLS-2$
+						// Find the index of the page we shall insert this page after
+						int index = getIndexOf(insertAfter);
+						if (index != -1 && index + 1 < pages.size()) addPage(index + 1, page);
+						else addPage(page);
+					} else {
+						// And add the page to the editor as last page.
+						addPage(page);
+					}
+				} catch (PartInitException e) { /* ignored on purpose */ }
+			}
 		}
 	}
 
@@ -128,6 +188,37 @@ public class Editor extends FormEditor implements IPersistableEditor,  ITabbedPr
 
 		// Update the part name
 		if (!"".equals(input.getName())) setPartName(input.getName()); //$NON-NLS-1$
+
+		// Dispose an existing event listener instance
+		if (listener != null) { listener.dispose(); listener = null; }
+		// Create the event listener. The event listener does register itself.
+		listener = new EditorEventListener(this);
+	}
+
+	/**
+	 * Update the editor part name based on the current editor input.
+	 */
+	public void updatePartName() {
+		IEditorInput input = getEditorInput();
+		String oldPartName = getPartName();
+
+		if (input instanceof EditorInput) {
+			// Reset the editor input name to trigger recalculation
+			((EditorInput)input).name = null;
+			// If the name changed, apply the new name
+			if (!oldPartName.equals(input.getName())) setPartName(input.getName());
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.forms.editor.FormEditor#dispose()
+	 */
+	@Override
+	public void dispose() {
+		// Dispose an existing event listener instance
+		if (listener != null) { listener.dispose(); listener = null; }
+
+	    super.dispose();
 	}
 
 	/* (non-Javadoc)
@@ -208,7 +299,7 @@ public class Editor extends FormEditor implements IPersistableEditor,  ITabbedPr
 	 */
 	@Override
 	public Object getAdapter(Class adapter) {
-		if(adapter == IPropertySheetPage.class) {
+		if (adapter == IPropertySheetPage.class) {
 			return new TabbedPropertySheetPage(this);
 		}
 		// We pass on the adapt request to the currently active page
@@ -220,12 +311,11 @@ public class Editor extends FormEditor implements IPersistableEditor,  ITabbedPr
 		return adapterInstance;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor#getContributorId()
 	 */
 	@Override
     public String getContributorId() {
-	    return IUIConstants.TABBED_PROPERETIES_CONTRIBUTOR_ID;
+	    return IUIConstants.TABBED_PROPERTIES_CONTRIBUTOR_ID;
     }
 }

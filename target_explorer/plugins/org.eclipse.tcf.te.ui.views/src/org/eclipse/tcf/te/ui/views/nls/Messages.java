@@ -40,11 +40,14 @@ public class Messages extends NLS {
 
 	public static String WorkingSetActionProvider_multipleWorkingSets;
 
-	public static String WorkingSetRootModeActionGroup_Top_Level_Element;
-	public static String WorkingSetRootModeActionGroup_Target;
-	public static String WorkingSetRootModeActionGroup_Working_Set;
+	public static String WorkingSetActionGroup_Top_Level_Element;
+	public static String WorkingSetActionGroup_Elements;
+	public static String WorkingSetActionGroup_Working_Set;
 
-	public static String WorkingSetContentProvider_others_name;
+	public static String ViewStateManager_others_name;
+
+	public static String ConfigureWorkingSetAction_text;
+	public static String ConfigureWorkingSetAction_toolTip;
 
 	public static String PropertiesCommandHandler_error_initPartFailed;
 
@@ -61,4 +64,15 @@ public class Messages extends NLS {
 	public static String TargetWorkingSetPage_warning_resourceMustBeChecked;
 	public static String TargetWorkingSetPage_title;
 	public static String TargetWorkingSetPage_workingSet_description;
+
+	public static String WorkingSetConfigurationDialog_down_label;
+	public static String WorkingSetConfigurationDialog_up_label;
+	public static String WorkingSetConfigurationDialog_title;
+	public static String WorkingSetConfigurationDialog_selectAll_label;
+	public static String WorkingSetConfigurationDialog_edit_label;
+	public static String WorkingSetConfigurationDialog_message;
+	public static String WorkingSetConfigurationDialog_deselectAll_label;
+	public static String WorkingSetConfigurationDialog_new_label;
+	public static String WorkingSetConfigurationDialog_sort_working_sets;
+	public static String WorkingSetConfigurationDialog_remove_label;
 }

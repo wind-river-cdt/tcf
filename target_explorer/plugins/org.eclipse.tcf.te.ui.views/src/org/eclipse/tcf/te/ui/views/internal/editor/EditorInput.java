@@ -33,7 +33,7 @@ public class EditorInput implements IEditorInput, IPersistableElement {
 	// The parent editor id
 	private final String id;
 	// The editor input name, once determined
-	private String name;
+	/* default */ String name;
 	// The node (selection) the editor is showing
 	private final Object node;
 

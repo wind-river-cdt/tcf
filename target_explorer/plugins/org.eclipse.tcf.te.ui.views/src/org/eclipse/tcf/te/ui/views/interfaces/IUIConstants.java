@@ -39,5 +39,5 @@ public interface IUIConstants {
 	/**
 	 * The tabbed properties contributor id for Target Explorer
 	 */
-	public static final String TABBED_PROPERETIES_CONTRIBUTOR_ID = "org.eclipse.tcf.te.ui";  //$NON-NLS-1$
+	public static final String TABBED_PROPERTIES_CONTRIBUTOR_ID = "org.eclipse.tcf.te.ui";  //$NON-NLS-1$
 }

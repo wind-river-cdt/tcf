@@ -2,6 +2,17 @@
 <?eclipse version="3.4"?>
 <plugin>
 
+<!-- Event listener contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.eventListeners">
+      <eventListener
+            class="org.eclipse.tcf.te.tcf.ui.navigator.EventListener">
+         <eventSourceType
+               bundleId="org.eclipse.tcf.te.tcf.locator"
+               class="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel">
+         </eventSourceType>
+      </eventListener>
+   </extension>
+
 <!-- Common navigator contributions -->
    <extension point="org.eclipse.ui.navigator.viewer">
       <viewerContentBinding viewerId="org.eclipse.tcf.te.ui.views.TargetExplorer">
@@ -62,8 +73,10 @@
             name="%NewWizards.category.name">
       </category>
       <wizard
+            canFinishEarly="true"
             category="org.eclipse.tcf.te.tcf.ui.newWizards.category"
             class="org.eclipse.tcf.te.tcf.ui.wizards.NewTargetWizard"
+            hasPages="false"
             icon="icons/elcl16/newTarget_wiz.gif"
             id="org.eclipse.tcf.te.tcf.ui.wizards.NewTargetWizard"
             name="%NewTargetWizard.name">
@@ -76,17 +89,17 @@
 <!-- Editor page contributions -->
    <extension point="org.eclipse.tcf.te.ui.views.editorPages">
       <editorPage
-            class="org.eclipse.tcf.te.tcf.ui.editor.pages.NodePropertiesEditorPage"
-            name="%NodePropertiesEditorPage.name"
-            id="org.eclipse.tcf.te.tcf.ui.NodePropertiesEditorPage">
+            class="org.eclipse.tcf.te.tcf.ui.editor.OverviewEditorPage"
+            name="%OverviewEditorPage.name"
+            id="org.eclipse.tcf.te.tcf.ui.OverviewEditorPage">
       </editorPage>
    </extension>
 
 <!-- Editor page binding contributions -->
    <extension point="org.eclipse.tcf.te.ui.views.editorPageBindings">
       <editorPageBinding
-            id="org.eclipse.tcf.te.tcf.ui.binding.NodePropertiesEditorPage"
-            pageId="org.eclipse.tcf.te.tcf.ui.NodePropertiesEditorPage"
+            id="org.eclipse.tcf.te.tcf.ui.binding.OverviewEditorPage"
+            pageId="org.eclipse.tcf.te.tcf.ui.OverviewEditorPage"
             insertBefore="first">
          <enablement>
             <with variable="activeEditorInput">

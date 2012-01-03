@@ -18,6 +18,7 @@
                   <insertionPoint name="group.expand"/>
                   <insertionPoint name="group.open" separator="true"/>
                   <insertionPoint name="group.openWith"/>
+                  <insertionPoint name="group.showIn"/>
                   <insertionPoint name="group.connect" separator="true"/>
                   <insertionPoint name="group.redirect" separator="true"/>
                   <insertionPoint name="group.symbols" separator="true"/>
@@ -73,8 +74,6 @@
    
    <extension point="org.eclipse.ui.navigator.navigatorContent">
 
-<!-- Default navigator sorter contribution -->
-
 <!-- Default navigator action contributions -->
       <actionProvider
             class="org.eclipse.tcf.te.ui.views.actions.NewActionProvider"
@@ -85,7 +84,7 @@
 
 <!-- Working Sets navigator action contributions -->
       <actionProvider
-            class="org.eclipse.tcf.te.ui.views.actions.WorkingSetActionProvider"
+            class="org.eclipse.tcf.te.ui.views.workingsets.actions.WorkingSetActionProvider"
             id="org.eclipse.tcf.te.ui.views.navigator.actions.WorkingSetActions">
            <enablement>
                 <or>
@@ -116,10 +115,18 @@
             name="%workingsets.extension.name"
             priority="higher">
          <triggerPoints>
-            <instanceof value="org.eclipse.ui.IWorkingSet"/>
+            <or>
+               <instanceof value="org.eclipse.tcf.te.ui.views.workingsets.WorkingSetViewStateManager"/>
+               <instanceof value="org.eclipse.ui.IWorkingSet"/>
+               <instanceof value="org.eclipse.tcf.te.ui.views.workingsets.WorkingSetElementHolder"/>
+            </or>
          </triggerPoints>
          <possibleChildren>
-            <instanceof value="java.lang.Object"/>
+            <or>
+               <instanceof value="org.eclipse.tcf.te.ui.views.workingsets.WorkingSetViewStateManager"/>
+               <instanceof value="org.eclipse.ui.IWorkingSet"/>
+               <instanceof value="org.eclipse.tcf.te.ui.views.workingsets.WorkingSetElementHolder"/>
+            </or>
          </possibleChildren>
          <commonSorter
                class="org.eclipse.tcf.te.ui.views.workingsets.WorkingSetViewerSorter"
@@ -203,6 +210,10 @@
             class="org.eclipse.tcf.te.ui.views.workingsets.WorkingSetElementHolderFactory"
             id="org.eclipse.tcf.te.ui.views.workingsets.WorkingSetElementHolderFactory">
       </factory>
+      <factory
+            class="org.eclipse.tcf.te.ui.views.workingsets.CustomizedOrderComparatorFactory"
+            id="org.eclipse.tcf.te.ui.views.workingsets.CustomizedOrderComparatorFactory">
+      </factory>
    </extension>
    
 <!-- Adapter factories -->
@@ -233,6 +244,18 @@
                </visibleWhen>
          </command>
       </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.tcf.te.ui.views.TargetExplorer#Popup?after=group.showIn">
+         <menu
+               label="%menu.showIn.label">
+            <command
+                  commandId="org.eclipse.tcf.te.ui.views.command.ShowInProperties"
+                  icon="icons/eview16/prop_ps.gif"
+                  label="%menu.properties.label"
+                  style="push">
+            </command>
+         </menu>
+      </menuContribution>
    </extension>
 
 <!-- Command contributions -->
@@ -245,6 +268,12 @@
             helpContextId="org.eclipse.ui.navigator.Open"
             id="org.eclipse.ui.navigator.Open"
             name="%Command.open.name">
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.ui.views.command.help_ShowInProperties"
+            id="org.eclipse.tcf.te.ui.views.command.ShowInProperties"
+            name="%command.showInProperties.label">
       </command>
    </extension>
 
@@ -283,6 +312,18 @@
          <activeWhen>
             <with variable="activePartId">
                <equals value="org.eclipse.tcf.te.ui.views.TargetExplorer"/>
+            </with>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tcf.te.ui.views.handler.ShowInPropertiesHandler"
+            commandId="org.eclipse.tcf.te.ui.views.command.ShowInProperties">
+         <activeWhen>
+            <with
+                  variable="activePartId">
+               <equals
+                     value="org.eclipse.tcf.te.ui.views.TargetExplorer">
+               </equals>
             </with>
          </activeWhen>
       </handler>      

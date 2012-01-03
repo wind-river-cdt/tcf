@@ -69,23 +69,31 @@ public class Messages extends NLS {
 
 	// **** Declare externalized string id's down here *****
 
-	public static String NodePropertiesContentProvider_peerNode_sectionTitle;
+	public static String OverviewEditorPage_title;
 
-	public static String NodePropertiesLabelProvider_state;
-	public static String NodePropertiesLabelProvider_state__1;
-	public static String NodePropertiesLabelProvider_state_0;
-	public static String NodePropertiesLabelProvider_state_1;
-	public static String NodePropertiesLabelProvider_state_2;
-	public static String NodePropertiesLabelProvider_state_3;
+	public static String GeneralInformationSection_title;
+	public static String GeneralInformationSection_description;
 
-	public static String NodePropertiesLabelProvider_lastScannerError;
+	public static String GeneralInformationSection_state;
+	public static String GeneralInformationSection_state__1;
+	public static String GeneralInformationSection_state_0;
+	public static String GeneralInformationSection_state_1;
+	public static String GeneralInformationSection_state_2;
+	public static String GeneralInformationSection_state_3;
 
-	public static String NodePropertiesLabelProvider_services_local;
-	public static String NodePropertiesLabelProvider_services_remote;
+	public static String TransportSection_title;
+	public static String TransportSection_description;
 
-	public static String NodePropertiesLabelProvider_redirect_proxy;
+	public static String ServicesSection_title;
+	public static String ServicesSection_description;
+	public static String ServicesSection_group_local_title;
+	public static String ServicesSection_group_remote_title;
+
+	public static String AttributesSection_title;
+	public static String AttributesSection_description;
 
 	public static String NewTargetWizard_windowTitle;
+	public static String NewTargetWizard_newPeer_name;
 	public static String NewTargetWizard_error_savePeer;
 
 	public static String NewTargetWizardPage_title;

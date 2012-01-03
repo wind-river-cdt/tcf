@@ -19,10 +19,8 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
-import org.eclipse.tcf.te.tcf.ui.tables.NodePropertiesContentProvider;
-import org.eclipse.tcf.te.tcf.ui.tables.NodePropertiesLabelProvider;
-import org.eclipse.tcf.te.tcf.ui.tables.NodePropertiesViewerComparator;
 import org.eclipse.tcf.te.ui.forms.CustomFormToolkit;
+import org.eclipse.tcf.te.ui.tables.TableViewerComparator;
 import org.eclipse.tcf.te.ui.tables.properties.NodePropertiesTableControl;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -52,21 +50,21 @@ public class PeerGeneralSection extends AbstractPropertySection {
 			 */
 			@Override
 			protected IStructuredContentProvider doCreateTableViewerContentProvider(TableViewer viewer) {
-				return new NodePropertiesContentProvider(true);
+				return new PeerGeneralSectionContentProvider(true);
 			}
 			/* (non-Javadoc)
 			 * @see org.eclipse.tcf.te.tcf.vtl.ui.datasource.controls.tables.properties.NodePropertiesTableControl#doCreateTableViewerLabelProvider(org.eclipse.jface.viewers.TableViewer)
 			 */
 			@Override
 			protected ITableLabelProvider doCreateTableViewerLabelProvider(TableViewer viewer) {
-				return new NodePropertiesLabelProvider(viewer);
+				return new PeerGeneralSectionLabelProvider(viewer);
 			}
 			/* (non-Javadoc)
 			 * @see org.eclipse.tcf.te.tcf.vtl.ui.datasource.controls.tables.NodePropertiesTableControl#doCreateTableViewerComparator(org.eclipse.jface.viewers.TableViewer)
 			 */
 			@Override
 			protected ViewerComparator doCreateTableViewerComparator(TableViewer viewer) {
-				return new NodePropertiesViewerComparator(viewer, (ITableLabelProvider)viewer.getLabelProvider());
+				return new TableViewerComparator(viewer, (ITableLabelProvider)viewer.getLabelProvider());
 			}
 		};
 		CustomFormToolkit toolkit = new CustomFormToolkit(new FormToolkit(parent.getDisplay()));
@@ -94,5 +92,5 @@ public class PeerGeneralSection extends AbstractPropertySection {
     public void refresh() {
 		tableControl.getViewer().setInput(peer);
     }
-	
+
 }
