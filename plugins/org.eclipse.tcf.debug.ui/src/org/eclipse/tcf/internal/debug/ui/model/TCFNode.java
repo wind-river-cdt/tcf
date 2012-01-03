@@ -23,6 +23,7 @@ import org.eclipse.debug.internal.ui.viewers.model.provisional.ILabelUpdate;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IModelDelta;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IPresentationContext;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IViewerInputUpdate;
+import org.eclipse.tcf.debug.ui.ITCFObject;
 import org.eclipse.tcf.internal.debug.model.TCFLaunch;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.Protocol;
@@ -32,7 +33,7 @@ import org.eclipse.ui.IWorkbenchPart;
 /**
  * TCFNode is base class for all TCF debug model elements.
  */
-public abstract class TCFNode extends PlatformObject implements Comparable<TCFNode> {
+public abstract class TCFNode extends PlatformObject implements ITCFObject, Comparable<TCFNode> {
 
     protected final String id;
     protected final TCFNode parent;

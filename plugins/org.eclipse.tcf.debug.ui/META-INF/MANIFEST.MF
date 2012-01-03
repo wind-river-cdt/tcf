@@ -31,4 +31,5 @@ Bundle-ActivationPolicy: lazy
 Eclipse-LazyStart: true
 Export-Package: org.eclipse.tcf.internal.debug.ui.commands;x-friends:="org.eclipse.tcf.cdt.ui",
  org.eclipse.tcf.internal.debug.ui.launch;x-friends:="org.eclipse.tcf.cdt.ui",
- org.eclipse.tcf.internal.debug.ui.model;x-friends:="org.eclipse.tcf.cdt.ui"
+ org.eclipse.tcf.internal.debug.ui.model;x-friends:="org.eclipse.tcf.cdt.ui",
+ org.eclipse.tcf.debug.ui
