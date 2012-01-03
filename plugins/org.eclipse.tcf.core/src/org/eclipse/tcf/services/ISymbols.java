@@ -39,7 +39,8 @@ public interface ISymbols extends IService {
         array,                  // array of anything.
         composite,              // struct, union, or class.
         enumeration,            // enumeration type.
-        function                // function type.
+        function,               // function type.
+        member_pointer          // pointer to member type
     }
 
     static final int
@@ -119,7 +120,6 @@ public interface ISymbols extends IService {
          *   pointer type - return pointed type;
          *   array type - return element type;
          *   function type - return function result type;
-         *   class type - return base class;
          * otherwise return null.
          * @return type ID.
          */
@@ -133,6 +133,16 @@ public interface ISymbols extends IService {
          * @return type ID.
          */
         String getIndexTypeID();
+
+        /**
+         * Get container type ID.
+         * If this symbol is a
+         *   field or member - return containing class type;
+         *   member pointer - return containing class type;
+         * otherwise return null.
+         * @return type ID.
+         */
+        String getContainerID();
 
         /**
          * Return value size of the symbol (or type).
@@ -221,6 +231,7 @@ public interface ISymbols extends IService {
         PROP_TYPE_ID = "TypeID",
         PROP_BASE_TYPE_ID = "BaseTypeID",
         PROP_INDEX_TYPE_ID = "IndexTypeID",
+        PROP_CONTAINER_ID = "ContainerID",
         PROP_SIZE = "Size",
         PROP_LENGTH = "Length",
         PROP_LOWER_BOUND = "LowerBound",
@@ -378,8 +389,28 @@ public interface ISymbols extends IService {
          *  the value size (Number) and endianness (Boolean, false - little-endian, true - big-endian). */
         CMD_DEREF       = 4,
 
-        /** Add two values on top of the evaluation stack */
-        CMD_ADD         = 5;
+        /** Integer arithmetic and bit-wise boolean operations */
+        CMD_ADD         = 5,
+        CMD_SUB         = 6,
+        CMD_MUL         = 7,
+        CMD_DIV         = 8,
+        CMD_AND         = 9,
+        CMD_OR          = 10,
+        CMD_XOR         = 11,
+        CMD_NEG         = 12,
+        CMD_GE          = 13,
+        CMD_GT          = 14,
+        CMD_LE          = 15,
+        CMD_LT          = 16,
+        CMD_SHL         = 17,
+        CMD_SHR         = 18,
+
+        /** Load expression argument to evaluation stack. */
+        CMD_ARG         = 19,
+
+        /** Evaluate DWARF location expression. Command arguments are byte array of
+         *  DWARF expression instructions and an object that contains evaluation parameters. */
+        CMD_LOCATION    = 20;
 
     /**
      * Retrieve stack tracing commands for given instruction address in a context memory.

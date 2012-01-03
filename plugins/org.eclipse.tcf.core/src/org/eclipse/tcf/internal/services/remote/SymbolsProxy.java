@@ -60,6 +60,10 @@ public class SymbolsProxy implements ISymbols {
             return (String)props.get(PROP_INDEX_TYPE_ID);
         }
 
+        public String getContainerID() {
+            return (String)props.get(PROP_CONTAINER_ID);
+        }
+
         public int getLength() {
             Number n = (Number)props.get(PROP_LENGTH);
             if (n == null) return 0;
@@ -119,6 +123,7 @@ public class SymbolsProxy implements ISymbols {
                 case 6: return TypeClass.composite;
                 case 7: return TypeClass.enumeration;
                 case 8: return TypeClass.function;
+                case 9: return TypeClass.member_pointer;
                 }
             }
             return TypeClass.unknown;
