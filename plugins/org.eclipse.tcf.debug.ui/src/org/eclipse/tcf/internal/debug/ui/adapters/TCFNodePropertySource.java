@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.swt.graphics.Device;
@@ -28,6 +27,7 @@ import org.eclipse.tcf.internal.debug.ui.model.TCFNode;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExecContext;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExecContext.MemoryRegion;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNodeStackFrame;
+import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.JSON;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IRunControl;
@@ -180,10 +180,12 @@ public class TCFNodePropertySource implements IPropertySource {
                         }
                         return true;
                     }
-                }.get(5, TimeUnit.SECONDS);
+                }.get();
             }
             catch (Exception e) {
-                Activator.log("Error retrieving property data", e);
+                if (node.getChannel().getState() != IChannel.STATE_CLOSED) {
+                    Activator.log("Error retrieving property data", e);
+                }
                 descriptors = new IPropertyDescriptor[0];
             }
         }
