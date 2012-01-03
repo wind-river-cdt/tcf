@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.core.interfaces.listeners;
+package org.eclipse.tcf.te.tcf.core.listeners.interfaces;
 
 import org.eclipse.tcf.protocol.IChannel;
 

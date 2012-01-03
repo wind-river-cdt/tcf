@@ -7,10 +7,11 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.ui.views.actions;
+package org.eclipse.tcf.te.ui.views.workingsets.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ContributionItem;
+import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -28,6 +29,7 @@ import org.eclipse.tcf.te.ui.views.workingsets.WorkingSetsContentProvider;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.actions.ActionGroup;
+import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.navigator.IExtensionStateModel;
 
 /**
@@ -41,44 +43,59 @@ import org.eclipse.ui.navigator.IExtensionStateModel;
  * <p>
  * Copied and adapted from <code>org.eclipse.ui.internal.navigator.resources.actions.WorkingSetRootModeActionGroup</code>.
  */
-public class WorkingSetRootModeActionGroup extends ActionGroup {
+public class WorkingSetActionGroup extends ActionGroup {
+	private static final String WS_GROUP = "group.ws"; //$NON-NLS-1$
 
 	/* default */ IExtensionStateModel stateModel;
 	/* default */ StructuredViewer viewer;
 
 	private boolean hasContributedToViewMenu = false;
 	private IAction workingSetsAction = null;
-	private IAction targetsAction = null;
+	private IAction elementsAction = null;
 	/* default */ IAction[] actions;
 	/* default */ int currentSelection;
 	/* default */ MenuItem[] items;
 
+	/**
+	 * Toggle action switching the top elements between working sets and elements.
+	 */
 	private class TopLevelContentAction extends Action {
-
-		private final boolean groupWorkingSets;
+		// If true, the action does enable working set top elements.
+		private final boolean showWorkingSets;
 
 		/**
-		 * Construct an Action that represents a toggle-able state between Showing top level Working
-		 * Sets and Projects.
+		 * Constructor
 		 *
-		 * @param toGroupWorkingSets
+		 * @param showWorkingSets If <code>true</code>, the action does enable working sets as top level elements,
+		 *                        <code>false</code> to disable working sets as top level elements.
 		 */
 		public TopLevelContentAction(boolean toGroupWorkingSets) {
 			super("", AS_RADIO_BUTTON); //$NON-NLS-1$
-			groupWorkingSets = toGroupWorkingSets;
+			showWorkingSets = toGroupWorkingSets;
 		}
 
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.action.Action#run()
 		 */
-		@Override
+		@SuppressWarnings("restriction")
+        @Override
 		public void run() {
-			if (stateModel.getBooleanProperty(WorkingSetsContentProvider.SHOW_TOP_LEVEL_WORKING_SETS) != groupWorkingSets) {
-				stateModel.setBooleanProperty(WorkingSetsContentProvider.SHOW_TOP_LEVEL_WORKING_SETS, groupWorkingSets);
+			boolean isShowTopLevelWorkingSets = stateModel.getBooleanProperty(WorkingSetsContentProvider.SHOW_TOP_LEVEL_WORKING_SETS);
+			if (isShowTopLevelWorkingSets != showWorkingSets) {
+				// Toggle the "show working set top level elements" property.
+				//
+				// This will trigger the WorkingSetsContentProvider property change listener
+				// to update the target explorer view root mode.
+				stateModel.setBooleanProperty(WorkingSetsContentProvider.SHOW_TOP_LEVEL_WORKING_SETS, showWorkingSets);
 
+				// Disable the viewer redraw, refresh the viewer, reset
+				// the frame list and enable redraw finally.
 				viewer.getControl().setRedraw(false);
 				try {
 					viewer.refresh();
+					if (viewer instanceof CommonViewer) {
+						((CommonViewer)viewer).getFrameList().reset();
+					}
 				}
 				finally {
 					viewer.getControl().setRedraw(true);
@@ -94,7 +111,7 @@ public class WorkingSetRootModeActionGroup extends ActionGroup {
 	 * @param viewer
 	 * @param stateModel
 	 */
-	public WorkingSetRootModeActionGroup(StructuredViewer viewer, IExtensionStateModel stateModel) {
+	public WorkingSetActionGroup(StructuredViewer viewer, IExtensionStateModel stateModel) {
 		super();
 		this.viewer = viewer;
 		this.stateModel = stateModel;
@@ -106,9 +123,14 @@ public class WorkingSetRootModeActionGroup extends ActionGroup {
 	@Override
 	public void fillActionBars(IActionBars actionBars) {
 		if (hasContributedToViewMenu) return;
-		IMenuManager topLevelSubMenu = new MenuManager(Messages.WorkingSetRootModeActionGroup_Top_Level_Element);
+		IMenuManager topLevelSubMenu = new MenuManager(Messages.WorkingSetActionGroup_Top_Level_Element);
 		addActions(topLevelSubMenu);
-		actionBars.getMenuManager().insertBefore(IWorkbenchActionConstants.MB_ADDITIONS, topLevelSubMenu);
+
+		IMenuManager manager = actionBars.getMenuManager();
+		manager.insertBefore(IWorkbenchActionConstants.MB_ADDITIONS, new GroupMarker(WS_GROUP));
+		manager.appendToGroup(WS_GROUP, topLevelSubMenu);
+		manager.appendToGroup(WS_GROUP, new Separator());
+		manager.appendToGroup(WS_GROUP, new ConfigureWorkingSetAction(viewer));
 		hasContributedToViewMenu = true;
 	}
 
@@ -166,15 +188,15 @@ public class WorkingSetRootModeActionGroup extends ActionGroup {
 
 	private IAction[] createActions() {
 
-		targetsAction = new TopLevelContentAction(false);
-		targetsAction.setText(Messages.WorkingSetRootModeActionGroup_Target);
-		targetsAction.setImageDescriptor(UIPlugin.getImageDescriptor(ImageConsts.VIEW));
+		elementsAction = new TopLevelContentAction(false);
+		elementsAction.setText(Messages.WorkingSetActionGroup_Elements);
+		elementsAction.setImageDescriptor(UIPlugin.getImageDescriptor(ImageConsts.VIEW));
 
 		workingSetsAction = new TopLevelContentAction(true);
-		workingSetsAction.setText(Messages.WorkingSetRootModeActionGroup_Working_Set);
+		workingSetsAction.setText(Messages.WorkingSetActionGroup_Working_Set);
 		workingSetsAction.setImageDescriptor(UIPlugin.getImageDescriptor(ImageConsts.WORKING_SETS));
 
-		return new IAction[] { targetsAction, workingSetsAction };
+		return new IAction[] { elementsAction, workingSetsAction };
 	}
 
 	/**
@@ -188,12 +210,13 @@ public class WorkingSetRootModeActionGroup extends ActionGroup {
 
 		currentSelection = showTopLevelWorkingSets ? 1 : 0;
 		workingSetsAction.setChecked(showTopLevelWorkingSets);
-		targetsAction.setChecked(!showTopLevelWorkingSets);
+		elementsAction.setChecked(!showTopLevelWorkingSets);
 
 		if (items != null) {
 			for (int i = 0; i < items.length; i++) {
-				if (items[i] != null && actions[i] != null) items[i].setSelection(actions[i]
-				                .isChecked());
+				if (items[i] != null && actions[i] != null) {
+					items[i].setSelection(actions[i].isChecked());
+				}
 			}
 		}
 		if (stateModel != null) {

@@ -7,23 +7,23 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.core.internal.listener;
+package org.eclipse.tcf.te.tcf.core.listeners;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.tcf.core.Tcf;
-import org.eclipse.tcf.te.tcf.core.interfacesl.tracing.ITraceIds;
-import org.eclipse.tcf.te.tcf.core.internal.interfaces.IChannelOpenListener;
-import org.eclipse.tcf.te.tcf.core.internal.nls.Messages;
+import org.eclipse.tcf.te.tcf.core.interfaces.tracing.ITraceIds;
 import org.eclipse.tcf.te.tcf.core.internal.utils.LogUtils;
+import org.eclipse.tcf.te.tcf.core.listeners.interfaces.IChannelOpenListener;
+import org.eclipse.tcf.te.tcf.core.nls.Messages;
 
 
 /**
- * Internal channel listener. Attached to a TCF channel for tracing purpose.
+ * Channel listener implementation.
  */
-public class InternalChannelListener implements IChannel.IChannelListener {
+public class ChannelListener implements IChannel.IChannelListener {
 	// The reference to the channel
 	private final IChannel channel;
 
@@ -32,7 +32,7 @@ public class InternalChannelListener implements IChannel.IChannelListener {
 	 *
 	 * @param channel The channel. Must not be <code>null</code>.
 	 */
-	public InternalChannelListener(IChannel channel) {
+	public ChannelListener(IChannel channel) {
 		Assert.isNotNull(channel);
 		this.channel = channel;
 	}

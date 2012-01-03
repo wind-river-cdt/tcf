@@ -14,6 +14,7 @@ import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreePathViewerSorter;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.tcf.te.ui.trees.TreeViewerSorter;
+import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.navigator.CommonViewerSorter;
 import org.eclipse.ui.navigator.INavigatorContentService;
 
@@ -52,9 +53,11 @@ public final class ViewViewerSorter extends TreePathViewerSorter {
     public int compare(Viewer viewer, TreePath parentPath, Object e1, Object e2) {
         int result = sorter.compare(viewer, parentPath, e1, e2);
 
-        if (result == category(e1) - category(e2)) {
-        	int defaultSorterResult = defaultSorter.compare(viewer, parentPath, e1, e2);
-        	if (defaultSorterResult != 0) result = defaultSorterResult;
+        if (!(e1 instanceof IWorkingSet) && !(e2 instanceof IWorkingSet)) {
+        	if (result == category(e1) - category(e2)) {
+        		int defaultSorterResult = defaultSorter.compare(viewer, parentPath, e1, e2);
+        		if (defaultSorterResult != 0) result = defaultSorterResult;
+        	}
         }
 
         return result;

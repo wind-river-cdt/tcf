@@ -14,11 +14,11 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.tcf.te.ui.views.internal.ViewRoot;
 import org.eclipse.tcf.te.runtime.interfaces.workingsets.IWorkingSetElement;
+import org.eclipse.tcf.te.ui.views.internal.View;
+import org.eclipse.tcf.te.ui.views.internal.ViewRoot;
+import org.eclipse.tcf.te.ui.views.internal.ViewViewer;
 import org.eclipse.ui.IWorkingSet;
-import org.eclipse.ui.IWorkingSetManager;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.navigator.CommonViewer;
 
 /**
@@ -70,8 +70,8 @@ public class OthersWorkingSetElementUpdater extends WorkingSetElementUpdater {
 		Object[] elements = viewer.getNavigatorContentService().createCommonContentProvider().getElements(ViewRoot.getInstance());
 
 		// Get all working sets
-		IWorkingSetManager manager = PlatformUI.getWorkbench().getWorkingSetManager();
-		IWorkingSet[] allWorkingSets = manager.getAllWorkingSets();
+		WorkingSetViewStateManager manager = viewer.getCommonNavigator() instanceof View ? ((View)viewer.getCommonNavigator()).getStateManager() : null;
+		IWorkingSet[] allWorkingSets = manager != null ? manager.getAllWorkingSets() : new IWorkingSet[0];
 
 		// Loop the elements and check if they are contained in a working set
 		for (Object element : elements) {
@@ -79,13 +79,41 @@ public class OthersWorkingSetElementUpdater extends WorkingSetElementUpdater {
 
 			boolean isContained = isContained((IWorkingSetElement)element, allWorkingSets);
 			if (!isContained) {
-				WorkingSetElementHolder holder = new WorkingSetElementHolder(othersWorkingSet.getName(), ((IWorkingSetElement)element).getElementId());
-				holder.setElement((IWorkingSetElement)element);
+				WorkingSetElementHolder holder = null;
+
+				IAdaptable[] wsElements = othersWorkingSet.getElements();
+				for (IAdaptable wsElement : wsElements) {
+					if (!(wsElement instanceof WorkingSetElementHolder)) continue;
+
+					IWorkingSetElement candidate = ((WorkingSetElementHolder)wsElement).getElement();
+					String candidateId = ((WorkingSetElementHolder)wsElement).getElementId();
+
+					if (element.equals(candidate)) {
+						holder = (WorkingSetElementHolder)wsElement;
+						break;
+					} else if (candidate == null && (((IWorkingSetElement)element).getElementId().equals(candidateId))) {
+						holder = (WorkingSetElementHolder)wsElement;
+						((WorkingSetElementHolder)wsElement).setElement((IWorkingSetElement)element);
+						break;
+					}
+				}
+
+				if (holder == null) {
+					holder = new WorkingSetElementHolder(othersWorkingSet.getName(), ((IWorkingSetElement)element).getElementId());
+					holder.setElement((IWorkingSetElement)element);
+				}
 				otherElements.add(holder);
 			}
 		}
 
 		othersWorkingSet.setElements(otherElements.toArray(new IAdaptable[otherElements.size()]));
+
+		// Trigger a view update, but without triggering ourselves again.
+		if (viewer instanceof ViewViewer) {
+			boolean changed = ((ViewViewer)viewer).setSilentMode(true);
+			viewer.refresh();
+			if (changed) ((ViewViewer)viewer).setSilentMode(false);
+		}
 	}
 
 	/**
@@ -104,23 +132,43 @@ public class OthersWorkingSetElementUpdater extends WorkingSetElementUpdater {
 		boolean contained = false;
 
 		for (IWorkingSet workingSet : allWorkingSets) {
-			IAdaptable[] wsElements = workingSet.getElements();
-			for (IAdaptable wsElement : wsElements) {
-				if (!(wsElement instanceof WorkingSetElementHolder)) continue;
-
-				IWorkingSetElement candidate = ((WorkingSetElementHolder)wsElement).getElement();
-				String candidateId = ((WorkingSetElementHolder)wsElement).getElementId();
-
-				if (element.equals(candidate)) {
-					contained = true;
-					break;
-				} else if (candidate == null && element.getElementId().equals(candidateId)) {
-					contained = true;
-					((WorkingSetElementHolder)wsElement).setElement(element);
-					break;
-				}
-			}
+			if (workingSet.equals(othersWorkingSet)) continue;
+			contained = isContained(element, workingSet);
 			if (contained) break;
+		}
+
+		return contained;
+	}
+
+	/**
+	 * Checks if the element is contained in the given working set.
+	 *
+	 * @param element The element. Must not be <code>null</code>.
+	 * @param workingSet The working set. Must not be <code>null</code>.
+	 *
+	 * @return <code>True</code> if the element is contained in the given working set, <code>false</code> otherwise.
+	 */
+	protected boolean isContained(IWorkingSetElement element, IWorkingSet workingSet) {
+		Assert.isNotNull(element);
+		Assert.isNotNull(workingSet);
+
+		boolean contained = false;
+
+		IAdaptable[] wsElements = workingSet.getElements();
+		for (IAdaptable wsElement : wsElements) {
+			if (!(wsElement instanceof WorkingSetElementHolder)) continue;
+
+			IWorkingSetElement candidate = ((WorkingSetElementHolder)wsElement).getElement();
+			String candidateId = ((WorkingSetElementHolder)wsElement).getElementId();
+
+			if (element.equals(candidate)) {
+				contained = true;
+				break;
+			} else if (candidate == null && element.getElementId().equals(candidateId)) {
+				contained = true;
+				((WorkingSetElementHolder)wsElement).setElement(element);
+				break;
+			}
 		}
 
 		return contained;

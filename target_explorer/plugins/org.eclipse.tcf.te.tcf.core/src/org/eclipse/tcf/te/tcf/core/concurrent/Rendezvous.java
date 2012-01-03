@@ -7,7 +7,7 @@
  * Contributors:
  * William Chen (Wind River)- [345387]Open the remote files with a proper editor
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.core.utils;
+package org.eclipse.tcf.te.tcf.core.concurrent;
 
 import java.util.concurrent.TimeoutException;
 

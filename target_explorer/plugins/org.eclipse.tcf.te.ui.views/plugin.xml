@@ -84,7 +84,7 @@
 
 <!-- Working Sets navigator action contributions -->
       <actionProvider
-            class="org.eclipse.tcf.te.ui.views.actions.WorkingSetActionProvider"
+            class="org.eclipse.tcf.te.ui.views.workingsets.actions.WorkingSetActionProvider"
             id="org.eclipse.tcf.te.ui.views.navigator.actions.WorkingSetActions">
            <enablement>
                 <or>
@@ -115,10 +115,18 @@
             name="%workingsets.extension.name"
             priority="higher">
          <triggerPoints>
-            <instanceof value="org.eclipse.ui.IWorkingSet"/>
+            <or>
+               <instanceof value="org.eclipse.tcf.te.ui.views.workingsets.WorkingSetViewStateManager"/>
+               <instanceof value="org.eclipse.ui.IWorkingSet"/>
+               <instanceof value="org.eclipse.tcf.te.ui.views.workingsets.WorkingSetElementHolder"/>
+            </or>
          </triggerPoints>
          <possibleChildren>
-            <instanceof value="java.lang.Object"/>
+            <or>
+               <instanceof value="org.eclipse.tcf.te.ui.views.workingsets.WorkingSetViewStateManager"/>
+               <instanceof value="org.eclipse.ui.IWorkingSet"/>
+               <instanceof value="org.eclipse.tcf.te.ui.views.workingsets.WorkingSetElementHolder"/>
+            </or>
          </possibleChildren>
          <commonSorter
                class="org.eclipse.tcf.te.ui.views.workingsets.WorkingSetViewerSorter"
@@ -201,6 +209,10 @@
       <factory
             class="org.eclipse.tcf.te.ui.views.workingsets.WorkingSetElementHolderFactory"
             id="org.eclipse.tcf.te.ui.views.workingsets.WorkingSetElementHolderFactory">
+      </factory>
+      <factory
+            class="org.eclipse.tcf.te.ui.views.workingsets.CustomizedOrderComparatorFactory"
+            id="org.eclipse.tcf.te.ui.views.workingsets.CustomizedOrderComparatorFactory">
       </factory>
    </extension>
    

@@ -7,23 +7,26 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.core.utils;
+package org.eclipse.tcf.te.tcf.core.concurrent.interfaces;
 
 import java.lang.reflect.Method;
 
+import org.eclipse.tcf.te.tcf.core.concurrent.BlockingCallProxy;
+import org.eclipse.tcf.te.tcf.core.concurrent.internal.DefaultProxyDescriptor;
+
 /**
  * The proxy descriptor to describe a proxy interface, providing which method should be
- * executed in the dispatching thread, which method is a proxy method that 
+ * executed in the dispatching thread, which method is a proxy method that
  * should be handled by BlockingProxy and get the index of the callback of a specified
  * proxy method.
- * 
+ *
  * @see BlockingCallProxy
  * @see DefaultProxyDescriptor
  */
 public interface IProxyDescriptor {
 	/**
 	 * Check if the method should be called inside the dispatching thread. .
-	 * 
+	 *
 	 * @param method The method to be checked.
 	 * @return true if it should be called inside the dispatching thread.
 	 */
@@ -32,15 +35,15 @@ public interface IProxyDescriptor {
 	/**
 	 * Return if the method requires blocking invocation. The method requires blocking invocation if
 	 * it has a callback parameter called in the dispatching thread.
-	 * 
+	 *
 	 * @param method The method to check.
 	 * @return true if it requires a blocking invocation.
 	 */
 	boolean isProxyMethod(Method method);
 
 	/**
-	 * Get the index of the callback parameter. 
-	 * 
+	 * Get the index of the callback parameter.
+	 *
 	 * @param method The method to search the callback parameter.
 	 * @return The callback paramter's index.
 	 */

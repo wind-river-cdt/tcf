@@ -14,11 +14,10 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.tcf.te.ui.views.interfaces.workingsets.IWorkingSetIDs;
 import org.eclipse.tcf.te.runtime.interfaces.workingsets.IWorkingSetElement;
-import org.eclipse.ui.IAggregateWorkingSet;
 import org.eclipse.ui.IContainmentAdapter;
 import org.eclipse.ui.IWorkingSet;
 
@@ -45,19 +44,24 @@ public class WorkingSetFilter extends ViewerFilter {
      */
     @Override
     public boolean select(Viewer viewer, Object parentElement, Object element) {
-    	if (active && parentElement instanceof IWorkingSet) {
+    	// If the filter is not active, all elements pass
+    	if (!active) return true;
+
+    	// If the parent element is a tree path, assume the last element as parent element
+    	if (parentElement instanceof TreePath) {
+    		parentElement = ((TreePath)parentElement).getLastSegment();
+    	}
+
+    	if (parentElement instanceof IWorkingSet) {
     		if (((IWorkingSet)parentElement).isEmpty()) {
     			return true;
-    		}
-    		if (parentElement instanceof IAggregateWorkingSet) {
-    			List<IWorkingSet> workingSets = Arrays.asList(((IAggregateWorkingSet)parentElement).getComponents());
-    			if (workingSets.contains(element) || IWorkingSetIDs.ID_WS_OTHERS.equals(((IWorkingSet)element).getId())) {
-    				return true;
-    			}
     		}
     		if (element != null) {
     			return isEnclosed((IWorkingSet)parentElement, element);
     		}
+    	} else if (parentElement instanceof WorkingSetViewStateManager && element instanceof IWorkingSet) {
+			List<IWorkingSet> workingSets = Arrays.asList(((WorkingSetViewStateManager)parentElement).getAllWorkingSets());
+			return workingSets.contains(element);
     	}
         return true;
     }

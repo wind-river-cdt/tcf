@@ -13,12 +13,16 @@ Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: org.eclipse.tcf.te.tcf.core,
  org.eclipse.tcf.te.tcf.core.activator;x-internal:=true,
+ org.eclipse.tcf.te.tcf.core.concurrent,
+ org.eclipse.tcf.te.tcf.core.concurrent.interfaces,
+ org.eclipse.tcf.te.tcf.core.concurrent.internal;x-internal:=true,
  org.eclipse.tcf.te.tcf.core.interfaces,
- org.eclipse.tcf.te.tcf.core.interfaces.listeners,
+ org.eclipse.tcf.te.tcf.core.interfaces.tracing,
  org.eclipse.tcf.te.tcf.core.internal;x-internal:=true,
- org.eclipse.tcf.te.tcf.core.internal.interfaces;x-internal:=true,
- org.eclipse.tcf.te.tcf.core.internal.listener;x-internal:=true,
- org.eclipse.tcf.te.tcf.core.internal.nls;x-internal:=true,
  org.eclipse.tcf.te.tcf.core.internal.utils;x-internal:=true,
+ org.eclipse.tcf.te.tcf.core.listeners;x-internal:=true,
+ org.eclipse.tcf.te.tcf.core.listeners.interfaces,
+ org.eclipse.tcf.te.tcf.core.nls;x-internal:=true,
  org.eclipse.tcf.te.tcf.core.streams,
- org.eclipse.tcf.te.tcf.core.utils
+ org.eclipse.tcf.te.tcf.core.util,
+ org.eclipse.tcf.te.tcf.core.util.persistence

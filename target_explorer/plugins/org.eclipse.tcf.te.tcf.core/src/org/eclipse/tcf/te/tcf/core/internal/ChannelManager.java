@@ -25,8 +25,8 @@ import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.tcf.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
-import org.eclipse.tcf.te.tcf.core.interfacesl.tracing.ITraceIds;
-import org.eclipse.tcf.te.tcf.core.internal.nls.Messages;
+import org.eclipse.tcf.te.tcf.core.interfaces.tracing.ITraceIds;
+import org.eclipse.tcf.te.tcf.core.nls.Messages;
 
 
 /**

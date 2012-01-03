@@ -25,8 +25,8 @@ import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.runtime.events.EventManager;
 import org.eclipse.tcf.te.tcf.core.Tcf;
-import org.eclipse.tcf.te.tcf.core.interfaces.listeners.IChannelStateChangeListener;
-import org.eclipse.tcf.te.tcf.core.interfaces.listeners.IProtocolStateChangeListener;
+import org.eclipse.tcf.te.tcf.core.listeners.interfaces.IChannelStateChangeListener;
+import org.eclipse.tcf.te.tcf.core.listeners.interfaces.IProtocolStateChangeListener;
 import org.eclipse.tcf.te.tcf.log.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.tcf.log.core.events.MonitorEvent;
 import org.eclipse.tcf.te.tcf.log.core.interfaces.IPreferenceKeys;
@@ -154,7 +154,7 @@ public final class LogManager implements IProtocolStateChangeListener {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.core.interfaces.listeners.IProtocolStateChangeListener#stateChanged(boolean)
+	 * @see org.eclipse.tcf.te.tcf.core.listeners.interfaces.IProtocolStateChangeListener#stateChanged(boolean)
 	 */
 	@Override
 	public void stateChanged(boolean state) {

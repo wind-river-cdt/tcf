@@ -11,7 +11,7 @@ package org.eclipse.tcf.te.tcf.log.core.internal.listener;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.protocol.IChannel;
-import org.eclipse.tcf.te.tcf.core.interfaces.listeners.IChannelStateChangeListener;
+import org.eclipse.tcf.te.tcf.core.listeners.interfaces.IChannelStateChangeListener;
 
 /**
  * TCF logging channel state listener implementation.
@@ -19,7 +19,7 @@ import org.eclipse.tcf.te.tcf.core.interfaces.listeners.IChannelStateChangeListe
 public class ChannelStateChangeListener implements IChannelStateChangeListener {
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.core.interfaces.listeners.IChannelStateChangeListener#stateChanged(org.eclipse.tcf.protocol.IChannel, int)
+	 * @see org.eclipse.tcf.te.tcf.core.listeners.interfaces.IChannelStateChangeListener#stateChanged(org.eclipse.tcf.protocol.IChannel, int)
 	 */
 	@Override
 	public void stateChanged(IChannel channel, int state) {

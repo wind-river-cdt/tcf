@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.core.utils;
+package org.eclipse.tcf.te.tcf.core.concurrent;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -15,6 +15,8 @@ import java.lang.reflect.Proxy;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.te.tcf.core.concurrent.interfaces.IProxyDescriptor;
+import org.eclipse.tcf.te.tcf.core.concurrent.internal.DefaultProxyDescriptor;
 
 /**
  * BlockingCallProxy is a utility class. It can create an instance of a proxy class for the specified
@@ -35,7 +37,7 @@ import org.eclipse.tcf.protocol.Protocol;
  * <p>
  * Now if you want to invoke this method and wait for the result, you can use the following code
  * with this class:
- * 
+ *
  * <pre>
  * IFileSystem service = ... // Get the file system service.
  * IFileSystem proxy = BlockingCallProxy.newInstance(IFileSystem.class, service);
@@ -49,7 +51,7 @@ import org.eclipse.tcf.protocol.Protocol;
  * output.write(result[0]); // Now use the reading result.
  * ...
  * </pre>
- * 
+ *
  * In the above code, the line that does the read operation over the proxy object will block and
  * will not return until "doneRead" of the callback is called. The line that follows the read
  * operation can safely consume the read data.
@@ -72,7 +74,7 @@ public class BlockingCallProxy implements InvocationHandler {
 	/**
 	 * Create an instance of a proxy class for the specified interface that dispatches method
 	 * invocations to the delegate object. This delegate object must implement the same interface.
-	 * 
+	 *
 	 * @param proxyInterface The proxy interface for the proxy class.
 	 * @param delegate The delegate object which the proxy dispatches the method invocations to.
 	 * @return The proxy instance.
@@ -84,7 +86,7 @@ public class BlockingCallProxy implements InvocationHandler {
 	/**
 	 * Create an instance of a proxy class for the specified interface that dispatches method
 	 * invocations to the delegate object. This delegate object must implement the same interface.
-	 * 
+	 *
 	 * @param proxyInterface The proxy interface for the proxy class.
 	 * @param proxyDescriptor The proxy descriptor for the proxy class.
 	 * @param delegate The delegate object which the proxy dispatches the method invocations to.
@@ -106,7 +108,7 @@ public class BlockingCallProxy implements InvocationHandler {
 
 	/**
 	 * Create an instance of BlockingCall as the dynamic invocation handler of the proxy class.
-	 * 
+	 *
 	 * @param delegate The delegate object which the proxy dispatches the method invocations to.
 	 */
 	private BlockingCallProxy(IProxyDescriptor proxyDescriptor, Object delegate) {
@@ -138,10 +140,10 @@ public class BlockingCallProxy implements InvocationHandler {
 	 * a dynamic generated proxy that could delegate the invocation and unblock the callback.
 	 * Return a rendezvous object to be used to block the call. If it is not a proxy method, then
 	 * just return null object.
-	 * 
+	 *
 	 * @param method The method being called.
-	 * @param args The invocation arguments. 
-	 * @return The rendezvous object of the proxy call or null if no blocking is needed. 
+	 * @param args The invocation arguments.
+	 * @return The rendezvous object of the proxy call or null if no blocking is needed.
 	 */
 	private Rendezvous prepareArguments(final Method method, final Object[] args) {
 	    if (proxyDescriptor.isProxyMethod(method)) {
@@ -151,17 +153,17 @@ public class BlockingCallProxy implements InvocationHandler {
 				// Replace the callback with a proxy that block the call.
 				Rendezvous rendezvous = new Rendezvous();
 				Class<?>[] aTypes = method.getParameterTypes();
-				args[index] = Proxy.newProxyInstance(aTypes[index].getClassLoader(), 
+				args[index] = Proxy.newProxyInstance(aTypes[index].getClassLoader(),
 								new Class[] { aTypes[index] }, new DoneHandler(rendezvous, args[index]));
 				return rendezvous;
 			}
 		}
 	    return null;
     }
-	
+
 	/**
 	 * The invocation handler of the callback proxy. Used to delegate the callback invocation
-	 * and unblock the rendezvous object. 
+	 * and unblock the rendezvous object.
 	 */
 	private class DoneHandler implements InvocationHandler {
 		// The callback handler that delegates the invocation.
@@ -170,7 +172,7 @@ public class BlockingCallProxy implements InvocationHandler {
 		private Rendezvous rendezvous;
 		/**
 		 * Constructor with the two arguments to initialize the two fields.
-		 * 
+		 *
 		 * @param rendezvous The rendezvous object to unblock the invocation
 		 * @param done The callback handler that delegates the invocation.
 		 */
@@ -191,12 +193,12 @@ public class BlockingCallProxy implements InvocationHandler {
 	}
 
 	/**
-	 * Invoke the call directly in the current thread, using the rendezous object to block the call.
+	 * Invoke the call directly in the current thread, using the rendezvous object to block the call.
 	 * If the rendezvous object is null, then just invoke the call directly.
-	 * 
+	 *
 	 * @param method The method to be invoked.
 	 * @param args The argument of the invocation.
-	 * @param rendezvous The rendezous object to wait for the call.
+	 * @param rendezvous The rendezvous object to wait for the call.
 	 * @return The invocation result.
 	 * @throws Throwable Thrown during invocation.
 	 */
@@ -209,12 +211,12 @@ public class BlockingCallProxy implements InvocationHandler {
 	}
 
 	/**
-	 * Dispatch the method invocation in the dispatching thread, using the rendezous object to block
+	 * Dispatch the method invocation in the dispatching thread, using the rendezvous object to block
 	 * the call. If the rendezvous object is null, then just invoke the call in the dispatching thread.
-	 * 
+	 *
 	 * @param method The method to be invoked.
 	 * @param args The argument of the invocation.
-	 * @param rendezvous The rendezous object to wait for the call.
+	 * @param rendezvous The rendezvous object to wait for the call.
 	 * @return The invocation result.
 	 * @throws Throwable Thrown during invocation.
 	 */

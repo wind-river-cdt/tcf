@@ -19,12 +19,11 @@ import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.protocol.Protocol.ChannelOpenListener;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
-import org.eclipse.tcf.te.tcf.core.interfaces.listeners.IChannelStateChangeListener;
-import org.eclipse.tcf.te.tcf.core.interfaces.listeners.IProtocolStateChangeListener;
 import org.eclipse.tcf.te.tcf.core.internal.ChannelManager;
 import org.eclipse.tcf.te.tcf.core.internal.Startup;
-import org.eclipse.tcf.te.tcf.core.internal.interfaces.IChannelOpenListener;
-import org.eclipse.tcf.te.tcf.core.internal.listener.InternalChannelOpenListener;
+import org.eclipse.tcf.te.tcf.core.listeners.interfaces.IChannelOpenListener;
+import org.eclipse.tcf.te.tcf.core.listeners.interfaces.IChannelStateChangeListener;
+import org.eclipse.tcf.te.tcf.core.listeners.interfaces.IProtocolStateChangeListener;
 
 
 /**
@@ -188,7 +187,7 @@ public final class Tcf {
 
 		// Create and register the global channel open listener
 		if (tcf.channelOpenListener == null) {
-			tcf.channelOpenListener = new InternalChannelOpenListener();
+			tcf.channelOpenListener = new org.eclipse.tcf.te.tcf.core.listeners.ChannelOpenListener();
 			Protocol.addChannelOpenListener(tcf.channelOpenListener);
 		}
 

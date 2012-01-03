@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.core.internal.listener;
+package org.eclipse.tcf.te.tcf.core.listeners;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,16 +17,16 @@ import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IChannel.IChannelListener;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.tcf.core.Tcf;
-import org.eclipse.tcf.te.tcf.core.interfacesl.tracing.ITraceIds;
-import org.eclipse.tcf.te.tcf.core.internal.interfaces.IChannelOpenListener;
-import org.eclipse.tcf.te.tcf.core.internal.nls.Messages;
+import org.eclipse.tcf.te.tcf.core.interfaces.tracing.ITraceIds;
 import org.eclipse.tcf.te.tcf.core.internal.utils.LogUtils;
+import org.eclipse.tcf.te.tcf.core.listeners.interfaces.IChannelOpenListener;
+import org.eclipse.tcf.te.tcf.core.nls.Messages;
 
 
 /**
- * Internal channel open listener taking care of logging and caching.
+ * Channel open listener implementation.
  */
-public class InternalChannelOpenListener implements IChannelOpenListener {
+public class ChannelOpenListener implements IChannelOpenListener {
 	// Static map containing the channel listeners per channel. Access to the
 	// map should happen from the TCF protocol dispatch thread only.
 	private final Map<IChannel, IChannel.IChannelListener> channelListeners = new HashMap<IChannel, IChannel.IChannelListener>();
@@ -46,7 +46,7 @@ public class InternalChannelOpenListener implements IChannelOpenListener {
 		IChannel.IChannelListener channelListener = channelListeners.remove(channel);
 		if (channelListener != null) channel.removeChannelListener(channelListener);
 		// Create a new channel listener instance
-		channelListener = new InternalChannelListener(channel);
+		channelListener = new ChannelListener(channel);
 		// Add the channel listener to the global map
 		setChannelListener(channel, channelListener);
 		// Attach channel listener to the channel

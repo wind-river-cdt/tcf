@@ -34,8 +34,8 @@ import org.eclipse.tcf.te.ui.views.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.views.interfaces.IRoot;
 import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
 import org.eclipse.tcf.te.ui.views.nls.Messages;
+import org.eclipse.tcf.te.ui.views.workingsets.WorkingSetViewStateManager;
 import org.eclipse.ui.IAggregateWorkingSet;
-import org.eclipse.ui.ILocalWorkingSetManager;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkingSet;
@@ -70,14 +70,16 @@ public class View extends CommonNavigator implements ITabbedPropertySheetPageCon
 	private String workingSetLabel;
 
 	/**
-	 * The local working set manager instance.
+	 * The working set view state manager.
 	 */
-	private final ILocalWorkingSetManager localWorkingSetManager = PlatformUI.getWorkbench().createLocalWorkingSetManager();
+	private final WorkingSetViewStateManager stateManager;
 
 	/**
 	 * Constructor.
 	 */
 	public View() {
+		super();
+		stateManager = new WorkingSetViewStateManager(this);
 	}
 
 	/* (non-Javadoc)
@@ -131,12 +133,12 @@ public class View extends CommonNavigator implements ITabbedPropertySheetPageCon
 	}
 
 	/**
-	 * Returns the local working set manager instance.
+	 * Returns the working set view state manager instance.
 	 *
-	 * @return The local working set manager instance.
+	 * @return The working set view state manager instance.
 	 */
-	public final ILocalWorkingSetManager getLocalWorkingSetManager() {
-		return localWorkingSetManager;
+	public final WorkingSetViewStateManager getStateManager() {
+		return stateManager;
 	}
 
 	/* (non-Javadoc)
@@ -144,7 +146,7 @@ public class View extends CommonNavigator implements ITabbedPropertySheetPageCon
 	 */
 	@Override
 	public void dispose() {
-		localWorkingSetManager.dispose();
+		stateManager.dispose();
 	    super.dispose();
 	}
 
@@ -245,7 +247,7 @@ public class View extends CommonNavigator implements ITabbedPropertySheetPageCon
 			IWorkbenchAdapter adapter = (IWorkbenchAdapter) ((IAdaptable) input).getAdapter(IWorkbenchAdapter.class);
 			if (adapter != null) contentDescription = adapter.getLabel(input);
 		}
-		else if (input instanceof IRoot) {
+		else if (input instanceof IRoot || input instanceof WorkingSetViewStateManager) {
 			// The root node does not have a content description
 		}
 		else if (input != null && !(input instanceof IAggregateWorkingSet)) {

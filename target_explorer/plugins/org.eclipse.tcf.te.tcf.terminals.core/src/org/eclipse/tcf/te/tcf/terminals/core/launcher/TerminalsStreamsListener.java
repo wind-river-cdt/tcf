@@ -36,7 +36,7 @@ import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.core.streams.StreamsDataProvider;
 import org.eclipse.tcf.te.tcf.core.streams.StreamsDataReceiver;
-import org.eclipse.tcf.te.tcf.core.utils.ExceptionUtils;
+import org.eclipse.tcf.te.tcf.core.util.ExceptionUtils;
 
 /**
  * Remote terminal streams listener implementation.

@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.core.utils;
+package org.eclipse.tcf.te.tcf.core.util;
 
 import java.util.concurrent.ExecutionException;
 

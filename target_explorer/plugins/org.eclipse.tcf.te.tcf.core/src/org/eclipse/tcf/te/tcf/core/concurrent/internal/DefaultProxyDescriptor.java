@@ -7,21 +7,24 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.core.utils;
+package org.eclipse.tcf.te.tcf.core.concurrent.internal;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.tcf.te.tcf.core.concurrent.BlockingCallProxy;
+import org.eclipse.tcf.te.tcf.core.concurrent.interfaces.IProxyDescriptor;
+
 /**
  * The default proxy descriptor for proxy interfaces. It assumes the method with a parameter
  * whose type is an interface, and whose name has a segment of "$Done", is the proxy method.
- * 
+ *
  * @see BlockingCallProxy
  * @see IProxyDescriptor
  */
-class DefaultProxyDescriptor implements IProxyDescriptor {
+public class DefaultProxyDescriptor implements IProxyDescriptor {
 	// Descriptor cache to store known proxy descriptors.
 	private static Map<Class<?>, IProxyDescriptor> descriptorCache;
 
@@ -29,7 +32,7 @@ class DefaultProxyDescriptor implements IProxyDescriptor {
 	 * Get a default proxy descriptor from the cache using the class as the key.
 	 * If no such proxy descriptor is found, then create a default proxy descriptor for it
 	 * and cache it.
-	 * 
+	 *
 	 * @param proxyInterface The proxy interface.
 	 * @return A default proxy descriptor for the proxy interface.
 	 */
@@ -49,7 +52,7 @@ class DefaultProxyDescriptor implements IProxyDescriptor {
 	private Map<Method, Integer> callbacks;
 	/**
 	 * Constructor using the proxy interface.
-	 * 
+	 *
 	 * @param proxyInterface The proxy interface.
 	 */
 	private DefaultProxyDescriptor(Class<?> proxyInterface) {
@@ -67,7 +70,7 @@ class DefaultProxyDescriptor implements IProxyDescriptor {
 
 	/**
 	 * Find the index of the callback parameter in the specified method.
-	 *  
+	 *
 	 * @param method The method to be checked.
 	 * @return the index of the callback parameter or -1 if there's no callback parameter.
 	 */
@@ -81,10 +84,10 @@ class DefaultProxyDescriptor implements IProxyDescriptor {
 		}
 		return -1;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.core.utils.IProxyDescriptor#isDispatchMethod(java.lang.reflect.Method)
+	 * @see org.eclipse.tcf.te.tcf.core.util.IProxyDescriptor#isDispatchMethod(java.lang.reflect.Method)
 	 */
 	@Override
     public boolean isDispatchMethod(Method method) {
@@ -93,7 +96,7 @@ class DefaultProxyDescriptor implements IProxyDescriptor {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.core.utils.IProxyDescriptor#isProxyMethod(java.lang.reflect.Method)
+	 * @see org.eclipse.tcf.te.tcf.core.util.IProxyDescriptor#isProxyMethod(java.lang.reflect.Method)
 	 */
 	@Override
     public boolean isProxyMethod(Method method) {
@@ -102,7 +105,7 @@ class DefaultProxyDescriptor implements IProxyDescriptor {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.core.utils.IProxyDescriptor#getCallbackIndex(java.lang.reflect.Method)
+	 * @see org.eclipse.tcf.te.tcf.core.util.IProxyDescriptor#getCallbackIndex(java.lang.reflect.Method)
 	 */
 	@Override
     public int getCallbackIndex(Method method) {
