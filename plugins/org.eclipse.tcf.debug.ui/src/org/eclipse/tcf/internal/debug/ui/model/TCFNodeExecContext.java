@@ -57,6 +57,7 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
     private final TCFChildrenHoverExpressions children_hover_exps;
     private final TCFChildrenLogExpressions children_log_exps;
     private final TCFChildrenModules children_modules;
+    private final TCFChildrenExecStatus children_exec_status;
 
     private final TCFData<IMemory.MemoryContext> mem_context;
     private final TCFData<IRunControl.RunControlContext> run_context;
@@ -235,6 +236,7 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
         children_hover_exps = new TCFChildrenHoverExpressions(this);
         children_log_exps = new TCFChildrenLogExpressions(this);
         children_modules = new TCFChildrenModules(this);
+        children_exec_status = new TCFChildrenExecStatus(this);
         mem_context = new TCFData<IMemory.MemoryContext>(channel) {
             @Override
             protected boolean startDataRetrieval() {
@@ -880,6 +882,11 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
             IMemory.MemoryContext ctx = mem_context.getData();
             if (ctx != null) children = children_modules;
         }
+        else if ("ExecStatusView".equals(view_id)) {
+            if (!state.validate(done)) return false;
+            TCFContextState ctx = state.getData();
+            if (ctx != null) children = children_exec_status;
+        }
         if (children != null) {
             if (!children.validate(done)) return false;
             if (children == children_stack) last_stack_trace = children_stack.toArray();
@@ -955,6 +962,11 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
             IMemory.MemoryContext ctx = mem_context.getData();
             if (ctx != null) children = children_modules;
         }
+        else if ("ExecStatusView".equals(view_id)) {
+            if (!state.validate(done)) return false;
+            TCFContextState ctx = state.getData();
+            if (ctx != null) children = children_exec_status;
+        }
         if (children == null) return true;
         if (children == children_stack) {
             if (!children.validate(done)) return false;
@@ -1019,6 +1031,11 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
             if (!mem_context.validate(done)) return false;
             IMemory.MemoryContext ctx = mem_context.getData();
             if (ctx != null) children = children_modules;
+        }
+        else if ("ExecStatusView".equals(view_id)) {
+            if (!state.validate(done)) return false;
+            TCFContextState ctx = state.getData();
+            if (ctx != null) children = children_exec_status;
         }
         if (children != null) {
             if (!children.validate(done)) return false;

@@ -132,6 +132,14 @@
             class="org.eclipse.tcf.internal.debug.ui.trace.TraceView"
             id="org.eclipse.tcf.TraceView">
       </view>
+      <view
+            category="org.eclipse.debug.ui"
+            class="org.eclipse.tcf.internal.debug.ui.TCFContextView"
+            icon="icons/tcf.gif"
+            id="org.eclipse.tcf.ExecutionContext"
+            name="TCF Execution Context"
+            restorable="true">
+      </view>
    </extension>
 
    <extension
