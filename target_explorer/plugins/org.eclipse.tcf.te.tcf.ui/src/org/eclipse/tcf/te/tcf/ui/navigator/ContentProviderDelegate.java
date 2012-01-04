@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
@@ -27,14 +27,24 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelRefreshSe
 import org.eclipse.tcf.te.tcf.locator.model.Model;
 import org.eclipse.tcf.te.tcf.ui.navigator.nodes.PeerRedirectorGroupNode;
 import org.eclipse.tcf.te.ui.views.interfaces.IRoot;
+import org.eclipse.ui.IMemento;
+import org.eclipse.ui.internal.navigator.NavigatorFilterService;
 import org.eclipse.ui.navigator.CommonViewer;
+import org.eclipse.ui.navigator.ICommonContentExtensionSite;
+import org.eclipse.ui.navigator.ICommonContentProvider;
+import org.eclipse.ui.navigator.INavigatorContentService;
+import org.eclipse.ui.navigator.INavigatorFilterService;
 
 
 /**
  * Content provider delegate implementation.
  */
-public class ContentProviderDelegate implements ITreeContentProvider {
+@SuppressWarnings("restriction")
+public class ContentProviderDelegate implements ICommonContentProvider {
 	private final static Object[] NO_ELEMENTS = new Object[0];
+
+	// The "Redirected Peers" filter id
+	private final static String REDIRECT_PEERS_FILTER_ID = "org.eclipse.tcf.te.tcf.ui.navigator.RedirectPeersFilter"; //$NON-NLS-1$
 
 	// The locator model listener instance
 	/* default */ IModelListener modelListener = null;
@@ -182,4 +192,37 @@ public class ContentProviderDelegate implements ITreeContentProvider {
 			});
 		}
 	}
+
+	/* (non-Javadoc)
+     * @see org.eclipse.ui.navigator.ICommonContentProvider#init(org.eclipse.ui.navigator.ICommonContentExtensionSite)
+     */
+    @Override
+    public void init(ICommonContentExtensionSite config) {
+    	Assert.isNotNull(config);
+
+    	// Make sure that the hidden "Redirected Peers" filter is active
+    	INavigatorContentService cs = config.getService();
+    	INavigatorFilterService fs = cs != null ? cs.getFilterService() : null;
+		if (fs != null && !fs.isActive(REDIRECT_PEERS_FILTER_ID)) {
+			if (fs instanceof NavigatorFilterService) {
+				NavigatorFilterService navFilterService = (NavigatorFilterService)fs;
+				navFilterService.addActiveFilterIds(new String[] { REDIRECT_PEERS_FILTER_ID });
+				navFilterService.updateViewer();
+			}
+		}
+    }
+
+	/* (non-Javadoc)
+     * @see org.eclipse.ui.navigator.IMementoAware#restoreState(org.eclipse.ui.IMemento)
+     */
+    @Override
+    public void restoreState(IMemento aMemento) {
+    }
+
+	/* (non-Javadoc)
+     * @see org.eclipse.ui.navigator.IMementoAware#saveState(org.eclipse.ui.IMemento)
+     */
+    @Override
+    public void saveState(IMemento aMemento) {
+    }
 }

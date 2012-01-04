@@ -15,13 +15,22 @@ import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 import org.eclipse.tcf.te.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.trees.TreeContentProvider;
+import org.eclipse.ui.IMemento;
+import org.eclipse.ui.internal.navigator.NavigatorFilterService;
+import org.eclipse.ui.navigator.ICommonContentExtensionSite;
+import org.eclipse.ui.navigator.ICommonContentProvider;
+import org.eclipse.ui.navigator.INavigatorContentService;
+import org.eclipse.ui.navigator.INavigatorFilterService;
 
 /**
  * Process tree control content provider implementation.
  */
-public class ProcessTreeContentProvider extends TreeContentProvider {
-	/*
-	 * (non-Javadoc)
+@SuppressWarnings("restriction")
+public class ProcessTreeContentProvider extends TreeContentProvider implements ICommonContentProvider {
+	// The "Single Thread" filter id
+	private final static String SINGLE_THREAD_FILTER_ID = "org.eclipse.tcf.te.tcf.processes.ui.navigator.filter.singleThread"; //$NON-NLS-1$
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
 	 */
 	@Override
@@ -107,10 +116,43 @@ public class ProcessTreeContentProvider extends TreeContentProvider {
 
 	/**
 	 * If the root node of the tree is visible.
-	 * 
+	 *
 	 * @return true if it is visible.
 	 */
 	protected boolean isRootNodeVisible() {
 		return false;
-	}	
+	}
+
+	/* (non-Javadoc)
+     * @see org.eclipse.ui.navigator.ICommonContentProvider#init(org.eclipse.ui.navigator.ICommonContentExtensionSite)
+     */
+    @Override
+    public void init(ICommonContentExtensionSite config) {
+    	Assert.isNotNull(config);
+
+    	// Make sure that the hidden "Single Thread" filter is active
+    	INavigatorContentService cs = config.getService();
+    	INavigatorFilterService fs = cs != null ? cs.getFilterService() : null;
+		if (fs != null && !fs.isActive(SINGLE_THREAD_FILTER_ID)) {
+			if (fs instanceof NavigatorFilterService) {
+				NavigatorFilterService navFilterService = (NavigatorFilterService)fs;
+				navFilterService.addActiveFilterIds(new String[] { SINGLE_THREAD_FILTER_ID });
+				navFilterService.updateViewer();
+			}
+		}
+    }
+
+	/* (non-Javadoc)
+     * @see org.eclipse.ui.navigator.IMementoAware#restoreState(org.eclipse.ui.IMemento)
+     */
+    @Override
+    public void restoreState(IMemento aMemento) {
+    }
+
+	/* (non-Javadoc)
+     * @see org.eclipse.ui.navigator.IMementoAware#saveState(org.eclipse.ui.IMemento)
+     */
+    @Override
+    public void saveState(IMemento aMemento) {
+    }
 }
