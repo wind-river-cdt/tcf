@@ -81,6 +81,7 @@ public class ServicesSection extends AbstractSection {
 
 		local = new Text(group, SWT.READ_ONLY | SWT.WRAP | SWT.MULTI);
 		GridData layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		layoutData.widthHint = SWTControlUtil.convertWidthInCharsToPixels(local, 20);
 		layoutData.heightHint = SWTControlUtil.convertHeightInCharsToPixels(local, 5);
 		local.setLayoutData(layoutData);
 
@@ -91,6 +92,7 @@ public class ServicesSection extends AbstractSection {
 
 		remote = new Text(group, SWT.READ_ONLY | SWT.WRAP | SWT.MULTI);
 		layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		layoutData.widthHint = SWTControlUtil.convertWidthInCharsToPixels(local, 20);
 		layoutData.heightHint = SWTControlUtil.convertHeightInCharsToPixels(remote, 5);
 		remote.setLayoutData(layoutData);
 	}
