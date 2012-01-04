@@ -53,6 +53,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTException;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
@@ -91,7 +92,7 @@ import org.eclipse.ui.part.MultiPageSelectionProvider;
 /**
  * Abstract tree control implementation.
  */
-public abstract class AbstractTreeControl extends WorkbenchPartControl implements SelectionListener, 
+public abstract class AbstractTreeControl extends WorkbenchPartControl implements SelectionListener,
 								IDoubleClickListener, IPropertyChangeListener, ISelectionChangedListener, FocusListener {
 	// Reference to the tree viewer instance
 	private TreeViewer viewer;
@@ -197,7 +198,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 		viewer.setAutoExpandLevel(getAutoExpandLevel());
 
 		viewer.setLabelProvider(doCreateTreeViewerLabelProvider(viewer));
-		
+
 		final ITreeContentProvider contentProvider = doCreateTreeViewerContentProvider(viewer);
 		InvocationHandler handler = new InvocationHandler() {
 			@Override
@@ -214,7 +215,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 		Class<?>[] interfaces = new Class[] { ITreeContentProvider.class };
 		ITreeContentProvider proxy = (ITreeContentProvider) Proxy.newProxyInstance(classLoader, interfaces, handler);
 		viewer.setContentProvider(proxy);
-		
+
 		viewer.setComparator(doCreateTreeViewerComparator(viewer));
 
 		viewer.getTree().setLayoutData(doCreateTreeViewerLayoutData(viewer));
@@ -225,7 +226,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 		if (selectionChangedListener != null) {
 			viewer.addSelectionChangedListener(selectionChangedListener);
 		}
-		
+
 		viewer.addDoubleClickListener(this);
 
 		// Set the help context.
@@ -239,11 +240,11 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 		ColumnViewerEditorActivationStrategy activationStrategy = new TreeViewerEditorActivationStrategy(getViewerId(), viewer);
 		TreeViewerEditor.create(viewer, null, activationStrategy, ColumnViewerEditor.DEFAULT);
 	}
-	
+
 	/**
 	 * Handle the event when the new input is set. Get the viewer's state
 	 * and update the state of the viewer's columns and filters.
-	 * 
+	 *
 	 * @param oldInput the old input.
 	 * @param newInput The new input.
 	 */
@@ -265,12 +266,12 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 			installPropertyChangeListener(newInput);
 		}
 	}
-	
+
 	/**
 	 * Handle the event when the content provider is disposed.
 	 * Un-install the property change listener that has been added
 	 * to the input.
-	 * 
+	 *
 	 * @param oldInput the old input.
 	 * @param newInput The new input.
 	 */
@@ -280,10 +281,10 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 			uninstallPropertyChangeListener(input);
 		}
 	}
-	
+
 	/**
 	 * Uninstall the property change listener from the specified input.
-	 * 
+	 *
 	 * @param input The input of the tree viewer.
 	 */
 	private void uninstallPropertyChangeListener(Object input) {
@@ -292,10 +293,10 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 			viewerInput.removePropertyChangeListener(this);
 		}
 	}
-	
+
 	/**
 	 * Install the property change listener to the input of the tree viewer.
-	 * 
+	 *
 	 * @param input The input of the tree viewer.
 	 */
 	private void installPropertyChangeListener(Object input) {
@@ -308,7 +309,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	/**
 	 * Update the viewer state using the states from the viewerState which
 	 * is retrieved or created based on the input.
-	 * 
+	 *
 	 * @param newInput The new input of the viewer.
 	 */
 	private void updateViewerState(Object newInput) {
@@ -339,7 +340,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
     		viewerState.updateFilterState(filterDescriptors);
 		}
 	}
-	
+
 	/**
 	 * Update the filter's state using the latest filter descriptors.
 	 */
@@ -351,8 +352,8 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 
 	/**
 	 * Show or hide the specified column. Return true if the visible
-	 * state has changed. 
-	 * 
+	 * state has changed.
+	 *
 	 * @param column The column to be changed.
 	 * @param visible The new visible value.
 	 * @return true if the state has changed.
@@ -377,7 +378,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	/**
 	 * Return if this tree viewer's state is persistent. If it is persistent,
 	 * then its viewer state will be persisted during different session.
-	 * 
+	 *
 	 * @return true if the viewer's state is persistent.
 	 */
 	protected boolean isStatePersistent() {
@@ -386,17 +387,17 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 
 	/**
 	 * Get the help context id of this viewer.
-	 * 
+	 *
 	 * @return The help context id or null if no help available.
 	 */
 	protected String getHelpId() {
 		return null;
 	}
-	
+
 	/**
-	 * Create the tree viewer columns from the viewers extension. 
-	 * Subclass may override it to provide its customized viewer columns. 
-	 * 
+	 * Create the tree viewer columns from the viewers extension.
+	 * Subclass may override it to provide its customized viewer columns.
+	 *
 	 * @param newInput the input when the columns are created.
 	 * @return The tree viewer columns.
 	 */
@@ -407,11 +408,11 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 		}
 		return columns;
 	}
-	
+
 	/**
-	 * Create the viewer filters from the viewers extension. Subclass may 
-	 * override it to provide its customized viewer filters. 
-	 * 
+	 * Create the viewer filters from the viewers extension. Subclass may
+	 * override it to provide its customized viewer filters.
+	 *
 	 * @param newInput the input when the filters are initialized.
 	 * @return The filter descriptors for the viewer.
 	 */
@@ -422,7 +423,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 		}
 		return filterDescriptors;
 	}
-	
+
 	/**
 	 * Update the tree viewer's filters using the current filter descriptors.
 	 */
@@ -443,7 +444,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	/**
 	 * Create the tree columns for the viewer from the tree viewer columns.
 	 * Subclass may override to create its customized the creation.
-	 *  
+	 *
 	 * @param viewer The tree viewer.
 	 */
 	protected void createTreeColumns(TreeViewer viewer) {
@@ -477,14 +478,14 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 
 	/**
 	 * Create the tree column described by the specified colum descriptor.
-	 * 
+	 *
 	 * @param column The column descriptor.
 	 * @param append If the new column should be appended.
 	 * @return The tree column created.
 	 */
 	TreeColumn createTreeColumn(final ColumnDescriptor column, boolean append) {
 		Tree tree = viewer.getTree();
-		final TreeColumn treeColumn = append ? new TreeColumn(tree, column.getStyle()) : 
+		final TreeColumn treeColumn = append ? new TreeColumn(tree, column.getStyle()) :
 			new TreeColumn(tree, column.getStyle(), getColumnIndex(column));
 	    treeColumn.setData(column);
 	    treeColumn.setText(column.getName());
@@ -496,7 +497,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	    treeColumn.setWidth(column.getWidth());
 	    treeColumn.addSelectionListener(this);
 	    treeColumn.addControlListener(new ControlAdapter(){
-	    	
+
 			@Override
             public void controlMoved(ControlEvent e) {
 				columnMoved();
@@ -509,7 +510,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	    column.setTreeColumn(treeColumn);
 	    return treeColumn;
     }
-	
+
 	/**
 	 * Called when a column is moved. Store the column's order.
 	 */
@@ -527,11 +528,11 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 			}
 		}
 	}
-	
+
 	/**
 	 * Get the column index of the specified column. The column index
 	 * equals to the count of the visible columns before this column.
-	 * 
+	 *
 	 * @param column The column descriptor.
 	 * @return The column index.
 	 */
@@ -551,7 +552,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	/**
 	 * Get the tree viewer's id. This viewer id is used by
 	 * viewer extension to define columns and filters.
-	 * 
+	 *
 	 * @return This viewer's id or null.
 	 */
 	protected abstract String getViewerId();
@@ -685,7 +686,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 			if (service != null) {
 				service.populateContributionManager(toolbarManager, "toolbar:" + this.getContextMenuId()); //$NON-NLS-1$
 			}
-		}		
+		}
 		ToolBar toolbar = toolbarManager.createControl(parent);
 
 		// The cursor within the toolbar shall change to an hand
@@ -736,7 +737,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 
 	/**
 	 * Get the current filter descriptors of this viewer.
-	 *  
+	 *
 	 * @return The filter descriptors of this viewer.
 	 */
 	public FilterDescriptor[] getFilterDescriptors() {
@@ -745,7 +746,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 
 	/**
 	 * Get the current viewer columns of this viewer.
-	 * 
+	 *
 	 * @return The current viewer columns.
 	 */
 	public ColumnDescriptor[] getViewerColumns() {
@@ -778,7 +779,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 
 		return super.getAdapter(adapter);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
@@ -810,7 +811,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * Listens to the double-click event of the tree and expand or collapse
 	 * the tree by default. Subclass may override this method to invoke certain
 	 * command.
-	 * 
+	 *
 	 * @param event the double click event
 	 * @see org.eclipse.jface.viewers.IDoubleClickListener#doubleClick(DoubleClickEvent)
 	 */
@@ -860,7 +861,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	/**
 	 * Get the id of the command invoked when the tree is double-clicked.
 	 * If the id is null, then no command is invoked.
-	 * 
+	 *
 	 * @return The double-click command id.
 	 */
 	protected String getDoubleClickCommandId() {
@@ -928,12 +929,18 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 			if (site != null) {
 				ISelection selection = getViewer().getSelection();
 				ISelectionProvider selectionProvider = site.getSelectionProvider();
-				selectionProvider.setSelection(selection);
-				if (selectionProvider instanceof MultiPageSelectionProvider) {
-					SelectionChangedEvent changedEvent = new SelectionChangedEvent(selectionProvider, selection);
-					((MultiPageSelectionProvider) selectionProvider).firePostSelectionChanged(changedEvent);
+				// If the parent control is already disposed, we have no real chance of
+				// testing for it. Catch the SWT exception here just in case.
+				try {
+					selectionProvider.setSelection(selection);
+					if (selectionProvider instanceof MultiPageSelectionProvider) {
+						SelectionChangedEvent changedEvent = new SelectionChangedEvent(selectionProvider, selection);
+						((MultiPageSelectionProvider) selectionProvider).firePostSelectionChanged(changedEvent);
+					}
+				} catch (SWTException e) {
+					/* ignored on purpose */
 				}
 			}
 		}
-    }	
+    }
 }
