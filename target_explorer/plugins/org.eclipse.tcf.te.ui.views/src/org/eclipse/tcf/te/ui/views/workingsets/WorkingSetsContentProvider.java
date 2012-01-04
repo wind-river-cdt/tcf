@@ -37,6 +37,7 @@ import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.navigator.NavigatorContentService;
+import org.eclipse.ui.internal.navigator.NavigatorFilterService;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.navigator.ICommonContentExtensionSite;
@@ -119,8 +120,11 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 		}
 
 		if (filter != null && !filterService.isActive(WORKING_SET_FILTER_ID)) {
-			filterService.activateFilterIdsAndUpdateViewer(new String[] { WORKING_SET_FILTER_ID });
-			filterService.persistFilterActivationState();
+			if (filterService instanceof NavigatorFilterService) {
+				NavigatorFilterService navFilterService = (NavigatorFilterService)filterService;
+				navFilterService.addActiveFilterIds(new String[] { WORKING_SET_FILTER_ID });
+				navFilterService.updateViewer();
+			}
 		}
 		else if (filter == null) {
 			IStatus status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(),
