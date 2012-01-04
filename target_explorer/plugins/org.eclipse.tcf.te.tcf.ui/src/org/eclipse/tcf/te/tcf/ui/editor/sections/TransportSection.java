@@ -47,7 +47,6 @@ import org.eclipse.tcf.te.ui.forms.parts.AbstractSection;
 import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
 import org.eclipse.tcf.te.ui.views.editor.AbstractEditorPage;
 import org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataWizardPage;
-import org.eclipse.tcf.te.ui.wizards.interfaces.IValidatableWizardPage;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
@@ -55,7 +54,7 @@ import org.eclipse.ui.forms.widgets.Section;
 /**
  * Peer transport section implementation.
  */
-public class TransportSection extends AbstractSection implements IValidatableWizardPage {
+public class TransportSection extends AbstractSection {
 	// The section sub controls
 	private TransportSectionTypeControl transportTypeControl = null;
 	private TransportSectionTypePanelControl transportTypePanelControl = null;
@@ -299,26 +298,27 @@ public class TransportSection extends AbstractSection implements IValidatableWiz
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.IValidatableWizardPage#validatePage()
+	 * @see org.eclipse.tcf.te.ui.forms.parts.AbstractSection#isValid()
 	 */
 	@Override
-	public void validatePage() {
-		@SuppressWarnings("unused")
-		boolean valid = true;
+	public boolean isValid() {
+	    boolean valid = super.isValid();
 
 		if (transportTypeControl != null) {
 			valid &= transportTypeControl.isValid();
-//			if (transportTypeControl.getMessageType() > getMessageType()) {
-//				setMessage(transportTypeControl.getMessage(), transportTypeControl.getMessageType());
-//			}
+			if (transportTypeControl.getMessageType() > getMessageType()) {
+				setMessage(transportTypeControl.getMessage(), transportTypeControl.getMessageType());
+			}
 		}
 
 		if (transportTypePanelControl != null) {
 			valid &= transportTypePanelControl.isValid();
-//			if (transportTypePanelControl.getMessageType() > getMessageType()) {
-//				setMessage(transportTypePanelControl.getMessage(), transportTypePanelControl.getMessageType());
-//			}
+			if (transportTypePanelControl.getMessageType() > getMessageType()) {
+				setMessage(transportTypePanelControl.getMessage(), transportTypePanelControl.getMessageType());
+			}
 		}
+
+		return valid;
 	}
 
 	/* (non-Javadoc)

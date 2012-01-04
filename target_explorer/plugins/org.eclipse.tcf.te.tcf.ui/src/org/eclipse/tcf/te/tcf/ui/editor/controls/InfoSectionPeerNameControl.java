@@ -13,7 +13,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.tcf.te.tcf.ui.controls.PeerNameControl;
 import org.eclipse.tcf.te.tcf.ui.editor.sections.GeneralInformationSection;
-import org.eclipse.tcf.te.ui.wizards.interfaces.IValidatableWizardPage;
+import org.eclipse.tcf.te.ui.jface.interfaces.IValidatingContainer;
 
 /**
  * General information section peer name control implementation.
@@ -34,12 +34,13 @@ public class InfoSectionPeerNameControl extends PeerNameControl {
 		this.infoSection = infoSection;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.controls.BaseDialogPageControl#getValidatableWizardPage()
-	 */
-	@Override
-	public IValidatableWizardPage getValidatableWizardPage() {
-		return infoSection;
+    /* (non-Javadoc)
+     * @see org.eclipse.tcf.te.ui.controls.BaseDialogPageControl#getValidatingContainer()
+     */
+    @Override
+    public IValidatingContainer getValidatingContainer() {
+		Object container = infoSection.getManagedForm().getContainer();
+		return container instanceof IValidatingContainer ? (IValidatingContainer)container : null;
 	}
 
 	/* (non-Javadoc)

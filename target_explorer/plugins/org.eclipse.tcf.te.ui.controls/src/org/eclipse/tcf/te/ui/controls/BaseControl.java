@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tcf.te.ui.jface.interfaces.IValidatable;
 
 /**
  * Base implementation of a common UI control.
@@ -21,7 +22,7 @@ import org.eclipse.swt.widgets.Composite;
  * The control can be embedded into any UI container like dialogs,
  * wizard pages or preference pages.
  */
-public class BaseControl extends PlatformObject implements IMessageProvider {
+public class BaseControl extends PlatformObject implements IValidatable {
 
 	/**
 	 * Reference to the parent control.
@@ -104,16 +105,11 @@ public class BaseControl extends PlatformObject implements IMessageProvider {
 		return enabled;
 	}
 
-	/**
-	 * Validates the control and sets the message text and type so the parent
-	 * page or control is able to display validation result informations.
-	 * The validation should be done by implementations of WRValidator!
-	 * The default implementation of this method does nothing.
-	 * Use the isValid(WRBaseControl, boolean) method to validate child-controls.
-	 *
-	 * @return Result of validation.
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.interfaces.validator.IValidatable#isValid()
 	 */
-	public boolean isValid() {
+	@Override
+    public boolean isValid() {
 		setMessage(null, IMessageProvider.NONE);
 		return true;
 	}

@@ -14,11 +14,13 @@ import java.lang.reflect.Field;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.tcf.te.ui.forms.FormLayoutFactory;
+import org.eclipse.tcf.te.ui.jface.interfaces.IValidatable;
 import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
 import org.eclipse.ui.forms.AbstractFormPart;
 import org.eclipse.ui.forms.IManagedForm;
@@ -30,7 +32,11 @@ import org.eclipse.ui.forms.widgets.Section;
 /**
  * Abstract section implementation.
  */
-public abstract class AbstractSection extends SectionPart implements IAdaptable {
+public abstract class AbstractSection extends SectionPart implements IAdaptable, IValidatable {
+	// The message text
+	private String message = null;
+	// The message type. See IMessageProvider
+	private int messageType = NONE;
 
 	/**
 	 * Constructor.
@@ -132,5 +138,41 @@ public abstract class AbstractSection extends SectionPart implements IAdaptable 
 				getManagedForm().dirtyStateChanged();
 			} catch (Exception e) { /* ignored on purpose */ }
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.jface.interfaces.IValidatable#isValid()
+	 */
+	@Override
+	public boolean isValid() {
+		setMessage(null, IMessageProvider.NONE);
+		return true;
+	}
+
+	/**
+	 * Sets the message text and type.
+	 *
+	 * @param message The message or <code>null</code>.
+	 * @param messageType The message type. See {@link IMessageProvider}.
+	 */
+	protected final void setMessage(String message, int messageType) {
+		this.message = message;
+		this.messageType = messageType;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.IMessageProvider#getMessage()
+	 */
+	@Override
+	public final String getMessage() {
+		return message;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.IMessageProvider#getMessageType()
+	 */
+	@Override
+	public final int getMessageType() {
+		return messageType;
 	}
 }

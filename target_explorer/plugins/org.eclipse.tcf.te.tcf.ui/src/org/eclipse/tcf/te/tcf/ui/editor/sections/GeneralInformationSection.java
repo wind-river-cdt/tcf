@@ -43,7 +43,6 @@ import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.forms.parts.AbstractSection;
 import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
 import org.eclipse.tcf.te.ui.views.editor.AbstractEditorPage;
-import org.eclipse.tcf.te.ui.wizards.interfaces.IValidatableWizardPage;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
@@ -51,7 +50,7 @@ import org.eclipse.ui.forms.widgets.Section;
 /**
  * Peer general information section implementation.
  */
-public class GeneralInformationSection extends AbstractSection implements IValidatableWizardPage {
+public class GeneralInformationSection extends AbstractSection {
 	// The section sub controls
 	private InfoSectionPeerIdControl idControl = null;
 	private InfoSectionPeerNameControl nameControl = null;
@@ -308,24 +307,25 @@ public class GeneralInformationSection extends AbstractSection implements IValid
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.IValidatableWizardPage#validatePage()
+	 * @see org.eclipse.tcf.te.ui.forms.parts.AbstractSection#isValid()
 	 */
 	@Override
-	public void validatePage() {
-		@SuppressWarnings("unused")
-		boolean valid = true;
+	public boolean isValid() {
+	    boolean valid =  super.isValid();
 
 		if (idControl != null) {
 			valid &= idControl.isValid();
-//			setMessage(idControl.getMessage(), idControl.getMessageType());
+			setMessage(idControl.getMessage(), idControl.getMessageType());
 		}
 
 		if (nameControl != null) {
 			valid &= nameControl.isValid();
-//			if (nameControl.getMessageType() > getMessageType()) {
-//				setMessage(nameControl.getMessage(), nameControl.getMessageType());
-//			}
+			if (nameControl.getMessageType() > getMessageType()) {
+				setMessage(nameControl.getMessage(), nameControl.getMessageType());
+			}
 		}
+
+		return valid;
 	}
 
 	/* (non-Javadoc)

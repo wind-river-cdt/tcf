@@ -14,7 +14,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.tcf.te.tcf.ui.controls.TransportTypeControl;
 import org.eclipse.tcf.te.tcf.ui.editor.sections.TransportSection;
-import org.eclipse.tcf.te.ui.wizards.interfaces.IValidatableWizardPage;
+import org.eclipse.tcf.te.ui.jface.interfaces.IValidatingContainer;
 
 /**
  * Transport section transport type control implementation.
@@ -44,16 +44,19 @@ public class TransportSectionTypeControl extends TransportTypeControl {
 
 		if (transportTypePanelControl != null) {
 			transportTypePanelControl.showConfigurationPanel(getSelectedTransportType());
-			transportSection.validatePage();
+
+			IValidatingContainer validatingContainer = getValidatingContainer();
+			if (validatingContainer != null) validatingContainer.validate();
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.controls.BaseDialogPageControl#getValidatableWizardPage()
-	 */
-	@Override
-	public IValidatableWizardPage getValidatableWizardPage() {
-		return transportSection;
+    /* (non-Javadoc)
+     * @see org.eclipse.tcf.te.ui.controls.BaseDialogPageControl#getValidatingContainer()
+     */
+    @Override
+    public IValidatingContainer getValidatingContainer() {
+		Object container = transportSection.getManagedForm().getContainer();
+		return container instanceof IValidatingContainer ? (IValidatingContainer)container : null;
 	}
 
 	/* (non-Javadoc)

@@ -44,9 +44,9 @@ import org.eclipse.swt.widgets.Scrollable;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tcf.te.ui.controls.nls.Messages;
 import org.eclipse.tcf.te.ui.controls.validator.Validator;
+import org.eclipse.tcf.te.ui.jface.interfaces.IValidatingContainer;
 import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
 import org.eclipse.tcf.te.ui.utils.DialogSettingsUtil;
-import org.eclipse.tcf.te.ui.wizards.interfaces.IValidatableWizardPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
@@ -619,8 +619,8 @@ public class BaseEditBrowseTextControl extends BaseDialogPageControl implements 
 			}
 
 			// validate the page
-			IValidatableWizardPage validatable = getValidatableWizardPage();
-			if (validatable != null) validatable.validatePage();
+			IValidatingContainer validatingContainer = getValidatingContainer();
+			if (validatingContainer != null) validatingContainer.validate();
 		}
 	}
 
@@ -1011,8 +1011,8 @@ public class BaseEditBrowseTextControl extends BaseDialogPageControl implements 
 	@Override
 	public void modifyText(ModifyEvent e) {
 		// validate the page
-		IValidatableWizardPage validatable = getValidatableWizardPage();
-		if (validatable != null) validatable.validatePage();
+		IValidatingContainer validatingContainer = getValidatingContainer();
+		if (validatingContainer != null) validatingContainer.validate();
 	}
 
 	/**
@@ -1055,8 +1055,8 @@ public class BaseEditBrowseTextControl extends BaseDialogPageControl implements 
 	@Override
 	public void widgetSelected(SelectionEvent e) {
 		// validate the page
-		IValidatableWizardPage validatable = getValidatableWizardPage();
-		if (validatable != null) validatable.validatePage();
+		IValidatingContainer validatingContainer = getValidatingContainer();
+		if (validatingContainer != null) validatingContainer.validate();
 	}
 
 	/**

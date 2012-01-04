@@ -10,15 +10,14 @@
 package org.eclipse.tcf.te.ui.wizards.pages;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.tcf.te.ui.wizards.interfaces.IValidatableWizardPage;
+import org.eclipse.tcf.te.ui.jface.interfaces.IValidatingContainer;
 
 /**
- * An abstract validatable wizard page implementation.
+ * An abstract validating wizard page implementation.
  * <p>
- * This wizard page implementation is adding utility methods
- * for handling page validation.
+ * This wizard page implementation is adding utility methods for handling page validation.
  */
-public abstract class AbstractValidatableWizardPage extends AbstractWizardPage implements IValidatableWizardPage {
+public abstract class AbstractValidatingWizardPage extends AbstractWizardPage implements IValidatingContainer {
 	// A used to detect if a validation process is already running.
 	// If set to true, validatePage() should return immediately.
 	private boolean validationInProgress = false;
@@ -28,7 +27,7 @@ public abstract class AbstractValidatableWizardPage extends AbstractWizardPage i
 	 *
 	 * @param pageName The page name. Must not be <code>null</code>.
 	 */
-	public AbstractValidatableWizardPage(String pageName) {
+	public AbstractValidatingWizardPage(String pageName) {
 		super(pageName);
 	}
 
@@ -39,7 +38,7 @@ public abstract class AbstractValidatableWizardPage extends AbstractWizardPage i
 	 * @param title The wizard page title or <code>null</code>.
 	 * @param titleImage The wizard page title image or <code>null</code>.
 	 */
-	public AbstractValidatableWizardPage(String pageName, String title, ImageDescriptor titleImage) {
+	public AbstractValidatingWizardPage(String pageName, String title, ImageDescriptor titleImage) {
 		super(pageName, title, titleImage);
 	}
 
@@ -82,10 +81,10 @@ public abstract class AbstractValidatableWizardPage extends AbstractWizardPage i
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.controls.interfaces.IValidatableDialogPage#validatePage()
+	 * @see org.eclipse.tcf.te.ui.jface.interfaces.IValidatingContainer#validate()
 	 */
 	@Override
-	public void validatePage() {
+	public void validate() {
 		if (isValidationInProgress())  return;
 		setValidationInProgress(true);
 

@@ -36,7 +36,7 @@ import org.eclipse.tcf.te.tcf.locator.model.Model;
 import org.eclipse.tcf.te.tcf.ui.navigator.LabelProvider;
 import org.eclipse.tcf.te.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.interfaces.IUIConstants;
-import org.eclipse.tcf.te.ui.wizards.pages.AbstractValidatableWizardPage;
+import org.eclipse.tcf.te.ui.wizards.pages.AbstractValidatingWizardPage;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.FilteredTree;
@@ -49,7 +49,7 @@ import org.eclipse.ui.dialogs.PatternFilter;
  *
  * @since 3.8
  */
-public class TargetSelectionPage extends AbstractValidatableWizardPage {
+public class TargetSelectionPage extends AbstractValidatingWizardPage {
 	// References to the page subcontrol's
 	private FilteredTree filteredTree;
 	private PatternFilter filteredTreeFilter;
@@ -201,13 +201,12 @@ public class TargetSelectionPage extends AbstractValidatableWizardPage {
 		setPageComplete(peer != null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.wizards.pages.AbstractValidatableWizardPage#validatePage()
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.wizards.pages.AbstractValidatingWizardPage#validate()
 	 */
 	@Override
-	public void validatePage() {
-		super.validatePage();
+	public void validate() {
+	    super.validate();
 		if (!isPageComplete()) return;
 		if (isValidationInProgress()) return;
 		setValidationInProgress(true);
@@ -274,7 +273,7 @@ public class TargetSelectionPage extends AbstractValidatableWizardPage {
 			container.updateTitleBar();
 			container.updateButtons();
 		}
-		validatePage();
+		validate();
 	}
 
 	/*
