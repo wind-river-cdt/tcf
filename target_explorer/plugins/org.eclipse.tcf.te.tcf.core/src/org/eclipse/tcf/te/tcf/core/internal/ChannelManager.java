@@ -225,7 +225,29 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 			}
 
 		} else {
-			done.doneOpenChannel(null, channel);
+			// Wait for the channel to be fully opened if still in "OPENING" state
+			if (channel.getState() == IChannel.STATE_OPENING) {
+				final IChannel finChannel = channel;
+				channel.addChannelListener(new IChannel.IChannelListener() {
+
+					@Override
+					public void onChannelOpened() {
+						done.doneOpenChannel(null, finChannel);
+					}
+
+					@Override
+					public void onChannelClosed(Throwable error) {
+						done.doneOpenChannel(error, finChannel);
+					}
+
+					@Override
+					public void congestionLevel(int level) {
+					}
+				});
+			}
+			else {
+				done.doneOpenChannel(null, channel);
+			}
 		}
 
 	}
