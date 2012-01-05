@@ -67,6 +67,10 @@ tests/plugins/org.eclipse.tcf.debug.test/bin
 # target explorer
 /target_explorer/plugins/org.eclipse.tcf.te.core/target
 /target_explorer/plugins/org.eclipse.tcf.te.core/bin
+/target_explorer/plugins/org.eclipse.tcf.te.launch.core/target
+/target_explorer/plugins/org.eclipse.tcf.te.launch.core/bin
+/target_explorer/plugins/org.eclipse.tcf.te.launch.ui/target
+/target_explorer/plugins/org.eclipse.tcf.te.launch.ui/bin
 /target_explorer/plugins/org.eclipse.tcf.te.rcp/target
 /target_explorer/plugins/org.eclipse.tcf.te.rcp/bin
 /target_explorer/plugins/org.eclipse.tcf.te.rcp.application/target
@@ -89,12 +93,12 @@ tests/plugins/org.eclipse.tcf.debug.test/bin
 /target_explorer/plugins/org.eclipse.tcf.te.tcf.core/bin
 /target_explorer/plugins/org.eclipse.tcf.te.tcf.core.scripting/target
 /target_explorer/plugins/org.eclipse.tcf.te.tcf.core.scripting/bin
-/target_explorer/plugins/org.eclipse.tcf.te.tcf.debug.core/target
-/target_explorer/plugins/org.eclipse.tcf.te.tcf.debug.core/bin
-/target_explorer/plugins/org.eclipse.tcf.te.tcf.debug.ui/target
-/target_explorer/plugins/org.eclipse.tcf.te.tcf.debug.ui/bin
 /target_explorer/plugins/org.eclipse.tcf.te.tcf.filesystem/target
 /target_explorer/plugins/org.eclipse.tcf.te.tcf.filesystem/bin
+/target_explorer/plugins/org.eclipse.tcf.te.tcf.launch.core/target
+/target_explorer/plugins/org.eclipse.tcf.te.tcf.launch.core/bin
+/target_explorer/plugins/org.eclipse.tcf.te.tcf.launch.ui/target
+/target_explorer/plugins/org.eclipse.tcf.te.tcf.launch.ui/bin
 /target_explorer/plugins/org.eclipse.tcf.te.tcf.locator/target
 /target_explorer/plugins/org.eclipse.tcf.te.tcf.locator/bin
 /target_explorer/plugins/org.eclipse.tcf.te.tcf.log.core/target

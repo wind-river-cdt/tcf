@@ -41,11 +41,29 @@
          unpack="false"/>
 
    <plugin
+         id="org.eclipse.tcf.te.tcf.core.scripting"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
          id="org.eclipse.tcf.te.tcf.filesystem"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
+
+   <plugin
+         id="org.eclipse.tcf.te.tcf.launch.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="org.eclipse.tcf.te.tcf.launch.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.tcf.te.tcf.locator"
@@ -97,12 +115,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.tcf.te.tcf.core.scripting"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
          id="org.eclipse.tcf.te.tcf.ui.console"
          download-size="0"
          install-size="0"
@@ -115,17 +127,5 @@
          install-size="0"
          version="0.0.0"
          unpack="false"/>
-
-   <plugin
-         id="org.eclipse.tcf.te.tcf.debug.core"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.tcf.te.tcf.debug.ui"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
 
 </feature>

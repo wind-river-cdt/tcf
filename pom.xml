@@ -60,6 +60,8 @@
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.runtime.statushandler</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.runtime.stepper</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.core</module>
+	  <module>target_explorer/plugins/org.eclipse.tcf.te.launch.core</module>
+	  <module>target_explorer/plugins/org.eclipse.tcf.te.launch.ui</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.ui</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.ui.controls</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.ui.forms</module>
@@ -71,8 +73,8 @@
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.ui.views</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.core</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.core.scripting</module>
-	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.debug.core</module>
-	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.debug.ui</module>
+	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.launch.core</module>
+	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.launch.ui</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.filesystem</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.locator</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.log.core</module>
@@ -91,10 +93,6 @@
 	  <module>target_explorer/features/org.eclipse.tcf.te.tcf.feature</module>
 	  <module>target_explorer/features/org.eclipse.tcf.te.tcf.sdk.feature</module>
 	  
-<!--	  
-	  <module>target_explorer/plugins/org.eclipse.tcf.te.tests</module>
--->
-
 	  <module>features/org.eclipse.tcf.repo</module>
 	</modules>
 
