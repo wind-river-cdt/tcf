@@ -1349,7 +1349,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
         appendErrorText(bf.getStringBuffer(), expression.getError());
         if (bf.length() == pos) appendErrorText(bf.getStringBuffer(), value.getError());
         if (bf.length() > pos) {
-            bf.append(pos, 0, null, rgb_error);
+            bf.append(pos, SWT.ITALIC, null, rgb_error);
         }
         else {
             IExpressions.Value v = value.getData();

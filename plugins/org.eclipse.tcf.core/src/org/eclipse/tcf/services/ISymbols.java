@@ -438,4 +438,10 @@ public interface ISymbols extends IService {
                 Number address, Number size,
                 Object[] fp_cmds, Map<String,Object[]> reg_cmds);
     }
+
+    IToken getSymFileInfo(String context_id, Number address, DoneGetSymFileInfo done);
+
+    interface DoneGetSymFileInfo {
+        void doneGetSymFileInfo(IToken token, Exception error, Map<String,Object> props);
+    }
 }

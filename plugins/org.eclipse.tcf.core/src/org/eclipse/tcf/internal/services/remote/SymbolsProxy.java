@@ -265,6 +265,22 @@ public class SymbolsProxy implements ISymbols {
         }.token;
     }
 
+    public IToken getSymFileInfo(String context_id, Number address, final DoneGetSymFileInfo done) {
+        return new Command(channel, this, "getSymFileInfo", new Object[]{ context_id, address }) {
+            @SuppressWarnings("unchecked")
+            @Override
+            public void done(Exception error, Object[] args) {
+                Map<String,Object> props = null;
+                if (error == null) {
+                    assert args.length == 2;
+                    error = toError(args[0]);
+                    props = (Map<String,Object>)args[1];
+                }
+                done.doneGetSymFileInfo(token, error, props);
+            }
+        }.token;
+    }
+
     @SuppressWarnings("unchecked")
     private String[] toStringArray(Object o) {
         if (o == null) return null;

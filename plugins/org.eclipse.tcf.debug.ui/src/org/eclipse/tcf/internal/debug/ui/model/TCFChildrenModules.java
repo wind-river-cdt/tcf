@@ -13,8 +13,8 @@ package org.eclipse.tcf.internal.debug.ui.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.tcf.protocol.IToken;
-import org.eclipse.tcf.services.IMemoryMap;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExecContext.MemoryRegion;
+import org.eclipse.tcf.util.TCFDataCache;
 
 /**
  * Provides and caches memory regions (modules) for a context.
@@ -31,28 +31,21 @@ public class TCFChildrenModules extends TCFChildren {
 
     @Override
     protected boolean startDataRetrieval() {
-        assert command == null;
-        IMemoryMap mmap = node.model.getLaunch().getService(IMemoryMap.class);
-        if (mmap == null) {
-            set(null, null, null);
-            return true;
-        }
-        command = mmap.get(node.id, new IMemoryMap.DoneGet() {
-            public void doneGet(IToken token, Exception error, IMemoryMap.MemoryRegion[] map) {
-                Map<String, TCFNode> data = new HashMap<String, TCFNode>();
-                if (map != null) {
-                    for (IMemoryMap.MemoryRegion region : map) {
-                        String id = node.id + ".Module-" + region.getFileName() + '@' + region.getAddress();
-                        TCFNodeModule module = (TCFNodeModule) node.model.getNode(id);
-                        if (module == null) {
-                            module = new TCFNodeModule(node, id, region);
-                        }
-                        data.put(id, module);
-                    }
-                }
-                set(token, error, data);
+        TCFNodeExecContext exe = (TCFNodeExecContext)node;
+        TCFDataCache<MemoryRegion[]> map_cache = exe.getMemoryMap();
+        if (!map_cache.validate(this)) return false;
+        MemoryRegion[] map = map_cache.getData();
+        Map<String, TCFNode> data = new HashMap<String, TCFNode>();
+        if (map != null) {
+            for (MemoryRegion region : map) {
+                String id = node.id + ".Module-" + region.region.getFileName() + '@' + region.region.getAddress();
+                TCFNodeModule module = (TCFNodeModule) node.model.getNode(id);
+                if (module == null) module = new TCFNodeModule(node, id);
+                module.setRegion(region.region);
+                data.put(id, module);
             }
-        });
-        return false;
+        }
+        set(null, map_cache.getError(), data);
+        return true;
     }
 }

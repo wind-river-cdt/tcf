@@ -11,22 +11,33 @@
 package org.eclipse.tcf.internal.debug.ui.model;
 
 import java.math.BigInteger;
+import java.util.Map;
 
 import org.eclipse.debug.internal.ui.viewers.model.provisional.ILabelUpdate;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.tcf.core.ErrorReport;
+import org.eclipse.tcf.internal.debug.model.TCFSymFileRef;
 import org.eclipse.tcf.internal.debug.ui.ImageCache;
 import org.eclipse.tcf.protocol.JSON;
 import org.eclipse.tcf.services.IMemoryMap;
+import org.eclipse.tcf.util.TCFDataCache;
 
 /**
  * A node representing a memory region (module).
  */
 public class TCFNodeModule extends TCFNode implements IDetailsProvider {
 
-    private final IMemoryMap.MemoryRegion region;
+    private IMemoryMap.MemoryRegion region;
 
-    protected TCFNodeModule(TCFNode parent, String id, IMemoryMap.MemoryRegion region) {
+    private static final RGB
+        rgb_error = new RGB(192, 0, 0);
+
+    protected TCFNodeModule(TCFNode parent, String id) {
         super(parent, id);
+    }
+
+    void setRegion(IMemoryMap.MemoryRegion region) {
         this.region = region;
     }
 
@@ -65,13 +76,37 @@ public class TCFNodeModule extends TCFNode implements IDetailsProvider {
     }
 
     public boolean getDetailText(StyledStringBuffer bf, Runnable done) {
-        bf.append("File: ", SWT.BOLD).append(region.getFileName()).append('\n');
+        String file_name = region.getFileName();
+        if (file_name != null) {
+            bf.append("File name: ", SWT.BOLD).append(file_name).append('\n');
+            TCFNodeExecContext exe = (TCFNodeExecContext)parent;
+            TCFDataCache<TCFSymFileRef> sym_cache = exe.getSymFileInfo(JSON.toBigInteger(region.getAddress()));
+            if (sym_cache != null) {
+                if (!sym_cache.validate(done)) return false;
+                TCFSymFileRef sym_data = sym_cache.getData();
+                if (sym_data != null) {
+                    if (sym_data.props != null) {
+                        String sym_file_name = (String)sym_data.props.get("FileName");
+                        if (sym_file_name != null) bf.append("Symbol file name: ", SWT.BOLD).append(sym_file_name).append('\n');
+                        @SuppressWarnings("unchecked")
+                        Map<String,Object> map = (Map<String,Object>)sym_data.props.get("FileError");
+                        if (map != null) {
+                            String msg = TCFModel.getErrorMessage(new ErrorReport("", map), false);
+                            bf.append("Symbol file error: ", SWT.BOLD).append(msg, SWT.ITALIC, null, rgb_error).append('\n');
+                        }
+                    }
+                    if (sym_data.error != null) bf.append("Symbol file error: ", SWT.BOLD).append(
+                            TCFModel.getErrorMessage(sym_data.error, false),
+                            SWT.ITALIC, null, rgb_error).append('\n');
+                }
+            }
+            String section = region.getSectionName();
+            if (section != null) bf.append("File section: ", SWT.BOLD).append(section).append('\n');
+            else bf.append("File offset: ", SWT.BOLD).append(toHexString(region.getOffset())).append('\n');
+        }
         bf.append("Address: ", SWT.BOLD).append(toHexString(region.getAddress())).append('\n');
         bf.append("Size: ", SWT.BOLD).append(toHexString(region.getSize())).append('\n');
         bf.append("Flags: ", SWT.BOLD).append(getFlagsLabel(region.getFlags())).append('\n');
-        bf.append("Offset: ", SWT.BOLD).append(toHexString(region.getOffset())).append('\n');
-        String sectionName = region.getSectionName();
-        bf.append("Section: ", SWT.BOLD).append(sectionName != null ? sectionName : "<unknown>").append('\n');
         return true;
     }
 

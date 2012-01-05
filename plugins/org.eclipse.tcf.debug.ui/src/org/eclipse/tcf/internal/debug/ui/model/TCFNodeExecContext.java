@@ -33,6 +33,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.tcf.internal.debug.model.TCFContextState;
 import org.eclipse.tcf.internal.debug.model.TCFFunctionRef;
 import org.eclipse.tcf.internal.debug.model.TCFSourceRef;
+import org.eclipse.tcf.internal.debug.model.TCFSymFileRef;
 import org.eclipse.tcf.internal.debug.ui.ImageCache;
 import org.eclipse.tcf.protocol.IErrorReport;
 import org.eclipse.tcf.protocol.IToken;
@@ -69,6 +70,7 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
     private final TCFData<TCFNodeExecContext> symbols_node;
     private final TCFData<String> full_name;
 
+    private LinkedHashMap<BigInteger,TCFDataCache<TCFSymFileRef>> syms_info_lookup_cache;
     private LinkedHashMap<BigInteger,TCFDataCache<TCFSourceRef>> line_info_lookup_cache;
     private LinkedHashMap<BigInteger,TCFDataCache<TCFFunctionRef>> func_info_lookup_cache;
     private LookupCacheTimer lookup_cache_timer;
@@ -89,9 +91,17 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
 
         public void run() {
             if (isDisposed()) return;
+            if (syms_info_lookup_cache != null) {
+                BigInteger addr = syms_info_lookup_cache.keySet().iterator().next();
+                TCFDataCache<?> cache = syms_info_lookup_cache.get(addr);
+                if (!cache.isPending()) {
+                    syms_info_lookup_cache.remove(addr).dispose();
+                    if (syms_info_lookup_cache.size() == 0) syms_info_lookup_cache = null;
+                }
+            }
             if (line_info_lookup_cache != null) {
                 BigInteger addr = line_info_lookup_cache.keySet().iterator().next();
-                TCFDataCache<TCFSourceRef> cache = line_info_lookup_cache.get(addr);
+                TCFDataCache<?> cache = line_info_lookup_cache.get(addr);
                 if (!cache.isPending()) {
                     line_info_lookup_cache.remove(addr).dispose();
                     if (line_info_lookup_cache.size() == 0) line_info_lookup_cache = null;
@@ -99,13 +109,13 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
             }
             if (func_info_lookup_cache != null) {
                 BigInteger addr = func_info_lookup_cache.keySet().iterator().next();
-                TCFDataCache<TCFFunctionRef> cache = func_info_lookup_cache.get(addr);
+                TCFDataCache<?> cache = func_info_lookup_cache.get(addr);
                 if (!cache.isPending()) {
                     func_info_lookup_cache.remove(addr).dispose();
                     if (func_info_lookup_cache.size() == 0) func_info_lookup_cache = null;
                 }
             }
-            if (line_info_lookup_cache == null && func_info_lookup_cache == null) {
+            if (syms_info_lookup_cache == null && line_info_lookup_cache == null && func_info_lookup_cache == null) {
                 lookup_cache_timer = null;
             }
             else {
@@ -537,6 +547,49 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
         return signal_mask;
     }
 
+    public TCFDataCache<TCFSymFileRef> getSymFileInfo(final BigInteger addr) {
+        if (isDisposed()) return null;
+        TCFDataCache<TCFSymFileRef> ref_cache;
+        if (syms_info_lookup_cache != null) {
+            ref_cache = syms_info_lookup_cache.get(addr);
+            if (ref_cache != null) return ref_cache;
+        }
+        final ISymbols syms = launch.getService(ISymbols.class);
+        if (syms == null) return null;
+        if (syms_info_lookup_cache == null) {
+            syms_info_lookup_cache = new LinkedHashMap<BigInteger,TCFDataCache<TCFSymFileRef>>(11, 0.75f, true);
+            if (lookup_cache_timer == null) lookup_cache_timer = new LookupCacheTimer();
+        }
+        syms_info_lookup_cache.put(addr, ref_cache = new TCFData<TCFSymFileRef>(channel) {
+            @Override
+            protected boolean startDataRetrieval() {
+                if (!memory_node.validate(this)) return false;
+                IMemory.MemoryContext mem_data = null;
+                TCFNodeExecContext mem = memory_node.getData();
+                if (mem != null) {
+                    TCFDataCache<IMemory.MemoryContext> mem_cache = mem.mem_context;
+                    if (!mem_cache.validate(this)) return false;
+                    mem_data = mem_cache.getData();
+                }
+                final TCFSymFileRef ref_data = new TCFSymFileRef();
+                if (mem_data != null) {
+                    ref_data.context_id = mem_data.getID();
+                    ref_data.address_size = mem_data.getAddressSize();
+                }
+                command = syms.getSymFileInfo(ref_data.context_id, addr, new ISymbols.DoneGetSymFileInfo() {
+                    public void doneGetSymFileInfo(IToken token, Exception error, Map<String,Object> props) {
+                        ref_data.address = addr;
+                        ref_data.error = error;
+                        ref_data.props = props;
+                        set(token, null, ref_data);
+                    }
+                });
+                return false;
+            }
+        });
+        return ref_cache;
+    }
+
     public TCFDataCache<TCFSourceRef> getLineInfo(final BigInteger addr) {
         if (isDisposed()) return null;
         TCFDataCache<TCFSourceRef> ref_cache;
@@ -644,6 +697,16 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
     }
 
     private void clearLookupCaches() {
+        if (syms_info_lookup_cache != null) {
+            Iterator<TCFDataCache<TCFSymFileRef>> i = syms_info_lookup_cache.values().iterator();
+            while (i.hasNext()) {
+                TCFDataCache<TCFSymFileRef> cache = i.next();
+                if (cache.isPending()) continue;
+                cache.dispose();
+                i.remove();
+            }
+            if (syms_info_lookup_cache.size() == 0) syms_info_lookup_cache = null;
+        }
         if (line_info_lookup_cache != null) {
             Iterator<TCFDataCache<TCFSourceRef>> i = line_info_lookup_cache.values().iterator();
             while (i.hasNext()) {
