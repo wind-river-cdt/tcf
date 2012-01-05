@@ -107,6 +107,8 @@ tests/plugins/org.eclipse.tcf.debug.test/bin
 /target_explorer/plugins/org.eclipse.tcf.te.tcf.processes.core/bin
 /target_explorer/plugins/org.eclipse.tcf.te.tcf.processes.ui/target
 /target_explorer/plugins/org.eclipse.tcf.te.tcf.processes.ui/bin
+/target_explorer/plugins/org.eclipse.tcf.te.tcf.services.contexts/target
+/target_explorer/plugins/org.eclipse.tcf.te.tcf.services.contexts/bin
 /target_explorer/plugins/org.eclipse.tcf.te.tcf.terminals.core/target
 /target_explorer/plugins/org.eclipse.tcf.te.tcf.terminals.core/bin
 /target_explorer/plugins/org.eclipse.tcf.te.tcf.terminals.ui/target

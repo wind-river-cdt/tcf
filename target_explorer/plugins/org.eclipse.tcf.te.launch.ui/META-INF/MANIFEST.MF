@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
-Bundle-SymbolicName: org.eclipse.tcf.te.launch.ui
+Bundle-SymbolicName: org.eclipse.tcf.te.launch.ui;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.eclipe.tcf.te.launch.ui.activator.UIPlugin
 Bundle-Vendor: %providerName

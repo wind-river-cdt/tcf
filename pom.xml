@@ -80,6 +80,7 @@
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.log.core</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.processes.core</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.processes.ui</module>
+	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.services.contexts</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.terminals.core</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.terminals.ui</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.tcf.ui</module>

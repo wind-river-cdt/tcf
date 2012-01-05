@@ -86,6 +86,13 @@
          unpack="false"/>
 
    <plugin
+         id="org.eclipse.tcf.te.tcf.services.contexts.source"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
          id="org.eclipse.tcf.te.tcf.terminals.core.source"
          download-size="0"
          install-size="0"
