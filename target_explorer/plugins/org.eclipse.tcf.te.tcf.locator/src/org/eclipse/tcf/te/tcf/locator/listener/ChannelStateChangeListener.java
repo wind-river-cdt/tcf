@@ -55,29 +55,33 @@ public class ChannelStateChangeListener implements IChannelStateChangeListener {
 		switch (state) {
 			case IChannel.STATE_OPEN:
 				IPeer peer = channel.getRemotePeer();
-				// Find the corresponding model node
-				IPeerModel node = model.getService(ILocatorModelLookupService.class).lkupPeerModelById(peer.getID());
-				if (node != null) {
-					// Increase the channel reference counter by 1
-					int counter = node.getIntProperty(IPeerModelProperties.PROP_CHANNEL_REF_COUNTER);
-					if (counter < 0) counter = 0;
-					counter++;
-					node.setProperty(IPeerModelProperties.PROP_CHANNEL_REF_COUNTER, counter);
-					if (counter > 0) node.setProperty(IPeerModelProperties.PROP_STATE, IPeerModelProperties.STATE_CONNECTED);
+				if (peer != null && peer.getID() != null) {
+					// Find the corresponding model node
+					IPeerModel node = model.getService(ILocatorModelLookupService.class).lkupPeerModelById(peer.getID());
+					if (node != null) {
+						// Increase the channel reference counter by 1
+						int counter = node.getIntProperty(IPeerModelProperties.PROP_CHANNEL_REF_COUNTER);
+						if (counter < 0) counter = 0;
+						counter++;
+						node.setProperty(IPeerModelProperties.PROP_CHANNEL_REF_COUNTER, counter);
+						if (counter > 0) node.setProperty(IPeerModelProperties.PROP_STATE, IPeerModelProperties.STATE_CONNECTED);
+					}
 				}
 				break;
 			case IChannel.STATE_CLOSED:
 				peer = channel.getRemotePeer();
-				// Find the corresponding model node
-				node = model.getService(ILocatorModelLookupService.class).lkupPeerModelById(peer.getID());
-				if (node != null) {
-					// Decrease the channel reference counter by 1
-					int counter = node.getIntProperty(IPeerModelProperties.PROP_CHANNEL_REF_COUNTER);
-					counter--;
-					if (counter < 0) counter = 0;
-					node.setProperty(IPeerModelProperties.PROP_CHANNEL_REF_COUNTER, counter);
-					if (counter == 0 && node.isProperty(IPeerModelProperties.PROP_STATE, IPeerModelProperties.STATE_CONNECTED)) {
-						node.setProperty(IPeerModelProperties.PROP_STATE, IPeerModelProperties.STATE_REACHABLE);
+				if (peer != null && peer.getID() != null) {
+					// Find the corresponding model node
+					IPeerModel node = model.getService(ILocatorModelLookupService.class).lkupPeerModelById(peer.getID());
+					if (node != null) {
+						// Decrease the channel reference counter by 1
+						int counter = node.getIntProperty(IPeerModelProperties.PROP_CHANNEL_REF_COUNTER);
+						counter--;
+						if (counter < 0) counter = 0;
+						node.setProperty(IPeerModelProperties.PROP_CHANNEL_REF_COUNTER, counter);
+						if (counter == 0 && node.isProperty(IPeerModelProperties.PROP_STATE, IPeerModelProperties.STATE_CONNECTED)) {
+							node.setProperty(IPeerModelProperties.PROP_STATE, IPeerModelProperties.STATE_REACHABLE);
+						}
 					}
 				}
 				break;
