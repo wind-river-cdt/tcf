@@ -13,16 +13,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.te.runtime.interfaces.IDisposable;
 import org.eclipse.tcf.te.tcf.services.contexts.interfaces.IContexts;
 
 /**
  * Contexts service proxy implementation.
  */
-public class ContextsProxy implements IContexts {
-	// The channel instance the proxy is using
-	/* default */ final IChannel channel;
+public class ContextsProxy implements IContexts, IDisposable {
+	// The peer instance the proxy is associated with
+	/* default */ final IPeer peer;
 
 	// The list of context handler delegates
 	private final List<IContexts.IDelegate> delegates = new ArrayList<IContexts.IDelegate>();
@@ -30,11 +31,11 @@ public class ContextsProxy implements IContexts {
     /**
 	 * Constructor.
 	 *
-	 * @param channel The channel. Must not be <code>null</code>.
+	 * @param peer The peer. Must not be <code>null</code>.
 	 */
-	public ContextsProxy(IChannel channel) {
-		Assert.isNotNull(channel);
-		this.channel = channel;
+	public ContextsProxy(IPeer peer) {
+		Assert.isNotNull(peer);
+		this.peer = peer;
 	}
 
 	/* (non-Javadoc)
@@ -43,6 +44,15 @@ public class ContextsProxy implements IContexts {
 	@Override
     public String getName() {
 		return NAME;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.interfaces.IDisposable#dispose()
+	 */
+	@Override
+	public void dispose() {
+		// Clear out the delegates list
+		delegates.clear();
 	}
 
 	/* (non-Javadoc)

@@ -2,12 +2,13 @@
 <?eclipse version="3.4"?>
 <plugin>
 
-<!-- TCF service provider contributions -->
-   <extension point="org.eclipse.tcf.serviceProviders">
-      <serviceProvider
-            class="org.eclipse.tcf.te.tcf.services.contexts.internal.ServiceProvider"
-            id="org.eclipse.tcf.te.tcf.services.contexts.serviceProvider">
-      </serviceProvider>
+<!-- Adapter factory contributions -->
+   <extension point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.tcf.protocol.IPeer"
+            class="org.eclipse.tcf.te.tcf.services.contexts.internal.AdapterFactory">
+         <adapter type="org.eclipse.tcf.te.tcf.services.contexts.interfaces.IContexts"/>
+      </factory>
    </extension>
 
 </plugin>
