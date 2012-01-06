@@ -60,6 +60,10 @@ public class TransientPeer implements IPeer {
         return ro_attrs.get(ATTR_OS_NAME);
     }
 
+    public String getUserName() {
+        return ro_attrs.get(ATTR_USER_NAME);
+    }
+
     public String getTransportName() {
         return ro_attrs.get(ATTR_TRANSPORT_NAME);
     }

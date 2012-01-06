@@ -50,6 +50,9 @@ public interface IPeer {
         /** Name of the peer operating system */
         ATTR_OS_NAME = "OSName",
 
+        /** Name of a user that created the peer */
+        ATTR_USER_NAME = "UserName",
+
         /** Transport name, for example TCP, SSL */
         ATTR_TRANSPORT_NAME = "TransportName",
 
@@ -98,6 +101,11 @@ public interface IPeer {
      * @return agent OS name, same as getAttributes().get(ATTR_OS_NAME)
      */
     String getOSName();
+
+    /**
+     * @return agent user name, same as getAttributes().get(ATTR_USER_NAME)
+     */
+    String getUserName();
 
     /**
      * @return transport name, same as getAttributes().get(ATTR_TRANSPORT_NAME)

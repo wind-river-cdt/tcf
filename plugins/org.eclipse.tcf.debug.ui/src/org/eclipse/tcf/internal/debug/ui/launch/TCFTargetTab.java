@@ -241,7 +241,7 @@ public class TCFTargetTab extends AbstractLaunchConfigurationTab {
         });
         run_local_agent_button.setEnabled(true);
 
-        use_local_agent_button = createCheckButton(local_agent_comp, "Use local host as a target");
+        use_local_agent_button = createCheckButton(local_agent_comp, "Use local host as the target");
         use_local_agent_button.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent evt) {
@@ -300,7 +300,7 @@ public class TCFTargetTab extends AbstractLaunchConfigurationTab {
         gd.minimumWidth = 470;
         peer_tree.setLayoutData(gd);
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 6; i++) {
             TreeColumn column = new TreeColumn(peer_tree, SWT.LEAD, i);
             column.setMoveable(true);
             switch (i) {
@@ -313,14 +313,18 @@ public class TCFTargetTab extends AbstractLaunchConfigurationTab {
                 column.setWidth(100);
                 break;
             case 2:
+                column.setText("User");
+                column.setWidth(100);
+                break;
+            case 3:
                 column.setText("Transport");
                 column.setWidth(60);
                 break;
-            case 3:
+            case 4:
                 column.setText("Host");
                 column.setWidth(100);
                 break;
-            case 4:
+            case 5:
                 column.setText("Port");
                 column.setWidth(40);
                 break;
@@ -1022,12 +1026,13 @@ public class TCFTargetTab extends AbstractLaunchConfigurationTab {
         Object data = item.getData("TCFPeerInfo");
         if (data != null && data != info) item.removeAll();
         item.setData("TCFPeerInfo", info);
-        String text[] = new String[5];
+        String text[] = new String[6];
         text[0] = info.attrs.get(IPeer.ATTR_NAME);
         text[1] = info.attrs.get(IPeer.ATTR_OS_NAME);
-        text[2] = info.attrs.get(IPeer.ATTR_TRANSPORT_NAME);
-        text[3] = info.attrs.get(IPeer.ATTR_IP_HOST);
-        text[4] = info.attrs.get(IPeer.ATTR_IP_PORT);
+        text[2] = info.attrs.get(IPeer.ATTR_USER_NAME);
+        text[3] = info.attrs.get(IPeer.ATTR_TRANSPORT_NAME);
+        text[4] = info.attrs.get(IPeer.ATTR_IP_HOST);
+        text[5] = info.attrs.get(IPeer.ATTR_IP_PORT);
         for (int i = 0; i < text.length; i++) {
             if (text[i] == null) text[i] = "";
         }
