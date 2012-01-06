@@ -12,6 +12,7 @@ Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: org.eclipse.tcf.te.ui.jface.dialogs,
  org.eclipse.tcf.te.ui.jface.images,
+ org.eclipse.tcf.te.ui.jface.interfaces,
  org.eclipse.tcf.te.ui.swt,
  org.eclipse.tcf.te.ui.swt.activator;x-internal:=true,
  org.eclipse.tcf.te.ui.swt.listener,

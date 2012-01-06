@@ -15,7 +15,7 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.tcf.te.tcf.ui.controls.TransportTypePanelControl;
 import org.eclipse.tcf.te.tcf.ui.editor.sections.TransportSection;
 import org.eclipse.tcf.te.ui.controls.interfaces.IWizardConfigurationPanel;
-import org.eclipse.tcf.te.ui.wizards.interfaces.IValidatableWizardPage;
+import org.eclipse.tcf.te.ui.jface.interfaces.IValidatingContainer;
 
 /**
  * Transport section transport type panel control implementation.
@@ -62,12 +62,13 @@ public class TransportSectionTypePanelControl extends TransportTypePanelControl 
 		return valid;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.controls.BaseDialogPageControl#getValidatableWizardPage()
-	 */
-	@Override
-	public IValidatableWizardPage getValidatableWizardPage() {
-		return transportSection;
+    /* (non-Javadoc)
+     * @see org.eclipse.tcf.te.ui.controls.BaseDialogPageControl#getValidatingContainer()
+     */
+    @Override
+    public IValidatingContainer getValidatingContainer() {
+		Object container = transportSection.getManagedForm().getContainer();
+		return container instanceof IValidatingContainer ? (IValidatingContainer)container : null;
 	}
 
 	/* (non-Javadoc)

@@ -16,7 +16,7 @@ import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 /**
  * An abstract shared data wizard page implementation.
  */
-public abstract class AbstractSharedDataWizardPage extends AbstractValidatableWizardPage implements ISharedDataWizardPage {
+public abstract class AbstractSharedDataWizardPage extends AbstractValidatingWizardPage implements ISharedDataWizardPage {
 
 	/**
 	 * Constructor.

@@ -27,9 +27,9 @@ import org.eclipse.tcf.te.ui.controls.BaseEditBrowseTextControl;
 import org.eclipse.tcf.te.ui.controls.panels.AbstractWizardConfigurationPanel;
 import org.eclipse.tcf.te.ui.controls.validator.RegexValidator;
 import org.eclipse.tcf.te.ui.controls.validator.Validator;
+import org.eclipse.tcf.te.ui.jface.interfaces.IValidatingContainer;
 import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
 import org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataWizardPage;
-import org.eclipse.tcf.te.ui.wizards.interfaces.IValidatableWizardPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
@@ -77,12 +77,12 @@ public class CustomTransportPanel extends AbstractWizardConfigurationPanel imple
         	}
         }
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.tcf.te.ui.controls.BaseDialogPageControl#getValidatableWizardPage()
-		 */
-		@Override
-		public IValidatableWizardPage getValidatableWizardPage() {
-			return CustomTransportPanel.this.getParentControl().getValidatableWizardPage();
+        /* (non-Javadoc)
+         * @see org.eclipse.tcf.te.ui.controls.BaseDialogPageControl#getValidatingContainer()
+         */
+        @Override
+        public IValidatingContainer getValidatingContainer() {
+			return CustomTransportPanel.this.getParentControl().getValidatingContainer();
 		}
 
 		/* (non-Javadoc)

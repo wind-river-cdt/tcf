@@ -297,7 +297,7 @@
             class="org.eclipse.tcf.te.tcf.processes.ui.internal.filters.SingleThreadFilter"
             id="org.eclipse.tcf.te.tcf.processes.ui.navigator.filter.singleThread"
             name="Single Thread Filter"
-            visibleInUI="true">
+            visibleInUI="false">
       </commonFilter>
    </extension>
    <extension

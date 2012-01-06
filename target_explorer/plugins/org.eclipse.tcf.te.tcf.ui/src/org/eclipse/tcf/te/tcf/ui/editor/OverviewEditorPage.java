@@ -12,6 +12,7 @@ package org.eclipse.tcf.te.tcf.ui.editor;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -25,18 +26,19 @@ import org.eclipse.tcf.te.tcf.ui.internal.ImageConsts;
 import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.forms.CustomFormToolkit;
 import org.eclipse.tcf.te.ui.forms.FormLayoutFactory;
+import org.eclipse.tcf.te.ui.jface.interfaces.IValidatingContainer;
 import org.eclipse.tcf.te.ui.views.editor.AbstractCustomFormToolkitEditorPage;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.ui.forms.events.HyperlinkAdapter;
+import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
 
 /**
  * Peer overview page implementation.
  */
-public class OverviewEditorPage extends AbstractCustomFormToolkitEditorPage {
+public class OverviewEditorPage extends AbstractCustomFormToolkitEditorPage implements IValidatingContainer {
 	// References to the page sub sections
 	private GeneralInformationSection infoSection;
 	private TransportSection transportSection;
@@ -92,9 +94,6 @@ public class OverviewEditorPage extends AbstractCustomFormToolkitEditorPage {
 		// And set the header text and image
 		managedForm.getForm().getForm().setText(getFormTitle());
 		managedForm.getForm().getForm().setImage(UIPlugin.getImage(ImageConsts.PEER));
-
-		// Add a hyper link adapter
-		managedForm.getForm().getForm().addMessageHyperlinkListener(new HyperlinkAdapter());
 
 		// Add the toolbar items which will appear in the form header
 		IToolBarManager manager = managedForm.getForm().getForm().getToolBarManager();
@@ -169,5 +168,52 @@ public class OverviewEditorPage extends AbstractCustomFormToolkitEditorPage {
 	    if (transportSection != null) transportSection.setActive(active);
 	    if (servicesSection != null) servicesSection.setActive(active);
 	    if (attributesSection != null) attributesSection.setActive(active);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.jface.interfaces.IValidatingContainer#validate()
+	 */
+	@Override
+	public void validate() {
+		// Get the scrolled form
+		ScrolledForm form = getManagedForm().getForm();
+
+		String message = null;
+		int messageType = IMessageProvider.NONE;
+
+		if (infoSection != null) {
+			infoSection.isValid();
+			if (infoSection.getMessageType() > messageType) {
+				message = infoSection.getMessage();
+				messageType = infoSection.getMessageType();
+			}
+		}
+
+		if (transportSection != null) {
+			transportSection.isValid();
+			if (transportSection.getMessageType() > messageType) {
+				message = transportSection.getMessage();
+				messageType = transportSection.getMessageType();
+			}
+		}
+
+		if (servicesSection != null) {
+			servicesSection.isValid();
+			if (servicesSection.getMessageType() > messageType) {
+				message = servicesSection.getMessage();
+				messageType = servicesSection.getMessageType();
+			}
+		}
+
+		if (attributesSection != null) {
+			attributesSection.isValid();
+			if (attributesSection.getMessageType() > messageType) {
+				message = attributesSection.getMessage();
+				messageType = attributesSection.getMessageType();
+			}
+		}
+
+		// Apply the message to the form
+		form.setMessage(message, messageType);
 	}
 }

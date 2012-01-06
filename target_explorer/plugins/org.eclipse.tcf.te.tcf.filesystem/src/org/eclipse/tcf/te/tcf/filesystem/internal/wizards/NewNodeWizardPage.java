@@ -39,7 +39,7 @@ import org.eclipse.tcf.te.ui.controls.BaseEditBrowseTextControl;
 import org.eclipse.tcf.te.ui.forms.FormLayoutFactory;
 import org.eclipse.tcf.te.ui.trees.FilterDescriptor;
 import org.eclipse.tcf.te.ui.trees.ViewerStateManager;
-import org.eclipse.tcf.te.ui.wizards.pages.AbstractValidatableWizardPage;
+import org.eclipse.tcf.te.ui.wizards.pages.AbstractValidatingWizardPage;
 import org.eclipse.ui.IDecoratorManager;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
@@ -48,7 +48,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 /**
  * The base wizard page class to create a new file/folder in the file system of Target Explorer.
  */
-public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
+public abstract class NewNodeWizardPage extends AbstractValidatingWizardPage {
 	// The form toolkit to create the content of the wizard page.
 	private FormToolkit toolkit;
 	// The control for the user to enter the new name.
@@ -60,7 +60,7 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 
 	/**
 	 * Create an instance page with the specified page name.
-	 * 
+	 *
 	 * @param pageName The page name.
 	 */
 	public NewNodeWizardPage(String pageName) {
@@ -69,21 +69,21 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 
 	/**
 	 * Get the page's title.
-	 * 
+	 *
 	 * @return The page's title.
 	 */
 	protected abstract String getPageTitle();
 
 	/**
 	 * Get the page's description.
-	 * 
+	 *
 	 * @return The page's description.
 	 */
 	protected abstract String getPageDescription();
 
 	/**
 	 * Get the label of the text field to enter the new name.
-	 * 
+	 *
 	 * @return The label of the text field to enter the new name.
 	 */
 	protected abstract String getNameFieldLabel();
@@ -126,10 +126,10 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 		// Validate the page for the first time
 		setPageComplete(false);
 	}
-	
+
 	/**
 	 * Create the main panel of this wizard page.
-	 * 
+	 *
 	 * @param parent The parent composite in which the page is created.
 	 */
 	private void createMainPanelControls(Composite parent) {
@@ -212,10 +212,10 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 		// restore the widget values from the history
 		restoreWidgetValues();
 	}
-	
+
 	/**
 	 * Set the input of the tree viewer and apply the appropriate filters.
-	 * 
+	 *
 	 * @param input The tree viewer's input.
 	 */
     private void setInput(Object input) {
@@ -227,10 +227,10 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 			}
 		}
 	}
-    
+
 	/**
 	 * Create a decorating label provider using the specified label provider.
-	 * 
+	 *
 	 * @param labelProvider The label provider that actually provides labels and images.
 	 * @return The decorating label provider.
 	 */
@@ -263,14 +263,14 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 			container.updateTitleBar();
 			container.updateButtons();
 		}
-		validatePage();
+		validate();
 	}
 
 	/**
 	 * Set a new peer as the input of the file tree. Called
 	 * by the wizard to update the file tree when an alternative
 	 * target peer is selected in the target selection page.
-	 * 
+	 *
 	 * @param peer The new target peer.
 	 */
 	public void setPeer(IPeerModel peer) {
@@ -279,13 +279,12 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.controls.wizards.pages.AbstractValidatableWizardPage#validatePage()
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.wizards.pages.AbstractValidatingWizardPage#validate()
 	 */
 	@Override
-	public void validatePage() {
-		super.validatePage();
+	public void validate() {
+		super.validate();
 		if (!isPageComplete()) return;
 
 		if (isValidationInProgress()) return;
@@ -323,7 +322,7 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 
 	/**
 	 * Get the entered name of this node.
-	 * 
+	 *
 	 * @return The entered name of this node.
 	 */
 	public String getNodeName() {
@@ -341,10 +340,10 @@ public abstract class NewNodeWizardPage extends AbstractValidatableWizardPage {
 
 	/**
 	 * Get the currently input directory node. It parses
-	 * the currently entered path and tries to find the 
+	 * the currently entered path and tries to find the
 	 * corresponding directory node in the file system of
 	 * the target peer.
-	 * 
+	 *
 	 * @return The directory node if it exists or else null.
 	 */
 	public FSTreeNode getInputDir() {
