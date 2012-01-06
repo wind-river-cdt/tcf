@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+<!-- TCF service provider contributions -->
+   <extension point="org.eclipse.tcf.serviceProviders">
+      <serviceProvider
+            class="org.eclipse.tcf.te.tcf.services.contexts.internal.ServiceProvider"
+            id="org.eclipse.tcf.te.tcf.services.contexts.serviceProvider">
+      </serviceProvider>
+   </extension>
+
+</plugin>
