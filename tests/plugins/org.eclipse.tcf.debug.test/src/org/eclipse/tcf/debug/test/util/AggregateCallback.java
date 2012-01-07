@@ -100,7 +100,7 @@ public class AggregateCallback extends Callback {
     @Override
     public synchronized void setError(Throwable error) {
         if ((getError() == null)) {
-            setError(new AggregateError("") {
+            super.setError(new AggregateError("") {
                 private static final long serialVersionUID = 1L;
 
                 @Override

@@ -21,6 +21,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.debug.internal.ui.viewers.model.ITreeModelViewer;
 import org.eclipse.debug.internal.ui.viewers.model.InternalTreeModelViewer;
+import org.eclipse.debug.internal.ui.viewers.model.InternalVirtualTreeModelViewer;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IChildrenCountUpdate;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IChildrenUpdate;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IModelDelta;
@@ -426,7 +427,11 @@ public class TCFModelProxy extends AbstractModelProxy implements IModelProxy, Ru
                 asyncExec(new Runnable() {
                     boolean found;
                     public void run() {
-                        found = ((InternalTreeModelViewer)getViewer()).findElementIndex(TreePath.EMPTY, launch) >= 0;
+                        if (getViewer() instanceof InternalTreeModelViewer) { 
+                            found = ((InternalTreeModelViewer)getViewer()).findElementIndex(TreePath.EMPTY, launch) >= 0;
+                        } else if (getViewer() instanceof InternalVirtualTreeModelViewer) {
+                            found = ((InternalVirtualTreeModelViewer)getViewer()).findElementIndex(TreePath.EMPTY, launch) >= 0;
+                        }
                         Protocol.invokeLater(new Runnable() {
                             public void run() {
                                 if (disposed) return;

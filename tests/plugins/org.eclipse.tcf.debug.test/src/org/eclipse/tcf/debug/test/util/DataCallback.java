@@ -46,6 +46,11 @@ public class DataCallback<V> extends Callback {
      */
     public synchronized V getData() { return fData; }
     
+    public void done(V data, Throwable error) {
+        setData(data);
+        done(error);
+    }
+    
     @Override
     public String toString() { 
         if (getData() != null) {

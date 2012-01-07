@@ -251,6 +251,11 @@ public class Callback {
         }
     }
 
+    public void done(Throwable error) {
+        setError(error);
+        done();
+    }
+    
     /**
      * Marks this request as completed.  Once this method is called, the
      * monitor submits a runnable to the DSF Executor to call the 
@@ -261,6 +266,8 @@ public class Callback {
      * </p>  
      */
     public synchronized void done() {
+        assert Protocol.getEventQueue().isDispatchThread();
+        
         if (fDone) {
             throw new IllegalStateException("Callback: " + this + ", done() method called more than once");  //$NON-NLS-1$//$NON-NLS-2$
         }
@@ -276,19 +283,7 @@ public class Callback {
             fParentCallback.removeCancelListener(fCanceledListener);
         }
         
-        try {
-            Protocol.invokeLater(new Runnable() {
-                public void run() {
-                    Callback.this.handleCompleted();
-                }
-                @Override
-                public String toString() {
-                    return "Completed: " + Callback.this.toString(); //$NON-NLS-1$
-                }
-            });
-        } catch (IllegalStateException e) {
-            handleEventQueueShutDown(e);
-        }
+        handleCompleted();
     }
 
     @Override
@@ -402,23 +397,6 @@ public class Callback {
                 fParentCallback.setError(getError());
             }
             fParentCallback.done();
-        }
-    }
-    
-    /**
-     * Default handler for when the executor supplied in the constructor 
-     * rejects the runnable that is submitted invoke this request monitor.
-     * This usually happens only when the executor is shutting down.
-     * <p>
-     * The default handler creates a new error status for the rejected 
-     * execution and propagates it to the client or logs it.
-     */
-    protected void handleEventQueueShutDown(IllegalStateException e) {
-        if (fParentCallback != null) {
-            fParentCallback.setError(e);
-            fParentCallback.done();
-        } else {
-            Protocol.log("In callback " + toString() + ", unhandled event queue shut down.", e);
         }
     }
 }

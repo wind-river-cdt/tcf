@@ -412,7 +412,7 @@ public class ViewerUpdatesListener
         fLabelUpdatesRunning.remove(update);
         fLabelUpdatesCompleted.add(update);
     	fLabelUpdatesCounter--;
-        if (!fLabelUpdates.remove(update.getElementPath()) && fFailOnRedundantUpdates) {
+        if (!update.isCanceled() && !fLabelUpdates.remove(update.getElementPath()) && fFailOnRedundantUpdates) {
             fRedundantUpdates.add(update);
         }
         notifyAll();
@@ -443,7 +443,7 @@ public class ViewerUpdatesListener
         if (!fModelProxyInstalled) {
             delta.accept(new IModelDeltaVisitor() {
                 public boolean visit(IModelDelta delta, int depth) {
-                    if ((delta.getFlags() & IModelDelta.EXPAND) != 0) {
+                    if ((delta.getFlags() & IModelDelta.INSTALL) != 0) {
                         fModelProxyInstalled = true;
                         return false;
                     }

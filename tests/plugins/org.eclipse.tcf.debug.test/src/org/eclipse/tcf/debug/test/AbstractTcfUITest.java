@@ -9,10 +9,10 @@ import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Pattern;
 
 import junit.framework.TestCase;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
@@ -23,25 +23,33 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.ILaunchesListener2;
 import org.eclipse.debug.core.model.IDisconnect;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.PresentationContext;
+import org.eclipse.debug.internal.ui.viewers.model.provisional.VirtualItem;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.VirtualTreeModelViewer;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.core.TransientPeer;
+import org.eclipse.tcf.debug.test.services.BreakpointsCM;
+import org.eclipse.tcf.debug.test.services.DiagnosticsCM;
+import org.eclipse.tcf.debug.test.services.RunControlCM;
+import org.eclipse.tcf.debug.test.services.RunControlCM.ContextState;
+import org.eclipse.tcf.debug.test.services.StackTraceCM;
+import org.eclipse.tcf.debug.test.services.SymbolsCM;
 import org.eclipse.tcf.debug.test.util.AggregateCallback;
 import org.eclipse.tcf.debug.test.util.Callback;
+import org.eclipse.tcf.debug.test.util.Callback.ICanceledListener;
 import org.eclipse.tcf.debug.test.util.DataCallback;
+import org.eclipse.tcf.debug.test.util.ICache;
 import org.eclipse.tcf.debug.test.util.Query;
 import org.eclipse.tcf.debug.test.util.Task;
-import org.eclipse.tcf.debug.test.util.Callback.ICanceledListener;
+import org.eclipse.tcf.debug.test.util.Transaction;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
-import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IBreakpoints;
 import org.eclipse.tcf.services.IDiagnostics;
-import org.eclipse.tcf.services.IDiagnostics.ISymbol;
 import org.eclipse.tcf.services.IExpressions;
+import org.eclipse.tcf.services.IMemoryMap;
 import org.eclipse.tcf.services.IRunControl;
 import org.eclipse.tcf.services.IRunControl.RunControlContext;
 import org.eclipse.tcf.services.IStackTrace;
@@ -56,6 +64,7 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
 
     private final static int NUM_CHANNELS = 1;
 
+    
     protected IChannel[] channels;
     
     private Query<Object> fMonitorChannelQuery;
@@ -71,15 +80,21 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
     protected VariablesVirtualTreeModelViewer fRegistersViewViewer;
     protected VirtualViewerUpdatesListener fRegistersViewListener;
 
+    protected Object fTestRunKey;
+    
     protected IDiagnostics diag;
     protected IExpressions expr;
     protected ISymbols syms;
     protected IStackTrace stk;
     protected IRunControl rc;
     protected IBreakpoints bp;
+    protected IMemoryMap fMemoryMap;
 
-    protected TestRunControlListener fRcListener;
-
+    protected RunControlCM fRunControlCM;
+    protected DiagnosticsCM fDiagnosticsCM;
+    protected BreakpointsCM fBreakpointsCM;
+    protected StackTraceCM fStackTraceCM;
+    protected SymbolsCM fSymbolsCM;
     
     private static class RemotePeer extends TransientPeer {
         private final ArrayList<Map<String,String>> attrs;
@@ -122,7 +137,9 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
     }
 
     protected void setUp() throws Exception {
-
+        
+        fTestRunKey = new Object();
+        
         createDebugViewViewer();
         createLaunch();
         
@@ -168,8 +185,6 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
         
         getRemoteServices();
         
-        validateTestAvailable();
-        
         new Task<Object>() {
             @Override
             public Object call() throws Exception {
@@ -177,6 +192,8 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
                 return null;
             }
         }.get();
+        
+        validateTestAvailable();
     }
 
     @Override
@@ -198,9 +215,6 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
                 closeChannels(callback);
             }
         }.get();
-
-        // Check for listener errors at the end of tearDown.
-        fRcListener.checkError();
     }
 
     protected String getDiagnosticsTestName() {
@@ -208,11 +222,19 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
     }
 
     protected void setUpServiceListeners() throws Exception{
-        fRcListener = new TestRunControlListener(rc);        
+        fRunControlCM = new RunControlCM(rc);
+        fDiagnosticsCM = new DiagnosticsCM(diag);
+        fBreakpointsCM = new BreakpointsCM(bp);
+        fStackTraceCM = new StackTraceCM(stk, rc);
+        fSymbolsCM = new SymbolsCM(syms, fRunControlCM, fMemoryMap);
     }
     
     protected void tearDownServiceListeners() throws Exception{
-        fRcListener.dispose();
+        fSymbolsCM.dispose();
+        fBreakpointsCM.dispose();
+        fStackTraceCM.dispose();
+        fRunControlCM.dispose();
+        fDiagnosticsCM.dispose();
     }
     
     private void createDebugViewViewer() {
@@ -248,13 +270,19 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
         
     }
     
-    private void createLaunch() throws CoreException {
+    private void createLaunch() throws Exception {
         ILaunchManager lManager = DebugPlugin.getDefault().getLaunchManager();
         ILaunchConfigurationType lcType = lManager.getLaunchConfigurationType("org.eclipse.tcf.debug.LaunchConfigurationType");
         ILaunchConfigurationWorkingCopy lcWc = lcType.newInstance(null, "test");
         lcWc.doSave();
+        fDebugViewListener.reset();
+        fDebugViewListener.setDelayContentUntilProxyInstall(true);
         fLaunch = lcWc.launch("debug", new NullProgressMonitor());
+        fDebugViewListener.waitTillFinished(MODEL_CHANGED_COMPLETE | MODEL_PROXIES_INSTALLED | CONTENT_SEQUENCE_COMPLETE | LABEL_UPDATES_RUNNING);
         Assert.assertTrue( fLaunch instanceof IDisconnect ); 
+        
+        VirtualItem launchItem = fDebugViewListener.findElement(new Pattern[] { Pattern.compile(".*" + fLaunch.getLaunchConfiguration().getName() + ".*") }  );
+        Assert.assertTrue( launchItem != null && fLaunch.equals(launchItem.getData()) );
     }
     
     private void terminateLaunch() throws DebugException, InterruptedException, ExecutionException {
@@ -299,6 +327,7 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
                 stk = channels[0].getRemoteService(IStackTrace.class);
                 rc = channels[0].getRemoteService(IRunControl.class);
                 bp = channels[0].getRemoteService(IBreakpoints.class);
+                fMemoryMap = channels[0].getRemoteService(IMemoryMap.class);
             };
         });
     }
@@ -430,7 +459,11 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
     }
     
     private void validateTestAvailable() throws ExecutionException, InterruptedException {
-        String[] testList = getDiagnosticsTestList();
+        String[] testList = new Transaction<String[]>() {
+            protected String[] process() throws InvalidCacheException ,ExecutionException {
+                return validate( fDiagnosticsCM.getTestList() );
+            }
+        }.get();
         
         int i = 0;
         for (; i < testList.length; i++) {
@@ -440,166 +473,16 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
         Assert.assertTrue("Required test not supported", i != testList.length);
     }
     
-    protected String[] getDiagnosticsTestList() throws ExecutionException, InterruptedException {
-        assert !Protocol.isDispatchThread();
-        return new Query<String[]>() {
+    protected ContextState resumeAndWaitForSuspend(final RunControlContext context, final int mode) throws InterruptedException, ExecutionException {
+        return new Transaction<ContextState>() {
             @Override
-            protected void execute(final DataCallback<String[]> callback) {
-                diag.getTestList(new IDiagnostics.DoneGetTestList() {
-                    public void doneGetTestList(IToken token, Throwable error, String[] list) {
-                        callback.setData(list);
-                        callback.setError(error);
-                        callback.done();
-                    }
-                });
-                
+            protected ContextState process() throws InvalidCacheException, ExecutionException {
+                ICache<Object> waitCache = fRunControlCM.waitForContextSuspended(context.getID(), this);
+                validate( fRunControlCM.resume(context, this, mode, 1) );
+                validate(waitCache);
+                return validate( fRunControlCM.getState(context.getID()) );
             }
         }.get();
     }
     
-    protected void setBreakpoint(final String bp_id, final String location) throws InterruptedException, ExecutionException {
-        new Query<Object> () {
-            protected void execute(final DataCallback<Object> callback) {
-                Map<String,Object> m = new HashMap<String,Object>();
-                m.put(IBreakpoints.PROP_ID, bp_id);
-                m.put(IBreakpoints.PROP_ENABLED, Boolean.TRUE);
-                m.put(IBreakpoints.PROP_LOCATION, location);
-                bp.set(new Map[]{ m }, new IBreakpoints.DoneCommand() {
-                    public void doneCommand(IToken token, Exception error) {
-                        callback.setError(error);
-                        callback.done();
-                    }
-                });
-            }
-        }.get();
-    }
-    
-    protected String startDiagnosticsTest() throws InterruptedException, ExecutionException {
-        return new Query<String> () {
-            protected void execute(final DataCallback<String> callback) {
-                diag.runTest(getDiagnosticsTestName(), new IDiagnostics.DoneRunTest() {
-                    public void doneRunTest(IToken token, Throwable error, String id) {
-                        callback.setData(id);
-                        callback.setError(error);
-                        callback.done();
-                    }
-                });
-            }
-        }.get();
-    }
-    
-    protected RunControlContext getRunControlContext(final String contextId) throws InterruptedException, ExecutionException {
-        return new Query<RunControlContext> () {
-            @Override
-            protected void execute(final DataCallback<RunControlContext> callback) {
-                rc.getContext(contextId, new IRunControl.DoneGetContext() {
-                    public void doneGetContext(IToken token, Exception error, IRunControl.RunControlContext ctx) {
-                        callback.setData(ctx);
-                        callback.setError(error);
-                        callback.done();
-                    }
-                });
-            }
-        }.get();
-    }
-    
-    protected String getProcessIdFromRunControlContext(final RunControlContext rcContext) throws InterruptedException, ExecutionException {
-        return new Task<String>() {
-            @Override
-            public String call() throws Exception {
-                return rcContext.getProcessID();
-            }
-        }.get();
-    }
-    
-    protected String getSingleThreadIdFromProcess(final String processId) throws InterruptedException, ExecutionException {
-        return new Query<String> () {
-            protected void execute(final DataCallback<String> callback) {
-                rc.getChildren(processId, new IRunControl.DoneGetChildren() {
-                    public void doneGetChildren(IToken token, Exception error, String[] ids) {
-                        if (error != null) {
-                            callback.setError(error);
-                        }
-                        else if (ids == null || ids.length == 0) {
-                            callback.setError(new Exception("Test process has no threads"));
-                        }
-                        else if (ids.length != 1) {
-                            callback.setError(new Exception("Test process has too many threads"));
-                        }
-                        else {
-                            callback.setData(ids[0]);
-                        }
-                        callback.done();
-                    }
-                });
-            }
-        }.get();
-    }
-
-    protected boolean getRunControlContextHasState(final RunControlContext rcContext) throws InterruptedException, ExecutionException {
-        return new Task<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                return rcContext.hasState();
-            }
-        }.get();
-    }
-
-    protected ISymbol getDiagnosticsSymbol(final String processId, final String testFunction) throws InterruptedException, ExecutionException {
-        return new Query<ISymbol>() {
-            @Override
-            protected void execute(final DataCallback<ISymbol> callback) {
-                diag.getSymbol(processId, testFunction, new IDiagnostics.DoneGetSymbol() {
-                    public void doneGetSymbol(IToken token, Throwable error, IDiagnostics.ISymbol symbol) {
-                        if (error != null) {
-                            callback.setError(error);
-                        }
-                        else if (symbol == null) {
-                            callback.setError(new Exception("Symbol must not be null: tcf_test_func3"));
-                        }
-                        else {
-                            callback.setData(symbol);
-                        }
-                        callback.done();
-                    }
-                });                
-            }
-        }.get();
-    }
-    
-    protected Number getSymbolValue(final ISymbol symbol) throws InterruptedException, ExecutionException {
-        return new Task<Number>() {
-            @Override
-            public Number call() throws Exception {
-                return symbol.getValue();
-            }
-        }.get();        
-    }
-
-    protected void resumeContext(final RunControlContext rcContext, final int mode) throws InterruptedException, ExecutionException {
-        new Query<Object>() {
-            @Override
-            protected void execute(final DataCallback<Object> callback) {
-                rcContext.resume(mode, 1, new IRunControl.DoneCommand() {
-                    public void doneCommand(IToken token, Exception error) {
-                        callback.setError(error);
-                        callback.done();
-                    }
-                });
-            }
-        }.get();
-    }
-
-    protected void resumeAndWaitForSuspend(final RunControlContext rcContext, final int mode) throws InterruptedException, ExecutionException {
-        Query<String> suspendQuery = new Query<String> () {
-            @Override
-            protected void execute(DataCallback<String> callback) {
-                fRcListener.addWaitingForSuspend(rcContext.getID(), callback);
-            }
-        };
-        suspendQuery.invoke();
-        resumeContext(rcContext, mode);
-        suspendQuery.get();
-    }
-
 }

@@ -55,7 +55,7 @@ public class VariablesVirtualTreeModelViewer extends VirtualTreeModelViewer impl
         if (fActive) {
             setActiveContext(fDebugContextProvider.getActiveContext());
         } else {
-            fInputService.resolveViewerInput(TestViewerInputService.NULL_INPUT);
+            fInputService.resolveViewerInput(ViewerInputService.NULL_INPUT);
         }
     }
     
