@@ -7,12 +7,14 @@ Bundle-Activator: org.eclipse.tcf.te.tcf.core.activator.CoreBundleActivator
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime;bundle-version="3.7.0",
  org.eclipse.tcf.core;bundle-version="1.0.0",
- org.eclipse.tcf.te.runtime;bundle-version="1.0.0"
+ org.eclipse.tcf.te.runtime;bundle-version="1.0.0",
+ org.eclipse.tcf.te.core;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: org.eclipse.tcf.te.tcf.core,
  org.eclipse.tcf.te.tcf.core.activator;x-internal:=true,
+ org.eclipse.tcf.te.tcf.core.async,
  org.eclipse.tcf.te.tcf.core.concurrent,
  org.eclipse.tcf.te.tcf.core.concurrent.interfaces,
  org.eclipse.tcf.te.tcf.core.concurrent.internal;x-internal:=true,
