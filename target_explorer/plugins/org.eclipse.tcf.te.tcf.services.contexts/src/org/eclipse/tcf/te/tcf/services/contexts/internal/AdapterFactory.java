@@ -19,17 +19,17 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.listener.ModelAdapter;
 import org.eclipse.tcf.te.tcf.locator.model.Model;
-import org.eclipse.tcf.te.tcf.services.contexts.interfaces.IContexts;
+import org.eclipse.tcf.te.tcf.services.contexts.interfaces.IContextService;
 
 /**
- * Contexts service adapter factory implementation.
+ * Context service adapter factory implementation.
  */
 public class AdapterFactory implements IAdapterFactory {
-	// Maintain a map of contexts service proxy per peer
-	/* default */ Map<IPeer, IContexts> proxies = new HashMap<IPeer, IContexts>();
+	// Maintain a map of contexts service adapters per peer
+	/* default */ Map<IPeer, IContextService> adapters = new HashMap<IPeer, IContextService>();
 
 	private static final Class<?>[] CLASSES = new Class[] {
-		IContexts.class
+		IContextService.class
 	};
 
 	/**
@@ -44,8 +44,8 @@ public class AdapterFactory implements IAdapterFactory {
     		public void locatorModelChanged(ILocatorModel model, IPeerModel peer, boolean added) {
     			// If a peer gets removed, remove the context service proxy
     			if (peer != null && peer.getPeer() != null) {
-    				IContexts proxy = proxies.remove(peer.getPeer());
-    				if (proxy instanceof IDisposable) ((IDisposable)proxy).dispose();
+    				IContextService adapter = adapters.remove(peer.getPeer());
+    				if (adapter instanceof IDisposable) ((IDisposable)adapter).dispose();
     			}
     		}
     	});
@@ -57,14 +57,14 @@ public class AdapterFactory implements IAdapterFactory {
 	@Override
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if (adaptableObject instanceof IPeer) {
-			// Lookup the proxy
-			IContexts proxy = proxies.get(adaptableObject);
-			// No proxy yet -> create a new one for this peer
-			if (proxy == null) {
-				proxy = new ContextsProxy((IPeer)adaptableObject);
-				proxies.put((IPeer)adaptableObject, proxy);
+			// Lookup the adapter
+			IContextService adapter = adapters.get(adaptableObject);
+			// No adapter yet -> create a new one for this peer
+			if (adapter == null) {
+				adapter = new ContextServiceAdapter((IPeer)adaptableObject);
+				adapters.put((IPeer)adaptableObject, adapter);
 			}
-			return proxy;
+			return adapter;
 		}
 		return null;
 	}

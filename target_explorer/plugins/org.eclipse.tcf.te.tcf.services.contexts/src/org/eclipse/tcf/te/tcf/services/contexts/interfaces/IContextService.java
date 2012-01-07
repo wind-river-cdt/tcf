@@ -9,17 +9,11 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.services.contexts.interfaces;
 
-import org.eclipse.tcf.protocol.IService;
 
 /**
- * TCF contexts service.
+ * Context service.
  */
-public interface IContexts extends IService {
-
-	/**
-	 * The service name.
-	 */
-	public static final String NAME = "Contexts"; //$NON-NLS-1$
+public interface IContextService {
 
 	/**
 	 * Context handler delegate.
@@ -62,7 +56,7 @@ public interface IContexts extends IService {
 	         *
 	         * @param error The error description if the operation failed, <code>null</code> if succeeded.
 	         */
-	        void doneMakeAvailable(Exception error);
+	        void doneMakeAvailable(Throwable error);
 	    }
 
 		/**

@@ -16,34 +16,26 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.runtime.interfaces.IDisposable;
-import org.eclipse.tcf.te.tcf.services.contexts.interfaces.IContexts;
+import org.eclipse.tcf.te.tcf.services.contexts.interfaces.IContextService;
 
 /**
- * Contexts service proxy implementation.
+ * Context service adapter implementation.
  */
-public class ContextsProxy implements IContexts, IDisposable {
+public class ContextServiceAdapter implements IContextService, IDisposable {
 	// The peer instance the proxy is associated with
 	/* default */ final IPeer peer;
 
 	// The list of context handler delegates
-	private final List<IContexts.IDelegate> delegates = new ArrayList<IContexts.IDelegate>();
+	private final List<IContextService.IDelegate> delegates = new ArrayList<IContextService.IDelegate>();
 
     /**
 	 * Constructor.
 	 *
 	 * @param peer The peer. Must not be <code>null</code>.
 	 */
-	public ContextsProxy(IPeer peer) {
+	public ContextServiceAdapter(IPeer peer) {
 		Assert.isNotNull(peer);
 		this.peer = peer;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.protocol.IService#getName()
-	 */
-	@Override
-    public String getName() {
-		return NAME;
 	}
 
 	/* (non-Javadoc)
@@ -56,7 +48,7 @@ public class ContextsProxy implements IContexts, IDisposable {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.services.contexts.interfaces.IContexts#getDelegate(java.lang.String)
+	 * @see org.eclipse.tcf.te.tcf.services.contexts.interfaces.IContextService#getDelegate(java.lang.String)
 	 */
 	@Override
 	public IDelegate getDelegate(String contextID) {
@@ -64,8 +56,8 @@ public class ContextsProxy implements IContexts, IDisposable {
 		Assert.isNotNull(contextID);
 
 		// Make a snapshot of the registered delegates
-		IContexts.IDelegate[] candidates = delegates.toArray(new IContexts.IDelegate[delegates.size()]);
-		for (IContexts.IDelegate candidate : candidates) {
+		IContextService.IDelegate[] candidates = delegates.toArray(new IContextService.IDelegate[delegates.size()]);
+		for (IContextService.IDelegate candidate : candidates) {
 			if (candidate.canHandle(contextID)) {
 				return candidate;
 			}
@@ -75,7 +67,7 @@ public class ContextsProxy implements IContexts, IDisposable {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.services.contexts.interfaces.IContexts#addDelegate(org.eclipse.tcf.te.tcf.services.contexts.interfaces.IContexts.IDelegate)
+	 * @see org.eclipse.tcf.te.tcf.services.contexts.interfaces.IContextService#addDelegate(org.eclipse.tcf.te.tcf.services.contexts.interfaces.IContextService.IDelegate)
 	 */
 	@Override
 	public void addDelegate(IDelegate delegate) {
@@ -85,7 +77,7 @@ public class ContextsProxy implements IContexts, IDisposable {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.services.contexts.interfaces.IContexts#removeDelegate(org.eclipse.tcf.te.tcf.services.contexts.interfaces.IContexts.IDelegate)
+	 * @see org.eclipse.tcf.te.tcf.services.contexts.interfaces.IContextService#removeDelegate(org.eclipse.tcf.te.tcf.services.contexts.interfaces.IContextService.IDelegate)
 	 */
 	@Override
 	public void removeDelegate(IDelegate delegate) {
