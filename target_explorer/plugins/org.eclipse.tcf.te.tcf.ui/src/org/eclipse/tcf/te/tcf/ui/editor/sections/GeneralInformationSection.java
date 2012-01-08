@@ -206,14 +206,13 @@ public class GeneralInformationSection extends AbstractSection {
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
-				wc.setProperties(node.getProperties());
-				odc.setProperties(node.getProperties());
-
-				Map<String, String> properties = node.getPeer().getAttributes();
-				for (String key : properties.keySet()) {
-					wc.setProperty(key, properties.get(key));
-					odc.setProperty(key, properties.get(key));
-				}
+				// The section is handling the ID, the name and
+				// the link state. Ignore other properties.
+				odc.setProperty(IPeerModelProperties.PROP_STATE, node.getProperty(IPeerModelProperties.PROP_STATE));
+				odc.setProperty(IPeer.ATTR_ID, node.getPeer().getAttributes().get(IPeer.ATTR_ID));
+				odc.setProperty(IPeer.ATTR_NAME, node.getPeer().getAttributes().get(IPeer.ATTR_NAME));
+				// Initially, the working copy is a duplicate of the original data copy
+				wc.setProperties(odc.getProperties());
 			}
 		});
 
@@ -274,36 +273,39 @@ public class GeneralInformationSection extends AbstractSection {
 			wc.setProperty(IPeer.ATTR_NAME, nameControl.getEditFieldControlText());
 		}
 
-		// Copy the working copy data back to the original properties container
-		Protocol.invokeAndWait(new Runnable() {
-			@Override
-			public void run() {
-				// To update the peer attributes, the peer needs to be recreated
-				IPeer oldPeer = node.getPeer();
-				// Create a write able copy of the peer attributes
-				Map<String, String> attributes = new HashMap<String, String>(oldPeer.getAttributes());
-				// Update the (managed) attributes from the working copy
-				attributes.put(IPeer.ATTR_NAME, wc.getStringProperty(IPeer.ATTR_NAME));
-				// Update the persistence storage URI (if set)
-				if (attributes.containsKey(IPersistableNodeProperties.PROPERTY_URI)) {
-					IPersistenceService persistenceService = ServiceManager.getInstance().getService(IPersistenceService.class);
-					if (persistenceService != null) {
-						URI uri = null;
-						try {
-							uri = persistenceService.getURI(attributes);
-						} catch (IOException e) { /* ignored on purpose */ }
-						if (uri != null) attributes.put(IPersistableNodeProperties.PROPERTY_URI, uri.toString());
-						else attributes.remove(IPersistableNodeProperties.PROPERTY_URI);
+		// If the peer name changed, copy the working copy data back to
+		// the original properties container
+		if (!odc.getStringProperty(IPeer.ATTR_NAME).equals(wc.getStringProperty(IPeer.ATTR_NAME))) {
+			Protocol.invokeAndWait(new Runnable() {
+				@Override
+				public void run() {
+					// To update the peer attributes, the peer needs to be recreated
+					IPeer oldPeer = node.getPeer();
+					// Create a write able copy of the peer attributes
+					Map<String, String> attributes = new HashMap<String, String>(oldPeer.getAttributes());
+					// Update the (managed) attributes from the working copy
+					attributes.put(IPeer.ATTR_NAME, wc.getStringProperty(IPeer.ATTR_NAME));
+					// Update the persistence storage URI (if set)
+					if (attributes.containsKey(IPersistableNodeProperties.PROPERTY_URI)) {
+						IPersistenceService persistenceService = ServiceManager.getInstance().getService(IPersistenceService.class);
+						if (persistenceService != null) {
+							URI uri = null;
+							try {
+								uri = persistenceService.getURI(attributes);
+							} catch (IOException e) { /* ignored on purpose */ }
+							if (uri != null) attributes.put(IPersistableNodeProperties.PROPERTY_URI, uri.toString());
+							else attributes.remove(IPersistableNodeProperties.PROPERTY_URI);
+						}
 					}
+					// Create the new peer
+					IPeer newPeer = oldPeer instanceof PeerRedirector ? new PeerRedirector(((PeerRedirector)oldPeer).getParent(), attributes) : new TransientPeer(attributes);
+					// Update the peer node instance (silently)
+					boolean changed = node.setChangeEventsEnabled(false);
+					node.setProperty(IPeerModelProperties.PROP_INSTANCE, newPeer);
+					if (changed) node.setChangeEventsEnabled(true);
 				}
-				// Create the new peer
-				IPeer newPeer = oldPeer instanceof PeerRedirector ? new PeerRedirector(((PeerRedirector)oldPeer).getParent(), attributes) : new TransientPeer(attributes);
-				// Update the peer node instance (silently)
-				boolean changed = node.setChangeEventsEnabled(false);
-				node.setProperty(IPeerModelProperties.PROP_INSTANCE, newPeer);
-				if (changed) node.setChangeEventsEnabled(true);
-			}
-		});
+			});
+		}
 	}
 
 	/* (non-Javadoc)

@@ -23,8 +23,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.services.interfaces.constants.ITerminalsConnectorConstants;
 import org.eclipse.tcf.te.ui.controls.BaseDialogPageControl;
+import org.eclipse.tcf.te.ui.interfaces.data.IDataExchangeNode;
 import org.eclipse.tcf.te.ui.terminals.panels.AbstractConfigurationPanel;
-import org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataWizardPage;
 import org.eclipse.tm.internal.terminal.provisional.api.ISettingsPage;
 import org.eclipse.tm.internal.terminal.ssh.SshConnector;
 import org.eclipse.tm.internal.terminal.ssh.SshSettings;
@@ -34,7 +34,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
  * SSH wizard configuration panel implementation.
  */
 @SuppressWarnings("restriction")
-public class SshWizardConfigurationPanel extends AbstractConfigurationPanel implements ISharedDataWizardPage {
+public class SshWizardConfigurationPanel extends AbstractConfigurationPanel implements IDataExchangeNode {
 
     private SshSettings sshSettings;
 	private ISettingsPage sshSettingsPage;
@@ -77,7 +77,7 @@ public class SshWizardConfigurationPanel extends AbstractConfigurationPanel impl
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataWizardPage#setupData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
+	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataExchangeNode#setupData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
 	 */
 	@Override
     public void setupData(IPropertiesContainer data) {
@@ -93,7 +93,7 @@ public class SshWizardConfigurationPanel extends AbstractConfigurationPanel impl
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataWizardPage#extractData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
+	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataExchangeNode#extractData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
 	 */
 	@Override
     public void extractData(IPropertiesContainer data) {
@@ -110,20 +110,6 @@ public class SshWizardConfigurationPanel extends AbstractConfigurationPanel impl
 		data.setProperty(ITerminalsConnectorConstants.PROP_SSH_KEEP_ALIVE, sshSettings.getKeepalive());
 		data.setProperty(ITerminalsConnectorConstants.PROP_SSH_PASSWORD, sshSettings.getPassword());
 		data.setProperty(ITerminalsConnectorConstants.PROP_SSH_USER, sshSettings.getUser());
-    }
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataWizardPage#initializeData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
-	 */
-	@Override
-    public void initializeData(IPropertiesContainer data) {
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataWizardPage#removeData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
-	 */
-	@Override
-    public void removeData(IPropertiesContainer data) {
     }
 
 	/* (non-Javadoc)

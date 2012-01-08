@@ -71,7 +71,8 @@ public class AttributesSection extends AbstractSection {
 	 */
 	private static final String[] FILTERED_NAMES = new String [] {
 																	IPeer.ATTR_ID, IPeer.ATTR_NAME,
-																	IPeer.ATTR_TRANSPORT_NAME, IPeer.ATTR_IP_HOST, IPeer.ATTR_IP_PORT
+																	IPeer.ATTR_TRANSPORT_NAME, IPeer.ATTR_IP_HOST, IPeer.ATTR_IP_PORT,
+																	"PipeName" //$NON-NLS-1$
 																 };
 
 	/**
