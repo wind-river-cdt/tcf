@@ -27,7 +27,7 @@ import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.forms.CustomFormToolkit;
 import org.eclipse.tcf.te.ui.forms.FormLayoutFactory;
 import org.eclipse.tcf.te.ui.jface.interfaces.IValidatingContainer;
-import org.eclipse.tcf.te.ui.views.editor.AbstractCustomFormToolkitEditorPage;
+import org.eclipse.tcf.te.ui.views.editor.pages.AbstractCustomFormToolkitEditorPage;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.IManagedForm;
@@ -46,7 +46,7 @@ public class OverviewEditorPage extends AbstractCustomFormToolkitEditorPage impl
 	private AttributesSection attributesSection;
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.views.editor.AbstractCustomFormToolkitEditorPage#dispose()
+	 * @see org.eclipse.tcf.te.ui.views.editor.pages.AbstractCustomFormToolkitEditorPage#dispose()
 	 */
 	@Override
 	public void dispose() {

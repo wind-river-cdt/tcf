@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.ui.views.internal.editor;
+package org.eclipse.tcf.te.ui.views.editor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,9 +36,9 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 
 /**
- * Properties editor implementation.
+ * Editor implementation.
  */
-public class Editor extends FormEditor implements IPersistableEditor, ITabbedPropertySheetPageContributor {
+public final class Editor extends FormEditor implements IPersistableEditor, ITabbedPropertySheetPageContributor {
 
 	// The reference to an memento to restore once the editor got activated
 	private IMemento mementoToRestore;

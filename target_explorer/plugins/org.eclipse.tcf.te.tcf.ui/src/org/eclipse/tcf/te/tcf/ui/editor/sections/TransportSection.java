@@ -48,7 +48,7 @@ import org.eclipse.tcf.te.ui.forms.parts.AbstractSection;
 import org.eclipse.tcf.te.ui.interfaces.data.IDataExchangeNode;
 import org.eclipse.tcf.te.ui.interfaces.data.IDataExchangeNode3;
 import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
-import org.eclipse.tcf.te.ui.views.editor.AbstractEditorPage;
+import org.eclipse.tcf.te.ui.views.editor.pages.AbstractEditorPage;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;

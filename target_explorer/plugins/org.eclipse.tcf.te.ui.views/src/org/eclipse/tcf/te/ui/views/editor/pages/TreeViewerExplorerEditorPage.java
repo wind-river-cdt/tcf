@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.ui.views.editor;
+package org.eclipse.tcf.te.ui.views.editor.pages;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -22,7 +22,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 
 /**
- * Processes editor page implementation.
+ * Tree viewer based editor page implementation.
  */
 public class TreeViewerExplorerEditorPage extends AbstractCustomFormToolkitEditorPage {
 	// The references to the pages subcontrol's (needed for disposal)
@@ -44,7 +44,7 @@ public class TreeViewerExplorerEditorPage extends AbstractCustomFormToolkitEdito
 	@Override
 	protected void createFormContent(IManagedForm managedForm) {
 		super.createFormContent(managedForm);
-		
+
 		// Configure the managed form
 		configureManagedForm(managedForm);
 

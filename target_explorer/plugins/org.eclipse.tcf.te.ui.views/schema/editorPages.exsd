@@ -71,7 +71,7 @@
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  The class that implements &lt;code&gt;org.eclipse.tcf.te.ui.views.interfaces.IEditorPage&lt;/code&gt; or extends &lt;code&gt;org.eclipse.tcf.te.ui.views.editor.AbstractEditorPage&lt;/code&gt;.
+                  The class that implements &lt;code&gt;org.eclipse.tcf.te.ui.views.interfaces.IEditorPage&lt;/code&gt; or extends &lt;code&gt;org.eclipse.tcf.te.ui.views.editor.pages.AbstractEditorPage&lt;/code&gt;.
 &lt;p&gt;
 The editor page implementation class must be specified either by the class attribute or the class child element!
                </documentation>

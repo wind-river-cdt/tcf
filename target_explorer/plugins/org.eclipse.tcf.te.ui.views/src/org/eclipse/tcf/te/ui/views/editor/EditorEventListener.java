@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.ui.views.internal.editor;
+package org.eclipse.tcf.te.ui.views.editor;
 
 import java.util.EventObject;
 
@@ -28,7 +28,7 @@ import org.eclipse.ui.forms.editor.IFormPage;
  * The event listener is registered by an editor instance for a given editor input
  * and is supposed to receive events for the editor input only.
  */
-public class EditorEventListener extends AbstractEventListener implements IDisposable {
+public final class EditorEventListener extends AbstractEventListener implements IDisposable {
 	// Reference to the parent editor
 	private final Editor editor;
 
