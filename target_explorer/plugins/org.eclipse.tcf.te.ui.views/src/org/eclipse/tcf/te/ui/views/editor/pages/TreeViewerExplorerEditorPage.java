@@ -39,34 +39,19 @@ public class TreeViewerExplorerEditorPage extends AbstractCustomFormToolkitEdito
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ui.forms.editor.FormPage#createFormContent(org.eclipse.ui.forms.IManagedForm)
+	 * @see org.eclipse.tcf.te.ui.views.editor.pages.AbstractEditorPage#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
 	 */
-	@Override
-	protected void createFormContent(IManagedForm managedForm) {
-		super.createFormContent(managedForm);
-
-		// Configure the managed form
-		configureManagedForm(managedForm);
-
-		// Do create the content of the form now
-		doCreateFormContent(managedForm.getForm().getBody(), getFormToolkit());
-
-		// Re-arrange the controls
-		managedForm.reflow(true);
-	}
-
 	@Override
     public void setInitializationData(IConfigurationElement config, String propertyName, Object data) {
 	    super.setInitializationData(config, propertyName, data);
 		viewerId = data != null ? data.toString() : null;
     }
 
-	/**
-	 * Configure the managed form to be ready for usage.
-	 *
-	 * @param managedForm The managed form. Must be not <code>null</code>.
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.views.editor.pages.AbstractCustomFormToolkitEditorPage#configureManagedForm(org.eclipse.ui.forms.IManagedForm)
 	 */
-	protected void configureManagedForm(IManagedForm managedForm) {
+	@Override
+    protected void configureManagedForm(IManagedForm managedForm) {
 		Assert.isNotNull(managedForm);
 
 		// Configure main layout
@@ -77,13 +62,11 @@ public class TreeViewerExplorerEditorPage extends AbstractCustomFormToolkitEdito
 		body.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
 	}
 
-	/**
-	 * Do create the managed form content.
-	 *
-	 * @param parent The parent composite. Must be not <code>null</code>
-	 * @param toolkit The {@link CustomFormToolkit} instance. Must be not <code>null</code>.
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.views.editor.pages.AbstractCustomFormToolkitEditorPage#doCreateFormContent(org.eclipse.swt.widgets.Composite, org.eclipse.tcf.te.ui.forms.CustomFormToolkit)
 	 */
-	protected void doCreateFormContent(Composite parent, CustomFormToolkit toolkit) {
+	@Override
+    protected void doCreateFormContent(Composite parent, CustomFormToolkit toolkit) {
 		Assert.isNotNull(parent);
 		Assert.isNotNull(toolkit);
 
