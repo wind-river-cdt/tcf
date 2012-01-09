@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+<!-- Service contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.services.services">
+      <service
+            class="org.eclipse.tcf.te.tcf.launch.core.services.DebugService"
+            id="org.eclipse.tcf.te.tcf.launch.core.services.debug">
+         <serviceType
+               bundleId="org.eclipse.tcf.te.runtime.services"
+               class="org.eclipse.tcf.te.runtime.services.interfaces.IDebugService">
+         </serviceType>
+         <enablement>
+            <or>
+               <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+               <instanceof value="org.eclipse.tcf.protocol.IPeer"/>
+            </or>   
+         </enablement>
+      </service>
+   </extension>
+
+</plugin>

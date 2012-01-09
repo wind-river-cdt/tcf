@@ -10,13 +10,13 @@
 package org.eclipse.tcf.te.ui.wizards.pages;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataWizardPage;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
+import org.eclipse.tcf.te.ui.interfaces.data.IDataExchangeNode3;
 
 /**
  * An abstract shared data wizard page implementation.
  */
-public abstract class AbstractSharedDataWizardPage extends AbstractValidatingWizardPage implements ISharedDataWizardPage {
+public abstract class AbstractSharedDataWizardPage extends AbstractValidatingWizardPage implements IDataExchangeNode3 {
 
 	/**
 	 * Constructor.
@@ -39,30 +39,37 @@ public abstract class AbstractSharedDataWizardPage extends AbstractValidatingWiz
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataWizardPage#setupData(org.eclipse.tcf.te.runtime.interfaces.nodes.IPropertiesContainer)
+	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataExchangeNode#setupData(org.eclipse.tcf.te.runtime.interfaces.nodes.IPropertiesContainer)
 	 */
 	@Override
 	public void setupData(IPropertiesContainer data) {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataWizardPage#extractData(org.eclipse.tcf.te.runtime.interfaces.nodes.IPropertiesContainer)
+	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataExchangeNode#extractData(org.eclipse.tcf.te.runtime.interfaces.nodes.IPropertiesContainer)
 	 */
 	@Override
 	public void extractData(IPropertiesContainer data) {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataWizardPage#initializeData(org.eclipse.tcf.te.runtime.interfaces.nodes.IPropertiesContainer)
+	 * @see org.eclipse.tcf.te.ui.interfaces.data.IDataExchangeNode2#initializeData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
 	 */
 	@Override
 	public void initializeData(IPropertiesContainer data) {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataWizardPage#removeData(org.eclipse.tcf.te.runtime.interfaces.nodes.IPropertiesContainer)
+	 * @see org.eclipse.tcf.te.ui.interfaces.data.IDataExchangeNode3#removeData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
 	 */
 	@Override
 	public void removeData(IPropertiesContainer data) {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.interfaces.data.IDataExchangeNode3#copyData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
+	 */
+	@Override
+	public void copyData(IPropertiesContainer src, IPropertiesContainer dst) {
 	}
 }

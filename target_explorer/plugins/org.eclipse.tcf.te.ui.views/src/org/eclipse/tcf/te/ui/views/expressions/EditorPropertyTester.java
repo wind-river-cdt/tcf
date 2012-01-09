@@ -10,8 +10,8 @@
 package org.eclipse.tcf.te.ui.views.expressions;
 
 import org.eclipse.core.expressions.PropertyTester;
+import org.eclipse.tcf.te.ui.views.editor.EditorInput;
 import org.eclipse.tcf.te.ui.views.extensions.EditorPageBindingExtensionPointManager;
-import org.eclipse.tcf.te.ui.views.internal.editor.EditorInput;
 import org.eclipse.ui.IEditorInput;
 
 

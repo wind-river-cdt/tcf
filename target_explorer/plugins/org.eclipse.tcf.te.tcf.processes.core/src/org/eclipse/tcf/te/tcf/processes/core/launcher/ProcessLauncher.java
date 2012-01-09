@@ -55,6 +55,7 @@ import org.eclipse.tcf.te.runtime.services.ServiceManager;
 import org.eclipse.tcf.te.runtime.services.interfaces.ITerminalService;
 import org.eclipse.tcf.te.runtime.services.interfaces.constants.ITerminalsConnectorConstants;
 import org.eclipse.tcf.te.tcf.core.Tcf;
+import org.eclipse.tcf.te.tcf.core.async.CallbackInvocationDelegate;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
 import org.eclipse.tcf.te.tcf.core.streams.StreamsDataProvider;
 import org.eclipse.tcf.te.tcf.core.streams.StreamsDataReceiver;
@@ -128,16 +129,6 @@ public class ProcessLauncher extends PlatformObject implements IProcessLauncher 
 			eventListener = null;
 		}
 
-		// Create the callback invocation delegate
-		AsyncCallbackCollector.ICallbackInvocationDelegate delegate = new AsyncCallbackCollector.ICallbackInvocationDelegate() {
-			@Override
-			public void invoke(Runnable runnable) {
-				Assert.isNotNull(runnable);
-				if (Protocol.isDispatchThread()) runnable.run();
-				else Protocol.invokeLater(runnable);
-			}
-		};
-
 		// Create the callback collector
 		final AsyncCallbackCollector collector = new AsyncCallbackCollector(new Callback() {
 			@Override
@@ -146,7 +137,7 @@ public class ProcessLauncher extends PlatformObject implements IProcessLauncher 
 				// Close the channel as all disposal is done
 				if (finChannel != null) Tcf.getChannelManager().closeChannel(finChannel);
 			}
-		}, delegate);
+		}, new CallbackInvocationDelegate());
 
 		if (streamsListener != null) {
 			// Dispose the streams listener

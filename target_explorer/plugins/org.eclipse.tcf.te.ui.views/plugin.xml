@@ -175,7 +175,7 @@
 <!-- Editor contributions -->
    <extension point="org.eclipse.ui.editors">
       <editor
-            class="org.eclipse.tcf.te.ui.views.internal.editor.Editor"
+            class="org.eclipse.tcf.te.ui.views.editor.Editor"
             default="false"
             icon="icons/eview16/prop_ps.gif"
             id="org.eclipse.tcf.te.ui.view.Editor"

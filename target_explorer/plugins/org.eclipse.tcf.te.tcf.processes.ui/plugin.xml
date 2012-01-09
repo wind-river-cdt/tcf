@@ -5,7 +5,7 @@
 <!-- Target Explorer Details Editor page contributions -->
    <extension point="org.eclipse.tcf.te.ui.views.editorPages">
       <editorPage
-            class="org.eclipse.tcf.te.ui.views.editor.TreeViewerExplorerEditorPage:org.eclipse.tcf.te.ui.controls.viewer.processes"
+            class="org.eclipse.tcf.te.ui.views.editor.pages.TreeViewerExplorerEditorPage:org.eclipse.tcf.te.ui.controls.viewer.processes"
             name="%ProcessExplorerEditorPage.name"
             id="org.eclipse.tcf.te.tcf.processes.ui.ProcessExplorerEditorPage">
       </editorPage>

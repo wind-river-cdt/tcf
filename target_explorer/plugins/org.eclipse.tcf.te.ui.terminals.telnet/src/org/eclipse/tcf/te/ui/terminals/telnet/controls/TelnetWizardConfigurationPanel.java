@@ -19,8 +19,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.services.interfaces.constants.ITerminalsConnectorConstants;
 import org.eclipse.tcf.te.ui.controls.BaseDialogPageControl;
+import org.eclipse.tcf.te.ui.interfaces.data.IDataExchangeNode;
 import org.eclipse.tcf.te.ui.terminals.panels.AbstractConfigurationPanel;
-import org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataWizardPage;
 import org.eclipse.tm.internal.terminal.provisional.api.ISettingsPage;
 import org.eclipse.tm.internal.terminal.telnet.NetworkPortMap;
 import org.eclipse.tm.internal.terminal.telnet.TelnetConnector;
@@ -31,7 +31,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
  * telnet wizard configuration panel implementation.
  */
 @SuppressWarnings("restriction")
-public class TelnetWizardConfigurationPanel extends AbstractConfigurationPanel implements ISharedDataWizardPage {
+public class TelnetWizardConfigurationPanel extends AbstractConfigurationPanel implements IDataExchangeNode {
 
     private TelnetSettings telnetSettings;
 	private ISettingsPage telnetSettingsPage;
@@ -75,14 +75,14 @@ public class TelnetWizardConfigurationPanel extends AbstractConfigurationPanel i
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataWizardPage#setupData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
+	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataExchangeNode#setupData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
 	 */
 	@Override
     public void setupData(IPropertiesContainer data) {
     }
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataWizardPage#extractData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
+	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataExchangeNode#extractData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
 	 */
 	@Override
     public void extractData(IPropertiesContainer data) {
@@ -96,20 +96,6 @@ public class TelnetWizardConfigurationPanel extends AbstractConfigurationPanel i
 		data.setProperty(ITerminalsConnectorConstants.PROP_IP_HOST,telnetSettings.getHost());
 		data.setProperty(ITerminalsConnectorConstants.PROP_IP_PORT, telnetSettings.getNetworkPort());
 		data.setProperty(ITerminalsConnectorConstants.PROP_TIMEOUT, telnetSettings.getTimeout());
-    }
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataWizardPage#initializeData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
-	 */
-	@Override
-    public void initializeData(IPropertiesContainer data) {
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataWizardPage#removeData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
-	 */
-	@Override
-    public void removeData(IPropertiesContainer data) {
     }
 
 	/* (non-Javadoc)

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.core.runtime.Assert;
@@ -44,9 +45,10 @@ import org.eclipse.tcf.te.tcf.ui.editor.controls.TransportSectionTypePanelContro
 import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.controls.interfaces.IWizardConfigurationPanel;
 import org.eclipse.tcf.te.ui.forms.parts.AbstractSection;
+import org.eclipse.tcf.te.ui.interfaces.data.IDataExchangeNode;
+import org.eclipse.tcf.te.ui.interfaces.data.IDataExchangeNode3;
 import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
-import org.eclipse.tcf.te.ui.views.editor.AbstractEditorPage;
-import org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataWizardPage;
+import org.eclipse.tcf.te.ui.views.editor.pages.AbstractEditorPage;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
@@ -57,7 +59,7 @@ import org.eclipse.ui.forms.widgets.Section;
 public class TransportSection extends AbstractSection {
 	// The section sub controls
 	private TransportSectionTypeControl transportTypeControl = null;
-	private TransportSectionTypePanelControl transportTypePanelControl = null;
+	/* default */ TransportSectionTypePanelControl transportTypePanelControl = null;
 
 	// Reference to the original data object
 	/* default */ IPeerModel od;
@@ -194,11 +196,24 @@ public class TransportSection extends AbstractSection {
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
-				Map<String, String> properties = node.getPeer().getAttributes();
-				for (String key : properties.keySet()) {
-					wc.setProperty(key, properties.get(key));
-					odc.setProperty(key, properties.get(key));
+				// The section is handling the transport name and the
+				// transport type specific properties. Ignore other properties.
+				odc.setProperty(IPeer.ATTR_TRANSPORT_NAME, node.getPeer().getTransportName());
+				if (transportTypePanelControl != null) {
+					IPropertiesContainer src = new PropertiesContainer();
+					Map<String, String> properties = node.getPeer().getAttributes();
+					for (String key : properties.keySet()) {
+						src.setProperty(key, properties.get(key));
+					}
+
+					for (String id : transportTypePanelControl.getConfigurationPanelIds()) {
+						IWizardConfigurationPanel panel = transportTypePanelControl.getConfigurationPanel(id);
+						if (panel instanceof IDataExchangeNode3) ((IDataExchangeNode3)panel).copyData(src, odc);
+					}
 				}
+
+				// Initially, the working copy is a duplicate of the original data copy
+				wc.setProperties(odc.getProperties());
 			}
 		});
 
@@ -212,7 +227,7 @@ public class TransportSection extends AbstractSection {
 				if (transportTypePanelControl != null) {
 					transportTypePanelControl.showConfigurationPanel(transportType);
 					IWizardConfigurationPanel panel = transportTypePanelControl.getConfigurationPanel(transportType);
-					if (panel instanceof ISharedDataWizardPage) ((ISharedDataWizardPage)panel).setupData(wc);
+					if (panel instanceof IDataExchangeNode) ((IDataExchangeNode)panel).setupData(wc);
 				}
 			}
 		}
@@ -233,22 +248,39 @@ public class TransportSection extends AbstractSection {
 		// If no data is available, we are done
 		if (node == null) return;
 
-		// Extract the transport type and transport attributes into the working copy
+		// The list of removed attributes
+		final List<String> removed = new ArrayList<String>();
+		// Get the current key set from the working copy
+		Set<String> currentKeySet = wc.getProperties().keySet();
 
-		// Set the transport type
+		// Get the current transport type from the working copy
+		String oldTransportType = wc.getStringProperty(IPeer.ATTR_TRANSPORT_NAME);
+		if (oldTransportType != null) {
+			// Get the current transport type configuration panel
+			IWizardConfigurationPanel panel = transportTypePanelControl.getConfigurationPanel(oldTransportType);
+			// And clean out the current transport type specific attributes from the working copy
+			if (panel instanceof IDataExchangeNode3) ((IDataExchangeNode3)panel).removeData(wc);
+		}
+
+		// Get the new transport type from the widget
 		String transportType = transportTypeControl.getSelectedTransportType();
+		// And write the new transport to the working copy
 		wc.setProperty(IPeer.ATTR_TRANSPORT_NAME, transportType);
-
-		// Get the transport type configuration panel
+		// Get the new transport type configuration panel
 		IWizardConfigurationPanel panel = transportTypePanelControl.getConfigurationPanel(transportType);
-		// Clean the old attributes from the working copy
-		if (panel instanceof ISharedDataWizardPage) ((ISharedDataWizardPage)panel).removeData(wc);
-		// Extract the new attributes into the working copy
-		if (panel instanceof ISharedDataWizardPage) ((ISharedDataWizardPage)panel).extractData(wc);
+		// And extract the new attributes into the working copy
+		if (panel instanceof IDataExchangeNode) ((IDataExchangeNode)panel).extractData(wc);
 
 		// If the data has not changed compared to the original data copy,
 		// we are done here and return immediately
 		if (odc.equals(wc)) return;
+
+		// Get the new key set from the working copy
+		Set<String> newKeySet = wc.getProperties().keySet();
+		// Everything from the old key set not found in the new key set is a removed attribute
+		for (String key : currentKeySet) {
+			if (!newKeySet.contains(key)) removed.add(key);
+		}
 
 		// Copy the working copy data back to the original properties container
 		Protocol.invokeAndWait(new Runnable() {
@@ -258,11 +290,6 @@ public class TransportSection extends AbstractSection {
 				IPeer oldPeer = node.getPeer();
 				// Create a write able copy of the peer attributes
 				Map<String, String> attributes = new HashMap<String, String>(oldPeer.getAttributes());
-				// Determine the removed attributes
-				List<String> removed = new ArrayList<String>();
-				for (String key : attributes.keySet()) {
-					if (wc.getProperty(key) == null) removed.add(key);
-				}
 				// Clean out the removed attributes
 				for (String key : removed) attributes.remove(key);
 				// Update with the current configured attributes

@@ -26,15 +26,15 @@ import org.eclipse.tcf.te.ui.controls.BaseEditBrowseTextControl;
 import org.eclipse.tcf.te.ui.controls.panels.AbstractWizardConfigurationPanel;
 import org.eclipse.tcf.te.ui.controls.validator.RegexValidator;
 import org.eclipse.tcf.te.ui.controls.validator.Validator;
+import org.eclipse.tcf.te.ui.interfaces.data.IDataExchangeNode3;
 import org.eclipse.tcf.te.ui.jface.interfaces.IValidatingContainer;
 import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
-import org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataWizardPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
  * Pipe transport type panel implementation.
  */
-public class PipeTransportPanel extends AbstractWizardConfigurationPanel implements ISharedDataWizardPage {
+public class PipeTransportPanel extends AbstractWizardConfigurationPanel implements IDataExchangeNode3 {
 
 	private PipeNameControl pipeNameControl;
 
@@ -180,7 +180,7 @@ public class PipeTransportPanel extends AbstractWizardConfigurationPanel impleme
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataWizardPage#setupData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
+	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataExchangeNode#setupData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
 	 */
 	@Override
 	public void setupData(IPropertiesContainer data) {
@@ -192,7 +192,7 @@ public class PipeTransportPanel extends AbstractWizardConfigurationPanel impleme
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataWizardPage#extractData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
+	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataExchangeNode#extractData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
 	 */
 	@Override
 	public void extractData(IPropertiesContainer data) {
@@ -205,19 +205,29 @@ public class PipeTransportPanel extends AbstractWizardConfigurationPanel impleme
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataWizardPage#initializeData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
+	 * @see org.eclipse.tcf.te.ui.interfaces.data.IDataExchangeNode2#initializeData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
 	 */
 	@Override
 	public void initializeData(IPropertiesContainer data) {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataWizardPage#removeData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
+	 * @see org.eclipse.tcf.te.ui.interfaces.data.IDataExchangeNode3#removeData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
 	 */
 	@Override
 	public void removeData(IPropertiesContainer data) {
 		if (data == null) return;
 		data.setProperty("PipeName", null); //$NON-NLS-1$
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.interfaces.data.IDataExchangeNode3#copyData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
+	 */
+	@Override
+	public void copyData(IPropertiesContainer src, IPropertiesContainer dst) {
+		Assert.isNotNull(src);
+		Assert.isNotNull(dst);
+        dst.setProperty("PipeName", src.getProperty("PipeName")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/* (non-Javadoc)

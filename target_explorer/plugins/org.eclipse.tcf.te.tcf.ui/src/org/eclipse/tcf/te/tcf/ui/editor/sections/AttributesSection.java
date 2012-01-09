@@ -35,7 +35,7 @@ import org.eclipse.tcf.te.tcf.ui.controls.PeerAttributesTablePart;
 import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.forms.parts.AbstractSection;
 import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
-import org.eclipse.tcf.te.ui.views.editor.AbstractEditorPage;
+import org.eclipse.tcf.te.ui.views.editor.pages.AbstractEditorPage;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
@@ -71,7 +71,8 @@ public class AttributesSection extends AbstractSection {
 	 */
 	private static final String[] FILTERED_NAMES = new String [] {
 																	IPeer.ATTR_ID, IPeer.ATTR_NAME,
-																	IPeer.ATTR_TRANSPORT_NAME, IPeer.ATTR_IP_HOST, IPeer.ATTR_IP_PORT
+																	IPeer.ATTR_TRANSPORT_NAME, IPeer.ATTR_IP_HOST, IPeer.ATTR_IP_PORT,
+																	"PipeName" //$NON-NLS-1$
 																 };
 
 	/**

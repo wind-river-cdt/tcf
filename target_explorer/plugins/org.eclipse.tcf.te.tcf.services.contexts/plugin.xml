@@ -7,7 +7,7 @@
       <factory
             adaptableType="org.eclipse.tcf.protocol.IPeer"
             class="org.eclipse.tcf.te.tcf.services.contexts.internal.AdapterFactory">
-         <adapter type="org.eclipse.tcf.te.tcf.services.contexts.interfaces.IContexts"/>
+         <adapter type="org.eclipse.tcf.te.tcf.services.contexts.interfaces.IContextService"/>
       </factory>
    </extension>
 

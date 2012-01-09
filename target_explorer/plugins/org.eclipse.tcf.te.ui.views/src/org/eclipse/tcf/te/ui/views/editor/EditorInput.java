@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.ui.views.internal.editor;
+package org.eclipse.tcf.te.ui.views.editor;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Platform;
@@ -27,9 +27,9 @@ import org.eclipse.ui.navigator.CommonViewer;
 
 
 /**
- * Details editor input implementation.
+ * Editor input implementation.
  */
-public class EditorInput implements IEditorInput, IPersistableElement {
+public final class EditorInput implements IEditorInput, IPersistableElement {
 	// The parent editor id
 	private final String id;
 	// The editor input name, once determined

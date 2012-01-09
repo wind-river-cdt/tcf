@@ -10,10 +10,9 @@
 package org.eclipse.tcf.te.tcf.ui.editor;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tcf.te.tcf.ui.activator.UIPlugin;
@@ -25,12 +24,8 @@ import org.eclipse.tcf.te.tcf.ui.help.IContextHelpIds;
 import org.eclipse.tcf.te.tcf.ui.internal.ImageConsts;
 import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.forms.CustomFormToolkit;
-import org.eclipse.tcf.te.ui.forms.FormLayoutFactory;
 import org.eclipse.tcf.te.ui.jface.interfaces.IValidatingContainer;
-import org.eclipse.tcf.te.ui.views.editor.AbstractCustomFormToolkitEditorPage;
-import org.eclipse.ui.IWorkbenchActionConstants;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.forms.IManagedForm;
+import org.eclipse.tcf.te.ui.views.editor.pages.AbstractCustomFormToolkitEditorPage;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
@@ -46,7 +41,7 @@ public class OverviewEditorPage extends AbstractCustomFormToolkitEditorPage impl
 	private AttributesSection attributesSection;
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.views.editor.AbstractCustomFormToolkitEditorPage#dispose()
+	 * @see org.eclipse.tcf.te.ui.views.editor.pages.AbstractCustomFormToolkitEditorPage#dispose()
 	 */
 	@Override
 	public void dispose() {
@@ -58,75 +53,34 @@ public class OverviewEditorPage extends AbstractCustomFormToolkitEditorPage impl
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ui.forms.editor.FormPage#createFormContent(org.eclipse.ui.forms.IManagedForm)
+	 * @see org.eclipse.tcf.te.ui.views.editor.pages.AbstractCustomFormToolkitEditorPage#getContextHelpId()
 	 */
 	@Override
-	protected void createFormContent(IManagedForm managedForm) {
-		super.createFormContent(managedForm);
-
-		// Configure the managed form
-		configureManagedForm(managedForm);
-
-		// Do create the content of the form now
-		doCreateFormContent(managedForm.getForm().getBody(), getFormToolkit());
-
-		// Re-arrange the controls
-		managedForm.reflow(true);
+	protected String getContextHelpId() {
+	    return IContextHelpIds.OVERVIEW_EDITOR_PAGE;
 	}
 
-	/**
-	 * Configure the managed form to be ready for usage.
-	 *
-	 * @param managedForm The managed form. Must not be <code>null</code>.
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.views.editor.pages.AbstractCustomFormToolkitEditorPage#getFormTitle()
 	 */
-	protected void configureManagedForm(IManagedForm managedForm) {
-		Assert.isNotNull(managedForm);
-
-		// Configure main layout
-		Composite body = managedForm.getForm().getBody();
-		body.setLayout(FormLayoutFactory.createFormGridLayout(false, 1));
-
-		// Set context help id
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(managedForm.getForm(), IContextHelpIds.OVERVIEW_EDITOR_PAGE);
-
-		// Decorate the form header
-		getFormToolkit().getFormToolkit().decorateFormHeading(managedForm.getForm().getForm());
-		// And set the header text and image
-		managedForm.getForm().getForm().setText(getFormTitle());
-		managedForm.getForm().getForm().setImage(UIPlugin.getImage(ImageConsts.PEER));
-
-		// Add the toolbar items which will appear in the form header
-		IToolBarManager manager = managedForm.getForm().getForm().getToolBarManager();
-		createToolbarContributionItems(manager);
-		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-		manager.update(true);
-	}
-
-	/**
-	 * Returns the form title to set to the top form header.
-	 *
-	 * @return The form title.
-	 */
-	protected String getFormTitle() {
+	@Override
+    protected String getFormTitle() {
 		return Messages.OverviewEditorPage_title;
 	}
 
-	/**
-	 * Create the toolbar contribution items.
-	 *
-	 * @param manager The toolbar manager. Must not be <code>null</code>.
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.views.editor.pages.AbstractCustomFormToolkitEditorPage#getFormImage()
 	 */
-	protected void createToolbarContributionItems(IToolBarManager manager) {
-		Assert.isNotNull(manager);
+	@Override
+	protected Image getFormImage() {
+	    return UIPlugin.getImage(ImageConsts.PEER);
 	}
 
-	/**
-	 * Do create the managed form content.
-	 *
-	 * @param parent The parent composite. Must not be <code>null</code>
-	 * @param toolkit The {@link CustomFormToolkit} instance. Must not be <code>null</code>.
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.views.editor.pages.AbstractCustomFormToolkitEditorPage#doCreateFormContent(org.eclipse.swt.widgets.Composite, org.eclipse.tcf.te.ui.forms.CustomFormToolkit)
 	 */
-	protected void doCreateFormContent(Composite parent, CustomFormToolkit toolkit) {
+	@Override
+    protected void doCreateFormContent(Composite parent, CustomFormToolkit toolkit) {
 		Assert.isNotNull(parent);
 		Assert.isNotNull(toolkit);
 

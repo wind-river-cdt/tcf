@@ -31,7 +31,15 @@ public class EventListener extends AbstractEventListener {
 
 			// Property changes for individual peer model nodes refreshes the node only
 			if (source instanceof IPeerModel) {
-				refresh(source, false);
+				if ("expanded".equals(changeEvent.getEventId())) { //$NON-NLS-1$
+					// Expansion state of the node changed.
+					boolean expanded = ((Boolean)changeEvent.getNewValue()).booleanValue();
+					// Update the nodes expansion state
+					getViewer().setExpandedState(source, expanded);
+				} else {
+					// Refresh the node
+					refresh(source, false);
+				}
 			}
 		}
 	}

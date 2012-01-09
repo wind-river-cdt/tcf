@@ -25,17 +25,18 @@ import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.IStreams;
+import org.eclipse.tcf.te.core.async.AsyncCallbackCollector;
+import org.eclipse.tcf.te.runtime.callback.Callback;
+import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
+import org.eclipse.tcf.te.tcf.core.async.CallbackInvocationDelegate;
+import org.eclipse.tcf.te.tcf.core.streams.StreamsDataProvider;
+import org.eclipse.tcf.te.tcf.core.streams.StreamsDataReceiver;
+import org.eclipse.tcf.te.tcf.core.util.ExceptionUtils;
 import org.eclipse.tcf.te.tcf.processes.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.tcf.processes.core.interfaces.launcher.IProcessContextAwareListener;
 import org.eclipse.tcf.te.tcf.processes.core.interfaces.tracing.ITraceIds;
 import org.eclipse.tcf.te.tcf.processes.core.nls.Messages;
 import org.eclipse.tcf.util.TCFTask;
-import org.eclipse.tcf.te.core.async.AsyncCallbackCollector;
-import org.eclipse.tcf.te.runtime.callback.Callback;
-import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
-import org.eclipse.tcf.te.tcf.core.streams.StreamsDataProvider;
-import org.eclipse.tcf.te.tcf.core.streams.StreamsDataReceiver;
-import org.eclipse.tcf.te.tcf.core.util.ExceptionUtils;
 
 /**
  * Remote process streams listener implementation.
@@ -646,16 +647,6 @@ public class ProcessStreamsListener implements IStreams.StreamsListener, IProces
 			dataReceiver.clear();
 		}
 
-		// Create the callback invocation delegate
-		AsyncCallbackCollector.ICallbackInvocationDelegate delegate = new AsyncCallbackCollector.ICallbackInvocationDelegate() {
-			@Override
-			public void invoke(Runnable runnable) {
-				Assert.isNotNull(runnable);
-				if (Protocol.isDispatchThread()) runnable.run();
-				else Protocol.invokeLater(runnable);
-			}
-		};
-
 		// Create a new collector to catch all runnable stop callback's
 		AsyncCallbackCollector collector = new AsyncCallbackCollector(new Callback() {
 			/* (non-Javadoc)
@@ -677,7 +668,7 @@ public class ProcessStreamsListener implements IStreams.StreamsListener, IProces
 					}
 				});
 			}
-		}, delegate);
+		}, new CallbackInvocationDelegate());
 
 		// Loop all runnable's and force them to stop
 		synchronized (runnables) {

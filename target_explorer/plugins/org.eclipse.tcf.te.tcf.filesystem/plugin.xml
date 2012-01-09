@@ -99,7 +99,7 @@
 <!-- Editor page contributions -->
    <extension point="org.eclipse.tcf.te.ui.views.editorPages">
       <editorPage
-            class="org.eclipse.tcf.te.ui.views.editor.TreeViewerExplorerEditorPage:org.eclipse.tcf.te.ui.controls.viewer.fs"
+            class="org.eclipse.tcf.te.ui.views.editor.pages.TreeViewerExplorerEditorPage:org.eclipse.tcf.te.ui.controls.viewer.fs"
             name="%FSExplorerEditorPage.name"
             id="org.eclipse.tcf.te.tcf.filesystem.FSExplorerEditorPage">
       </editorPage>

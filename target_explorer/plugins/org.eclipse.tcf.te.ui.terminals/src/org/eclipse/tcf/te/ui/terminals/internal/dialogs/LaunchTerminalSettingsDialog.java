@@ -45,9 +45,9 @@ import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
 import org.eclipse.tcf.te.ui.controls.BaseDialogPageControl;
 import org.eclipse.tcf.te.ui.controls.BaseWizardConfigurationPanelControl;
 import org.eclipse.tcf.te.ui.controls.interfaces.IWizardConfigurationPanel;
+import org.eclipse.tcf.te.ui.interfaces.data.IDataExchangeNode;
 import org.eclipse.tcf.te.ui.jface.dialogs.CustomTrayDialog;
 import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
-import org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataWizardPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
@@ -313,8 +313,8 @@ public class LaunchTerminalSettingsDialog extends CustomTrayDialog {
     	data.setProperty("selection", selection); //$NON-NLS-1$
 
     	// Store the delegate specific settings
-    	if (panel instanceof ISharedDataWizardPage) {
-    		((ISharedDataWizardPage)panel).extractData(data);
+    	if (panel instanceof IDataExchangeNode) {
+    		((IDataExchangeNode)panel).extractData(data);
     	}
 
         super.okPressed();
