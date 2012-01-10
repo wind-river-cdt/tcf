@@ -25,6 +25,7 @@ import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.tcf.internal.debug.launch.TCFLaunchDelegate;
+import org.eclipse.tcf.internal.debug.model.TCFLaunch;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.runtime.concurrent.util.ExecutorsUtil;
@@ -84,7 +85,7 @@ public class DebugService extends AbstractService implements IDebugService {
 	 * @param data The data properties to parameterize the attach. Must not be <code>null</code>.
 	 * @param callback The callback to invoke once the operation completed. Must not be <code>null</code>.
 	 */
-	protected void attachPeer(IPeer peer, IPropertiesContainer data, ICallback callback) {
+	protected void attachPeer(final IPeer peer, final IPropertiesContainer data, final ICallback callback) {
 		Assert.isNotNull(peer);
 		Assert.isNotNull(data);
 		Assert.isNotNull(callback);
@@ -117,13 +118,41 @@ public class DebugService extends AbstractService implements IDebugService {
 
 		if (lc != null && l == null) {
 			try {
+				// Attach the launch listener to wait firing the callback until
+				// the TCFLaunch got connect
+				TCFLaunch.addListener(new TCFLaunch.LaunchListener() {
+					@Override
+					public void onProcessStreamError(TCFLaunch launch, String process_id, int stream_id, Exception error, int lost_size) {}
+					@Override
+					public void onProcessOutput(TCFLaunch launch, String process_id, int stream_id, byte[] data) {}
+					@Override
+					public void onDisconnected(TCFLaunch launch) {}
+					@Override
+					public void onCreated(TCFLaunch launch) {}
+
+					@Override
+					public void onConnected(TCFLaunch launch) {
+						// If "our" launch got connected, fire the callback
+						ILaunch l = (ILaunch)callback.getProperty("launch"); //$NON-NLS-1$
+						if (launch == l) {
+							TCFLaunch.removeListener(this);
+							callback.done(DebugService.this, Status.OK_STATUS);
+						}
+					}
+				});
+
+				// Execute the launch configuration
 				l = lc.launch(ILaunchManager.DEBUG_MODE, new NullProgressMonitor(), false, true);
+				// And remember the launch returned. Will be needed outside
+				// to set the selection to the debug view correctly
 				callback.setProperty("launch", l); //$NON-NLS-1$
-				callback.done(this, Status.OK_STATUS);
+
 			} catch (CoreException e) {
 				callback.done(this, e.getStatus());
 			}
 		} else {
+			// Remember the launch found. Will be needed outside
+			// to set the selection to the debug view correctly
 			callback.setProperty("launch", l); //$NON-NLS-1$
 			callback.done(this, Status.OK_STATUS);
 		}

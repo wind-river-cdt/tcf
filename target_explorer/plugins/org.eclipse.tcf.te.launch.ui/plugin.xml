@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+<!-- Command contributions -->
+   <extension point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            description="%Command.showInDebugView.description"
+            helpContextId="org.eclipse.tcf.te.launch.command_ShowInDebugView"
+            id="org.eclipse.tcf.te.launch.command.showInDebugView"
+            name="%Command.showInDebugView.name">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commandImages">
+      <image
+            commandId="org.eclipse.tcf.te.launch.command.showInDebugView"
+            icon="platform:/plugin/org.eclipse.debug.ui/icons/full/eview16/debug_view.gif">
+      </image>
+   </extension>
+
+</plugin>
