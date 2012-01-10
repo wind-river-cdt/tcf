@@ -1,5 +1,5 @@
 # *******************************************************************************
-# * Copyright (c) 2011 Wind River Systems, Inc. and others.
+# * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others.
 # * All rights reserved. This program and the accompanying materials
 # * are made available under the terms of the Eclipse Public License v1.0
 # * which accompanies this distribution, and is available at
@@ -211,10 +211,10 @@ class ChannelEventListener(channel.EventListener):
             args = channel.fromJSONSequence(data)
             if name == "contextAdded":
                 assert len(args) == 1
-                self.listener.contextAdded(_toContextArray(args[0]))
+                self.listener.contextAdded(_toContextArray(self.service, args[0]))
             elif name == "contextChanged":
                 assert len(args) == 1
-                self.listener.contextChanged(_toContextArray(args[0]))
+                self.listener.contextChanged(_toContextArray(self.service, args[0]))
             elif name == "contextRemoved":
                 assert len(args) == 1
                 self.listener.contextRemoved(args[0])
@@ -227,9 +227,11 @@ class ChannelEventListener(channel.EventListener):
             self.service.channel.terminate(x)
 
 
-def _toContextArray(o):
+def _toContextArray(svc, o):
     if o is None: return None
-    return map(MemContext, o)
+    ctx = []
+    for m in o: ctx.append(MemContext(svc, m))
+    return ctx
 
 def _toSizeArray(o):
     if o is None: return None
