@@ -427,7 +427,7 @@ public class TCFModelProxy extends AbstractModelProxy implements IModelProxy, Ru
                 asyncExec(new Runnable() {
                     boolean found;
                     public void run() {
-                        if (getViewer() instanceof InternalTreeModelViewer) { 
+                        if (getViewer() instanceof InternalTreeModelViewer) {
                             found = ((InternalTreeModelViewer)getViewer()).findElementIndex(TreePath.EMPTY, launch) >= 0;
                         } else if (getViewer() instanceof InternalVirtualTreeModelViewer) {
                             found = ((InternalVirtualTreeModelViewer)getViewer()).findElementIndex(TreePath.EMPTY, launch) >= 0;

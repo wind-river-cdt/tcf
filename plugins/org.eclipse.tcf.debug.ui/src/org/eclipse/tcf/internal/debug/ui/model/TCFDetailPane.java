@@ -122,10 +122,13 @@ public class TCFDetailPane implements IDetailPane {
     }
 
     private void setGlobalAction(String id, IAction action){
-        ((IViewSite)part_site).getActionBars().setGlobalActionHandler(id, action);
+        if (part_site instanceof IViewSite) {
+            ((IViewSite)part_site).getActionBars().setGlobalActionHandler(id, action);
+        }
     }
 
     private void createDetailContextMenu(Control menuControl) {
+        if (part_site == null) return;
         MenuManager manager = new MenuManager();
         manager.setRemoveAllWhenShown(true);
         manager.addMenuListener(new IMenuListener() {
@@ -184,16 +187,16 @@ public class TCFDetailPane implements IDetailPane {
         // Add a focus listener to update actions when details area gains focus
         source_viewer.getControl().addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent e) {
-                part_site.setSelectionProvider(source_viewer.getSelectionProvider());
+                if (part_site != null) part_site.setSelectionProvider(source_viewer.getSelectionProvider());
                 setGlobalAction(IDebugView.SELECT_ALL_ACTION, getAction(DETAIL_SELECT_ALL_ACTION));
                 setGlobalAction(IDebugView.COPY_ACTION, getAction(DETAIL_COPY_ACTION));
-                ((IViewSite)part_site).getActionBars().updateActionBars();
+                if (part_site instanceof IViewSite) ((IViewSite)part_site).getActionBars().updateActionBars();
             }
             public void focusLost(FocusEvent e) {
-                part_site.setSelectionProvider(null);
+                if (part_site != null) part_site.setSelectionProvider(null);
                 setGlobalAction(IDebugView.SELECT_ALL_ACTION, null);
                 setGlobalAction(IDebugView.COPY_ACTION, null);
-                ((IViewSite)part_site).getActionBars().updateActionBars();
+                if (part_site instanceof IViewSite) ((IViewSite)part_site).getActionBars().updateActionBars();
             }
         });
         // Add a context menu to the detail area
