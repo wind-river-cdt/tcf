@@ -1,11 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others. All rights reserved.
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  * Wind River Systems - initial API and implementation
+ * Tobias Schwarz (Wind River) - [368243] [UI] Allow dynamic new wizard contributions
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.wizards.newWizard;
 
@@ -60,7 +61,6 @@ import org.eclipse.ui.activities.WorkbenchActivityHelper;
 import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.internal.activities.ws.WorkbenchTriggerPoints;
-import org.eclipse.ui.internal.dialogs.WizardContentProvider;
 import org.eclipse.ui.internal.dialogs.WizardPatternFilter;
 import org.eclipse.ui.internal.dialogs.WorkbenchWizardElement;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
@@ -212,7 +212,7 @@ public class NewWizardSelectionPage extends WizardPage {
 		filteredTree.setLayoutData(layoutData);
 
 		final TreeViewer treeViewer = filteredTree.getViewer();
-		treeViewer.setContentProvider(new WizardContentProvider());
+		treeViewer.setContentProvider(new NewWizardContentProvider());
 		treeViewer.setLabelProvider(WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider());
 		treeViewer.setComparator(new NewWizardViewerComparator());
 
@@ -234,7 +234,9 @@ public class NewWizardSelectionPage extends WizardPage {
 					Object element = selection.getFirstElement();
 					if (element instanceof IWizardDescriptor) {
 						// Double-click on a connection type is triggering the sub wizard
-						if (canFlipToNextPage()) getWizard().getContainer().showPage(getNextPage());
+						if (canFlipToNextPage()) {
+							getWizard().getContainer().showPage(getNextPage());
+						}
 					} else if (event.getViewer() instanceof TreeViewer) {
 						TreeViewer viewer = (TreeViewer)event.getViewer();
 						if (viewer.isExpandable(element)) {
@@ -245,7 +247,7 @@ public class NewWizardSelectionPage extends WizardPage {
 			}
 		});
 
-		treeViewer.setInput(wizardRegistry.getRootCategory());
+		treeViewer.setInput(wizardRegistry);
 
 		// apply the standard dialog font
 		Dialog.applyDialogFont(composite);
@@ -303,7 +305,9 @@ public class NewWizardSelectionPage extends WizardPage {
 				if (selectedWizardDescriptor.getDescription() != null && !"".equals(selectedWizardDescriptor.getDescription())) { //$NON-NLS-1$
 					setDescription(selectedWizardDescriptor.getDescription());
 				} else {
-					if (!getDefaultDescription().equals(getDescription())) setDescription(getDefaultDescription());
+					if (!getDefaultDescription().equals(getDescription())) {
+						setDescription(getDefaultDescription());
+					}
 				}
 			} else {
 				selectedWizardDescriptor = null;
@@ -341,7 +345,9 @@ public class NewWizardSelectionPage extends WizardPage {
             	if (wizard != null) {
             		// If the wizard got created by the call to getWizard(),
             		// then allow the wizard to create its pages
-            		if (!isCreated) wizard.addPages();
+					if (!isCreated) {
+						wizard.addPages();
+					}
             		// Return the starting page of the wizard
             		return wizard.getStartingPage();
             	}
@@ -393,9 +399,13 @@ public class NewWizardSelectionPage extends WizardPage {
 		IDialogSettings settings = super.getDialogSettings();
 		// If the dialog settings could not set from the wizard, fallback to the plugin's
 		// dialog settings store.
-		if (settings == null) settings = UIPlugin.getDefault().getDialogSettings();
+		if (settings == null) {
+			settings = UIPlugin.getDefault().getDialogSettings();
+		}
 		String sectionName = this.getClass().getName();
-		if (settings.getSection(sectionName) == null) settings.addNewSection(sectionName);
+		if (settings.getSection(sectionName) == null) {
+			settings.addNewSection(sectionName);
+		}
 		settings = settings.getSection(sectionName);
 
 		return settings;
@@ -409,11 +419,13 @@ public class NewWizardSelectionPage extends WizardPage {
 		if (settings != null) {
 			String[] expandedCategories = settings.getArray(EXPANDED_CATEGORIES_SETTINGS_ID);
 			// by default we expand always the "General" category.
-			if (expandedCategories == null) expandedCategories = DEFAULT_EXPANDED_CATEGORY_IDS;
+			if (expandedCategories == null) {
+				expandedCategories = DEFAULT_EXPANDED_CATEGORY_IDS;
+			}
 			if (expandedCategories != null) {
 				List<IWizardCategory> expanded = new ArrayList<IWizardCategory>();
-				for (int i = 0; i < expandedCategories.length; i++) {
-					String categoryId = expandedCategories[i];
+				for (String expandedCategorie : expandedCategories) {
+					String categoryId = expandedCategorie;
 					if (categoryId != null && !"".equals(categoryId.trim())) { //$NON-NLS-1$
 						IWizardCategory category = wizardRegistry.findCategory(categoryId);
 						if (category != null && !expanded.contains(category)) {
@@ -422,7 +434,9 @@ public class NewWizardSelectionPage extends WizardPage {
 					}
 				}
 
-				if (expanded.size() > 0) filteredTree.getViewer().setExpandedElements(expanded.toArray());
+				if (expanded.size() > 0) {
+					filteredTree.getViewer().setExpandedElements(expanded.toArray());
+				}
 			}
 
 			String selectedWizardDescriptorId = settings.get(SELECTED_WIZARD_DESCRIPTOR_SETTINGS_ID);
@@ -443,9 +457,9 @@ public class NewWizardSelectionPage extends WizardPage {
 		if (settings != null) {
 			List<String> expandedCategories = new ArrayList<String>();
 			Object[] expanded = filteredTree.getViewer().getVisibleExpandedElements();
-			for (int i = 0; i < expanded.length; i++) {
-				if (expanded[i] instanceof IWizardCategory) {
-					expandedCategories.add(((IWizardCategory)expanded[i]).getId());
+			for (Object element : expanded) {
+				if (element instanceof IWizardCategory) {
+					expandedCategories.add(((IWizardCategory)element).getId());
 				}
 			}
 			settings.put(EXPANDED_CATEGORIES_SETTINGS_ID, expandedCategories.toArray(new String[expandedCategories.size()]));

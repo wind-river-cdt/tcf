@@ -6,26 +6,30 @@
  *
  * Contributors:
  * Wind River Systems - initial API and implementation
+ * Tobias Schwarz (Wind River) - [368243] [UI] Allow dynamic new wizard contributions
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.views.actions;
 
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
-import org.eclipse.tcf.te.ui.views.nls.Messages;
 import org.eclipse.tcf.te.ui.interfaces.IContextHelpIds;
 import org.eclipse.tcf.te.ui.interfaces.ImageConsts;
+import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
+import org.eclipse.tcf.te.ui.views.nls.Messages;
 import org.eclipse.tcf.te.ui.wizards.newWizard.NewWizardRegistry;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.internal.actions.CommandAction;
+import org.eclipse.ui.internal.navigator.wizards.WizardShortcutAction;
 import org.eclipse.ui.navigator.CommonActionProvider;
 import org.eclipse.ui.navigator.ICommonActionExtensionSite;
 import org.eclipse.ui.navigator.ICommonMenuConstants;
 import org.eclipse.ui.navigator.ICommonViewerWorkbenchSite;
 import org.eclipse.ui.navigator.WizardActionGroup;
+import org.eclipse.ui.wizards.IWizardDescriptor;
 
 /**
  * Action provider implementation providing the "New >" content menu
@@ -107,6 +111,13 @@ public class NewActionProvider extends CommonActionProvider {
 		if (newWizardActionGroup != null) {
 			newWizardActionGroup.setContext(getContext());
 			newWizardActionGroup.fillContextMenu(newMenu);
+		}
+
+
+		IWorkbenchWindow window = ((ICommonViewerWorkbenchSite)getActionSite().getViewSite()).getWorkbenchWindow();
+		for (IWizardDescriptor wizard : NewWizardRegistry.getInstance().getCommonWizards(getContext().getSelection())) {
+			IAction action = new WizardShortcutAction(window, wizard);
+			newMenu.add(action);
 		}
 
 		// Add the standard additions marker

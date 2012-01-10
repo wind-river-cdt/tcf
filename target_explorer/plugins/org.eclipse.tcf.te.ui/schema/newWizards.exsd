@@ -3,12 +3,12 @@
 <schema targetNamespace="org.eclipse.tcf.te.ui" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.eclipse.tcf.te.ui" id="newWizards" name="New Target Wizards"/>
+         <meta.schema plugin="org.eclipse.tcf.te.ui" id="newWizards" name="New Wizards"/>
       </appinfo>
       <documentation>
-         This extension point is used to register target creation wizard extensions. Target creation wizards appear as choices within the &quot;New Target&quot; dialog, and are used to create target definitions. Target creation wizards can be organized in categories. Uncategorized wizards or wizards with invalid category paths will be sorted in as non-categorized root element.
+         This extension point is used to register element creation wizard extensions. Element creation wizards appear as choices within the &quot;New&quot; dialog. The new element creation wizards can be organized in categories. Uncategorized wizards or wizards with invalid category paths will be sorted in as non-categorized root element.
 &lt;p&gt;
-Target creation wizards may optionally specify a description subelement whose body should contain short text about the wizard.
+New element creation wizards may optionally specify a description subelement whose body should contain short text about the wizard.
       </documentation>
    </annotation>
 
@@ -200,7 +200,7 @@ Target creation wizards may optionally specify a description subelement whose bo
          <meta.section type="apiinfo"/>
       </appinfo>
       <documentation>
-         The provider of a new target creation wizard must implement &lt;samp&gt;org.eclipse.ui.IWorkbenchWizard&lt;/samp&gt;.
+         The provider of a new element creation wizard must implement &lt;samp&gt;org.eclipse.ui.IWorkbenchWizard&lt;/samp&gt;.
       </documentation>
    </annotation>
 
