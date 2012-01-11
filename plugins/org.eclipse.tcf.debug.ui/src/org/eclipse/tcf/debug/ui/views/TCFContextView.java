@@ -19,7 +19,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.debug.ui.AbstractDebugView;
 import org.eclipse.debug.ui.DebugUITools;
-import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.debug.ui.contexts.DebugContextEvent;
 import org.eclipse.debug.ui.contexts.IDebugContextListener;
 import org.eclipse.debug.ui.contexts.IDebugContextService;
@@ -30,11 +29,12 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.jface.action.*;
 import org.eclipse.ui.*;
-import org.eclipse.ui.views.properties.PropertySheet;
-import org.eclipse.ui.views.properties.PropertySheetPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExecContext;
+import org.eclipse.tcf.debug.ui.ITCFObject;
+import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.IRunControl;
+import org.eclipse.tcf.util.TCFDataCache;
 
 public class TCFContextView extends AbstractDebugView implements IDebugContextListener {
 
@@ -69,9 +69,10 @@ public class TCFContextView extends AbstractDebugView implements IDebugContextLi
         }
 
         public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+            if (listenerLabel.isDisposed()) return;
             localInputElement = new ArrayList<MyTableEntry>();
             // Convert the map as ArrayList.
-            TCFNodeExecContext node = (TCFNodeExecContext)newInput;
+            ITCFObject node = (ITCFObject)newInput;
 
             // Do proper validation
             if (node == null) {
@@ -373,7 +374,9 @@ public class TCFContextView extends AbstractDebugView implements IDebugContextLi
 
     private class MyNodeRetrieved implements Runnable {
 
-        TCFNodeExecContext l_node;
+        ITCFObject l_node;
+        final TCFDataCache<Map<String,Object>> state;
+        final TCFDataCache<IRunControl.RunControlContext> run_context;
 
        /* "local_copy" is assigned on TCF thread, but used on display thread 
         * - potential racing condition.
@@ -384,53 +387,80 @@ public class TCFContextView extends AbstractDebugView implements IDebugContextLi
 
         Map<String, Object> temp_copy;
 
-        public MyNodeRetrieved(TCFNodeExecContext node) {
-            l_node = node;
+        public MyNodeRetrieved(ITCFObject node) {
+            l_node= node;
+            run_context = new TCFDataCache<IRunControl.RunControlContext>(node.getChannel()) {
+                @Override
+                protected boolean startDataRetrieval() {
+                    IRunControl run = l_node.getChannel().getRemoteService(IRunControl.class);
+                    if (run == null) {
+                        set(null, null, null);
+                        return true;
+                    }
+                    command = run.getContext(l_node.getID(), new IRunControl.DoneGetContext() {
+                        public void doneGetContext(IToken token, Exception error, IRunControl.RunControlContext context) {
+                            set(token, error, context);
+                        }
+                    });
+                    return false;
+                }
+            };
+            state = new TCFDataCache<Map<String,Object>>(node.getChannel()) {
+                @Override
+                protected boolean startDataRetrieval() {
+                    if (!run_context.validate(this)) return false;
+                    IRunControl.RunControlContext ctx = run_context.getData();
+                    if (ctx == null || !ctx.hasState()) {
+                        set(null, null, null);
+                        return true;
+                    }
+                    command = ctx.getState(new IRunControl.DoneGetState() {
+                        public void doneGetState(IToken token, Exception error, boolean suspended, String pc, String reason, Map<String,Object> params) {
+                            set(token, error, params);
+                        }
+                    });
+                    return false;
+                }
+            };
         }
 
         public void run() {
 
             // Validate the cache for the State too.
-            if (!l_node.getState().validate(this)) {
+            if (!state.validate(this)) {
                 return;
             }
 
             // Get the suspend map and copy it locally
-            if (l_node.getState().getData() == null) {
-                temp_copy = null;
-            }
-            else if (l_node.getState().getData().suspend_params == null) {
-                temp_copy = null;
+            if (state.getData() == null) {
+                temp_copy = new HashMap<String, Object>();
             }
             else {
-                temp_copy = new HashMap<String, Object>(l_node.getState().getData().suspend_params);
+                temp_copy = new HashMap<String, Object>(state.getData());
             }
 
+            state.dispose();
+            run_context.dispose();
             // We can ask the UI to refresh now !
-            if (temp_copy == null) {
-                listenerLabel.setText("Can't get data from caches. Try again..");
-            }
-            else {
-                synchronized (Device.class) {
-                    Display display = Display.getDefault();
-                    if (!display.isDisposed()) {
-                        // This will be executed in the UI thread.
-                        display.asyncExec(new Runnable() {
-                            public void run() {
-                                // Now we have select a TCFNodeExecContext
-                                // String result =
-                                // "Suspended states for target pid  " +
-                                // node.getSystemMonitor().getData().pid;
-                                String result = "Cache retrieved !";
-                                listenerLabel.setText(result);
+            synchronized (Device.class) {
+                Display display = Display.getDefault();
+                if (!display.isDisposed()) {
+                    // This will be executed in the UI thread.
+                    display.asyncExec(new Runnable() {
+                        public void run() {
+                            // Now we have select a TCFNodeExecContext
+                            // String result =
+                            // "Suspended states for target pid  " +
+                            // node.getSystemMonitor().getData().pid;
+                            String result = "Cache retrieved !";
+                            listenerLabel.setText(result);
 
-                                // Both caches are available, we can refresh the
-                                // UI.
-                                local_copy = new HashMap<String, Object>(temp_copy);
-                                fTableView.setInput(l_node);
-                            }
-                        });
-                    }
+                            // Both caches are available, we can refresh the
+                            // UI.
+                            local_copy = temp_copy;
+                            fTableView.setInput(l_node);
+                        }
+                    });
                 }
             }
         }
@@ -441,8 +471,8 @@ public class TCFContextView extends AbstractDebugView implements IDebugContextLi
 
     public void debugContextChanged(DebugContextEvent event) {
         Object element = ((StructuredSelection)event.getContext()).getFirstElement();
-        if (element instanceof TCFNodeExecContext) {
-            TCFNodeExecContext node = (TCFNodeExecContext)element;
+        if (element instanceof ITCFObject) {
+            ITCFObject node = (ITCFObject)element;
 
             listenerLabel.setText("Retrieving the cache...");
             // Retrieve the datas from the caches
