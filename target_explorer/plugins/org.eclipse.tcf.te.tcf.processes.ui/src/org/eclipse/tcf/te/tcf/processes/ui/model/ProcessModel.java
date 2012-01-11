@@ -76,6 +76,7 @@ public class ProcessModel implements IPreferenceConsts{
 	 */
 	ProcessModel(IPeerModel peerModel) {
 		this.peerModel = peerModel;
+		this.stopped = true;
 	}
 
 	/**
@@ -99,13 +100,12 @@ public class ProcessModel implements IPreferenceConsts{
 		root.childrenQueried = false;
 		root.childrenQueryRunning = false;
 		this.root = root;
-		startPolling();
 	}
 
 	/**
 	 * Start the periodical polling.
 	 */
-	public void startPolling() {
+	void startPolling() {
 	    setStopped(false);
 	    pollingTimer = new Timer();
 		schedulePolling();
@@ -132,7 +132,7 @@ public class ProcessModel implements IPreferenceConsts{
 	/**
 	 * Stop the periodical polling.
 	 */
-	public void stopPolling() {
+	void stopPolling() {
 		setStopped(true);
 	}
 
@@ -156,11 +156,6 @@ public class ProcessModel implements IPreferenceConsts{
 					}
 				});
 	        }};
-	    if(interval == 0) {
-	    	// Interval has not yet been initialized.
-	    	IPreferenceStore prefStore = UIPlugin.getDefault().getPreferenceStore();
-	    	interval = prefStore.getInt(PREF_LAST_INTERVAL);
-	    }
         pollingTimer.schedule(pollingTask, interval * 1000);
     }
 	
@@ -170,11 +165,17 @@ public class ProcessModel implements IPreferenceConsts{
 	 * @param interval The new interval.
 	 */
 	public void setInterval(int interval) {
-		Assert.isTrue(interval > 0);
+		Assert.isTrue(interval >= 0);
 		if (this.interval != interval) {
-			this.interval = interval;
-			IPreferenceStore prefStore = UIPlugin.getDefault().getPreferenceStore();
-			prefStore.setValue(PREF_LAST_INTERVAL, interval);
+			if(this.interval == 0) {
+				this.interval = interval;
+				startPolling();
+			} else {
+				this.interval = interval;
+				if(interval == 0) {
+					stopPolling();
+				}
+			}
 		}
 	}
 

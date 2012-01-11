@@ -130,7 +130,7 @@ public final class ProcessTreeNode extends PlatformObject {
 	 */
 	public void firePropertyChanged() {
 		IViewerInput  provider = (IViewerInput) peerNode.getAdapter(IViewerInput.class);
-		PropertyChangeEvent event = new PropertyChangeEvent(this, "state", null, null); //$NON-NLS-1$
+		PropertyChangeEvent event = new PropertyChangeEvent(parent == null ? peerNode : this, "state", null, null); //$NON-NLS-1$
 		provider.firePropertyChange(event);
     }
 }

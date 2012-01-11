@@ -262,6 +262,10 @@ public class TreeViewerExtension {
 		ViewerFilter filter = (ViewerFilter) configuration.createExecutableExtension("class"); //$NON-NLS-1$
 		Assert.isNotNull(filter);
 		descriptor.setFilter(filter);
+		attribute = configuration.getAttribute("visibleInUI");  //$NON-NLS-1$
+		if(attribute != null) {
+			descriptor.setVisible(Boolean.valueOf(attribute).booleanValue());
+		}
 	}
 
 	/**

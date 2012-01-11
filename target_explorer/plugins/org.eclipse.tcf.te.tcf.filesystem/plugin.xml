@@ -99,7 +99,7 @@
 <!-- Editor page contributions -->
    <extension point="org.eclipse.tcf.te.ui.views.editorPages">
       <editorPage
-            class="org.eclipse.tcf.te.ui.views.editor.pages.TreeViewerExplorerEditorPage:org.eclipse.tcf.te.ui.controls.viewer.fs"
+            class="org.eclipse.tcf.te.ui.views.editor.pages.TreeViewerExplorerEditorPage:org.eclipse.tcf.te.ui.controls.viewer.fs:File System Explorer"
             name="%FSExplorerEditorPage.name"
             id="org.eclipse.tcf.te.tcf.filesystem.FSExplorerEditorPage">
       </editorPage>
@@ -2124,7 +2124,8 @@
                enabled="true"
                id="org.eclipse.tcf.te.tcf.filesystem.navigator.filter.hiddenFiles"
                image="icons/obj16/hidden_file_filter.png"
-               name="%filter.name.hidden">
+               name="%filter.name.hidden"
+               visibleInUI="true">
          </filter>
          <filter
                class="org.eclipse.tcf.te.tcf.filesystem.filters.SystemFilesViewerFilter"
@@ -2132,7 +2133,8 @@
                enabled="true"
                id="org.eclipse.tcf.te.tcf.filesystem.navigator.filter.systemFiles"
                image="icons/obj16/system_file_filter.png"
-               name="%filter.name.system">
+               name="%filter.name.system"
+               visibleInUI="true">
             <activation>
                <with variable="input">
                   <test property="org.eclipse.tcf.te.tcf.filesystem.propertytester.peer.isWindows"/>

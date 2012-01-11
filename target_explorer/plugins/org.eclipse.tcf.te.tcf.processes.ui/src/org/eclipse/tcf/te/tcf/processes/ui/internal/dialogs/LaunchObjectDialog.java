@@ -33,7 +33,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.tcf.te.core.utils.text.StringUtil;
 import org.eclipse.tcf.te.runtime.services.interfaces.constants.ILineSeparatorConstants;
 import org.eclipse.tcf.te.runtime.services.interfaces.constants.ITerminalsConnectorConstants;
-import org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeContentProvider;
+import org.eclipse.tcf.te.tcf.filesystem.controls.FSNavigatorContentProvider;
 import org.eclipse.tcf.te.tcf.filesystem.dialogs.FSOpenFileDialog;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
@@ -138,7 +138,7 @@ public class LaunchObjectDialog extends CustomTrayDialog {
 				if (dialog.open() == Window.OK) {
 					Object candidate = dialog.getFirstResult();
 					if (candidate instanceof FSTreeNode) {
-						String absPath = FSTreeContentProvider.getEntryAbsoluteName((FSTreeNode) candidate);
+						String absPath = FSNavigatorContentProvider.getEntryAbsoluteName((FSTreeNode) candidate);
 						if (absPath != null) {
 							imagePath.setText(absPath);
 						}

@@ -107,6 +107,8 @@ public class Messages extends NLS {
 
 	public static String BasicInformationSection_User;
 
+	public static String ConfigIntervalDynamicContribution_Custom;
+
 	public static String ContextIDSection_ContextIDs;
 
 	public static String ContextIDSection_GroupID;
@@ -153,8 +155,6 @@ public class Messages extends NLS {
 
 	public static String IntervalConfigDialog_ChoiceTwoLabel;
 
-	public static String IntervalConfigDialog_DialogMessage;
-
 	public static String IntervalConfigDialog_DialogTitle;
 
 	public static String IntervalConfigDialog_InvalidNumber;
@@ -168,6 +168,8 @@ public class Messages extends NLS {
 	public static String IntervalConfigDialog_SelectSpeed;
 
 	public static String IntervalConfigDialog_SPEED;
+
+	public static String IntervalConfigDialog_ZeroWarning;
 
 	public static String MemorySection_PSize;
 
