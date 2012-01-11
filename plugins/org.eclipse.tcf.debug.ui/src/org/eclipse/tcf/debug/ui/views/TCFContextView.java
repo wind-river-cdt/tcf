@@ -41,7 +41,7 @@ public class TCFContextView extends AbstractDebugView implements IDebugContextLi
     ArrayList<String> filteredKeys;
 
     Map<String, Object> local_copy;
-    
+
     private class MyTableEntry {
         // Used in the table viewer...
         String key;
@@ -375,6 +375,15 @@ public class TCFContextView extends AbstractDebugView implements IDebugContextLi
 
         TCFNodeExecContext l_node;
 
+       /* "local_copy" is assigned on TCF thread, but used on display thread 
+        * - potential racing condition.
+        * A better approach is to put the map into a local variable 
+        * and assign "local_copy" right before
+        * fTableView.setInput(l_node); 
+        */
+
+        Map<String, Object> temp_copy;
+
         public MyNodeRetrieved(TCFNodeExecContext node) {
             l_node = node;
         }
@@ -382,37 +391,48 @@ public class TCFContextView extends AbstractDebugView implements IDebugContextLi
         public void run() {
 
             // Validate the cache for the State too.
-            if (!l_node.getState().validate()) {
-                // Question : How can I tell the UI that something went wrong ??
+            if (!l_node.getState().validate(this)) {
                 return;
             }
-            
-            // Get the suspend map and copy it locally
-            if (l_node.getState().getData().suspend_params == null) {
-                local_copy = null;
-            } else {
-                local_copy = new HashMap<String,Object> (l_node.getState().getData().suspend_params);
-            }
-            
-            // We can ask the UI to refresh now !
-            synchronized (Device.class) {
-                Display display = Display.getDefault();
-                if (!display.isDisposed()) {
-                    // This will be executed in the UI thread.
-                    display.asyncExec(new Runnable() {
-                        public void run() {
-                            // Now we have select a TCFNodeExecContext
-                            // String result = "Suspended states for target pid  " + node.getSystemMonitor().getData().pid;
-                            String result = "Cache retrieved !";
-                            listenerLabel.setText(result);
 
-                            // Both caches are available, we can refresh the UI.
-                            fTableView.setInput(l_node);
-                        }
-                    });
+            // Get the suspend map and copy it locally
+            if (l_node.getState().getData() == null) {
+                temp_copy = null;
+            }
+            else if (l_node.getState().getData().suspend_params == null) {
+                temp_copy = null;
+            }
+            else {
+                temp_copy = new HashMap<String, Object>(l_node.getState().getData().suspend_params);
+            }
+
+            // We can ask the UI to refresh now !
+            if (temp_copy == null) {
+                listenerLabel.setText("Can't get data from caches. Try again..");
+            }
+            else {
+                synchronized (Device.class) {
+                    Display display = Display.getDefault();
+                    if (!display.isDisposed()) {
+                        // This will be executed in the UI thread.
+                        display.asyncExec(new Runnable() {
+                            public void run() {
+                                // Now we have select a TCFNodeExecContext
+                                // String result =
+                                // "Suspended states for target pid  " +
+                                // node.getSystemMonitor().getData().pid;
+                                String result = "Cache retrieved !";
+                                listenerLabel.setText(result);
+
+                                // Both caches are available, we can refresh the
+                                // UI.
+                                local_copy = new HashMap<String, Object>(temp_copy);
+                                fTableView.setInput(l_node);
+                            }
+                        });
+                    }
                 }
             }
-            
         }
     }
 
@@ -426,12 +446,8 @@ public class TCFContextView extends AbstractDebugView implements IDebugContextLi
 
             listenerLabel.setText("Retrieving the cache...");
             // Retrieve the datas from the caches
-            try {
-                Protocol.invokeAndWait(new MyNodeRetrieved(node));
-            }
-            catch (Exception e) {
-                listenerLabel.setText("Can't get data from caches. Try again..");
-            }
+
+            Protocol.invokeLater(new MyNodeRetrieved(node));
         }
         return;
     }
