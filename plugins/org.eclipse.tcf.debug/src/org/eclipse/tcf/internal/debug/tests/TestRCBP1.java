@@ -26,6 +26,7 @@ import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.protocol.JSON;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IBreakpoints;
+import org.eclipse.tcf.services.IContextQuery;
 import org.eclipse.tcf.services.IDiagnostics;
 import org.eclipse.tcf.services.IDisassembly;
 import org.eclipse.tcf.services.ILineNumbers;
@@ -63,6 +64,7 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
     private final IDisassembly srv_disassembly;
     private final IPathMap srv_path_map;
     private final IMemoryMap srv_memory_map;
+    private final IContextQuery srv_context_query;
     private final Map<String,IRunControl.RunControlContext> threads = new HashMap<String,IRunControl.RunControlContext>();
     private final Map<String,SuspendedContext> suspended = new HashMap<String,SuspendedContext>();
     private final Map<String,SuspendedContext> suspended_prev = new HashMap<String,SuspendedContext>();
@@ -250,6 +252,7 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
         srv_disassembly = channel.getRemoteService(IDisassembly.class);
         srv_path_map = channel.getRemoteService(IPathMap.class);
         srv_memory_map = channel.getRemoteService(IMemoryMap.class);
+        srv_context_query = channel.getRemoteService(IContextQuery.class);
     }
 
     public void start() {
@@ -883,7 +886,7 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
 
     public void contextAdded(RunControlContext[] contexts) {
         for (RunControlContext ctx : contexts) {
-            String id = ctx.getID();
+            final String id = ctx.getID();
             if (threads.get(id) != null) {
                 exit(new Exception("Invalid contextAdded event:\nContext: " + ctx));
                 return;
@@ -899,6 +902,28 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
                     assert !canResume(id);
                     exit(new Exception("Unexpected contextAdded event\nContext: " + ctx));
                     return;
+                }
+                if (srv_context_query != null) {
+                    String s = null;
+                    switch (rnd.nextInt(4)) {
+                    case 0: s = "ID=" + id; break;
+                    case 1: s = "**/ID=" + id; break;
+                    case 2: s = "/**/ID=" + id; break;
+                    case 3: s = "ID=" + id + ",ID=" + id; break;
+                    }
+                    srv_context_query.query(s, new IContextQuery.DoneQuery() {
+                        public void doneQuery(IToken token, Exception error, String[] contexts) {
+                            if (error != null) {
+                                exit(error);
+                            }
+                            else if (contexts == null || contexts.length != 1) {
+                                exit(new Exception("Invalid result length of ContextQuery.query command"));
+                            }
+                            else if (!id.equals(contexts[0])) {
+                                exit(new Exception("Invalid ID returned by ContextQuery.query command"));
+                            }
+                        }
+                    });
                 }
                 if (ctx.hasState()) {
                     threads.put(id, ctx);
