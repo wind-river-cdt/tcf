@@ -19,16 +19,16 @@
    <extension point="org.eclipse.ui.commands">
       <category
             id="org.eclipse.tcf.te.ui.commands.category"
-            name="%Command.category.name">
+            name="%command.category.name">
       </category>
 
       <command
             categoryId="org.eclipse.tcf.te.ui.commands.category"
             defaultHandler="org.eclipse.tcf.te.ui.wizards.newWizard.NewWizardCommandHandler"
-            description="%Command.newWizards.description"
+            description="%command.newWizards.description"
             helpContextId="org.eclipse.tcf.te.ui.command_NewWizards"
             id="org.eclipse.tcf.te.ui.command.newWizards"
-            name="%Command.newWizards.name">
+            name="%command.newWizards.name">
       </command>
    </extension>
    

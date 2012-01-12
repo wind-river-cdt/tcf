@@ -49,6 +49,11 @@
                   <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
                </enablement>
             </commonWizard>
+            <possibleChildren>
+               <instanceof
+                     value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel">
+               </instanceof>
+            </possibleChildren>
       </navigatorContent>
       <commonFilter
             activeByDefault="false"

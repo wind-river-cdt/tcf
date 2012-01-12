@@ -55,8 +55,8 @@ public class ConfigFilterAction extends Action {
 	 */
 	@Override
 	public void run() {
-		FilterDescriptor[] filterDescriptors = treeControl.getFilterDescriptors();
-		if (filterDescriptors == null) return;
+		FilterDescriptor[] filterDescriptors = getVisibleFilters();
+		if (filterDescriptors == null || filterDescriptors.length == 0) return;
 		
 		ILabelProvider filterLabelProvider = createFilterLabelProvider();
 		Shell parent = treeControl.getViewer().getControl().getShell();
@@ -73,7 +73,9 @@ public class ConfigFilterAction extends Action {
 		if (dialog.open() == Window.OK) {
 			Object[] elements = dialog.getResult();
 			for (FilterDescriptor descriptor : filterDescriptors) {
-				descriptor.setEnabled(false);
+				if (descriptor.isVisible()) {
+					descriptor.setEnabled(false);
+				}
 			}
 			for (Object element : elements) {
 				if (element instanceof FilterDescriptor) {
@@ -84,6 +86,25 @@ public class ConfigFilterAction extends Action {
 			treeControl.updateFilters();
 			treeControl.updateFilterState();
 		}
+	}
+	
+	/**
+	 * Get currently visible filter descriptors.
+	 * 
+	 * @return Currently visible filter descriptors.
+	 */
+	private FilterDescriptor[] getVisibleFilters() {
+		FilterDescriptor[] filterDescriptors = treeControl.getFilterDescriptors();
+		if (filterDescriptors != null && filterDescriptors.length > 0) {
+			List<FilterDescriptor> visibleList = new ArrayList<FilterDescriptor>();
+			for (FilterDescriptor filterDescriptor : filterDescriptors) {
+				if (filterDescriptor.isVisible()) {
+					visibleList.add(filterDescriptor);
+				}
+			}
+			return visibleList.toArray(new FilterDescriptor[visibleList.size()]);		
+		}
+		return null;
 	}
 
 	/**

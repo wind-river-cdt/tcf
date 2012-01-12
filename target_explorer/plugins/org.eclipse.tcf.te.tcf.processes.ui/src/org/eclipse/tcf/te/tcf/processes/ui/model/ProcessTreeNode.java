@@ -15,6 +15,7 @@ import java.util.UUID;
 
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
@@ -36,9 +37,14 @@ public final class ProcessTreeNode extends PlatformObject {
 	public String type = null;
 
 	/**
-	 * The process context object
+	 * The system monitor context object
 	 */
 	public ISysMonitor.SysMonitorContext context;
+
+	/**
+	 * The process context object
+	 */
+	public IProcesses.ProcessContext pContext;
 
 	/**
 	 * The internal process id

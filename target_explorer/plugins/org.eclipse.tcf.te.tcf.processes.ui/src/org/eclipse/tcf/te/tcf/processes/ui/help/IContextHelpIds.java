@@ -40,4 +40,14 @@ public interface IContextHelpIds {
 	 * Error dialog: remote process launch failed.
 	 */
 	public final static String LAUNCH_PROCESS_ERROR_DIALOG = PREFIX + "LaunchProcessErrorDialog"; //$NON-NLS-1$
+
+	/**
+	 * Attach step: Operation failed.
+	 */
+	public final static String MESSAGE_ATTACH_FAILED = PREFIX + ".status.messageAttachFailed"; //$NON-NLS-1$
+
+	/**
+	 * Detach step: Operation failed.
+	 */
+	public final static String MESSAGE_DETACH_FAILED = PREFIX + ".status.messageDetachFailed"; //$NON-NLS-1$
 }

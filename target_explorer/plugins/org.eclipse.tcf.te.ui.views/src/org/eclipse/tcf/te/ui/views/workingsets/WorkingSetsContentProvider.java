@@ -245,6 +245,25 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 				return ws;
 			}
 		}
+		else if (element instanceof IWorkingSetElement) {
+			CommonNavigator navigator = viewer.getCommonNavigator();
+			if (navigator != null) {
+				if (navigator.getRootMode() == IUIConstants.MODE_WORKING_SETS) {
+					IWorkingSet[] workingSets = PlatformUI.getWorkbench().getWorkingSetManager().getAllWorkingSets();
+					List<IWorkingSet> list = new ArrayList<IWorkingSet>();
+					list.addAll(Arrays.asList(workingSets));
+					ILocalWorkingSetManager wsManager = ((View) viewer.getCommonNavigator()).getStateManager().getLocalWorkingSetManager();
+					workingSets = wsManager.getAllWorkingSets();
+					list.addAll(Arrays.asList(workingSets));
+					for (IWorkingSet workingSet : list) {
+						IAdaptable[] wsElements = getWorkingSetElements(workingSet);
+						for (IAdaptable wsElement : wsElements) {
+							if (wsElement == element) return workingSet;
+						}
+					}
+				}
+			}
+		}
 
 		return null;
 	}
