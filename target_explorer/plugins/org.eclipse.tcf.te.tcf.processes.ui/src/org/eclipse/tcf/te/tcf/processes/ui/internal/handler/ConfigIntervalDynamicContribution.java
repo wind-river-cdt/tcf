@@ -10,28 +10,41 @@
 package org.eclipse.tcf.te.tcf.processes.ui.internal.handler;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.SafeRunnable;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.processes.ui.internal.preferences.IPreferenceConsts;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
+import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.ISources;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.CompoundContributionItem;
+import org.eclipse.ui.commands.ICommandService;
 
 /**
  * The dynamic contribution class to create a drop down menu of interval configuration.
  */
 public class ConfigIntervalDynamicContribution extends CompoundContributionItem implements IPreferenceConsts {
-
+	private static final String CUSTOM_COMMAND_ID = "org.eclipse.tcf.te.tcf.processes.ui.command.refreshInterval"; //$NON-NLS-1$
 	/**
 	 * The action to allow a most recently used interval to be selected.
 	 */
@@ -47,7 +60,7 @@ public class ConfigIntervalDynamicContribution extends CompoundContributionItem 
 		 * @param seconds The interval time.
 		 */
 		public MRUAction(ProcessModel model, int seconds) {
-			super("" + seconds + " S", AS_RADIO_BUTTON);  //$NON-NLS-1$//$NON-NLS-2$
+			super("" + seconds + " s", AS_RADIO_BUTTON);  //$NON-NLS-1$//$NON-NLS-2$
 			this.seconds = seconds;
 			this.model = model;
 			if(model.getInterval() == seconds) {
@@ -84,12 +97,9 @@ public class ConfigIntervalDynamicContribution extends CompoundContributionItem 
 		 * @param seconds The interval time.
 		 */
 		public GradeAction(ProcessModel model, String name, int seconds) {
-			super(name+" ("+seconds+" s)", AS_RADIO_BUTTON);  //$NON-NLS-1$//$NON-NLS-2$
+			super(name + (seconds > 0 ? " (" + seconds + " s)" : ""), AS_RADIO_BUTTON); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 			this.model = model;
 			this.seconds = seconds;
-			if(model.getInterval() == seconds) {
-				setChecked(true);
-			}
 		}
 		
 		/*
@@ -105,6 +115,52 @@ public class ConfigIntervalDynamicContribution extends CompoundContributionItem 
         }
 	}
 
+
+	/**
+	 * The action to allow defining a custom interval.
+	 */
+	class CustomAction extends Action {
+		/**
+		 * Constructor
+		 * 
+		 * @param model The process model.
+		 * @param name The grade name.
+		 * @param seconds The interval time.
+		 */
+		public CustomAction() {
+			super(Messages.ConfigIntervalDynamicContribution_Custom, AS_RADIO_BUTTON); 
+		}
+		
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.jface.action.Action#run()
+		 */
+		@Override
+		public void run() {
+			if (isChecked()) {
+				final IWorkbench workbench = PlatformUI.getWorkbench();				
+				ICommandService service = (ICommandService) workbench.getService(ICommandService.class);
+				Command cmd = service != null ? service.getCommand(CUSTOM_COMMAND_ID) : null;
+				if (cmd != null && cmd.isDefined() && cmd.isEnabled()) {
+					final Command command = cmd;
+					SafeRunner.run(new SafeRunnable() {
+						@Override
+						public void run() throws Exception {
+							EvaluationContext ctx = new EvaluationContext(null, StructuredSelection.EMPTY);
+							IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+							Shell shell = window.getShell();
+							ctx.addVariable(ISources.ACTIVE_SHELL_NAME, shell);
+							IEditorInput editorInput = window.getActivePage().getActiveEditor().getEditorInput();
+							ctx.addVariable(ISources.ACTIVE_EDITOR_INPUT_NAME, editorInput);
+							ExecutionEvent executionEvent = new ExecutionEvent(command, Collections.EMPTY_MAP, CustomAction.this, ctx);
+							command.executeWithChecks(executionEvent);
+						}
+					});
+				}
+			}
+		}
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.actions.CompoundContributionItem#getContributionItems()
@@ -141,6 +197,8 @@ public class ConfigIntervalDynamicContribution extends CompoundContributionItem 
 	    String grades = prefStore.getString(PREF_INTERVAL_GRADES);
 	    Assert.isNotNull(grades);
 	    StringTokenizer st = new StringTokenizer(grades, "|"); //$NON-NLS-1$
+	    int current = model.getInterval();
+	    boolean custom = true;
 	    while(st.hasMoreTokens()) {
 	    	String token = st.nextToken();
 	    	StringTokenizer st2 = new StringTokenizer(token, ":"); //$NON-NLS-1$
@@ -148,13 +206,18 @@ public class ConfigIntervalDynamicContribution extends CompoundContributionItem 
 	    	String value = st2.nextToken();
 	    	try{
 	    		int seconds = Integer.parseInt(value);
-	    		if(seconds > 0) {
-	    			items.add(new ActionContributionItem(new GradeAction(model, name, seconds)));
-	    		}
+	    		GradeAction action = new GradeAction(model, name, seconds);
+	    		boolean checked = current == seconds;
+				action.setChecked(checked);
+				custom &= !checked;
+    			items.add(new ActionContributionItem(action));
 	    	}
 	    	catch (NumberFormatException nfe) {
 	    	}
 	    }
+	    CustomAction action = new CustomAction();
+	    action.setChecked(custom);
+	    items.add(new ActionContributionItem(action));
 	    return items;
     }
 
@@ -176,12 +239,10 @@ public class ConfigIntervalDynamicContribution extends CompoundContributionItem 
 	    	while (st.hasMoreTokens()) {
 	    		String token = st.nextToken();
 	    		try {
-	    			int seconds = Integer.parseInt(token);
-	    			if (seconds > 0) {
-	    				mru.add(Integer.valueOf(seconds));
-	    				count ++;
-	    				if (count >= maxCount) break;
-	    			}
+					int seconds = Integer.parseInt(token);
+					mru.add(Integer.valueOf(seconds));
+					count++;
+					if (count >= maxCount) break;
 	    		}
 	    		catch (NumberFormatException nfe) {
 	    		}

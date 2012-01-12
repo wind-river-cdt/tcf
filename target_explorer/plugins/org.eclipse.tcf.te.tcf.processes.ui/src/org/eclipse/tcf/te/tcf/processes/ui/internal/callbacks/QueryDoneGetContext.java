@@ -23,6 +23,7 @@ import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
  * The callback handler that handles the result of service.getContext when querying.
  */
 public class QueryDoneGetContext implements ISysMonitor.DoneGetContext {
+	private static final int PROGRESSIVE_STEP_COUNT = 50;
 	// The current context id.
 	String contextId;
 	// The channel used for query.
@@ -64,31 +65,27 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext {
     private void setAndCheckStatus() {
     	synchronized(status) {
     		status.put(contextId, Boolean.TRUE);
-    		if(isAllComplete()){
+    		boolean completed = true;
+    		int count = 0;
+    		synchronized (status) {
+    			for (String id : status.keySet()) {
+    				Boolean bool = status.get(id);
+    				if(bool.booleanValue()) {
+    					count ++;
+    				} else {
+    					completed = false;
+    				}
+    			}
+    		}
+    		if(completed || (count % PROGRESSIVE_STEP_COUNT ) == 0) {
+    			parentNode.firePropertyChanged();
+    		}
+    		if(completed){
 				parentNode.childrenQueryRunning = false;
 				parentNode.childrenQueried = true;
-				parentNode.firePropertyChanged();
 				Tcf.getChannelManager().closeChannel(channel);
     		}
     	}
-    }
-    
-    /**
-     * Check if all tasks have completed by checking
-     * the status entries. 
-     * 
-     * @return true if all of them are marked finished.
-     */
-    private boolean isAllComplete() {
-		synchronized (status) {
-			for (String id : status.keySet()) {
-				Boolean bool = status.get(id);
-				if (!bool.booleanValue()) {
-					return false;
-				}
-			}
-			return true;
-		}
     }
     
 	/**

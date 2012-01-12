@@ -34,6 +34,5 @@ public class PreferencesInitializer extends AbstractPreferenceInitializer implem
 		IPreferenceStore preferenceStore = UIPlugin.getDefault().getPreferenceStore();
 		preferenceStore.setDefault(PREF_INTERVAL_GRADES, DEFAULT_INTERVAL_GRADES);
 		preferenceStore.setDefault(PREF_INTERVAL_MRU_COUNT, DEFAULT_INTERVAL_MRU_COUNT);
-		preferenceStore.setDefault(PREF_LAST_INTERVAL, DEFAULT_LAST_INTERVAL);
 	}
 }

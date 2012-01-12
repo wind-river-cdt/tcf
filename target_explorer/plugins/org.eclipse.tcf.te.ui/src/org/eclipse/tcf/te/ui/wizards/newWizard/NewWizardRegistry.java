@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -34,8 +35,10 @@ import org.eclipse.ui.wizards.IWizardDescriptor;
  */
 @SuppressWarnings("restriction")
 public final class NewWizardRegistry extends AbstractExtensionWizardRegistry {
-
+	// The list of new wizard providers
 	private List<INewWizardProvider> newWizardProvider = new ArrayList<INewWizardProvider>();
+	// The reference to the root category
+	private IWizardCategory root;
 
 	/*
 	 * Thread save singleton instance creation.
@@ -64,6 +67,7 @@ public final class NewWizardRegistry extends AbstractExtensionWizardRegistry {
 	@Override
 	protected void doInitialize() {
 		super.doInitialize();
+
 		IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint(getPlugin(), "wizardProviders"); //$NON-NLS-1$
 		for (IConfigurationElement element : point.getConfigurationElements()) {
 			if (element.getName().equals("wizardProvider")) { //$NON-NLS-1$
@@ -76,6 +80,73 @@ public final class NewWizardRegistry extends AbstractExtensionWizardRegistry {
 			}
 		}
 
+		// Determine the root category
+		if (!newWizardProvider.isEmpty()) {
+			NewWizardCategory newRoot = new NewWizardCategory(super.getRootCategory());
+
+			for (INewWizardProvider provider : newWizardProvider) {
+				for (IWizardCategory category : provider.getCategories()) {
+					// Look for an existing category first
+					IWizardCategory existing = newRoot.findCategory(category.getId());
+					if (existing != null) {
+						// The category exist already -> merge needed.
+						if (existing instanceof NewWizardCategory) {
+							mergeCategory(category, (NewWizardCategory)existing);
+						} else {
+							NewWizardCategory dst = new NewWizardCategory(existing);
+							if (super.getRootCategory().equals(dst.getParent())) {
+								dst.setParent(newRoot);
+							}
+							mergeCategory(category, dst);
+							newRoot.removeCategory(existing);
+							newRoot.addCategory(dst);
+						}
+					}
+					else {
+						newRoot.addCategory(category);
+					}
+				}
+			}
+
+			root = newRoot;
+		} else {
+			root = super.getRootCategory();
+		}
+	}
+
+	/**
+	 * Merge wizard categories.
+	 *
+	 * @param src The source wizard category. Must not be <code>null</code>.
+	 * @param dst The destination wizard category. Must not be <code>null</code>.
+	 */
+	private void mergeCategory(IWizardCategory src, NewWizardCategory dst) {
+		Assert.isNotNull(src);
+		Assert.isNotNull(dst);
+
+		IWizardCategory[] categories = src.getCategories();
+		for (IWizardCategory category : categories) {
+			IWizardCategory existing = dst.findCategory(category.getId());
+			if (existing != null) {
+				if (existing instanceof NewWizardCategory) {
+					mergeCategory(category, (NewWizardCategory)existing);
+				} else {
+					NewWizardCategory merged = new NewWizardCategory(existing);
+					mergeCategory(category, merged);
+					dst.addCategory(merged);
+				}
+			}
+			else {
+				dst.addCategory(category);
+			}
+		}
+
+		IWizardDescriptor[] wizards = src.getWizards();
+		for (IWizardDescriptor wizard : wizards) {
+			if (dst.findWizard(wizard.getId()) == null) {
+				dst.addWizard(wizard);
+			}
+		}
 	}
 
 	/* (non-Javadoc)
@@ -117,7 +188,7 @@ public final class NewWizardRegistry extends AbstractExtensionWizardRegistry {
 	public IWizardCategory findCategory(String id) {
 		IWizardCategory root = getRootCategory();
 		if (root instanceof NewWizardCategory) {
-			((NewWizardCategory)root).findCategory(id);
+			return ((NewWizardCategory)root).findCategory(id);
 		}
 		return super.findCategory(id);
 	}
@@ -128,19 +199,7 @@ public final class NewWizardRegistry extends AbstractExtensionWizardRegistry {
 	@Override
 	public IWizardCategory getRootCategory() {
 		initialize();
-		if (!newWizardProvider.isEmpty()) {
-			NewWizardCategory root = new NewWizardCategory(super.getRootCategory());
-
-			for (INewWizardProvider provider : newWizardProvider) {
-				for (IWizardCategory category : provider.getCategories()) {
-					root.addCategory(category);
-				}
-			}
-
-			return root;
-		}
-
-		return super.getRootCategory();
+		return root;
 	}
 
 	/**

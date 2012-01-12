@@ -46,8 +46,7 @@ public class ConfigFilterAction extends Action {
 		setImageDescriptor(image);
 		image = UIPlugin.getImageDescriptor(ImageConsts.VIEWER_FILTER_CONFIG_DISABLED);
 		setDisabledImageDescriptor(image);
-		FilterDescriptor[] filterDescriptors = treeControl.getFilterDescriptors();
-		setEnabled(filterDescriptors != null && filterDescriptors.length > 0);
+		updateEnablement();
 	}
 
 	/*
@@ -110,4 +109,22 @@ public class ConfigFilterAction extends Action {
             }
 		};
 	}
+
+	/**
+	 * Update the enablement of this action. If there is any visible filter in the
+	 * tree control, then enable this action. Or else disable it.
+	 */
+	public void updateEnablement() {
+		FilterDescriptor[] filterDescriptors = treeControl.getFilterDescriptors();
+		boolean enabled = false;
+		if(filterDescriptors != null && filterDescriptors.length > 0) {
+			for(FilterDescriptor filterDescriptor : filterDescriptors) {
+				if(filterDescriptor.isVisible()) {
+					enabled = true;
+					break;
+				}
+			}
+		}
+		setEnabled(enabled);	    
+    }
 }

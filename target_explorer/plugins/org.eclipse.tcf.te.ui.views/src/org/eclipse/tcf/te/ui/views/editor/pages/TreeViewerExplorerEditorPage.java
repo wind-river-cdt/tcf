@@ -9,6 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.views.editor.pages;
 
+import java.util.StringTokenizer;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.swt.layout.GridData;
@@ -28,6 +30,7 @@ public class TreeViewerExplorerEditorPage extends AbstractCustomFormToolkitEdito
 	// The references to the pages subcontrol's (needed for disposal)
 	private TreeControl treeControl;
 	private String viewerId;
+	private String titleText;
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.forms.editor.FormPage#dispose()
@@ -44,7 +47,14 @@ public class TreeViewerExplorerEditorPage extends AbstractCustomFormToolkitEdito
 	@Override
     public void setInitializationData(IConfigurationElement config, String propertyName, Object data) {
 	    super.setInitializationData(config, propertyName, data);
-		viewerId = data != null ? data.toString() : null;
+	    if(data != null && data instanceof String) {
+	    	String args = (String) data;
+	    	StringTokenizer st = new StringTokenizer(args, ":"); //$NON-NLS-1$
+	    	if(st.hasMoreTokens())
+	    		viewerId = st.nextToken();
+	    	if(st.hasMoreTokens())
+	    		titleText = st.nextToken();
+	    }
     }
 
 	/* (non-Javadoc)
@@ -71,7 +81,7 @@ public class TreeViewerExplorerEditorPage extends AbstractCustomFormToolkitEdito
 		Assert.isNotNull(toolkit);
 
 		Section section = toolkit.getFormToolkit().createSection(parent, ExpandableComposite.TITLE_BAR);
-		String title = getTitle();
+		String title = titleText == null ? getTitle() :titleText;
 		// Stretch to a length of 40 characters to make sure the title can be changed
 		// to hold and show text up to this length
 		while (title.length() < 40) {

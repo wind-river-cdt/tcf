@@ -358,6 +358,13 @@
                </appinfo>
             </annotation>
          </attribute>
+         <attribute name="visibleInUI" type="boolean">
+            <annotation>
+               <documentation>
+                  If this filter appears in the filter configuration dialog. It is false, i.e., invisible by default.
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 

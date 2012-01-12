@@ -5,7 +5,7 @@
 <!-- Target Explorer Details Editor page contributions -->
    <extension point="org.eclipse.tcf.te.ui.views.editorPages">
       <editorPage
-            class="org.eclipse.tcf.te.ui.views.editor.pages.TreeViewerExplorerEditorPage:org.eclipse.tcf.te.ui.controls.viewer.processes"
+            class="org.eclipse.tcf.te.ui.views.editor.pages.TreeViewerExplorerEditorPage:org.eclipse.tcf.te.ui.controls.viewer.processes:Process Monitor"
             name="%ProcessExplorerEditorPage.name"
             id="org.eclipse.tcf.te.tcf.processes.ui.ProcessExplorerEditorPage">
       </editorPage>
@@ -58,20 +58,6 @@
       </menuContribution>
       <menuContribution
             locationURI="toolbar:org.eclipse.tcf.te.ui.controls.menu.processes?after=additions">
-         <command
-               commandId="org.eclipse.tcf.te.tcf.processes.ui.command.startPolling"
-               icon="icons/obj16/run_refresh.png"
-               label="%command.startPolling.label"
-               style="push"
-               tooltip="%command.startPolling.tooltip">
-         </command>
-         <command
-               commandId="org.eclipse.tcf.te.tcf.processes.ui.command.stopPolling"
-               icon="icons/obj16/stop_refresh.gif"
-               label="%command.stopPolling.label"
-               style="push"
-               tooltip="%command.stopPolling.tooltip">
-         </command>
          <command
                commandId="org.eclipse.tcf.te.tcf.processes.ui.command.refresh"
                icon="icons/obj16/refresh.gif"
@@ -148,42 +134,6 @@
       <handler
             class="org.eclipse.tcf.te.tcf.processes.ui.internal.handler.ConfigRefreshIntervalHandler"
             commandId="org.eclipse.tcf.te.tcf.processes.ui.command.refreshInterval">
-         <enabledWhen>
-            <with
-                  variable="activeEditorInput">
-               <not>
-                  <test
-                        property="org.eclipse.tcf.te.tcf.processes.ui.editorInput.isRefreshStopped">
-                  </test>
-               </not>
-            </with>
-         </enabledWhen>
-      </handler>
-      <handler
-            class="org.eclipse.tcf.te.tcf.processes.ui.internal.handler.StartPollingHandler"
-            commandId="org.eclipse.tcf.te.tcf.processes.ui.command.startPolling">
-         <enabledWhen>
-            <with
-                  variable="activeEditorInput">
-               <test
-                     property="org.eclipse.tcf.te.tcf.processes.ui.editorInput.isRefreshStopped">
-               </test>
-            </with>
-         </enabledWhen>
-      </handler>
-      <handler
-            class="org.eclipse.tcf.te.tcf.processes.ui.internal.handler.StopPollingHandler"
-            commandId="org.eclipse.tcf.te.tcf.processes.ui.command.stopPolling">
-         <enabledWhen>
-            <with
-                  variable="activeEditorInput">
-               <not>
-                  <test
-                        property="org.eclipse.tcf.te.tcf.processes.ui.editorInput.isRefreshStopped">
-                  </test>
-               </not>
-            </with>
-         </enabledWhen>
       </handler>
    </extension>
    <extension
@@ -257,10 +207,10 @@
             viewerId="org.eclipse.tcf.te.ui.controls.viewer.processes">
          <filter
                class="org.eclipse.tcf.te.tcf.processes.ui.internal.filters.SingleThreadFilter"
-               description="For single thread processes the thread child is hidden. "
+               description="%singlethreadfilter.description"
                enabled="true"
                id="org.eclipse.tcf.te.tcf.processes.ui.navigator.filter.singleThread"
-               name="Single Thread Filter">
+               name="%singlethreadfilter.name">
          </filter>
       </filterContribution>
    </extension>
@@ -269,7 +219,7 @@
       <navigatorContent
             activeByDefault="false"
             contentProvider="org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessNavigatorContentProvider"
-            icon="icons/obj16/process.gif"
+            icon="icons/obj16/process_root.png"
             id="org.eclipse.tcf.te.tcf.processes.ui.navigator.content"
             labelProvider="org.eclipse.tcf.te.tcf.processes.ui.internal.columns.ProcessLabelProvider"
             name="%navigatorContent.name"
@@ -296,7 +246,7 @@
             activeByDefault="true"
             class="org.eclipse.tcf.te.tcf.processes.ui.internal.filters.SingleThreadFilter"
             id="org.eclipse.tcf.te.tcf.processes.ui.navigator.filter.singleThread"
-            name="Single Thread Filter"
+            name="%commonFilter.singlethread.name"
             visibleInUI="false">
       </commonFilter>
    </extension>
@@ -316,44 +266,25 @@
       <initializer class="org.eclipse.tcf.te.tcf.processes.ui.internal.preferences.PreferencesInitializer"/>
    </extension>
    <extension
-         point="org.eclipse.core.expressions.propertyTesters">
-      <propertyTester
-            class="org.eclipse.tcf.te.tcf.processes.ui.internal.testers.EditorInputPropertyTester"
-            id="org.eclipse.tcf.te.tcf.processes.ui.editorInput"
-            namespace="org.eclipse.tcf.te.tcf.processes.ui.editorInput"
-            properties="isRefreshStopped"
-            type="org.eclipse.ui.IEditorInput">
-      </propertyTester>
-   </extension>
-   <extension
-         point="org.eclipse.ui.preferencePages">
-      <page
-            category="org.eclipse.tcf.te.ui.preferences.general"
-            class="org.eclipse.tcf.te.tcf.processes.ui.internal.preferences.ProcessPreferencePage"
-            id="org.eclipse.tcf.te.ui.preferences.tcf.process"
-            name="%page.process.name">
-      </page>
-   </extension>
-   <extension
          point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
       <propertyTabs
             contributorId="org.eclipse.tcf.te.ui">
          <propertyTab
                category="target_explorer"
                id="org.eclipse.tcf.te.tcf.processes.ui.propertytab.general"
-               label="General">
+               label="%propertyTab.general.label">
          </propertyTab>
          <propertyTab
                afterTab="org.eclipse.tcf.te.tcf.processes.ui.propertytab.general"
                category="target_explorer"
                id="org.eclipse.tcf.te.tcf.processes.ui.propertytab.context"
-               label="Context">
+               label="%propertyTab.context.label">
          </propertyTab>
          <propertyTab
                afterTab="org.eclipse.tcf.te.tcf.processes.ui.propertytab.context"
                category="target_explorer"
                id="org.eclipse.tcf.te.tcf.processes.ui.propertytab.advanced"
-               label="Advanced">
+               label="%propertyTab.advanced.label">
          </propertyTab>
       </propertyTabs>
    </extension>

@@ -34,7 +34,7 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 	// The listener to refresh the common viewer when properties change.
 	private IPropertyChangeListener commonViewerListener;
 	// The viewer inputs that have been added a property change listener.
-	private Set<IViewerInput> viewerInputs;
+	private Set<IViewerInput> viewerInputs = Collections.synchronizedSet(new HashSet<IViewerInput>());
 	// The viewer
 	private TreeViewer viewer;
 
@@ -77,7 +77,6 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 		Assert.isTrue(viewer instanceof TreeViewer);
 		this.viewer = (TreeViewer) viewer; 
 		commonViewerListener = new CommonViewerListener(this.viewer);
-		viewerInputs = Collections.synchronizedSet(new HashSet<IViewerInput>());
 	}
 	
 	/**
