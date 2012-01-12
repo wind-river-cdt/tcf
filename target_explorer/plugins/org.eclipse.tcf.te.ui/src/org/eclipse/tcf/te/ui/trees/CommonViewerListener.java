@@ -22,10 +22,10 @@ import org.eclipse.swt.widgets.Tree;
 public class CommonViewerListener implements IPropertyChangeListener {
 	// The common viewer of Target Explorer view.
 	private TreeViewer viewer;
-	
+
 	/***
 	 * Create an instance for the specified common viewer.
-	 * 
+	 *
 	 * @param viewer The common viewer from Target Explorer view.
 	 */
 	public CommonViewerListener(TreeViewer viewer) {

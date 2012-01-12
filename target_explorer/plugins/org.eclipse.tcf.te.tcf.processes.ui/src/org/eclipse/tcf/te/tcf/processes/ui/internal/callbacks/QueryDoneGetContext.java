@@ -15,6 +15,8 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.IProcesses;
+import org.eclipse.tcf.services.IProcesses.ProcessContext;
 import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
@@ -32,7 +34,7 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext {
 	ProcessTreeNode parentNode;
 	// The status map to mark and check the completion status.
 	Map<String, Boolean> status;
-	
+
 	/**
 	 * Create an instance with the field parameters.
 	 */
@@ -42,7 +44,7 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext {
 		this.parentNode = parentNode;
 		this.status = status;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.tcf.services.ISysMonitor.DoneGetContext#doneGetContext(org.eclipse.tcf.protocol.IToken, java.lang.Exception, org.eclipse.tcf.services.ISysMonitor.SysMonitorContext)
@@ -50,19 +52,35 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext {
     @Override
 	public void doneGetContext(IToken token, Exception error, ISysMonitor.SysMonitorContext context) {
 		if (error == null && context != null) {
-			ProcessTreeNode childNode = createNodeForContext(context);
+			final ProcessTreeNode childNode = createNodeForContext(context);
 			childNode.parent = parentNode;
 			childNode.peerNode = parentNode.peerNode;
 			parentNode.children.add(childNode);
+
+			IProcesses pService = channel.getRemoteService(IProcesses.class);
+			if (pService != null) {
+				pService.getContext(contextId, new IProcesses.DoneGetContext() {
+					@Override
+					public void doneGetContext(IToken token, Exception error, ProcessContext context) {
+						if (error == null && context != null) {
+							childNode.pContext = context;
+						}
+						setAndCheckStatus();
+					}
+				});
+			} else {
+				setAndCheckStatus();
+			}
+		} else {
+			setAndCheckStatus();
 		}
-		setAndCheckStatus();
 	}
 
     /**
      * Set the complete flag for this context id and check if
-     * all tasks have completed. 
+     * all tasks have completed.
      */
-    private void setAndCheckStatus() {
+    /* default */ void setAndCheckStatus() {
     	synchronized(status) {
     		status.put(contextId, Boolean.TRUE);
     		boolean completed = true;
@@ -87,12 +105,12 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext {
     		}
     	}
     }
-    
+
 	/**
 	 * Creates a node from the given system monitor context.
-	 * 
+	 *
 	 * @param context The system monitor context. Must be not <code>null</code>.
-	 * 
+	 *
 	 * @return The node.
 	 */
 	private ProcessTreeNode createNodeForContext(ISysMonitor.SysMonitorContext context) {
@@ -104,6 +122,7 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext {
 		node.childrenQueried = false;
 		node.childrenQueryRunning = false;
 		node.context = context;
+		node.pContext = null;
 		node.name = context.getFile();
 		node.type = "ProcNode";  //$NON-NLS-1$
 		node.id = context.getID();
@@ -114,5 +133,5 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext {
 		node.username = context.getUserName();
 
 		return node;
-	}        
+	}
 }
