@@ -126,6 +126,9 @@
                <instanceof value="org.eclipse.tcf.te.ui.views.workingsets.WorkingSetViewStateManager"/>
                <instanceof value="org.eclipse.ui.IWorkingSet"/>
                <instanceof value="org.eclipse.tcf.te.ui.views.workingsets.WorkingSetElementHolder"/>
+               <instanceof
+                     value="org.eclipse.tcf.te.runtime.interfaces.workingsets.IWorkingSetElement">
+               </instanceof>
             </or>
          </possibleChildren>
          <commonSorter
