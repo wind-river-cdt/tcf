@@ -18,6 +18,7 @@ import org.eclipse.debug.ui.contexts.ISuspendTrigger;
 import org.eclipse.tcf.internal.debug.model.TCFLaunch;
 import org.eclipse.tcf.internal.debug.ui.Activator;
 import org.eclipse.tcf.internal.debug.ui.model.TCFModel;
+import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.util.TCFTask;
 
 
@@ -33,18 +34,21 @@ public class TCFLaunchAdapterFactory implements IAdapterFactory {
     private static final IElementLabelProvider launch_label_provider = new TCFLaunchLabelProvider();
 
     @SuppressWarnings("rawtypes")
+    private static Object getModelAdapter(Object from, Class to) {
+        TCFLaunch launch = (TCFLaunch)from;
+        TCFModel model = Activator.getModelManager().getModel(launch);
+        if (model != null && to.isInstance(model)) return model;
+        return null;
+    }
+
+    @SuppressWarnings("rawtypes")
     public Object getAdapter(final Object from, final Class to) {
         if (from instanceof TCFLaunch) {
             if (to == IElementLabelProvider.class) return launch_label_provider;
+            if (Protocol.isDispatchThread()) return getModelAdapter(from, to);
             return new TCFTask<Object>() {
                 public void run() {
-                    TCFLaunch launch = (TCFLaunch)from;
-                    TCFModel model = Activator.getModelManager().getModel(launch);
-                    if (model != null && to.isInstance(model)) {
-                        done(model);
-                        return;
-                    }
-                    done(null);
+                    done(getModelAdapter(from, to));
                 }
             }.getE();
         }
