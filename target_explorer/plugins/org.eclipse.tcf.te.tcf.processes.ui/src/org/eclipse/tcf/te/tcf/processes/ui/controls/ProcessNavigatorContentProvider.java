@@ -39,7 +39,15 @@ public class ProcessNavigatorContentProvider  extends TreeContentProvider implem
 	@Override
 	public Object getParent(Object element) {
 		if (element instanceof ProcessTreeNode) {
-			return ((ProcessTreeNode) element).parent;
+			ProcessTreeNode parent = ((ProcessTreeNode) element).parent;
+			// If the parent is a root node, return the associated peer node
+			if (parent != null) {
+				if (parent.type != null && parent.type.endsWith("ProcRootNode")) { //$NON-NLS-1$
+					return parent.peerNode;
+				}
+				return parent;
+			}
+			return ((ProcessTreeNode) element).peerNode;
 		}
 		return null;
 	}

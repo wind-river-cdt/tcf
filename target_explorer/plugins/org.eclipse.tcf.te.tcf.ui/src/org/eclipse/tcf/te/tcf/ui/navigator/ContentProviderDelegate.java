@@ -109,6 +109,7 @@ public class ContentProviderDelegate implements ICommonContentProvider {
 				if (!roots.containsKey(parentPeerId)) roots.put(parentPeer.getID(), new PeerRedirectorGroupNode(parentPeerId));
 				return roots.get(parentPeerId);
 			}
+			return ((IPeerModel)element).getModel();
 		} else if (element instanceof PeerRedirectorGroupNode) {
 			// Return the parent peer model node
 			final AtomicReference<IPeerModel> parent = new AtomicReference<IPeerModel>();

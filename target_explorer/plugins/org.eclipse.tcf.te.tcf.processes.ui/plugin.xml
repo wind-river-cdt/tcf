@@ -256,7 +256,7 @@
             viewerId="org.eclipse.tcf.te.ui.views.TargetExplorer">
          <includes>
             <contentExtension
-                  isRoot="false"
+                  isRoot="true"
                   pattern="org.eclipse.tcf.te.tcf.processes.ui.navigator.*">
             </contentExtension>
          </includes>

@@ -7,7 +7,7 @@
       <viewerContentBinding viewerId="org.eclipse.tcf.te.ui.views.TargetExplorer">
          <includes>
             <contentExtension
-                  isRoot="false"
+                  isRoot="true"
                   pattern="org.eclipse.tcf.te.tcf.filesystem.navigator.*"/>
          </includes>
       </viewerContentBinding>
