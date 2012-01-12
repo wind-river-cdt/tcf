@@ -405,6 +405,17 @@
             </enablement>
          </action>
       </objectContribution>
+      <objectContribution
+            adaptable="false"
+            id="org.eclipse.tcf.debug.ui.TCFNodeRegister"
+            objectClass="org.eclipse.tcf.internal.debug.ui.model.TCFNodeRegister">
+         <action
+               class="org.eclipse.tcf.internal.debug.ui.commands.CustomPropertiesCommand"
+               id="org.eclipse.tcf.debug.ui.CustomProperties"
+               label="%CustomProperties.label"
+               menubarPath="debug">
+         </action>
+      </objectContribution>
    </extension>
 
    <extension
