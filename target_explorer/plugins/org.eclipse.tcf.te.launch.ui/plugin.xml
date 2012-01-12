@@ -6,17 +6,41 @@
    <extension point="org.eclipse.ui.commands">
       <command
             categoryId="org.eclipse.tcf.te.ui.commands.category"
-            description="%Command.showInDebugView.description"
+            description="%command.showInDebugView.description"
             helpContextId="org.eclipse.tcf.te.launch.command_ShowInDebugView"
             id="org.eclipse.tcf.te.launch.command.showInDebugView"
-            name="%Command.showInDebugView.name">
+            name="%command.showInDebugView.name">
       </command>
+
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            description="%command.attach.description"
+            helpContextId="org.eclipse.tcf.te.launch.command_Attach"
+            id="org.eclipse.tcf.te.launch.command.attach"
+            name="%command.attach.name"/>
+
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            description="%command.detach.description"
+            helpContextId="org.eclipse.tcf.te.launch.command_Detach"
+            id="org.eclipse.tcf.te.launch.command.detach"
+            name="%command.detach.name"/>
    </extension>
-   <extension
-         point="org.eclipse.ui.commandImages">
+   
+   <extension point="org.eclipse.ui.commandImages">
       <image
             commandId="org.eclipse.tcf.te.launch.command.showInDebugView"
             icon="platform:/plugin/org.eclipse.debug.ui/icons/full/eview16/debug_view.gif">
+      </image>
+      <image
+            commandId="org.eclipse.tcf.te.launch.command.attach"
+            disabledIcon="icons/dlcl16/attach.gif"
+            icon="icons/elcl16/attach.gif">
+      </image>
+      <image
+            commandId="org.eclipse.tcf.te.launch.command.detach"
+            disabledIcon="icons/dlcl16/detach.gif"
+            icon="icons/elcl16/detach.gif">
       </image>
    </extension>
 

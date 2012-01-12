@@ -281,7 +281,7 @@
             categoryId="org.eclipse.tcf.te.ui.commands.category"
             helpContextId="org.eclipse.ui.navigator.Open"
             id="org.eclipse.ui.navigator.Open"
-            name="%Command.open.name">
+            name="%command.open.name">
       </command>
       <command
             categoryId="org.eclipse.tcf.te.ui.commands.category"
