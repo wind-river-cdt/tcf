@@ -122,10 +122,26 @@ public class TCFAnnotationManager {
         public int hashCode() {
             return hash_code;
         }
+
+        @Override
+        public String toString() {
+            StringBuffer bf = new StringBuffer();
+            bf.append('[');
+            bf.append(area);
+            bf.append(',');
+            bf.append(text);
+            bf.append(',');
+            bf.append(type);
+            bf.append(',');
+            bf.append(model);
+            bf.append(']');
+            return bf.toString();
+        }
     }
 
     private class WorkbenchWindowInfo {
         final LinkedList<TCFAnnotation> annotations = new LinkedList<TCFAnnotation>();
+        final Map<IEditorInput,ITextEditor> editors = new HashMap<IEditorInput,ITextEditor>();
 
         void dispose() {
             for (TCFAnnotation a : annotations) a.dispose();
@@ -519,7 +535,14 @@ public class TCFAnnotationManager {
                 }
             }.getE();
         }
-        boolean flush_all = node == null || changed_launch_cfgs.contains(node.launch);
+        Map<IEditorInput,ITextEditor> editors = new HashMap<IEditorInput,ITextEditor>();
+        for (IEditorReference ref : window.getActivePage().getEditorReferences()) {
+            IEditorPart part = ref.getEditor(false);
+            if (!(part instanceof ITextEditor)) continue;
+            ITextEditor editor = (ITextEditor)part;
+            editors.put(editor.getEditorInput(), editor);
+        }
+        boolean flush_all = node == null || !editors.equals(win_info.editors) || changed_launch_cfgs.contains(node.launch);
         Iterator<TCFAnnotation> i = win_info.annotations.iterator();
         while (i.hasNext()) {
             TCFAnnotation a = i.next();
@@ -528,13 +551,8 @@ public class TCFAnnotationManager {
             i.remove();
         }
         if (set == null || set.size() == 0) return;
-        Map<IEditorInput,ITextEditor> editors = new HashMap<IEditorInput,ITextEditor>();
-        for (IEditorReference ref : window.getActivePage().getEditorReferences()) {
-            IEditorPart part = ref.getEditor(false);
-            if (!(part instanceof ITextEditor)) continue;
-            ITextEditor editor = (ITextEditor)part;
-            editors.put(editor.getEditorInput(), editor);
-        }
+        win_info.editors.clear();
+        win_info.editors.putAll(editors);
         ISourcePresentation presentation = TCFModelPresentation.getDefault();
         for (TCFAnnotation a : set) {
             Object source_element = TCFSourceLookupDirector.lookup(node.launch, a.area);
