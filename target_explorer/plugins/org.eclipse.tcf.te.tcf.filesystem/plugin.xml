@@ -2165,6 +2165,12 @@
          <propertyTab
                afterTab="org.eclipse.tcf.te.tcf.filesystem.propertytab.general"
                category="target_explorer"
+               id="org.eclipse.tcf.te.tcf.filesystem.propertytab.permissions"
+               label="Permissions">
+         </propertyTab>
+         <propertyTab
+               afterTab="org.eclipse.tcf.te.tcf.filesystem.propertytab.general,org.eclipse.tcf.te.tcf.filesystem.propertytab.permissions"
+               category="target_explorer"
                id="org.eclipse.tcf.te.tcf.filesystem.propertytab.advanced"
                label="%propertyTab.advanced.label">
          </propertyTab>
@@ -2197,12 +2203,11 @@
                tab="org.eclipse.tcf.te.tcf.filesystem.propertytab.general">
          </propertySection>
          <propertySection
-               afterSection="org.eclipse.tcf.te.tcf.filesystem.propertysection.folder.basic,org.eclipse.tcf.te.tcf.filesystem.propertysection.file.basic"
                class="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.LinuxPermissionsSection"
                enablesFor="1"
                filter="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.LinuxFilter"
                id="org.eclipse.tcf.te.tcf.filesystem.propertysection.linux.permissions"
-               tab="org.eclipse.tcf.te.tcf.filesystem.propertytab.general">
+               tab="org.eclipse.tcf.te.tcf.filesystem.propertytab.permissions">
          </propertySection>
          <propertySection
                class="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.WindowsFolderAISection"
