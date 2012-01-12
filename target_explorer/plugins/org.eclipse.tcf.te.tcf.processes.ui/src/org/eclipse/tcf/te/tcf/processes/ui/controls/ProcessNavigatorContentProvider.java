@@ -10,12 +10,14 @@
 package org.eclipse.tcf.te.tcf.processes.ui.controls;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 import org.eclipse.tcf.te.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.trees.TreeContentProvider;
 import org.eclipse.ui.IMemento;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.navigator.NavigatorFilterService;
 import org.eclipse.ui.navigator.ICommonContentExtensionSite;
 import org.eclipse.ui.navigator.ICommonContentProvider;
@@ -136,9 +138,14 @@ public class ProcessNavigatorContentProvider  extends TreeContentProvider implem
     	INavigatorFilterService fs = cs != null ? cs.getFilterService() : null;
 		if (fs != null && !fs.isActive(SINGLE_THREAD_FILTER_ID)) {
 			if (fs instanceof NavigatorFilterService) {
-				NavigatorFilterService navFilterService = (NavigatorFilterService)fs;
+				final NavigatorFilterService navFilterService = (NavigatorFilterService)fs;
 				navFilterService.addActiveFilterIds(new String[] { SINGLE_THREAD_FILTER_ID });
-				navFilterService.updateViewer();
+				Display display = PlatformUI.getWorkbench().getDisplay();
+				display.asyncExec(new Runnable(){
+					@Override
+                    public void run() {
+						navFilterService.updateViewer();
+                    }});
 			}
 		}
     }
