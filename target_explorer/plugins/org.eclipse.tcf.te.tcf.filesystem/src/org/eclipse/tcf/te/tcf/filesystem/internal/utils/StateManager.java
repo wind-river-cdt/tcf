@@ -25,6 +25,7 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation;
 import org.eclipse.tcf.te.tcf.filesystem.model.CacheState;
+import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 
@@ -144,7 +145,7 @@ public class StateManager {
 	void commitNodeAttr(FSTreeNode node, FileAttrs attr){
 		node.attr = attr;
 		PersistenceManager.getInstance().setBaseTimestamp(node.getLocationURL(), attr.mtime);
-		node.firePropertyChange();
+		FSModel.firePropertyChange(node);
 	}
 
 	/**

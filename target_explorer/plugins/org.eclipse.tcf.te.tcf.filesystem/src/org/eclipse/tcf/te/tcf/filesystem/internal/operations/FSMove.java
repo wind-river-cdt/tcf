@@ -28,6 +28,7 @@ import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.dialogs.TimeTriggeredProgressMonitorDialog;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
+import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 import org.eclipse.ui.PlatformUI;
@@ -64,7 +65,7 @@ public class FSMove extends FSOperation {
 			// Clear the clip board.
 			UIPlugin.getDefault().getClipboard().clear();
 			// Refresh the file system tree.
-			dest.firePropertyChange();
+			FSModel.firePropertyChange(dest);
 			return true;
 		}
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
@@ -99,7 +100,7 @@ public class FSMove extends FSOperation {
 					UIPlugin.getDefault().getClipboard().clear();
 					if (channel != null) Tcf.getChannelManager().closeChannel(channel);
 					// Refresh the file system tree.
-					dest.firePropertyChange();
+					FSModel.firePropertyChange(dest);
 					monitor.done();
 				}
 			}

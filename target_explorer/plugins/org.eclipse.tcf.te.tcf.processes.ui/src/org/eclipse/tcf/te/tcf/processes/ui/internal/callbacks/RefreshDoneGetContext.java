@@ -22,6 +22,7 @@ import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.IProcesses.ProcessContext;
 import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.te.tcf.core.Tcf;
+import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 
 /**
@@ -44,13 +45,16 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext {
 	ISysMonitor service;
 	// The callback to be called when refresh is done.
 	Runnable callback;
+	// The process model attached.
+	ProcessModel model;
 
 	/**
 	 * Create an instance with the field parameters.
 	 */
-	public RefreshDoneGetContext(List<ProcessTreeNode> newNodes,
+	public RefreshDoneGetContext(ProcessModel model, List<ProcessTreeNode> newNodes,
 					Runnable callback, ISysMonitor service, Queue<ProcessTreeNode>queue, String contextId,
 					IChannel channel, Map<String, Boolean> status, ProcessTreeNode parentNode) {
+		this.model = model;
 		this.callback = callback;
 		this.service = service;
 		this.queue = queue;
@@ -179,14 +183,14 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext {
                 	}
                 }
 				if (queue.isEmpty()) {
-					parentNode.firePropertyChanged();
+					model.firePropertyChanged(parentNode);
 					Tcf.getChannelManager().closeChannel(channel);
 					if(callback != null) {
 						callback.run();
 					}
 				} else {
 					ProcessTreeNode node = queue.poll();
-					service.getChildren(node.id, new RefreshDoneGetChildren(callback, queue, channel, service, node));
+					service.getChildren(node.id, new RefreshDoneGetChildren(model, callback, queue, channel, service, node));
 				}
     		}
     	}

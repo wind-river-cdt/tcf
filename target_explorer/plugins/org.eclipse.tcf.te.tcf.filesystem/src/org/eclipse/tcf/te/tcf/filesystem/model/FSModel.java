@@ -295,4 +295,14 @@ public final class FSModel {
 		}
 		return null;
 	}
+	
+
+	/**
+	 * Fire a property change event for the node.
+	 */
+	public static void firePropertyChange(FSTreeNode node) {
+		IViewerInput viewerInput = (IViewerInput) node.peerNode.getAdapter(IViewerInput.class);
+		PropertyChangeEvent event = new PropertyChangeEvent(node.isRoot() ? node.peerNode : node, "state", null, null); //$NON-NLS-1$
+		viewerInput.firePropertyChange(event);
+    }
 }

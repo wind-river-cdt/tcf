@@ -35,6 +35,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.dialogs.TimeTriggeredProgressMonitorDialog;
 import org.eclipse.tcf.te.tcf.filesystem.internal.url.TcfURLConnection;
+import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 import org.eclipse.ui.PlatformUI;
@@ -226,7 +227,7 @@ public class CacheManager {
 									PersistenceManager.getInstance().setBaseTimestamp(node.getLocationURL(), node.attr.mtime);
 									file.setLastModified(node.attr.mtime);
 									if (!node.isWritable()) file.setReadOnly();
-									node.firePropertyChange();
+									FSModel.firePropertyChange(node);
 								}
 							}
 						});
@@ -400,7 +401,7 @@ public class CacheManager {
 								File file = getCacheFile(node);
 								file.setLastModified(node.attr.mtime);
 							}
-							node.firePropertyChange();
+							FSModel.firePropertyChange(node);
 						}
 					});
 				}

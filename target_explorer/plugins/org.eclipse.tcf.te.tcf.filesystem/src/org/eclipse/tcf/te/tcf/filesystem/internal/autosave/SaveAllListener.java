@@ -57,7 +57,7 @@ public class SaveAllListener implements IExecutionListener {
 			}
 			else {
 				FSTreeNode dirtyNode = fDirtyNodes.get(0);
-				dirtyNode.firePropertyChange();
+				FSModel.firePropertyChange(dirtyNode);
 			}
 		}
 	}

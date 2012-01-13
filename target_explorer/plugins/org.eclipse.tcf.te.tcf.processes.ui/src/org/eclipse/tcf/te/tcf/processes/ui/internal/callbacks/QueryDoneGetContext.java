@@ -19,6 +19,7 @@ import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.IProcesses.ProcessContext;
 import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.te.tcf.core.Tcf;
+import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 
 /**
@@ -34,11 +35,14 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext {
 	ProcessTreeNode parentNode;
 	// The status map to mark and check the completion status.
 	Map<String, Boolean> status;
+	// The process model attached.
+	ProcessModel model;
 
 	/**
 	 * Create an instance with the field parameters.
 	 */
-	public QueryDoneGetContext(String contextId, IChannel channel, Map<String, Boolean> status, ProcessTreeNode parentNode) {
+	public QueryDoneGetContext(ProcessModel model, String contextId, IChannel channel, Map<String, Boolean> status, ProcessTreeNode parentNode) {
+		this.model = model;
 		this.contextId = contextId;
 		this.channel = channel;
 		this.parentNode = parentNode;
@@ -96,7 +100,7 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext {
     			}
     		}
     		if(completed || (count % PROGRESSIVE_STEP_COUNT ) == 0) {
-    			parentNode.firePropertyChanged();
+    			model.firePropertyChanged(parentNode);
     		}
     		if(completed){
 				parentNode.childrenQueryRunning = false;

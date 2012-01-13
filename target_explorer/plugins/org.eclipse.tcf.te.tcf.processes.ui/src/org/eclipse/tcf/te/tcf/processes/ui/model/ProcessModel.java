@@ -305,5 +305,14 @@ public class ProcessModel implements IPreferenceConsts{
 	IPeerModel getPeerModel() {
 		return peerModel;
 	}
+	
+	/**
+	 * Fire a property change event.
+	 */
+	public void firePropertyChanged(ProcessTreeNode node) {
+		IViewerInput  provider = (IViewerInput) peerModel.getAdapter(IViewerInput.class);
+		PropertyChangeEvent event = new PropertyChangeEvent(node.parent == null ? peerModel : node, "state", null, null); //$NON-NLS-1$
+		provider.firePropertyChange(event);
+    }
 }	
 

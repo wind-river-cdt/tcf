@@ -14,6 +14,7 @@ import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
+import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 
 /**
@@ -43,7 +44,8 @@ public class QueryDoneOpenChannel implements IChannelManager.DoneOpenChannel {
 		if (error == null && channel != null) {
 			ISysMonitor service = channel.getRemoteService(ISysMonitor.class);
 			if (service != null) {
-				service.getChildren(parentNode.id, new QueryDoneGetChildren(channel, service, parentNode));
+				ProcessModel model = ProcessModel.getProcessModel(parentNode.peerNode);
+				service.getChildren(parentNode.id, new QueryDoneGetChildren(model, channel, service, parentNode));
 			}
 		}
     }

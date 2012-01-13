@@ -14,11 +14,9 @@ import java.util.List;
 import java.util.UUID;
 
 import org.eclipse.core.runtime.PlatformObject;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
-import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 
 /**
  * Representation of a process tree node.
@@ -130,13 +128,4 @@ public final class ProcessTreeNode extends PlatformObject {
 	public String toString() {
 		return name != null ? name : super.toString();
 	}
-
-	/**
-	 * Fire a property change event.
-	 */
-	public void firePropertyChanged() {
-		IViewerInput  provider = (IViewerInput) peerNode.getAdapter(IViewerInput.class);
-		PropertyChangeEvent event = new PropertyChangeEvent(parent == null ? peerNode : this, "state", null, null); //$NON-NLS-1$
-		provider.firePropertyChange(event);
-    }
 }

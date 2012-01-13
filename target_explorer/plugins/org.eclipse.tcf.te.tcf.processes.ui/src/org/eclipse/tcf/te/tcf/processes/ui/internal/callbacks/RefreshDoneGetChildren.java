@@ -20,6 +20,7 @@ import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.te.tcf.core.Tcf;
+import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 
 /**
@@ -36,11 +37,14 @@ public class RefreshDoneGetChildren implements ISysMonitor.DoneGetChildren {
 	Queue<ProcessTreeNode> queue;
 	// The service used for refreshing.
 	Runnable callback;
+	// The process model attached.
+	ProcessModel model;
 
 	/**
 	 * Create an instance with the field parameters.
 	 */
-	public RefreshDoneGetChildren(Runnable callback, Queue<ProcessTreeNode> queue, IChannel channel, ISysMonitor service, ProcessTreeNode parentNode) {
+	public RefreshDoneGetChildren(ProcessModel model, Runnable callback, Queue<ProcessTreeNode> queue, IChannel channel, ISysMonitor service, ProcessTreeNode parentNode) {
+		this.model = model;
 		this.callback = callback;
 		this.queue = queue;
 		this.channel = channel;
@@ -58,21 +62,21 @@ public class RefreshDoneGetChildren implements ISysMonitor.DoneGetChildren {
         	Map<String, Boolean> status = createStatusMap(context_ids);
             List<ProcessTreeNode> newNodes = Collections.synchronizedList(new ArrayList<ProcessTreeNode>());	
 			for (String contextId : context_ids) {
-				service.getContext(contextId, new RefreshDoneGetContext(newNodes, callback, service, queue, contextId, channel, status, parentNode));
+				service.getContext(contextId, new RefreshDoneGetContext(model, newNodes, callback, service, queue, contextId, channel, status, parentNode));
 			}
     	} else {
             parentNode.childrenQueryRunning = false;
             parentNode.childrenQueried = true;
             parentNode.children.clear();
 			if (queue.isEmpty()) {
-				parentNode.firePropertyChanged();
+				model.firePropertyChanged(parentNode);
 				Tcf.getChannelManager().closeChannel(channel);
 				if(callback != null) {
 					callback.run();
 				}
 			} else {
 				ProcessTreeNode node = queue.poll();
-				service.getChildren(node.id, new RefreshDoneGetChildren(callback, queue, channel, service, node));
+				service.getChildren(node.id, new RefreshDoneGetChildren(model, callback, queue, channel, service, node));
 			}
     	}
     }

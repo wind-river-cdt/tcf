@@ -28,6 +28,7 @@ import org.eclipse.tcf.te.tcf.filesystem.dialogs.TimeTriggeredProgressMonitorDia
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.PersistenceManager;
+import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 import org.eclipse.ui.PlatformUI;
@@ -90,7 +91,7 @@ public class FSCopy extends FSOperation {
 				finally {
 					if (channel != null) Tcf.getChannelManager().closeChannel(channel);
 					// Refresh the file system tree.
-					head.firePropertyChange();
+					FSModel.firePropertyChange(head);
 					monitor.done();
 				}
 			}

@@ -222,13 +222,13 @@ public class FSNavigatorContentProvider extends TreeContentProvider {
 											// Reset the children query markers
 											rootNode.childrenQueryRunning = false;
 											rootNode.childrenQueried = true;
-											rootNode.firePropertyChange();
+											FSModel.firePropertyChange(rootNode);
 										}
 									}
 								});
 							}
 						});
-						rootNode.firePropertyChange();
+						FSModel.firePropertyChange(rootNode);
 					} else {
 						// The file system service is not available for this peer.
 						// --> Close the just opened channel
@@ -395,7 +395,7 @@ public class FSNavigatorContentProvider extends TreeContentProvider {
 							readdir(channel, service, handle, parentNode);
 						}
 
-						parentNode.firePropertyChange();
+						FSModel.firePropertyChange(parentNode);
 					}
 				});
 			}
