@@ -1437,21 +1437,24 @@
             </and>
          </enabledWhen>
       </handler>
+      
       <handler
             class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.DeleteFilesHandler"
             commandId="org.eclipse.ui.edit.delete">
          <activeWhen>
-            <with
-                  variable="activePartId">
-               <or>
-                  <equals
-                        value="org.eclipse.tcf.te.ui.views.TargetExplorer">
-                  </equals>
-                  <equals
-                        value="org.eclipse.tcf.te.ui.views.Editor">
-                  </equals>
-               </or>
-            </with>
+            <and>
+               <with variable="activePartId">
+                  <or>
+                     <equals value="org.eclipse.tcf.te.ui.views.TargetExplorer"/>
+                     <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
+                  </or>
+               </with>
+               <with variable="selection">
+                  <iterate operator="and" ifEmpty="false">
+                     <instanceof value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode"/>
+                  </iterate>
+               </with>
+            </and>
          </activeWhen>
          <enabledWhen>
             <with
@@ -1494,6 +1497,7 @@
             </with>
          </enabledWhen>
       </handler>
+      
       <handler
             class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.CutFilesHandler"
             commandId="org.eclipse.ui.edit.cut">

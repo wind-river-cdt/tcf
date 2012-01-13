@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.ui.navigator.LabelProvider;
+import org.eclipse.tcf.te.ui.views.interfaces.handler.IDeleteHandlerDelegate;
 import org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate;
 
 /**
@@ -23,11 +24,14 @@ public class AdapterFactory implements IAdapterFactory {
 	private LabelProvider labelProvider = new LabelProvider();
 	// The refresh handler delegate adapter
 	private IRefreshHandlerDelegate refreshDelegate = new RefreshHandlerDelegate();
+	// The delete handler delegate adapter
+	private IDeleteHandlerDelegate deleteDelegate = new DeleteHandlerDelegate();
 
 	// The adapter class.
 	private Class<?>[] adapters = {
 					ILabelProvider.class,
-					IRefreshHandlerDelegate.class
+					IRefreshHandlerDelegate.class,
+					IDeleteHandlerDelegate.class
 				};
 
 	/* (non-Javadoc)
@@ -41,6 +45,9 @@ public class AdapterFactory implements IAdapterFactory {
 			}
 			if (IRefreshHandlerDelegate.class.equals(adapterType)) {
 				return refreshDelegate;
+			}
+			if (IDeleteHandlerDelegate.class.equals(adapterType)) {
+				return deleteDelegate;
 			}
 		}
 		return null;

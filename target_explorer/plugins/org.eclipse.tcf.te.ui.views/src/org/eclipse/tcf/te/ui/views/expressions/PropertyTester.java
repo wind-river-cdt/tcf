@@ -12,6 +12,7 @@ package org.eclipse.tcf.te.ui.views.expressions;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.tcf.te.ui.views.editor.EditorInput;
 import org.eclipse.tcf.te.ui.views.extensions.EditorPageBindingExtensionPointManager;
+import org.eclipse.tcf.te.ui.views.interfaces.handler.IDeleteHandlerDelegate;
 import org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate;
 import org.eclipse.ui.IEditorInput;
 
@@ -56,6 +57,32 @@ public class PropertyTester extends org.eclipse.core.expressions.PropertyTester 
 			if (delegate != null) canRefresh = delegate.canRefresh(receiver);
 
 			return expectedValue.equals(Boolean.valueOf(canRefresh));
+		}
+
+
+		if ("isDeletableElement".equals(property)) { //$NON-NLS-1$
+			// An element is deletable if it implements or adapt to IDeleteHandlerDelegate
+			//
+			// Note: This test will force the load of the adapter.
+
+			boolean deletable = receiver instanceof IDeleteHandlerDelegate;
+			if (!deletable) {
+				IDeleteHandlerDelegate delegate = (IDeleteHandlerDelegate)Platform.getAdapterManager().loadAdapter(receiver, IDeleteHandlerDelegate.class.getName());
+				deletable = delegate != null;
+			}
+
+			return expectedValue.equals(Boolean.valueOf(deletable));
+		}
+
+		if ("canDelete".equals(property)) { //$NON-NLS-1$
+			// Test if the receiver can be deleted
+			IDeleteHandlerDelegate delegate = receiver instanceof IDeleteHandlerDelegate ? (IDeleteHandlerDelegate)receiver : null;
+			if (delegate == null) delegate = (IDeleteHandlerDelegate)Platform.getAdapterManager().loadAdapter(receiver, IDeleteHandlerDelegate.class.getName());
+
+			boolean canDelete = false;
+			if (delegate != null) canDelete = delegate.canDelete(receiver);
+
+			return expectedValue.equals(Boolean.valueOf(canDelete));
 		}
 
 		return false;

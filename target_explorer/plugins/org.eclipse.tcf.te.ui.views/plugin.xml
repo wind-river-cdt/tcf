@@ -260,6 +260,29 @@
             </visibleWhen>
          </command>
       </menuContribution>
+
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.TargetExplorer#Popup?after=group.delete">
+         <command
+               commandId="org.eclipse.ui.edit.delete"
+               disabledIcon="platform:/plugin/org.eclipse.ui/icons/full/dtool16/delete.gif"
+               helpContextId="org.eclipse.tcf.te.ui.command_Delete"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/delete.gif"
+               id="org.eclipse.tcf.te.ui.commands.delete"
+               label="%command.delete.label"
+               style="push"
+               tooltip="%command.delete.description">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <count value="+"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <test
+                           property="org.eclipse.tcf.te.ui.views.isDeletableElement"
+                           value="true"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
    
       <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.TargetExplorer#Popup?after=group.properties">
          <command
@@ -363,11 +386,59 @@
       <handler
             commandId="org.eclipse.tcf.te.ui.command.refresh"
             class="org.eclipse.tcf.te.ui.views.handler.RefreshHandler">
+            <activeWhen>
+               <and>
+                  <with variable="activePartId">
+                     <or>
+                        <equals value="org.eclipse.tcf.te.ui.views.TargetExplorer"/>
+                        <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
+                     </or>
+                  </with>
+                  <with variable="selection">
+                     <iterate operator="and" ifEmpty="false">
+                        <test
+                              property="org.eclipse.tcf.te.ui.views.isRefreshableElement"
+                              value="true"/>
+                     </iterate>
+                  </with>
+               </and>
+            </activeWhen>
             <enabledWhen>
                <with variable="selection">
                   <iterate operator="and" ifEmpty="false">
                      <test
                            property="org.eclipse.tcf.te.ui.views.canRefresh"
+                           value="true"/>
+                  </iterate>
+               </with>
+            </enabledWhen>
+      </handler>
+      
+      <handler
+            commandId="org.eclipse.ui.edit.delete"
+            class="org.eclipse.tcf.te.ui.views.handler.DeleteHandler">
+            <activeWhen>
+               <and>
+                  <with variable="activePartId">
+                     <or>
+                        <equals value="org.eclipse.tcf.te.ui.views.TargetExplorer"/>
+                        <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
+                     </or>
+                  </with>
+                  <with variable="selection">
+                     <iterate operator="and" ifEmpty="false">
+                        <test
+                              property="org.eclipse.tcf.te.ui.views.isDeletableElement"
+                              value="true"/>
+                     </iterate>
+                  </with>
+               </and>
+            </activeWhen>
+            <enabledWhen>
+               <with variable="selection">
+                  <iterate operator="and" ifEmpty="false">
+                     <test
+                           property="org.eclipse.tcf.te.ui.views.canDelete"
                            value="true"/>
                   </iterate>
                </with>
@@ -381,7 +452,7 @@
             class="org.eclipse.tcf.te.ui.views.expressions.PropertyTester"
             id="org.eclipse.tcf.te.ui.views.PropertyTester"
             namespace="org.eclipse.tcf.te.ui.views"
-            properties="hasApplicableEditorBindings,isRefreshableElement,canRefresh"
+            properties="hasApplicableEditorBindings,isRefreshableElement,canRefresh,isDeletableElement,canDelete"
             type="java.lang.Object">
       </propertyTester>
    </extension>
