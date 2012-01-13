@@ -122,6 +122,56 @@
             </visibleWhen>
          </command>
       </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.tcf.te.ui.views.TargetExplorer#Popup?after=group.open">
+         <command
+               commandId="org.eclipse.tcf.te.tcf.processes.ui.command.refreshNode"
+               helpContextId="org.eclipse.tcf.te.tcf.processes.ui.command_RefreshNode"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/elcl16/refresh_nav.gif"
+               id="refresh"
+               label="%command.refreshNode.label"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.tcf.te.ui.controls.menu.processes?after=additions">
+         <command
+               commandId="org.eclipse.tcf.te.tcf.processes.ui.command.refreshNode"
+               helpContextId="org.eclipse.tcf.te.tcf.processes.ui.command_RefreshNode"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/elcl16/refresh_nav.gif"
+               id="refresh"
+               label="%command.refreshNode.label.0"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
    </extension>
 
 <!-- Command contributions -->
@@ -155,6 +205,12 @@
             helpContextId="org.eclipse.tcf.te.tcf.processes.ui.command_StopPolling"
             id="org.eclipse.tcf.te.tcf.processes.ui.command.stopPolling"
             name="%command.stopPolling.label">
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.tcf.processes.ui.command_RefreshNode"
+            id="org.eclipse.tcf.te.tcf.processes.ui.command.refreshNode"
+            name="%command.refreshNode.name">
       </command>
    </extension>
 
@@ -219,6 +275,48 @@
                   </iterate>
                </with>
             </enabledWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tcf.te.tcf.processes.ui.internal.handler.RefreshProcessNodeHandler"
+            commandId="org.eclipse.tcf.te.tcf.processes.ui.command.refreshNode">
+         <activeWhen>
+            <and>
+               <with
+                     variable="activePartId">
+                  <or>
+                     <equals
+                           value="org.eclipse.tcf.te.ui.views.TargetExplorer">
+                     </equals>
+                     <equals
+                           value="org.eclipse.tcf.te.ui.view.Editor">
+                     </equals>
+                  </or>
+               </with>
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </and>
+         </activeWhen>
+         <enabledWhen>
+            <with
+                  variable="selection">
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
+                  </instanceof>
+               </iterate>
+            </with></enabledWhen>
       </handler>
    </extension>
 
