@@ -171,6 +171,40 @@
                </with>
             </visibleWhen>
          </command>
+         <separator
+               name="group.launch.rundebug"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.tcf.te.launch.command.attach"
+               disabledIcon="platform:/plugin/org.eclipse.tcf.te.launch.ui/icons/dlcl16/attach.gif"
+               icon="platform:/plugin/org.eclipse.tcf.te.launch.ui/icons/elcl16/attach.gif"
+               id="org.eclipse.tcf.te.tcf.processes.ui.commands.attach"
+               label="%command.attach.label"
+               style="push"
+               tooltip="%command.attach.tooltip">
+            <visibleWhen
+                  checkEnabled="false">
+               <reference
+                     definitionId="te.expressions.processes.isProcessTreeNode">
+               </reference>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.tcf.te.launch.command.detach"
+               disabledIcon="platform:/plugin/org.eclipse.tcf.te.launch.ui/icons/dlcl16/detach.gif"
+               icon="platform:/plugin/org.eclipse.tcf.te.launch.ui/icons/elcl16/detach.gif"
+               id="org.eclipse.tcf.te.tcf.processes.ui.commands.detach"
+               label="%command.detach.label"
+               style="push"
+               tooltip="%command.detach.tooltip">
+            <visibleWhen
+                  checkEnabled="false">
+               <reference
+                     definitionId="te.expressions.processes.isProcessTreeNode">
+               </reference>
+            </visibleWhen>
+         </command>
       </menuContribution>
    </extension>
 
@@ -237,7 +271,14 @@
             <activeWhen>
                <and>
                   <with variable="activePartId">
-                     <equals value="org.eclipse.tcf.te.ui.views.TargetExplorer"/>
+                     <or>
+                        <equals
+                              value="org.eclipse.tcf.te.ui.views.TargetExplorer">
+                        </equals>
+                        <equals
+                              value="org.eclipse.tcf.te.ui.view.Editor">
+                        </equals>
+                     </or>
                   </with>
                   <reference definitionId="te.expressions.processes.isProcessTreeNode"/>
                </and>
@@ -260,7 +301,14 @@
             <activeWhen>
                <and>
                   <with variable="activePartId">
-                     <equals value="org.eclipse.tcf.te.ui.views.TargetExplorer"/>
+                     <or>
+                        <equals
+                              value="org.eclipse.tcf.te.ui.views.TargetExplorer">
+                        </equals>
+                        <equals
+                              value="org.eclipse.tcf.te.ui.view.Editor">
+                        </equals>
+                     </or>
                   </with>
                   <reference definitionId="te.expressions.processes.isProcessTreeNode"/>
                </and>
