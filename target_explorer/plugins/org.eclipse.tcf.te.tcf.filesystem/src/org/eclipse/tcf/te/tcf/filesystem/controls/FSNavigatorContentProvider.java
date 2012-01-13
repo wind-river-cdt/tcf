@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.IToken;
@@ -136,13 +134,6 @@ public class FSNavigatorContentProvider extends TreeContentProvider {
 				else if (node.type.endsWith("DirNode")) { //$NON-NLS-1$
 					children = getDirNodeChildren(node);
 				}
-			}
-		}
-		else {
-			// If the node can be adapted to an IPeerModel object.
-			Object adapted = adaptPeerModel(parentElement);
-			if (adapted != null) {
-				children = getChildren(adapted);
 			}
 		}
 
@@ -340,22 +331,6 @@ public class FSNavigatorContentProvider extends TreeContentProvider {
 
 		return children;
 	}
-	/**
-	 * Adapt the specified element to a IPeerModel.
-	 *
-	 * @param element The element to be adapted.
-	 * @return The IPeerModel adapted.
-	 */
-	private Object adaptPeerModel(Object element) {
-	    Object adapted;
-	    if (element instanceof IAdaptable) {
-	    	adapted = ((IAdaptable) element).getAdapter(IPeerModel.class);
-	    }
-	    else {
-	    	adapted = Platform.getAdapterManager().getAdapter(element, IPeerModel.class);
-	    }
-	    return adapted;
-    }
 
 	/**
 	 * Reads the content of a directory until the file system service signals EOF.
@@ -524,12 +499,6 @@ public class FSNavigatorContentProvider extends TreeContentProvider {
 			// not queried yet.
 			FSTreeNode root = FSModel.getFSModel(((IPeerModel)element)).getRoot();
 			hasChildren = root != null ? hasChildren(root) : true;
-		}
-		else {
-			Object adapted = adaptPeerModel(element);
-			if(adapted!=null){
-				return hasChildren(adapted);
-			}
 		}
 
 		return hasChildren;
