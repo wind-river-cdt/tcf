@@ -13,15 +13,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.ui.utils.PropertyChangeProvider;
 
 /**
  * Representation of a process tree node.
  */
-public final class ProcessTreeNode extends PlatformObject {
+public final class ProcessTreeNode extends PropertyChangeProvider {
 	private final UUID uuid = UUID.randomUUID();
 
 	/**

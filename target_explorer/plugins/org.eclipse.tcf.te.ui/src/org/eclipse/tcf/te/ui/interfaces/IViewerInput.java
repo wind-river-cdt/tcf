@@ -9,52 +9,23 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.interfaces;
 
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.tcf.te.ui.trees.AbstractTreeControl;
 
 /**
  * A viewer input is an input of the AbstractTreeControl.
- * It triggers a property change event when one of its properties 
- * has changed. It has two methods,
- * addPropertyChangeListener and removePropertyChangeListener to add
- * and remove property change listeners which are interested in the property
- * change.
  * <p>
- * If the input of AbstractTreeControl is an instance of or adapted to IPropertyChangeProvider,
+ * If the input of AbstractTreeControl is an instance of or adapted to IViewerInput,
  * AbstractTreeControl adds a property change listener to the input and update
  * its UI including the tree viewer and the tool bar when the properties of the input
  * have changed.
  * 
  * @see AbstractTreeControl
  */
-public interface IViewerInput {
+public interface IViewerInput extends IPropertyChangeProvider {
 
 	/**
 	 * Get the id of the input used to persist the state of the tree viewer
 	 * as the persistence id.
 	 */
 	String getInputId();
-	/**
-	 * Add a property change listener to the provider. When this listener
-	 * is already added, then it will not be added again.
-	 * 
-	 * @param listener The property change listener
-	 */
-	void addPropertyChangeListener(IPropertyChangeListener listener);
-
-	/**
-	 * Remove a property change listener from the provider if it is already
-	 * added to provider.
-	 * 
-	 * @param listener The property change listener
-	 */
-	void removePropertyChangeListener(IPropertyChangeListener listener);
-
-	/**
-	 * Fire the property change event to the property change listeners
-	 * of the provider.
-	 * 
-	 * @param event the property change  event.
-	 */
-	void firePropertyChange(PropertyChangeEvent event);
 }

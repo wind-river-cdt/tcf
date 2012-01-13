@@ -23,7 +23,6 @@ import java.util.UUID;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IFileSystem;
@@ -34,6 +33,7 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.url.TcfURLConnection;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.UserManager;
 import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.ui.utils.PropertyChangeProvider;
 
 /**
  * Representation of a file system tree node.
@@ -41,7 +41,7 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
  * <b>Note:</b> Node construction and child list access is limited to the TCF
  * event dispatch thread.
  */
-public final class FSTreeNode extends PlatformObject implements Cloneable{
+public final class FSTreeNode extends PropertyChangeProvider implements Cloneable {
 
 	private static final String KEY_WIN32_ATTRS = "Win32Attrs"; //$NON-NLS-1$
 
