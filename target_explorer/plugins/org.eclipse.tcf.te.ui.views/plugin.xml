@@ -241,6 +241,26 @@
 
 <!-- Target Explorer menu contributions -->
    <extension point="org.eclipse.ui.menus">
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.TargetExplorer#Popup?after=group.refresh">
+         <command
+               commandId="org.eclipse.tcf.te.ui.command.refresh"
+               id="org.eclipse.tcf.te.ui.commands.refresh"
+               label="%command.refresh.label"
+               style="push"
+               tooltip="%command.refresh.description">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <count value="+"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <test
+                           property="org.eclipse.tcf.te.ui.views.isRefreshableElement"
+                           value="true"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+   
       <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.TargetExplorer#Popup?after=group.properties">
          <command
                commandId="org.eclipse.ui.file.properties"
@@ -258,10 +278,9 @@
                </visibleWhen>
          </command>
       </menuContribution>
-      <menuContribution
-            locationURI="popup:org.eclipse.tcf.te.ui.views.TargetExplorer#Popup?after=group.showIn">
-         <menu
-               label="%menu.showIn.label">
+      
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.TargetExplorer#Popup?after=group.showIn">
+         <menu label="%menu.showIn.label">
             <command
                   commandId="org.eclipse.tcf.te.ui.views.command.ShowInProperties"
                   icon="icons/eview16/prop_ps.gif"
@@ -283,9 +302,10 @@
             id="org.eclipse.ui.navigator.Open"
             name="%command.open.name">
       </command>
+      
       <command
             categoryId="org.eclipse.tcf.te.ui.commands.category"
-            helpContextId="org.eclipse.tcf.te.ui.views.command.help_ShowInProperties"
+            helpContextId="org.eclipse.tcf.te.ui.views.command_ShowInProperties"
             id="org.eclipse.tcf.te.ui.views.command.ShowInProperties"
             name="%command.showInProperties.label">
       </command>
@@ -329,38 +349,49 @@
             </with>
          </activeWhen>
       </handler>
+      
       <handler
             class="org.eclipse.tcf.te.ui.views.handler.ShowInPropertiesHandler"
             commandId="org.eclipse.tcf.te.ui.views.command.ShowInProperties">
          <activeWhen>
-            <with
-                  variable="activePartId">
-               <equals
-                     value="org.eclipse.tcf.te.ui.views.TargetExplorer">
-               </equals>
+            <with variable="activePartId">
+               <equals value="org.eclipse.tcf.te.ui.views.TargetExplorer"/>
             </with>
          </activeWhen>
-      </handler>      
+      </handler>
+      
+      <handler
+            commandId="org.eclipse.tcf.te.ui.command.refresh"
+            class="org.eclipse.tcf.te.ui.views.handler.RefreshHandler">
+            <enabledWhen>
+               <with variable="selection">
+                  <iterate operator="and" ifEmpty="false">
+                     <test
+                           property="org.eclipse.tcf.te.ui.views.canRefresh"
+                           value="true"/>
+                  </iterate>
+               </with>
+            </enabledWhen>
+      </handler>
    </extension>
 
 <!-- Eclipse core expressions property tester -->
    <extension point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
-            class="org.eclipse.tcf.te.ui.views.expressions.EditorPropertyTester"
-            id="org.eclipse.tcf.te.ui.views.EditorPropertyTester"
+            class="org.eclipse.tcf.te.ui.views.expressions.PropertyTester"
+            id="org.eclipse.tcf.te.ui.views.PropertyTester"
             namespace="org.eclipse.tcf.te.ui.views"
-            properties="hasApplicableEditorBindings"
+            properties="hasApplicableEditorBindings,isRefreshableElement,canRefresh"
             type="java.lang.Object">
       </propertyTester>
    </extension>
-   <extension
-         point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
+   
+<!-- Tabbed properties view contributions -->   
+   <extension point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
       <propertyContributor
             contributorId="org.eclipse.tcf.te.ui"
             labelProvider="org.eclipse.tcf.te.ui.views.internal.PropertyContributorLabelProvider">
-         <propertyCategory
-               category="target_explorer">
-         </propertyCategory>
+         <propertyCategory category="target_explorer"/>
       </propertyContributor>
    </extension>
 

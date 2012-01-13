@@ -4,7 +4,7 @@
    <extension-point id="newWizards" name="%extension-point.newWizards.name" schema="schema/newWizards.exsd"/>
    <extension-point id="wizardProviders" name="%extension-point.wizardProviders.name" schema="schema/wizardProviders.exsd"/>
    <extension-point id="viewers" name="%extension-point.viewers.name" schema="schema/viewers.exsd"/>
-   <extension-point id="cellEditors" name="%ExtensionPoint.cellEditors.name" schema="schema/cellEditors.exsd"/>
+   <extension-point id="cellEditors" name="%extension-point.cellEditors.name" schema="schema/cellEditors.exsd"/>
 
 <!-- New target wizard contributions -->
 
@@ -30,6 +30,14 @@
             id="org.eclipse.tcf.te.ui.command.newWizards"
             name="%command.newWizards.name">
       </command>
+
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            description="%command.refresh.description"
+            helpContextId="org.eclipse.tcf.te.ui.command_Refresh"
+            id="org.eclipse.tcf.te.ui.command.refresh"
+            name="%command.refresh.name">
+      </command>
    </extension>
    
 <!-- Command image contributions -->   
@@ -38,6 +46,12 @@
             commandId="org.eclipse.tcf.te.ui.command.newWizards"
             disabledIcon="icons/dlcl16/newtarget_wiz.gif"
             icon="icons/elcl16/newtarget_wiz.gif">
+      </image>
+      
+      <image
+            commandId="org.eclipse.tcf.te.ui.command.refresh"
+            disabledIcon="platform:/plugin/org.eclipse.ui/icons/full/dlcl16/refresh_nav.gif"
+            icon="platform:/plugin/org.eclipse.ui/icons/full/elcl16/refresh_nav.gif">
       </image>
    </extension>
    
@@ -57,6 +71,13 @@
             contextId="org.eclipse.tcf.te.ui.views.TargetExplorer"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+N">
+      </key>
+
+      <key
+            commandId="org.eclipse.tcf.te.ui.command.refresh"
+            contextId="org.eclipse.tcf.te.ui.views.TargetExplorer"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="F5">
       </key>
    </extension>
 
