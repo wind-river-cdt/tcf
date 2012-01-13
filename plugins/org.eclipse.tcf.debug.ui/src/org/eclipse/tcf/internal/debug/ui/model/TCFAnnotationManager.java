@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2011 Wind River Systems, Inc. and others.
+ * Copyright (c) 2008, 2012 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 package org.eclipse.tcf.internal.debug.ui.model;
 
 import java.math.BigInteger;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -20,14 +21,28 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.cdt.debug.core.model.ICBreakpoint;
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceRuleFactory;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.ISchedulingRule;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.MultiRule;
 import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.IBreakpointManager;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationListener;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IBreakpoint;
+import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.ISourcePresentation;
@@ -39,11 +54,13 @@ import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.internal.debug.launch.TCFSourceLookupDirector;
 import org.eclipse.tcf.internal.debug.model.ITCFBreakpointListener;
+import org.eclipse.tcf.internal.debug.model.TCFBreakpointsModel;
 import org.eclipse.tcf.internal.debug.model.TCFBreakpointsStatus;
 import org.eclipse.tcf.internal.debug.model.TCFContextState;
 import org.eclipse.tcf.internal.debug.model.TCFLaunch;
@@ -71,9 +88,9 @@ import org.eclipse.ui.texteditor.ITextEditor;
 public class TCFAnnotationManager {
 
     private static final String
-        TYPE_BP_INSTANCE = "org.eclipse.tcf.debug.breakpoint_instance",
-        TYPE_TOP_FRAME = "org.eclipse.tcf.debug.top_frame",
-        TYPE_STACK_FRAME = "org.eclipse.tcf.debug.stack_frame";
+        TYPE_BP_INSTANCE = "org.eclipse.tcf.debug.breakpoint_instance", //$NON-NLS-1$
+        TYPE_TOP_FRAME = "org.eclipse.tcf.debug.top_frame", //$NON-NLS-1$
+        TYPE_STACK_FRAME = "org.eclipse.tcf.debug.stack_frame"; //$NON-NLS-1$
 
     class TCFAnnotation extends Annotation {
 
@@ -338,7 +355,7 @@ public class TCFAnnotationManager {
                     Collection<Map<String,Object>> list = (Collection<Map<String,Object>>)planted;
                     for (Map<String,Object> m : list) {
                         if (m.get(IBreakpoints.INSTANCE_ERROR) == null) {
-                            return "Planted";
+                            return Messages.TCFAnnotationManager_3;
                         }
                     }
                 }
@@ -370,13 +387,67 @@ public class TCFAnnotationManager {
                         null, null, 0, false, false, false, false);
                 TCFAnnotation a = new TCFAnnotation(area,
                         ImageCache.getImage(ImageCache.IMG_BREAKPOINT_ERROR),
-                        "Cannot plant breakpoint: " + error,
+                        MessageFormat.format(Messages.TCFAnnotationManager_4, error),
                         TYPE_BP_INSTANCE);
                 set.add(a);
             }
         }
     }
 
+    /**
+     * If a line BP was specified, and the lines do not match, update the marker
+     * 
+     * @param  bp - Registered Breakpoint 
+     * @param  area - Resolved location for status
+     */    
+    private void updateBPMarker(IBreakpoint bp, ILineNumbers.CodeArea area ) {
+        final IBreakpoint breakpoint = bp;
+        final ILineNumbers.CodeArea larea = area;
+        
+        IResource resources = bp.getMarker().getResource();
+        ISchedulingRule changeRule = null;
+        IResourceRuleFactory ruleFactory = ResourcesPlugin.getWorkspace().getRuleFactory();
+        ISchedulingRule markerRule = ruleFactory.markerRule(resources);
+        changeRule = MultiRule.combine(changeRule, markerRule);
+        
+        WorkspaceJob job = new WorkspaceJob(Messages.TCFAnnotationManager_5) { //$NON_NLS-1$
+            @Override
+            public IStatus runInWorkspace(IProgressMonitor monitor) {
+                IMarker bpMarker = breakpoint.getMarker();
+                int bp_line = bpMarker.getAttribute(IMarker.LINE_NUMBER, -1);
+
+                if (bp_line != larea.start_line) {
+                    try {
+                        bpMarker.setAttribute(IMarker.LINE_NUMBER, larea.start_line);
+                    }
+                    catch (CoreException e) {
+                        IStatus status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                                NLS.bind(Messages.TCFAnnotationManager_6, IMarker.LINE_NUMBER, breakpoint.toString()),
+                                e);                                
+                        Activator.getDefault().getLog().log(status);
+                        e.printStackTrace();
+                    }
+                    try {
+                        ICBreakpoint cbp = (ICBreakpoint)breakpoint;
+                        cbp.refreshMessage();
+                    }
+                    catch (CoreException e) {
+                        IStatus status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                                NLS.bind(Messages.TCFAnnotationManager_7, null ),
+                                e);                                
+                        Activator.getDefault().getLog().log(status);                        
+                        e.printStackTrace();
+                    }
+                }
+                return Status.OK_STATUS;
+            }
+        };
+        job.setPriority(Job.INTERACTIVE);
+        job.setSystem(true);
+        job.setRule(changeRule);
+        job.schedule();
+    }
+    
     private void updateAnnotations(IWorkbenchWindow window, final TCFNode node) {
         if (disposed) return;
         assert Thread.currentThread() == display.getThread();
@@ -395,6 +466,7 @@ public class TCFAnnotationManager {
                     TCFNodeStackFrame frame = null;
                     TCFNodeStackFrame last_top_frame = null;
                     String bp_group = null;
+                    IBreakpoint bp = null;
                     boolean suspended = false;
                     if (node instanceof TCFNodeStackFrame) {
                         thread = (TCFNodeExecContext)node.parent;
@@ -428,6 +500,19 @@ public class TCFAnnotationManager {
                             for (String id : bs.getStatusIDs()) {
                                 Map<String,Object> map = bs.getStatus(id);
                                 if (map == null) continue;
+                                final IBreakpointManager bp_manager = DebugPlugin.getDefault().getBreakpointManager();
+                                IBreakpoint[] bpList = bp_manager.getBreakpoints();
+                                for (IBreakpoint findBp : bpList) {
+                                    try {
+                                        if (id.equals(TCFBreakpointsModel.getBreakpointID(findBp))) {
+                                            bp = findBp;
+                                            break;
+                                        }
+                                    }
+                                    catch (CoreException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
                                 String error = (String)map.get(IBreakpoints.STATUS_ERROR);
                                 if (error != null) addBreakpointErrorAnnotation(set, launch, id, error);
                                 Object[] arr = toObjectArray(map.get(IBreakpoints.STATUS_INSTANCES));
@@ -461,19 +546,26 @@ public class TCFAnnotationManager {
                                         }
                                         if (area != null) {
                                             if (error != null) {
+                                                Object[] obj = {String.format("0x%x", addr.toString(16)), error};
                                                 TCFAnnotation a = new TCFAnnotation(area,
                                                         ImageCache.getImage(ImageCache.IMG_BREAKPOINT_ERROR),
-                                                        "Cannot plant breakpoint at 0x" + addr.toString(16) + ": " + error,
+                                                        MessageFormat.format(Messages.TCFAnnotationManager_8, obj),
                                                         TYPE_BP_INSTANCE);
                                                 set.add(a);
                                                 error = null;
                                             }
                                             else {
-                                                TCFAnnotation a = new TCFAnnotation(area,
+                                                if (bp != null) {
+                                                    //Check if the marker needs to be updated.
+                                                    updateBPMarker(bp, area);
+                                                }
+                                                else {
+                                                    TCFAnnotation a = new TCFAnnotation(area,
                                                         ImageCache.getImage(ImageCache.IMG_BREAKPOINT_INSTALLED),
-                                                        "Breakpoint planted at 0x" + addr.toString(16),
+                                                        MessageFormat.format(Messages.TCFAnnotationManager_0, String.format("0x%x",addr.toString(16))),
                                                         TYPE_BP_INSTANCE);
-                                                set.add(a);
+                                                    set.add(a);
+                                                }
                                             }
                                         }
                                     }
@@ -491,13 +583,13 @@ public class TCFAnnotationManager {
                             if (frame.getFrameNo() == 0) {
                                 a = new TCFAnnotation(line_data.area,
                                         DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_INSTRUCTION_POINTER_TOP),
-                                        "Current Instruction Pointer",
+                                        Messages.TCFAnnotationManager_1,
                                         TYPE_TOP_FRAME);
                             }
                             else {
                                 a = new TCFAnnotation(line_data.area,
                                         DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_INSTRUCTION_POINTER),
-                                        "Stack Frame",
+                                        Messages.TCFAnnotationManager_2,
                                         TYPE_STACK_FRAME);
                             }
                             set.add(a);
@@ -510,7 +602,7 @@ public class TCFAnnotationManager {
                         if (line_data != null && line_data.area != null) {
                             TCFAnnotation a = new TCFAnnotation(line_data.area,
                                     DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_INSTRUCTION_POINTER),
-                                    "Last Instruction Pointer position",
+                                    Messages.TCFAnnotationManager_9,
                                     TYPE_STACK_FRAME);
                             set.add(a);
                         }
@@ -594,7 +686,7 @@ public class TCFAnnotationManager {
                         }
                         catch (Throwable x) {
                             if (node == null || !node.isDisposed()) {
-                                Activator.log("Cannot update editor annotations", x);
+                                Activator.log(Messages.TCFAnnotationManager_10, x);
                             }
                         }
                     }
