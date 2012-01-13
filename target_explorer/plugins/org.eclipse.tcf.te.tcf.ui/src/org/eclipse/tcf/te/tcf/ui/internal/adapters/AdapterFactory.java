@@ -16,9 +16,9 @@ import org.eclipse.tcf.te.tcf.ui.navigator.LabelProvider;
 import org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate;
 
 /**
- * The adapter factory for IPeerModel.
+ * Adapter factory implementation.
  */
-public class PeerModelAdapterFactory implements IAdapterFactory {
+public class AdapterFactory implements IAdapterFactory {
 	// The adapter for ILabelProvider.class
 	private LabelProvider labelProvider = new LabelProvider();
 	// The refresh handler delegate adapter

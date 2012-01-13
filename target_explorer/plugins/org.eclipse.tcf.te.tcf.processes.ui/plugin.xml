@@ -6,9 +6,10 @@
    <extension point="org.eclipse.core.runtime.adapters">
       <factory
             adaptableType="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode"
-            class="org.eclipse.tcf.te.tcf.processes.ui.internal.adapters.ProcessTreeNodeAdapterFactory">
+            class="org.eclipse.tcf.te.tcf.processes.ui.internal.adapters.AdapterFactory">
          <adapter type="org.eclipse.jface.viewers.ILabelProvider"/>
          <adapter type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+         <adapter type="org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate"/>
       </factory>
    </extension>
 
@@ -122,31 +123,7 @@
             </visibleWhen>
          </command>
       </menuContribution>
-      <menuContribution
-            locationURI="popup:org.eclipse.tcf.te.ui.views.TargetExplorer#Popup?after=group.open">
-         <command
-               commandId="org.eclipse.tcf.te.tcf.processes.ui.command.refreshNode"
-               helpContextId="org.eclipse.tcf.te.tcf.processes.ui.command_RefreshNode"
-               icon="platform:/plugin/org.eclipse.ui/icons/full/elcl16/refresh_nav.gif"
-               id="refresh"
-               label="%command.refreshNode.label"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <with
-                     variable="selection">
-                  <count
-                        value="1">
-                  </count>
-                  <iterate>
-                     <instanceof
-                           value="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
-                     </instanceof>
-                  </iterate>
-               </with>
-            </visibleWhen>
-         </command>
-      </menuContribution>
+      
       <menuContribution
             locationURI="popup:org.eclipse.tcf.te.ui.controls.menu.processes?after=additions">
          <command
@@ -331,14 +308,9 @@
             <and>
                <with
                      variable="activePartId">
-                  <or>
-                     <equals
-                           value="org.eclipse.tcf.te.ui.views.TargetExplorer">
-                     </equals>
-                     <equals
-                           value="org.eclipse.tcf.te.ui.view.Editor">
-                     </equals>
-                  </or>
+                  <equals
+                        value="org.eclipse.tcf.te.ui.view.Editor">
+                  </equals>
                </with>
                <with
                      variable="selection">

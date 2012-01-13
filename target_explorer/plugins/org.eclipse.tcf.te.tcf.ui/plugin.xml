@@ -6,7 +6,7 @@
    <extension point="org.eclipse.core.runtime.adapters">
       <factory
             adaptableType="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"
-            class="org.eclipse.tcf.te.tcf.ui.internal.adapters.PeerModelAdapterFactory">
+            class="org.eclipse.tcf.te.tcf.ui.internal.adapters.AdapterFactory">
          <adapter type="org.eclipse.jface.viewers.ILabelProvider"/>
          <adapter type="org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate"/>
       </factory>

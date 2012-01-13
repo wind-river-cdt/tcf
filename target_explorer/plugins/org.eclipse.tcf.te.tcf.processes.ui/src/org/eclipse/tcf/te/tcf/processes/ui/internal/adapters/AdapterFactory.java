@@ -14,17 +14,22 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.processes.ui.internal.columns.ProcessLabelProvider;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
+import org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate;
 
 /**
- * The adapter factory for ProcessTreeNode.
+ * Adapter factory implementation.
  */
-public class ProcessTreeNodeAdapterFactory implements IAdapterFactory {
+public class AdapterFactory implements IAdapterFactory {
 	// The adapter for ILabelProvider.class
 	private ILabelProvider labelProvider = new ProcessLabelProvider();
+	// The refresh handler delegate adapter
+	private IRefreshHandlerDelegate refreshDelegate = new RefreshHandlerDelegate();
+
 	// The adapter class.
 	private Class<?>[] adapters = {
 					ILabelProvider.class,
-					IPeerModel.class
+					IPeerModel.class,
+					IRefreshHandlerDelegate.class
 				};
 
 	/* (non-Javadoc)
@@ -38,6 +43,9 @@ public class ProcessTreeNodeAdapterFactory implements IAdapterFactory {
 			}
 			if (IPeerModel.class.equals(adapterType)) {
 				return ((ProcessTreeNode)adaptableObject).peerNode;
+			}
+			if (IRefreshHandlerDelegate.class.equals(adapterType)) {
+				return refreshDelegate;
 			}
 		}
 		return null;
