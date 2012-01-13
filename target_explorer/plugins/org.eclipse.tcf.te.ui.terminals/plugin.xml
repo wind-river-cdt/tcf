@@ -88,6 +88,7 @@
                icon="platform:/plugin/org.eclipse.ui.console/icons/full/eview16/console_view.gif"
                id="org.eclipse.tcf.te.ui.terminals.commands.launch"
                label="%command.launch.label"
+               mnemonic="L"
                style="push"
                tooltip="%command.launch.tooltip">
                <visibleWhen checkEnabled="false">

@@ -143,6 +143,7 @@
                helpContextId="org.eclipse.tcf.te.tcf.ui.command_Redirect"
                id="org.eclipse.tcf.te.tcf.ui.commands.redirect"
                label="%command.redirect.label"
+               mnemonic="e"
                style="push"
                tooltip="%command.redirect.tooltip">
             <visibleWhen checkEnabled="false">
@@ -163,6 +164,7 @@
                helpContextId="org.eclipse.tcf.te.tcf.ui.command_ResetRedirect"
                id="org.eclipse.tcf.te.tcf.ui.commands.resetredirect"
                label="%command.resetredirect.label"
+               mnemonic="s"
                style="push"
                tooltip="%command.resetredirect.tooltip">
             <visibleWhen checkEnabled="false">

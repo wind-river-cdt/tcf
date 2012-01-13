@@ -246,6 +246,7 @@
                commandId="org.eclipse.tcf.te.ui.command.refresh"
                id="org.eclipse.tcf.te.ui.commands.refresh"
                label="%command.refresh.label"
+               mnemonic="f"
                style="push"
                tooltip="%command.refresh.description">
             <visibleWhen checkEnabled="false">
@@ -269,6 +270,7 @@
                icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/delete.gif"
                id="org.eclipse.tcf.te.ui.commands.delete"
                label="%command.delete.label"
+               mnemonic="D"
                style="push"
                tooltip="%command.delete.description">
             <visibleWhen checkEnabled="false">
@@ -290,6 +292,7 @@
                helpContextId="org.eclipse.tcf.te.ui.views.command_Properties"
                id="properties"
                label="%PropertiesAction.label"
+               mnemonic="r"
                tooltip="%PropertiesAction.tooltip">
                <visibleWhen>
                   <with variable="selection">
