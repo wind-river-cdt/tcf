@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Queue;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.protocol.Protocol;
@@ -75,7 +76,7 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext {
 			final ProcessTreeNode childNode = createNodeForContext(context);
 			childNode.parent = parentNode;
 			childNode.peerNode = parentNode.peerNode;
-            int index = searchChild(childNode);
+            final int index = searchChild(childNode);
 			if (index != -1) {
 				ProcessTreeNode node = parentNode.children.get(index);
 				updateData(childNode, node);
@@ -90,6 +91,11 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext {
 					public void doneGetContext(IToken token, Exception error, ProcessContext context) {
 						if (error == null && context != null) {
 							childNode.pContext = context;
+							if(index != -1) {
+								ProcessTreeNode node = parentNode.children.get(index);
+								node.pContext = context;
+								node.firePropertyChange(new PropertyChangeEvent(RefreshDoneGetContext.this, "properties", null, null)); //$NON-NLS-1$
+							}
 						}
 						setAndCheckStatus();
 					}
@@ -117,6 +123,7 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext {
         dest.state = src.state;
         dest.type = src.type;
         dest.username = src.username;
+        dest.firePropertyChange(new PropertyChangeEvent(this, "properties", null, null)); //$NON-NLS-1$
     }
 
 	/**

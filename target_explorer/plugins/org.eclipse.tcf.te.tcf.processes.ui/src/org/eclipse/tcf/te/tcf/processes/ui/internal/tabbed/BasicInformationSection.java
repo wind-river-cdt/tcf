@@ -10,9 +10,12 @@
 package org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
@@ -23,7 +26,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 /**
  * The property section to display the basic information of a process.
  */
-public class BasicInformationSection extends BaseTitledSection {
+public class BasicInformationSection extends BaseTitledSection implements IPropertyChangeListener {
 	// The process tree node to be displayed.
 	protected ProcessTreeNode node;
 	// The text field for the name of the process.
@@ -34,7 +37,7 @@ public class BasicInformationSection extends BaseTitledSection {
 	protected Text stateText;
 	// The text field for the ownere of the process.
 	protected Text userText;
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.tcf.te.ui.views.tabbed.BaseTitledSection#createControls(org.eclipse.swt.widgets.Composite, org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage)
@@ -58,7 +61,24 @@ public class BasicInformationSection extends BaseTitledSection {
         Assert.isTrue(selection instanceof IStructuredSelection);
         Object input = ((IStructuredSelection) selection).getFirstElement();
         Assert.isTrue(input instanceof ProcessTreeNode);
+        if(this.node != null) {
+        	this.node.removePropertyChangeListener(this);
+        }
         this.node = (ProcessTreeNode) input;
+        if(this.node != null) {
+        	this.node.addPropertyChangeListener(this);
+        }
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#aboutToBeHidden()
+	 */
+	@Override
+    public void aboutToBeHidden() {
+		if(this.node != null) {
+			this.node.removePropertyChangeListener(this);
+		}
     }
 
 	/*
@@ -83,4 +103,17 @@ public class BasicInformationSection extends BaseTitledSection {
 		return Messages.BasicInformationSection_Title; 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
+	 */
+	@Override
+    public void propertyChange(PropertyChangeEvent event) {
+		Display display = getPart().getSite().getShell().getDisplay();
+		display.asyncExec(new Runnable(){
+			@Override
+            public void run() {
+				refresh();
+			}});
+    }
 }

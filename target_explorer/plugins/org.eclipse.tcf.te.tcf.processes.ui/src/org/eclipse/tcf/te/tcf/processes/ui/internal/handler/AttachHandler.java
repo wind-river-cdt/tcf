@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.tcf.protocol.Protocol;
@@ -84,6 +85,7 @@ public class AttachHandler extends AbstractHandler {
 			@Override
 			protected void internalDone(Object caller, IStatus status) {
 				if (status.getSeverity() == IStatus.OK) {
+					node.firePropertyChange(new PropertyChangeEvent(this, "properties", null, null)); //$NON-NLS-1$
 					// Get the launch instance from the callback properties
 					Object launch = getProperty("launch"); //$NON-NLS-1$
 					if (launch != null) {
