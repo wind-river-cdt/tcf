@@ -22,7 +22,7 @@ public interface IUIConstants {
 	/**
 	 * The target explorer editor id.
 	 */
-	public static final String ID_EDITOR = "org.eclipse.tcf.te.ui.view.Editor"; //$NON-NLS-1$
+	public static final String ID_EDITOR = "org.eclipse.tcf.te.ui.views.Editor"; //$NON-NLS-1$
 
 	// ***** Define the constants for the Target Explorer view root mode *****
 

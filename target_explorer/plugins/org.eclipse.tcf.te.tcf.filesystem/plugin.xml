@@ -1135,7 +1135,7 @@
                            value="org.eclipse.tcf.te.ui.views.TargetExplorer">
                      </equals>
                      <equals
-                           value="org.eclipse.tcf.te.ui.view.Editor">
+                           value="org.eclipse.tcf.te.ui.views.Editor">
                      </equals>
                   </or>
                </with>
@@ -1206,7 +1206,7 @@
                         value="org.eclipse.tcf.te.ui.views.TargetExplorer">
                   </equals>
                   <equals
-                        value="org.eclipse.tcf.te.ui.view.Editor">
+                        value="org.eclipse.tcf.te.ui.views.Editor">
                   </equals>
                </or>
             </with>
@@ -1266,7 +1266,7 @@
                         value="org.eclipse.tcf.te.ui.views.TargetExplorer">
                   </equals>
                   <equals
-                        value="org.eclipse.tcf.te.ui.view.Editor">
+                        value="org.eclipse.tcf.te.ui.views.Editor">
                   </equals>
                </or>
             </with>
@@ -1310,7 +1310,7 @@
                         value="org.eclipse.tcf.te.ui.views.TargetExplorer">
                   </equals>
                   <equals
-                        value="org.eclipse.tcf.te.ui.view.Editor">
+                        value="org.eclipse.tcf.te.ui.views.Editor">
                   </equals>
                </or>
             </with>
@@ -1354,7 +1354,7 @@
                         value="org.eclipse.tcf.te.ui.views.TargetExplorer">
                   </equals>
                   <equals
-                        value="org.eclipse.tcf.te.ui.view.Editor">
+                        value="org.eclipse.tcf.te.ui.views.Editor">
                   </equals>
                </or>
             </with>
@@ -1398,7 +1398,7 @@
                         value="org.eclipse.tcf.te.ui.views.TargetExplorer">
                   </equals>
                   <equals
-                        value="org.eclipse.tcf.te.ui.view.Editor">
+                        value="org.eclipse.tcf.te.ui.views.Editor">
                   </equals>
                </or>
             </with>
@@ -1448,7 +1448,7 @@
                         value="org.eclipse.tcf.te.ui.views.TargetExplorer">
                   </equals>
                   <equals
-                        value="org.eclipse.tcf.te.ui.view.Editor">
+                        value="org.eclipse.tcf.te.ui.views.Editor">
                   </equals>
                </or>
             </with>
@@ -1505,7 +1505,7 @@
                         value="org.eclipse.tcf.te.ui.views.TargetExplorer">
                   </equals>
                   <equals
-                        value="org.eclipse.tcf.te.ui.view.Editor">
+                        value="org.eclipse.tcf.te.ui.views.Editor">
                   </equals>
                </or>
             </with>
@@ -1562,7 +1562,7 @@
                         value="org.eclipse.tcf.te.ui.views.TargetExplorer">
                   </equals>
                   <equals
-                        value="org.eclipse.tcf.te.ui.view.Editor">
+                        value="org.eclipse.tcf.te.ui.views.Editor">
                   </equals>
                </or>
             </with>
@@ -1600,7 +1600,7 @@
                         value="org.eclipse.tcf.te.ui.views.TargetExplorer">
                   </equals>
                   <equals
-                        value="org.eclipse.tcf.te.ui.view.Editor">
+                        value="org.eclipse.tcf.te.ui.views.Editor">
                   </equals>
                </or>
             </with>
@@ -1635,7 +1635,7 @@
                         value="org.eclipse.tcf.te.ui.views.TargetExplorer">
                   </equals>
                   <equals
-                        value="org.eclipse.tcf.te.ui.view.Editor">
+                        value="org.eclipse.tcf.te.ui.views.Editor">
                   </equals>
                </or>
             </with>
@@ -1692,7 +1692,7 @@
                         value="org.eclipse.tcf.te.ui.views.TargetExplorer">
                   </equals>
                   <equals
-                        value="org.eclipse.tcf.te.ui.view.Editor">
+                        value="org.eclipse.tcf.te.ui.views.Editor">
                   </equals>
                </or>
             </with>
@@ -1750,7 +1750,7 @@
                            value="org.eclipse.tcf.te.ui.views.TargetExplorer">
                      </equals>
                      <equals
-                           value="org.eclipse.tcf.te.ui.view.Editor">
+                           value="org.eclipse.tcf.te.ui.views.Editor">
                      </equals>
                   </or>
                </with>
@@ -1794,7 +1794,7 @@
                <with
                      variable="activePartId">
                   <equals
-                        value="org.eclipse.tcf.te.ui.view.Editor">
+                        value="org.eclipse.tcf.te.ui.views.Editor">
                   </equals>
                </with>
          </activeWhen>
@@ -1838,7 +1838,7 @@
             <with
                   variable="activePartId">
                <equals
-                     value="org.eclipse.tcf.te.ui.view.Editor">
+                     value="org.eclipse.tcf.te.ui.views.Editor">
                </equals>
             </with>
          </activeWhen>

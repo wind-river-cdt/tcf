@@ -192,7 +192,7 @@
             class="org.eclipse.tcf.te.ui.views.editor.Editor"
             default="false"
             icon="icons/eview16/prop_ps.gif"
-            id="org.eclipse.tcf.te.ui.view.Editor"
+            id="org.eclipse.tcf.te.ui.views.Editor"
             name="%Editor.name">
       </editor>
    </extension>

@@ -63,6 +63,12 @@
             name="%context.targetexplorer.name"
             parentId="org.eclipse.ui.contexts.window">
       </context>
+      <context
+            description="%context.editor.description"
+            id="org.eclipse.tcf.te.ui.views.Editor"
+            name="%context.editor.name"
+            parentId="org.eclipse.ui.contexts.window">
+      </context>
    </extension>
 
    <extension point="org.eclipse.ui.bindings">
@@ -76,6 +82,13 @@
       <key
             commandId="org.eclipse.tcf.te.ui.command.refresh"
             contextId="org.eclipse.tcf.te.ui.views.TargetExplorer"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="F5">
+      </key>
+
+      <key
+            commandId="org.eclipse.tcf.te.ui.command.refresh"
+            contextId="org.eclipse.tcf.te.ui.views.Editor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="F5">
       </key>
