@@ -29,9 +29,8 @@
          <enablement>
             <with variable="activeEditorInput">
                <and>
-                  <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel">
-                     <test property="org.eclipse.tcf.te.tcf.locator.hasRemoteService" value="Processes"/>
-                  </adapt>
+                  <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                  <test property="org.eclipse.tcf.te.tcf.locator.hasRemoteService" value="Processes"/>
                </and>
             </with>
          </enablement>
