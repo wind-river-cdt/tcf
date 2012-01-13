@@ -35,8 +35,11 @@ public interface IPathMap extends IService {
         /** String, destination, or run-time file path */
         PROP_DESTINATION = "Destination",
 
-        /** String, symbols context group ID or name */
+        /** String, symbols context group ID or name, deprecated - use ContextQuery */
         PROP_CONTEXT = "Context",
+
+        /** String, contexts query, see IContextQuery */
+        PROP_CONTEXT_QUERY = "ContextQuery",
 
         /** String, */
         PROP_HOST = "Host",
@@ -103,6 +106,13 @@ public interface IPathMap extends IService {
          * @return protocol name.
          */
         String getProtocol();
+
+        /**
+         * Get context query that defines scope of the mapping rule, see also IContextQuery.
+         * Same as getProperties().get(PROP_CONTEXT_QUERY)
+         * @return context query expression, or null.
+         */
+        String getContextQuery();
     }
 
     /**

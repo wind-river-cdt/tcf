@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import org.eclipse.tcf.internal.debug.model.TCFMemoryRegion;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IErrorReport;
 import org.eclipse.tcf.protocol.IToken;
@@ -120,45 +121,6 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
             this.pc = pc;
             this.reason = reason;
             this.params = params;
-        }
-    }
-
-    private static class MemRegion implements MemoryRegion {
-
-        private final Map<String,Object> props;
-
-        MemRegion(Map<String,Object> props) {
-            this.props = props;
-        }
-
-        public Number getAddress() {
-            return (Number)props.get(IMemoryMap.PROP_ADDRESS);
-        }
-
-        public Number getSize() {
-            return (Number)props.get(IMemoryMap.PROP_SIZE);
-        }
-
-        public Number getOffset() {
-            return (Number)props.get(IMemoryMap.PROP_OFFSET);
-        }
-
-        public String getFileName() {
-            return (String)props.get(IMemoryMap.PROP_FILE_NAME);
-        }
-
-        public String getSectionName() {
-            return (String)props.get(IMemoryMap.PROP_SECTION_NAME);
-        }
-
-        public int getFlags() {
-            Number n = (Number)props.get(IMemoryMap.PROP_FLAGS);
-            if (n != null) return n.intValue();
-            return 0;
-        }
-
-        public Map<String,Object> getProperties() {
-            return props;
         }
     }
 
@@ -1649,7 +1611,7 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
                     return;
                 }
                 final Map<String,Object> props = new HashMap<String,Object>();
-                final String test_id = "TestRCBP1." + mem_map_region_id++;
+                final String test_id = "TestRCBP1." + mem_map_region_id++ + "." + prs_id;
                 props.put(IMemoryMap.PROP_ID, test_id);
                 if (rnd.nextBoolean()) props.put(IMemoryMap.PROP_ADDRESS, rnd.nextInt(0x10000000));
                 if (rnd.nextBoolean()) props.put(IMemoryMap.PROP_SIZE, rnd.nextInt(0x10000000));
@@ -1666,7 +1628,7 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
                     if (id != null) list.add(r);
                 }
                 final List<MemoryRegion> org_list = new ArrayList<MemoryRegion>(list);
-                list.add(new MemRegion(props));
+                list.add(new TCFMemoryRegion(props));
                 srv_memory_map.set(prs_id, list.toArray(new MemoryRegion[list.size()]), new IMemoryMap.DoneSet() {
                     public void doneSet(IToken token, Exception error) {
                         if (error != null) {

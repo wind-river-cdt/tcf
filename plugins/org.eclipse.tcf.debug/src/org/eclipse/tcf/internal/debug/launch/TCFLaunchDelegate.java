@@ -36,6 +36,7 @@ import org.eclipse.tcf.protocol.JSON;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IMemoryMap;
 import org.eclipse.tcf.services.IPathMap;
+import org.eclipse.tcf.util.TCFPathMapRule;
 import org.eclipse.tcf.util.TCFTask;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -62,40 +63,15 @@ public class TCFLaunchDelegate extends LaunchConfigurationDelegate {
         ATTR_PATH_MAP = ITCFConstants.ID_TCF_DEBUG_MODEL + ".PathMap",
         ATTR_MEMORY_MAP = ITCFConstants.ID_TCF_DEBUG_MODEL + ".MemoryMap";
 
-    public static class PathMapRule implements IPathMap.PathMapRule {
-
-        private final Map<String,Object> props;
+    public static class PathMapRule extends TCFPathMapRule {
 
         public PathMapRule(Map<String,Object> props) {
-            this.props = props;
-        }
-
-        public Map<String,Object> getProperties() {
-            return props;
-        }
-
-        public String getID() {
-            return (String)props.get(IPathMap.PROP_ID);
-        }
-
-        public String getSource() {
-            return (String)props.get(IPathMap.PROP_SOURCE);
-        }
-
-        public String getDestination() {
-            return (String)props.get(IPathMap.PROP_DESTINATION);
-        }
-
-        public String getHost() {
-            return (String)props.get(IPathMap.PROP_HOST);
-        }
-
-        public String getProtocol() {
-            return (String)props.get(IPathMap.PROP_PROTOCOL);
+            super(props);
         }
 
         public String toString() {
             StringBuffer bf = new StringBuffer();
+            Map<String,Object> props = getProperties();
             for (String nm : props.keySet()) {
                 Object o = props.get(nm);
                 if (o != null) {
@@ -150,7 +126,7 @@ public class TCFLaunchDelegate extends LaunchConfigurationDelegate {
                 while (i < s.length()) {
                     ch = s.charAt(i++);
                     if (ch == '|') {
-                        if (bf.length() > 0) e.props.put(nm, bf.toString());
+                        if (bf.length() > 0) e.getProperties().put(nm, bf.toString());
                         break;
                     }
                     else if (ch == '\\') {
@@ -227,10 +203,10 @@ public class TCFLaunchDelegate extends LaunchConfigurationDelegate {
                             String src = map_entry.getAttribute("backendPath");
                             String dst = map_entry.getAttribute("localPath");
                             if (src != null) src = src.replace('\\', '/');
-                            PathMapRule e = new PathMapRule(new HashMap<String,Object>());
-                            e.props.put(IPathMap.PROP_SOURCE, src);
-                            e.props.put(IPathMap.PROP_DESTINATION, dst);
-                            map.add(e);
+                            Map<String,Object> props = new HashMap<String,Object>();
+                            props.put(IPathMap.PROP_SOURCE, src);
+                            props.put(IPathMap.PROP_DESTINATION, dst);
+                            map.add(new PathMapRule(props));
                         }
                     }
                 }

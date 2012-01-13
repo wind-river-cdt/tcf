@@ -29,6 +29,9 @@ public interface IMemoryMap extends IService {
         /** String, memory region ID */
         PROP_ID = "ID",
 
+        /** String, memory region context query, see IContextQuery */
+        PROP_CONTEXT_QUERY = "ContextQuery",
+
         /** Number, region address in memory */
         PROP_ADDRESS = "Addr",
 
@@ -77,39 +80,62 @@ public interface IMemoryMap extends IService {
 
         /**
          * Get memory region address.
+         * Same as getProperties().get(PROP_ADDRESS)
          * @return region address.
          */
         Number getAddress();
 
         /**
          * Get memory region size.
+         * Same as getProperties().get(PROP_SIZE)
          * @return region size.
          */
         Number getSize();
 
         /**
          * Get memory region file offset.
+         * Same as getProperties().get(PROP_OFFSET)
          * @return file offset.
          */
         Number getOffset();
 
         /**
+         * Check if the region represents BSS - data segment containing
+         * statically-allocated variables represented solely by zero-valued bits initially.
+         * Memory for BSS segments is not backed by a file contents.
+         * Same as getProperties().get(PROP_BSS)
+         * @return file offset.
+         */
+        boolean isBSS();
+
+        /**
          * Get memory region flags.
+         * Same as getProperties().get(PROP_FLAGS)
          * @return region flags.
          */
         int getFlags();
 
         /**
          * Get memory region file name.
+         * Same as getProperties().get(PROP_FILE_NAME)
          * @return file name.
          */
         String getFileName();
 
         /**
          * Get memory region section name.
+         * Same as getProperties().get(PROP_SECTION_NAME)
          * @return section name.
          */
         String getSectionName();
+
+        /**
+         * Get context query that defines scope of the region, see also IContextQuery.
+         * Same as getProperties().get(PROP_CONTEXT_QUERY)
+         * Only user-defined regions can have a context query property.
+         * @return context query expression, or null.
+         */
+        String getContextQuery();
     }
 
     /**
@@ -135,6 +161,10 @@ public interface IMemoryMap extends IService {
 
     /**
      * Set memory map for given context.
+     * 'id' can be null, in such case scope of each memory region is
+     * defined by its ContextQuery property.
+     *
+     * Using non-null 'id' is deprecated - use ContextQuery instead.
      *
      * @param id – symbols context group ID or name.
      * @param map – memory map data.

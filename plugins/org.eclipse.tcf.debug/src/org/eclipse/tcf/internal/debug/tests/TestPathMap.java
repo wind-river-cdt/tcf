@@ -21,6 +21,7 @@ import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IPathMap;
 import org.eclipse.tcf.services.IPathMap.PathMapRule;
+import org.eclipse.tcf.util.TCFPathMapRule;
 
 class TestPathMap implements ITCFTest {
 
@@ -39,43 +40,6 @@ class TestPathMap implements ITCFTest {
     };
 
     private int cnt = 0;
-
-    private static class Rule implements IPathMap.PathMapRule {
-
-        final Map<String,Object> props;
-
-        public Rule(Map<String,Object> props) {
-            this.props = props;
-        }
-
-        public Map<String,Object> getProperties() {
-            return props;
-        }
-
-        public String getID() {
-            return (String)props.get(IPathMap.PROP_ID);
-        }
-
-        public String getSource() {
-            return (String)props.get(IPathMap.PROP_SOURCE);
-        }
-
-        public String getDestination() {
-            return (String)props.get(IPathMap.PROP_DESTINATION);
-        }
-
-        public String getHost() {
-            return (String)props.get(IPathMap.PROP_HOST);
-        }
-
-        public String getProtocol() {
-            return (String)props.get(IPathMap.PROP_PROTOCOL);
-        }
-
-        public String toString() {
-            return props.toString();
-        }
-    }
 
     TestPathMap(TCFTestSuite test_suite, IChannel channel, List<PathMapRule> map) {
         this.test_suite = test_suite;
@@ -122,7 +86,7 @@ class TestPathMap implements ITCFTest {
                     String val = bf.toString();
                     props.put(nm, val);
                 }
-                map_out[i] = new Rule(props);
+                map_out[i] = new TCFPathMapRule(props);
             }
             service.set(map_out, new IPathMap.DoneSet() {
                 public void doneSet(IToken token, Exception error) {

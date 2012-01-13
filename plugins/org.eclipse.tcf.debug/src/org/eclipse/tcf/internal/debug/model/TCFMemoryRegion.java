@@ -15,49 +15,19 @@ import java.util.Map;
 
 import org.eclipse.tcf.protocol.JSON;
 import org.eclipse.tcf.services.IMemoryMap;
-import org.eclipse.tcf.services.IMemoryMap.MemoryRegion;
 
-public class TCFMemoryRegion implements MemoryRegion, Comparable<TCFMemoryRegion> {
-
-    private final Map<String,Object> props;
+/**
+ * A comparable extension of TCFMemoryRegion.
+ */
+public class TCFMemoryRegion extends org.eclipse.tcf.util.TCFMemoryRegion implements Comparable<TCFMemoryRegion> {
 
     public final BigInteger addr;
     public final BigInteger size;
 
     public TCFMemoryRegion(Map<String,Object> props) {
-        this.props = props;
+        super(props);
         this.addr = JSON.toBigInteger((Number)props.get(IMemoryMap.PROP_ADDRESS));
         this.size = JSON.toBigInteger((Number)props.get(IMemoryMap.PROP_SIZE));
-    }
-
-    public Number getAddress() {
-        return addr;
-    }
-
-    public Number getSize() {
-        return size;
-    }
-
-    public Number getOffset() {
-        return (Number)props.get(IMemoryMap.PROP_OFFSET);
-    }
-
-    public String getFileName() {
-        return (String)props.get(IMemoryMap.PROP_FILE_NAME);
-    }
-
-    public String getSectionName() {
-        return (String)props.get(IMemoryMap.PROP_SECTION_NAME);
-    }
-
-    public int getFlags() {
-        Number n = (Number)props.get(IMemoryMap.PROP_FLAGS);
-        if (n != null) return n.intValue();
-        return 0;
-    }
-
-    public Map<String,Object> getProperties() {
-        return props;
     }
 
     public int compareTo(TCFMemoryRegion r) {

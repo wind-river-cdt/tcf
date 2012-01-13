@@ -20,51 +20,13 @@ import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.protocol.JSON;
 import org.eclipse.tcf.services.IMemoryMap;
+import org.eclipse.tcf.util.TCFMemoryRegion;
 
 public class MemoryMapProxy implements IMemoryMap {
 
     private final IChannel channel;
     private final Map<MemoryMapListener,IChannel.IEventListener> listeners =
         new HashMap<MemoryMapListener,IChannel.IEventListener>();
-
-    private class Region implements MemoryRegion {
-
-        final Map<String,Object> props;
-
-        Region(Map<String,Object> props) {
-            this.props = props;
-        }
-
-        public Number getAddress() {
-            return (Number)props.get(PROP_ADDRESS);
-        }
-
-        public Number getOffset() {
-            return (Number)props.get(PROP_OFFSET);
-        }
-
-        public Number getSize() {
-            return (Number)props.get(PROP_SIZE);
-        }
-
-        public String getFileName() {
-            return (String)props.get(PROP_FILE_NAME);
-        }
-
-        public String getSectionName() {
-            return (String)props.get(PROP_SECTION_NAME);
-        }
-
-        public int getFlags() {
-            Number n = (Number)props.get(PROP_FLAGS);
-            if (n != null) return n.intValue();
-            return 0;
-        }
-
-        public Map<String,Object> getProperties() {
-            return props;
-        }
-    }
 
     public MemoryMapProxy(IChannel channel) {
         this.channel = channel;
@@ -115,7 +77,7 @@ public class MemoryMapProxy implements IMemoryMap {
     @SuppressWarnings("unchecked")
     private MemoryRegion toMemoryRegion(Object o) {
         if (o == null) return null;
-        return new Region((Map<String,Object>)o);
+        return new TCFMemoryRegion((Map<String,Object>)o);
     }
 
     public void addListener(final MemoryMapListener listener) {

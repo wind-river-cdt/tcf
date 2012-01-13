@@ -20,49 +20,13 @@ import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.protocol.JSON;
 import org.eclipse.tcf.services.IPathMap;
+import org.eclipse.tcf.util.TCFPathMapRule;
 
 public class PathMapProxy implements IPathMap {
 
     private final IChannel channel;
     private final Map<PathMapListener,IChannel.IEventListener> listeners =
             new HashMap<PathMapListener,IChannel.IEventListener>();
-
-    private static class MapRule implements PathMapRule {
-
-        final Map<String,Object> props;
-
-        MapRule(Map<String,Object> props) {
-            this.props = props;
-        }
-
-        public Map<String,Object> getProperties() {
-            return props;
-        }
-
-        public String getID() {
-            return (String)props.get(PROP_ID);
-        }
-
-        public String getSource() {
-            return (String)props.get(PROP_SOURCE);
-        }
-
-        public String getDestination() {
-            return (String)props.get(PROP_DESTINATION);
-        }
-
-        public String getHost() {
-            return (String)props.get(PROP_HOST);
-        }
-
-        public String getProtocol() {
-            return (String)props.get(PROP_PROTOCOL);
-        }
-
-        public String toString() {
-            return props.toString();
-        }
-    }
 
     public PathMapProxy(IChannel channel) {
         this.channel = channel;
@@ -113,7 +77,7 @@ public class PathMapProxy implements IPathMap {
     @SuppressWarnings("unchecked")
     private PathMapRule toPathMapRule(Object o) {
         if (o == null) return null;
-        return new MapRule((Map<String,Object>)o);
+        return new TCFPathMapRule((Map<String,Object>)o);
     }
 
     public void addListener(final PathMapListener listener) {

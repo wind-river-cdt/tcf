@@ -46,6 +46,7 @@ public interface IBreakpoints extends IService {
         PROP_CONTEXTNAMES = "ContextNames",       // Array
         PROP_CONTEXTIDS = "ContextIds",           // Array
         PROP_EXECUTABLEPATHS = "ExecPaths",       // Array
+        PROP_CONTEXT_QUERY = "ContextQuery",      // String, see IContextQuery
         PROP_LOCATION = "Location",               // String
         PROP_SIZE = "Size",                       // Number
         PROP_ACCESSMODE = "AccessMode",           // Number
