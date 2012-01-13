@@ -17,10 +17,9 @@ import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
- * The handler that refreshes the directory and its children recursively
- * in the file system tree.
+ * The handler to refresh the root of the file system tree in Target Explorer.
  */
-public class RefreshDirectoryHandler extends RefreshNodeHandler {
+public class RefreshFSRootHandler extends RefreshNodeHandler {
 
 	/*
 	 * (non-Javadoc)
@@ -30,10 +29,11 @@ public class RefreshDirectoryHandler extends RefreshNodeHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getCurrentSelectionChecked(event);
 		Assert.isTrue(selection.size() == 1);
-		final FSTreeNode node = (FSTreeNode) selection.getFirstElement();
-		if(node.childrenQueried) {
-			scheduleRefreshJob(node);
+		final FSTreeNode root = (FSTreeNode) selection.getFirstElement();
+		if (root != null) {
+			scheduleRefreshJob(root);
 		}
 		return null;
 	}
+
 }

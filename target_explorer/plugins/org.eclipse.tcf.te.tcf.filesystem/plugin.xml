@@ -866,6 +866,31 @@
             </visibleWhen>
          </command>
          <command
+               commandId="org.eclipse.ui.file.refresh"
+               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_RefreshDirectory"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/elcl16/refresh_nav.gif"
+               id="refresh"
+               label="%fsmenu.refresh.label"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                     </instanceof>
+                     <test
+                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isSystemRoot">
+                     </test>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
                commandId="org.eclipse.tcf.te.tcf.filesystem.commands.update"
                helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Update"
                id="update"
@@ -1854,6 +1879,50 @@
             class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.RefreshViewerHandler"
             commandId="org.eclipse.tcf.te.tcf.filesystem.commands.refreshViewer">
       </handler>
+      <handler
+            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.RefreshFSRootHandler"
+            commandId="org.eclipse.ui.file.refresh">
+         <activeWhen>
+            <and>
+               <with
+                     variable="activePartId">
+                  <equals
+                        value="org.eclipse.tcf.te.ui.views.TargetExplorer">
+                  </equals>
+               </with>
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                     </instanceof>
+                     <test
+                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isSystemRoot">
+                     </test>
+                  </iterate>
+               </with>
+            </and>
+         </activeWhen>
+         <enabledWhen>
+            <with
+                  variable="selection">
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                  </instanceof>
+                  <test
+                        property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isSystemRoot">
+                  </test>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
    </extension>
    
 <!-- Decorator contributions -->
@@ -2165,7 +2234,7 @@
                afterTab="org.eclipse.tcf.te.tcf.filesystem.propertytab.general"
                category="target_explorer"
                id="org.eclipse.tcf.te.tcf.filesystem.propertytab.permissions"
-               label="Permissions">
+               label="%propertyTab.permission.label">
          </propertyTab>
          <propertyTab
                afterTab="org.eclipse.tcf.te.tcf.filesystem.propertytab.general,org.eclipse.tcf.te.tcf.filesystem.propertytab.permissions"
