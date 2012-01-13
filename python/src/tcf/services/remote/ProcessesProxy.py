@@ -1,5 +1,5 @@
 # *******************************************************************************
-# * Copyright (c) 2011 Wind River Systems, Inc. and others.
+# * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others.
 # * All rights reserved. This program and the accompanying materials
 # * are made available under the terms of the Eclipse Public License v1.0
 # * which accompanies this distribution, and is available at
@@ -140,7 +140,7 @@ class ProcessesProxy(processes.ProcessesService):
                 if not error:
                     assert len(args) == 4
                     error = self.toError(args[0])
-                    dont_stop, dont_pass, pending = args[1:3]
+                    dont_stop, dont_pass, pending = args[1:4]
                 done.doneGetSignalMask(self.token, error, dont_stop, dont_pass, pending)
         return GetSignalMaskCommand().token
 

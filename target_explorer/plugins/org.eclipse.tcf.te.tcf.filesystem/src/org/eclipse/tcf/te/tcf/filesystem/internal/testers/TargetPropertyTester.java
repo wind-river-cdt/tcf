@@ -53,13 +53,13 @@ public class TargetPropertyTester extends PropertyTester {
 	public static String getOSName(final IPeerModel peerModel) {
 	    final String[] osName = new String[1];
 		if (Protocol.isDispatchThread()) {
-			osName[0] = peerModel.getStringProperty("OSName"); //$NON-NLS-1$
+			osName[0] = peerModel.getPeer().getOSName();
 		}
 		else {
 			Protocol.invokeAndWait(new Runnable() {
 				@Override
 				public void run() {
-					osName[0] = peerModel.getStringProperty("OSName"); //$NON-NLS-1$
+					osName[0] = peerModel.getPeer().getOSName();
 				}
 			});
 		}

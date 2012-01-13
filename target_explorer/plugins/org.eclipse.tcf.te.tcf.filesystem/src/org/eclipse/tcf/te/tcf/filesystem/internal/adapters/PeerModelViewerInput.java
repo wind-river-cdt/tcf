@@ -43,8 +43,10 @@ public class PeerModelViewerInput implements IViewerInput {
 	 */
 	@Override
     public void firePropertyChange(PropertyChangeEvent event) {
-		for(IPropertyChangeListener listener : propertyChangeListeners) {
-			listener.propertyChange(event);
+		synchronized (propertyChangeListeners) {
+			for(IPropertyChangeListener listener : propertyChangeListeners) {
+				listener.propertyChange(event);
+			}
 		}
 	}
 	

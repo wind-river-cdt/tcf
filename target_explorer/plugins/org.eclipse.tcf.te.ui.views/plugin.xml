@@ -126,6 +126,9 @@
                <instanceof value="org.eclipse.tcf.te.ui.views.workingsets.WorkingSetViewStateManager"/>
                <instanceof value="org.eclipse.ui.IWorkingSet"/>
                <instanceof value="org.eclipse.tcf.te.ui.views.workingsets.WorkingSetElementHolder"/>
+               <instanceof
+                     value="org.eclipse.tcf.te.runtime.interfaces.workingsets.IWorkingSetElement">
+               </instanceof>
             </or>
          </possibleChildren>
          <commonSorter
@@ -133,6 +136,17 @@
                id="org.eclipse.tcf.te.ui.views.navigator.content.workingSets.sorter">
          </commonSorter>
       </navigatorContent>
+      <actionProvider
+            class="org.eclipse.tcf.te.ui.views.actions.GoIntoActionProvider"
+            id="org.eclipse.tcf.te.ui.views.navigator.actions.GoIntoActionProvider">
+         <enablement>
+            <with
+                  variable="selection">
+               <count
+                     value="1">
+               </count>
+            </with></enablement>
+      </actionProvider>
       
    </extension>
 
@@ -267,7 +281,7 @@
             categoryId="org.eclipse.tcf.te.ui.commands.category"
             helpContextId="org.eclipse.ui.navigator.Open"
             id="org.eclipse.ui.navigator.Open"
-            name="%Command.open.name">
+            name="%command.open.name">
       </command>
       <command
             categoryId="org.eclipse.tcf.te.ui.commands.category"

@@ -37,8 +37,11 @@ public class ConfigRefreshIntervalHandler extends AbstractHandler {
 		if (peer != null) {
 			Shell parent = HandlerUtil.getActiveShellChecked(event);
 			IntervalConfigDialog dialog = new IntervalConfigDialog(parent);
+			ProcessModel model = ProcessModel.getProcessModel(peer);
+			int interval = model.getInterval();
+			dialog.setResult(interval);
 			if (dialog.open() == Window.OK) {
-				int interval = dialog.getResult();
+				interval = dialog.getResult();
 				ProcessModel processModel = ProcessModel.getProcessModel(peer);
 				processModel.setInterval(interval);
 				processModel.addMRUInterval(interval);

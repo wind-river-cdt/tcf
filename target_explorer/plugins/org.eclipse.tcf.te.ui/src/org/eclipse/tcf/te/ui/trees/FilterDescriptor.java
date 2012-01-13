@@ -27,6 +27,8 @@ public class FilterDescriptor {
 	private boolean enabled;
 	// The image of this filter.
 	private Image image;
+	// If this filter should visible in the configuration dialog.
+	private boolean visible;
 
 	// The viewer filter.
 	private ViewerFilter filter;
@@ -138,4 +140,22 @@ public class FilterDescriptor {
 	public void setImage(Image image) {
     	this.image = image;
     }
+	
+	/**
+	 * Return if the filter is visible in the configuration UI.
+	 * 
+	 * @return true if it is visible.
+	 */
+	public boolean isVisible() {
+		return visible;
+	}
+	
+	/**
+	 * Set if this filter should be visible in the configuration UI.
+	 * 
+	 * @param v if this filter is visible.
+	 */
+	public void setVisible(boolean v) {
+		visible = v;
+	}
 }

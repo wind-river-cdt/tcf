@@ -16,24 +16,14 @@ import java.util.StringTokenizer;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.StatusDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -47,13 +37,7 @@ import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
 /**
  * The dialog to configure the refreshing interval of the process list.
  */
-public class IntervalConfigDialog extends StatusDialog implements SelectionListener, ModifyListener, ISelectionChangedListener, IPreferenceConsts {
-	// The option to enter the interval value in a text field.
-	private Button button1;
-	// The option to enter the interval value in a combo field.
-	private Button button2;
-	// The combo viewer to input the interval value.
-	private ComboViewer comboViewer;
+public class IntervalConfigDialog extends StatusDialog implements ModifyListener, IPreferenceConsts {
 	// The text field to enter the interval value.
 	private Text text;
 	// The entered result
@@ -84,67 +68,28 @@ public class IntervalConfigDialog extends StatusDialog implements SelectionListe
     protected Control createDialogArea(Composite parent) {
 	    Composite composite = (Composite) super.createDialogArea(parent);
 	    
-	    Composite comp0 = new Composite(composite, SWT.NONE);
-	    GridData data = new GridData(SWT.FILL, SWT.CENTER, true, false);
-	    comp0.setLayoutData(data);
-	    GridLayout layout = new GridLayout(3, false);
-	    layout.horizontalSpacing = 0;
-	    comp0.setLayout(layout);
-	    
-	    Label label = new Label(comp0, SWT.NONE);
-	    label.setText(Messages.IntervalConfigDialog_DialogMessage);
-	    
 	    Composite comp1 = new Composite(composite, SWT.NONE);
-	    data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+	    GridData data = new GridData(SWT.FILL, SWT.CENTER, true, false);
 	    comp1.setLayoutData(data);
-	    layout = new GridLayout(3, false);
+	    GridLayout layout = new GridLayout(3, false);
 	    layout.horizontalSpacing = 0;
 	    comp1.setLayout(layout);
 	    
-	    button1 = new Button(comp1, SWT.RADIO);
-	    button1.setText(Messages.IntervalConfigDialog_ChoiceOneLabel);
-	    button1.addSelectionListener(this);
+	    Label label = new Label(comp1, SWT.RADIO);
+	    label.setText(Messages.IntervalConfigDialog_ChoiceOneLabel);
 	    
 	    text = new Text(comp1, SWT.SINGLE | SWT.BORDER);
 	    text.setTextLimit(Text.LIMIT);
-	    text.addModifyListener(this);
 	    data = new GridData();
 	    data.widthHint = 70;
 	    text.setLayoutData(data);
+	    text.setText(""+result); //$NON-NLS-1$
+	    text.selectAll();
+	    text.setFocus();
+	    text.addModifyListener(this);
 	    
 	    label = new Label(comp1, SWT.NONE);
 	    label.setText(Messages.IntervalConfigDialog_SECONDS);
-	    
-	    Composite comp2 = new Composite(composite, SWT.NONE);
-	    data = new GridData(SWT.FILL, SWT.CENTER, true, false);
-	    comp2.setLayoutData(data);	    
-	    layout = new GridLayout(3, false);
-	    layout.horizontalSpacing = 0;
-	    comp2.setLayout(layout);
-	    
-	    button2 = new Button(comp2, SWT.RADIO);
-	    button2.setText(Messages.IntervalConfigDialog_ChoiceTwoLabel);
-	    button2.addSelectionListener(this);
-	    
-	    comboViewer = new ComboViewer(comp2, SWT.READ_ONLY);
-	    comboViewer.setContentProvider(ArrayContentProvider.getInstance());
-	    comboViewer.setLabelProvider(new GradeLabelProvider());
-	    comboViewer.setInput(getGrades());
-	    comboViewer.addSelectionChangedListener(this);
-	    data = new GridData();
-	    data.widthHint = 70;
-	    comboViewer.getCombo().setLayoutData(data);
-
-	    label = new Label(comp2, SWT.NONE);
-	    label.setText(Messages.IntervalConfigDialog_SPEED);
-	    
-	    button1.setSelection(true);
-		button2.setSelection(false);
-		comboViewer.getCombo().setEnabled(false);
-    	// Interval has not yet been initialized.
-    	IPreferenceStore prefStore = UIPlugin.getDefault().getPreferenceStore();
-    	int interval = prefStore.getInt(PREF_LAST_INTERVAL);
-    	text.setText(""+interval); //$NON-NLS-1$
     	
 	    return composite;
     }
@@ -157,23 +102,17 @@ public class IntervalConfigDialog extends StatusDialog implements SelectionListe
 	 */
 	private IStatus isInputValid() {
 		String pluginId = UIPlugin.getUniqueIdentifier();
-		if(button1.getSelection()) {
-			String txt = text.getText();
-			if(txt == null || txt.trim().length() == 0) {
-				return new Status(IStatus.CANCEL, pluginId, null);
-			}
-			try{
-            	int interval = Integer.parseInt(txt.trim());
-            	if(interval <= 0) 
-            		return new Status(IStatus.ERROR, pluginId, Messages.IntervalConfigDialog_BiggerThanZero);
-            }catch(NumberFormatException e) {
-            	return new Status(IStatus.ERROR, pluginId, Messages.IntervalConfigDialog_InvalidNumber);
-            }
-		}else if(button2.getSelection()) {
-			ISelection selection = comboViewer.getSelection();
-			if(selection.isEmpty()) {
-				return new Status(IStatus.CANCEL, pluginId, null);
-			}
+		String txt = text.getText();
+		if (txt == null || txt.trim().length() == 0) {
+			return new Status(IStatus.ERROR, pluginId, null);
+		}
+		try {
+			int interval = Integer.parseInt(txt.trim());
+			if (interval < 0) return new Status(IStatus.ERROR, pluginId, Messages.IntervalConfigDialog_BiggerThanZero);
+			if(interval == 0) return new Status(IStatus.WARNING, pluginId, Messages.IntervalConfigDialog_ZeroWarning);
+		}
+		catch (NumberFormatException e) {
+			return new Status(IStatus.ERROR, pluginId, Messages.IntervalConfigDialog_InvalidNumber);
 		}
 		return Status.OK_STATUS;
 	}
@@ -184,14 +123,8 @@ public class IntervalConfigDialog extends StatusDialog implements SelectionListe
 	 */
 	@Override
     protected void okPressed() {
-		if(button1.getSelection()) {
-			String txt = text.getText().trim();
-			result = Integer.parseInt(txt);
-		}else if(button2.getSelection()) {
-			IStructuredSelection selection = (IStructuredSelection) comboViewer.getSelection();
-			IntervalGrade grade = (IntervalGrade) selection.getFirstElement();
-			result = grade.getValue();
-		}
+		String txt = text.getText().trim();
+		result = Integer.parseInt(txt);
 	    super.okPressed();
     }
 	
@@ -202,17 +135,6 @@ public class IntervalConfigDialog extends StatusDialog implements SelectionListe
 	 */
 	public int getResult() {
 		return result;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.dialogs.StatusDialog#updateButtonsEnableState(org.eclipse.core.runtime.IStatus)
-	 */
-	@Override
-    protected void updateButtonsEnableState(IStatus status) {
-		if (getButton(IDialogConstants.OK_ID) != null && !getButton(IDialogConstants.OK_ID).isDisposed()) {
-			getButton(IDialogConstants.OK_ID).setEnabled(status.isOK());
-		}
 	}
 
 	/**
@@ -267,32 +189,6 @@ public class IntervalConfigDialog extends StatusDialog implements SelectionListe
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-	 */
-	@Override
-    public void widgetSelected(SelectionEvent e) {
-		if(e.getSource() == button1) {
-			text.setEnabled(true);
-			button2.setSelection(false);
-			comboViewer.getCombo().setEnabled(false);
-		} else if(e.getSource() == button2) {
-			comboViewer.getCombo().setEnabled(true);
-			button1.setSelection(false);
-			text.setEnabled(false);
-		}
-		validateInput();
-    }
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
-	 */
-	@Override
-    public void widgetDefaultSelected(SelectionEvent e) {
-    }
-
-	/*
-	 * (non-Javadoc)
 	 * @see org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events.ModifyEvent)
 	 */
 	@Override
@@ -300,12 +196,12 @@ public class IntervalConfigDialog extends StatusDialog implements SelectionListe
 		validateInput();
     }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
+	/**
+	 * Set the current interval to the text field.
+	 * 
+	 * @param interval The current interval.
 	 */
-	@Override
-    public void selectionChanged(SelectionChangedEvent event) {
-		validateInput();
+	public void setResult(int interval) {
+		this.result = interval;
     }
 }

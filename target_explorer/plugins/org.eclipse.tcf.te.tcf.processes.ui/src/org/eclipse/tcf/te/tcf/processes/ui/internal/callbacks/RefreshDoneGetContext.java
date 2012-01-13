@@ -18,6 +18,8 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.IProcesses;
+import org.eclipse.tcf.services.IProcesses.ProcessContext;
 import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
@@ -34,7 +36,7 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext {
 	ProcessTreeNode parentNode;
 	// The status map to mark and check the completion status.
 	Map<String, Boolean> status;
-	// The queue to iterate the legitimate node in the whole tree. 
+	// The queue to iterate the legitimate node in the whole tree.
 	Queue<ProcessTreeNode> queue;
 	// The list to record all new nodes for merging.
 	List<ProcessTreeNode> newNodes;
@@ -42,12 +44,12 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext {
 	ISysMonitor service;
 	// The callback to be called when refresh is done.
 	Runnable callback;
-	
+
 	/**
 	 * Create an instance with the field parameters.
 	 */
-	public RefreshDoneGetContext(List<ProcessTreeNode> newNodes, 
-					Runnable callback, ISysMonitor service, Queue<ProcessTreeNode>queue, String contextId, 
+	public RefreshDoneGetContext(List<ProcessTreeNode> newNodes,
+					Runnable callback, ISysMonitor service, Queue<ProcessTreeNode>queue, String contextId,
 					IChannel channel, Map<String, Boolean> status, ProcessTreeNode parentNode) {
 		this.callback = callback;
 		this.service = service;
@@ -58,7 +60,7 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext {
 		this.status = status;
 		this.newNodes = newNodes;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.tcf.services.ISysMonitor.DoneGetContext#doneGetContext(org.eclipse.tcf.protocol.IToken, java.lang.Exception, org.eclipse.tcf.services.ISysMonitor.SysMonitorContext)
@@ -66,7 +68,7 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext {
     @Override
 	public void doneGetContext(IToken token, Exception error, ISysMonitor.SysMonitorContext context) {
 		if (error == null && context != null) {
-			ProcessTreeNode childNode = createNodeForContext(context);
+			final ProcessTreeNode childNode = createNodeForContext(context);
 			childNode.parent = parentNode;
 			childNode.peerNode = parentNode.peerNode;
             int index = searchChild(childNode);
@@ -76,18 +78,35 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext {
 			}
 			else parentNode.children.add(childNode);
 			newNodes.add(childNode);
+
+			IProcesses pService = channel.getRemoteService(IProcesses.class);
+			if (pService != null) {
+				pService.getContext(contextId, new IProcesses.DoneGetContext() {
+					@Override
+					public void doneGetContext(IToken token, Exception error, ProcessContext context) {
+						if (error == null && context != null) {
+							childNode.pContext = context;
+						}
+						setAndCheckStatus();
+					}
+				});
+			} else {
+				setAndCheckStatus();
+			}
+		} else {
+			setAndCheckStatus();
 		}
-		setAndCheckStatus();
 	}
 
     /**
-     * Update the destination node's data with the source node's data. 
-     * 
+     * Update the destination node's data with the source node's data.
+     *
      * @param src The source node.
      * @param dest The destination node.
      */
 	private void updateData(ProcessTreeNode src, ProcessTreeNode dest) {
         dest.context = src.context;
+        dest.pContext = src.pContext;
         dest.name = src.name;
         dest.pid = src.pid;
         dest.ppid = src.ppid;
@@ -114,7 +133,7 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext {
 
     /**
      * Search the specified child node in the specified list.
-     * 
+     *
      * @param childNode The child node.
      * @param list The process node list.
      * @return The index of the child node or -1 if no such node.
@@ -133,7 +152,7 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext {
 
     /**
      * Search the specified child node in the children of the parent node.
-     * 
+     *
      * @param childNode The child node.
      * @return The index of the child node or -1 if no such node.
      */
@@ -145,9 +164,9 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext {
      * Set the complete flag for this context id and check if
      * all tasks have completed. If it is all completed, then
      * merge the resulting children and continue with the
-     * next node in the queue. 
+     * next node in the queue.
      */
-    private void setAndCheckStatus() {
+    /* default */ void setAndCheckStatus() {
     	synchronized(status) {
     		status.put(contextId, Boolean.TRUE);
     		if(isAllComplete()){
@@ -172,11 +191,11 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext {
     		}
     	}
     }
-    
+
     /**
      * Check if all tasks have completed by checking
-     * the status entries. 
-     * 
+     * the status entries.
+     *
      * @return true if all of them are marked finished.
      */
     private boolean isAllComplete() {
@@ -190,12 +209,12 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext {
 			return true;
 		}
     }
-    
+
 	/**
 	 * Creates a node from the given system monitor context.
-	 * 
+	 *
 	 * @param context The system monitor context. Must be not <code>null</code>.
-	 * 
+	 *
 	 * @return The node.
 	 */
 	private ProcessTreeNode createNodeForContext(ISysMonitor.SysMonitorContext context) {
@@ -207,6 +226,7 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext {
 		node.childrenQueried = false;
 		node.childrenQueryRunning = false;
 		node.context = context;
+		node.pContext = null;
 		node.name = context.getFile();
 		node.type = "ProcNode";  //$NON-NLS-1$
 		node.id = context.getID();
@@ -217,5 +237,5 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext {
 		node.username = context.getUserName();
 
 		return node;
-	}        
+	}
 }

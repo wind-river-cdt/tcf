@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -85,7 +86,7 @@ public class NewWizardCategory implements IWizardCategory, IWorkbenchAdapter {
 	@Override
 	public boolean equals(Object other) {
 		if (other instanceof IWizardCategory) {
-			((IWizardCategory)other).getId().equals(getId());
+			return ((IWizardCategory)other).getId().equals(getId());
 		}
 		return super.equals(other);
 	}
@@ -166,10 +167,22 @@ public class NewWizardCategory implements IWizardCategory, IWorkbenchAdapter {
 
 	/**
 	 * Add a sub category.
-	 * @param category The category.
+	 *
+	 * @param category The category. Must not be <code>null</code>.
 	 */
 	public void addCategory(IWizardCategory category) {
+		Assert.isNotNull(category);
 		categories.add(category);
+	}
+
+	/**
+	 * Removes a sub category.
+	 *
+	 * @param category The category. Must not be <code>null</code>.
+	 */
+	public void removeCategory(IWizardCategory category) {
+		Assert.isNotNull(category);
+		categories.remove(category);
 	}
 
 	/* (non-Javadoc)

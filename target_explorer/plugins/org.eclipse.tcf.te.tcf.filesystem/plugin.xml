@@ -7,7 +7,7 @@
       <viewerContentBinding viewerId="org.eclipse.tcf.te.ui.views.TargetExplorer">
          <includes>
             <contentExtension
-                  isRoot="false"
+                  isRoot="true"
                   pattern="org.eclipse.tcf.te.tcf.filesystem.navigator.*"/>
          </includes>
       </viewerContentBinding>
@@ -99,7 +99,7 @@
 <!-- Editor page contributions -->
    <extension point="org.eclipse.tcf.te.ui.views.editorPages">
       <editorPage
-            class="org.eclipse.tcf.te.ui.views.editor.pages.TreeViewerExplorerEditorPage:org.eclipse.tcf.te.ui.controls.viewer.fs"
+            class="org.eclipse.tcf.te.ui.views.editor.pages.TreeViewerExplorerEditorPage:org.eclipse.tcf.te.ui.controls.viewer.fs:File System Explorer"
             name="%FSExplorerEditorPage.name"
             id="org.eclipse.tcf.te.tcf.filesystem.FSExplorerEditorPage">
       </editorPage>
@@ -2124,7 +2124,8 @@
                enabled="true"
                id="org.eclipse.tcf.te.tcf.filesystem.navigator.filter.hiddenFiles"
                image="icons/obj16/hidden_file_filter.png"
-               name="%filter.name.hidden">
+               name="%filter.name.hidden"
+               visibleInUI="true">
          </filter>
          <filter
                class="org.eclipse.tcf.te.tcf.filesystem.filters.SystemFilesViewerFilter"
@@ -2132,7 +2133,8 @@
                enabled="true"
                id="org.eclipse.tcf.te.tcf.filesystem.navigator.filter.systemFiles"
                image="icons/obj16/system_file_filter.png"
-               name="%filter.name.system">
+               name="%filter.name.system"
+               visibleInUI="true">
             <activation>
                <with variable="input">
                   <test property="org.eclipse.tcf.te.tcf.filesystem.propertytester.peer.isWindows"/>
@@ -2162,6 +2164,12 @@
          </propertyTab>
          <propertyTab
                afterTab="org.eclipse.tcf.te.tcf.filesystem.propertytab.general"
+               category="target_explorer"
+               id="org.eclipse.tcf.te.tcf.filesystem.propertytab.permissions"
+               label="Permissions">
+         </propertyTab>
+         <propertyTab
+               afterTab="org.eclipse.tcf.te.tcf.filesystem.propertytab.general,org.eclipse.tcf.te.tcf.filesystem.propertytab.permissions"
                category="target_explorer"
                id="org.eclipse.tcf.te.tcf.filesystem.propertytab.advanced"
                label="%propertyTab.advanced.label">
@@ -2195,12 +2203,11 @@
                tab="org.eclipse.tcf.te.tcf.filesystem.propertytab.general">
          </propertySection>
          <propertySection
-               afterSection="org.eclipse.tcf.te.tcf.filesystem.propertysection.folder.basic,org.eclipse.tcf.te.tcf.filesystem.propertysection.file.basic"
                class="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.LinuxPermissionsSection"
                enablesFor="1"
                filter="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.LinuxFilter"
                id="org.eclipse.tcf.te.tcf.filesystem.propertysection.linux.permissions"
-               tab="org.eclipse.tcf.te.tcf.filesystem.propertytab.general">
+               tab="org.eclipse.tcf.te.tcf.filesystem.propertytab.permissions">
          </propertySection>
          <propertySection
                class="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.WindowsFolderAISection"
