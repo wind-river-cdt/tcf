@@ -80,6 +80,13 @@
             name="%RedirectPeersFilter.name"
             visibleInUI="false">
       </commonFilter>
+      <commonFilter
+            activeByDefault="false"
+            class="org.eclipse.tcf.te.tcf.ui.filter.PeersByCurrentUserFilter"
+            id="org.eclipse.tcf.te.tcf.ui.navigator.PeersByCurrentUserFilter"
+            name="%PeersByCurrentUserFilter.name"
+            visibleInUI="true">
+      </commonFilter>
    </extension>
 
 <!-- New target wizard contributions -->
