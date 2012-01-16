@@ -25,7 +25,7 @@ import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 /**
  * The callback handler that handles the result of service.getContext when querying.
  */
-public class QueryDoneGetContext implements ISysMonitor.DoneGetContext {
+public class QueryDoneGetContext implements ISysMonitor.DoneGetContext, IProcesses.DoneGetContext {
 	private static final int PROGRESSIVE_STEP_COUNT = 50;
 	// The current context id.
 	String contextId;
@@ -37,7 +37,13 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext {
 	Map<String, Boolean> status;
 	// The process model attached.
 	ProcessModel model;
-
+	// The current child node
+	ProcessTreeNode childNode;
+	// The process context of this child node.
+	IProcesses.ProcessContext pContext;
+	// 
+	volatile boolean sysMonitorDone;
+	volatile boolean processesDone;
 	/**
 	 * Create an instance with the field parameters.
 	 */
@@ -47,6 +53,8 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext {
 		this.channel = channel;
 		this.parentNode = parentNode;
 		this.status = status;
+		this.sysMonitorDone = false;
+		this.processesDone = false;
 	}
 
 	/*
@@ -56,28 +64,13 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext {
     @Override
 	public void doneGetContext(IToken token, Exception error, ISysMonitor.SysMonitorContext context) {
 		if (error == null && context != null) {
-			final ProcessTreeNode childNode = createNodeForContext(context);
+			childNode = createNodeForContext(context);
 			childNode.parent = parentNode;
 			childNode.peerNode = parentNode.peerNode;
 			parentNode.children.add(childNode);
-
-			IProcesses pService = channel.getRemoteService(IProcesses.class);
-			if (pService != null) {
-				pService.getContext(contextId, new IProcesses.DoneGetContext() {
-					@Override
-					public void doneGetContext(IToken token, Exception error, ProcessContext context) {
-						if (error == null && context != null) {
-							childNode.pContext = context;
-						}
-						setAndCheckStatus();
-					}
-				});
-			} else {
-				setAndCheckStatus();
-			}
-		} else {
-			setAndCheckStatus();
 		}
+		sysMonitorDone = true;
+		setAndCheckStatus();
 	}
 
     /**
@@ -86,10 +79,11 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext {
      */
     /* default */ void setAndCheckStatus() {
     	synchronized(status) {
-    		status.put(contextId, Boolean.TRUE);
-    		boolean completed = true;
-    		int count = 0;
-    		synchronized (status) {
+    		if(sysMonitorDone && processesDone) {
+				if (childNode != null) childNode.pContext = pContext;
+	    		status.put(contextId, Boolean.TRUE);
+	    		boolean completed = true;
+	    		int count = 0;
     			for (String id : status.keySet()) {
     				Boolean bool = status.get(id);
     				if(bool.booleanValue()) {
@@ -98,15 +92,15 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext {
     					completed = false;
     				}
     			}
-    		}
-    		if(completed || (count % PROGRESSIVE_STEP_COUNT ) == 0) {
-    			model.firePropertyChanged(parentNode);
-    		}
-    		if(completed){
-				parentNode.childrenQueryRunning = false;
-				parentNode.childrenQueried = true;
-				Tcf.getChannelManager().closeChannel(channel);
-    		}
+	    		if(completed || (count % PROGRESSIVE_STEP_COUNT ) == 0) {
+	    			model.firePropertyChanged(parentNode);
+	    		}
+	    		if(completed){
+					parentNode.childrenQueryRunning = false;
+					parentNode.childrenQueried = true;
+					Tcf.getChannelManager().closeChannel(channel);
+	    		}
+	    	}
     	}
     }
 
@@ -138,4 +132,13 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext {
 
 		return node;
 	}
+
+	@Override
+    public void doneGetContext(IToken token, Exception error, ProcessContext context) {
+		if (error == null && context != null) {
+			pContext = context;
+		}
+		processesDone = true;
+		setAndCheckStatus();
+    }
 }

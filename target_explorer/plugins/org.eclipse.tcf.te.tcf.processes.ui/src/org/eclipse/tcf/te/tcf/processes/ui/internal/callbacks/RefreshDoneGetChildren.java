@@ -18,6 +18,7 @@ import java.util.Queue;
 
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
@@ -59,10 +60,15 @@ public class RefreshDoneGetChildren implements ISysMonitor.DoneGetChildren {
     @Override
     public void doneGetChildren(IToken token, Exception error, String[] context_ids) {
         if (error == null && context_ids != null && context_ids.length > 0) {
-        	Map<String, Boolean> status = createStatusMap(context_ids);
-            List<ProcessTreeNode> newNodes = Collections.synchronizedList(new ArrayList<ProcessTreeNode>());	
-			for (String contextId : context_ids) {
-				service.getContext(contextId, new RefreshDoneGetContext(model, newNodes, callback, service, queue, contextId, channel, status, parentNode));
+			IProcesses pService = channel.getRemoteService(IProcesses.class);
+			if(pService != null) {
+				Map<String, Boolean> status = createStatusMap(context_ids);
+	            List<ProcessTreeNode> newNodes = Collections.synchronizedList(new ArrayList<ProcessTreeNode>());	
+				for (String contextId : context_ids) {
+					RefreshDoneGetContext done = new RefreshDoneGetContext(model, newNodes, callback, service, queue, contextId, channel, status, parentNode);
+					service.getContext(contextId, done);
+					pService.getContext(contextId, done);
+				}
 			}
     	} else {
             parentNode.childrenQueryRunning = false;

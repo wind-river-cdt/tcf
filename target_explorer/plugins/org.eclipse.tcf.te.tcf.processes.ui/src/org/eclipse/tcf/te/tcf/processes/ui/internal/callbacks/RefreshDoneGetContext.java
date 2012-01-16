@@ -29,7 +29,7 @@ import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 /**
  * The callback handler that handles the result of service.getContext when refreshing.
  */
-public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext {
+public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext, IProcesses.DoneGetContext {
 	// The current context id.
 	String contextId;
 	// The channel used for refreshing.
@@ -48,7 +48,13 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext {
 	Runnable callback;
 	// The process model attached.
 	ProcessModel model;
-
+	// 
+	ProcessTreeNode childNode;
+	//
+	ProcessContext pContext;
+	//
+	volatile boolean sysMonitorDone;
+	volatile boolean processesDone;
 	/**
 	 * Create an instance with the field parameters.
 	 */
@@ -64,6 +70,8 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext {
 		this.parentNode = parentNode;
 		this.status = status;
 		this.newNodes = newNodes;
+		this.sysMonitorDone = false;
+		this.processesDone = false;
 	}
 
 	/*
@@ -73,39 +81,20 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext {
     @Override
 	public void doneGetContext(IToken token, Exception error, ISysMonitor.SysMonitorContext context) {
 		if (error == null && context != null) {
-			final ProcessTreeNode childNode = createNodeForContext(context);
+			childNode = createNodeForContext(context);
 			childNode.parent = parentNode;
 			childNode.peerNode = parentNode.peerNode;
             final int index = searchChild(childNode);
 			if (index != -1) {
 				ProcessTreeNode node = parentNode.children.get(index);
 				updateData(childNode, node);
+				childNode = node;
 			}
 			else parentNode.children.add(childNode);
 			newNodes.add(childNode);
-
-			IProcesses pService = channel.getRemoteService(IProcesses.class);
-			if (pService != null) {
-				pService.getContext(contextId, new IProcesses.DoneGetContext() {
-					@Override
-					public void doneGetContext(IToken token, Exception error, ProcessContext context) {
-						if (error == null && context != null) {
-							childNode.pContext = context;
-							if(index != -1) {
-								ProcessTreeNode node = parentNode.children.get(index);
-								node.pContext = context;
-								node.firePropertyChange(new PropertyChangeEvent(RefreshDoneGetContext.this, "properties", null, null)); //$NON-NLS-1$
-							}
-						}
-						setAndCheckStatus();
-					}
-				});
-			} else {
-				setAndCheckStatus();
-			}
-		} else {
-			setAndCheckStatus();
 		}
+		sysMonitorDone = true;
+		setAndCheckStatus();
 	}
 
     /**
@@ -179,28 +168,34 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext {
      */
     /* default */ void setAndCheckStatus() {
     	synchronized(status) {
-    		status.put(contextId, Boolean.TRUE);
-    		if(isAllComplete()){
-				parentNode.childrenQueryRunning = false;
-				parentNode.childrenQueried = true;
-                removeDead();
-                for(ProcessTreeNode node:parentNode.children) {
-                	if(node.childrenQueried && !node.childrenQueryRunning) {
-                		queue.offer(node);
-                	}
-                }
-				if (queue.isEmpty()) {
-					model.firePropertyChanged(parentNode);
-					Tcf.getChannelManager().closeChannel(channel);
-					if(callback != null) {
-						callback.run();
-					}
-				} else {
-					ProcessTreeNode node = queue.poll();
-					service.getChildren(node.id, new RefreshDoneGetChildren(model, callback, queue, channel, service, node));
+    		if(sysMonitorDone && processesDone) {
+				if (childNode != null) {
+					childNode.pContext = pContext;
+					childNode.firePropertyChange(new PropertyChangeEvent(RefreshDoneGetContext.this, "properties", null, null)); //$NON-NLS-1$
 				}
-    		}
-    	}
+	    		status.put(contextId, Boolean.TRUE);
+	    		if(isAllComplete()){
+					parentNode.childrenQueryRunning = false;
+					parentNode.childrenQueried = true;
+	                removeDead();
+	                for(ProcessTreeNode node:parentNode.children) {
+	                	if(node.childrenQueried && !node.childrenQueryRunning) {
+	                		queue.offer(node);
+	                	}
+	                }
+					if (queue.isEmpty()) {
+						model.firePropertyChanged(parentNode);
+						Tcf.getChannelManager().closeChannel(channel);
+						if(callback != null) {
+							callback.run();
+						}
+					} else {
+						ProcessTreeNode node = queue.poll();
+						service.getChildren(node.id, new RefreshDoneGetChildren(model, callback, queue, channel, service, node));
+					}
+	    		}
+	    	}
+		}
     }
 
     /**
@@ -249,4 +244,13 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext {
 
 		return node;
 	}
+
+	@Override
+    public void doneGetContext(IToken token, Exception error, ProcessContext context) {
+		if (error == null && context != null) {
+			pContext = context;
+		}
+		processesDone = true;
+		setAndCheckStatus();
+    }
 }
