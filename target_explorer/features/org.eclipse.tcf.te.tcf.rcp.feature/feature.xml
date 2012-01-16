@@ -3,7 +3,7 @@
       id="org.eclipse.tcf.te.tcf.rcp.feature"
       label="%featureName"
       version="1.0.0.qualifier"
-      provider-name="%featureProvider"
+      provider-name="%providerName"
       plugin="org.eclipse.tcf.te.rcp">
 
    <description>

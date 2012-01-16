@@ -3,7 +3,7 @@
       id="org.eclipse.tcf.te.tcf.feature"
       label="%featureName"
       version="1.0.0.qualifier"
-      provider-name="%featureProvider">
+      provider-name="%providerName">
 
    <description>
       %description
