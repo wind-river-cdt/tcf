@@ -33,7 +33,6 @@ import org.eclipse.tcf.te.ui.views.internal.ViewRoot;
 import org.eclipse.tcf.te.ui.views.nls.Messages;
 import org.eclipse.ui.ILocalWorkingSetManager;
 import org.eclipse.ui.IMemento;
-import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.navigator.NavigatorContentService;
@@ -318,15 +317,8 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 		}
 		else {
 			navigator.setRootMode(IUIConstants.MODE_NORMAL);
-
-			// Determine if to use the windows working set by default
-			IWorkingSet windowWorkingSet = null;
-			if (PlatformUI.getPreferenceStore().getBoolean(IWorkbenchPreferenceConstants.USE_WINDOW_WORKING_SET_BY_DEFAULT)) {
-				windowWorkingSet = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getAggregateWorkingSet();
-			}
-
-			newInput = windowWorkingSet != null ? windowWorkingSet : ViewRoot.getInstance();
-			filterActive = windowWorkingSet != null;
+			newInput = ViewRoot.getInstance();
+			filterActive = false;
 		}
 
 		if (!newInput.equals(viewer.getInput())) {
