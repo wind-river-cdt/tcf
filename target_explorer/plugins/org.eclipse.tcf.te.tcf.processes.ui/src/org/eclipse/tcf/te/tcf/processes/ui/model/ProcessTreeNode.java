@@ -27,7 +27,32 @@ import org.eclipse.tcf.te.ui.utils.PropertyChangeProvider;
  * Representation of a process tree node.
  */
 public final class ProcessTreeNode extends PropertyChangeProvider {
-	public static final ProcessTreeNode PENDING_NODE = new ProcessTreeNode();
+	public static final ProcessTreeNode PENDING_NODE = createPendingNode();
+	
+	/**
+	 * Create a pending node.
+	 * 
+	 * @return A pending node.
+	 */
+	private static ProcessTreeNode createPendingNode() {
+		ProcessTreeNode node = new ProcessTreeNode();
+		node.name = Messages.PendingOperation_label;
+		node.type = "ProcPendingNode"; //$NON-NLS-1$
+		return node;
+	}
+	
+	/**
+	 * Create a root process node.
+	 * 
+	 * @param peerModel The peer model which this process belongs to.
+	 * @return The root process node.
+	 */
+	public static ProcessTreeNode createRootNode(IPeerModel peerModel) {
+		ProcessTreeNode node = new ProcessTreeNode();
+		node.type = "ProcRootNode"; //$NON-NLS-1$
+		node.peerNode = peerModel;
+		return node;
+	}
 	
 	private final UUID uuid = UUID.randomUUID();
 
@@ -109,19 +134,7 @@ public final class ProcessTreeNode extends PropertyChangeProvider {
 	/**
 	 * Create a pending node.
 	 */
-	private ProcessTreeNode() {
-		name = Messages.PendingOperation_label;
-		type = "ProcPendingNode"; //$NON-NLS-1$
-	}
-	
-	/**
-	 * Create a root node with its peer model.
-	 * 
-	 * @param peerModel The peer model.
-	 */
-	public ProcessTreeNode(IPeerModel peerModel) {
-		type = "ProcRootNode"; //$NON-NLS-1$
-		peerNode = peerModel;
+	public ProcessTreeNode() {
 	}
 
 	/**
@@ -147,6 +160,15 @@ public final class ProcessTreeNode extends PropertyChangeProvider {
 		peerNode = parentNode.peerNode;
 	}
 	
+	/**
+	 * Return if this node is a pending node.
+	 * 
+	 * @return true if this node is a pending node.
+	 */
+	public boolean isPendingNode() {
+		return type != null && type.equals("ProcPendingNode"); //$NON-NLS-1$
+	}
+
 	/**
 	 * Return if this node is a root node.
 	 * 

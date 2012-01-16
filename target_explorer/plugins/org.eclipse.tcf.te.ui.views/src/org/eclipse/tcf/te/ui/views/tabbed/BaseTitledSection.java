@@ -9,6 +9,11 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.views.tabbed;
 
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.layout.FormAttachment;
@@ -16,7 +21,10 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.tcf.te.ui.interfaces.IPropertyChangeProvider;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.views.properties.tabbed.AbstractPropertySection;
@@ -26,11 +34,47 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 /**
  * The base section that displays a title in a title bar.
  */
-public abstract class BaseTitledSection extends AbstractPropertySection {
+public abstract class BaseTitledSection extends AbstractPropertySection implements IPropertyChangeListener {
 
 	// The main composite used to create the section content.
 	protected Composite composite;
+	
+	// The input node.
+	protected IPropertyChangeProvider provider;
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#setInput(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+	 */
+	@Override
+    public void setInput(IWorkbenchPart part, ISelection selection) {
+        super.setInput(part, selection);
+        Assert.isTrue(selection instanceof IStructuredSelection);
+        Object input = ((IStructuredSelection) selection).getFirstElement();
+		if (this.provider != null) {
+			this.provider.removePropertyChangeListener(this);
+		}
+		if (input instanceof IPropertyChangeProvider) {
+			this.provider = (IPropertyChangeProvider) input;
+			if (this.provider != null) {
+				this.provider.addPropertyChangeListener(this);
+			}
+		} else {
+			this.provider = null;
+		}
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#aboutToBeHidden()
+	 */
+	@Override
+    public void aboutToBeHidden() {
+		if(this.provider != null) {
+			this.provider.removePropertyChangeListener(this);
+		}
+    }
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#createControls(org.eclipse.swt.widgets.Composite, org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage)
@@ -157,6 +201,20 @@ public abstract class BaseTitledSection extends AbstractPropertySection {
     public void refresh() {
 		composite.layout();
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
+	 */
+	@Override
+    public void propertyChange(PropertyChangeEvent event) {
+		Display display = getPart().getSite().getShell().getDisplay();
+		display.asyncExec(new Runnable(){
+			@Override
+            public void run() {
+				refresh();
+			}});
+    }
 
 	/**
 	 * Get the text which is used as the title in the title bar of the section.

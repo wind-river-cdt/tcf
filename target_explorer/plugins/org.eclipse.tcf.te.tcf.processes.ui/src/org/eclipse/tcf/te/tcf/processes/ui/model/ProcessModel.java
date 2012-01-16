@@ -94,7 +94,7 @@ public class ProcessModel implements IPreferenceConsts{
 	 * @param root The root node
 	 */
 	public void createRoot(IPeerModel peerModel ) {
-		this.root = new ProcessTreeNode(peerModel);
+		this.root = ProcessTreeNode.createRootNode(peerModel);
 	}
 
 	/**

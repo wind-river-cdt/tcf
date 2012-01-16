@@ -73,7 +73,7 @@ public class ProcessNavigatorContentProvider  extends TreeContentProvider implem
 		}
 		else if (parentElement instanceof ProcessTreeNode) {
 			ProcessTreeNode node = (ProcessTreeNode) parentElement;
-			if(node == ProcessTreeNode.PENDING_NODE) {
+			if(node.isPendingNode()) {
 				return NO_ELEMENTS;
 			}
 			if (!node.childrenQueried) {
@@ -81,11 +81,9 @@ public class ProcessNavigatorContentProvider  extends TreeContentProvider implem
 					ProcessModel model = ProcessModel.getProcessModel(node.peerNode);
 					model.queryChildren(node);
 				}
-				ProcessTreeNode[] current = node.children.toArray(new ProcessTreeNode[node.children.size()]);
-				ProcessTreeNode[] children = new ProcessTreeNode[current.length+1];
-				System.arraycopy(current, 0, children, 0, current.length);
-				children[current.length] = ProcessTreeNode.PENDING_NODE;
-				return children;
+				if(node.children.isEmpty()) {
+					return new Object[] {ProcessTreeNode.PENDING_NODE};
+				}
 			}
 			return node.children.toArray();
 		}
@@ -105,7 +103,9 @@ public class ProcessNavigatorContentProvider  extends TreeContentProvider implem
 		// No children yet and the element is a process node
 		if (element instanceof ProcessTreeNode) {
 			ProcessTreeNode node = (ProcessTreeNode) element;
-			if (!node.childrenQueried || node.childrenQueryRunning) {
+			if(node.isPendingNode()) {
+				hasChildren = false;
+			}else if (!node.childrenQueried || node.childrenQueryRunning) {
 				hasChildren = true;
 			}
 			else {

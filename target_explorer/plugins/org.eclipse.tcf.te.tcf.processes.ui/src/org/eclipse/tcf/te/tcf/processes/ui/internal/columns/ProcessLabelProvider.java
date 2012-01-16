@@ -51,6 +51,9 @@ public class ProcessLabelProvider extends LabelProvider {
 	public Image getImage(Object element) {
 		if (element instanceof ProcessTreeNode) {
 			ProcessTreeNode node = (ProcessTreeNode) element;
+			if(node.isPendingNode()) {
+				return null;
+			}
 			if(node.isRootNode()) {
 				return UIPlugin.getImage(ImageConsts.OBJ_Process_Root);
 			}
