@@ -13,15 +13,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.ISysMonitor;
+import org.eclipse.tcf.services.ISysMonitor.SysMonitorContext;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.utils.PropertyChangeProvider;
 
 /**
  * Representation of a process tree node.
  */
 public final class ProcessTreeNode extends PropertyChangeProvider {
+	public static final ProcessTreeNode PENDING_NODE = new ProcessTreeNode();
+	
 	private final UUID uuid = UUID.randomUUID();
 
 	/**
@@ -99,6 +106,74 @@ public final class ProcessTreeNode extends PropertyChangeProvider {
 	 */
 	public IPeerModel peerNode;
 
+	/**
+	 * Create a pending node.
+	 */
+	private ProcessTreeNode() {
+		name = Messages.PendingOperation_label;
+		type = "ProcPendingNode"; //$NON-NLS-1$
+	}
+	
+	/**
+	 * Create a root node with its peer model.
+	 * 
+	 * @param peerModel The peer model.
+	 */
+	public ProcessTreeNode(IPeerModel peerModel) {
+		type = "ProcRootNode"; //$NON-NLS-1$
+		peerNode = peerModel;
+	}
+
+	/**
+	 * Create process node with its parent node and a context.
+	 * 
+	 * @param parentNode The parent node.
+	 * @param aContext The system monitor context.
+	 */
+	public ProcessTreeNode(ProcessTreeNode parentNode, ISysMonitor.SysMonitorContext aContext) {
+		Assert.isTrue(Protocol.isDispatchThread());
+		Assert.isNotNull(aContext);
+		context = aContext;
+		pContext = null;
+		name = aContext.getFile();
+		type = "ProcNode";  //$NON-NLS-1$
+		id = aContext.getID();
+		pid = aContext.getPID();
+		ppid = aContext.getPPID();
+		parentId = aContext.getParentID();
+		state = aContext.getState();
+		username = aContext.getUserName();
+		parent = parentNode;
+		peerNode = parentNode.peerNode;
+	}
+	
+	/**
+	 * Return if this node is a root node.
+	 * 
+	 * @return true if it is a root node.
+	 */
+	public boolean isRootNode() {
+		return type != null && type.equals("ProcRootNode"); //$NON-NLS-1$
+	}
+
+    /**
+     * Update the destination node's data with the source node's data.
+     *
+     * @param src The source node.
+     * @param dest The destination node.
+     */
+	public void updateData(SysMonitorContext aContext) {
+		this.context = aContext;
+		name = aContext.getFile();
+		id = aContext.getID();
+		pid = aContext.getPID();
+		ppid = aContext.getPPID();
+		parentId = aContext.getParentID();
+		state = aContext.getState();
+		username = aContext.getUserName();
+        firePropertyChange(new PropertyChangeEvent(this, "properties", null, null)); //$NON-NLS-1$
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
@@ -127,5 +202,15 @@ public final class ProcessTreeNode extends PropertyChangeProvider {
 	@Override
 	public String toString() {
 		return name != null ? name : super.toString();
+	}
+
+	/**
+	 * Set the process context.
+	 * 
+	 * @param pContext The process context.
+	 */
+	public void setProcessContext(IProcesses.ProcessContext pContext) {
+		this.pContext = pContext;
+		firePropertyChange(new PropertyChangeEvent(this, "properties", null, null)); //$NON-NLS-1$
 	}
 }

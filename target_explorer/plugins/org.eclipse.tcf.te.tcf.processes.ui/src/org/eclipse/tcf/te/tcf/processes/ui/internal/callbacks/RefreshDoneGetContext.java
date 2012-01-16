@@ -14,11 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
-import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
-import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.IProcesses.ProcessContext;
 import org.eclipse.tcf.services.ISysMonitor;
@@ -48,12 +45,13 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext, IProce
 	Runnable callback;
 	// The process model attached.
 	ProcessModel model;
-	// 
+	// The current child node
 	ProcessTreeNode childNode;
-	//
+	// The process context of this child node.
 	ProcessContext pContext;
-	//
+	// The flag to indicate if the system monitor service has returned. 
 	volatile boolean sysMonitorDone;
+	// The flag to indicate if the process service has returned.
 	volatile boolean processesDone;
 	/**
 	 * Create an instance with the field parameters.
@@ -81,13 +79,11 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext, IProce
     @Override
 	public void doneGetContext(IToken token, Exception error, ISysMonitor.SysMonitorContext context) {
 		if (error == null && context != null) {
-			childNode = createNodeForContext(context);
-			childNode.parent = parentNode;
-			childNode.peerNode = parentNode.peerNode;
+			childNode = new ProcessTreeNode(parentNode, context);
             final int index = searchChild(childNode);
 			if (index != -1) {
 				ProcessTreeNode node = parentNode.children.get(index);
-				updateData(childNode, node);
+				node.updateData(context);
 				childNode = node;
 			}
 			else parentNode.children.add(childNode);
@@ -96,24 +92,6 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext, IProce
 		sysMonitorDone = true;
 		setAndCheckStatus();
 	}
-
-    /**
-     * Update the destination node's data with the source node's data.
-     *
-     * @param src The source node.
-     * @param dest The destination node.
-     */
-	private void updateData(ProcessTreeNode src, ProcessTreeNode dest) {
-        dest.context = src.context;
-        dest.pContext = src.pContext;
-        dest.name = src.name;
-        dest.pid = src.pid;
-        dest.ppid = src.ppid;
-        dest.state = src.state;
-        dest.type = src.type;
-        dest.username = src.username;
-        dest.firePropertyChange(new PropertyChangeEvent(this, "properties", null, null)); //$NON-NLS-1$
-    }
 
 	/**
 	 * Remove the dead process nodes.
@@ -166,12 +144,11 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext, IProce
      * merge the resulting children and continue with the
      * next node in the queue.
      */
-    /* default */ void setAndCheckStatus() {
+    private void setAndCheckStatus() {
     	synchronized(status) {
     		if(sysMonitorDone && processesDone) {
 				if (childNode != null) {
-					childNode.pContext = pContext;
-					childNode.firePropertyChange(new PropertyChangeEvent(RefreshDoneGetContext.this, "properties", null, null)); //$NON-NLS-1$
+					childNode.setProcessContext(pContext);
 				}
 	    		status.put(contextId, Boolean.TRUE);
 	    		if(isAllComplete()){
@@ -216,35 +193,10 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext, IProce
 		}
     }
 
-	/**
-	 * Creates a node from the given system monitor context.
-	 *
-	 * @param context The system monitor context. Must be not <code>null</code>.
-	 *
-	 * @return The node.
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.services.IProcesses.DoneGetContext#doneGetContext(org.eclipse.tcf.protocol.IToken, java.lang.Exception, org.eclipse.tcf.services.IProcesses.ProcessContext)
 	 */
-	private ProcessTreeNode createNodeForContext(ISysMonitor.SysMonitorContext context) {
-		Assert.isTrue(Protocol.isDispatchThread());
-		Assert.isNotNull(context);
-
-		ProcessTreeNode node = new ProcessTreeNode();
-
-		node.childrenQueried = false;
-		node.childrenQueryRunning = false;
-		node.context = context;
-		node.pContext = null;
-		node.name = context.getFile();
-		node.type = "ProcNode";  //$NON-NLS-1$
-		node.id = context.getID();
-		node.pid = context.getPID();
-		node.ppid = context.getPPID();
-		node.parentId = context.getParentID();
-		node.state = context.getState();
-		node.username = context.getUserName();
-
-		return node;
-	}
-
 	@Override
     public void doneGetContext(IToken token, Exception error, ProcessContext context) {
 		if (error == null && context != null) {

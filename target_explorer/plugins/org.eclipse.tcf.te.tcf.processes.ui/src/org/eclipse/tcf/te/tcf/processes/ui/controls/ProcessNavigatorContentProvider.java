@@ -14,7 +14,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
-import org.eclipse.tcf.te.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.trees.TreeContentProvider;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.PlatformUI;
@@ -42,7 +41,7 @@ public class ProcessNavigatorContentProvider  extends TreeContentProvider implem
 			ProcessTreeNode parent = ((ProcessTreeNode) element).parent;
 			// If the parent is a root node, return the associated peer node
 			if (parent != null) {
-				if (parent.type != null && parent.type.endsWith("ProcRootNode")) { //$NON-NLS-1$
+				if (parent.type != null && parent.isRootNode()) {
 					return parent.peerNode;
 				}
 				return parent;
@@ -74,7 +73,7 @@ public class ProcessNavigatorContentProvider  extends TreeContentProvider implem
 		}
 		else if (parentElement instanceof ProcessTreeNode) {
 			ProcessTreeNode node = (ProcessTreeNode) parentElement;
-			if(node.type.equals("ProcPendingNode")) {//$NON-NLS-1$
+			if(node == ProcessTreeNode.PENDING_NODE) {
 				return NO_ELEMENTS;
 			}
 			if (!node.childrenQueried) {
@@ -82,10 +81,11 @@ public class ProcessNavigatorContentProvider  extends TreeContentProvider implem
 					ProcessModel model = ProcessModel.getProcessModel(node.peerNode);
 					model.queryChildren(node);
 				}
-				ProcessTreeNode pendingNode = new ProcessTreeNode();
-				pendingNode.name = Messages.PendingOperation_label;
-				pendingNode.type = "ProcPendingNode"; //$NON-NLS-1$
-				return new Object[] { pendingNode };
+				ProcessTreeNode[] current = node.children.toArray(new ProcessTreeNode[node.children.size()]);
+				ProcessTreeNode[] children = new ProcessTreeNode[current.length+1];
+				System.arraycopy(current, 0, children, 0, current.length);
+				children[current.length] = ProcessTreeNode.PENDING_NODE;
+				return children;
 			}
 			return node.children.toArray();
 		}

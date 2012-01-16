@@ -11,10 +11,8 @@ package org.eclipse.tcf.te.tcf.processes.ui.internal.callbacks;
 
 import java.util.Map;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
-import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.IProcesses.ProcessContext;
 import org.eclipse.tcf.services.ISysMonitor;
@@ -41,8 +39,9 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext, IProcess
 	ProcessTreeNode childNode;
 	// The process context of this child node.
 	IProcesses.ProcessContext pContext;
-	// 
+	// The flag to indicate if the system monitor service has returned. 
 	volatile boolean sysMonitorDone;
+	// The flag to indicate if the process service has returned.
 	volatile boolean processesDone;
 	/**
 	 * Create an instance with the field parameters.
@@ -64,9 +63,7 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext, IProcess
     @Override
 	public void doneGetContext(IToken token, Exception error, ISysMonitor.SysMonitorContext context) {
 		if (error == null && context != null) {
-			childNode = createNodeForContext(context);
-			childNode.parent = parentNode;
-			childNode.peerNode = parentNode.peerNode;
+			childNode = new ProcessTreeNode(parentNode, context);
 			parentNode.children.add(childNode);
 		}
 		sysMonitorDone = true;
@@ -77,10 +74,12 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext, IProcess
      * Set the complete flag for this context id and check if
      * all tasks have completed.
      */
-    /* default */ void setAndCheckStatus() {
+    private void setAndCheckStatus() {
     	synchronized(status) {
     		if(sysMonitorDone && processesDone) {
-				if (childNode != null) childNode.pContext = pContext;
+				if (childNode != null) {
+					childNode.setProcessContext(pContext);
+				}
 	    		status.put(contextId, Boolean.TRUE);
 	    		boolean completed = true;
 	    		int count = 0;
@@ -104,35 +103,10 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext, IProcess
     	}
     }
 
-	/**
-	 * Creates a node from the given system monitor context.
-	 *
-	 * @param context The system monitor context. Must be not <code>null</code>.
-	 *
-	 * @return The node.
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.services.IProcesses.DoneGetContext#doneGetContext(org.eclipse.tcf.protocol.IToken, java.lang.Exception, org.eclipse.tcf.services.IProcesses.ProcessContext)
 	 */
-	private ProcessTreeNode createNodeForContext(ISysMonitor.SysMonitorContext context) {
-		Assert.isTrue(Protocol.isDispatchThread());
-		Assert.isNotNull(context);
-
-		ProcessTreeNode node = new ProcessTreeNode();
-
-		node.childrenQueried = false;
-		node.childrenQueryRunning = false;
-		node.context = context;
-		node.pContext = null;
-		node.name = context.getFile();
-		node.type = "ProcNode";  //$NON-NLS-1$
-		node.id = context.getID();
-		node.pid = context.getPID();
-		node.ppid = context.getPPID();
-		node.parentId = context.getParentID();
-		node.state = context.getState();
-		node.username = context.getUserName();
-
-		return node;
-	}
-
 	@Override
     public void doneGetContext(IToken token, Exception error, ProcessContext context) {
 		if (error == null && context != null) {

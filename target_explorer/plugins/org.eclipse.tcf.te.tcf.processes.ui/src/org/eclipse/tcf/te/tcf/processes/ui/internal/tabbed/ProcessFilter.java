@@ -25,7 +25,7 @@ public class ProcessFilter implements IFilter {
 	public boolean select(Object toTest) {
 		if(toTest instanceof ProcessTreeNode) {
 			ProcessTreeNode node = (ProcessTreeNode) toTest;
-			return !(node.type.equals("ProcRootNode") || node.type.equals("ProcPendingNode")); //$NON-NLS-1$//$NON-NLS-2$
+			return !(node.isRootNode() || node == ProcessTreeNode.PENDING_NODE);
 		}
 		return false;
 	}

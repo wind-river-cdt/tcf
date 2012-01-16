@@ -12,7 +12,6 @@ package org.eclipse.tcf.te.tcf.processes.ui.model.steps;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
@@ -36,7 +35,6 @@ import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.processes.ui.help.IContextHelpIds;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
-import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 
 /**
  * Process attach step implementation.
@@ -125,24 +123,12 @@ public class AttachStep {
 													monService.getContext(node.id, new ISysMonitor.DoneGetContext() {
 														@Override
 														public void doneGetContext(IToken token, Exception error, SysMonitorContext context) {
-															node.context = context;
-															node.name = context.getFile();
-															node.id = context.getID();
-															node.pid = context.getPID();
-															node.ppid = context.getPPID();
-															node.parentId = context.getParentID();
-															node.state = context.getState();
-															node.username = context.getUserName();
+															node.updateData(context);
 
 															service.getContext(node.pContext.getID(), new IProcesses.DoneGetContext() {
 																@Override
 																public void doneGetContext(IToken token, Exception error, ProcessContext context) {
-																	node.pContext = context;
-
-																	IViewerInput  provider = (IViewerInput) node.peerNode.getAdapter(IViewerInput.class);
-																	PropertyChangeEvent event = new PropertyChangeEvent(node, "state", null, null); //$NON-NLS-1$
-																	provider.firePropertyChange(event);
-
+																	node.setProcessContext(context);
 																	onDone(callback);
 																}
 															});

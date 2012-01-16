@@ -94,12 +94,7 @@ public class ProcessModel implements IPreferenceConsts{
 	 * @param root The root node
 	 */
 	public void createRoot(IPeerModel peerModel ) {
-		ProcessTreeNode root = new ProcessTreeNode();
-		root.type = "ProcRootNode"; //$NON-NLS-1$
-		root.peerNode = peerModel;
-		root.childrenQueried = false;
-		root.childrenQueryRunning = false;
-		this.root = root;
+		this.root = new ProcessTreeNode(peerModel);
 	}
 
 	/**
