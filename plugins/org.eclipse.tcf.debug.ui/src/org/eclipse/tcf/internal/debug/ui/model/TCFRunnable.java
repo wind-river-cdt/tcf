@@ -11,7 +11,6 @@
 package org.eclipse.tcf.internal.debug.ui.model;
 
 import org.eclipse.debug.core.IRequest;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.protocol.Protocol;
 
 
@@ -29,12 +28,6 @@ public abstract class TCFRunnable implements Runnable {
     public void done() {
         assert !done;
         done = true;
-        // Don't call back into Eclipse on TCF thread -
-        // it will cause deadlocks.
-        Display.getDefault().asyncExec(new Runnable() {
-            public void run() {
-                request.done();
-            }
-        });
+        request.done();
     }
 }
