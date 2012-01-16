@@ -306,13 +306,17 @@
       </menuContribution>
       
       <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.TargetExplorer#Popup?after=group.showIn">
-         <menu label="%menu.showIn.label">
+         <menu
+               id="org.eclipse.tcf.te.ui.views.TargetExplorer.showIn"
+               label="%menu.showIn.label">
             <command
                   commandId="org.eclipse.tcf.te.ui.views.command.ShowInProperties"
                   icon="icons/eview16/prop_ps.gif"
                   label="%menu.properties.label"
                   style="push">
+                  <visibleWhen checkEnabled="true"/>
             </command>
+            <visibleWhen checkEnabled="true"/>
          </menu>
       </menuContribution>
    </extension>
