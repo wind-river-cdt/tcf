@@ -113,8 +113,6 @@ public class FSRefresh extends FSOperation {
 			current.remove(aNode);
 		}
 		for (FSTreeNode aNode : newNodes) {
-			aNode.parent = node;
-			aNode.peerNode = node.peerNode;
 			current.add(aNode);
 		}
 	}

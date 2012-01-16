@@ -330,8 +330,6 @@ public class FSOperation {
 		List<FSTreeNode> children = queryChildren(node, service);
 		List<FSTreeNode> current = getCurrentChildren(node);
 		for (FSTreeNode childNode : children) {
-			childNode.parent = node;
-			childNode.peerNode = node.peerNode;
 			current.add(childNode);
 		}
 		node.childrenQueried = true;
@@ -349,7 +347,7 @@ public class FSOperation {
 		final TCFFileSystemException[] errors = new TCFFileSystemException[1];
 		final IFileHandle[] handles = new IFileHandle[1];
 		try {
-			String dir = node.getLocation(true);
+			String dir = node.getLocation();
 			service.opendir(dir, new DoneOpen() {
 				@Override
 				public void doneOpen(IToken token, FileSystemException error, IFileHandle handle) {
@@ -378,10 +376,8 @@ public class FSOperation {
 						if (error == null) {
 							if (entries != null && entries.length > 0) {
 								for (DirEntry entry : entries) {
-									FSTreeNode childNode = createNodeFromDirEntry(entry, false);
-									if (childNode != null) {
-										children.add(childNode);
-									}
+									FSTreeNode childNode = new FSTreeNode(node, entry, false);
+									children.add(childNode);
 								}
 							}
 						}
@@ -576,41 +572,6 @@ public class FSOperation {
 			});
 			if (errors[0] != null) throw errors[0];
 		}
-	}
-
-	/**
-	 * Create an directory entry using the specified DirEntry which contains the directory
-	 * information.
-	 *
-	 * @param entry The directory entry node.
-	 * @param entryIsRootNode If it is root node.
-	 * @return An FSTreeNode representing the folder.
-	 */
-	FSTreeNode createNodeFromDirEntry(DirEntry entry, boolean entryIsRootNode) {
-		Assert.isNotNull(entry);
-
-		FSTreeNode node = null;
-
-		IFileSystem.FileAttrs attrs = entry.attrs;
-
-		if (attrs == null || attrs.isDirectory()) {
-			node = new FSTreeNode();
-			node.childrenQueried = false;
-			node.childrenQueryRunning = false;
-			node.attr = attrs;
-			node.name = entry.filename;
-			node.type = entryIsRootNode ? "FSRootDirNode" : "FSDirNode"; //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		else if (attrs.isFile()) {
-			node = new FSTreeNode();
-			node.childrenQueried = false;
-			node.childrenQueryRunning = false;
-			node.attr = attrs;
-			node.name = entry.filename;
-			node.type = "FSFileNode"; //$NON-NLS-1$
-		}
-
-		return node;
 	}
 
 	/**

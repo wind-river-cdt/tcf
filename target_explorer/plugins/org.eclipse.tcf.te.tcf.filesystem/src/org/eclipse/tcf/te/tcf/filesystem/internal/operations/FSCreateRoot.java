@@ -83,12 +83,8 @@ public class FSCreateRoot extends FSOperation {
 					public void doneRoots(IToken token, FileSystemException error, DirEntry[] entries) {
 						if (error == null) {
 							for (DirEntry entry : entries) {
-								FSTreeNode node = createNodeFromDirEntry(entry, true);
-								if (node != null) {
-									node.parent = rootNode;
-									node.peerNode = rootNode.peerNode;
-									rootNode.getChildren().add(node);
-								}
+								FSTreeNode node = new FSTreeNode(rootNode, entry, true);
+								rootNode.getChildren().add(node);
 							}
 						}
 					}
