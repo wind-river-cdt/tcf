@@ -20,12 +20,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IFileSystem;
+import org.eclipse.tcf.services.IFileSystem.DirEntry;
 import org.eclipse.tcf.te.tcf.filesystem.interfaces.IWindowsFileAttributes;
 import org.eclipse.tcf.te.tcf.filesystem.internal.UserAccount;
 import org.eclipse.tcf.te.tcf.filesystem.internal.testers.TargetPropertyTester;
@@ -42,6 +44,25 @@ import org.eclipse.tcf.te.ui.utils.PropertyChangeProvider;
  * event dispatch thread.
  */
 public final class FSTreeNode extends PropertyChangeProvider implements Cloneable {
+	public static final FSTreeNode PENDING_NODE = createPendingNode();
+
+	static FSTreeNode createPendingNode() {
+		if (Protocol.isDispatchThread()) {
+			FSTreeNode pendingNode = new FSTreeNode();
+			pendingNode.name = org.eclipse.tcf.te.ui.nls.Messages.PendingOperation_label;
+			pendingNode.type = "FSPendingNode"; //$NON-NLS-1$
+			return pendingNode;
+		}
+		final AtomicReference<FSTreeNode> reference = new AtomicReference<FSTreeNode>();
+		Protocol.invokeAndWait(new Runnable() {
+
+			@Override
+			public void run() {
+				reference.set(createPendingNode());
+			}
+		});
+		return reference.get();
+	}
 
 	private static final String KEY_WIN32_ATTRS = "Win32Attrs"; //$NON-NLS-1$
 
@@ -87,6 +108,23 @@ public final class FSTreeNode extends PropertyChangeProvider implements Cloneabl
 	 */
 	public boolean childrenQueryRunning = false;
 
+	public FSTreeNode(FSTreeNode parentNode, DirEntry entry, boolean entryIsRootNode) {
+		Assert.isNotNull(entry);
+		children = Collections.synchronizedList(new ArrayList<FSTreeNode>());
+		IFileSystem.FileAttrs attrs = entry.attrs;
+
+		this.attr = attrs;
+		this.name = entry.filename;
+		if (attrs == null || attrs.isDirectory()) {
+			this.type = entryIsRootNode ? "FSRootDirNode" : "FSDirNode"; //$NON-NLS-1$ //$NON-NLS-2$
+		} else if (attrs.isFile()) {
+			this.type = "FSFileNode"; //$NON-NLS-1$
+		}
+		this.parent = parentNode;
+		this.peerNode = parentNode.peerNode;
+		Assert.isTrue(Protocol.isDispatchThread());
+	}
+	
 	/**
 	 * Constructor.
 	 */
@@ -324,7 +362,7 @@ public final class FSTreeNode extends PropertyChangeProvider implements Cloneabl
 	 * Get the location of a file/folder node using the format of the file
 	 * system's platform.
 	 *
-	 * @param node
+	 * @param parentNode
 	 *            The file/folder node.
 	 * @return The location of the file/folder.
 	 */
@@ -489,7 +527,7 @@ public final class FSTreeNode extends PropertyChangeProvider implements Cloneabl
 	 * @return The type label text.
 	 */
 	public String getFileType() {
-		if (type.equals("FSPendingNode")) {//$NON-NLS-1$
+		if (isPendingNode()) {
 			return ""; //$NON-NLS-1$
 		}
 		if (isRoot()) {
@@ -510,5 +548,17 @@ public final class FSTreeNode extends PropertyChangeProvider implements Cloneabl
 			return Messages.GeneralInformationPage_UnknownFileType;
 		}
 		return name.substring(lastDot + 1).toUpperCase() + " " + Messages.FSTreeNode_TypeFile; //$NON-NLS-1$
+    }
+
+	public static FSTreeNode createRootNode(IPeerModel peerNode) {
+		FSTreeNode node = new FSTreeNode();
+		node.type = "FSRootNode"; //$NON-NLS-1$
+		node.peerNode = peerNode;
+		node.name = org.eclipse.tcf.te.tcf.filesystem.nls.Messages.FSTreeNodeContentProvider_rootNode_label;
+	    return node;
+    }
+
+	public boolean isPendingNode() {
+	    return type != null && type.equals("FSPendingNode"); //$NON-NLS-1$
     }
 }

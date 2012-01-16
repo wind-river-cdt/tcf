@@ -307,7 +307,7 @@ public class CacheManager {
 	/**
 	 * Display the error in an error dialog.
 	 *
-	 * @param node
+	 * @param parentNode
 	 *            the file node.
 	 * @param parent
 	 *            the parent shell.

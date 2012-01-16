@@ -96,8 +96,7 @@ public class FSFolderSelectionDialog extends ElementTreeSelectionDialog {
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
 				if (element instanceof FSTreeNode) {
 					FSTreeNode node = (FSTreeNode) element;
-					return node.isDirectory() || node.type != null && node.type
-					                .equals("FSPendingNode"); //$NON-NLS-1$
+					return node.isDirectory() || node.isPendingNode();
 				}
 				return false;
 			}

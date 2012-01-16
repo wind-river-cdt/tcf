@@ -51,7 +51,8 @@ public class FSCreateRoot extends FSOperation {
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
-				result[0] = createRootNode();
+				result[0] = FSTreeNode.createRootNode(peerModel);
+			    FSModel.getFSModel(peerModel).setRoot(result[0]);
 			}
 		});
 		SafeRunner.run(new SafeRunnable() {
@@ -62,19 +63,6 @@ public class FSCreateRoot extends FSOperation {
 		});
 		return result[0];
 	}
-
-	/**
-	 * Create the root node instance.
-	 *
-	 * @return The root node instance.
-	 */
-	FSTreeNode createRootNode() {
-	    final FSTreeNode rootNode = new FSTreeNode();
-	    rootNode.type = "FSRootNode"; //$NON-NLS-1$
-	    rootNode.peerNode = peerModel;
-	    FSModel.getFSModel(peerModel).setRoot(rootNode);
-	    return rootNode;
-    }
 
 	/**
 	 * Query the root file system node's children nodes.

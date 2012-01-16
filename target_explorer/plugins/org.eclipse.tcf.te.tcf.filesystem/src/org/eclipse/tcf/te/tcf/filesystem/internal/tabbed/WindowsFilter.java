@@ -25,7 +25,7 @@ public class WindowsFilter implements IFilter {
 	public boolean select(Object toTest) {
 		if(toTest instanceof FSTreeNode) {
 			FSTreeNode node = (FSTreeNode) toTest;
-			return !node.type.equals("FSPendingNode") && !node.isSystemRoot() && node.isWindowsNode() && (node.isFile() || node.isDirectory()); //$NON-NLS-1$
+			return !node.isPendingNode() && !node.isSystemRoot() && node.isWindowsNode() && (node.isFile() || node.isDirectory());
 		}
 		return false;
 	}

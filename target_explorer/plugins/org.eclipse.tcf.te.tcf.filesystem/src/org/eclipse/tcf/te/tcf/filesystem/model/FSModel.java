@@ -24,7 +24,9 @@ import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.te.runtime.utils.Host;
+import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
+import org.eclipse.tcf.te.tcf.filesystem.internal.callbacks.QueryDoneOpenChannel;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSCreateRoot;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation;
@@ -304,5 +306,25 @@ public final class FSModel {
 		IViewerInput viewerInput = (IViewerInput) node.peerNode.getAdapter(IViewerInput.class);
 		PropertyChangeEvent event = new PropertyChangeEvent(node.isRoot() ? node.peerNode : node, "state", null, null); //$NON-NLS-1$
 		viewerInput.firePropertyChange(event);
+    }
+
+	public void createRoot(final IPeerModel peerNode) {
+		if (Protocol.isDispatchThread()) {
+			this.root = FSTreeNode.createRootNode(peerNode);
+		}
+		else {
+			Protocol.invokeAndWait(new Runnable() {
+				@Override
+				public void run() {
+					createRoot(peerNode);
+				}
+			});
+		}
+	}
+
+	public void queryChildren(FSTreeNode parentNode) {
+		Assert.isNotNull(parentNode);
+		parentNode.childrenQueryRunning = true;
+		Tcf.getChannelManager().openChannel(parentNode.peerNode.getPeer(), false, new QueryDoneOpenChannel(parentNode));
     }
 }
