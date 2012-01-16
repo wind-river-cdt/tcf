@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2010 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2012 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,6 +28,10 @@ public abstract class TCFRunnable implements Runnable {
     public void done() {
         assert !done;
         done = true;
+        // Don't call Display.asyncExec: display thread can be blocked waiting for the request.
+        // For example, display thread is blocked for action state update requests.
+        // Calling back into Eclipse on TCF thread is dangerous too - if Eclipse blocks TCF thread
+        // we can get deadlocked. Might need a new thread (or Job) to make this call safe.
         request.done();
     }
 }
