@@ -58,6 +58,8 @@ public class CastToArrayCommand extends AbstractActionDelegate {
         }
     }
 
+    private String cur_length;
+
     @Override
     protected void run() {
         final TCFNode node = getCastToTypeNode();
@@ -66,7 +68,7 @@ public class CastToArrayCommand extends AbstractActionDelegate {
         if (window == null) return;
         final String base_type_name = getBaseTypeName();
         if (base_type_name == null) return;
-        CastToTypeDialog dialog = new CastToTypeDialog(window.getShell(), node.getModel().getCastToType(node.getID()));
+        CastToTypeDialog dialog = new CastToTypeDialog(window.getShell(), cur_length);
         if (dialog.open() != Window.OK) return;
         final String new_type = dialog.getValue().trim();
         Protocol.invokeLater(new Runnable() {
@@ -81,6 +83,19 @@ public class CastToArrayCommand extends AbstractActionDelegate {
         if (node == null) return null;
         return new TCFTask<String>(node.getChannel()) {
             public void run() {
+                cur_length = null;
+                String cast = node.getModel().getCastToType(node.getID());
+                if (cast != null) {
+                    if (cast.endsWith("]")) {
+                        int i = cast.lastIndexOf('[');
+                        if (i > 0) {
+                            cur_length = cast.substring(i + 1, cast.length() - 1);
+                            done(cast.substring(0, i));
+                            return;
+                        }
+                    }
+                    done(null);
+                }
                 TCFDataCache<ISymbols.Symbol> type_cache = ((ICastToType)node).getType();
                 if (!type_cache.validate(this)) return;
                 ISymbols.Symbol type_data = type_cache.getData();
@@ -88,8 +103,7 @@ public class CastToArrayCommand extends AbstractActionDelegate {
                     done(null);
                 }
                 else {
-                    String ptrs = "****";
-                    for (int i = 0; i <= ptrs.length(); i++) {
+                    for (int i = 0;; i++) {
                         TCFDataCache<ISymbols.Symbol> base_type_cache = node.getModel().getSymbolInfoCache(type_data.getBaseTypeID());
                         if (!base_type_cache.validate(this)) return;
                         ISymbols.Symbol base_type_data = base_type_cache.getData();
@@ -99,7 +113,7 @@ public class CastToArrayCommand extends AbstractActionDelegate {
                         }
                         else {
                             if (base_type_data.getName() != null) {
-                                done(base_type_data.getName() + ptrs.substring(0, i));
+                                done(makePtrTypeName(base_type_data.getName(), i));
                                 return;
                             }
                             else if (base_type_data.getTypeClass() == ISymbols.TypeClass.pointer) {
@@ -111,7 +125,7 @@ public class CastToArrayCommand extends AbstractActionDelegate {
                                 if (!base_type_cache.validate(this)) return;
                                 base_type_data = base_type_cache.getData();
                                 if (base_type_data != null && base_type_data.getName() != null) {
-                                    done(base_type_data.getName() + ptrs.substring(0, i));
+                                    done(makePtrTypeName(base_type_data.getName(), i));
                                 }
                                 else {
                                     done(null);
@@ -127,6 +141,19 @@ public class CastToArrayCommand extends AbstractActionDelegate {
                 }
             }
         }.getE();
+    }
+
+    private static String makePtrTypeName(String base, int cnt) {
+        StringBuffer bf = new StringBuffer();
+        bf.append(base);
+        if (cnt > 0) {
+            bf.append(' ');
+            while (cnt > 0) {
+                bf.append('*');
+                cnt--;
+            }
+        }
+        return bf.toString();
     }
 
     @Override
