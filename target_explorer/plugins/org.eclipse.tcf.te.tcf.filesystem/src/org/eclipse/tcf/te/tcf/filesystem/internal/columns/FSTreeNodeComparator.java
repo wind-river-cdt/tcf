@@ -29,13 +29,11 @@ public abstract class FSTreeNodeComparator implements Comparator<FSTreeNode> {
 		String type2 = node2.type;
 
 		// Group directories and files always together before sorting by name
-		if (("FSRootDirNode".equals(type1) || "FSDirNode".equals(type1)) //$NON-NLS-1$ //$NON-NLS-2$
-		                && !("FSRootDirNode".equals(type2) || "FSDirNode".equals(type2))) { //$NON-NLS-1$ //$NON-NLS-2$
+		if ((node1.isRoot() || node1.isDirectory()) && !(node2.isRoot() || node2.isDirectory())) {
 			return -1;
 		}
 
-		if (("FSRootDirNode".equals(type2) || "FSDirNode".equals(type2)) //$NON-NLS-1$ //$NON-NLS-2$
-		                && !("FSRootDirNode".equals(type1) || "FSDirNode".equals(type1))) { //$NON-NLS-1$ //$NON-NLS-2$
+		if ((node2.isRoot() || node2.isDirectory()) && !(node1.isRoot() || node1.isDirectory())) {
 			return 1;
 		}
 

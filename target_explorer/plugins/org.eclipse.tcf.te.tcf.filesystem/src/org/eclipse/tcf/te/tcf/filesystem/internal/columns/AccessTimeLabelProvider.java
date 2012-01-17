@@ -30,12 +30,10 @@ public class AccessTimeLabelProvider extends LabelProvider {
 	public String getText(Object element) {
 		if (element instanceof FSTreeNode) {
 			FSTreeNode node = (FSTreeNode) element;
-			if (node.type != null && node.type.startsWith("FS")) { //$NON-NLS-1$
-				// Pending nodes does not have column texts at all
-				if (node.type.endsWith("PendingNode")) return ""; //$NON-NLS-1$ //$NON-NLS-2$
-				if (node.attr != null) {
-					return DATE_ACCESSED_FORMAT.format(new Date(node.attr.atime));
-				}
+			// Pending nodes does not have column texts at all
+			if(node.isPendingNode()) return ""; //$NON-NLS-1$
+			if (node.attr != null) {
+				return DATE_ACCESSED_FORMAT.format(new Date(node.attr.atime));
 			}
 		}
 		return ""; //$NON-NLS-1$

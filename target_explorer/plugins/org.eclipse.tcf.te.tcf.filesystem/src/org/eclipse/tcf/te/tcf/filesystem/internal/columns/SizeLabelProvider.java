@@ -29,13 +29,11 @@ public class SizeLabelProvider extends LabelProvider {
 	public String getText(Object element) {
 		if (element instanceof FSTreeNode) {
 			FSTreeNode node = (FSTreeNode) element;
-			if (node.type != null && node.type.startsWith("FS")) { //$NON-NLS-1$
-				// Pending nodes does not have column texts at all
-				if (node.type.endsWith("PendingNode")) return ""; //$NON-NLS-1$ //$NON-NLS-2$
-				// Directory nodes does not have a size
-				if (node.isFile() && node.attr != null) {
-					return SIZE_FORMAT.format(node.attr.size / 1024) + " KB"; //$NON-NLS-1$
-				}
+			// Pending nodes does not have column texts at all
+			if (node.isPendingNode()) return ""; //$NON-NLS-1$
+			// Directory nodes does not have a size
+			if (node.isFile() && node.attr != null) {
+				return SIZE_FORMAT.format(node.attr.size / 1024) + " KB"; //$NON-NLS-1$
 			}
 		}
 		return ""; //$NON-NLS-1$

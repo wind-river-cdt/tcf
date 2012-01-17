@@ -53,16 +53,16 @@ public class FSTreeElementLabelProvider extends LabelProvider {
 		if (element != null) {
 			if (element instanceof FSTreeNode) {
 				FSTreeNode node = (FSTreeNode) element;
-				if ("FSRootNode".equals(node.type)) { //$NON-NLS-1$
+				if (node.isSystemRoot()) {
 					return UIPlugin.getImage(ImageConsts.ROOT);
 				}
-				else if ("FSRootDirNode".equals(node.type)) {//$NON-NLS-1$
+				else if (node.isRoot()) {
 					return UIPlugin.getImage(ImageConsts.ROOT_DRIVE);
 				}
-				else if ("FSDirNode".equals(node.type)) { //$NON-NLS-1$
+				else if (node.isDirectory()) {
 					return UIPlugin.getImage(ImageConsts.FOLDER);
 				}
-				else if ("FSFileNode".equals(node.type)) { //$NON-NLS-1$
+				else if (node.isFile()) {
 					String key = node.name;
 					Image image = UIPlugin.getImage(key);
 					if (image == null) {
