@@ -62,7 +62,16 @@ public abstract class BaseTitledSection extends AbstractPropertySection implemen
 		} else {
 			this.provider = null;
 		}
+		updateInput(provider);
     }
+	
+	/**
+	 * Update the input node.
+	 * 
+	 * @param input The input node.
+	 */
+	protected void updateInput(IPropertyChangeProvider input) {
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -208,6 +217,7 @@ public abstract class BaseTitledSection extends AbstractPropertySection implemen
 	 */
 	@Override
     public void propertyChange(PropertyChangeEvent event) {
+		updateInput(provider);
 		Display display = getPart().getSite().getShell().getDisplay();
 		display.asyncExec(new Runnable(){
 			@Override

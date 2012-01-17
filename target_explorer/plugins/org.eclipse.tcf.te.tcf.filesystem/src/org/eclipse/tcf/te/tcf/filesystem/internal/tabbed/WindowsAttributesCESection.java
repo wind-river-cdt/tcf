@@ -10,8 +10,6 @@
 package org.eclipse.tcf.te.tcf.filesystem.internal.tabbed;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -20,8 +18,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tcf.te.tcf.filesystem.interfaces.IWindowsFileAttributes;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
+import org.eclipse.tcf.te.ui.interfaces.IPropertyChangeProvider;
 import org.eclipse.tcf.te.ui.views.tabbed.BaseTitledSection;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
@@ -65,13 +63,10 @@ public class WindowsAttributesCESection extends BaseTitledSection {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#setInput(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+	 * @see org.eclipse.tcf.te.ui.views.tabbed.BaseTitledSection#updateData(org.eclipse.tcf.te.ui.interfaces.IPropertyChangeProvider)
 	 */
 	@Override
-	public void setInput(IWorkbenchPart part, ISelection selection) {
-		super.setInput(part, selection);
-		Assert.isTrue(selection instanceof IStructuredSelection);
-		Object input = ((IStructuredSelection) selection).getFirstElement();
+    protected void updateInput(IPropertyChangeProvider input) {
 		Assert.isTrue(input instanceof FSTreeNode);
 		this.node = (FSTreeNode) input;
 		this.clone = (FSTreeNode) node.clone();
