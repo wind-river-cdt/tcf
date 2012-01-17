@@ -10,16 +10,15 @@
 package org.eclipse.tcf.te.tcf.filesystem.internal.adapters;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.osgi.util.NLS;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
-import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSRefresh;
+import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.RefreshNodeJob;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.PersistenceManager;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
-import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 import org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate;
 
 /**
@@ -33,7 +32,9 @@ public class RefreshHandlerDelegate implements IRefreshHandlerDelegate {
 	@Override
 	public boolean canRefresh(Object element) {
 		if (element instanceof FSTreeNode) {
-			return true;
+			FSTreeNode node = (FSTreeNode) element;
+			return node.isSystemRoot() || node.isRoot() || node.isDirectory() 
+							|| node.isFile() && !PersistenceManager.getInstance().isAutoSaving();
 		}
 		return false;
 	}
@@ -47,18 +48,14 @@ public class RefreshHandlerDelegate implements IRefreshHandlerDelegate {
 		Assert.isNotNull(state);
 
 		if (canRefresh(element)) {
-			final FSTreeNode node = (FSTreeNode) element;
-			Job job = new Job(NLS.bind(Messages.RefreshDirectoryHandler_RefreshJobTitle, node.name)) {
+			Job job = new RefreshNodeJob((FSTreeNode) element);
+			job.addJobChangeListener(new JobChangeAdapter(){
 				@Override
-				protected IStatus run(IProgressMonitor monitor) {
-					FSRefresh refresh = new FSRefresh(node);
-					refresh.doit();
-					if (callback != null) {
-						callback.done(this, Status.OK_STATUS);
+                public void done(IJobChangeEvent event) {
+					if(callback != null) {
+						callback.done(this, event.getResult());
 					}
-					return Status.OK_STATUS;
-				}
-			};
+                }});
 			job.schedule();
 		}
 		else {

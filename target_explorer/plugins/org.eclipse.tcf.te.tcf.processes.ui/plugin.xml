@@ -322,17 +322,6 @@
                         value="org.eclipse.tcf.te.ui.views.Editor">
                   </equals>
                </with>
-               <with
-                     variable="selection">
-                  <count
-                        value="1">
-                  </count>
-                  <iterate>
-                     <instanceof
-                           value="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
-                     </instanceof>
-                  </iterate>
-               </with>
             </and>
          </activeWhen>
          <enabledWhen>

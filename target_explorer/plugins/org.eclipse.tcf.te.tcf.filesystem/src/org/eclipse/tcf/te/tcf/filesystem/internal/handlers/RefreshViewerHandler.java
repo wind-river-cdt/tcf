@@ -9,8 +9,10 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.handlers;
 
+import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
@@ -20,7 +22,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 /**
  * The action handler to refresh the whole file system tree.
  */
-public class RefreshViewerHandler extends RefreshNodeHandler {
+public class RefreshViewerHandler extends AbstractHandler {
 	
 	/*
 	 * (non-Javadoc)
@@ -31,9 +33,10 @@ public class RefreshViewerHandler extends RefreshNodeHandler {
 		IEditorInput editorInput = HandlerUtil.getActiveEditorInputChecked(event);
 		IPeerModel peer = (IPeerModel) editorInput.getAdapter(IPeerModel.class);
 		if (peer != null) {
-			final FSTreeNode root = FSModel.getFSModel(peer).getRoot();
+			FSTreeNode root = FSModel.getFSModel(peer).getRoot();
 			if (root != null) {
-				scheduleRefreshJob(root);
+				Job job = new RefreshNodeJob(root);
+				job.schedule();
 			}
 		}
 		return null;

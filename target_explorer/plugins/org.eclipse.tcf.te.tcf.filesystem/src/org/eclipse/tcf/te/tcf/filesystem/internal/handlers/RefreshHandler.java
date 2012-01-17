@@ -13,19 +13,13 @@ package org.eclipse.tcf.te.tcf.filesystem.internal.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
-import org.eclipse.tcf.te.tcf.filesystem.internal.utils.StateManager;
-import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
-import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
- * The handler to refresh the state of a file.
+ * The handler to refresh the state of a file or a folder.
  */
 public class RefreshHandler extends AbstractHandler {
 
@@ -36,13 +30,8 @@ public class RefreshHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getCurrentSelectionChecked(event);
 		FSTreeNode node = (FSTreeNode) selection.getFirstElement();
-		try {
-			StateManager.getInstance().refreshState(node);
-			FSModel.firePropertyChange(node);
-		} catch (TCFException e) {
-			Shell parent = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-			MessageDialog.openError(parent, Messages.StateManager_RefreshFailureTitle, e.getLocalizedMessage());
-		}
+		Job job = new RefreshNodeJob(node);
+		job.schedule();
 		return null;
 	}
 }
