@@ -2025,6 +2025,9 @@
          <adapter
                type="org.eclipse.jface.viewers.ILabelProvider">
          </adapter>
+         <adapter
+               type="org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate">
+         </adapter>
       </factory>
    </extension>
 
