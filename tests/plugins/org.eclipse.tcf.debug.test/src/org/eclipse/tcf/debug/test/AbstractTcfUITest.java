@@ -31,6 +31,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.core.TransientPeer;
 import org.eclipse.tcf.debug.test.services.BreakpointsCM;
 import org.eclipse.tcf.debug.test.services.DiagnosticsCM;
+import org.eclipse.tcf.debug.test.services.LineNumbersCM;
 import org.eclipse.tcf.debug.test.services.RunControlCM;
 import org.eclipse.tcf.debug.test.services.RunControlCM.ContextState;
 import org.eclipse.tcf.debug.test.services.StackTraceCM;
@@ -49,6 +50,7 @@ import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IBreakpoints;
 import org.eclipse.tcf.services.IDiagnostics;
 import org.eclipse.tcf.services.IExpressions;
+import org.eclipse.tcf.services.ILineNumbers;
 import org.eclipse.tcf.services.IMemoryMap;
 import org.eclipse.tcf.services.IRunControl;
 import org.eclipse.tcf.services.IRunControl.RunControlContext;
@@ -89,12 +91,14 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
     protected IRunControl rc;
     protected IBreakpoints bp;
     protected IMemoryMap fMemoryMap;
+    protected ILineNumbers fLineNumbers;
 
     protected RunControlCM fRunControlCM;
     protected DiagnosticsCM fDiagnosticsCM;
     protected BreakpointsCM fBreakpointsCM;
     protected StackTraceCM fStackTraceCM;
     protected SymbolsCM fSymbolsCM;
+    protected LineNumbersCM fLineNumbersCM;
     
     private static class RemotePeer extends TransientPeer {
         private final ArrayList<Map<String,String>> attrs;
@@ -227,6 +231,7 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
         fBreakpointsCM = new BreakpointsCM(bp);
         fStackTraceCM = new StackTraceCM(stk, rc);
         fSymbolsCM = new SymbolsCM(syms, fRunControlCM, fMemoryMap);
+        fLineNumbersCM = new LineNumbersCM(fLineNumbers, fMemoryMap, fRunControlCM);
     }
     
     protected void tearDownServiceListeners() throws Exception{
@@ -235,6 +240,7 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
         fStackTraceCM.dispose();
         fRunControlCM.dispose();
         fDiagnosticsCM.dispose();
+        fLineNumbersCM.dispose();
     }
     
     private void createDebugViewViewer() {
@@ -328,6 +334,7 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
                 rc = channels[0].getRemoteService(IRunControl.class);
                 bp = channels[0].getRemoteService(IBreakpoints.class);
                 fMemoryMap = channels[0].getRemoteService(IMemoryMap.class);
+                fLineNumbers = channels[0].getRemoteService(ILineNumbers.class);
             };
         });
     }

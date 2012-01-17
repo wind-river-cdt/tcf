@@ -39,15 +39,19 @@ public interface ICache<V> {
     public Throwable getError();
 
 	/**
-	 * Asks the cache to update its value from the source. If the cache is
-	 * already valid, the request is completed immediately, otherwise data will
-	 * first be retrieved from the source. Typically, this method is called by a
-	 * client after it discovers the cache is invalid via {@link #isValid()}
+	 * Asks the cache to update its value from the source. Typically, this 
+	 * method is called by a client after it discovers the cache is invalid 
+	 * via {@link #isValid()}.
 	 * 
-	 * @param rm
-	 *            RequestMonitor that is called when cache becomes valid.
+	 * <p>If the cache is already valid, the cache is not updated again from 
+	 * source.  Instead the callback is completed next time the cache state is 
+	 * changed.  Clients can use this feature to be notified when the cache is 
+	 * being reset.
+	 * </p>
+	 * @param cb
+	 *            Callback that is called when cache becomes valid.
 	 */
-    public void update(Callback rm);
+    public void update(Callback cb);
 
     /**
      * Returns <code>true</code> if the cache is currently valid.  I.e. 

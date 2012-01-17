@@ -24,6 +24,7 @@ import org.eclipse.tcf.services.IRunControl;
 import org.eclipse.tcf.services.IRunControl.RunControlContext;
 import org.eclipse.tcf.services.ISymbols;
 import org.eclipse.tcf.services.ISymbols.Symbol;
+import org.eclipse.tcf.services.ILineNumbers.CodeArea;
 import org.junit.Assert;
 
 @SuppressWarnings("restriction")
@@ -343,6 +344,75 @@ public class SampleTest extends AbstractTcfUITest
         }.get();
     }
 
+    public void testLineNumbersCMResetOnContextRemove() throws Exception {
+        createBreakpoint("TestStepBP", "tcf_test_func0");
+        startProcess();        
+        runToTestEntry("tcf_test_func0");
+        
+        // Retrieve the current PC for use later
+        final String pc = new Transaction<String>() {
+            @Override
+            protected String process() throws InvalidCacheException, ExecutionException {
+                return validate(fRunControlCM.getState(fThreadId)).pc;
+            }
+        }.get();
+        
+        final BigInteger pcNumber = new BigInteger(pc);
+        final BigInteger pcNumberPlusOne = pcNumber.add(BigInteger.valueOf(1));
+
+        // Retrieve the line number for current PC.
+        final CodeArea[] pcCodeAreas = new Transaction<CodeArea[]>() {
+            @Override
+            protected CodeArea[] process() throws InvalidCacheException, ExecutionException {
+                CodeArea[] areas = validate(fLineNumbersCM.mapToSource(fProcessId, pcNumber, pcNumberPlusOne));
+                Assert.assertNotNull(areas);
+                Assert.assertTrue(areas.length != 0);
+                
+                areas = validate(fLineNumbersCM.mapToSource(fThreadId, pcNumber, pcNumberPlusOne));
+                Assert.assertNotNull(areas);
+                Assert.assertTrue(areas.length != 0);
+                
+                CodeArea[] areas2 = validate(fLineNumbersCM.mapToMemory(fProcessId, areas[0].file, areas[0].start_line, areas[0].start_column));
+                Assert.assertNotNull(areas2);
+                Assert.assertTrue(areas2.length != 0);
+                
+                areas2 = validate(fLineNumbersCM.mapToMemory(fThreadId, areas[0].file, areas[0].start_line, areas[0].start_column));
+                Assert.assertNotNull(areas2);
+                Assert.assertTrue(areas2.length != 0);
+                
+                return areas;
+            }
+        }.get();
+
+        // End test, check that all caches were reset and now return an error.
+        new Transaction<String>() {
+            @Override
+            protected String process() throws InvalidCacheException, ExecutionException {
+                validate( fDiagnosticsCM.cancelTest(fTestId, this) );
+                validate( fRunControlCM.waitForContextRemoved(fProcessId, this) );
+                try {
+                    validate(fLineNumbersCM.mapToSource(fProcessId, pcNumber, pcNumberPlusOne));
+                    Assert.fail("Expected error");
+                } catch (ExecutionException e) {}
+                try {
+                    validate(fLineNumbersCM.mapToSource(fThreadId, pcNumber, pcNumberPlusOne));
+                    Assert.fail("Expected error");
+                } catch (ExecutionException e) {}
+                try {
+                    CodeArea[] areas3 = validate(fLineNumbersCM.mapToMemory(fProcessId, pcCodeAreas[0].file, pcCodeAreas[0].start_line, pcCodeAreas[0].start_column));
+                    Assert.fail("Expected error");
+                } catch (ExecutionException e) {}
+                try {
+                    validate(fLineNumbersCM.mapToMemory(fThreadId, pcCodeAreas[0].file, pcCodeAreas[0].start_line, pcCodeAreas[0].start_column));
+                    Assert.fail("Expected error");
+                } catch (ExecutionException e) {}
+
+                return null;
+            }
+        }.get();
+    }
+    
+    
     public void testSymbolsCMResetOnContextStateChange() throws Exception {
         createBreakpoint("TestStepBP", "tcf_test_func2");
         startProcess();        

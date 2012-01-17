@@ -90,14 +90,14 @@ public abstract class AbstractCache<V> implements ICache<V> {
     }
 
     public V getData() {
-        if (!fValid) {
+        if (!isValid()) {
             throw new IllegalStateException("Cache is not valid.  Cache data can be read only when cache is valid."); //$NON-NLS-1$
         }
         return fData;
     }
     
     public Throwable getError() {
-        if (!fValid) {
+        if (!isValid()) {
             throw new IllegalStateException("Cache is not valid.  Cache status can be read only when cache is valid."); //$NON-NLS-1$
         }
         return fError;
@@ -106,42 +106,37 @@ public abstract class AbstractCache<V> implements ICache<V> {
     public void update(Callback rm) { 
         assert Protocol.isDispatchThread();
 
-        if (!fValid) {
-            boolean first = false;
-            synchronized (this) {
-                if (fWaitingList == null) {
-                    first = true;
-                    fWaitingList = rm;
-                } else if (fWaitingList instanceof Callback[]) {
-                    Callback[] waitingList = (Callback[])fWaitingList;
-                    int waitingListLength = waitingList.length;
-                    int i;
-                    for (i = 0; i < waitingListLength; i++) {
-                        if (waitingList[i] == null) {
-                            waitingList[i] = rm;
-                            break;
-                        }
+        boolean first = false;
+        synchronized (this) {
+            if (fWaitingList == null) {
+                first = true;
+                fWaitingList = rm;
+            } else if (fWaitingList instanceof Callback[]) {
+                Callback[] waitingList = (Callback[])fWaitingList;
+                int waitingListLength = waitingList.length;
+                int i;
+                for (i = 0; i < waitingListLength; i++) {
+                    if (waitingList[i] == null) {
+                        waitingList[i] = rm;
+                        break;
                     }
-                    if (i == waitingListLength) {
-                        Callback[] newWaitingList = new Callback[waitingListLength + 1];
-                        System.arraycopy(waitingList, 0, newWaitingList, 0, waitingListLength);
-                        newWaitingList[waitingListLength] = rm;
-                        fWaitingList = newWaitingList;
-                    }
-                } else {
-                    Callback[] newWaitingList = new Callback[2];
-                    newWaitingList[0] = (Callback)fWaitingList;
-                    newWaitingList[1] = rm;
+                }
+                if (i == waitingListLength) {
+                    Callback[] newWaitingList = new Callback[waitingListLength + 1];
+                    System.arraycopy(waitingList, 0, newWaitingList, 0, waitingListLength);
+                    newWaitingList[waitingListLength] = rm;
                     fWaitingList = newWaitingList;
                 }
-            }            
-            rm.addCancelListener(fRequestCanceledListener);
-            if (first) {
-                retrieve();
+            } else {
+                Callback[] newWaitingList = new Callback[2];
+                newWaitingList[0] = (Callback)fWaitingList;
+                newWaitingList[1] = rm;
+                fWaitingList = newWaitingList;
             }
-        } else {
-            rm.setError(fError); 
-            rm.done(); 
+        }            
+        rm.addCancelListener(fRequestCanceledListener);
+        if (first && !isValid()) {
+            retrieve();
         }
     } 
 
@@ -167,7 +162,12 @@ public abstract class AbstractCache<V> implements ICache<V> {
     }
     
     private void completeWaitingRm(Callback rm) {
-        rm.setError(fError); 
+        if (!isValid() && fError == null) {
+            rm.setError(INVALID_STATUS);
+        } else {
+            rm.setError(fError);
+        }
+         
         rm.removeCancelListener(fRequestCanceledListener);
         rm.done(); 
     }
