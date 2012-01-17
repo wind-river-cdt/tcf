@@ -1503,6 +1503,7 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
                     }
                 }
                 String ctx_id = null;
+                String mem_id = null;
                 boolean top_frame = false;
                 ILineNumbers.CodeArea area = null;
                 if (stack_frame != null) {
@@ -1512,17 +1513,20 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
                     TCFSourceRef src_ref = line_info.getData();
                     if (error == null && src_ref != null) error = src_ref.error;
                     if (error != null) Activator.log("Error retrieving source mapping for a stack frame", error);
-                    if (src_ref != null) area = src_ref.area;
+                    if (src_ref != null) {
+                        mem_id = src_ref.context_id;
+                        area = src_ref.area;
+                    }
                     top_frame = stack_frame.getFrameNo() == 0;
                     ctx_id = stack_frame.parent.id;
                 }
-                displaySource(cnt, page, element, ctx_id, top_frame, area);
+                displaySource(cnt, page, element, ctx_id, mem_id, top_frame, area);
             }
         });
     }
 
     private void displaySource(final int cnt, final IWorkbenchPage page,
-            final Object element, final String exe_id, final boolean top_frame, final ILineNumbers.CodeArea area) {
+            final Object element, final String exe_id, final String mem_id, final boolean top_frame, final ILineNumbers.CodeArea area) {
         final boolean disassembly_available = channel.getRemoteService(IDisassembly.class) != null;
         display.asyncExec(new Runnable() {
             public void run() {
@@ -1532,7 +1536,7 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
                     IEditorInput editor_input = null;
                     int line = 0;
                     if (area != null) {
-                        Object source_element = TCFSourceLookupDirector.lookup(launch, area);
+                        Object source_element = TCFSourceLookupDirector.lookup(launch, mem_id, area);
                         if (source_element != null) {
                             ISourcePresentation presentation = TCFModelPresentation.getDefault();
                             editor_input = presentation.getEditorInput(source_element);

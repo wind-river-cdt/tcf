@@ -44,12 +44,14 @@ import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.services.IFileSystem.IFileHandle;
 import org.eclipse.tcf.services.IMemory;
 import org.eclipse.tcf.services.IMemory.MemoryContext;
+import org.eclipse.tcf.services.IContextQuery;
 import org.eclipse.tcf.services.IMemoryMap;
 import org.eclipse.tcf.services.IPathMap;
 import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.IProcesses.ProcessContext;
 import org.eclipse.tcf.services.IProcessesV1;
 import org.eclipse.tcf.services.IRunControl;
+import org.eclipse.tcf.services.IRunControl.RunControlContext;
 import org.eclipse.tcf.services.IStreams;
 import org.eclipse.tcf.util.TCFDataCache;
 import org.eclipse.tcf.util.TCFTask;
@@ -144,7 +146,9 @@ public class TCFLaunch extends Launch {
     private ArrayList<PathMapRule> host_path_map;
     private TCFDataCache<IPathMap.PathMapRule[]> target_path_map;
 
-    private HashMap<String,IStorage> target_path_maaping_cache = new HashMap<String,IStorage>();
+    private HashMap<String,IStorage> target_path_mapping_cache = new HashMap<String,IStorage>();
+
+    private final HashMap<String,TCFDataCache<String[]>> context_query_cache = new HashMap<String,TCFDataCache<String[]>>();
 
     private Set<String> context_filter;
 
@@ -173,6 +177,40 @@ public class TCFLaunch extends Launch {
         }
     };
 
+    private final IRunControl.RunControlListener rc_listener = new IRunControl.RunControlListener() {
+
+        private void flushContextQueryCache() {
+            for (TCFDataCache<?> c : context_query_cache.values()) c.reset();
+        }
+
+        public void contextAdded(RunControlContext[] contexts) {
+            flushContextQueryCache();
+        }
+
+        public void contextChanged(RunControlContext[] contexts) {
+            flushContextQueryCache();
+        }
+
+        public void contextRemoved(String[] context_ids) {
+            flushContextQueryCache();
+        }
+
+        public void contextSuspended(String context, String pc, String reason, Map<String, Object> params) {
+        }
+
+        public void contextResumed(String context) {
+        }
+
+        public void containerSuspended(String context, String pc, String reason, Map<String, Object> params, String[] suspended_ids) {
+        }
+
+        public void containerResumed(String[] context_ids) {
+        }
+
+        public void contextException(String context, String msg) {
+        }
+    };
+
     private static LaunchListener[] getListeners() {
         if (listeners_array != null) return listeners_array;
         return listeners_array = listeners.toArray(new LaunchListener[listeners.size()]);
@@ -186,24 +224,31 @@ public class TCFLaunch extends Launch {
     private void onConnected() throws Exception {
         // The method is called when TCF channel is successfully connected.
 
+        final IRunControl rc_service = getService(IRunControl.class);
+        if (rc_service != null) {
+            rc_service.addListener(rc_listener);
+        }
+
         final IPathMap path_map_service = getService(IPathMap.class);
-        target_path_map = new TCFDataCache<IPathMap.PathMapRule[]>(channel) {
-            @Override
-            protected boolean startDataRetrieval() {
-                command = path_map_service.get(new IPathMap.DoneGet() {
-                    public void doneGet(IToken token, Exception error, IPathMap.PathMapRule[] map) {
-                        set(token, error, map);
-                    }
-                });
-                return false;
-            }
-        };
-        path_map_service.addListener(new IPathMap.PathMapListener() {
-            public void changed() {
-                target_path_map.reset();
-                target_path_maaping_cache = new HashMap<String,IStorage>();
-            }
-        });
+        if (path_map_service != null) {
+            target_path_map = new TCFDataCache<IPathMap.PathMapRule[]>(channel) {
+                @Override
+                protected boolean startDataRetrieval() {
+                    command = path_map_service.get(new IPathMap.DoneGet() {
+                        public void doneGet(IToken token, Exception error, IPathMap.PathMapRule[] map) {
+                            set(token, error, map);
+                        }
+                    });
+                    return false;
+                }
+            };
+            path_map_service.addListener(new IPathMap.PathMapListener() {
+                public void changed() {
+                    target_path_map.reset();
+                    target_path_mapping_cache = new HashMap<String,IStorage>();
+                }
+            });
+        }
 
         final ILaunchConfiguration cfg = getLaunchConfiguration();
         if (cfg != null) {
@@ -330,6 +375,8 @@ public class TCFLaunch extends Launch {
         connecting = false;
         disconnected = true;
         for (LaunchListener l : getListeners()) l.onDisconnected(this);
+        for (TCFDataCache<?> c : context_query_cache.values()) c.dispose();
+        context_query_cache.clear();
         if (DebugPlugin.getDefault() != null) fireChanged();
         runShutdownSequence(new Runnable() {
             public void run() {
@@ -1148,7 +1195,29 @@ public class TCFLaunch extends Launch {
     }
 
     public Map<String,IStorage> getTargetPathMappingCache() {
-        return target_path_maaping_cache;
+        return target_path_mapping_cache;
+    }
+
+    public TCFDataCache<String[]> getContextQuery(final String query) {
+        TCFDataCache<String[]> cache = context_query_cache.get(query);
+        if (cache == null) {
+            if (disconnected) return null;
+            final IContextQuery service = channel.getRemoteService(IContextQuery.class);
+            if (service == null) return null;
+            cache = new TCFDataCache<String[]>(channel) {
+                @Override
+                protected boolean startDataRetrieval() {
+                    command = service.query(query, new IContextQuery.DoneQuery() {
+                        public void doneQuery(IToken token, Exception error, String[] contexts) {
+                            set(token, error, contexts);
+                        }
+                    });
+                    return false;
+                }
+            };
+            context_query_cache.put(query, cache);
+        }
+        return cache;
     }
 
     /**

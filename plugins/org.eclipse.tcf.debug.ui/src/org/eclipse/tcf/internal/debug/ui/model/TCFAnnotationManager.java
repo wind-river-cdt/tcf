@@ -77,6 +77,7 @@ public class TCFAnnotationManager {
 
     class TCFAnnotation extends Annotation {
 
+        final String ctx;
         final ILineNumbers.CodeArea area;
         final Image image;
         final String text;
@@ -85,7 +86,8 @@ public class TCFAnnotationManager {
 
         IAnnotationModel model;
 
-        TCFAnnotation(ILineNumbers.CodeArea area, Image image, String text, String type) {
+        TCFAnnotation(String ctx, ILineNumbers.CodeArea area, Image image, String text, String type) {
+            this.ctx = ctx;
             this.area = area;
             this.image = image;
             this.text = text;
@@ -111,6 +113,7 @@ public class TCFAnnotationManager {
         public boolean equals(Object o) {
             if (!(o instanceof TCFAnnotation)) return false;
             TCFAnnotation a = (TCFAnnotation)o;
+            if (!ctx.equals(a.ctx)) return false;
             if (!area.equals(a.area)) return false;
             if (!image.equals(a.image)) return false;
             if (!text.equals(a.text)) return false;
@@ -375,7 +378,7 @@ public class TCFAnnotationManager {
         return (Map<String,Object>)o;
     }
 
-    private void addBreakpointErrorAnnotation(List<TCFAnnotation> set, TCFLaunch launch, String id, String error) {
+    private void addBreakpointErrorAnnotation(List<TCFAnnotation> set, TCFLaunch launch, String ctx, String id, String error) {
         Map<String,Object> props = launch.getBreakpointsStatus().getProperties(id);
         if (props != null) {
             String file = (String)props.get(IBreakpoints.PROP_FILE);
@@ -384,7 +387,7 @@ public class TCFAnnotationManager {
                 ILineNumbers.CodeArea area = new ILineNumbers.CodeArea(null, file,
                         line.intValue(), 0, line.intValue() + 1, 0,
                         null, null, 0, false, false, false, false);
-                TCFAnnotation a = new TCFAnnotation(area,
+                TCFAnnotation a = new TCFAnnotation(ctx, area,
                         ImageCache.getImage(ImageCache.IMG_BREAKPOINT_ERROR),
                         "Cannot plant breakpoint: " + error,
                         TYPE_BP_INSTANCE);
@@ -445,7 +448,7 @@ public class TCFAnnotationManager {
                                 Map<String,Object> map = bs.getStatus(id);
                                 if (map == null) continue;
                                 String error = (String)map.get(IBreakpoints.STATUS_ERROR);
-                                if (error != null) addBreakpointErrorAnnotation(set, launch, id, error);
+                                if (error != null) addBreakpointErrorAnnotation(set, launch, memory.id, id, error);
                                 Object[] arr = toObjectArray(map.get(IBreakpoints.STATUS_INSTANCES));
                                 if (arr == null) continue;
                                 for (Object o : arr) {
@@ -477,7 +480,7 @@ public class TCFAnnotationManager {
                                         }
                                         if (area != null) {
                                             if (error != null) {
-                                                TCFAnnotation a = new TCFAnnotation(area,
+                                                TCFAnnotation a = new TCFAnnotation(memory.id, area,
                                                         ImageCache.getImage(ImageCache.IMG_BREAKPOINT_ERROR),
                                                         "Cannot plant breakpoint at 0x" + addr.toString(16) + ": " + error,
                                                         TYPE_BP_INSTANCE);
@@ -485,7 +488,7 @@ public class TCFAnnotationManager {
                                                 error = null;
                                             }
                                             else {
-                                                TCFAnnotation a = new TCFAnnotation(area,
+                                                TCFAnnotation a = new TCFAnnotation(memory.id, area,
                                                         ImageCache.getImage(ImageCache.IMG_BREAKPOINT_INSTALLED),
                                                         "Breakpoint planted at 0x" + addr.toString(16),
                                                         TYPE_BP_INSTANCE);
@@ -493,7 +496,7 @@ public class TCFAnnotationManager {
                                             }
                                         }
                                     }
-                                    if (error != null) addBreakpointErrorAnnotation(set, launch, id, error);
+                                    if (error != null) addBreakpointErrorAnnotation(set, launch, memory.id, id, error);
                                 }
                             }
                         }
@@ -505,13 +508,13 @@ public class TCFAnnotationManager {
                         if (line_data != null && line_data.area != null) {
                             TCFAnnotation a = null;
                             if (frame.getFrameNo() == 0) {
-                                a = new TCFAnnotation(line_data.area,
+                                a = new TCFAnnotation(line_data.context_id, line_data.area,
                                         DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_INSTRUCTION_POINTER_TOP),
                                         "Current Instruction Pointer",
                                         TYPE_TOP_FRAME);
                             }
                             else {
-                                a = new TCFAnnotation(line_data.area,
+                                a = new TCFAnnotation(line_data.context_id, line_data.area,
                                         DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_INSTRUCTION_POINTER),
                                         "Stack Frame",
                                         TYPE_STACK_FRAME);
@@ -524,7 +527,7 @@ public class TCFAnnotationManager {
                         if (!line_cache.validate(this)) return;
                         TCFSourceRef line_data = line_cache.getData();
                         if (line_data != null && line_data.area != null) {
-                            TCFAnnotation a = new TCFAnnotation(line_data.area,
+                            TCFAnnotation a = new TCFAnnotation(line_data.context_id, line_data.area,
                                     DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_INSTRUCTION_POINTER),
                                     "Last Instruction Pointer position",
                                     TYPE_STACK_FRAME);
@@ -555,7 +558,7 @@ public class TCFAnnotationManager {
         win_info.editors.putAll(editors);
         ISourcePresentation presentation = TCFModelPresentation.getDefault();
         for (TCFAnnotation a : set) {
-            Object source_element = TCFSourceLookupDirector.lookup(node.launch, a.area);
+            Object source_element = TCFSourceLookupDirector.lookup(node.launch, a.ctx, a.area);
             if (source_element == null) continue;
             IEditorInput editor_input = presentation.getEditorInput(source_element);
             ITextEditor editor = editors.get(editor_input);

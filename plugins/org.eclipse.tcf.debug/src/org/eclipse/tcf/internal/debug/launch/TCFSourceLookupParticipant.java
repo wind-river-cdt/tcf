@@ -28,12 +28,13 @@ import org.eclipse.debug.core.sourcelookup.AbstractSourceLookupParticipant;
 import org.eclipse.debug.core.sourcelookup.ISourceLookupDirector;
 import org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage;
 import org.eclipse.tcf.internal.debug.launch.TCFLaunchDelegate.PathMapRule;
+import org.eclipse.tcf.internal.debug.model.TCFSourceRef;
 import org.eclipse.tcf.services.ILineNumbers;
 import org.eclipse.tcf.services.IPathMap;
 
 /**
- * The TCF source lookup participant knows how to translate a ILineNumbers.CodeArea
- * into a source file name
+ * The TCF source lookup participant knows how to translate
+ * a ILineNumbers.CodeArea into a source file name.
  */
 public class TCFSourceLookupParticipant extends AbstractSourceLookupParticipant {
 
@@ -58,6 +59,11 @@ public class TCFSourceLookupParticipant extends AbstractSourceLookupParticipant 
         if (object instanceof ILineNumbers.CodeArea) {
             ILineNumbers.CodeArea area = (ILineNumbers.CodeArea)object;
             return toFileName(area);
+        }
+        if (object instanceof TCFSourceRef) {
+            TCFSourceRef ref = (TCFSourceRef)object;
+            if (ref.area == null) return null;
+            return toFileName(ref.area);
         }
         return null;
     }
@@ -108,6 +114,8 @@ public class TCFSourceLookupParticipant extends AbstractSourceLookupParticipant 
             if (path_map.length() == 0) return fnm;
             ArrayList<PathMapRule> map = TCFLaunchDelegate.parsePathMapAttribute(path_map);
             for (PathMapRule r : map) {
+                String query = r.getContextQuery();
+                if (query != null && query.length() > 0 && !query.equals("*")) continue;
                 String res = toFileName(r, fnm);
                 if (res != null) return res;
             }
@@ -157,8 +165,9 @@ public class TCFSourceLookupParticipant extends AbstractSourceLookupParticipant 
     public Object[] findSourceElements(Object object) throws CoreException {
         String name = getSourceName(object);
         if (name == null) return null;
-        if (cache.containsKey(name)) return cache.get(name);
-        Object[] res = findSource(name);
+        Object[] res = cache.get(name);
+        if (res != null) return res;
+        res = findSource(name);
         cache.put(name, res);
         return res;
     }

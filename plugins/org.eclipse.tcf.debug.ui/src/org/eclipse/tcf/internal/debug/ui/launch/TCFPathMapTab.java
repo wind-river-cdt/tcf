@@ -60,13 +60,13 @@ public class TCFPathMapTab extends AbstractLaunchConfigurationTab {
     private static final String[] column_ids = {
         IPathMap.PROP_SOURCE,
         IPathMap.PROP_DESTINATION,
-        IPathMap.PROP_CONTEXT,
+        IPathMap.PROP_CONTEXT_QUERY,
     };
 
     private static final int[] column_size = {
         300,
         300,
-        50,
+        100,
     };
 
     private static final String TAB_ID = "org.eclipse.tcf.launch.pathMapTab";

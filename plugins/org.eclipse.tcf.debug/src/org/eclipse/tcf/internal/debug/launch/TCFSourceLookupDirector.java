@@ -37,7 +37,7 @@ import org.eclipse.tcf.util.TCFTask;
  */
 public class TCFSourceLookupDirector extends AbstractSourceLookupDirector {
 
-    public static Object lookup(final TCFLaunch launch, Object element) {
+    public static Object lookup(final TCFLaunch launch, final String ctx, Object element) {
         if (element instanceof ILineNumbers.CodeArea) {
             element = TCFSourceLookupParticipant.toFileName((ILineNumbers.CodeArea)element);
         }
@@ -52,9 +52,11 @@ public class TCFSourceLookupDirector extends AbstractSourceLookupDirector {
         if (source_element == null && element instanceof String) {
             /* Try to lookup the element using target side path mapping rules */
             final String str = (String)element;
+            String key = str;
+            if (ctx != null) key = ctx + "::" + str;
             Map<String,IStorage> map = launch.getTargetPathMappingCache();
             synchronized (map) {
-                if (map.containsKey(str)) return map.get(str);
+                if (map.containsKey(str)) return map.get(key);
             }
             IStorage storage = new TCFTask<IStorage>(launch.getChannel()) {
                 public void run() {
@@ -64,6 +66,20 @@ public class TCFSourceLookupDirector extends AbstractSourceLookupDirector {
                         IPathMap.PathMapRule[] data = cache.getData();
                         if (data != null) {
                             for (IPathMap.PathMapRule r : data) {
+                                final String query = r.getContextQuery();
+                                if (query != null && query.length() > 0 && !query.equals("*")) {
+                                    if (ctx == null) continue;
+                                    TCFDataCache<String[]> q_cache = launch.getContextQuery(query);
+                                    if (q_cache == null) continue;
+                                    if (!q_cache.validate(this)) return;
+                                    String[] q_data = q_cache.getData();
+                                    if (q_data == null) continue;
+                                    boolean ok = false;
+                                    for (String id : q_data) {
+                                        if (ctx.equals(id)) ok = true;
+                                    }
+                                    if (!ok) continue;
+                                }
                                 String fnm = TCFSourceLookupParticipant.toFileName(r, str);
                                 if (fnm == null) continue;
                                 File file = new File(fnm);
@@ -94,7 +110,7 @@ public class TCFSourceLookupDirector extends AbstractSourceLookupDirector {
                 }
             }
             synchronized (map) {
-                map.put(str, storage);
+                map.put(key, storage);
             }
             source_element = storage;
         }
