@@ -11,12 +11,6 @@ package org.eclipse.tcf.te.ui.terminals.services;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.tcf.te.ui.terminals.interfaces.IConnectorType;
-import org.eclipse.tcf.te.ui.terminals.interfaces.IUIConstants;
-import org.eclipse.tcf.te.ui.terminals.manager.ConsoleManager;
-import org.eclipse.tcf.te.ui.terminals.nls.Messages;
-import org.eclipse.tcf.te.ui.terminals.types.ConnectorManager;
-import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.services.AbstractService;
@@ -24,6 +18,12 @@ import org.eclipse.tcf.te.runtime.services.interfaces.ITerminalService;
 import org.eclipse.tcf.te.runtime.services.interfaces.constants.ITerminalsConnectorConstants;
 import org.eclipse.tcf.te.runtime.utils.StatusHelper;
 import org.eclipse.tcf.te.ui.swt.DisplayUtil;
+import org.eclipse.tcf.te.ui.terminals.interfaces.IConnectorType;
+import org.eclipse.tcf.te.ui.terminals.interfaces.IUIConstants;
+import org.eclipse.tcf.te.ui.terminals.manager.ConsoleManager;
+import org.eclipse.tcf.te.ui.terminals.nls.Messages;
+import org.eclipse.tcf.te.ui.terminals.types.ConnectorManager;
+import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
 
 /**
  * Terminal service implementation.
@@ -195,6 +195,26 @@ public class TerminalService extends AbstractService implements ITerminalService
 			public void run(String id, String title, ITerminalConnector connector, Object data, ICallback callback) {
 				// Close the console
 				ConsoleManager.getInstance().closeConsole(id, title, connector, data);
+				// Invoke the callback
+				if (callback != null) {
+					callback.done(this, Status.OK_STATUS);
+				}
+			}
+		}, callback);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.services.interfaces.ITerminalService#terminateConsole(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.tcf.te.runtime.interfaces.callback.ICallback)
+	 */
+	@Override
+	public void terminateConsole(IPropertiesContainer properties, ICallback callback) {
+		Assert.isNotNull(properties);
+
+		executeServiceOperation(properties, new TerminalServiceRunnable() {
+			@Override
+			public void run(String id, String title, ITerminalConnector connector, Object data, ICallback callback) {
+				// Close the console
+				ConsoleManager.getInstance().terminateConsole(id, title, connector, data);
 				// Invoke the callback
 				if (callback != null) {
 					callback.done(this, Status.OK_STATUS);
