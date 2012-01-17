@@ -47,11 +47,11 @@ public class RefreshHandlerDelegate implements IRefreshHandlerDelegate {
 		Assert.isNotNull(state);
 
 		if (canRefresh(element)) {
-			final FSTreeNode process = (FSTreeNode) element;
-			Job job = new Job(NLS.bind(Messages.RefreshDirectoryHandler_RefreshJobTitle, process.name)) {
+			final FSTreeNode node = (FSTreeNode) element;
+			Job job = new Job(NLS.bind(Messages.RefreshDirectoryHandler_RefreshJobTitle, node.name)) {
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
-					FSRefresh refresh = new FSRefresh(process);
+					FSRefresh refresh = new FSRefresh(node);
 					refresh.doit();
 					if (callback != null) {
 						callback.done(this, Status.OK_STATUS);

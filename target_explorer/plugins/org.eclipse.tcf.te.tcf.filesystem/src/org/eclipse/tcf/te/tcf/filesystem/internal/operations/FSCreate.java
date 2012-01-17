@@ -107,7 +107,7 @@ public abstract class FSCreate extends FSOperation {
 				@Override
 				public void doneStat(IToken token, FileSystemException error, FileAttrs attrs) {
 					if (error == null) {
-						node.attr = attrs;
+						node.setAttributes(attrs);
 					}
 					else {
 						String message = NLS

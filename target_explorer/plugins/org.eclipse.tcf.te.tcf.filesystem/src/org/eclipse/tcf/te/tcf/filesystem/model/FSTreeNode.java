@@ -25,9 +25,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.DirEntry;
+import org.eclipse.tcf.services.IFileSystem.FileAttrs;
 import org.eclipse.tcf.te.tcf.filesystem.interfaces.IWindowsFileAttributes;
 import org.eclipse.tcf.te.tcf.filesystem.internal.UserAccount;
 import org.eclipse.tcf.te.tcf.filesystem.internal.testers.TargetPropertyTester;
@@ -531,6 +533,43 @@ public final class FSTreeNode extends PropertyChangeProvider implements Cloneabl
 		return name.substring(lastDot + 1).toUpperCase() + " " + Messages.FSTreeNode_TypeFile; //$NON-NLS-1$
     }
 
+	/**
+	 * Set the file's attributes and trigger property change event.
+	 * 
+	 * @param attrs The new attributes.
+	 */
+	public void setAttributes(FileAttrs attrs) {
+		FileAttrs oldAttrs = this.attr;
+		this.attr = attrs;
+		if (attrs != oldAttrs) {
+			firePropertyChange(new PropertyChangeEvent(this, "attributes", oldAttrs, attrs)); //$NON-NLS-1$
+		}
+	}
+	
+	/**
+	 * Set the file's new name and trigger property change event.
+	 * 
+	 * @param name The new name.
+	 */
+	public void setName(String name) {
+		String oldName = this.name;
+		this.name = name;
+		if(oldName == null) {
+			if(name != null) {
+				firePropertyChange(new PropertyChangeEvent(this, "name", oldName, name)); //$NON-NLS-1$
+			}
+		} 
+		else	if(!oldName.equals(name)) {
+			firePropertyChange(new PropertyChangeEvent(this, "name", oldName, name)); //$NON-NLS-1$
+		}
+	}
+
+	/**
+	 * Create a root node for the peer.
+	 * 
+	 * @param peerNode The peer.
+	 * @return The root file system node.
+	 */
 	public static FSTreeNode createRootNode(IPeerModel peerNode) {
 		FSTreeNode node = new FSTreeNode();
 		node.type = "FSRootNode"; //$NON-NLS-1$
@@ -539,6 +578,11 @@ public final class FSTreeNode extends PropertyChangeProvider implements Cloneabl
 	    return node;
     }
 
+	/**
+	 * Return if this node is a pending node.
+	 * 
+	 * @return true if it is a pending node.
+	 */
 	public boolean isPendingNode() {
 	    return type != null && type.equals("FSPendingNode"); //$NON-NLS-1$
     }

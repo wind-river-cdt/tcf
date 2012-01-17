@@ -118,7 +118,7 @@ public class FSRename extends FSOperation {
 						}
 						file.delete();
 					}
-					node.name = newName;
+					node.setName(newName);
 				}
 			}
 		});
