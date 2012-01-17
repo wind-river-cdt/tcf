@@ -741,13 +741,21 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
             if (!type_cache.validate(done)) return false;
             ISymbols.Symbol type_symbol = type_cache.getData();
             if (type_symbol != null) {
-                int flags = type_symbol.getFlags();
+                int flags = 0;
                 s = type_symbol.getName();
+                if (s == null) flags = type_symbol.getFlags();
                 if (s != null && type_symbol.getTypeClass() == ISymbols.TypeClass.composite) {
                     if ((flags & ISymbols.SYM_FLAG_UNION_TYPE) != 0) s = "union " + s;
                     else if ((flags & ISymbols.SYM_FLAG_CLASS_TYPE) != 0) s = "class " + s;
                     else if ((flags & ISymbols.SYM_FLAG_INTERFACE_TYPE) != 0) s = "interface " + s;
                     else s = "struct " + s;
+                }
+                if (s == null && !type_symbol.getID().equals(type_symbol.getTypeID())) {
+                    // modified type without name, like "volatile int"
+                    TCFDataCache<ISymbols.Symbol> base_type_cache = model.getSymbolInfoCache(type_symbol.getTypeID());
+                    if (!base_type_cache.validate(done)) return false;
+                    ISymbols.Symbol base_type_data = base_type_cache.getData();
+                    if (base_type_data != null) s = base_type_data.getName();
                 }
                 if (s == null) s = getTypeName(type_symbol.getTypeClass(), type_symbol.getSize());
                 if (s == null) {
