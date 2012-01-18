@@ -43,7 +43,7 @@ public class MapContentProvider implements IStructuredContentProvider {
 	public Object[] getElements(Object inputElement) {
 		if(inputElement instanceof Map) {
 			Map<?, ?> map = (Map<?, ?>) inputElement;
-			return map.keySet().toArray();
+			return map.entrySet().toArray();
 		}
 		return null;
 	}

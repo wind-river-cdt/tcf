@@ -14,11 +14,8 @@ import java.util.Map;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
@@ -66,38 +63,7 @@ public class AdvancedPropertiesSection extends AbstractPropertySection {
 		table.setLinesVisible(true);
 	    viewer = new TableViewer(table);
 	    viewer.setContentProvider(new MapContentProvider());
-	    viewer.setLabelProvider(new PropertyLabelProvider());
-	}
-	
-	/**
-	 * The label provider to display the property and its value in the table.
-	 */
-	class PropertyLabelProvider extends LabelProvider implements ITableLabelProvider {
-		/*
-		 * (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object, int)
-		 */
-		@Override
-        public Image getColumnImage(Object element, int columnIndex) {
-	        return null;
-        }
-
-		/*
-		 * (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object, int)
-		 */
-		@Override
-        public String getColumnText(Object element, int columnIndex) {
-			if(element instanceof String) {
-				if(columnIndex == 0) 
-					return (String) element;
-				Object object = properties.get(element);
-				if(object == null)
-					return ""; //$NON-NLS-1$
-				return object.toString();
-			}
-	        return null;
-        }
+	    viewer.setLabelProvider(new MapEntryLabelProvider());
 	}
 
 	/*
