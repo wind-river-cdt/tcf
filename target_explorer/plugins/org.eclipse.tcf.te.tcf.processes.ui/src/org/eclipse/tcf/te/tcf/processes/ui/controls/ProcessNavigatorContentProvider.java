@@ -214,9 +214,7 @@ public class ProcessNavigatorContentProvider  extends TreeContentProvider implem
 			ProcessTreeNode parent = (ProcessTreeNode) element;
 			if (parent.childrenQueried && !parent.childrenQueryRunning) {
 				final ProcessModel model = ProcessModel.getProcessModel(parent.peerNode);
-				for (ProcessTreeNode child : parent.children) {
-					model.refresh(child);
-				}
+				model.refreshChildren(parent);
 			}
 		}
     }

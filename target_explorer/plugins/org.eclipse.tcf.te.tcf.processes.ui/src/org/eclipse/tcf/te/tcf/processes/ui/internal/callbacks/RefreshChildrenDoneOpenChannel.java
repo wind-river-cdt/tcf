@@ -9,6 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.processes.ui.internal.callbacks;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -24,17 +26,14 @@ import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 /**
  * The callback handler that handles the event when the channel opens when refreshing.
  */
-public class RefreshDoneOpenChannel implements IChannelManager.DoneOpenChannel {
+public class RefreshChildrenDoneOpenChannel implements IChannelManager.DoneOpenChannel {
 	// The parent node to be refreshed.
 	ProcessTreeNode parentNode;
-	// The callback to be called when refresh is done.
-	Runnable callback;
-	
+	Map<String, Boolean> status;
 	/**
 	 * Create an instance with the specified field parameters.
 	 */
-	public RefreshDoneOpenChannel(Runnable callback, ProcessTreeNode parentNode) {
-		this.callback = callback;
+	public RefreshChildrenDoneOpenChannel(ProcessTreeNode parentNode) {
 		this.parentNode = parentNode;
 	}
 	
@@ -43,22 +42,60 @@ public class RefreshDoneOpenChannel implements IChannelManager.DoneOpenChannel {
 	 * @see org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel#doneOpenChannel(java.lang.Throwable, org.eclipse.tcf.protocol.IChannel)
 	 */
 	@Override
-    public void doneOpenChannel(Throwable error, final IChannel channel) {
+	public void doneOpenChannel(Throwable error, final IChannel channel) {
 		Assert.isTrue(Protocol.isDispatchThread());
 		if (error == null && channel != null) {
 			ISysMonitor service = channel.getRemoteService(ISysMonitor.class);
 			if (service != null) {
-				Queue<ProcessTreeNode> queue = new ConcurrentLinkedQueue<ProcessTreeNode>();
 				final ProcessModel model = ProcessModel.getProcessModel(parentNode.peerNode);
-				service.getChildren(parentNode.id, new RefreshDoneGetChildren(model, new Runnable(){
-					@Override
-                    public void run() {
-						Tcf.getChannelManager().closeChannel(channel);
-						if(callback!=null) {
-							callback.run();
+				status = createStatusMap();
+				final String[] contextId = new String[1];
+				for (ProcessTreeNode child : parentNode.children) {
+					Queue<ProcessTreeNode> queue = new ConcurrentLinkedQueue<ProcessTreeNode>();
+					contextId[0] = child.id;
+					service.getChildren(contextId[0], new RefreshDoneGetChildren(model, new Runnable() {
+						@Override
+						public void run() {
+							setAndCheckStatus(contextId[0], channel);
 						}
-                    }}, queue, channel, service, parentNode));
+					}, queue, channel, service, child));
+				}
 			}
 		}
-    }
+	}
+
+    /**
+     * Set the complete flag for this context id and check if
+     * all tasks have completed.
+     */
+    void setAndCheckStatus(String contextId, IChannel channel) {
+		synchronized (status) {
+			status.put(contextId, Boolean.TRUE);
+			boolean completed = true;
+			for (String id : status.keySet()) {
+				Boolean bool = status.get(id);
+				if (!bool.booleanValue()) {
+					completed = false;
+				}
+			}
+			if (completed) {
+				parentNode.childrenQueryRunning = false;
+				parentNode.childrenQueried = true;
+				Tcf.getChannelManager().closeChannel(channel);
+			}
+		}
+	}
+
+	/**
+     * Create and initialize a status map with all the context ids and completion status
+     * set to false.
+     */
+	private Map<String, Boolean> createStatusMap() {
+        Map<String, Boolean> status = new HashMap<String, Boolean>();
+        for (ProcessTreeNode child : parentNode.children) {
+        	String contextId = child.id;
+        	status.put(contextId, Boolean.FALSE);
+        }
+        return status;
+    }	
 }
