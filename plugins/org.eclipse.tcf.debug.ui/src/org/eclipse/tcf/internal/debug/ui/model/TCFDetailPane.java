@@ -88,11 +88,7 @@ public class TCFDetailPane implements IDetailPane {
             this.op_code = op_code;
         }
         void update() {
-            boolean was_enabled = isEnabled();
-            boolean is_enabled = (source_viewer != null && source_viewer.canDoOperation(op_code));
-            setEnabled(is_enabled);
-            if (was_enabled == is_enabled) return;
-            firePropertyChange(ENABLED, was_enabled, is_enabled);
+            setEnabled(source_viewer != null && source_viewer.canDoOperation(op_code));
         }
         @Override
         public void run() {
