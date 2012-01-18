@@ -36,7 +36,7 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 	// The viewer inputs that have been added a property change listener.
 	private Set<IViewerInput> viewerInputs = Collections.synchronizedSet(new HashSet<IViewerInput>());
 	// The viewer
-	private TreeViewer viewer;
+	protected TreeViewer viewer;
 
 	/*
 	 * (non-Javadoc)

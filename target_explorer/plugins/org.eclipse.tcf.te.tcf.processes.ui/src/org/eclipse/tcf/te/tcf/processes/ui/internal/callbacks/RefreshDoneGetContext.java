@@ -19,7 +19,6 @@ import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.IProcesses.ProcessContext;
 import org.eclipse.tcf.services.ISysMonitor;
-import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 
@@ -161,8 +160,6 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext, IProce
 	                	}
 	                }
 					if (queue.isEmpty()) {
-						model.firePropertyChanged(parentNode);
-						Tcf.getChannelManager().closeChannel(channel);
 						if(callback != null) {
 							callback.run();
 						}

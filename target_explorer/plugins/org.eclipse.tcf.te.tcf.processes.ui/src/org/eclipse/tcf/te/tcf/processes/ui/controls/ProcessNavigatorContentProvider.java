@@ -10,6 +10,9 @@
 package org.eclipse.tcf.te.tcf.processes.ui.controls;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.viewers.ITreeViewerListener;
+import org.eclipse.jface.viewers.TreeExpansionEvent;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
@@ -28,7 +31,7 @@ import org.eclipse.ui.navigator.INavigatorFilterService;
  * Processes content provider for the common navigator of Target Explorer.
  */
 @SuppressWarnings("restriction")
-public class ProcessNavigatorContentProvider  extends TreeContentProvider implements ICommonContentProvider {
+public class ProcessNavigatorContentProvider  extends TreeContentProvider implements ICommonContentProvider, ITreeViewerListener {
 	// The "Single Thread" filter id
 	private final static String SINGLE_THREAD_FILTER_ID = "org.eclipse.tcf.te.tcf.processes.ui.navigator.filter.singleThread"; //$NON-NLS-1$
 
@@ -50,6 +53,26 @@ public class ProcessNavigatorContentProvider  extends TreeContentProvider implem
 		}
 		return null;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.trees.TreeContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+	 */
+	@Override
+    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+	    super.inputChanged(viewer, oldInput, newInput);
+	    this.viewer.addTreeListener(this);
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.trees.TreeContentProvider#dispose()
+	 */
+	@Override
+    public void dispose() {
+	    super.dispose();
+	    this.viewer.removeTreeListener(this);
+    }
 
 	/*
 	 * (non-Javadoc)
@@ -170,5 +193,31 @@ public class ProcessNavigatorContentProvider  extends TreeContentProvider implem
      */
     @Override
     public void saveState(IMemento aMemento) {
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.viewers.ITreeViewerListener#treeCollapsed(org.eclipse.jface.viewers.TreeExpansionEvent)
+     */
+	@Override
+    public void treeCollapsed(TreeExpansionEvent event) {
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ITreeViewerListener#treeExpanded(org.eclipse.jface.viewers.TreeExpansionEvent)
+	 */
+	@Override
+    public void treeExpanded(TreeExpansionEvent event) {
+		Object element = event.getElement();
+		if(element instanceof ProcessTreeNode) {
+			ProcessTreeNode parent = (ProcessTreeNode) element;
+			if (parent.childrenQueried && !parent.childrenQueryRunning) {
+				final ProcessModel model = ProcessModel.getProcessModel(parent.peerNode);
+				for (ProcessTreeNode child : parent.children) {
+					model.refresh(child);
+				}
+			}
+		}
     }
 }

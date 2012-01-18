@@ -20,7 +20,6 @@ import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.ISysMonitor;
-import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 
@@ -75,8 +74,6 @@ public class RefreshDoneGetChildren implements ISysMonitor.DoneGetChildren {
             parentNode.childrenQueried = true;
             parentNode.children.clear();
 			if (queue.isEmpty()) {
-				model.firePropertyChanged(parentNode);
-				Tcf.getChannelManager().closeChannel(channel);
 				if(callback != null) {
 					callback.run();
 				}
