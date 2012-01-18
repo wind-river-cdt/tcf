@@ -27,9 +27,11 @@ import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
  * The callback handler that handles the event when the channel opens when refreshing.
  */
 public class RefreshChildrenDoneOpenChannel implements IChannelManager.DoneOpenChannel {
+	private static final int PROGRESSIVE_STEP_COUNT = 10;
 	// The parent node to be refreshed.
 	ProcessTreeNode parentNode;
 	Map<String, Boolean> status;
+	ProcessModel model;
 	/**
 	 * Create an instance with the specified field parameters.
 	 */
@@ -47,18 +49,21 @@ public class RefreshChildrenDoneOpenChannel implements IChannelManager.DoneOpenC
 		if (error == null && channel != null) {
 			ISysMonitor service = channel.getRemoteService(ISysMonitor.class);
 			if (service != null) {
-				final ProcessModel model = ProcessModel.getProcessModel(parentNode.peerNode);
+				model = ProcessModel.getProcessModel(parentNode.peerNode);
 				status = createStatusMap();
 				final String[] contextId = new String[1];
 				for (ProcessTreeNode child : parentNode.children) {
-					Queue<ProcessTreeNode> queue = new ConcurrentLinkedQueue<ProcessTreeNode>();
-					contextId[0] = child.id;
-					service.getChildren(contextId[0], new RefreshDoneGetChildren(model, new Runnable() {
-						@Override
-						public void run() {
-							setAndCheckStatus(contextId[0], channel);
-						}
-					}, queue, channel, service, child));
+					if (!child.childrenQueried && !child.childrenQueryRunning) {
+						Queue<ProcessTreeNode> queue = new ConcurrentLinkedQueue<ProcessTreeNode>();
+						contextId[0] = child.id;
+						service.getChildren(contextId[0], new RefreshDoneGetChildren(model, new Runnable() {
+							private String contextID = contextId[0];
+							@Override
+							public void run() {
+								setAndCheckStatus(contextID, channel);
+							}
+						}, queue, channel, service, child));
+					}
 				}
 			}
 		}
@@ -72,16 +77,23 @@ public class RefreshChildrenDoneOpenChannel implements IChannelManager.DoneOpenC
 		synchronized (status) {
 			status.put(contextId, Boolean.TRUE);
 			boolean completed = true;
+			int count = 0;
 			for (String id : status.keySet()) {
 				Boolean bool = status.get(id);
-				if (!bool.booleanValue()) {
+				if (bool.booleanValue()) {
+					count++;
+				}
+				else {
 					completed = false;
 				}
 			}
+			if (completed || (count % PROGRESSIVE_STEP_COUNT) == 0) {
+				model.firePropertyChanged(parentNode);
+			}
+
 			if (completed) {
-				parentNode.childrenQueryRunning = false;
-				parentNode.childrenQueried = true;
 				Tcf.getChannelManager().closeChannel(channel);
+				model.firePropertyChanged(parentNode);
 			}
 		}
 	}

@@ -26,7 +26,7 @@ import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
  * The callback handler that handles the result of service.getContext when querying.
  */
 public class QueryDoneGetContext implements ISysMonitor.DoneGetContext, IProcesses.DoneGetContext {
-	private static final int PROGRESSIVE_STEP_COUNT = 10;
+	private static final int PROGRESSIVE_STEP_COUNT = 5;
 	// The current context id.
 	String contextId;
 	// The channel used for query.

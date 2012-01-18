@@ -325,7 +325,6 @@ public class ProcessModel implements IPreferenceConsts{
 	 */
 	public void refreshChildren(ProcessTreeNode parentNode) {
 		Assert.isNotNull(parentNode);
-		parentNode.childrenQueryRunning = true;
 		Tcf.getChannelManager().openChannel(parentNode.peerNode.getPeer(), false, new RefreshChildrenDoneOpenChannel(parentNode));	    
     }
 }	
