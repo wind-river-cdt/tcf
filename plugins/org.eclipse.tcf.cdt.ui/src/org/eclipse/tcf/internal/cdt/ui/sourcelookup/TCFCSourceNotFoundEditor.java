@@ -19,7 +19,6 @@ import org.eclipse.tcf.internal.cdt.ui.sourcelookup.TCFSourceNotFoundPresentatio
 import org.eclipse.tcf.internal.cdt.ui.sourcelookup.TCFSourceNotFoundPresentation.TCFCSourceNotFoundElement;
 import org.eclipse.tcf.internal.debug.ui.model.TCFModel;
 import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 
 /**
@@ -82,11 +81,10 @@ public class TCFCSourceNotFoundEditor extends CSourceNotFoundEditor {
     }
 
     protected void closeEditor() {
-        final IEditorPart editor = this;
-        editor.getSite().getShell().getDisplay().asyncExec(new Runnable() {
+        getSite().getShell().getDisplay().asyncExec(new Runnable() {
             public void run() {
-                IWorkbenchPage page = editor.getSite().getPage();
-                if (page != null) page.closeEditor(editor, false);
+                IWorkbenchPage page = getSite().getPage();
+                if (page != null) page.closeEditor(TCFCSourceNotFoundEditor.this, false);
             }
         });
     }
