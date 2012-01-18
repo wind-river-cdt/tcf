@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.terminals.ssh.controls;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
@@ -58,13 +61,17 @@ public class SshWizardConfigurationPanel extends AbstractConfigurationPanel impl
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 		panel.setLayoutData(data);
 
+		if(isWithoutSelection()){
+			createHostsUI(panel);			
+		}
+
 		SshConnector conn = new SshConnector();
 		sshSettings = (SshSettings) conn.getSshSettings();
 		sshSettings.setHost(getSelectionHost());
 		sshSettings.setUser(getDefaultUser());
 		sshSettingsPage = conn.makeSettingsPage();
 		sshSettingsPage.createControl(panel);
-
+		
 		setControl(panel);
 	}
 
@@ -113,15 +120,13 @@ public class SshWizardConfigurationPanel extends AbstractConfigurationPanel impl
     }
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.controls.interfaces.IWizardConfigurationPanel#doRestoreWidgetValues(org.eclipse.jface.dialogs.IDialogSettings, java.lang.String)
+	 * @see org.eclipse.tcf.te.ui.terminals.panels.AbstractConfigurationPanel#fillSettingsForHost(java.lang.String)
 	 */
 	@Override
-	public void doRestoreWidgetValues(IDialogSettings settings, String idPrefix) {
-		String host = getSelectionHost();
-		if (host != null) {
-			// is there a section for this host
-			IDialogSettings hostSettings = settings.getSection(host);
-			if (hostSettings != null) {
+	protected void fillSettingsForHost(String host){
+		if(host!=null && host.length()!=0){
+			if(hostSettingsMap.containsKey(host)){
+				Map<String, String> hostSettings=hostSettingsMap.get(host);
 				if (hostSettings.get(ITerminalsConnectorConstants.PROP_IP_HOST) != null) {
 					sshSettings.setHost(hostSettings.get(ITerminalsConnectorConstants.PROP_IP_HOST));
 				}
@@ -141,12 +146,12 @@ public class SshWizardConfigurationPanel extends AbstractConfigurationPanel impl
 				if (password != null) {
 					sshSettings.setPassword(password);
 				}
-				// set settings in page
-				sshSettingsPage.loadSettings();
+			} else {
+				sshSettings.setHost(getSelectionHost());
+				sshSettings.setUser(getDefaultUser());
 			}
-		}
-		else {
-			// MWE TODO combo for all hosts
+			// set settings in page
+			sshSettingsPage.loadSettings();
 		}
 	}
 
@@ -154,24 +159,39 @@ public class SshWizardConfigurationPanel extends AbstractConfigurationPanel impl
 	 * @see org.eclipse.tcf.te.ui.controls.interfaces.IWizardConfigurationPanel#doSaveWidgetValues(org.eclipse.jface.dialogs.IDialogSettings, java.lang.String)
 	 */
 	@Override
-	public void doSaveWidgetValues(IDialogSettings settings, String idPrefix) {
-		// make sure the values are saved
-		// actually not needed since this is done before in extractData
-		sshSettingsPage.saveSettings();
-		String host = sshSettings.getHost();
-		IDialogSettings hostSection=settings.getSection(host);
-		if(hostSection==null){
-			hostSection=settings.addNewSection(host);
-		}
+    public void doSaveWidgetValues(IDialogSettings settings, String idPrefix) {
+    	saveSettingsForHost(true);
+    	super.doSaveWidgetValues(settings, idPrefix);
+    }
 
-		hostSection.put(ITerminalsConnectorConstants.PROP_IP_HOST, sshSettings.getHost());
-		hostSection.put(ITerminalsConnectorConstants.PROP_IP_PORT, sshSettings.getPort());
-		hostSection.put(ITerminalsConnectorConstants.PROP_TIMEOUT, sshSettings.getTimeout());
-		hostSection.put(ITerminalsConnectorConstants.PROP_SSH_KEEP_ALIVE, sshSettings.getKeepalive());
-		hostSection.put(ITerminalsConnectorConstants.PROP_SSH_USER, sshSettings.getUser());
+	@Override
+	protected void saveSettingsForHost(boolean add){
+		String host=getHostFromSettings();
+		if(host!=null && host.length()!=0){
+			if(hostSettingsMap.containsKey(host)){
+				Map<String, String> hostSettings=hostSettingsMap.get(host);
+				hostSettings.put(ITerminalsConnectorConstants.PROP_IP_HOST, sshSettings.getHost());
+				hostSettings.put(ITerminalsConnectorConstants.PROP_IP_PORT, new Integer(sshSettings.getPort()).toString());
+				hostSettings.put(ITerminalsConnectorConstants.PROP_TIMEOUT, new Integer(sshSettings.getTimeout()).toString());
+				hostSettings.put(ITerminalsConnectorConstants.PROP_SSH_KEEP_ALIVE, new Integer(sshSettings.getKeepalive()).toString());
+				hostSettings.put(ITerminalsConnectorConstants.PROP_SSH_USER, sshSettings.getUser());
 
-		if(sshSettings.getPassword()!=null && sshSettings.getPassword().length()!=0){
-			saveSecurePassword(host, sshSettings.getPassword());
+				if(sshSettings.getPassword()!=null && sshSettings.getPassword().length()!=0){
+					saveSecurePassword(host, sshSettings.getPassword());
+				}
+			} else if(add){
+				Map<String, String> hostSettings=new HashMap<String, String>();
+				hostSettings.put(ITerminalsConnectorConstants.PROP_IP_HOST, sshSettings.getHost());
+				hostSettings.put(ITerminalsConnectorConstants.PROP_IP_PORT, new Integer(sshSettings.getPort()).toString());
+				hostSettings.put(ITerminalsConnectorConstants.PROP_TIMEOUT, new Integer(sshSettings.getTimeout()).toString());
+				hostSettings.put(ITerminalsConnectorConstants.PROP_SSH_KEEP_ALIVE, new Integer(sshSettings.getKeepalive()).toString());
+				hostSettings.put(ITerminalsConnectorConstants.PROP_SSH_USER, sshSettings.getUser());
+				hostSettingsMap.put(host, hostSettings);
+
+				if(sshSettings.getPassword()!=null && sshSettings.getPassword().length()!=0){
+					saveSecurePassword(host, sshSettings.getPassword());
+				}
+			}
 		}
 	}
 
@@ -229,10 +249,38 @@ public class SshWizardConfigurationPanel extends AbstractConfigurationPanel impl
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.terminals.panels.AbstractConfigurationPanel#removeSecurePassword(java.lang.String)
+	 */
+	@Override
+	protected void removeSecurePassword(String host) {
+		Assert.isNotNull(host);
+
+		// To access the secure storage, we need the preference instance
+		ISecurePreferences preferences = SecurePreferencesFactory.getDefault();
+		if (preferences != null) {
+			// Construct the secure preferences node key
+			String nodeKey = "/Target Explorer SSH Password/" + host; //$NON-NLS-1$
+			ISecurePreferences node = preferences.node(nodeKey);
+			if (node != null) {
+				node.remove("password"); //$NON-NLS-1$
+			}
+		}
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.ui.controls.panels.AbstractWizardConfigurationPanel#isValid()
 	 */
 	@Override
     public boolean isValid(){
 		return sshSettingsPage.validateSettings();
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.terminals.panels.AbstractConfigurationPanel#getHostFromSettings()
+	 */
+	@Override
+    protected String getHostFromSettings() {
+		sshSettingsPage.saveSettings();
+	    return sshSettings.getHost();
+    }
 }

@@ -9,8 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.terminals.types;
 
-import org.eclipse.tcf.te.ui.terminals.interfaces.IConnectorType;
 import org.eclipse.tcf.te.runtime.extensions.ExecutableExtension;
+import org.eclipse.tcf.te.ui.terminals.interfaces.IConnectorType;
 
 /**
  * Abstract terminal connector type implementation.

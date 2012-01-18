@@ -13,8 +13,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.tm.internal.terminal.provisional.api.ISettingsStore;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
+import org.eclipse.tm.internal.terminal.provisional.api.ISettingsStore;
 
 /**
  * Streams connector settings implementation.

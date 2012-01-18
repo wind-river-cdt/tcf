@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.terminals.telnet.controls;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TypedEvent;
@@ -33,7 +36,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 @SuppressWarnings("restriction")
 public class TelnetWizardConfigurationPanel extends AbstractConfigurationPanel implements IDataExchangeNode {
 
-    private TelnetSettings telnetSettings;
+    public TelnetSettings telnetSettings;
 	private ISettingsPage telnetSettingsPage;
 
 	/**
@@ -55,14 +58,18 @@ public class TelnetWizardConfigurationPanel extends AbstractConfigurationPanel i
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 		panel.setLayoutData(data);
 
+		if(isWithoutSelection()){
+			createHostsUI(panel);			
+		}
+
 		TelnetConnector conn = new TelnetConnector();
 		telnetSettings = (TelnetSettings) conn.getTelnetSettings();
+		telnetSettingsPage = conn.makeSettingsPage();
+		telnetSettingsPage.createControl(panel);
 		telnetSettings.setHost(getSelectionHost());
 		// MWE otherwise we don't get a valid default selection of the combo
 		telnetSettings.setNetworkPort(NetworkPortMap.PROP_VALUETELNET);
-		telnetSettingsPage = conn.makeSettingsPage();
-		telnetSettingsPage.createControl(panel);
-
+		
 		setControl(panel);
 	}
 
@@ -99,15 +106,13 @@ public class TelnetWizardConfigurationPanel extends AbstractConfigurationPanel i
     }
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.controls.interfaces.IWizardConfigurationPanel#doRestoreWidgetValues(org.eclipse.jface.dialogs.IDialogSettings, java.lang.String)
+	 * @see org.eclipse.tcf.te.ui.terminals.panels.AbstractConfigurationPanel#fillSettingsForHost(java.lang.String)
 	 */
 	@Override
-	public void doRestoreWidgetValues(IDialogSettings settings, String idPrefix) {
-		String host = getSelectionHost();
-		if (host != null) {
-			// is there a section for this host
-			IDialogSettings hostSettings = settings.getSection(host);
-			if (hostSettings != null) {
+	protected void fillSettingsForHost(String host){
+		if(host!=null && host.length()!=0){
+			if(hostSettingsMap.containsKey(host)){
+				Map<String, String> hostSettings=hostSettingsMap.get(host);
 				if (hostSettings.get(ITerminalsConnectorConstants.PROP_IP_HOST) != null) {
 					telnetSettings.setHost(hostSettings.get(ITerminalsConnectorConstants.PROP_IP_HOST));
 				}
@@ -117,33 +122,36 @@ public class TelnetWizardConfigurationPanel extends AbstractConfigurationPanel i
 				if (hostSettings.get(ITerminalsConnectorConstants.PROP_TIMEOUT) != null) {
 					telnetSettings.setTimeout(hostSettings.get(ITerminalsConnectorConstants.PROP_TIMEOUT));
 				}
-
-				// set settings in page
-				telnetSettingsPage.loadSettings();
+			} else{
+				telnetSettings.setHost(getSelectionHost());
+				// MWE otherwise we don't get a valid default selection of the combo
+				telnetSettings.setNetworkPort(NetworkPortMap.PROP_VALUETELNET);
 			}
-		}
-		else {
-			// MWE TODO combo for all hosts
+			// set settings in page
+			telnetSettingsPage.loadSettings();
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.controls.interfaces.IWizardConfigurationPanel#doSaveWidgetValues(org.eclipse.jface.dialogs.IDialogSettings, java.lang.String)
+	 * @see org.eclipse.tcf.te.ui.terminals.panels.AbstractConfigurationPanel#saveSettingsForHost(boolean)
 	 */
 	@Override
-	public void doSaveWidgetValues(IDialogSettings settings, String idPrefix) {
-		// make sure the values are saved
-		// actually not needed since this is done before in extractData
-		telnetSettingsPage.saveSettings();
-
-		String host = telnetSettings.getHost();
-		IDialogSettings hostSection = settings.getSection(host);
-		if (hostSection == null) {
-			hostSection = settings.addNewSection(host);
+	protected void saveSettingsForHost(boolean add){
+		String host=getHostFromSettings();
+		if(host!=null && host.length()!=0){
+			if(hostSettingsMap.containsKey(host)){
+				Map<String, String> hostSettings=hostSettingsMap.get(host);
+				hostSettings.put(ITerminalsConnectorConstants.PROP_IP_HOST, telnetSettings.getHost());
+				hostSettings.put(ITerminalsConnectorConstants.PROP_IP_PORT, new Integer(telnetSettings.getNetworkPort()).toString());
+				hostSettings.put(ITerminalsConnectorConstants.PROP_TIMEOUT, new Integer(telnetSettings.getTimeout()).toString());
+			} else if(add){
+				Map<String, String> hostSettings=new HashMap<String, String>();
+				hostSettings.put(ITerminalsConnectorConstants.PROP_IP_HOST, telnetSettings.getHost());
+				hostSettings.put(ITerminalsConnectorConstants.PROP_IP_PORT, new Integer(telnetSettings.getNetworkPort()).toString());
+				hostSettings.put(ITerminalsConnectorConstants.PROP_TIMEOUT, new Integer(telnetSettings.getTimeout()).toString());
+				hostSettingsMap.put(host, hostSettings);
+			}
 		}
-		hostSection.put(ITerminalsConnectorConstants.PROP_IP_HOST, telnetSettings.getHost());
-		hostSection.put(ITerminalsConnectorConstants.PROP_IP_PORT, telnetSettings.getNetworkPort());
-		hostSection.put(ITerminalsConnectorConstants.PROP_TIMEOUT, telnetSettings.getTimeout());
 	}
 
 	/* (non-Javadoc)
@@ -153,4 +161,22 @@ public class TelnetWizardConfigurationPanel extends AbstractConfigurationPanel i
     public boolean isValid(){
 		return telnetSettingsPage.validateSettings();
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.terminals.panels.AbstractConfigurationPanel#doSaveWidgetValues(org.eclipse.jface.dialogs.IDialogSettings, java.lang.String)
+	 */
+	@Override
+    public void doSaveWidgetValues(IDialogSettings settings, String idPrefix) {
+    	saveSettingsForHost(true);
+    	super.doSaveWidgetValues(settings, idPrefix);
+    }
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.terminals.panels.AbstractConfigurationPanel#getHostFromSettings()
+	 */
+	@Override
+    protected String getHostFromSettings() {
+		telnetSettingsPage.saveSettings();
+	    return telnetSettings.getHost();
+    }
 }

@@ -12,8 +12,8 @@ package org.eclipse.tcf.te.ui.terminals.events;
 import java.util.EventObject;
 
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.tcf.te.ui.terminals.tabs.TabFolderManager;
 import org.eclipse.tcf.te.runtime.events.EventManager;
+import org.eclipse.tcf.te.ui.terminals.tabs.TabFolderManager;
 
 /**
  * Terminal console selection changed broadcast event. The event is typically fired

@@ -13,9 +13,9 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.tm.internal.terminal.control.ITerminalViewControl;
 import org.eclipse.tcf.te.runtime.events.DisposedEvent;
 import org.eclipse.tcf.te.runtime.events.EventManager;
+import org.eclipse.tm.internal.terminal.control.ITerminalViewControl;
 
 /**
  * Terminals tab default dispose listener implementation.

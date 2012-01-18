@@ -32,6 +32,10 @@ public class Messages extends NLS {
 
 	public static String AbstractAction_error_commandExecutionFailed;
 
+	public static String AbstractConfigurationPanel_delete;
+	public static String AbstractConfigurationPanel_deleteButtonTooltip;
+	public static String AbstractConfigurationPanel_hosts;
+
 	public static String TabTerminalListener_consoleTerminated;
 
 	public static String PinTerminalAction_menu;

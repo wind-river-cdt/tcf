@@ -10,9 +10,9 @@
 package org.eclipse.tcf.te.ui.terminals.internal;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.tcf.te.runtime.preferences.ScopedEclipsePreferences;
 import org.eclipse.tcf.te.ui.terminals.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.terminals.interfaces.IPreferenceKeys;
-import org.eclipse.tcf.te.runtime.preferences.ScopedEclipsePreferences;
 
 /**
  * Terminals default preferences initializer.
