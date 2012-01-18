@@ -9,8 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.terminals.internal;
 
-import org.eclipse.tm.internal.terminal.provisional.api.ISettingsStore;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
+import org.eclipse.tm.internal.terminal.provisional.api.ISettingsStore;
 
 /**
  * Simple default Terminal settings store implementation keeping the settings

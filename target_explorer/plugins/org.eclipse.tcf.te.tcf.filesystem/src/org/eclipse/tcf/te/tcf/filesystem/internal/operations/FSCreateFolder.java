@@ -58,10 +58,10 @@ public class FSCreateFolder extends FSCreate {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.wizards.FSCreate#getNodeType()
+	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSCreate#newTreeNode()
 	 */
 	@Override
-	protected String getNodeType() {
-		return "FSDirNode"; //$NON-NLS-1$
+	protected FSTreeNode newTreeNode() {
+		return FSTreeNode.createFolderNode(name, folder);
 	}
 }

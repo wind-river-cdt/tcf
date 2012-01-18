@@ -1,0 +1,2 @@
+org.eclipse.tcf.te.ui.controls/debugmode = 0
+org.eclipse.tcf.te.ui.controls/trace/serialLinePanel = false

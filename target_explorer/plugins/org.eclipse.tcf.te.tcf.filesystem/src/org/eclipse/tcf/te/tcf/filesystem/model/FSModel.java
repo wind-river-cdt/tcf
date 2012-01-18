@@ -308,6 +308,11 @@ public final class FSModel {
 		viewerInput.firePropertyChange(event);
     }
 
+	/**
+	 * Create a root node for the specified peer.
+	 * 
+	 * @param peerNode The peer.
+	 */
 	public void createRoot(final IPeerModel peerNode) {
 		if (Protocol.isDispatchThread()) {
 			this.root = FSTreeNode.createRootNode(peerNode);

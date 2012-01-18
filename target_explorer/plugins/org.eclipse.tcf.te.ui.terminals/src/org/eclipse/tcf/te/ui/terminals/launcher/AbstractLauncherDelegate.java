@@ -13,8 +13,8 @@ import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.expressions.ExpressionConverter;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.tcf.te.ui.terminals.interfaces.ILauncherDelegate;
 import org.eclipse.tcf.te.runtime.extensions.ExecutableExtension;
+import org.eclipse.tcf.te.ui.terminals.interfaces.ILauncherDelegate;
 
 /**
  * Abstract launcher delegate implementation.

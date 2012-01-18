@@ -9,9 +9,9 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.terminals.interfaces;
 
-import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
 import org.eclipse.tcf.te.runtime.interfaces.extensions.IExecutableExtension;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
+import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
 
 /**
  * Terminal connector type.

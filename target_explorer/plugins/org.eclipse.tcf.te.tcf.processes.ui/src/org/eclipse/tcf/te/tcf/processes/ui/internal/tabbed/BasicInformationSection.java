@@ -10,14 +10,12 @@
 package org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
+import org.eclipse.tcf.te.ui.interfaces.IPropertyChangeProvider;
 import org.eclipse.tcf.te.ui.views.tabbed.BaseTitledSection;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 /**
@@ -50,13 +48,10 @@ public class BasicInformationSection extends BaseTitledSection {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#setInput(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+	 * @see org.eclipse.tcf.te.ui.views.tabbed.BaseTitledSection#updateData(org.eclipse.tcf.te.ui.interfaces.IPropertyChangeProvider)
 	 */
 	@Override
-    public void setInput(IWorkbenchPart part, ISelection selection) {
-        super.setInput(part, selection);
-        Assert.isTrue(selection instanceof IStructuredSelection);
-        Object input = ((IStructuredSelection) selection).getFirstElement();
+    protected void updateInput(IPropertyChangeProvider input) {
         Assert.isTrue(input instanceof ProcessTreeNode);
         this.node = (ProcessTreeNode) input;
     }

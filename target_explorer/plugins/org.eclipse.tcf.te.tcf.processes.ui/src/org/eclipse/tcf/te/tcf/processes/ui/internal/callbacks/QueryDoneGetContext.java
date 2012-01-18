@@ -10,6 +10,8 @@
 package org.eclipse.tcf.te.tcf.processes.ui.internal.callbacks;
 
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
@@ -24,7 +26,7 @@ import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
  * The callback handler that handles the result of service.getContext when querying.
  */
 public class QueryDoneGetContext implements ISysMonitor.DoneGetContext, IProcesses.DoneGetContext {
-	private static final int PROGRESSIVE_STEP_COUNT = 50;
+	private static final int PROGRESSIVE_STEP_COUNT = 5;
 	// The current context id.
 	String contextId;
 	// The channel used for query.
@@ -43,6 +45,7 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext, IProcess
 	volatile boolean sysMonitorDone;
 	// The flag to indicate if the process service has returned.
 	volatile boolean processesDone;
+
 	/**
 	 * Create an instance with the field parameters.
 	 */
@@ -64,44 +67,62 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext, IProcess
 	public void doneGetContext(IToken token, Exception error, ISysMonitor.SysMonitorContext context) {
 		if (error == null && context != null) {
 			childNode = new ProcessTreeNode(parentNode, context);
-			parentNode.children.add(childNode);
 		}
 		sysMonitorDone = true;
-		setAndCheckStatus();
+		refreshChildren();
 	}
+    
+    /**
+     * Refresh the children under this child node.
+     */
+    private void refreshChildren() {
+		if(sysMonitorDone && processesDone) {
+			if (childNode != null) {
+				ISysMonitor service = channel.getRemoteService(ISysMonitor.class);
+				if (service != null) {
+					Queue<ProcessTreeNode> queue = new ConcurrentLinkedQueue<ProcessTreeNode>();
+					service.getChildren(childNode.id, new RefreshDoneGetChildren(model, new Runnable(){
+						@Override
+                        public void run() {
+							setAndCheckStatus();
+                        }}, queue, channel, service, childNode));
+				}
+			}
+		}    		
+    }
 
     /**
      * Set the complete flag for this context id and check if
      * all tasks have completed.
      */
-    private void setAndCheckStatus() {
-    	synchronized(status) {
-    		if(sysMonitorDone && processesDone) {
-				if (childNode != null) {
-					childNode.setProcessContext(pContext);
+	void setAndCheckStatus() {
+		synchronized (status) {
+			if (childNode != null) {
+				parentNode.children.add(childNode);
+				childNode.setProcessContext(pContext);
+			}
+			status.put(contextId, Boolean.TRUE);
+			boolean completed = true;
+			int count = 0;
+			for (String id : status.keySet()) {
+				Boolean bool = status.get(id);
+				if (bool.booleanValue()) {
+					count++;
 				}
-	    		status.put(contextId, Boolean.TRUE);
-	    		boolean completed = true;
-	    		int count = 0;
-    			for (String id : status.keySet()) {
-    				Boolean bool = status.get(id);
-    				if(bool.booleanValue()) {
-    					count ++;
-    				} else {
-    					completed = false;
-    				}
-    			}
-	    		if(completed || (count % PROGRESSIVE_STEP_COUNT ) == 0) {
-	    			model.firePropertyChanged(parentNode);
-	    		}
-	    		if(completed){
-					parentNode.childrenQueryRunning = false;
-					parentNode.childrenQueried = true;
-					Tcf.getChannelManager().closeChannel(channel);
-	    		}
-	    	}
-    	}
-    }
+				else {
+					completed = false;
+				}
+			}
+			if (completed || (count % PROGRESSIVE_STEP_COUNT) == 0) {
+				model.firePropertyChanged(parentNode);
+			}
+			if (completed) {
+				parentNode.childrenQueryRunning = false;
+				parentNode.childrenQueried = true;
+				Tcf.getChannelManager().closeChannel(channel);
+			}
+		}
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -113,6 +134,6 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext, IProcess
 			pContext = context;
 		}
 		processesDone = true;
-		setAndCheckStatus();
+		refreshChildren();
     }
 }

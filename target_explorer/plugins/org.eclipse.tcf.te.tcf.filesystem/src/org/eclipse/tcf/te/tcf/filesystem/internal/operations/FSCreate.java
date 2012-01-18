@@ -30,13 +30,13 @@ import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
  */
 public abstract class FSCreate extends FSOperation {
 	// The folder in which a file/folder is going to be created.
-	FSTreeNode folder;
+	protected FSTreeNode folder;
 	// The node that is created after the operation.
-	FSTreeNode node;
+	protected FSTreeNode node;
 	// The name of the node to be created.
-	String name;
+	protected String name;
 	// The error generated when creating the node.
-	String error;
+	protected String error;
 
 	/**
 	 * Create an FSCreate instance with the specified folder and the name of the new node.
@@ -107,7 +107,7 @@ public abstract class FSCreate extends FSOperation {
 				@Override
 				public void doneStat(IToken token, FileSystemException error, FileAttrs attrs) {
 					if (error == null) {
-						node.attr = attrs;
+						node.setAttributes(attrs);
 					}
 					else {
 						String message = NLS
@@ -130,11 +130,7 @@ public abstract class FSCreate extends FSOperation {
 	 */
 	void addNode(final IFileSystem service) throws TCFFileSystemException {
 		if (Protocol.isDispatchThread()) {
-			node = new FSTreeNode();
-			node.name = name;
-			node.parent = folder;
-			node.peerNode = folder.peerNode;
-			node.type = getNodeType();
+			node = newTreeNode();
 			getCurrentChildren(folder).add(node);
 		}
 		else {
@@ -155,12 +151,11 @@ public abstract class FSCreate extends FSOperation {
 	}
 
 	/**
-	 * Get the new node's type, either "FSFileNode" or "FSDirNode". Note <b>it is not possible for a
-	 * new node with "FSRootDirNode".</b>
+	 * Create the new node, either a directory node or a file node.
 	 *
-	 * @return The new node's type.
+	 * @return The new node.
 	 */
-	protected abstract String getNodeType();
+	protected abstract FSTreeNode newTreeNode();
 
 	/**
 	 * Create the node in the target system.

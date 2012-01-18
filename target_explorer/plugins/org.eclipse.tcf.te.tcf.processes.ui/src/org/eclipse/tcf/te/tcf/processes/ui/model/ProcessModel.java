@@ -22,6 +22,7 @@ import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.processes.ui.internal.callbacks.QueryDoneOpenChannel;
+import org.eclipse.tcf.te.tcf.processes.ui.internal.callbacks.RefreshChildrenDoneOpenChannel;
 import org.eclipse.tcf.te.tcf.processes.ui.internal.callbacks.RefreshDoneOpenChannel;
 import org.eclipse.tcf.te.tcf.processes.ui.internal.preferences.IPreferenceConsts;
 import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
@@ -201,10 +202,17 @@ public class ProcessModel implements IPreferenceConsts{
 	 * @param parentNode The process context node. Must be not <code>null</code>.
 	 * @param callback The callback object, or <code>null</code> when callback is not needed.
 	 */
-	public void refresh(ProcessTreeNode parentNode, Runnable callback) {
+	public void refresh(final ProcessTreeNode parentNode, final Runnable callback) {
 		Assert.isNotNull(parentNode);
 		parentNode.childrenQueryRunning = true;
-		Tcf.getChannelManager().openChannel(parentNode.peerNode.getPeer(), false, new RefreshDoneOpenChannel(callback, parentNode));
+		Tcf.getChannelManager().openChannel(parentNode.peerNode.getPeer(), false, new RefreshDoneOpenChannel(new Runnable(){
+			@Override
+            public void run() {
+				firePropertyChanged(parentNode);
+	            if(callback != null) {
+	            	callback.run();
+	            }
+            }}, parentNode));
 	}
 
 	/**
@@ -308,6 +316,16 @@ public class ProcessModel implements IPreferenceConsts{
 		IViewerInput  provider = (IViewerInput) peerModel.getAdapter(IViewerInput.class);
 		PropertyChangeEvent event = new PropertyChangeEvent(node.parent == null ? peerModel : node, "state", null, null); //$NON-NLS-1$
 		provider.firePropertyChange(event);
+    }
+
+	/**
+	 * Refresh the children without refreshing itself.
+	 * 
+	 * @param parentNode The parent whose children are to be refreshed.
+	 */
+	public void refreshChildren(ProcessTreeNode parentNode) {
+		Assert.isNotNull(parentNode);
+		Tcf.getChannelManager().openChannel(parentNode.peerNode.getPeer(), false, new RefreshChildrenDoneOpenChannel(parentNode));	    
     }
 }	
 

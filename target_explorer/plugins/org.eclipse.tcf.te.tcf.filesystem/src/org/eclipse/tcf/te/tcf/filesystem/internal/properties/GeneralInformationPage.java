@@ -366,9 +366,8 @@ public class GeneralInformationPage extends PropertyPage {
 		// Field "Type"
 		createField(Messages.GeneralInformationPage_Type, clone.getFileType(), page);
 		// Field "Location"
-		String location = clone.type.endsWith("FSRootNode") //$NON-NLS-1$
-				|| clone.type.endsWith("FSRootDirNode") ? Messages.GeneralInformationPage_Computer //$NON-NLS-1$
-				: clone.getLocation();
+		String location = clone.isSystemRoot() || clone.isRoot() ? 
+						Messages.GeneralInformationPage_Computer : clone.getLocation();
 		createField(Messages.GeneralInformationPage_Location, location, page);
 		// Field "Size"
 		if (clone.isFile()) {

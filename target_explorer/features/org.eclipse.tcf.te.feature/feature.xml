@@ -31,6 +31,10 @@
       <import plugin="org.eclipse.equinox.security" version="1.1.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.navigator" version="3.5.100" match="greaterOrEqual"/>
       <import feature="org.eclipse.tcf.feature" version="1.0.0.qualifier"/>
+      <import plugin="org.eclipse.debug.core" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.debug.ui" version="3.7.101" match="greaterOrEqual"/>
+      <import plugin="gnu.io.rxtx"/>
+      <import plugin="org.eclipse.ui.views.properties.tabbed" version="3.5.200" match="greaterOrEqual"/>
    </requires>
 
    <plugin
@@ -102,7 +106,6 @@
          install-size="0"
          version="0.0.0"
          unpack="false"/>
-
 
    <plugin
          id="org.eclipse.tcf.te.ui"

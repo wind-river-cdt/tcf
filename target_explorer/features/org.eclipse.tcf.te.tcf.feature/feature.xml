@@ -28,9 +28,12 @@
       <import plugin="org.eclipse.text" version="3.5.100" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.workbench.texteditor" version="3.7.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.expressions" version="3.4.300" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.tm.terminal" version="3.1.1" match="greaterOrEqual"/>
       <import feature="org.eclipse.tcf.feature" version="1.0.0" match="greaterOrEqual"/>
       <import feature="org.eclipse.tcf.te.feature" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.tm.terminal" version="3.1.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.views.properties.tabbed" version="3.5.200" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.debug.core" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.console" version="3.5.100" match="greaterOrEqual"/>
    </requires>
 
    <plugin

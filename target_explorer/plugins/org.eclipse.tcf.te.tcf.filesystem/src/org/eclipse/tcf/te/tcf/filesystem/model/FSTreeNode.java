@@ -25,9 +25,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.DirEntry;
+import org.eclipse.tcf.services.IFileSystem.FileAttrs;
 import org.eclipse.tcf.te.tcf.filesystem.interfaces.IWindowsFileAttributes;
 import org.eclipse.tcf.te.tcf.filesystem.internal.UserAccount;
 import org.eclipse.tcf.te.tcf.filesystem.internal.testers.TargetPropertyTester;
@@ -45,25 +47,6 @@ import org.eclipse.tcf.te.ui.utils.PropertyChangeProvider;
  */
 public final class FSTreeNode extends PropertyChangeProvider implements Cloneable {
 	public static final FSTreeNode PENDING_NODE = createPendingNode();
-
-	static FSTreeNode createPendingNode() {
-		if (Protocol.isDispatchThread()) {
-			FSTreeNode pendingNode = new FSTreeNode();
-			pendingNode.name = org.eclipse.tcf.te.ui.nls.Messages.PendingOperation_label;
-			pendingNode.type = "FSPendingNode"; //$NON-NLS-1$
-			return pendingNode;
-		}
-		final AtomicReference<FSTreeNode> reference = new AtomicReference<FSTreeNode>();
-		Protocol.invokeAndWait(new Runnable() {
-
-			@Override
-			public void run() {
-				reference.set(createPendingNode());
-			}
-		});
-		return reference.get();
-	}
-
 	private static final String KEY_WIN32_ATTRS = "Win32Attrs"; //$NON-NLS-1$
 
 	private final UUID uniqueId = UUID.randomUUID();
@@ -420,7 +403,7 @@ public final class FSTreeNode extends PropertyChangeProvider implements Cloneabl
 	 * @return true if this node is a root node.
 	 */
 	public boolean isRoot() {
-		return type.endsWith("FSRootDirNode") || type.endsWith("FSRootNode"); //$NON-NLS-1$ //$NON-NLS-2$
+		return type.endsWith("FSRootDirNode"); //$NON-NLS-1$
 	}
 
 	/**
@@ -550,6 +533,43 @@ public final class FSTreeNode extends PropertyChangeProvider implements Cloneabl
 		return name.substring(lastDot + 1).toUpperCase() + " " + Messages.FSTreeNode_TypeFile; //$NON-NLS-1$
     }
 
+	/**
+	 * Set the file's attributes and trigger property change event.
+	 * 
+	 * @param attrs The new attributes.
+	 */
+	public void setAttributes(FileAttrs attrs) {
+		FileAttrs oldAttrs = this.attr;
+		this.attr = attrs;
+		if (attrs != oldAttrs) {
+			firePropertyChange(new PropertyChangeEvent(this, "attributes", oldAttrs, attrs)); //$NON-NLS-1$
+		}
+	}
+	
+	/**
+	 * Set the file's new name and trigger property change event.
+	 * 
+	 * @param name The new name.
+	 */
+	public void setName(String name) {
+		String oldName = this.name;
+		this.name = name;
+		if(oldName == null) {
+			if(name != null) {
+				firePropertyChange(new PropertyChangeEvent(this, "name", oldName, name)); //$NON-NLS-1$
+			}
+		} 
+		else	if(!oldName.equals(name)) {
+			firePropertyChange(new PropertyChangeEvent(this, "name", oldName, name)); //$NON-NLS-1$
+		}
+	}
+
+	/**
+	 * Create a root node for the peer.
+	 * 
+	 * @param peerNode The peer.
+	 * @return The root file system node.
+	 */
 	public static FSTreeNode createRootNode(IPeerModel peerNode) {
 		FSTreeNode node = new FSTreeNode();
 		node.type = "FSRootNode"; //$NON-NLS-1$
@@ -558,7 +578,75 @@ public final class FSTreeNode extends PropertyChangeProvider implements Cloneabl
 	    return node;
     }
 
+	/**
+	 * Return if this node is a pending node.
+	 * 
+	 * @return true if it is a pending node.
+	 */
 	public boolean isPendingNode() {
 	    return type != null && type.equals("FSPendingNode"); //$NON-NLS-1$
+    }
+
+
+	/**
+	 * Create a pending node.
+	 * 
+	 * @return A pending node.
+	 */
+	static FSTreeNode createPendingNode() {
+		if (Protocol.isDispatchThread()) {
+			FSTreeNode pendingNode = new FSTreeNode();
+			pendingNode.name = org.eclipse.tcf.te.ui.nls.Messages.PendingOperation_label;
+			pendingNode.type = "FSPendingNode"; //$NON-NLS-1$
+			return pendingNode;
+		}
+		final AtomicReference<FSTreeNode> reference = new AtomicReference<FSTreeNode>();
+		Protocol.invokeAndWait(new Runnable() {
+
+			@Override
+			public void run() {
+				reference.set(createPendingNode());
+			}
+		});
+		return reference.get();
+	}
+	
+	/**
+	 * Create a file node under the folder specified folder using the new name.
+	 * 
+	 * @param name The file's name.
+	 * @param folder The parent folder.
+	 * @return The file tree node.
+	 */
+	public static FSTreeNode createFileNode(String name, FSTreeNode folder) {
+		return createTreeNode(name, "FSFileNode", folder); //$NON-NLS-1$
+    }
+
+	/**
+	 * Create a folder node under the folder specified folder using the new name.
+	 * 
+	 * @param name The folder's name.
+	 * @param folder The parent folder.
+	 * @return The folder tree node.
+	 */
+	public static FSTreeNode createFolderNode(String name, FSTreeNode folder) {
+		return createTreeNode(name, "FSDirNode", folder); //$NON-NLS-1$
+    }
+
+	/**
+	 * Create a tree node under the folder specified folder using the new name.
+	 * 
+	 * @param name The tree node's name.
+	 * @param type The new node's type.
+	 * @param folder The parent folder.
+	 * @return The tree node.
+	 */
+	private static FSTreeNode createTreeNode(String name, String type, FSTreeNode folder) {
+	    FSTreeNode node = new FSTreeNode();
+		node.name = name;
+		node.parent = folder;
+		node.peerNode = folder.peerNode;
+		node.type = type;
+	    return node;
     }
 }

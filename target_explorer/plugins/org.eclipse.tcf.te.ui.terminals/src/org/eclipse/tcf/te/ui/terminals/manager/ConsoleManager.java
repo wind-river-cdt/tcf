@@ -27,6 +27,7 @@ import org.eclipse.tcf.te.ui.terminals.interfaces.ITerminalsView;
 import org.eclipse.tcf.te.ui.terminals.interfaces.IUIConstants;
 import org.eclipse.tcf.te.ui.terminals.tabs.TabFolderManager;
 import org.eclipse.tcf.te.ui.terminals.view.TerminalsView;
+import org.eclipse.tm.internal.terminal.control.ITerminalViewControl;
 import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveListener;
@@ -521,6 +522,31 @@ public class ConsoleManager {
 		// If found, dispose the console
 		if (console != null) {
 			console.dispose();
+		}
+	}
+
+	/**
+	 * Terminate (disconnect) the console with the given title and the given terminal connector.
+	 * <p>
+	 * <b>Note:</b> The method must be called within the UI thread.
+	 * <b>Note:</b> The method will handle unified console titles itself.
+	 *
+	 * @param title The console title. Must not be <code>null</code>.
+	 * @param connector The terminal connector. Must not be <code>null</code>.
+	 * @param data The custom terminal data node or <code>null</code>.
+	 */
+	public void terminateConsole(String id, String title, ITerminalConnector connector, Object data) {
+		assert title != null && connector != null;
+		assert Display.findDisplay(Thread.currentThread()) != null;
+
+		// Lookup the console
+		CTabItem console = findConsoleForTerminalConnector(id, title, connector, data);
+		// If found, disconnect the console
+		if (console != null && !console.isDisposed()) {
+			ITerminalViewControl terminal = (ITerminalViewControl)console.getData();
+			if (terminal != null && !terminal.isDisposed()) {
+				terminal.disconnectTerminal();
+			}
 		}
 	}
 }

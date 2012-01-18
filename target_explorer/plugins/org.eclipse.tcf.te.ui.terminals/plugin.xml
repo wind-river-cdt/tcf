@@ -100,7 +100,33 @@
                   </with>
                </visibleWhen>
          </command>
+      </menuContribution>      
+      <menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="org.eclipse.tcf.te.ui.terminals.toolbar">
+	         <command
+	               commandId="org.eclipse.tcf.te.ui.terminals.command.launchToolbar"
+	               helpContextId="org.eclipse.tcf.te.ui.terminals.command_Launch"
+	               icon="platform:/plugin/org.eclipse.ui.console/icons/full/eview16/console_view.gif"
+	               id="org.eclipse.tcf.te.ui.terminals.commands.launchToolbar"
+	               label="%command.launch.label"
+	               style="push"
+	               tooltip="%command.launch.tooltip">
+	         </command>
+         </toolbar>
       </menuContribution>
+      <menuContribution locationURI="toolbar:org.eclipse.tcf.te.ui.terminals.TerminalsView">
+         <command
+               commandId="org.eclipse.tcf.te.ui.terminals.command.launchToolbar"
+               helpContextId="org.eclipse.tcf.te.ui.terminals.command_Launch"
+               icon="platform:/plugin/org.eclipse.ui.console/icons/full/eview16/console_view.gif"
+               id="org.eclipse.tcf.te.ui.terminals.commands.launchToolbarTerminalsView"
+               label="%command.launch.label"
+               style="push"
+               tooltip="%command.launchWithoutSelection.tooltip">
+         </command>
+      </menuContribution>
+      
    </extension>
 
 <!-- Command contributions -->
@@ -111,6 +137,12 @@
             id="org.eclipse.tcf.te.ui.terminals.command.launch"
             name="%command.launch.name">
       </command>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.ui.terminals.command_Launch"
+            id="org.eclipse.tcf.te.ui.terminals.command.launchToolbar"
+            name="%command.launch.name">
+      </command>
    </extension>
 
 <!-- Handler contributions -->
@@ -118,6 +150,10 @@
       <handler
             class="org.eclipse.tcf.te.ui.terminals.internal.handler.LaunchTerminalCommandHandler"
             commandId="org.eclipse.tcf.te.ui.terminals.command.launch">
+      </handler>
+      <handler
+            class="org.eclipse.tcf.te.ui.terminals.internal.handler.LaunchTerminalCommandHandler"
+            commandId="org.eclipse.tcf.te.ui.terminals.command.launchToolbar">
       </handler>
    </extension>
 

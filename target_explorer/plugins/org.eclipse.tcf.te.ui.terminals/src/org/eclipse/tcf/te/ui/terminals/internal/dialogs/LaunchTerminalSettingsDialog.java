@@ -33,13 +33,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.tcf.te.ui.terminals.help.IContextHelpIds;
-import org.eclipse.tcf.te.ui.terminals.interfaces.IConfigurationPanel;
-import org.eclipse.tcf.te.ui.terminals.interfaces.ILauncherDelegate;
-import org.eclipse.tcf.te.ui.terminals.launcher.LauncherDelegateManager;
-import org.eclipse.tcf.te.ui.terminals.nls.Messages;
-import org.eclipse.tcf.te.ui.terminals.panels.AbstractConfigurationPanel;
-import org.eclipse.tm.internal.terminal.view.ViewMessages;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
 import org.eclipse.tcf.te.ui.controls.BaseDialogPageControl;
@@ -48,6 +42,13 @@ import org.eclipse.tcf.te.ui.controls.interfaces.IWizardConfigurationPanel;
 import org.eclipse.tcf.te.ui.interfaces.data.IDataExchangeNode;
 import org.eclipse.tcf.te.ui.jface.dialogs.CustomTrayDialog;
 import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
+import org.eclipse.tcf.te.ui.terminals.help.IContextHelpIds;
+import org.eclipse.tcf.te.ui.terminals.interfaces.IConfigurationPanel;
+import org.eclipse.tcf.te.ui.terminals.interfaces.ILauncherDelegate;
+import org.eclipse.tcf.te.ui.terminals.launcher.LauncherDelegateManager;
+import org.eclipse.tcf.te.ui.terminals.nls.Messages;
+import org.eclipse.tcf.te.ui.terminals.panels.AbstractConfigurationPanel;
+import org.eclipse.tm.internal.terminal.view.ViewMessages;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
@@ -98,6 +99,8 @@ public class LaunchTerminalSettingsDialog extends CustomTrayDialog {
 	 */
 	protected class EmptySettingsPanel extends AbstractConfigurationPanel {
 
+		Text fHostText;
+
 		/**
 	     * Constructor.
 	     *
@@ -133,6 +136,27 @@ public class LaunchTerminalSettingsDialog extends CustomTrayDialog {
 	    public boolean dataChanged(IPropertiesContainer data, TypedEvent e) {
 	        return false;
 	    }
+
+		@Override
+        protected void saveSettingsForHost(boolean add) {
+        }
+
+		@Override
+        protected void fillSettingsForHost(String host) {
+        }
+
+		@Override
+        protected String getHostFromSettings() {
+			return null;
+        }
+
+		@Override
+	    public void doRestoreWidgetValues(IDialogSettings settings, String idPrefix) {
+		}
+
+		@Override
+	    public void doSaveWidgetValues(IDialogSettings settings, String idPrefix) {
+		}
 	}
 
 	/**
@@ -248,14 +272,29 @@ public class LaunchTerminalSettingsDialog extends CustomTrayDialog {
 
     	List<String> items = new ArrayList<String>();
 
-    	ILauncherDelegate[] delegates = LauncherDelegateManager.getInstance().getApplicableLauncherDelegates(selection);
-    	for (ILauncherDelegate delegate : delegates) {
-    		String label = delegate.getLabel();
-    		if (label == null || "".equals(label.trim())) label = delegate.getId(); //$NON-NLS-1$
-    		label2delegate.put(label, delegate);
-    		items.add(label);
-    	}
+    	if(selection==null || selection.isEmpty()){
+    		ILauncherDelegate[] delegates = LauncherDelegateManager.getInstance().getLauncherDelegates(true);
+    		for (ILauncherDelegate delegate : delegates) {
+    			String label = delegate.getLabel();
+    			String id=delegate.getId();
+    			// filter out tcf terminal
+    			if(id.equals("org.eclipse.tcf.te.ui.terminals.launcher.tcf")){ //$NON-NLS-1$
+    				continue;
+    			}
 
+    			if (label == null || "".equals(label.trim())) label = delegate.getId(); //$NON-NLS-1$
+    			label2delegate.put(label, delegate);
+    			items.add(label);
+    		}
+    	} else {
+    		ILauncherDelegate[] delegates = LauncherDelegateManager.getInstance().getApplicableLauncherDelegates(selection);
+    		for (ILauncherDelegate delegate : delegates) {
+    			String label = delegate.getLabel();
+    			if (label == null || "".equals(label.trim())) label = delegate.getId(); //$NON-NLS-1$
+    			label2delegate.put(label, delegate);
+    			items.add(label);
+    		}
+    	}
     	Collections.sort(items);
     	combo.setItems(items.toArray(new String[items.size()]));
     }

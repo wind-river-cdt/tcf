@@ -14,8 +14,6 @@ import java.text.DateFormat;
 import java.util.Date;
 
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.tcf.te.ui.terminals.ssh.controls.SshWizardConfigurationPanel;
-import org.eclipse.tcf.te.ui.terminals.ssh.nls.Messages;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.services.ServiceManager;
@@ -24,6 +22,8 @@ import org.eclipse.tcf.te.runtime.services.interfaces.constants.ITerminalsConnec
 import org.eclipse.tcf.te.ui.controls.BaseDialogPageControl;
 import org.eclipse.tcf.te.ui.terminals.interfaces.IConfigurationPanel;
 import org.eclipse.tcf.te.ui.terminals.launcher.AbstractLauncherDelegate;
+import org.eclipse.tcf.te.ui.terminals.ssh.controls.SshWizardConfigurationPanel;
+import org.eclipse.tcf.te.ui.terminals.ssh.nls.Messages;
 
 /**
  * SSH launcher delegate implementation.

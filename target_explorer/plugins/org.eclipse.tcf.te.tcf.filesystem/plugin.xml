@@ -370,57 +370,25 @@
                visible="true">
          </separator>
          <command
-               commandId="org.eclipse.ui.file.refresh"
-               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_RefreshFile"
-               icon="platform:/plugin/org.eclipse.ui/icons/full/elcl16/refresh_nav.gif"
-               id="refresh"
+               commandId="org.eclipse.tcf.te.ui.command.refresh"
+               id="org.eclipse.tcf.te.ui.commands.refresh"
                label="%fsmenu.refresh.label"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <and>
-	               <with
-	                     variable="selection">
-	                  <count
-	                        value="1">
-	                  </count>
-	                  <iterate>
-	                     <instanceof
-	                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
-	                     </instanceof>
-	                     <test
-	                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isFile">
-	                     </test>
-	                  </iterate>
-	               </with>
-                 <not>
-                    <test
-                          property="org.eclipse.tcf.te.tcf.filesystem.propertytester.cache.isAutoSavingOn">
-                    </test>
-                 </not>
-               </and>
-            </visibleWhen>
-         </command>
-         <command
-               commandId="org.eclipse.ui.file.refresh"
-               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_RefreshDirectory"
-               icon="platform:/plugin/org.eclipse.ui/icons/full/elcl16/refresh_nav.gif"
-               id="refresh"
-               label="%fsmenu.refresh.label"
-               style="push">
+               mnemonic="f"
+               style="push"
+               tooltip="Refresh the selected node">
             <visibleWhen
                   checkEnabled="false">
                <with
                      variable="selection">
                   <count
-                        value="1">
+                        value="+">
                   </count>
-                  <iterate>
-                     <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
-                     </instanceof>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
                      <test
-                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isDirectory">
+                           property="org.eclipse.tcf.te.ui.views.isRefreshableElement"
+                           value="true">
                      </test>
                   </iterate>
                </with>
@@ -809,88 +777,6 @@
                visible="true">
          </separator>
          <command
-               commandId="org.eclipse.ui.file.refresh"
-               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_RefreshFile"
-               icon="platform:/plugin/org.eclipse.ui/icons/full/elcl16/refresh_nav.gif"
-               id="refresh"
-               label="%temenu.refresh.label"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <and>
-                  <with
-                        variable="selection">
-                     <count
-                           value="1">
-                     </count>
-                     <iterate>
-                        <instanceof
-                              value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
-                        </instanceof>
-                        <test
-                              property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isFile">
-                        </test>
-                     </iterate>
-                  </with>
-                  <not>
-                     <test
-                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.cache.isAutoSavingOn">
-                     </test>
-                  </not>
-               </and>
-            </visibleWhen>
-         </command>
-         <command
-               commandId="org.eclipse.ui.file.refresh"
-               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_RefreshDirectory"
-               icon="platform:/plugin/org.eclipse.ui/icons/full/elcl16/refresh_nav.gif"
-               id="refresh"
-               label="%fsmenu.refresh.label"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <with
-                     variable="selection">
-                  <count
-                        value="1">
-                  </count>
-                  <iterate>
-                     <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
-                     </instanceof>
-                     <test
-                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isDirectory">
-                     </test>
-                  </iterate>
-               </with>
-            </visibleWhen>
-         </command>
-         <command
-               commandId="org.eclipse.ui.file.refresh"
-               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_RefreshDirectory"
-               icon="platform:/plugin/org.eclipse.ui/icons/full/elcl16/refresh_nav.gif"
-               id="refresh"
-               label="%fsmenu.refresh.label"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <with
-                     variable="selection">
-                  <count
-                        value="1">
-                  </count>
-                  <iterate>
-                     <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
-                     </instanceof>
-                     <test
-                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isSystemRoot">
-                     </test>
-                  </iterate>
-               </with>
-            </visibleWhen>
-         </command>
-         <command
                commandId="org.eclipse.tcf.te.tcf.filesystem.commands.update"
                helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Update"
                id="update"
@@ -1192,67 +1078,6 @@
                   </not>
                </iterate>
             </with>
-         </enabledWhen>
-      </handler>
-      <handler
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.RefreshHandler"
-            commandId="org.eclipse.ui.file.refresh">
-         <activeWhen>
-           <and>
-            <with
-                  variable="activePartId">
-               <or>
-                  <equals
-                        value="org.eclipse.tcf.te.ui.views.TargetExplorer">
-                  </equals>
-                  <equals
-                        value="org.eclipse.tcf.te.ui.views.Editor">
-                  </equals>
-               </or>
-            </with>
-            <with
-                  variable="selection">
-               <count
-                     value="1">
-               </count>
-               <iterate>
-                  <instanceof
-                        value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
-                  </instanceof>
-                  <test
-                        property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isFile">
-                  </test>
-               </iterate>
-            </with>
-            <not>
-               <test
-                     property="org.eclipse.tcf.te.tcf.filesystem.propertytester.cache.isAutoSavingOn">
-               </test>
-            </not>
-            </and>
-         </activeWhen>
-         <enabledWhen>
-            <and>
-               <with
-                     variable="selection">
-                  <count
-                        value="1">
-                  </count>
-                  <iterate>
-                     <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
-                     </instanceof>
-                     <test
-                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isFile">
-                     </test>
-                  </iterate>
-               </with>
-               <not>
-                  <test
-                        property="org.eclipse.tcf.te.tcf.filesystem.propertytester.cache.isAutoSavingOn">
-                  </test>
-               </not>
-            </and>
          </enabledWhen>
       </handler>
       <handler
@@ -1743,55 +1568,6 @@
          </enabledWhen>
       </handler>
       <handler
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.RefreshDirectoryHandler"
-            commandId="org.eclipse.ui.file.refresh">
-         <activeWhen>
-            <and>
-               <with
-                     variable="activePartId">
-                  <or>
-                     <equals
-                           value="org.eclipse.tcf.te.ui.views.TargetExplorer">
-                     </equals>
-                     <equals
-                           value="org.eclipse.tcf.te.ui.views.Editor">
-                     </equals>
-                  </or>
-               </with>
-               <with
-                     variable="selection">
-                  <count
-                        value="1">
-                  </count>
-                  <iterate>
-                     <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
-                     </instanceof>
-                     <test
-                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isDirectory">
-                     </test>
-                  </iterate>
-               </with>
-            </and>
-         </activeWhen>
-         <enabledWhen>
-               <with
-                     variable="selection">
-                  <count
-                        value="1">
-                  </count>
-                  <iterate>
-                     <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
-                     </instanceof>
-                     <test
-                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isDirectory">
-                     </test>
-                  </iterate>
-               </with>
-         </enabledWhen>
-      </handler>
-      <handler
             class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.NewFileHandler"
             commandId="org.eclipse.tcf.te.tcf.filesystem.commands.newFile">
          <activeWhen>
@@ -1882,50 +1658,6 @@
       <handler
             class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.RefreshViewerHandler"
             commandId="org.eclipse.tcf.te.tcf.filesystem.commands.refreshViewer">
-      </handler>
-      <handler
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.RefreshFSRootHandler"
-            commandId="org.eclipse.ui.file.refresh">
-         <activeWhen>
-            <and>
-               <with
-                     variable="activePartId">
-                  <equals
-                        value="org.eclipse.tcf.te.ui.views.TargetExplorer">
-                  </equals>
-               </with>
-               <with
-                     variable="selection">
-                  <count
-                        value="1">
-                  </count>
-                  <iterate>
-                     <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
-                     </instanceof>
-                     <test
-                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isSystemRoot">
-                     </test>
-                  </iterate>
-               </with>
-            </and>
-         </activeWhen>
-         <enabledWhen>
-            <with
-                  variable="selection">
-               <count
-                     value="1">
-               </count>
-               <iterate>
-                  <instanceof
-                        value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
-                  </instanceof>
-                  <test
-                        property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isSystemRoot">
-                  </test>
-               </iterate>
-            </with>
-         </enabledWhen>
       </handler>
    </extension>
    
@@ -2024,6 +1756,9 @@
          </adapter>
          <adapter
                type="org.eclipse.jface.viewers.ILabelProvider">
+         </adapter>
+         <adapter
+               type="org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate">
          </adapter>
       </factory>
    </extension>

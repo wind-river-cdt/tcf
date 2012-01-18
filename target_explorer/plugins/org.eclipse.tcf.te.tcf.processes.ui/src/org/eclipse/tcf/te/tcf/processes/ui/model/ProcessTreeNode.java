@@ -185,6 +185,7 @@ public final class ProcessTreeNode extends PropertyChangeProvider {
      * @param dest The destination node.
      */
 	public void updateData(SysMonitorContext aContext) {
+		SysMonitorContext oldContext = this.context;
 		this.context = aContext;
 		name = aContext.getFile();
 		id = aContext.getID();
@@ -193,7 +194,9 @@ public final class ProcessTreeNode extends PropertyChangeProvider {
 		parentId = aContext.getParentID();
 		state = aContext.getState();
 		username = aContext.getUserName();
-        firePropertyChange(new PropertyChangeEvent(this, "properties", null, null)); //$NON-NLS-1$
+		if (oldContext != aContext) {
+			firePropertyChange(new PropertyChangeEvent(this, "context", oldContext, aContext)); //$NON-NLS-1$
+		}
 	}
 
 	/*
@@ -232,7 +235,10 @@ public final class ProcessTreeNode extends PropertyChangeProvider {
 	 * @param pContext The process context.
 	 */
 	public void setProcessContext(IProcesses.ProcessContext pContext) {
+		IProcesses.ProcessContext oldContext = this.pContext;
 		this.pContext = pContext;
-		firePropertyChange(new PropertyChangeEvent(this, "properties", null, null)); //$NON-NLS-1$
+		if (oldContext != pContext) {
+			firePropertyChange(new PropertyChangeEvent(this, "pContext", oldContext, pContext)); //$NON-NLS-1$
+		}
 	}
 }

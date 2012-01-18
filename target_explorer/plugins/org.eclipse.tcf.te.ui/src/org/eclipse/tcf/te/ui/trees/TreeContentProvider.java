@@ -14,7 +14,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -32,11 +31,11 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 	protected final static Object[] NO_ELEMENTS = new Object[0];
 
 	// The listener to refresh the common viewer when properties change.
-	private IPropertyChangeListener commonViewerListener;
+	private CommonViewerListener commonViewerListener;
 	// The viewer inputs that have been added a property change listener.
 	private Set<IViewerInput> viewerInputs = Collections.synchronizedSet(new HashSet<IViewerInput>());
 	// The viewer
-	private TreeViewer viewer;
+	protected TreeViewer viewer;
 
 	/*
 	 * (non-Javadoc)
@@ -47,6 +46,7 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 		for(IViewerInput viewerInput : viewerInputs) {
 			viewerInput.removePropertyChangeListener(commonViewerListener);
 		}
+		commonViewerListener.cancel();
     }
 	
 	/**
@@ -76,7 +76,11 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		Assert.isTrue(viewer instanceof TreeViewer);
 		this.viewer = (TreeViewer) viewer; 
-		commonViewerListener = new CommonViewerListener(this.viewer);
+		commonViewerListener = new CommonViewerListener(this.viewer) {
+			@Override
+            protected Object getParent(Object node) {
+	            return TreeContentProvider.this.getParent(node);
+            }};
 	}
 	
 	/**

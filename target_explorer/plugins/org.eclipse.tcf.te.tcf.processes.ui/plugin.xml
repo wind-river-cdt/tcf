@@ -69,7 +69,7 @@
       
       <menuContribution locationURI="toolbar:org.eclipse.tcf.te.ui.controls.menu.processes?after=additions">
          <command
-               commandId="org.eclipse.tcf.te.tcf.processes.ui.command.refresh"
+               commandId="org.eclipse.tcf.te.tcf.processes.ui.command.refreshViewer"
                icon="icons/obj16/refresh.gif"
                label="%command.refresh.label"
                style="push"
@@ -127,23 +127,26 @@
       <menuContribution
             locationURI="popup:org.eclipse.tcf.te.ui.controls.menu.processes?after=additions">
          <command
-               commandId="org.eclipse.tcf.te.tcf.processes.ui.command.refreshNode"
-               helpContextId="org.eclipse.tcf.te.tcf.processes.ui.command_RefreshNode"
-               icon="platform:/plugin/org.eclipse.ui/icons/full/elcl16/refresh_nav.gif"
-               id="refresh"
-               label="%command.refreshNode.label.0"
-               style="push">
+               commandId="org.eclipse.tcf.te.ui.command.refresh"
+               id="org.eclipse.tcf.te.ui.commands.refresh"
+               label="%command.refresh.label.1"
+               mnemonic="f"
+               style="push"
+               tooltip="%command.refresh.tooltip.1">
             <visibleWhen
                   checkEnabled="false">
                <with
                      variable="selection">
                   <count
-                        value="1">
+                        value="+">
                   </count>
-                  <iterate>
-                     <instanceof
-                           value="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
-                     </instanceof>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <test
+                           property="org.eclipse.tcf.te.ui.views.isRefreshableElement"
+                           value="true">
+                     </test>
                   </iterate>
                </with>
             </visibleWhen>
@@ -182,6 +185,67 @@
                </reference>
             </visibleWhen>
          </command>
+         <separator
+               name="group.properties"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.ui.file.properties"
+               id="properties"
+               label="%command.properties.label.0">
+            <visibleWhen>
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <and>
+                        <instanceof
+                              value="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
+                        </instanceof>
+                        <not>
+                           <test
+                                 property="org.eclipse.tcf.te.tcf.processes.ui.propertytester.process.isSystemRoot">
+                           </test>
+                        </not>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.tcf.te.ui.views.TargetExplorer#Popup?after=group.properties">
+         <command
+               commandId="org.eclipse.ui.file.properties"
+               id="properties"
+               label="%command.properties.label.1">
+            <visibleWhen>
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <and>
+                        <instanceof
+                              value="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
+                        </instanceof>
+                        <not>
+                           <test
+                                 property="org.eclipse.tcf.te.tcf.processes.ui.propertytester.process.isSystemRoot">
+                           </test>
+                        </not>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
       </menuContribution>
    </extension>
 
@@ -196,7 +260,7 @@
       <command
             categoryId="org.eclipse.tcf.te.ui.commands.category"
             helpContextId="org.eclipse.tcf.te.tcf.processes.ui.command_Refresh"
-            id="org.eclipse.tcf.te.tcf.processes.ui.command.refresh"
+            id="org.eclipse.tcf.te.tcf.processes.ui.command.refreshViewer"
             name="%command.refresh.name">
       </command>
       <command
@@ -217,12 +281,6 @@
             id="org.eclipse.tcf.te.tcf.processes.ui.command.stopPolling"
             name="%command.stopPolling.label">
       </command>
-      <command
-            categoryId="org.eclipse.tcf.te.ui.commands.category"
-            helpContextId="org.eclipse.tcf.te.tcf.processes.ui.command_RefreshNode"
-            id="org.eclipse.tcf.te.tcf.processes.ui.command.refreshNode"
-            name="%command.refreshNode.name">
-      </command>
    </extension>
 
 <!-- Handler contributions -->
@@ -234,12 +292,28 @@
 
       <handler
             class="org.eclipse.tcf.te.tcf.processes.ui.internal.handler.RefreshProcessListHandler"
-            commandId="org.eclipse.tcf.te.tcf.processes.ui.command.refresh">
+            commandId="org.eclipse.tcf.te.tcf.processes.ui.command.refreshViewer">
+         <activeWhen>
+            <with
+                  variable="activePartId">
+               <equals
+                     value="org.eclipse.tcf.te.ui.views.Editor">
+               </equals>
+            </with>
+         </activeWhen>
       </handler>
 
       <handler
             class="org.eclipse.tcf.te.tcf.processes.ui.internal.handler.ConfigRefreshIntervalHandler"
             commandId="org.eclipse.tcf.te.tcf.processes.ui.command.refreshInterval">
+         <activeWhen>
+            <with
+                  variable="activePartId">
+               <equals
+                     value="org.eclipse.tcf.te.ui.views.Editor">
+               </equals>
+            </with>
+         </activeWhen>
       </handler>
 
       <handler
@@ -300,43 +374,6 @@
                   </iterate>
                </with>
             </enabledWhen>
-      </handler>
-      <handler
-            class="org.eclipse.tcf.te.tcf.processes.ui.internal.handler.RefreshProcessNodeHandler"
-            commandId="org.eclipse.tcf.te.tcf.processes.ui.command.refreshNode">
-         <activeWhen>
-            <and>
-               <with
-                     variable="activePartId">
-                  <equals
-                        value="org.eclipse.tcf.te.ui.views.Editor">
-                  </equals>
-               </with>
-               <with
-                     variable="selection">
-                  <count
-                        value="1">
-                  </count>
-                  <iterate>
-                     <instanceof
-                           value="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
-                     </instanceof>
-                  </iterate>
-               </with>
-            </and>
-         </activeWhen>
-         <enabledWhen>
-            <with
-                  variable="selection">
-               <count
-                     value="1">
-               </count>
-               <iterate>
-                  <instanceof
-                        value="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
-                  </instanceof>
-               </iterate>
-            </with></enabledWhen>
       </handler>
    </extension>
 
@@ -578,6 +615,70 @@
                tab="org.eclipse.tcf.te.tcf.processes.ui.propertytab.advanced">
          </propertySection>
       </propertySections>
+   </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="org.eclipse.tcf.te.tcf.processes.ui.internal.properties.AdvancedPropertiesPage"
+            id="org.eclipse.tcf.te.tcf.processes.ui.pages.advanced"
+            name="%page.properties.name">
+         <enabledWhen>
+            <and>
+               <instanceof
+                     value="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
+               </instanceof>
+               <not>
+                  <test
+                        property="org.eclipse.tcf.te.tcf.processes.ui.propertytester.process.isSystemRoot">
+                  </test>
+               </not>
+            </and>
+         </enabledWhen>
+      </page>
+      <page
+            class="org.eclipse.tcf.te.tcf.processes.ui.internal.properties.ContextPage"
+            id="org.eclipse.tcf.te.tcf.processes.ui.pages.context"
+            name="%page.context.name">
+         <enabledWhen>
+            <and>
+               <instanceof
+                     value="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
+               </instanceof>
+               <not>
+                  <test
+                        property="org.eclipse.tcf.te.tcf.processes.ui.propertytester.process.isSystemRoot">
+                  </test>
+               </not>
+            </and>
+         </enabledWhen>
+      </page>
+      <page
+            class="org.eclipse.tcf.te.tcf.processes.ui.internal.properties.GeneralInformationPage"
+            id="org.eclipse.tcf.te.tcf.processes.ui.pages.basic"
+            name="%page.basic.name">
+         <enabledWhen>
+            <and>
+               <instanceof
+                     value="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
+               </instanceof>
+               <not>
+                  <test
+                        property="org.eclipse.tcf.te.tcf.processes.ui.propertytester.process.isSystemRoot">
+                  </test>
+               </not>
+            </and>
+         </enabledWhen>
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.eclipse.tcf.te.tcf.processes.ui.internal.testers.ProcessPropertyTester"
+            id="org.eclipse.tcf.te.tcf.processes.ui.propertytester.process"
+            namespace="org.eclipse.tcf.te.tcf.processes.ui.propertytester.process"
+            properties="isSystemRoot"
+            type="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
+      </propertyTester>
    </extension>
    
 </plugin>

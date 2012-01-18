@@ -76,7 +76,7 @@ public class StateManager {
 						@Override
 						public void doneStat(IToken token, FileSystemException error, FileAttrs attrs) {
 							if (error == null) {
-								node.attr = attrs;
+								node.setAttributes(attrs);
 							} else {
 								String message = NLS.bind(Messages.StateManager_CannotGetFileStatMessage, new Object[]{node.name, error});
 								errors[0] = new TCFFileSystemException(message, error);
@@ -143,7 +143,7 @@ public class StateManager {
 	 * @param attr The new file attribute.
 	 */
 	void commitNodeAttr(FSTreeNode node, FileAttrs attr){
-		node.attr = attr;
+		node.setAttributes(attr);
 		PersistenceManager.getInstance().setBaseTimestamp(node.getLocationURL(), attr.mtime);
 		FSModel.firePropertyChange(node);
 	}

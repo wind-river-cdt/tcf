@@ -13,9 +13,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.tcf.te.ui.terminals.interfaces.IConnectorType;
 import org.eclipse.tcf.te.runtime.extensions.AbstractExtensionPointManager;
 import org.eclipse.tcf.te.runtime.extensions.ExecutableExtensionProxy;
+import org.eclipse.tcf.te.ui.terminals.interfaces.IConnectorType;
 
 /**
  * Terminal connector type extension point manager implementation.

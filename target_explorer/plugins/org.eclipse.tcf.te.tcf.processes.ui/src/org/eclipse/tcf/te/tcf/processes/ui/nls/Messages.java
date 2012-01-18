@@ -97,6 +97,40 @@ public class Messages extends NLS {
 	public static String ContextIDSection_UserGRPID;
 	public static String ContextIDSection_UserID;
 
+	public static String ContextPage_File;
+
+	public static String ContextPage_Group;
+
+	public static String ContextPage_GroupID;
+
+	public static String ContextPage_ID;
+
+	public static String ContextPage_Pages;
+
+	public static String ContextPage_ParentID;
+
+	public static String ContextPage_PID;
+
+	public static String ContextPage_PPID;
+
+	public static String ContextPage_Resident;
+
+	public static String ContextPage_Root;
+
+	public static String ContextPage_State;
+
+	public static String ContextPage_TracerPID;
+
+	public static String ContextPage_TTYGRPID;
+
+	public static String ContextPage_UserGRPID;
+
+	public static String ContextPage_UserID;
+
+	public static String ContextPage_Virtual;
+
+	public static String ContextPage_WorkHome;
+
 	public static String EditSpeedGradeDialog_DialogMessage;
 	public static String EditSpeedGradeDialog_DialogTitle;
 	public static String EditSpeedGradeDialog_GradeSameValue;
@@ -145,4 +179,20 @@ public class Messages extends NLS {
 	public static String DetachStep_error_getContext;
 	public static String DetachStep_error_detach;
 	public static String DetachStep_error_openChannel;
+
+	public static String GeneralInformationPage_InternalPID;
+
+	public static String GeneralInformationPage_InternalPPID;
+
+	public static String GeneralInformationPage_Name;
+
+	public static String GeneralInformationPage_ParentPID;
+
+	public static String GeneralInformationPage_ProcessID;
+
+	public static String GeneralInformationPage_State;
+
+	public static String GeneralInformationPage_Type;
+
+	public static String GeneralInformationPage_User;
 }

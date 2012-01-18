@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.ISysMonitor;
+import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
@@ -42,14 +43,21 @@ public class RefreshDoneOpenChannel implements IChannelManager.DoneOpenChannel {
 	 * @see org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel#doneOpenChannel(java.lang.Throwable, org.eclipse.tcf.protocol.IChannel)
 	 */
 	@Override
-    public void doneOpenChannel(Throwable error, IChannel channel) {
+    public void doneOpenChannel(Throwable error, final IChannel channel) {
 		Assert.isTrue(Protocol.isDispatchThread());
 		if (error == null && channel != null) {
 			ISysMonitor service = channel.getRemoteService(ISysMonitor.class);
 			if (service != null) {
 				Queue<ProcessTreeNode> queue = new ConcurrentLinkedQueue<ProcessTreeNode>();
-				ProcessModel model = ProcessModel.getProcessModel(parentNode.peerNode);
-				service.getChildren(parentNode.id, new RefreshDoneGetChildren(model, callback, queue, channel, service, parentNode));
+				final ProcessModel model = ProcessModel.getProcessModel(parentNode.peerNode);
+				service.getChildren(parentNode.id, new RefreshDoneGetChildren(model, new Runnable(){
+					@Override
+                    public void run() {
+						Tcf.getChannelManager().closeChannel(channel);
+						if(callback!=null) {
+							callback.run();
+						}
+                    }}, queue, channel, service, parentNode));
 			}
 		}
     }
