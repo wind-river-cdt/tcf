@@ -22,8 +22,8 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.tcf.internal.debug.ui.model.TCFModel;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNode;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExecContext;
+import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.util.TCFDataCache;
-import org.eclipse.tcf.util.TCFTask;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -58,17 +58,14 @@ public class RefreshHandler extends AbstractHandler {
         }
         if (input instanceof TCFNode) {
             final TCFNode node = (TCFNode)input;
-            return new TCFTask<Object>(node.getChannel()) {
+            Protocol.invokeLater(new Runnable() {
                 public void run() {
                     TCFModel model = node.getModel();
                     TCFNode ref_node = node;
                     if (part instanceof IMemoryRenderingSite) {
                         // Search memory node
                         TCFDataCache<TCFNodeExecContext> mem_cache = model.searchMemoryContext(node);
-                        if (mem_cache == null) {
-                            done(null);
-                            return;
-                        }
+                        if (mem_cache == null) return;
                         if (!mem_cache.validate(this)) return;
                         ref_node = mem_cache.getData();
                     }
@@ -78,9 +75,8 @@ public class RefreshHandler extends AbstractHandler {
                             model.setLock(part);
                         }
                     }
-                    done(null);
                 }
-            }.getE();
+            });
         }
         return null;
     }
