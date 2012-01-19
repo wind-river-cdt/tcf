@@ -154,7 +154,7 @@ public class TCFModelManager {
         return models.get(launch);
     }
 
-    public TCFNode getRootNode(TCFLaunch launch) {
+    public TCFNodeLaunch getRootNode(TCFLaunch launch) {
         TCFModel model = getModel(launch);
         if (model == null) return null;
         return model.getRootNode();
@@ -175,7 +175,7 @@ public class TCFModelManager {
     /**
      * Synchronized and thread-safe method to map a launch to TCFNode.
      */
-    public static TCFNode getRootNodeSync(Launch launch) {
+    public static TCFNodeLaunch getRootNodeSync(Launch launch) {
         if (launch instanceof TCFLaunch) {
             TCFModel model = sync_model_map.get((TCFLaunch)launch);
             if (model != null) return model.getRootNode();

@@ -169,7 +169,7 @@ public class TCFNodePropertySource implements IPropertySource {
                         properties.put(id, value);
                     }
 
-                    boolean validateAll(TCFDataCache<?>... caches) {
+                    private boolean validateAll(TCFDataCache<?>... caches) {
                         TCFDataCache<?> pending = null;
                         for (TCFDataCache<?> cache : caches) {
                             if (!cache.validate()) pending = cache;
@@ -179,6 +179,11 @@ public class TCFNodePropertySource implements IPropertySource {
                             return false;
                         }
                         return true;
+                    }
+                    @Override
+                    public void done(IPropertyDescriptor[] r) {
+                        need_refresh = true;
+                        super.done(r);
                     }
                 }.get();
             }
@@ -219,9 +224,11 @@ public class TCFNodePropertySource implements IPropertySource {
     private static final long REFRESH_DELAY = 250;
     private static boolean refresh_posted = false;
     private static long refresh_time = 0;
+    private static boolean need_refresh = false;
 
     public static void refresh(TCFNode node) {
         assert Protocol.isDispatchThread();
+        if (!need_refresh) return;
         refresh_time = System.currentTimeMillis();
         if (refresh_posted) return;
         refresh_posted = true;
@@ -233,6 +240,7 @@ public class TCFNodePropertySource implements IPropertySource {
                     return;
                 }
                 refresh_posted = false;
+                need_refresh = false;
                 synchronized (Device.class) {
                     Display display = Display.getDefault();
                     if (!display.isDisposed()) {
