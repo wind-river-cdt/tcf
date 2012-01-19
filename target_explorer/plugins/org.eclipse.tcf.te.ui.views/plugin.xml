@@ -139,13 +139,7 @@
       <actionProvider
             class="org.eclipse.tcf.te.ui.views.actions.GoIntoActionProvider"
             id="org.eclipse.tcf.te.ui.views.navigator.actions.GoIntoActionProvider">
-         <enablement>
-            <with
-                  variable="selection">
-               <count
-                     value="1">
-               </count>
-            </with></enablement>
+         <enablement></enablement>
       </actionProvider>
       
    </extension>
