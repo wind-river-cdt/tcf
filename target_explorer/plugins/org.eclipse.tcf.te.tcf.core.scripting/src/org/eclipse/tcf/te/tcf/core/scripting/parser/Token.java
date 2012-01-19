@@ -72,10 +72,9 @@ public final class Token {
     /**
      * Adds an argument to the command arguments list.
      *
-     * @param arg The argument. Must not be <code>null</code>.
+     * @param arg The argument or <code>null</code>.
      */
     public void addArgument(Object arg) {
-    	Assert.isNotNull(arg);
     	if (arguments == null) arguments = new ArrayList<Object>();
     	arguments.add(arg);
     }

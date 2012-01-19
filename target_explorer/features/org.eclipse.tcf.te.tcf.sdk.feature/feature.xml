@@ -30,6 +30,13 @@
          unpack="false"/>
 
    <plugin
+         id="org.eclipse.tcf.te.tcf.core.model.source"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
          id="org.eclipse.tcf.te.tcf.core.scripting.source"
          download-size="0"
          install-size="0"

@@ -9,6 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.controls;
 
+import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
+
 
 
 /**
@@ -18,10 +20,34 @@ public class FSTreeContentProvider extends FSNavigatorContentProvider {
 
 	/*
 	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.controls.FSNavigatorContentProvider#getParent(java.lang.Object)
+	 */
+	@Override
+	public Object getParent(Object element) {
+		if (element instanceof FSTreeNode) {
+			return ((FSTreeNode)element).parent;
+		}
+		return null;
+	}
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.tcf.te.tcf.filesystem.controls.FSNavigatorContentProvider#isRootNodeVisible()
 	 */
 	@Override
     protected boolean isRootNodeVisible() {
 	    return false;
     }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.trees.TreeContentProvider#isRootObject(java.lang.Object)
+	 */
+	@Override
+    protected boolean isRootObject(Object object) {
+		if(object instanceof FSTreeNode) {
+			FSTreeNode node = (FSTreeNode) object;
+			return node.isSystemRoot();
+		}
+	    return false;
+    }		
 }

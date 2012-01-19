@@ -9,17 +9,12 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.processes.ui.internal.callbacks;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Queue;
 
-import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.IProcesses.ProcessContext;
 import org.eclipse.tcf.services.ISysMonitor;
-import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 
 /**
@@ -28,22 +23,10 @@ import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext, IProcesses.DoneGetContext {
 	// The current context id.
 	String contextId;
-	// The channel used for refreshing.
-	IChannel channel;
 	// The parent node to be refreshed.
 	ProcessTreeNode parentNode;
-	// The status map to mark and check the completion status.
-	Map<String, Boolean> status;
-	// The queue to iterate the legitimate node in the whole tree.
-	Queue<ProcessTreeNode> queue;
 	// The list to record all new nodes for merging.
 	List<ProcessTreeNode> newNodes;
-	// The service used for refreshing.
-	ISysMonitor service;
-	// The callback to be called when refresh is done.
-	Runnable callback;
-	// The process model attached.
-	ProcessModel model;
 	// The current child node
 	ProcessTreeNode childNode;
 	// The process context of this child node.
@@ -52,20 +35,15 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext, IProce
 	volatile boolean sysMonitorDone;
 	// The flag to indicate if the process service has returned.
 	volatile boolean processesDone;
+	// The callback monitor
+	CallbackMonitor monitor;
 	/**
 	 * Create an instance with the field parameters.
 	 */
-	public RefreshDoneGetContext(ProcessModel model, List<ProcessTreeNode> newNodes,
-					Runnable callback, ISysMonitor service, Queue<ProcessTreeNode>queue, String contextId,
-					IChannel channel, Map<String, Boolean> status, ProcessTreeNode parentNode) {
-		this.model = model;
-		this.callback = callback;
-		this.service = service;
-		this.queue = queue;
+	public RefreshDoneGetContext(List<ProcessTreeNode> newNodes, String contextId,  CallbackMonitor monitor, ProcessTreeNode parentNode) {
 		this.contextId = contextId;
-		this.channel = channel;
 		this.parentNode = parentNode;
-		this.status = status;
+		this.monitor = monitor;
 		this.newNodes = newNodes;
 		this.sysMonitorDone = false;
 		this.processesDone = false;
@@ -89,24 +67,23 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext, IProce
 			newNodes.add(childNode);
 		}
 		sysMonitorDone = true;
-		setAndCheckStatus();
+		if(sysMonitorDone && processesDone) {
+			if (childNode != null) {
+				childNode.setProcessContext(pContext);
+			}
+			monitor.unlock(contextId);
+		}
 	}
 
-	/**
-	 * Remove the dead process nodes.
-	 */
-    private void removeDead() {
-		List<ProcessTreeNode> dead = new ArrayList<ProcessTreeNode>();
-		for (ProcessTreeNode node : parentNode.children) {
-			int index = searchInList(node, newNodes);
-			if (index == -1) {
-				dead.add(node);
-			}
-		}
-		for (ProcessTreeNode node : dead) {
-			parentNode.children.remove(node);
-		}
-    }
+    /**
+     * Search the specified child node in the children of the parent node.
+     *
+     * @param childNode The child node.
+     * @return The index of the child node or -1 if no such node.
+     */
+	private int searchChild(ProcessTreeNode childNode) {
+		return searchInList(childNode, parentNode.children);
+    }    
 
     /**
      * Search the specified child node in the specified list.
@@ -126,70 +103,6 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext, IProce
 			return -1;
 		}
     }
-
-    /**
-     * Search the specified child node in the children of the parent node.
-     *
-     * @param childNode The child node.
-     * @return The index of the child node or -1 if no such node.
-     */
-	private int searchChild(ProcessTreeNode childNode) {
-		return searchInList(childNode, parentNode.children);
-    }
-
-    /**
-     * Set the complete flag for this context id and check if
-     * all tasks have completed. If it is all completed, then
-     * merge the resulting children and continue with the
-     * next node in the queue.
-     */
-    private void setAndCheckStatus() {
-    	synchronized(status) {
-    		if(sysMonitorDone && processesDone) {
-				if (childNode != null) {
-					childNode.setProcessContext(pContext);
-				}
-	    		status.put(contextId, Boolean.TRUE);
-	    		if(isAllComplete()){
-					parentNode.childrenQueryRunning = false;
-					parentNode.childrenQueried = true;
-	                removeDead();
-	                for(ProcessTreeNode node:parentNode.children) {
-	                	if(node.childrenQueried && !node.childrenQueryRunning) {
-	                		queue.offer(node);
-	                	}
-	                }
-					if (queue.isEmpty()) {
-						if(callback != null) {
-							callback.run();
-						}
-					} else {
-						ProcessTreeNode node = queue.poll();
-						service.getChildren(node.id, new RefreshDoneGetChildren(model, callback, queue, channel, service, node));
-					}
-	    		}
-	    	}
-		}
-    }
-
-    /**
-     * Check if all tasks have completed by checking
-     * the status entries.
-     *
-     * @return true if all of them are marked finished.
-     */
-    private boolean isAllComplete() {
-		synchronized (status) {
-			for (String id : status.keySet()) {
-				Boolean bool = status.get(id);
-				if (!bool.booleanValue()) {
-					return false;
-				}
-			}
-			return true;
-		}
-    }
-
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.tcf.services.IProcesses.DoneGetContext#doneGetContext(org.eclipse.tcf.protocol.IToken, java.lang.Exception, org.eclipse.tcf.services.IProcesses.ProcessContext)
@@ -200,6 +113,11 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext, IProce
 			pContext = context;
 		}
 		processesDone = true;
-		setAndCheckStatus();
+		if(sysMonitorDone && processesDone) {
+			if (childNode != null) {
+				childNode.setProcessContext(pContext);
+			}
+			monitor.unlock(contextId);
+		}
     }
 }
