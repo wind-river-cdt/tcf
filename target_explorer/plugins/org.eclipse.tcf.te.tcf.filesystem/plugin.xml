@@ -296,12 +296,14 @@
          </separator>
          <command
                commandId="org.eclipse.ui.edit.delete"
-               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Delete"
-               icon="platform:/plugin/org.eclipse.ui/icons/full/obj16/delete_obj.gif"
-               id="delete"
+               disabledIcon="platform:/plugin/org.eclipse.ui/icons/full/dtool16/delete.gif"
+               helpContextId="org.eclipse.tcf.te.ui.command_Delete"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/delete.gif"
+               id="org.eclipse.tcf.te.ui.commands.delete"
                label="%command.label.delete"
                mnemonic="D"
-               style="push">
+               style="push"
+               tooltip="%command.delete.description">
             <visibleWhen
                   checkEnabled="false">
                <with
@@ -309,10 +311,13 @@
                   <count
                         value="+">
                   </count>
-                  <iterate>
-                     <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
-                     </instanceof>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <test
+                           property="org.eclipse.tcf.te.ui.views.isDeletableElement"
+                           value="true">
+                     </test>
                   </iterate>
                </with>
             </visibleWhen>
@@ -375,7 +380,7 @@
                label="%fsmenu.refresh.label"
                mnemonic="f"
                style="push"
-               tooltip="Refresh the selected node">
+               tooltip="%command.refresh.tooltip">
             <visibleWhen
                   checkEnabled="false">
                <with
@@ -682,32 +687,6 @@
                id="paste"
                label="%command.label.paste.1"
                mnemonic="P"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <with
-                     variable="selection">
-                  <count
-                        value="+">
-                  </count>
-                  <iterate>
-                     <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
-                     </instanceof>
-                  </iterate>
-               </with>
-            </visibleWhen>
-         </command>
-         <separator
-               name="group.delete">
-         </separator>
-         <command
-               commandId="org.eclipse.ui.edit.delete"
-               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Delete"
-               icon="platform:/plugin/org.eclipse.ui/icons/full/obj16/delete_obj.gif"
-               id="delete"
-               label="%command.label.delete.1"
-               mnemonic="D"
                style="push">
             <visibleWhen
                   checkEnabled="false">
@@ -1263,65 +1242,6 @@
          </enabledWhen>
       </handler>
       
-      <handler
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.DeleteFilesHandler"
-            commandId="org.eclipse.ui.edit.delete">
-         <activeWhen>
-            <and>
-               <with variable="activePartId">
-                  <or>
-                     <equals value="org.eclipse.tcf.te.ui.views.TargetExplorer"/>
-                     <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
-                  </or>
-               </with>
-               <with variable="selection">
-                  <iterate operator="and" ifEmpty="false">
-                     <instanceof value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode"/>
-                  </iterate>
-               </with>
-            </and>
-         </activeWhen>
-         <enabledWhen>
-            <with
-                  variable="selection">
-               <count
-                     value="+">
-               </count>
-               <iterate>
-                  <instanceof
-                        value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
-                  </instanceof>
-                  <not>
-                     <test
-                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isRoot">
-                     </test>
-                  </not>
-                  <or>
-                     <and>
-                        <test
-                              property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isWindows">
-                        </test>
-                        <not>
-                           <test
-                                 property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isReadOnly">
-                           </test>
-                        </not>
-                     </and>
-                     <and>
-                        <not>
-                           <test
-                                 property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isWindows">
-                           </test>
-                        </not>
-                        <test
-                              property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isWritable">
-                        </test>
-                     </and>
-                  </or>
-               </iterate>
-            </with>
-         </enabledWhen>
-      </handler>
       
       <handler
             class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.CutFilesHandler"
@@ -1759,6 +1679,9 @@
          </adapter>
          <adapter
                type="org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate">
+         </adapter>
+         <adapter
+               type="org.eclipse.tcf.te.ui.views.interfaces.handler.IDeleteHandlerDelegate">
          </adapter>
       </factory>
    </extension>

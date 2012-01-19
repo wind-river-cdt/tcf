@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.tcf.te.tcf.filesystem.internal.columns.FSTreeElementLabelProvider;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
+import org.eclipse.tcf.te.ui.views.interfaces.handler.IDeleteHandlerDelegate;
 import org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate;
 import org.eclipse.ui.IActionFilter;
 
@@ -26,9 +27,10 @@ import org.eclipse.ui.IActionFilter;
  */
 public class NodeStateFilterFactory implements IAdapterFactory {
 	private static ILabelProvider nodeLabelProvider = new FSTreeElementLabelProvider();
+	private static IDeleteHandlerDelegate deleteDelegate = new DeleteHandlerDelegate();
 	private static IRefreshHandlerDelegate refreshDelegate = new RefreshHandlerDelegate();
 	// The ADAPTERS adapted by this factory.
-	private static Class<?>[] ADAPTERS = {IActionFilter.class, ILabelProvider.class, IRefreshHandlerDelegate.class};
+	private static Class<?>[] ADAPTERS = {IActionFilter.class, ILabelProvider.class, IRefreshHandlerDelegate.class, IDeleteHandlerDelegate.class};
 	// The fFilters map caching fFilters for FS nodes.
 	private Map<FSTreeNode, NodeStateFilter> filters;
 
@@ -59,6 +61,9 @@ public class NodeStateFilterFactory implements IAdapterFactory {
 			}
 			else if(adapterType == IRefreshHandlerDelegate.class) {
 				return refreshDelegate;
+			}
+			else if(adapterType == IDeleteHandlerDelegate.class) {
+				return deleteDelegate;
 			}
 		}
 		return null;
