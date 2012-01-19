@@ -19,6 +19,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.tcf.core.ErrorReport;
 import org.eclipse.tcf.internal.debug.model.TCFSymFileRef;
 import org.eclipse.tcf.internal.debug.ui.ImageCache;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExecContext.MemoryRegion;
 import org.eclipse.tcf.protocol.JSON;
 import org.eclipse.tcf.services.IMemoryMap;
 import org.eclipse.tcf.util.TCFDataCache;
@@ -28,46 +29,71 @@ import org.eclipse.tcf.util.TCFDataCache;
  */
 public class TCFNodeModule extends TCFNode implements IDetailsProvider {
 
-    private IMemoryMap.MemoryRegion region;
+    private final TCFData<MemoryRegion> region;
 
     private static final RGB
         rgb_error = new RGB(192, 0, 0);
 
-    protected TCFNodeModule(TCFNode parent, String id) {
+    protected TCFNodeModule(final TCFNodeExecContext parent, String id, final int index) {
         super(parent, id);
+        region = new TCFData<MemoryRegion>(channel) {
+            @Override
+            protected boolean startDataRetrieval() {
+                TCFDataCache<MemoryRegion[]> map_cache = parent.getMemoryMap();
+                if (!map_cache.validate(this)) return false;
+                Throwable error = map_cache.getError();
+                MemoryRegion[] map_data = map_cache.getData();
+                MemoryRegion region = null;
+                if (map_data != null && index < map_data.length) region = map_data[index];
+                set(null, error, region);
+                return true;
+            }
+        };
     }
 
-    void setRegion(IMemoryMap.MemoryRegion region) {
-        this.region = region;
+    public TCFDataCache<MemoryRegion> getRegion() {
+        return region;
+    }
+
+    void onMemoryMapChanged() {
+        region.reset();
     }
 
     @Override
     protected boolean getData(ILabelUpdate update, Runnable done) {
-        String[] col_ids = update.getColumnIds();
-        if (col_ids == null) {
-            update.setLabel(region.getFileName(), 0);
+        if (!region.validate(done)) return false;
+        MemoryRegion mr = region.getData();
+        IMemoryMap.MemoryRegion r = mr != null ? mr.region : null;
+        if (r == null) {
+            update.setLabel("...", 0);
         }
         else {
-            for (int i=0; i < col_ids.length; ++i) {
-                String col_id = col_ids[i];
-                if (TCFColumnPresentationModules.COL_NAME.equals(col_id)) {
-                    update.setLabel(region.getFileName(), i);
-                }
-                else if (TCFColumnPresentationModules.COL_ADDRESS.equals(col_id)) {
-                    update.setLabel(toHexString(region.getAddress()), i);
-                }
-                else if (TCFColumnPresentationModules.COL_SIZE.equals(col_id)) {
-                    update.setLabel(toHexString(region.getSize()), i);
-                }
-                else if (TCFColumnPresentationModules.COL_FLAGS.equals(col_id)) {
-                    update.setLabel(getFlagsLabel(region.getFlags()), i);
-                }
-                else if (TCFColumnPresentationModules.COL_OFFSET.equals(col_id)) {
-                    update.setLabel(toHexString(region.getOffset()), i);
-                }
-                else if (TCFColumnPresentationModules.COL_SECTION.equals(col_id)) {
-                    String sectionName = region.getSectionName();
-                    update.setLabel(sectionName != null ? sectionName : "", i);
+            String[] col_ids = update.getColumnIds();
+            if (col_ids == null) {
+                update.setLabel(r.getFileName(), 0);
+            }
+            else {
+                for (int i=0; i < col_ids.length; ++i) {
+                    String col_id = col_ids[i];
+                    if (TCFColumnPresentationModules.COL_NAME.equals(col_id)) {
+                        update.setLabel(r.getFileName(), i);
+                    }
+                    else if (TCFColumnPresentationModules.COL_ADDRESS.equals(col_id)) {
+                        update.setLabel(toHexString(r.getAddress()), i);
+                    }
+                    else if (TCFColumnPresentationModules.COL_SIZE.equals(col_id)) {
+                        update.setLabel(toHexString(r.getSize()), i);
+                    }
+                    else if (TCFColumnPresentationModules.COL_FLAGS.equals(col_id)) {
+                        update.setLabel(getFlagsLabel(r.getFlags()), i);
+                    }
+                    else if (TCFColumnPresentationModules.COL_OFFSET.equals(col_id)) {
+                        update.setLabel(toHexString(r.getOffset()), i);
+                    }
+                    else if (TCFColumnPresentationModules.COL_SECTION.equals(col_id)) {
+                        String sectionName = r.getSectionName();
+                        update.setLabel(sectionName != null ? sectionName : "", i);
+                    }
                 }
             }
         }
@@ -76,11 +102,15 @@ public class TCFNodeModule extends TCFNode implements IDetailsProvider {
     }
 
     public boolean getDetailText(StyledStringBuffer bf, Runnable done) {
-        String file_name = region.getFileName();
+        if (!region.validate(done)) return false;
+        MemoryRegion mr = region.getData();
+        IMemoryMap.MemoryRegion r = mr != null ? mr.region : null;
+        if (r == null) return true;
+        String file_name = r.getFileName();
         if (file_name != null) {
             bf.append("File name: ", SWT.BOLD).append(file_name).append('\n');
             TCFNodeExecContext exe = (TCFNodeExecContext)parent;
-            TCFDataCache<TCFSymFileRef> sym_cache = exe.getSymFileInfo(JSON.toBigInteger(region.getAddress()));
+            TCFDataCache<TCFSymFileRef> sym_cache = exe.getSymFileInfo(JSON.toBigInteger(r.getAddress()));
             if (sym_cache != null) {
                 if (!sym_cache.validate(done)) return false;
                 TCFSymFileRef sym_data = sym_cache.getData();
@@ -100,13 +130,13 @@ public class TCFNodeModule extends TCFNode implements IDetailsProvider {
                             SWT.ITALIC, null, rgb_error).append('\n');
                 }
             }
-            String section = region.getSectionName();
+            String section = r.getSectionName();
             if (section != null) bf.append("File section: ", SWT.BOLD).append(section).append('\n');
-            else bf.append("File offset: ", SWT.BOLD).append(toHexString(region.getOffset())).append('\n');
+            else bf.append("File offset: ", SWT.BOLD).append(toHexString(r.getOffset())).append('\n');
         }
-        bf.append("Address: ", SWT.BOLD).append(toHexString(region.getAddress())).append('\n');
-        bf.append("Size: ", SWT.BOLD).append(toHexString(region.getSize())).append('\n');
-        bf.append("Flags: ", SWT.BOLD).append(getFlagsLabel(region.getFlags())).append('\n');
+        bf.append("Address: ", SWT.BOLD).append(toHexString(r.getAddress())).append('\n');
+        bf.append("Size: ", SWT.BOLD).append(toHexString(r.getSize())).append('\n');
+        bf.append("Flags: ", SWT.BOLD).append(getFlagsLabel(r.getFlags())).append('\n');
         return true;
     }
 

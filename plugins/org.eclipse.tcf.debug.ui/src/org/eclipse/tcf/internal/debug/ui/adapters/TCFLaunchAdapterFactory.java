@@ -18,6 +18,7 @@ import org.eclipse.debug.ui.contexts.ISuspendTrigger;
 import org.eclipse.tcf.internal.debug.model.TCFLaunch;
 import org.eclipse.tcf.internal.debug.ui.model.TCFModel;
 import org.eclipse.tcf.internal.debug.ui.model.TCFModelManager;
+import org.eclipse.ui.views.properties.IPropertySource;
 
 public class TCFLaunchAdapterFactory implements IAdapterFactory {
 
@@ -26,6 +27,7 @@ public class TCFLaunchAdapterFactory implements IAdapterFactory {
         IElementContentProvider.class,
         IModelProxyFactory.class,
         ISuspendTrigger.class,
+        IPropertySource.class,
     };
 
     private static final IElementLabelProvider launch_label_provider = new TCFLaunchLabelProvider();
@@ -35,7 +37,10 @@ public class TCFLaunchAdapterFactory implements IAdapterFactory {
         if (from instanceof TCFLaunch) {
             if (to == IElementLabelProvider.class) return launch_label_provider;
             TCFModel model = TCFModelManager.getModelSync((TCFLaunch)from);
-            if (model != null && to.isInstance(model)) return model;
+            if (model != null) {
+                if (to.isInstance(model)) return model;
+                if (to == IPropertySource.class) return new TCFNodePropertySource(model.getRootNode());
+            }
             return null;
         }
         return null;

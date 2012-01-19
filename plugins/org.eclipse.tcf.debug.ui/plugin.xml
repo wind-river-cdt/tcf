@@ -26,6 +26,7 @@
          <adapter type="org.eclipse.debug.internal.ui.viewers.model.provisional.IElementContentProvider"/>
          <adapter type="org.eclipse.debug.internal.ui.viewers.model.provisional.IElementLabelProvider"/>
          <adapter type="org.eclipse.debug.internal.ui.viewers.model.provisional.IModelProxyFactory"/>
+         <adapter type="org.eclipse.ui.views.properties.IPropertySource"/>
          <adapter type="org.eclipse.debug.ui.contexts.ISuspendTrigger"/>
       </factory>
       <factory
