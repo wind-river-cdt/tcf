@@ -15,6 +15,7 @@ import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.ui.trees.TreeContentProvider;
+import org.eclipse.tcf.te.ui.views.interfaces.IRoot;
 
 
 /**
@@ -140,9 +141,8 @@ public class FSNavigatorContentProvider extends TreeContentProvider {
 	 */
 	@Override
     protected boolean isRootObject(Object object) {
-		if(object instanceof FSTreeNode) {
-			FSTreeNode node = (FSTreeNode) object;
-			return node.isSystemRoot();
+		if(object instanceof IRoot) {
+			return true;
 		}
 	    return false;
     }	

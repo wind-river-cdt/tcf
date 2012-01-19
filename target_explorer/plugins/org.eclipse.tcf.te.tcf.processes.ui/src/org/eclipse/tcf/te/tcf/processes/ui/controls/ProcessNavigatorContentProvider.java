@@ -18,6 +18,7 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 import org.eclipse.tcf.te.ui.trees.TreeContentProvider;
+import org.eclipse.tcf.te.ui.views.interfaces.IRoot;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.navigator.NavigatorFilterService;
@@ -225,10 +226,9 @@ public class ProcessNavigatorContentProvider  extends TreeContentProvider implem
 	 */
 	@Override
     protected boolean isRootObject(Object object) {
-		if(object instanceof ProcessTreeNode) {
-			ProcessTreeNode node = (ProcessTreeNode) object;
-			return node.isRootNode();
+		if(object instanceof IRoot) {
+			return true;
 		}
 	    return false;
-    }
+    }	
 }

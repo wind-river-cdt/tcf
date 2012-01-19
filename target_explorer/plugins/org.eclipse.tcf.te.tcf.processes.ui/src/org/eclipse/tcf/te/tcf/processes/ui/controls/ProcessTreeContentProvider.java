@@ -12,6 +12,7 @@ package org.eclipse.tcf.te.tcf.processes.ui.controls;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
+import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 
 
 /**
@@ -21,6 +22,18 @@ public class ProcessTreeContentProvider extends ProcessNavigatorContentProvider 
 	// The target's peer model.
 	private IPeerModel peerModel;
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessNavigatorContentProvider#getParent(java.lang.Object)
+	 */
+	@Override
+	public Object getParent(Object element) {
+		if (element instanceof ProcessTreeNode) {
+			return ((ProcessTreeNode) element).parent;
+		}
+		return null;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.tcf.te.ui.trees.TreeContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
@@ -57,4 +70,17 @@ public class ProcessTreeContentProvider extends ProcessNavigatorContentProvider 
     protected boolean isRootNodeVisible() {
 	    return false;
     }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.trees.TreeContentProvider#isRootObject(java.lang.Object)
+	 */
+	@Override
+    protected boolean isRootObject(Object object) {
+		if(object instanceof ProcessTreeNode) {
+			ProcessTreeNode node = (ProcessTreeNode) object;
+			return node.isRootNode();
+		}
+	    return false;
+    }	
 }
