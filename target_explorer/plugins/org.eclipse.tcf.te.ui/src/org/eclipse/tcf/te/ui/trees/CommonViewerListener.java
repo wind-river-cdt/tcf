@@ -94,7 +94,6 @@ public abstract class CommonViewerListener extends TimerTask implements IPropert
 				else {
 					// If there are multiple root nodes, then select NULL as the final root.
 					object = getCommonAncestor((List<?>)object);
-					System.out.println();
 					if(object == null) object = NULL;
 				}
 			}
