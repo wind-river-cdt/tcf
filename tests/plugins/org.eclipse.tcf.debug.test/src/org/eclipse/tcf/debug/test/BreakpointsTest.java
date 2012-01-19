@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutionException;
 import org.eclipse.cdt.debug.core.CDIDebugModel;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.tcf.debug.test.util.Transaction;
+import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IBreakpoints;
 import org.eclipse.tcf.services.ILineNumbers.CodeArea;
 import org.eclipse.tcf.services.IRunControl.RunControlContext;
@@ -122,10 +123,21 @@ public class BreakpointsTest extends AbstractTcfUITest
             }
         }.get();
         
+        // Initiate wait for the context changed event.
+        final Object contextChangedWaitKey = new Object();
+        Protocol.invokeAndWait(new Runnable() { public void run() {
+            fBreakpointsCM.waitContextAdded(contextChangedWaitKey);               
+        }});
         
+        CDIDebugModel.createLineBreakpoint(bpCodeArea.file, ResourcesPlugin.getWorkspace().getRoot(), bpCodeArea.start_line, true, 0, "", true);
         
-        CDIDebugModel.createLineBreakpoint(bpCodeArea.file, ResourcesPlugin.getWorkspace().getRoot(), bpCodeArea.start_line, true, 0, "", false);
+        Map<String, Object>[] addedBps = new Transaction<Map<String, Object>[]>() {
+            protected Map<String, Object>[] process() throws InvalidCacheException ,ExecutionException {
+                return validate(fBreakpointsCM.waitContextAdded(contextChangedWaitKey));
+            }
+            
+        }.get();
         
-        checkBreakpointForErrors(bpId, fProcessId);
+        assert addedBps.length != 0;
     }
 }
