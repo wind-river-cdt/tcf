@@ -63,7 +63,8 @@ public final class FSModel {
 		if (allModels != null) {
 			for (FSModel model : allModels) {
 				IViewerInput viewerInput = (IViewerInput) model.peerModel.getAdapter(IViewerInput.class);
-				PropertyChangeEvent event = new PropertyChangeEvent(model.peerModel, "state", null, null); //$NON-NLS-1$
+				FSTreeNode root = FSModel.getFSModel(model.peerModel).getRoot();
+				PropertyChangeEvent event = new PropertyChangeEvent(root, "state", null, null); //$NON-NLS-1$
 				viewerInput.firePropertyChange(event);
 			}
 		}
@@ -304,7 +305,7 @@ public final class FSModel {
 	 */
 	public static void firePropertyChange(FSTreeNode node) {
 		IViewerInput viewerInput = (IViewerInput) node.peerNode.getAdapter(IViewerInput.class);
-		PropertyChangeEvent event = new PropertyChangeEvent(node.isRoot() ? node.peerNode : node, "state", null, null); //$NON-NLS-1$
+		PropertyChangeEvent event = new PropertyChangeEvent(node, "state", null, null); //$NON-NLS-1$
 		viewerInput.firePropertyChange(event);
     }
 
