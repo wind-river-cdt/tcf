@@ -327,6 +327,11 @@ public final class FSModel {
 		}
 	}
 
+	/**
+	 * Query the children of the given file system node.
+	 * 
+	 * @param parentNode The file system node. Must be not <code>null</code>.
+	 */
 	public void queryChildren(FSTreeNode parentNode) {
 		Assert.isNotNull(parentNode);
 		parentNode.childrenQueryRunning = true;
