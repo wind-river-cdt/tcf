@@ -1,17 +1,20 @@
 package org.eclipse.tcf.debug.test;
 
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
 
 import org.eclipse.cdt.debug.core.CDIDebugModel;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.tcf.debug.test.util.Transaction;
 import org.eclipse.tcf.services.IBreakpoints;
+import org.eclipse.tcf.services.ILineNumbers.CodeArea;
 import org.eclipse.tcf.services.IRunControl.RunControlContext;
+import org.eclipse.tcf.services.ISymbols.Symbol;
 import org.junit.Assert;
 
-@SuppressWarnings("restriction")
 public class BreakpointsTest extends AbstractTcfUITest 
 {
     private String fTestId;
@@ -106,9 +109,22 @@ public class BreakpointsTest extends AbstractTcfUITest
         String bpId = "TestStepBP";
         initProcessModel(bpId, "tcf_test_func0");
         
+        CodeArea bpCodeArea = new Transaction<CodeArea>() {
+            @Override
+            protected CodeArea process() throws InvalidCacheException, ExecutionException {
+                String symId = validate ( fSymbolsCM.find(fProcessId, BigInteger.valueOf(0), "tcf_test_func0") );
+                Symbol sym = validate ( fSymbolsCM.getContext(symId) );
+                CodeArea[] area = validate ( fLineNumbersCM.mapToSource(
+                    fProcessId, 
+                    sym.getAddress(), 
+                    new BigInteger(sym.getAddress().toString()).add(BigInteger.valueOf(1))) );
+                return area[0];
+            }
+        }.get();
         
         
-        //CDIDebugModel.createFunctionBreakpoint();
+        
+        CDIDebugModel.createLineBreakpoint(bpCodeArea.file, ResourcesPlugin.getWorkspace().getRoot(), bpCodeArea.start_line, true, 0, "", false);
         
         checkBreakpointForErrors(bpId, fProcessId);
     }
