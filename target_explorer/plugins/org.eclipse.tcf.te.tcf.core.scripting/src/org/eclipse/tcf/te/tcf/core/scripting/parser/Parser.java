@@ -105,6 +105,11 @@ public class Parser {
     		String tok = tokenizer.nextToken();
     		if (tok == null || "".equals(tok.trim())) continue; //$NON-NLS-1$
 
+    		if (tok.equals("null")) { //$NON-NLS-1$
+    			token.addArgument(null);
+    			continue;
+    		}
+
     		if (tok.startsWith("\"")) { //$NON-NLS-1$
     			// String type
 
