@@ -80,8 +80,20 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 			@Override
             protected Object getParent(Object node) {
 	            return TreeContentProvider.this.getParent(node);
+            }
+			@Override
+            protected boolean isRootObject(Object object) {
+	            return TreeContentProvider.this.isRootObject(object);
             }};
 	}
+	
+	/**
+	 * If the specified object is a root object;
+	 * 
+	 * @param object The object to be tested.
+	 * @return true if it is root object.
+	 */
+	protected abstract boolean isRootObject(Object object);
 	
 	/**
 	 * Install a property change listener to the specified element.

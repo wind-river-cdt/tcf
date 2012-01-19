@@ -82,6 +82,9 @@ public abstract class CommonViewerListener extends TimerTask implements IPropert
 				List<?> list = (List<?>) object;
 				if (list.size() == 1) {
 					object = list.get(0);
+					if(isRootObject(object)) {
+						object = NULL;
+					}
 				}
 				else {
 					// If there are multiple root nodes, then select NULL as the final root.
@@ -93,6 +96,14 @@ public abstract class CommonViewerListener extends TimerTask implements IPropert
 			lastTime = System.currentTimeMillis();
 		}
 	}
+
+	/**
+	 * If the specified object is a root object;
+	 * 
+	 * @param object The object to be tested.
+	 * @return true if it is root object.
+	 */
+	protected abstract boolean isRootObject(Object object);
 
 	/**
 	 * Merge the current objects into an ancestor object.

@@ -218,4 +218,17 @@ public class ProcessNavigatorContentProvider  extends TreeContentProvider implem
 			}
 		}
     }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.trees.TreeContentProvider#isRootObject(java.lang.Object)
+	 */
+	@Override
+    protected boolean isRootObject(Object object) {
+		if(object instanceof ProcessTreeNode) {
+			ProcessTreeNode node = (ProcessTreeNode) object;
+			return node.isRootNode();
+		}
+	    return false;
+    }
 }

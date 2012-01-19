@@ -132,5 +132,18 @@ public class FSNavigatorContentProvider extends TreeContentProvider {
 	 */
 	protected boolean isRootNodeVisible() {
 		return true;
-	}	
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.trees.TreeContentProvider#isRootObject(java.lang.Object)
+	 */
+	@Override
+    protected boolean isRootObject(Object object) {
+		if(object instanceof FSTreeNode) {
+			FSTreeNode node = (FSTreeNode) object;
+			return node.isSystemRoot();
+		}
+	    return false;
+    }	
 }
