@@ -292,37 +292,6 @@
             </visibleWhen>
          </command>
          <separator
-               name="group.delete">
-         </separator>
-         <command
-               commandId="org.eclipse.ui.edit.delete"
-               disabledIcon="platform:/plugin/org.eclipse.ui/icons/full/dtool16/delete.gif"
-               helpContextId="org.eclipse.tcf.te.ui.command_Delete"
-               icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/delete.gif"
-               id="org.eclipse.tcf.te.ui.commands.delete"
-               label="%command.label.delete"
-               mnemonic="D"
-               style="push"
-               tooltip="%command.delete.description">
-            <visibleWhen
-                  checkEnabled="false">
-               <with
-                     variable="selection">
-                  <count
-                        value="+">
-                  </count>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <test
-                           property="org.eclipse.tcf.te.ui.views.isDeletableElement"
-                           value="true">
-                     </test>
-                  </iterate>
-               </with>
-            </visibleWhen>
-         </command>
-         <separator
                name="group.move"
                visible="true">
          </separator>
@@ -366,6 +335,38 @@
                      <instanceof
                            value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
                      </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <separator
+               name="group.delete"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.ui.edit.delete"
+               disabledIcon="platform:/plugin/org.eclipse.ui/icons/full/dtool16/delete.gif"
+               helpContextId="org.eclipse.tcf.te.ui.command_Delete"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/delete.gif"
+               id="org.eclipse.tcf.te.ui.commands.delete"
+               label="%command.label.delete"
+               mnemonic="D"
+               style="push"
+               tooltip="%command.delete.description">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="+">
+                  </count>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <test
+                           property="org.eclipse.tcf.te.ui.views.isDeletableElement"
+                           value="true">
+                     </test>
                   </iterate>
                </with>
             </visibleWhen>

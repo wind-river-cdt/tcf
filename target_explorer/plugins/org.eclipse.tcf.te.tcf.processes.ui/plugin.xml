@@ -126,31 +126,6 @@
       
       <menuContribution
             locationURI="popup:org.eclipse.tcf.te.ui.controls.menu.processes?after=additions">
-         <command
-               commandId="org.eclipse.tcf.te.ui.command.refresh"
-               id="org.eclipse.tcf.te.ui.commands.refresh"
-               label="%command.refresh.label.1"
-               mnemonic="f"
-               style="push"
-               tooltip="%command.refresh.tooltip.1">
-            <visibleWhen
-                  checkEnabled="false">
-               <with
-                     variable="selection">
-                  <count
-                        value="+">
-                  </count>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <test
-                           property="org.eclipse.tcf.te.ui.views.isRefreshableElement"
-                           value="true">
-                     </test>
-                  </iterate>
-               </with>
-            </visibleWhen>
-         </command>
          <separator
                name="group.launch.rundebug"
                visible="true">
@@ -183,6 +158,35 @@
                <reference
                      definitionId="te.expressions.processes.isProcessTreeNode">
                </reference>
+            </visibleWhen>
+         </command>
+         <separator
+               name="group.refresh"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.tcf.te.ui.command.refresh"
+               id="org.eclipse.tcf.te.ui.commands.refresh"
+               label="%command.refresh.label.1"
+               mnemonic="f"
+               style="push"
+               tooltip="%command.refresh.tooltip.1">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="+">
+                  </count>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <test
+                           property="org.eclipse.tcf.te.ui.views.isRefreshableElement"
+                           value="true">
+                     </test>
+                  </iterate>
+               </with>
             </visibleWhen>
          </command>
          <separator
