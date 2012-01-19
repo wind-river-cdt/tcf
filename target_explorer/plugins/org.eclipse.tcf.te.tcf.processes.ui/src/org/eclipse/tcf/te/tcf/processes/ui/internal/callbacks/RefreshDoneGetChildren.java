@@ -11,9 +11,7 @@ package org.eclipse.tcf.te.tcf.processes.ui.internal.callbacks;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 
 import org.eclipse.tcf.protocol.IChannel;
@@ -57,14 +55,15 @@ public class RefreshDoneGetChildren implements ISysMonitor.DoneGetChildren {
 	 * @see org.eclipse.tcf.services.ISysMonitor.DoneGetChildren#doneGetChildren(org.eclipse.tcf.protocol.IToken, java.lang.Exception, java.lang.String[])
 	 */
     @Override
-    public void doneGetChildren(IToken token, Exception error, String[] context_ids) {
-        if (error == null && context_ids != null && context_ids.length > 0) {
+    public void doneGetChildren(IToken token, Exception error, String[] contextIds) {
+        if (error == null && contextIds != null && contextIds.length > 0) {
 			IProcesses pService = channel.getRemoteService(IProcesses.class);
 			if(pService != null) {
-				Map<String, Boolean> status = createStatusMap(context_ids);
 	            List<ProcessTreeNode> newNodes = Collections.synchronizedList(new ArrayList<ProcessTreeNode>());	
-				for (String contextId : context_ids) {
-					RefreshDoneGetContext done = new RefreshDoneGetContext(model, newNodes, callback, service, queue, contextId, channel, status, parentNode);
+				Runnable monitorCallback = new RefreshDoneMonitorCallback(newNodes, parentNode, queue, callback, service, model, channel);
+				CallbackMonitor monitor = new CallbackMonitor(monitorCallback, (Object[])contextIds);
+				for (String contextId : contextIds) {
+					RefreshDoneGetContext done = new RefreshDoneGetContext(newNodes, contextId, monitor, parentNode);
 					service.getContext(contextId, done);
 					pService.getContext(contextId, done);
 				}
@@ -83,19 +82,4 @@ public class RefreshDoneGetChildren implements ISysMonitor.DoneGetChildren {
 			}
     	}
     }
-
-    /**
-     * Create and initialize a status map with all the context ids and completion status
-     * set to false.
-     * 
-     * @param context_ids All the context ids.
-     * @return A map with initial values
-     */
-	private Map<String, Boolean> createStatusMap(String[] context_ids) {
-        Map<String, Boolean> status = new HashMap<String, Boolean>();
-        for (String contextId : context_ids) {
-        	status.put(contextId, Boolean.FALSE);
-        }
-        return status;
-    }		
 }

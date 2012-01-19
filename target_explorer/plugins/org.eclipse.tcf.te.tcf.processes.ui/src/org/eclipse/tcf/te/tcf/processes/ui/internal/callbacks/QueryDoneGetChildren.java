@@ -9,9 +9,6 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.processes.ui.internal.callbacks;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IProcesses;
@@ -23,7 +20,7 @@ import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 /**
  * The callback handler that handles the result of service.getChildren when querying.
  */
-public class QueryDoneGetChildren implements ISysMonitor.DoneGetChildren {
+public class QueryDoneGetChildren implements ISysMonitor.DoneGetChildren, Runnable {
 	// The channel used for query.
 	IChannel channel;
 	// The service used for query.
@@ -32,7 +29,6 @@ public class QueryDoneGetChildren implements ISysMonitor.DoneGetChildren {
 	ProcessTreeNode parentNode;
 	// The process model attached.
 	ProcessModel model;
-	
 	/**
 	 * Create an instance with the field parameters.
 	 */
@@ -48,37 +44,31 @@ public class QueryDoneGetChildren implements ISysMonitor.DoneGetChildren {
 	 * @see org.eclipse.tcf.services.ISysMonitor.DoneGetChildren#doneGetChildren(org.eclipse.tcf.protocol.IToken, java.lang.Exception, java.lang.String[])
 	 */
     @Override
-    public void doneGetChildren(IToken token, Exception error, String[] context_ids) {
-        if (error == null && context_ids != null && context_ids.length > 0) {
+    public void doneGetChildren(IToken token, Exception error, String[] contextIds) {
+        if (error == null && contextIds != null && contextIds.length > 0) {
 			IProcesses pService = channel.getRemoteService(IProcesses.class);
 			if (pService != null) {
-	        	Map<String, Boolean> status = createStatusMap(context_ids);
-				for (String contextId : context_ids) {
-					QueryDoneGetContext done = new QueryDoneGetContext(model, contextId, channel, status, parentNode); 
+				CallbackMonitor monitor = new CallbackMonitor(this, (Object[])contextIds);
+				for (String contextId : contextIds) {
+					QueryDoneGetContext done = new QueryDoneGetContext(model, contextId, channel, monitor, parentNode); 
 					service.getContext(contextId, done);
 					pService.getContext(contextId, done);
 				}
 			}
     	} else {
-            parentNode.childrenQueryRunning = false;
-            parentNode.childrenQueried = true;
-			model.firePropertyChanged(parentNode);
-            Tcf.getChannelManager().closeChannel(channel);
+    		run();
     	}
     }
 
-    /**
-     * Create and initialize a status map with all the context ids and completion status
-     * set to false.
-     * 
-     * @param context_ids All the context ids.
-     * @return A map with initial values
+    /*
+     * (non-Javadoc)
+     * @see java.lang.Runnable#run()
      */
-	private Map<String, Boolean> createStatusMap(String[] context_ids) {
-        Map<String, Boolean> status = new HashMap<String, Boolean>();
-        for (String contextId : context_ids) {
-        	status.put(contextId, Boolean.FALSE);
-        }
-        return status;
-    }		
+	@Override
+    public void run() {
+		parentNode.childrenQueryRunning = false;
+		parentNode.childrenQueried = true;
+		model.firePropertyChanged(parentNode);
+		Tcf.getChannelManager().closeChannel(channel);
+    }
 }

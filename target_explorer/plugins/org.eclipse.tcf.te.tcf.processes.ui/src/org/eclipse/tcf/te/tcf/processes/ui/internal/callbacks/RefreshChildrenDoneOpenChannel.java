@@ -9,8 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.processes.ui.internal.callbacks;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -27,11 +27,9 @@ import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
  * The callback handler that handles the event when the channel opens when refreshing.
  */
 public class RefreshChildrenDoneOpenChannel implements IChannelManager.DoneOpenChannel {
-	private static final int PROGRESSIVE_STEP_COUNT = 10;
 	// The parent node to be refreshed.
 	ProcessTreeNode parentNode;
-	Map<String, Boolean> status;
-	ProcessModel model;
+
 	/**
 	 * Create an instance with the specified field parameters.
 	 */
@@ -49,51 +47,21 @@ public class RefreshChildrenDoneOpenChannel implements IChannelManager.DoneOpenC
 		if (error == null && channel != null) {
 			ISysMonitor service = channel.getRemoteService(ISysMonitor.class);
 			if (service != null) {
-				model = ProcessModel.getProcessModel(parentNode.peerNode);
-				status = createStatusMap();
-				final String[] contextId = new String[1];
+				final ProcessModel model = ProcessModel.getProcessModel(parentNode.peerNode);
+				CallbackMonitor monitor = new CallbackMonitor(new Runnable(){
+					@Override
+                    public void run() {
+						Tcf.getChannelManager().closeChannel(channel);
+						model.firePropertyChanged(parentNode);
+                    }}, getChildrenIds());
 				for (ProcessTreeNode child : parentNode.children) {
 					if (!child.childrenQueried && !child.childrenQueryRunning) {
+						Runnable callback = new RefreshChildrenDoneCallback(child.id, parentNode, monitor, model);
 						Queue<ProcessTreeNode> queue = new ConcurrentLinkedQueue<ProcessTreeNode>();
-						contextId[0] = child.id;
-						service.getChildren(contextId[0], new RefreshDoneGetChildren(model, new Runnable() {
-							private String contextID = contextId[0];
-							@Override
-							public void run() {
-								setAndCheckStatus(contextID, channel);
-							}
-						}, queue, channel, service, child));
+						ISysMonitor.DoneGetChildren done = new RefreshDoneGetChildren(model, callback, queue, channel, service, child);
+						service.getChildren(child.id, done);
 					}
 				}
-			}
-		}
-	}
-
-    /**
-     * Set the complete flag for this context id and check if
-     * all tasks have completed.
-     */
-    void setAndCheckStatus(String contextId, IChannel channel) {
-		synchronized (status) {
-			status.put(contextId, Boolean.TRUE);
-			boolean completed = true;
-			int count = 0;
-			for (String id : status.keySet()) {
-				Boolean bool = status.get(id);
-				if (bool.booleanValue()) {
-					count++;
-				}
-				else {
-					completed = false;
-				}
-			}
-			if (completed || (count % PROGRESSIVE_STEP_COUNT) == 0) {
-				model.firePropertyChanged(parentNode);
-			}
-
-			if (completed) {
-				Tcf.getChannelManager().closeChannel(channel);
-				model.firePropertyChanged(parentNode);
 			}
 		}
 	}
@@ -102,12 +70,11 @@ public class RefreshChildrenDoneOpenChannel implements IChannelManager.DoneOpenC
      * Create and initialize a status map with all the context ids and completion status
      * set to false.
      */
-	private Map<String, Boolean> createStatusMap() {
-        Map<String, Boolean> status = new HashMap<String, Boolean>();
+	private Object[] getChildrenIds() {
+        List<Object> ids = new ArrayList<Object>();
         for (ProcessTreeNode child : parentNode.children) {
-        	String contextId = child.id;
-        	status.put(contextId, Boolean.FALSE);
+        	ids.add(child.id);
         }
-        return status;
-    }	
+        return ids.toArray(new Object[ids.size()]);
+    }
 }
