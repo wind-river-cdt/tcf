@@ -29,6 +29,12 @@ public interface ImageConsts {
     public final static String  IMAGE_DIR_EVIEW = "eview16/"; //$NON-NLS-1$
 
     /**
+     * The directory where to load enabled toolbar images from,
+     * relative to the image root directory.
+     */
+    public final static String  IMAGE_DIR_ETOOL = "etool16/"; //$NON-NLS-1$
+
+    /**
      * The directory where to load model object images from,
      * relative to the image root directory.
      */
@@ -55,4 +61,9 @@ public interface ImageConsts {
      * The key to access the Target Explorer working set image.
      */
     public static final String  WORKING_SET = "TargetExplorerWorkingSet"; //$NON-NLS-1$
+
+    /**
+     * The key to access the help action image.
+     */
+    public static final String  HELP = "HelpAction"; //$NON-NLS-1$
 }

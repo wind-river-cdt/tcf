@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others. All rights reserved.
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -114,6 +114,8 @@ public class UIPlugin extends AbstractUIPlugin {
 		registry.put(ImageConsts.WORKING_SET, ImageDescriptor.createFromURL(url));
 		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OBJ + "workingsets.gif"); //$NON-NLS-1$
 		registry.put(ImageConsts.WORKING_SETS, ImageDescriptor.createFromURL(url));
+		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_ETOOL + "help.gif"); //$NON-NLS-1$
+		registry.put(ImageConsts.HELP, ImageDescriptor.createFromURL(url));
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others. All rights reserved.
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -10,6 +10,8 @@
 package org.eclipse.tcf.te.ui.views.editor.pages;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
@@ -17,6 +19,9 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tcf.te.ui.forms.CustomFormToolkit;
 import org.eclipse.tcf.te.ui.forms.FormLayoutFactory;
+import org.eclipse.tcf.te.ui.views.activator.UIPlugin;
+import org.eclipse.tcf.te.ui.views.interfaces.ImageConsts;
+import org.eclipse.tcf.te.ui.views.nls.Messages;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.IManagedForm;
@@ -29,6 +34,37 @@ import org.eclipse.ui.menus.IMenuService;
 public abstract class AbstractCustomFormToolkitEditorPage extends AbstractEditorPage {
 	// Reference to the form toolkit instance
 	private CustomFormToolkit toolkit = null;
+
+	// The default help action class definition
+	protected class HelpAction extends Action {
+		/* default */ final String helpID;
+
+		/**
+         * Constructor.
+         *
+         * @param helpID The context help id. Must not be <code>null</code>.
+         */
+        public HelpAction(String helpID) {
+        	super(Messages.AbstractCustomFormToolkitEditorPage_HelpAction_label, IAction.AS_PUSH_BUTTON);
+        	Assert.isNotNull(helpID);
+        	this.helpID = helpID;
+        	setToolTipText(Messages.AbstractCustomFormToolkitEditorPage_HelpAction_tooltip);
+        	setImageDescriptor(UIPlugin.getImageDescriptor(ImageConsts.HELP));
+        }
+
+        /* (non-Javadoc)
+         * @see org.eclipse.jface.action.Action#run()
+         */
+        @Override
+        public void run() {
+        	PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+        		@Override
+        		public void run() {
+        			PlatformUI.getWorkbench().getHelpSystem().displayHelp(helpID);
+        		}
+        	});
+        }
+	}
 
 	/**
 	 * Returns the custom form toolkit instance.
@@ -104,10 +140,10 @@ public abstract class AbstractCustomFormToolkitEditorPage extends AbstractEditor
 
 		// Add the toolbar items which will appear in the form header
 		IToolBarManager manager = managedForm.getForm().getForm().getToolBarManager();
-		// Create fixed toolbar contribution items
-		createToolbarContributionItems(manager);
 		// Add the default "additions" separator
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+		// Create fixed toolbar contribution items
+		createToolbarContributionItems(manager);
 		// Get the menu service and populate contributed toolbar actions
 		IMenuService service = (IMenuService) getSite().getService(IMenuService.class);
 		if (service != null) {
@@ -151,6 +187,13 @@ public abstract class AbstractCustomFormToolkitEditorPage extends AbstractEditor
 	 */
 	protected void createToolbarContributionItems(IToolBarManager manager) {
 		Assert.isNotNull(manager);
+
+		// If the page is associated with a context help id, add a default
+		// help action button into the toolbar
+		if (getContextHelpId() != null) {
+			HelpAction helpAction = new HelpAction(getContextHelpId());
+			manager.add(helpAction);
+		}
 	}
 
 	/**
