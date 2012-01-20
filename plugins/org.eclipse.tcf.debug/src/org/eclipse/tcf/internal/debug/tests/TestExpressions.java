@@ -168,7 +168,7 @@ class TestExpressions implements ITCFTest,
                                     }
                                     else if (cnt < 600) {
                                         if (test_done && !cancel_test_sent) {
-                                            test_rc.cancel(thread_id, test_ctx_id);
+                                            test_rc.cancel(test_ctx_id);
                                             cancel_test_sent = true;
                                         }
                                         Protocol.invokeLater(100, this);

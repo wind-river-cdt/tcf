@@ -93,15 +93,15 @@ class TestAttachTerminate implements ITCFTest, IRunControl.RunControlListener {
                     if (error != null) {
                         exit(error);
                     }
+                    else if (id == null) {
+                        exit(new Error("Invalid ID in Diagnostics.runTest responce"));
+                    }
+                    else if (test_rc.getContext(id) == null) {
+                        exit(new Error("Missing 'contextAdded' event for context " + id));
+                    }
                     else {
-                        assert id != null;
-                        if (test_rc.getContext(id) == null) {
-                            exit(new Error("Missing 'contextAdded' event for context " + id));
-                        }
-                        else {
-                            test_ctx_ids.add(id);
-                            test_rc.cancel(id, id);
-                        }
+                        test_ctx_ids.add(id);
+                        test_rc.cancel(id);
                     }
                 }
             });
