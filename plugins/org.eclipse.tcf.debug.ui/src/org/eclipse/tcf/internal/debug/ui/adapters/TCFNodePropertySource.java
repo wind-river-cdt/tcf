@@ -70,6 +70,10 @@ public class TCFNodePropertySource implements IPropertySource {
 
     public IPropertyDescriptor[] getPropertyDescriptors() {
         if (descriptors == null) {
+            if (node == null) {
+                // A disconnected TCF launch was selected
+                return descriptors = new IPropertyDescriptor[0];
+            }
             try {
                 final List<IPropertyDescriptor> list = new ArrayList<IPropertyDescriptor>();
                 descriptors = new TCFTask<IPropertyDescriptor[]>(node.getChannel()) {
@@ -207,12 +211,6 @@ public class TCFNodePropertySource implements IPropertySource {
                         TCFLaunch launch = launch_node.getModel().getLaunch();
                         Set<String> filter = launch.getContextFilter();
                         if (filter != null) addDescriptor("Context Filter", "Context IDs", filter.toString());
-                        addDescriptor("Launch Status", "Connecting", launch.isConnecting());
-                        addDescriptor("Launch Status", "Disconnected", launch.isDisconnected());
-                        addDescriptor("Launch Status", "Terminated", launch.isTerminated());
-                        addDescriptor("Launch Status", "Exited", launch.isExited());
-                        Throwable error = launch.getError();
-                        if (error != null) addDescriptor("Launch Status", "Error", TCFModel.getErrorMessage(error, false));
                         done(list.toArray(new IPropertyDescriptor[list.size()]));
                     }
 
