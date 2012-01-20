@@ -1,5 +1,5 @@
 # *******************************************************************************
-# * Copyright (c) 2011 Wind River Systems, Inc. and others.
+# * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others.
 # * All rights reserved. This program and the accompanying materials
 # * are made available under the terms of the Eclipse Public License v1.0
 # * which accompanies this distribution, and is available at
@@ -203,7 +203,7 @@ class FileSystemProxy(filesystem.FileSystemService):
                 else:
                     assert len(args) == 2
                     s = self._toSFError(args[0])
-                    if not s: h = self._toFileHandle(args[1])
+                    if not s: h = service._toFileHandle(args[1])
                 done.doneOpen(self.token, s, h)
         return OpenCommand().token
 
@@ -221,7 +221,7 @@ class FileSystemProxy(filesystem.FileSystemService):
                 else:
                     assert len(args) == 2
                     s = self._toSFError(args[0])
-                    if not s: h = self._toFileHandle(args[1])
+                    if not s: h = service._toFileHandle(args[1])
                 done.doneOpen(self.token, s, h)
         return OpenDirCommand().token
 
@@ -458,15 +458,15 @@ def _toObject(attrs):
     m = {}
     if attrs.attributes is not None: m.update(attrs.attributes)
     if (attrs.flags & filesystem.ATTR_SIZE) != 0:
-        m.put("Size", attrs.size)
+        m["Size"] = attrs.size
     if (attrs.flags & filesystem.ATTR_UIDGID) != 0:
-        m.put("UID", attrs.uid)
-        m.put("GID", attrs.gid)
+        m["UID"] = attrs.uid
+        m["GID"] = attrs.gid
     if (attrs.flags & filesystem.ATTR_PERMISSIONS) != 0:
-        m.put("Permissions", attrs.permissions)
+        m["Permissions"] = attrs.permissions
     if (attrs.flags & filesystem.ATTR_ACMODTIME) != 0:
-        m.put("ATime", attrs.atime)
-        m.put("MTime", attrs.mtime)
+        m["ATime"] = attrs.atime
+        m["MTime"] = attrs.mtime
     return m
 
 def _toFileAttrs(m):
