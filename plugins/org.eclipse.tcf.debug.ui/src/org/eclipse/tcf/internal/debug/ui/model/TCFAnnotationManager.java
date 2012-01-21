@@ -568,7 +568,7 @@ public class TCFAnnotationManager {
                                                     updateBPMarker(bp, area);
                                                 }
                                                 else {
-                                                TCFAnnotation a = new TCFAnnotation(memory.id, area,
+                                                    TCFAnnotation a = new TCFAnnotation(memory.id, area,
                                                         ImageCache.getImage(ImageCache.IMG_BREAKPOINT_INSTALLED),
                                                         MessageFormat.format(Messages.TCFAnnotationManager_0, String.format("0x%s",addr.toString(16))),
                                                         TYPE_BP_INSTANCE);
