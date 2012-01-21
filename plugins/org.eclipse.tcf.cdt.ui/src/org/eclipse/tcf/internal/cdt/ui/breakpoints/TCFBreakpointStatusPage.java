@@ -17,8 +17,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.text.MessageFormat;
 
 import org.eclipse.cdt.debug.core.model.ICBreakpoint;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -39,7 +41,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.tcf.internal.cdt.ui.ImageCache;
 import org.eclipse.tcf.internal.debug.model.TCFBreakpointsStatus;
 import org.eclipse.tcf.internal.debug.model.TCFLaunch;
-import org.eclipse.tcf.internal.debug.model.TCFSourceRef;
 import org.eclipse.tcf.internal.debug.ui.model.TCFModel;
 import org.eclipse.tcf.internal.debug.ui.model.TCFModelManager;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNode;
@@ -61,6 +62,7 @@ public class TCFBreakpointStatusPage extends PropertyPage {
         Object object;
         String text;
         boolean has_state;
+        boolean is_property = false;
         boolean planted_ok;
         List<StatusItem> children;
         StatusItem parent;
@@ -97,11 +99,14 @@ public class TCFBreakpointStatusPage extends PropertyPage {
                 set(null, null, null);
                 return true;
             }
-            Map<String,Object> map = status.getStatus(getBreakpoint());
+            ICBreakpoint bp = getBreakpoint();
+            Map<String,Object> map = status.getStatus(bp);
             if (map == null || map.size() == 0) {
                 set(null, null, null);
                 return true;
             }
+            
+            IMarker marker = bp.getMarker();    
             StatusItem x = new StatusItem();
             x.object = launch;
             Object planted = map.get(IBreakpoints.STATUS_INSTANCES);
@@ -118,49 +123,77 @@ public class TCFBreakpointStatusPage extends PropertyPage {
                         StatusItem y = getNodeItem(x, model.getNode(ctx_id));
                         if (y != null) {
                             StatusItem z = new StatusItem();
+                            StatusItem addressList = null;
+                            StatusItem z1 = null;
+                            StatusItem z2 = null;
                             z.text = (String)m.get(IBreakpoints.INSTANCE_ERROR);
-                            if (z.text == null) {
-                                Number addr = (Number)m.get(IBreakpoints.INSTANCE_ADDRESS);
-                                if (addr != null) {
-                                    BigInteger i = JSON.toBigInteger(addr);
-                                    z.text = "Planted at 0x" + i.toString(16);
-                                    z.planted_ok = true;
-                                    Number size = (Number)m.get(IBreakpoints.INSTANCE_SIZE);
-                                    if (size != null) z.text += "; Size " + size;
-                                    String type = (String)m.get(IBreakpoints.INSTANCE_TYPE);
-                                    if (type != null) z.text += "; Type: " + type;
-                                    if (y.object instanceof TCFNode) {
-                                        TCFDataCache<TCFNodeExecContext> mem = model.searchMemoryContext((TCFNode)y.object);
-                                        if (mem != null) {
-                                            if (!mem.validate(this)) {
-                                                pending = mem;
-                                            }
-                                            else {
-                                                TCFNodeExecContext ctx = mem.getData();
-                                                if (ctx != null) {
-                                                    TCFDataCache<TCFSourceRef> ln_cache = ctx.getLineInfo(i);
-                                                    if (ln_cache != null) {
-                                                        if (!ln_cache.validate()) {
-                                                            pending = ln_cache;
-                                                        }
-                                                        else {
-                                                            TCFSourceRef ref = ln_cache.getData();
-                                                            if (ref != null && ref.area != null && ref.area.file != null) {
-                                                                z.text += "; " + ref.area.file + ":" + ref.area.start_line;
-                                                                if (ref.area.start_column > 0) z.text += "." + ref.area.start_column;
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
                             z.parent = y;
                             if (y.children == null) y.children = new ArrayList<StatusItem>();
                             y.children.add(z);
-                        }
+                            
+                            if (z.text == null) {
+                                z.text = marker.getAttribute(IMarker.MESSAGE, (String)null);
+                                Number addr = (Number)m.get(IBreakpoints.INSTANCE_ADDRESS);
+                                if (addr != null) {
+                                    addressList = new StatusItem();
+                                    // TODO: Add logic to handle a list of addresses (when the result format is updated).
+                                    BigInteger i = JSON.toBigInteger(addr);
+                                    addressList.text = MessageFormat.format(Messages.TCFBreakpointStatusPage_0 , String.format("0x%s", i.toString(16)));
+                                    z.planted_ok = true;
+                                    addressList.is_property = true;
+                                    Number size = (Number)m.get(IBreakpoints.INSTANCE_SIZE);
+                                    if (size != null) {
+                                        z1 = new StatusItem();
+                                        z1.text = MessageFormat.format(Messages.TCFBreakpointStatusPage_1,size);
+                                        z1.is_property = true;
+                                    }
+                                    String type = (String)m.get(IBreakpoints.INSTANCE_TYPE);
+                                    if (type != null) {
+                                        z2 = new StatusItem();
+                                        z2.text = MessageFormat.format(Messages.TCFBreakpointStatusPage_6,type);
+                                        z2.is_property = true;
+                                    }
+                                }
+                                if (z.children == null) z.children = new ArrayList<StatusItem>();
+                                if (addressList != null) {
+                                    addressList.parent = z;
+                                    z.children.add(addressList);
+                                }
+                                if (z1 != null) {
+                                    z1.parent = z;
+                                    z.children.add(z1);
+                                }
+                                if (z2 != null) {
+                                    z2.parent = z;
+                                    z.children.add(z2);
+                                }
+
+                                String req_file = marker.getAttribute(ICBreakpoint.ATTR_REQUESTED_FILE, (String)null);
+
+                                if ( req_file != null) {
+                                    StatusItem orig_file_item = new StatusItem();
+                                    StatusItem file_item = null;
+                                    int line_num = marker.getAttribute(ICBreakpoint.ATTR_REQUESTED_LINE, -1);
+                                    String file = marker.getAttribute(ICBreakpoint.SOURCE_HANDLE, (String)null);
+                                    int current_line_num = marker.getAttribute(IMarker.LINE_NUMBER, -1);
+                                    Object[] req_args = {req_file, line_num};
+                                    orig_file_item.text = MessageFormat.format(Messages.TCFBreakpointStatusPage_2, req_args);
+                                    if (line_num != current_line_num) {
+                                        file_item = new StatusItem();
+                                        Object[] current_args = {file, current_line_num};
+                                        file_item.text = MessageFormat.format(Messages.TCFBreakpointStatusPage_3 , current_args);
+                                    }
+                                    orig_file_item.parent = z;
+                                    orig_file_item.is_property = true;
+                                    z.children.add(orig_file_item);
+                                    if (file_item != null) {
+                                        file_item.parent = z;
+                                        file_item.is_property = true;
+                                        z.children.add(file_item);
+                                    }
+                                }
+                            }
+                        }    
                     }
                 }
             }
@@ -257,6 +290,7 @@ public class TCFBreakpointStatusPage extends PropertyPage {
             }
             if (x.has_state) return DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_THREAD_RUNNING);
             if (x.object != null) return DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_DEBUG_TARGET);
+            if (x.is_property) return null;
             if (x.planted_ok) return DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_BREAKPOINT);
             return DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_BREAKPOINT_DISABLED);
         }
@@ -287,7 +321,7 @@ public class TCFBreakpointStatusPage extends PropertyPage {
 
     private void createStatusViewer(Composite parent) {
         Label label = new Label(parent, SWT.NONE);
-        label.setText("Breakpoint planting status:");
+        label.setText(Messages.TCFBreakpointStatusPage_4);
         label.setFont(parent.getFont());
         label.setLayoutData(new GridData());
         GridData data = new GridData(GridData.FILL_BOTH);
@@ -333,7 +367,7 @@ public class TCFBreakpointStatusPage extends PropertyPage {
                 for (StatusCache cache : caches) cache.dispose();
                 if (roots.size() == 0) {
                     StatusItem x = new StatusItem();
-                    x.text = "Not planted";
+                    x.text = Messages.TCFBreakpointStatusPage_5;
                     roots.add(x);
                 }
                 done(roots);
