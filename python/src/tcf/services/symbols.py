@@ -314,7 +314,8 @@ class DoneGetContext(object):
         @param error - error description if operation failed, None if succeeded.
         @param context - context properties.
         """
-        pass
+        pass
+
 class DoneGetChildren(object):
     """
     Client call back interface for getChildren().
