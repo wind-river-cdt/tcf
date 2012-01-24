@@ -70,7 +70,11 @@ public class BreakpointsListener implements IBreakpointsListener {
 
     public void breakpointsRemoved(IBreakpoint[] bps, IMarkerDelta[] deltas) {
         for (int i =0; i < bps.length; i++) {
-            if (fTester.checkEvent(EventType.REMOVED, bps[i], deltas[i].getAttributes())) {
+        	Map<String,Object> attributes = Collections.emptyMap();
+        	if (deltas[i] != null) {
+        		attributes = deltas[i].getAttributes();
+        	}        	
+            if (fTester.checkEvent(EventType.REMOVED, bps[i], attributes)) {
                 synchronized(this) {
                     fWaiting = false;
                     notifyAll();
@@ -82,7 +86,11 @@ public class BreakpointsListener implements IBreakpointsListener {
 
     public void breakpointsChanged(IBreakpoint[] bps, IMarkerDelta[] deltas) {
         for (int i =0; i < bps.length; i++) {
-            if (fTester.checkEvent(EventType.CHANGED, bps[i], deltas[i].getAttributes())) {
+        	Map<String,Object> attributes = Collections.emptyMap();
+        	if (deltas[i] != null) {
+        		attributes = deltas[i].getAttributes();
+        	}        	        	
+            if (fTester.checkEvent(EventType.CHANGED, bps[i], attributes)) {
                 synchronized(this) {
                     fWaiting = false;
                     notifyAll();
