@@ -490,7 +490,7 @@ public class TerminalsLauncher extends PlatformObject implements ITerminalsLaunc
 			title.append("[").append(peerName.get()).append("]"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		DateFormat format = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG);
+		DateFormat format = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 		String date = format.format(new Date(System.currentTimeMillis()));
 		title.append(" (").append(date).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
 
