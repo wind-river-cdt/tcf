@@ -36,11 +36,13 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.MultiRule;
 import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.IBreakpointManager;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationListener;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IBreakpoint;
+import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.ISourcePresentation;
@@ -86,9 +88,9 @@ import org.eclipse.ui.texteditor.ITextEditor;
 public class TCFAnnotationManager {
 
     private static final String
-        TYPE_BP_INSTANCE = "org.eclipse.tcf.debug.breakpoint_instance",
-        TYPE_TOP_FRAME = "org.eclipse.tcf.debug.top_frame",
-        TYPE_STACK_FRAME = "org.eclipse.tcf.debug.stack_frame";
+        TYPE_BP_INSTANCE = "org.eclipse.tcf.debug.breakpoint_instance", //$NON-NLS-1$
+        TYPE_TOP_FRAME = "org.eclipse.tcf.debug.top_frame", //$NON-NLS-1$
+        TYPE_STACK_FRAME = "org.eclipse.tcf.debug.stack_frame"; //$NON-NLS-1$
 
     class TCFAnnotation extends Annotation {
 
