@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.tcf.debug.test.BreakpointsListener.EventTester;
 import org.eclipse.tcf.debug.test.BreakpointsListener.EventType;
+import org.eclipse.tcf.debug.test.services.RunControlCM.ContextState;
 import org.eclipse.tcf.debug.test.util.Transaction;
 import org.eclipse.tcf.internal.debug.ui.launch.TCFLaunchContext;
 import org.eclipse.tcf.protocol.Protocol;
@@ -48,12 +49,13 @@ public class BreakpointsTest extends AbstractTcfUITest
         return new Transaction<CodeArea>() {
             @Override
             protected CodeArea process() throws InvalidCacheException, ExecutionException {
-                String symId = validate ( fSymbolsCM.find(fProcessId, BigInteger.valueOf(0), "tcf_test_func0") );
+            	ContextState state = validate ( fRunControlCM.getState(fThreadId) );
+                String symId = validate ( fSymbolsCM.find(fProcessId, new BigInteger(state.pc), "tcf_test_func0") );
                 Symbol sym = validate ( fSymbolsCM.getContext(symId) );
                 CodeArea[] area = validate ( fLineNumbersCM.mapToSource(
-                    fProcessId, 
-                    sym.getAddress(), 
-                    new BigInteger(sym.getAddress().toString()).add(BigInteger.valueOf(1))) );
+                		fProcessId,
+                		sym.getAddress(),
+                		new BigInteger(sym.getAddress().toString()).add(BigInteger.valueOf(1))) );
                 return area[0];
             }
         }.get();
