@@ -1661,7 +1661,7 @@
    <extension point="org.eclipse.ui.preferencePages">
       <page
             category="org.eclipse.tcf.te.ui.preferences.general"
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.preferences.TargetExplorerPreferencePage"
+            class="org.eclipse.tcf.te.tcf.filesystem.internal.preferences.PreferencePage"
             id="org.eclipse.tcf.te.ui.preferences.tcf.filesystem"
             name="%preference.page.name">
       </page>
