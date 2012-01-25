@@ -81,7 +81,7 @@
 
 <!-- Menu contributions -->
    <extension point="org.eclipse.ui.menus">
-      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.TargetExplorer#Popup?after=group.launch">
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.launch">
          <command
                commandId="org.eclipse.tcf.te.ui.terminals.command.launch"
                helpContextId="org.eclipse.tcf.te.ui.terminals.command_Launch"

@@ -40,7 +40,7 @@
 
 <!-- Processes menu contributions -->
    <extension point="org.eclipse.ui.menus">
-      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.TargetExplorer#Popup?after=group.launch">
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.launch">
          <command
                commandId="org.eclipse.tcf.te.tcf.processes.ui.command.launch"
                helpContextId="org.eclipse.tcf.te.tcf.processes.ui.command_Launch"
@@ -96,7 +96,7 @@
          </dynamic>
       </menuContribution>
 
-      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.TargetExplorer#Popup?after=group.launch.rundebug">
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.launch.rundebug">
          <command
                commandId="org.eclipse.tcf.te.launch.command.attach"
                disabledIcon="platform:/plugin/org.eclipse.tcf.te.launch.ui/icons/dlcl16/attach.gif"
@@ -222,7 +222,7 @@
          </command>
       </menuContribution>
       <menuContribution
-            locationURI="popup:org.eclipse.tcf.te.ui.views.TargetExplorer#Popup?after=group.properties">
+            locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.properties">
          <command
                commandId="org.eclipse.ui.file.properties"
                id="properties"
@@ -312,7 +312,7 @@
                   <with variable="activePartId">
                      <or>
                         <equals
-                              value="org.eclipse.tcf.te.ui.views.TargetExplorer">
+                              value="org.eclipse.tcf.te.ui.views.View">
                         </equals>
                         <equals
                               value="org.eclipse.tcf.te.ui.views.Editor">
@@ -342,7 +342,7 @@
                   <with variable="activePartId">
                      <or>
                         <equals
-                              value="org.eclipse.tcf.te.ui.views.TargetExplorer">
+                              value="org.eclipse.tcf.te.ui.views.View">
                         </equals>
                         <equals
                               value="org.eclipse.tcf.te.ui.views.Editor">
@@ -517,7 +517,7 @@
    
    <extension point="org.eclipse.ui.navigator.viewer">
       <viewerContentBinding
-            viewerId="org.eclipse.tcf.te.ui.views.TargetExplorer">
+            viewerId="org.eclipse.tcf.te.ui.views.View">
          <includes>
             <contentExtension
                   isRoot="true"

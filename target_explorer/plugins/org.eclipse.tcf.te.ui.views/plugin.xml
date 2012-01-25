@@ -7,10 +7,10 @@
 <!-- Common Navigator contributions -->
    <extension point="org.eclipse.ui.navigator.viewer">
       <viewer
-            helpContext="org.eclipse.tcf.te.ui.views.TargetExplorer"
-            viewerId="org.eclipse.tcf.te.ui.views.TargetExplorer">
+            helpContext="org.eclipse.tcf.te.ui.views.View"
+            viewerId="org.eclipse.tcf.te.ui.views.View">
             <popupMenu
-                  id="org.eclipse.tcf.te.ui.views.TargetExplorer#Popup"
+                  id="org.eclipse.tcf.te.ui.views.View#Popup"
                   allowsPlatformContributions="true">
                   <insertionPoint name="group.new" separator="true"/>
                   <insertionPoint name="group.goto"/>
@@ -53,7 +53,7 @@
             </options>
       </viewer>
 
-      <viewerContentBinding viewerId="org.eclipse.tcf.te.ui.views.TargetExplorer">
+      <viewerContentBinding viewerId="org.eclipse.tcf.te.ui.views.View">
          <includes>
             <contentExtension
                   isRoot="true"
@@ -63,7 +63,7 @@
       </viewerContentBinding>
       
       <viewerActionBinding
-            viewerId="org.eclipse.tcf.te.ui.views.TargetExplorer">
+            viewerId="org.eclipse.tcf.te.ui.views.View">
             <includes>
                <actionExtension
                      pattern="org.eclipse.tcf.te.ui.views.navigator.actions.*">
@@ -154,7 +154,7 @@
             category="org.eclipse.tcf.te.ui.views.category"
             class="org.eclipse.tcf.te.ui.views.internal.View"
             icon="icons/eview16/targets_view.gif"
-            id="org.eclipse.tcf.te.ui.views.TargetExplorer"
+            id="org.eclipse.tcf.te.ui.views.View"
             name="%TargetExplorer.name"
             restorable="true">
       </view>
@@ -176,7 +176,7 @@
       	 <!-- Run/Debug actions should be available -->
          <actionSet id="org.eclipse.debug.ui.launchActionSet"/>
 		 <!-- Register the view shortcuts  -->
-         <viewShortcut id="org.eclipse.tcf.te.ui.views.TargetExplorer"/>
+         <viewShortcut id="org.eclipse.tcf.te.ui.views.View"/>
       </perspectiveExtension>
    </extension>
 
@@ -235,7 +235,7 @@
 
 <!-- Target Explorer menu contributions -->
    <extension point="org.eclipse.ui.menus">
-      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.TargetExplorer#Popup?after=group.refresh">
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.refresh">
          <command
                commandId="org.eclipse.tcf.te.ui.command.refresh"
                id="org.eclipse.tcf.te.ui.commands.refresh"
@@ -256,7 +256,7 @@
          </command>
       </menuContribution>
 
-      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.TargetExplorer#Popup?after=group.delete">
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.delete">
          <command
                commandId="org.eclipse.ui.edit.delete"
                disabledIcon="platform:/plugin/org.eclipse.ui/icons/full/dtool16/delete.gif"
@@ -280,7 +280,7 @@
          </command>
       </menuContribution>
    
-      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.TargetExplorer#Popup?after=group.properties">
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.properties">
          <command
                commandId="org.eclipse.ui.file.properties"
                helpContextId="org.eclipse.tcf.te.ui.views.command_Properties"
@@ -299,9 +299,9 @@
          </command>
       </menuContribution>
       
-      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.TargetExplorer#Popup?after=group.showIn">
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.showIn">
          <menu
-               id="org.eclipse.tcf.te.ui.views.TargetExplorer.showIn"
+               id="org.eclipse.tcf.te.ui.views.View.showIn"
                label="%menu.showIn.label">
             <command
                   commandId="org.eclipse.tcf.te.ui.views.command.ShowInProperties"
@@ -348,7 +348,7 @@
          <activeWhen>
             <and>
                <with variable="activePartId">
-                  <equals value="org.eclipse.tcf.te.ui.views.TargetExplorer"/>
+                  <equals value="org.eclipse.tcf.te.ui.views.View"/>
                </with>
                <with variable="selection">
                   <iterate operator="and" ifEmpty="false">
@@ -369,7 +369,7 @@
          </enabledWhen>
          <activeWhen>
             <with variable="activePartId">
-               <equals value="org.eclipse.tcf.te.ui.views.TargetExplorer"/>
+               <equals value="org.eclipse.tcf.te.ui.views.View"/>
             </with>
          </activeWhen>
       </handler>
@@ -379,7 +379,7 @@
             commandId="org.eclipse.tcf.te.ui.views.command.ShowInProperties">
          <activeWhen>
             <with variable="activePartId">
-               <equals value="org.eclipse.tcf.te.ui.views.TargetExplorer"/>
+               <equals value="org.eclipse.tcf.te.ui.views.View"/>
             </with>
          </activeWhen>
       </handler>
@@ -391,7 +391,7 @@
                <and>
                   <with variable="activePartId">
                      <or>
-                        <equals value="org.eclipse.tcf.te.ui.views.TargetExplorer"/>
+                        <equals value="org.eclipse.tcf.te.ui.views.View"/>
                         <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
                      </or>
                   </with>
@@ -422,7 +422,7 @@
                <and>
                   <with variable="activePartId">
                      <or>
-                        <equals value="org.eclipse.tcf.te.ui.views.TargetExplorer"/>
+                        <equals value="org.eclipse.tcf.te.ui.views.View"/>
                         <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
                      </or>
                   </with>

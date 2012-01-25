@@ -4,7 +4,7 @@
 
 <!-- Common navigator contributions -->
    <extension point="org.eclipse.ui.navigator.viewer">
-      <viewerContentBinding viewerId="org.eclipse.tcf.te.ui.views.TargetExplorer">
+      <viewerContentBinding viewerId="org.eclipse.tcf.te.ui.views.View">
          <includes>
             <contentExtension
                   isRoot="true"
@@ -13,7 +13,7 @@
       </viewerContentBinding>
       <dragAssistant
             class="org.eclipse.tcf.te.tcf.filesystem.internal.dnd.FSDragAdapterAssistant"
-            viewerId="org.eclipse.tcf.te.ui.views.TargetExplorer">
+            viewerId="org.eclipse.tcf.te.ui.views.View">
       </dragAssistant>
    </extension>
    
@@ -550,7 +550,7 @@
                </visibleWhen>
          </command>
       </menuContribution>
-      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.TargetExplorer#Popup?after=group.properties">
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.properties">
          <command
                commandId="org.eclipse.ui.file.properties"
                helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Properties"
@@ -576,7 +576,7 @@
                </visibleWhen>
          </command>
       </menuContribution>
-      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.TargetExplorer#Popup?after=group.open">
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.open">
          <command
                commandId="org.eclipse.ui.navigator.Open"
                helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Open"
@@ -998,7 +998,7 @@
                      variable="activePartId">
                   <or>
                      <equals
-                           value="org.eclipse.tcf.te.ui.views.TargetExplorer">
+                           value="org.eclipse.tcf.te.ui.views.View">
                      </equals>
                      <equals
                            value="org.eclipse.tcf.te.ui.views.Editor">
@@ -1068,7 +1068,7 @@
                   variable="activePartId">
                <or>
                   <equals
-                        value="org.eclipse.tcf.te.ui.views.TargetExplorer">
+                        value="org.eclipse.tcf.te.ui.views.View">
                   </equals>
                   <equals
                         value="org.eclipse.tcf.te.ui.views.Editor">
@@ -1112,7 +1112,7 @@
                   variable="activePartId">
                <or>
                   <equals
-                        value="org.eclipse.tcf.te.ui.views.TargetExplorer">
+                        value="org.eclipse.tcf.te.ui.views.View">
                   </equals>
                   <equals
                         value="org.eclipse.tcf.te.ui.views.Editor">
@@ -1156,7 +1156,7 @@
                   variable="activePartId">
                <or>
                   <equals
-                        value="org.eclipse.tcf.te.ui.views.TargetExplorer">
+                        value="org.eclipse.tcf.te.ui.views.View">
                   </equals>
                   <equals
                         value="org.eclipse.tcf.te.ui.views.Editor">
@@ -1200,7 +1200,7 @@
                   variable="activePartId">
                <or>
                   <equals
-                        value="org.eclipse.tcf.te.ui.views.TargetExplorer">
+                        value="org.eclipse.tcf.te.ui.views.View">
                   </equals>
                   <equals
                         value="org.eclipse.tcf.te.ui.views.Editor">
@@ -1252,7 +1252,7 @@
                   variable="activePartId">
                <or>
                   <equals
-                        value="org.eclipse.tcf.te.ui.views.TargetExplorer">
+                        value="org.eclipse.tcf.te.ui.views.View">
                   </equals>
                   <equals
                         value="org.eclipse.tcf.te.ui.views.Editor">
@@ -1309,7 +1309,7 @@
                   variable="activePartId">
                <or>
                   <equals
-                        value="org.eclipse.tcf.te.ui.views.TargetExplorer">
+                        value="org.eclipse.tcf.te.ui.views.View">
                   </equals>
                   <equals
                         value="org.eclipse.tcf.te.ui.views.Editor">
@@ -1347,7 +1347,7 @@
                   variable="activePartId">
                <or>
                   <equals
-                        value="org.eclipse.tcf.te.ui.views.TargetExplorer">
+                        value="org.eclipse.tcf.te.ui.views.View">
                   </equals>
                   <equals
                         value="org.eclipse.tcf.te.ui.views.Editor">
@@ -1382,7 +1382,7 @@
                   variable="activePartId">
                <or>
                   <equals
-                        value="org.eclipse.tcf.te.ui.views.TargetExplorer">
+                        value="org.eclipse.tcf.te.ui.views.View">
                   </equals>
                   <equals
                         value="org.eclipse.tcf.te.ui.views.Editor">
@@ -1439,7 +1439,7 @@
                   variable="activePartId">
                <or>
                   <equals
-                        value="org.eclipse.tcf.te.ui.views.TargetExplorer">
+                        value="org.eclipse.tcf.te.ui.views.View">
                   </equals>
                   <equals
                         value="org.eclipse.tcf.te.ui.views.Editor">
@@ -1713,7 +1713,7 @@
             </and>
          </activation>
          <contributeTo
-               viewerId="org.eclipse.tcf.te.ui.views.TargetExplorer">
+               viewerId="org.eclipse.tcf.te.ui.views.View">
          </contributeTo>
          <contributeTo
                viewerId="org.eclipse.tcf.te.ui.controls.viewer.fs">

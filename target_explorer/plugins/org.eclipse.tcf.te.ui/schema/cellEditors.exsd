@@ -157,7 +157,7 @@ The cell editor factory implementation class must be specified either by the &qu
             &lt;/and&gt;
          &lt;/activation&gt;
          &lt;contributeTo
-               viewerId=&quot;org.eclipse.tcf.te.ui.views.TargetExplorer&quot;&gt;
+               viewerId=&quot;org.eclipse.tcf.te.ui.views.View&quot;&gt;
          &lt;/contributeTo&gt;
          &lt;contributeTo
                viewerId=&quot;org.eclipse.tcf.te.ui.controls.viewer.fs&quot;&gt;

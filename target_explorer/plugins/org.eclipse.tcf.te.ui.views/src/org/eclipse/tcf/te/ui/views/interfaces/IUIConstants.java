@@ -17,7 +17,7 @@ public interface IUIConstants {
 	/**
 	 * The target explorer view id.
 	 */
-	public static final String ID_EXPLORER = "org.eclipse.tcf.te.ui.views.TargetExplorer"; //$NON-NLS-1$
+	public static final String ID_EXPLORER = "org.eclipse.tcf.te.ui.views.View"; //$NON-NLS-1$
 
 	/**
 	 * The target explorer editor id.

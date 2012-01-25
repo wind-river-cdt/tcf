@@ -59,7 +59,7 @@
    <extension point="org.eclipse.ui.contexts">
       <context
             description="%context.targetexplorer.description"
-            id="org.eclipse.tcf.te.ui.views.TargetExplorer"
+            id="org.eclipse.tcf.te.ui.views.View"
             name="%context.targetexplorer.name"
             parentId="org.eclipse.ui.contexts.window">
       </context>
@@ -74,14 +74,14 @@
    <extension point="org.eclipse.ui.bindings">
       <key
             commandId="org.eclipse.tcf.te.ui.command.newWizards"
-            contextId="org.eclipse.tcf.te.ui.views.TargetExplorer"
+            contextId="org.eclipse.tcf.te.ui.views.View"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+N">
       </key>
 
       <key
             commandId="org.eclipse.tcf.te.ui.command.refresh"
-            contextId="org.eclipse.tcf.te.ui.views.TargetExplorer"
+            contextId="org.eclipse.tcf.te.ui.views.View"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="F5">
       </key>
