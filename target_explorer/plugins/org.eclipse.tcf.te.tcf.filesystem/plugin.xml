@@ -114,7 +114,7 @@
             <with variable="activeEditorInput">
                <and>
                   <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
-                  <test property="org.eclipse.tcf.te.tcf.locator.hasRemoteService" value="Processes"/>
+                  <test property="org.eclipse.tcf.te.tcf.locator.hasRemoteService" value="FileSystem"/>
                   <test
                         property="org.eclipse.tcf.te.runtime.preference"
                         args="bundleId=org.eclipse.tcf.te.tcf.filesystem,key=tcf.filesystem.core.feature.editor.content.enable"

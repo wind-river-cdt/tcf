@@ -13,7 +13,7 @@
       </factory>
    </extension>
 
-<!-- Target Explorer Details Editor page contributions -->
+<!-- Editor page contributions -->
    <extension point="org.eclipse.tcf.te.ui.views.editorPages">
       <editorPage
             class="org.eclipse.tcf.te.ui.views.editor.pages.TreeViewerExplorerEditorPage:org.eclipse.tcf.te.ui.controls.viewer.processes:Process Monitor"
@@ -22,7 +22,7 @@
       </editorPage>
    </extension>
 
-<!-- Target Explorer Details Editor page binding contributions -->
+<!-- Editor page binding contributions -->
    <extension point="org.eclipse.tcf.te.ui.views.editorPageBindings">
       <editorPageBinding
             id="org.eclipse.tcf.te.tcf.processes.ui.binding.ProcessExplorerEditorPage"
