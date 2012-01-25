@@ -58,9 +58,9 @@
 <!-- Context and binding contributions -->
    <extension point="org.eclipse.ui.contexts">
       <context
-            description="%context.targetexplorer.description"
+            description="%context.view.description"
             id="org.eclipse.tcf.te.ui.views.View"
-            name="%context.targetexplorer.name"
+            name="%context.view.name"
             parentId="org.eclipse.ui.contexts.window">
       </context>
       <context

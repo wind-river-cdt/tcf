@@ -155,7 +155,7 @@
             class="org.eclipse.tcf.te.ui.views.internal.View"
             icon="icons/eview16/targets_view.gif"
             id="org.eclipse.tcf.te.ui.views.View"
-            name="%TargetExplorer.name"
+            name="%View.name"
             restorable="true">
       </view>
    </extension>
