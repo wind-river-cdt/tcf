@@ -3,7 +3,7 @@
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
@@ -53,7 +53,7 @@ import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.menus.IMenuService;
 
 /**
- * Target Explorer, RCP: Adds actions to the application window.
+ * RCP: Adds actions to the application window.
  */
 @SuppressWarnings("restriction")
 public final class ApplicationActionBarAdvisor extends ActionBarAdvisor {

@@ -254,7 +254,7 @@
    <extension point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
       <propertyTabs contributorId="org.eclipse.tcf.te.ui">
          <propertyTab
-               category="target_explorer"
+               category="org.eclipse.tcf.te"
                id="org.eclipse.tcf.te.ui.views.propertyTab.peer.general"
                label="%propertyTab.general.label">
          </propertyTab>

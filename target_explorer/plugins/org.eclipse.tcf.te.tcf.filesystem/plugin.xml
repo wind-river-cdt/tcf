@@ -1889,19 +1889,19 @@
       <propertyTabs
             contributorId="org.eclipse.tcf.te.ui">
          <propertyTab
-               category="target_explorer"
+               category="org.eclipse.tcf.te"
                id="org.eclipse.tcf.te.tcf.filesystem.propertytab.general"
                label="%propertyTab.general.label">
          </propertyTab>
          <propertyTab
                afterTab="org.eclipse.tcf.te.tcf.filesystem.propertytab.general"
-               category="target_explorer"
+               category="org.eclipse.tcf.te"
                id="org.eclipse.tcf.te.tcf.filesystem.propertytab.permissions"
                label="%propertyTab.permission.label">
          </propertyTab>
          <propertyTab
                afterTab="org.eclipse.tcf.te.tcf.filesystem.propertytab.general,org.eclipse.tcf.te.tcf.filesystem.propertytab.permissions"
-               category="target_explorer"
+               category="org.eclipse.tcf.te"
                id="org.eclipse.tcf.te.tcf.filesystem.propertytab.advanced"
                label="%propertyTab.advanced.label">
          </propertyTab>

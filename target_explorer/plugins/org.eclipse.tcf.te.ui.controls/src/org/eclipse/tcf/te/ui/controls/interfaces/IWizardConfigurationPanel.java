@@ -17,7 +17,7 @@ import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
- * Target explorer: Interface to deal with the replaceable wizard configuration panels.
+ * Interface to deal with the replaceable wizard configuration panels.
  */
 public interface IWizardConfigurationPanel extends IMessageProvider {
 

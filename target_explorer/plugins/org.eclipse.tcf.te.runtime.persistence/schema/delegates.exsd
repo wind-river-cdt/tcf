@@ -3,10 +3,10 @@
 <schema targetNamespace="org.eclipse.tcf.te.runtime.persistence" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.eclipse.tcf.te.runtime.persistence" id="delegates" name="Target Explorer Persistence Delegates"/>
+         <meta.schema plugin="org.eclipse.tcf.te.runtime.persistence" id="delegates" name="Persistence Delegates"/>
       </appinfo>
       <documentation>
-         This extension point is used to allow the contribution of new Target Explorer persistence delegates.
+         This extension point is used to allow the contribution of new persistence delegates.
       </documentation>
    </annotation>
 
@@ -50,7 +50,7 @@
    <element name="delegate">
       <annotation>
          <documentation>
-            Declares a Target Explorer persistence delegate contribution.
+            Declares a persistence delegate contribution.
          </documentation>
       </annotation>
       <complexType>

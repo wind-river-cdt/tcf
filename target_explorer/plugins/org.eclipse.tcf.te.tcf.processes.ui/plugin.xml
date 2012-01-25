@@ -535,19 +535,19 @@
       <propertyTabs
             contributorId="org.eclipse.tcf.te.ui">
          <propertyTab
-               category="target_explorer"
+               category="org.eclipse.tcf.te"
                id="org.eclipse.tcf.te.tcf.processes.ui.propertytab.general"
                label="%propertyTab.general.label">
          </propertyTab>
          <propertyTab
                afterTab="org.eclipse.tcf.te.tcf.processes.ui.propertytab.general"
-               category="target_explorer"
+               category="org.eclipse.tcf.te"
                id="org.eclipse.tcf.te.tcf.processes.ui.propertytab.context"
                label="%propertyTab.context.label">
          </propertyTab>
          <propertyTab
                afterTab="org.eclipse.tcf.te.tcf.processes.ui.propertytab.context"
-               category="target_explorer"
+               category="org.eclipse.tcf.te"
                id="org.eclipse.tcf.te.tcf.processes.ui.propertytab.advanced"
                label="%propertyTab.advanced.label">
          </propertyTab>

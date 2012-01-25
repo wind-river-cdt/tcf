@@ -10,21 +10,21 @@
 package org.eclipse.tcf.te.ui.views.interfaces;
 
 /**
- * Target Explorer UI constants.
+ * UI constants.
  */
 public interface IUIConstants {
 
 	/**
-	 * The target explorer view id.
+	 * The main view id.
 	 */
 	public static final String ID_EXPLORER = "org.eclipse.tcf.te.ui.views.View"; //$NON-NLS-1$
 
 	/**
-	 * The target explorer editor id.
+	 * The properties editor id.
 	 */
 	public static final String ID_EDITOR = "org.eclipse.tcf.te.ui.views.Editor"; //$NON-NLS-1$
 
-	// ***** Define the constants for the Target Explorer view root mode *****
+	// ***** Define the constants for the main view root mode *****
 
 	/**
 	 * Root nodes are working sets.
@@ -35,7 +35,7 @@ public interface IUIConstants {
 	 * Root nodes are whatever is contributed to the view.
 	 */
 	public static final int MODE_NORMAL = 1;
-	
+
 	/**
 	 * The tabbed properties contributor id for Target Explorer
 	 */

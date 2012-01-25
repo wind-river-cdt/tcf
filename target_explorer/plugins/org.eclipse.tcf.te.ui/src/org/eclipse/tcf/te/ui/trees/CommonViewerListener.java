@@ -27,26 +27,26 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
 
 /**
- * CommonViewerListener listens to the property change event from Target Explorer's
+ * CommonViewerListener listens to the property change event from the
  *  tree and update the viewer accordingly.
  */
 public abstract class CommonViewerListener extends TimerTask implements IPropertyChangeListener {
 	private static final long INTERVAL = 500;
 	private static final long MAX_IMMEDIATE_INTERVAL = 1000;
 	private static final Object NULL = new Object();
-	// The common viewer of Target Explorer view.
+	// The common viewer
 	private TreeViewer viewer;
 	// Last time that the property event was processed.
 	private long lastTime = 0;
 	// The timer that process the property events periodically.
 	private Timer timer;
-	// The current queued property event sources.	
+	// The current queued property event sources.
 	private Queue<Object> queue;
 
 	/***
 	 * Create an instance for the specified common viewer.
 	 *
-	 * @param viewer The common viewer from Target Explorer view.
+	 * @param viewer The common viewer.
 	 */
 	public CommonViewerListener(TreeViewer viewer) {
 		this.viewer = viewer;
@@ -102,10 +102,10 @@ public abstract class CommonViewerListener extends TimerTask implements IPropert
 			lastTime = System.currentTimeMillis();
 		}
 	}
-	
+
 	/**
 	 * Get a object which is the common ancestor of the specified objects.
-	 * 
+	 *
 	 * @param objects The object list.
 	 * @return The common ancestor.
 	 */
@@ -122,7 +122,7 @@ public abstract class CommonViewerListener extends TimerTask implements IPropert
 
 	/**
 	 * Get the common ancestor of the specified two objects.
-	 *  
+	 *
 	 * @param object1 The first object.
 	 * @param object2 The second object.
 	 * @return The common ancestor.
@@ -148,10 +148,10 @@ public abstract class CommonViewerListener extends TimerTask implements IPropert
 		}
 		return ancestor;
 	}
-	
+
 	/**
 	 * If the specified object is a root object;
-	 * 
+	 *
 	 * @param object The object to be tested.
 	 * @return true if it is root object.
 	 */
@@ -159,7 +159,7 @@ public abstract class CommonViewerListener extends TimerTask implements IPropert
 
 	/**
 	 * Merge the current objects into an ancestor object.
-	 * 
+	 *
 	 * @param objects The objects to be merged.
 	 * @return NULL or a list presenting the top objects.
 	 */
@@ -172,7 +172,7 @@ public abstract class CommonViewerListener extends TimerTask implements IPropert
 		List<Object> list = Arrays.asList(objects);
 		Set<Object> set = new HashSet<Object>(list);
 		objects = set.toArray();
-		
+
 		list = Arrays.asList(objects);
 		List<Object> result = new ArrayList<Object>();
 		for (Object object : list) {
@@ -198,10 +198,10 @@ public abstract class CommonViewerListener extends TimerTask implements IPropert
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Judges if the object1 is an ancestor of the object2.
-	 * 
+	 *
 	 * @param object1 The first object to be tested.
 	 * @param object2 The second object to be tested.
 	 * @return true if the first object is the ancestor of the second object2.
@@ -212,10 +212,10 @@ public abstract class CommonViewerListener extends TimerTask implements IPropert
 		if (parent == object1) return true;
 		return isAncestorOf(object1, parent);
    }
-	
+
 	/**
 	 * Get the element's parent object.
-	 * 
+	 *
 	 * @param element The element
 	 * @return The parent of the element.
 	 */
@@ -223,7 +223,7 @@ public abstract class CommonViewerListener extends TimerTask implements IPropert
 
 	/**
 	 * Process the object node.
-	 * 
+	 *
 	 * @param object The object to be processed.
 	 */
 	void processObject(final Object object) {

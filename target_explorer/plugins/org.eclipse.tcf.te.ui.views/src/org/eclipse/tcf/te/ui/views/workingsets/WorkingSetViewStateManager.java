@@ -131,11 +131,11 @@ public final class WorkingSetViewStateManager implements IMementoAware {
 	public IWorkingSet[] getAllWorkingSets() {
 		List<IWorkingSet> workingSets = new ArrayList<IWorkingSet>();
 
-		// Add the workbench wide working sets (target explorer type only)
+		// Add the workbench wide working sets (target type only)
 		IWorkingSetManager manager = PlatformUI.getWorkbench().getWorkingSetManager();
 		IWorkingSet[] candidates = manager.getAllWorkingSets();
 		for (IWorkingSet candidate : candidates) {
-			if (!candidate.isAggregateWorkingSet() && IWorkingSetIDs.ID_WS_TARGET_EXPLORER.equals(candidate.getId())) {
+			if (!candidate.isAggregateWorkingSet() && IWorkingSetIDs.ID_WS_TARGET.equals(candidate.getId())) {
 				if (!workingSets.contains(candidate)) {
 					workingSets.add(candidate);
 				}

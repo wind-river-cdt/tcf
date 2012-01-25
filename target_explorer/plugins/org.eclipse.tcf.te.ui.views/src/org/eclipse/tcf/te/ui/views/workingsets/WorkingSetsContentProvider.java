@@ -143,7 +143,7 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 	 */
 	@Override
 	public void restoreState(IMemento memento) {
-		// Determine the target explorer view local working set manager instance
+		// Determine the view local working set manager instance
 		ILocalWorkingSetManager manager = null;
 		if (viewer.getCommonNavigator() instanceof View) {
 			manager = ((View)viewer.getCommonNavigator()).getStateManager().getLocalWorkingSetManager();

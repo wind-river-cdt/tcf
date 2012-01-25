@@ -3,10 +3,10 @@
 <schema targetNamespace="org.eclipse.tcf.te.ui.views" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.eclipse.tcf.te.ui.views" id="editorPages" name="Target Explorer Editor Pages Extension Point"/>
+         <meta.schema plugin="org.eclipse.tcf.te.ui.views" id="editorPages" name="Editor Pages Extension Point"/>
       </appinfo>
       <documentation>
-         This extension point is used to allow the contribution of new Target Explorer editor pages.
+         This extension point is used to allow the contribution of new editor pages.
       </documentation>
    </annotation>
 
@@ -50,7 +50,7 @@
    <element name="editorPage">
       <annotation>
          <documentation>
-            Declares a Target Explorer editor page contribution.
+            Declares a editor page contribution.
          </documentation>
       </annotation>
       <complexType>

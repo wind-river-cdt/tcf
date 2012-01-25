@@ -399,7 +399,7 @@ public class WorkingSetConfigurationDialog extends SelectionDialog {
 	}
 
 	void createWorkingSet() {
-		IWorkingSetNewWizard wizard = workingSetManager.createWorkingSetNewWizard(new String[] { IWorkingSetIDs.ID_WS_TARGET_EXPLORER });
+		IWorkingSetNewWizard wizard = workingSetManager.createWorkingSetNewWizard(new String[] { IWorkingSetIDs.ID_WS_TARGET });
 		// the wizard can't be null since we have at least the Java working set.
 		WizardDialog dialog = new WizardDialog(getShell(), wizard);
 		dialog.create();

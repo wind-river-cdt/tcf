@@ -29,8 +29,7 @@ public class WorkingSetElementAdapter implements IWorkingSetElementAdapter {
 	public IAdaptable[] adaptElements(IWorkingSet ws, IAdaptable[] elements) {
 		List<IAdaptable> adapted = new ArrayList<IAdaptable>();
 
-		// All elements of a target explorer working set needs to
-		// be of type WorkingSetElementHolder
+		// All elements of a working set needs to be of type WorkingSetElementHolder
 		for (IAdaptable adaptable : elements) {
 			if (adaptable instanceof WorkingSetElementHolder) {
 				adapted.add(adaptable);

@@ -85,7 +85,7 @@ public class WorkingSetActionGroup extends ActionGroup {
 				// Toggle the "show working set top level elements" property.
 				//
 				// This will trigger the WorkingSetsContentProvider property change listener
-				// to update the target explorer view root mode.
+				// to update the view root mode.
 				stateModel.setBooleanProperty(WorkingSetsContentProvider.SHOW_TOP_LEVEL_WORKING_SETS, showWorkingSets);
 
 				// Disable the viewer redraw, refresh the viewer, reset

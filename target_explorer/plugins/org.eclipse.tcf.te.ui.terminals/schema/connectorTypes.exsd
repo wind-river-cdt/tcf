@@ -50,7 +50,7 @@
    <element name="connectorType">
       <annotation>
          <documentation>
-            Declares a Target Explorer terminal connector type contribution.
+            Declares a terminal connector type contribution.
          </documentation>
       </annotation>
       <complexType>

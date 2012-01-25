@@ -43,22 +43,22 @@ public interface ImageConsts {
     // ***** The image constants *****
 
     /**
-     * The key to access the Target Explorer editor image.
+     * The key to access the editor image.
      */
     public static final String  EDITOR = "Editor"; //$NON-NLS-1$
 
     /**
-     * The key to access the Target Explorer view image.
+     * The key to access the view image.
      */
     public static final String  VIEW = "View"; //$NON-NLS-1$
 
     /**
-     * The key to access the Target Explorer working sets image.
+     * The key to access the working sets image.
      */
     public static final String  WORKING_SETS = "WorkingSets"; //$NON-NLS-1$
 
     /**
-     * The key to access the Target Explorer working set image.
+     * The key to access the working set image.
      */
     public static final String  WORKING_SET = "WorkingSet"; //$NON-NLS-1$
 

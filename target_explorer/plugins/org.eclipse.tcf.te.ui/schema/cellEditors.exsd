@@ -6,7 +6,7 @@
          <meta.schema plugin="org.eclipse.tcf.te.ui" id="cellEditors" name="Tree Viewer Cell Editors"/>
       </appinfo>
       <documentation>
-         This extension point is used to declare the cell editor factories in Target Explorer tree viewers.
+         This extension point is used to declare the cell editor factories in tree viewers.
       </documentation>
    </annotation>
 
@@ -52,7 +52,7 @@
    <element name="cellEditor">
       <annotation>
          <documentation>
-            Declares a cell editor factory for Target Explorer view.
+            Declares a cell editor factory for the main view.
          </documentation>
       </annotation>
       <complexType>

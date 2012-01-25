@@ -463,7 +463,7 @@
       <propertyContributor
             contributorId="org.eclipse.tcf.te.ui"
             labelProvider="org.eclipse.tcf.te.ui.views.internal.PropertyContributorLabelProvider">
-         <propertyCategory category="target_explorer"/>
+         <propertyCategory category="org.eclipse.tcf.te"/>
       </propertyContributor>
    </extension>
 
