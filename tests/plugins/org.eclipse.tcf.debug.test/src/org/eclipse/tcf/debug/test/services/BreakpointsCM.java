@@ -287,8 +287,8 @@ public class BreakpointsCM extends AbstractCacheManager implements IBreakpoints.
         
         // TODO: avoid iterating over all entries, use separate list for events.
         for (Map.Entry<Key<?>, ICache<?>> entry: fMap.entrySet()) {
-            if (entry.getKey() instanceof IdEventKey) {
-                IdEventKey<?> eventKey = (IdEventKey<?>)entry.getKey();
+            if (entry.getKey() instanceof EventKey) {
+                EventKey<?> eventKey = (EventKey<?>)entry.getKey();
                 if ( ContextAddedCache.class.equals( eventKey.getCacheClass() ) ) {
                     ((ContextAddedCache)entry.getValue()).eventReceived(bps);
                 }
@@ -312,8 +312,8 @@ public class BreakpointsCM extends AbstractCacheManager implements IBreakpoints.
         
         // TODO: avoid iterating over all entries, use separate list for events.
         for (Map.Entry<Key<?>, ICache<?>> entry: fMap.entrySet()) {
-            if (entry.getKey() instanceof IdEventKey) {
-                IdEventKey<?> eventKey = (IdEventKey<?>)entry.getKey();
+            if (entry.getKey() instanceof EventKey) {
+                EventKey<?> eventKey = (EventKey<?>)entry.getKey();
                 if ( ContextChangedCache.class.equals( eventKey.getCacheClass() ) ) {
                     ((ContextChangedCache)entry.getValue()).eventReceived(bps);
                 }
@@ -342,6 +342,16 @@ public class BreakpointsCM extends AbstractCacheManager implements IBreakpoints.
             PropertiesCache cache = mapCache(new  PropertiesCacheKey(id));
             cache.resetProperties();
         }        
+
+        // TODO: avoid iterating over all entries, use separate list for events.
+        for (Map.Entry<Key<?>, ICache<?>> entry: fMap.entrySet()) {
+            if (entry.getKey() instanceof EventKey) {
+                EventKey<?> eventKey = (EventKey<?>)entry.getKey();
+                if ( ContextRemovedCache.class.equals( eventKey.getCacheClass() ) ) {
+                    ((ContextRemovedCache)entry.getValue()).eventReceived(ids);
+                }
+            }
+        }
     }
     
     

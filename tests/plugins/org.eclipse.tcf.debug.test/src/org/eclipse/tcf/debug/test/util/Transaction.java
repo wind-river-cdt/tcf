@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.tcf.protocol.Protocol;
 
 /**
  * @since 2.2
@@ -62,6 +63,36 @@ public abstract class Transaction<V>  implements Future<V> {
         execute();
     }
 
+    protected void preProcess() {}
+    
+    protected void postProcess(boolean done, V data, Throwable error) {}
+    
+    protected boolean processUnchecked() {
+        try {
+            // Execute the transaction logic
+            V data = process();
+            
+            // No exception means all cache objects used by the transaction
+            // were valid and up to date. Complete the request
+            setData(data);
+            return true;
+        }
+        catch (InvalidCacheException e) {
+            // At least one of the cache objects was stale/unset. Keep the
+            // request monitor in the incomplete state, thus leaving our client
+            // "waiting" (asynchronously). We'll get called again once the cache
+            // objects are updated, thus re-starting the whole transaction
+            // attempt.
+            return false;
+        }
+        catch (Throwable e) {
+            // At least one of the cache objects encountered a failure obtaining
+            // the data from the source. Complete the request.
+            setError(e);
+            return true;
+        }
+    }
+    
 	/**
 	 * The transaction logic--code that tries to synchronously make use of,
 	 * usually, multiple data points that are normally obtained asynchronously.
@@ -83,6 +114,24 @@ public abstract class Transaction<V>  implements Future<V> {
 	 */
     abstract protected V process() throws InvalidCacheException, ExecutionException;
 
+    /**
+     * Can be called only while in process().
+     * @param data
+     */
+    protected void setData(V data) {
+        assert Protocol.isDispatchThread();
+        fRm.setData(data);
+    }
+    
+    /**
+     * Can be called only while in process().
+     * @param data
+     */
+    protected void setError(Throwable error) {
+        assert Protocol.isDispatchThread();
+        fRm.setError(error);
+    }
+    
 	/**
 	 * Method which invokes the transaction logic and handles any exception that
 	 * may result. If that logic encounters a stale/unset cache object, then we
@@ -95,32 +144,15 @@ public abstract class Transaction<V>  implements Future<V> {
             fRm = null;
             return;
         }
-        
-        try {
-        	// Execute the transaction logic
-            V data = process();
-            
-			// No exception means all cache objects used by the transaction
-			// were valid and up to date. Complete the request
-            fRm.setData(data);
+
+        preProcess();
+        if (processUnchecked()) {
+            postProcess(true, fRm.getData(), fRm.getError());
             fRm.done();
             fRm = null;
+        } else {
+            postProcess(false, null, null);
         }
-        catch (InvalidCacheException e) {
-            // At least one of the cache objects was stale/unset. Keep the
-            // request monitor in the incomplete state, thus leaving our client
-            // "waiting" (asynchronously). We'll get called again once the cache
-            // objects are updated, thus re-starting the whole transaction
-            // attempt.
-        }
-        catch (Throwable e) {
-			// At least one of the cache objects encountered a failure obtaining
-			// the data from the source. Complete the request.
-            fRm.setError(e);
-            fRm.done();
-            fRm = null;
-        }
-       
     }
 
 	/**

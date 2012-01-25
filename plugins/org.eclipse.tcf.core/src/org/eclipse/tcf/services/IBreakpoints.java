@@ -62,6 +62,7 @@ public interface IBreakpoints extends IService {
         PROP_UNITS = "TimeUnits",                 // String
         PROP_CONDITION = "Condition",             // String
         PROP_TEMPORARY = "Temporary",             // Boolean
+        PROP_REQUESTED_LINE = "requestedLine",    // String
         PROP_CLIENT_DATA = "ClientData";          // Object
 
     /**

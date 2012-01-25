@@ -65,6 +65,7 @@ public class TCFBreakpointsModel {
         ATTR_SIZE          = "org.eclipse.cdt.debug.core.range",
         ATTR_FILE          = "org.eclipse.cdt.debug.core.sourceHandle",
         ATTR_LINE          = IMarker.LINE_NUMBER,
+        ATTR_REQESTED_LINE = IBreakpoints.PROP_REQUESTED_LINE,
         ATTR_CONDITION     = "org.eclipse.cdt.debug.core.condition",
         ATTR_IGNORE_COUNT  = "org.eclipse.cdt.debug.core.ignoreCount",
         ATTR_CONTEXTNAMES  = ITCFConstants.ID_TCF_DEBUG_MODEL + '.' + IBreakpoints.PROP_CONTEXTNAMES,
@@ -601,7 +602,11 @@ public class TCFBreakpointsModel {
                 else if (i < j) name = file.substring(j + 1);
             }
             m.put(IBreakpoints.PROP_FILE, name);
-            Integer line = (Integer)p.get(ATTR_LINE);
+            Integer line = (Integer)p.get(ATTR_REQESTED_LINE);
+            if (line == null) {
+                line = (Integer)p.get(ATTR_LINE);
+            }
+
             if (line != null) {
                 m.put(IBreakpoints.PROP_LINE, new Integer(line.intValue()));
                 Integer column = (Integer)p.get(IMarker.CHAR_START);
