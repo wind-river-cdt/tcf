@@ -285,9 +285,9 @@
                commandId="org.eclipse.ui.file.properties"
                helpContextId="org.eclipse.tcf.te.ui.views.command_Properties"
                id="properties"
-               label="%PropertiesAction.label"
+               label="%command.properties.label"
                mnemonic="r"
-               tooltip="%PropertiesAction.tooltip">
+               tooltip="%command.properties.tooltip">
                <visibleWhen>
                   <with variable="selection">
                      <count value="1"/>
