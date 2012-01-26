@@ -48,11 +48,11 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 		}
 		commonViewerListener.cancel();
     }
-	
+
 	/**
 	 * Get the filtered children of the parent using the
 	 * filters registered in the viewer.
-	 * 
+	 *
 	 * @param parent The parent element.
 	 * @return The children after filtering.
 	 */
@@ -67,7 +67,7 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 		}
 		return result;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
@@ -75,7 +75,7 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		Assert.isTrue(viewer instanceof TreeViewer);
-		this.viewer = (TreeViewer) viewer; 
+		this.viewer = (TreeViewer) viewer;
 		commonViewerListener = new CommonViewerListener(this.viewer) {
 			@Override
             protected Object getParent(Object node) {
@@ -86,24 +86,26 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 	            return TreeContentProvider.this.isRootObject(object);
             }};
 	}
-	
+
 	/**
 	 * If the specified object is a root object;
-	 * 
+	 *
 	 * @param object The object to be tested.
 	 * @return true if it is root object.
 	 */
 	protected abstract boolean isRootObject(Object object);
-	
+
 	/**
 	 * Install a property change listener to the specified element.
-	 * 
+	 *
 	 * @param element The element node.
 	 */
     protected void installPropertyChangeListener(Object element) {
 		IViewerInput viewerInput = ViewerStateManager.getViewerInput(element);
 		if(viewerInput != null && !viewerInputs.contains(viewerInput)) {
-			viewerInput.addPropertyChangeListener(commonViewerListener);
+			if (commonViewerListener != null) {
+				viewerInput.addPropertyChangeListener(commonViewerListener);
+			}
 			viewerInputs.add(viewerInput);
 		}
     }
