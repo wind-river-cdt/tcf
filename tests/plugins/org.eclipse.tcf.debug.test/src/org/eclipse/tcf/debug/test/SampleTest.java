@@ -3,23 +3,15 @@ package org.eclipse.tcf.debug.test;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
 import org.eclipse.debug.internal.ui.viewers.model.provisional.VirtualItem;
-import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.tcf.debug.test.services.IWaitForEventCache;
 import org.eclipse.tcf.debug.test.services.RunControlCM;
-import org.eclipse.tcf.debug.test.services.RunControlCM.ContextState;
 import org.eclipse.tcf.debug.test.util.Transaction;
-import org.eclipse.tcf.debug.ui.ITCFObject;
-import org.eclipse.tcf.protocol.IChannel;
-import org.eclipse.tcf.services.IBreakpoints;
-import org.eclipse.tcf.services.IDiagnostics.ISymbol;
+import org.eclipse.tcf.services.ILineNumbers.CodeArea;
 import org.eclipse.tcf.services.IRunControl;
 import org.eclipse.tcf.services.IRunControl.RunControlContext;
 import org.eclipse.tcf.services.ISymbols;
@@ -27,194 +19,11 @@ import org.eclipse.tcf.services.ISymbols.Symbol;
 import org.junit.Assert;
 
 @SuppressWarnings("restriction")
-public class SampleTest extends AbstractTcfUITest 
-{
-    private String fTestId;
-    private RunControlContext fTestCtx;
-    private String fProcessId = "";
-    private String fThreadId = "";
-    private RunControlContext fThreadCtx;
+public class SampleTest extends AbstractTcfUITest {
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        clearBreakpoints();
-    }
-    
-    private void clearBreakpoints() throws InterruptedException, ExecutionException {
-        new Transaction<Object>() {
-            @Override
-            protected Object process() throws InvalidCacheException, ExecutionException {
-                // Initialize the event cache for breakpoint status
-                @SuppressWarnings("unchecked")
-                Map<String, Object>[] bps = (Map<String, Object>[])new Map[] { };
-                validate( fBreakpointsCM.set(bps, this) );
-                return null;
-            }
-        }.get();        
-    }
-    
-    private void createBreakpoint(final String bpId, final String testFunc) throws InterruptedException, ExecutionException {
-        new Transaction<Object>() {
-            private Map<String,Object> fBp;
-            
-            {
-                fBp = new TreeMap<String,Object>();
-                fBp.put(IBreakpoints.PROP_ID, bpId);
-                fBp.put(IBreakpoints.PROP_ENABLED, Boolean.TRUE);
-                fBp.put(IBreakpoints.PROP_LOCATION, testFunc);
-            }
-            
-            @Override
-            protected Object process() throws InvalidCacheException, ExecutionException {
-                
-                // Initialize the event cache for breakpoint status
-//                ICache<Map<String, Object>> waitStatusCache = fBreakpointsCM.waitStatusChanged(bpId, fTestRunKey);
-                
-                validate( fBreakpointsCM.add(fBp, this) );
-                
-//                // Wait for breakpoint status event and validate it.
-//                Map<String, Object> status = validate(waitStatusCache);
-//                String s = (String)status.get(IBreakpoints.STATUS_ERROR);
-//                if (s != null) {
-//                    Assert.fail("Invalid BP status: " + s);
-//                }
-//                @SuppressWarnings("unchecked")
-//                Collection<Map<String,Object>> list = (Collection<Map<String,Object>>)status.get(IBreakpoints.STATUS_INSTANCES);
-//                if (list != null) {
-//                    String err = null;
-//                    for (Map<String,Object> map : list) {
-//                        String ctx = (String)map.get(IBreakpoints.INSTANCE_CONTEXT);
-//                        if (processId.equals(ctx) && map.get(IBreakpoints.INSTANCE_ERROR) != null)
-//                            err = (String)map.get(IBreakpoints.INSTANCE_ERROR);
-//                    }
-//                    if (err != null) {
-//                        Assert.fail("Invalid BP status: " + s);
-//                    }
-//                }                
-                return null;
-            }
-        }.get();
-    }
-
-    private void checkBreakpointForErrors(final String bpId, final String processId) throws InterruptedException, ExecutionException {
-        new Transaction<Object>() {          
-            @Override
-            protected Object process() throws InvalidCacheException, ExecutionException {
-                // Wait for breakpoint status event and validate it.
-                Map<String, Object> status = validate( fBreakpointsCM.getStatus(bpId) );
-                String s = (String)status.get(IBreakpoints.STATUS_ERROR);
-                if (s != null) {
-                    Assert.fail("Invalid BP status: " + s);
-                }
-                @SuppressWarnings("unchecked")
-                Collection<Map<String,Object>> list = (Collection<Map<String,Object>>)status.get(IBreakpoints.STATUS_INSTANCES);
-                if (list != null) {
-                    String err = null;
-                    for (Map<String,Object> map : list) {
-                        String ctx = (String)map.get(IBreakpoints.INSTANCE_CONTEXT);
-                        if (processId.equals(ctx) && map.get(IBreakpoints.INSTANCE_ERROR) != null)
-                            err = (String)map.get(IBreakpoints.INSTANCE_ERROR);
-                    }
-                    if (err != null) {
-                        Assert.fail("Invalid BP status: " + s);
-                    }
-                }                
-                return null;
-            }
-        }.get();        
-    }
-    
-    private void startProcess() throws InterruptedException, ExecutionException {
-        new Transaction<Object>() {
-            protected Object process() throws Transaction.InvalidCacheException ,ExecutionException {
-                fTestId = validate( fDiagnosticsCM.runTest(getDiagnosticsTestName(), this) );
-                fTestCtx = validate( fRunControlCM.getContext(fTestId) );
-                fProcessId = fTestCtx.getProcessID();
-                // Create the cache to listen for exceptions.
-                fRunControlCM.waitForContextException(fTestId, fTestRunKey); 
-                
-                if (!fProcessId.equals(fTestId)) {
-                    fThreadId = fTestId;
-                } else {
-                    String[] threads = validate( fRunControlCM.getChildren(fProcessId) );
-                    fThreadId = threads[0];
-                }
-                fThreadCtx = validate( fRunControlCM.getContext(fThreadId) );
-                
-                Assert.assertTrue("Invalid thread context", fThreadCtx.hasState());
-                return new Object();
-            };
-        }.get();
-    }
-    
-    private boolean runToTestEntry(final String testFunc) throws InterruptedException, ExecutionException {
-        return new Transaction<Boolean>() {
-            Object fWaitForSuspendKey = new Object();
-            boolean fSuspendEventReceived = false;
-            protected Boolean process() throws Transaction.InvalidCacheException ,ExecutionException {
-                ISymbol sym_func0 = validate( fDiagnosticsCM.getSymbol(fProcessId, testFunc) );
-                String sym_func0_value = sym_func0.getValue().toString();
-                ContextState state = validate (fRunControlCM.getState(fThreadId));
-                if (state.suspended) {
-                    if ( !new BigInteger(state.pc).equals(new BigInteger(sym_func0_value)) ) {
-                        fSuspendEventReceived = true;
-                        // We are not at test entry.  Create a new suspend wait cache.
-                        fWaitForSuspendKey = new Object();
-                        fRunControlCM.waitForContextSuspended(fThreadId, fWaitForSuspendKey);
-                        // Run to entry point.
-                        validate( fRunControlCM.resume(fThreadCtx, fWaitForSuspendKey, IRunControl.RM_RESUME, 1) );
-                    }
-                } else {
-                    // Wait until we suspend.
-                    validate( fRunControlCM.waitForContextSuspended(fThreadId, fWaitForSuspendKey) );
-                }
-                
-                return fSuspendEventReceived;
-            }
-        }.get();
-    }
-
-    private void initProcessModel(String bpId, String testFunc) throws Exception {
-        createBreakpoint(bpId, testFunc);
-        fDebugViewListener.reset();
-        
-        ITCFObject processTCFContext = new ITCFObject() {  
-            public String getID() { return fProcessId; }
-            public IChannel getChannel() { return channels[0]; }
-        };
-        ITCFObject threadTCFContext = new ITCFObject() {  
-            public String getID() { return fThreadId; }
-            public IChannel getChannel() { return channels[0]; }
-        };
-        
-        fDebugViewListener.addLabelUpdate(new TreePath(new Object[] { fLaunch, processTCFContext }));
-        fDebugViewListener.addLabelUpdate(new TreePath(new Object[] { fLaunch, processTCFContext, threadTCFContext }));
-
-        startProcess();        
-        runToTestEntry(testFunc);
-        
-        final String topFrameId = new Transaction<String>() {
-            @Override
-            protected String process() throws InvalidCacheException, ExecutionException {
-                String[] frameIds = validate( fStackTraceCM.getChildren(fThreadId) );
-                Assert.assertTrue("No stack frames" , frameIds.length != 0);
-                return frameIds[frameIds.length - 1];
-            }
-        }.get();
-
-        ITCFObject frameTCFContext = new ITCFObject() {  
-            public String getID() { return topFrameId; }
-            public IChannel getChannel() { return channels[0]; }
-        };
-        fDebugViewListener.addLabelUpdate(new TreePath(new Object[] { fLaunch, processTCFContext, threadTCFContext, frameTCFContext }));
-        
-        fDebugViewListener.waitTillFinished(MODEL_CHANGED_COMPLETE | CONTENT_SEQUENCE_COMPLETE | LABEL_SEQUENCE_COMPLETE | LABEL_UPDATES);
-    }
     
     public void testDebugViewContent() throws Exception {
-        String bpId = "TestStepBP";
-        initProcessModel(bpId, "tcf_test_func0");
+        initProcessModel("tcf_test_func0");
 
         VirtualItem launchItem = fDebugViewListener.findElement(new Pattern[] { Pattern.compile(".*" + fLaunch.getLaunchConfiguration().getName() + ".*") }  );
         Assert.assertTrue(launchItem != null);
@@ -227,13 +36,10 @@ public class SampleTest extends AbstractTcfUITest
 
         VirtualItem frameItem = fDebugViewListener.findElement(threadItem, new Pattern[] { Pattern.compile(".*tcf_test_func0.*")});
         Assert.assertTrue(frameItem != null);
-        
-        checkBreakpointForErrors(bpId, fProcessId);
     }
 
     public void testSteppingDebugViewOnly() throws Exception {
-        String bpId = "TestStepBP";
-        initProcessModel(bpId, "tcf_test_func0");
+        initProcessModel("tcf_test_func0");
         
         // Execute step loop
         String previousThreadLabel = null;
@@ -250,15 +56,13 @@ public class SampleTest extends AbstractTcfUITest
             Assert.assertTrue(!topFrameLabel.equals(previousThreadLabel));
             previousThreadLabel = topFrameLabel;
         }
-        
-        checkBreakpointForErrors(bpId, fProcessId);
     }
     
     public void testSteppingWithVariablesAndRegisters() throws Exception {
         fVariablesViewViewer.setActive(true);
         fRegistersViewViewer.setActive(true);
 
-        initProcessModel("TestStepBP", "tcf_test_func0");
+        initProcessModel("tcf_test_func0");
         
         // Execute step loop
         String previousThreadLabel = null;
@@ -279,14 +83,10 @@ public class SampleTest extends AbstractTcfUITest
             Assert.assertTrue(!topFrameLabel.equals(previousThreadLabel));
             previousThreadLabel = topFrameLabel;
         }
-        
-        checkBreakpointForErrors("TestStepBP", fProcessId);
     }
     
     public void testSymbolsCMResetOnContextRemove() throws Exception {
-        createBreakpoint("TestStepBP", "tcf_test_func0");
-        startProcess();        
-        runToTestEntry("tcf_test_func0");
+        initProcessModel("tcf_test_func0");
         
         // Retrieve the current PC for use later
         final String pc = new Transaction<String>() {
@@ -343,10 +143,75 @@ public class SampleTest extends AbstractTcfUITest
         }.get();
     }
 
+    public void testLineNumbersCMResetOnContextRemove() throws Exception {
+        initProcessModel("tcf_test_func0");
+        
+        // Retrieve the current PC for use later
+        final String pc = new Transaction<String>() {
+            @Override
+            protected String process() throws InvalidCacheException, ExecutionException {
+                return validate(fRunControlCM.getState(fThreadId)).pc;
+            }
+        }.get();
+        
+        final BigInteger pcNumber = new BigInteger(pc);
+        final BigInteger pcNumberPlusOne = pcNumber.add(BigInteger.valueOf(1));
+
+        // Retrieve the line number for current PC.
+        final CodeArea[] pcCodeAreas = new Transaction<CodeArea[]>() {
+            @Override
+            protected CodeArea[] process() throws InvalidCacheException, ExecutionException {
+                CodeArea[] areas = validate(fLineNumbersCM.mapToSource(fProcessId, pcNumber, pcNumberPlusOne));
+                Assert.assertNotNull(areas);
+                Assert.assertTrue(areas.length != 0);
+                
+                areas = validate(fLineNumbersCM.mapToSource(fThreadId, pcNumber, pcNumberPlusOne));
+                Assert.assertNotNull(areas);
+                Assert.assertTrue(areas.length != 0);
+                
+                CodeArea[] areas2 = validate(fLineNumbersCM.mapToMemory(fProcessId, areas[0].file, areas[0].start_line, areas[0].start_column));
+                Assert.assertNotNull(areas2);
+                Assert.assertTrue(areas2.length != 0);
+                
+                areas2 = validate(fLineNumbersCM.mapToMemory(fThreadId, areas[0].file, areas[0].start_line, areas[0].start_column));
+                Assert.assertNotNull(areas2);
+                Assert.assertTrue(areas2.length != 0);
+                
+                return areas;
+            }
+        }.get();
+
+        // End test, check that all caches were reset and now return an error.
+        new Transaction<String>() {
+            @Override
+            protected String process() throws InvalidCacheException, ExecutionException {
+                validate( fDiagnosticsCM.cancelTest(fTestId, this) );
+                validate( fRunControlCM.waitForContextRemoved(fProcessId, this) );
+                try {
+                    validate(fLineNumbersCM.mapToSource(fProcessId, pcNumber, pcNumberPlusOne));
+                    Assert.fail("Expected error");
+                } catch (ExecutionException e) {}
+                try {
+                    validate(fLineNumbersCM.mapToSource(fThreadId, pcNumber, pcNumberPlusOne));
+                    Assert.fail("Expected error");
+                } catch (ExecutionException e) {}
+                try {
+                    CodeArea[] areas3 = validate(fLineNumbersCM.mapToMemory(fProcessId, pcCodeAreas[0].file, pcCodeAreas[0].start_line, pcCodeAreas[0].start_column));
+                    Assert.fail("Expected error");
+                } catch (ExecutionException e) {}
+                try {
+                    validate(fLineNumbersCM.mapToMemory(fThreadId, pcCodeAreas[0].file, pcCodeAreas[0].start_line, pcCodeAreas[0].start_column));
+                    Assert.fail("Expected error");
+                } catch (ExecutionException e) {}
+
+                return null;
+            }
+        }.get();
+    }
+    
+    
     public void testSymbolsCMResetOnContextStateChange() throws Exception {
-        createBreakpoint("TestStepBP", "tcf_test_func2");
-        startProcess();        
-        runToTestEntry("tcf_test_func2");
+        initProcessModel("tcf_test_func2");
         
         // Retrieve the current PC and top frame for use later
         final String pc = new Transaction<String>() {
@@ -406,10 +271,10 @@ public class SampleTest extends AbstractTcfUITest
     }
     
     public void testRunControlCMChildrenInvalidation() throws Exception {
-        createBreakpoint("BP1", "tcf_test_func0");
-        startProcess();
-        runToTestEntry("tcf_test_func0");
+        initProcessModel("tcf_test_func0");
 
+        createBreakpoint("testRunControlCMChildrenInvalidation", "tcf_test_func0");
+        
         // Wait for each threads to start.
         final String[] threads = new Transaction<String[]>() {
             List<String> fThreads = new ArrayList<String>();
@@ -497,6 +362,9 @@ public class SampleTest extends AbstractTcfUITest
                 return null;
             }
         }.get();
+        
+        removeBreakpoint("testRunControlCMChildrenInvalidation");
+
     }
     
 }

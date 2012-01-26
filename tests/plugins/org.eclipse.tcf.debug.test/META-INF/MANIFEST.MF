@@ -10,8 +10,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.tcf.debug.ui,
  org.eclipse.tcf.core,
  org.junit;bundle-version="3.8.2",
- org.eclipse.debug.ui;bundle-version="3.7.0",
- org.eclipse.cdt.debug.core;bundle-version="7.2.0"
+ org.eclipse.debug.ui,
+ org.eclipse.cdt.debug.core;bundle-version="7.2.0",
+ org.eclipse.tcf.cdt.ui;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Import-Package: org.eclipse.debug.internal.ui.viewers.model
