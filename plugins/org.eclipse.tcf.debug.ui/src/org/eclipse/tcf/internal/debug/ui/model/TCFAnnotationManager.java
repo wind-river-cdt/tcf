@@ -11,13 +11,10 @@
 package org.eclipse.tcf.internal.debug.ui.model;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
@@ -142,7 +139,7 @@ public class TCFAnnotationManager {
     }
 
     private class WorkbenchWindowInfo {
-        final LinkedList<TCFAnnotation> annotations = new LinkedList<TCFAnnotation>();
+        final HashSet<TCFAnnotation> annotations = new HashSet<TCFAnnotation>();
         final Map<IEditorInput,ITextEditor> editors = new HashMap<IEditorInput,ITextEditor>();
 
         Runnable update_task;
@@ -380,7 +377,7 @@ public class TCFAnnotationManager {
         return (Map<String,Object>)o;
     }
 
-    private void addBreakpointErrorAnnotation(List<TCFAnnotation> set, TCFLaunch launch, String ctx, String id, String error) {
+    private void addBreakpointErrorAnnotation(HashSet<TCFAnnotation> set, TCFLaunch launch, String ctx, String id, String error) {
         Map<String,Object> props = launch.getBreakpointsStatus().getProperties(id);
         if (props != null) {
             String file = (String)props.get(IBreakpoints.PROP_FILE);
@@ -398,7 +395,7 @@ public class TCFAnnotationManager {
         }
     }
 
-    private void updateAnnotations(IWorkbenchWindow window, TCFNode node, List<TCFAnnotation> set) {
+    private void updateAnnotations(IWorkbenchWindow window, TCFNode node, HashSet<TCFAnnotation> set) {
         if (disposed) return;
         assert Thread.currentThread() == display.getThread();
         WorkbenchWindowInfo win_info = windows.get(window);
@@ -506,7 +503,7 @@ public class TCFAnnotationManager {
                     if (!state_cache.validate(this)) return;
                     suspended = state_cache.getData() != null && state_cache.getData().is_suspended;
                 }
-                List<TCFAnnotation> set = new ArrayList<TCFAnnotation>();
+                HashSet<TCFAnnotation> set = new HashSet<TCFAnnotation>();
                 if (memory != null) {
                     TCFLaunch launch = node.launch;
                     TCFBreakpointsStatus bs = launch.getBreakpointsStatus();
@@ -603,7 +600,7 @@ public class TCFAnnotationManager {
                 }
                 done(set);
             }
-            private void done(final List<TCFAnnotation> res) {
+            private void done(final HashSet<TCFAnnotation> res) {
                 final Runnable update_task = this;
                 displayExec(new Runnable() {
                     public void run() {

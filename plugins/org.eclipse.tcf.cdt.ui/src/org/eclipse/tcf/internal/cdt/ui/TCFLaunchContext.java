@@ -139,7 +139,7 @@ public class TCFLaunchContext implements ITCFLaunchContext {
         }
         if (page != null) {
             IEditorPart part = page.getActiveEditor();
-            
+
             if (part != null) {
                 IEditorInput input = part.getEditorInput();
                 return (ICElement)input.getAdapter(ICElement.class);
