@@ -44,17 +44,20 @@ class FileSystemCommand(Command):
         super(FileSystemCommand, self).__init__(service.channel, service, command, args)
 
     def _toSFError(self, data):
-        if data is None: return None
-        error_code = map.get(errors.ERROR_CODE)
+        if data is None:
+            return None
+        error_code = data.get(errors.ERROR_CODE)
         cmd = self.getCommandString()
-        if len(cmd) > 72: cmd = cmd[0, 72] + "..."
+        if len(cmd) > 72:
+            cmd = cmd[0:72] + "..."
         s = Status(error_code,
                 "TCF command exception:" +
                 "\nCommand: " + cmd +
-                "\nException: " + self.toErrorString(data) +
-                "\nError code: " + error_code, map)
-        caused_by = map.get(errors.ERROR_CAUSED_BY)
-        if caused_by is not None: s.initCause(self.toError(caused_by, False))
+                "\nException: " + errors.toErrorString(data) +
+                "\nError code: " + str(error_code), data)
+        caused_by = data.get(errors.ERROR_CAUSED_BY)
+        if caused_by is not None:
+            s.initCause(self.toError(caused_by, False))
         return s
 
 class FileSystemProxy(filesystem.FileSystemService):
@@ -396,7 +399,7 @@ class FileSystemProxy(filesystem.FileSystemService):
         assert handle.getService() is self
         done = self._makeCallback(done)
         id = handle.id
-        binary = bytearray(data[data_pos:data_pos+data_size])
+        binary = bytearray(data[data_pos:data_pos + data_size])
         service = self
         class WriteCommand(FileSystemCommand):
             def __init__(self):
