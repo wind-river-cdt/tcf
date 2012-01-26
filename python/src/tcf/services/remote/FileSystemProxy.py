@@ -228,14 +228,15 @@ class FileSystemProxy(filesystem.FileSystemService):
                 done.doneOpen(self.token, s, h)
         return OpenDirCommand().token
 
-    def read(self, handle, offset, len, done):
+    def read(self, handle, offset, length, done):
         assert handle.getService() is self
         done = self._makeCallback(done)
-        id = handle.id
+        handleID = handle.id
         service = self
         class ReadCommand(FileSystemCommand):
             def __init__(self):
-                super(ReadCommand, self).__init__(service, "read", (id, offset, len))
+                super(ReadCommand, self).__init__(service, "read",
+                                                  (handleID, offset, length))
             def done(self, error, args):
                 s = None
                 b = None
