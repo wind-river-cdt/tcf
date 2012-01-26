@@ -162,8 +162,8 @@ class LocatorService(locator.LocatorService):
         self.out_buf = bytearray(MAX_PACKET_SIZE)
         service = self
         class TimerThread(threading.Thread):
-            def __init__(self, callable):
-                self._callable = callable
+            def __init__(self, _callable):
+                self._callable = _callable
                 super(TimerThread, self).__init__()
             def run(self):
                 while service._alive:
@@ -211,8 +211,8 @@ class LocatorService(locator.LocatorService):
                         service._log("Unhandled exception in TCF discovery DNS lookup thread", x)
         self.dns_lookup_thread = DNSLookupThread()
         class InputThread(threading.Thread):
-            def __init__(self, callable):
-                self._callable = callable
+            def __init__(self, _callable):
+                self._callable = _callable
                 super(InputThread, self).__init__()
             def run(self):
                 try:
@@ -404,13 +404,13 @@ class LocatorService(locator.LocatorService):
             if s in self.subnets: continue
             self.subnets.add(s)
         if __TRACE_DISCOVERY__:
-            str = cStringIO.StringIO()
-            str.write("Refreshed subnet list:")
+            buf = cStringIO.StringIO()
+            buf.write("Refreshed subnet list:")
             for subnet in self.subnets:
-                str.write("\n\t* address=%s, broadcast=%s" % (subnet.address, subnet.broadcast))
-            logging.trace(str.getvalue())
+                buf.write("\n\t* address=%s, broadcast=%s" % (subnet.address, subnet.broadcast))
+            logging.trace(buf.getvalue())
 
-    def __getSubNetList(self, set):
+    def __getSubNetList(self, _set):
         # TODO iterate over network interfaces to get proper broadcast addresses
         hostname = socket.gethostname()
         _, _, addresses = socket.gethostbyname_ex(hostname)
@@ -421,7 +421,7 @@ class LocatorService(locator.LocatorService):
             if len(rawaddr) != 4: continue
             rawaddr = rawaddr[:3] + '\xFF'
             broadcast = socket.inet_ntoa(rawaddr)
-            set.add(SubNet(24, InetAddress(hostname, address), InetAddress(None, broadcast)))
+            _set.add(SubNet(24, InetAddress(hostname, address), InetAddress(None, broadcast)))
 
     def __getUTF8Bytes(self, s):
         return s.encode("UTF-8")
@@ -610,8 +610,8 @@ class LocatorService(locator.LocatorService):
         try:
             tm = int(time.time() * 1000)
             buf = p.getData()
-            len = p.getLength()
-            if len < 8: return
+            length = p.getLength()
+            if length < 8: return
             if buf[0] != 'T': return
             if buf[1] != 'C': return
             if buf[2] != 'F': return
@@ -787,14 +787,14 @@ class LocatorService(locator.LocatorService):
             # addr is a InputPacket
             port = addr.getPort()
             addr = addr.getAddress()
-        str = cStringIO.StringIO()
-        str.write(type)
-        str.write((" sent to ", " received from ")[received])
-        str.write("%s/%s" % (addr, port))
+        buf = cStringIO.StringIO()
+        buf.write(type)
+        buf.write((" sent to ", " received from ")[received])
+        buf.write("%s/%s" % (addr, port))
         if attrs is not None:
             for key, value in attrs.items():
-                str.write("\n\t%s=%s" % (key, value))
-        logging.trace(str.getvalue())
+                buf.write("\n\t%s=%s" % (key, value))
+        logging.trace(buf.getvalue())
 
 class LocatorServiceProvider(services.ServiceProvider):
     def getLocalService(self, _channel):

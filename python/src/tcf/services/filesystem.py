@@ -279,7 +279,7 @@ class FileSystemService(services.Service):
         """
         raise NotImplementedError("Abstract methods")
 
-    def read(self, handle, offset, len, done):
+    def read(self, handle, offset, length, done):
         """
         Read bytes from an open file.
         In response to this request, the server will read as many bytes as it
@@ -295,7 +295,7 @@ class FileSystemService(services.Service):
         @param offset is the offset (in bytes) relative
         to the beginning of the file from where to start reading.
         If offset < 0 then reading starts from current position in the file.
-        @param len is the maximum number of bytes to read.
+        @param length is the maximum number of bytes to read.
         @param done is call back object.
         @return pending command handle.
         """
