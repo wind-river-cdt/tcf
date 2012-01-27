@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.internal.debug.ui.model;
 
+import java.io.File;
 import java.math.BigInteger;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -413,6 +414,74 @@ public class TCFAnnotationManager {
         }
     }
 
+    /**
+     * Add/Modify marker properties for a given breakpoint.
+     * 
+     * @param  markerAttrs - Attributes to adjust for marker
+     * @param  bp - breakpoint to update marker data.
+     */    
+    private void updateMarkerAttributes(final Map<String, Object> markerAttrs, final IBreakpoint bp) {
+        final IMarker marker = bp.getMarker();
+        IResource resources = marker.getResource();
+        ISchedulingRule changeRule = null;
+        IResourceRuleFactory ruleFactory = ResourcesPlugin.getWorkspace().getRuleFactory();
+        ISchedulingRule markerRule = ruleFactory.markerRule(resources);
+        changeRule = MultiRule.combine(changeRule, markerRule);
+        
+        WorkspaceJob job = new WorkspaceJob(Messages.TCFAnnotationManager_5) { //$NON_NLS-1$
+            @Override
+            public IStatus runInWorkspace(IProgressMonitor monitor) {
+                Map<?,?> oldAttrs = null;
+                List<String> keys = new ArrayList<String>(markerAttrs.size());
+                List<Object> values = new ArrayList<Object>(markerAttrs.size());
+                try {
+                    oldAttrs = marker.getAttributes();
+                }
+                catch (CoreException e) {
+                    Activator.log(Messages.TCFAnnotationManager_11, e);
+                    e.printStackTrace();
+                }
+                for (Map.Entry<?,?> entry : markerAttrs.entrySet()) {
+                    String key = (String) entry.getKey();
+                    Object newVal = entry.getValue();
+                    Object oldVal = oldAttrs.remove(key);
+                    if (oldVal == null || !oldVal.equals(newVal)) {
+                        keys.add(key);
+                        values.add(newVal);
+                    }
+                }
+                if (keys.size() != 0) {
+                    String[] keyArr = (String[]) keys.toArray(new String[keys.size()]);
+                    Object[] valueArr = (Object[]) values.toArray(new Object[values.size()]);
+                    try {
+                        marker.setAttributes(keyArr, valueArr);
+                    }
+                    catch (CoreException e) {
+                        Activator.log(Messages.TCFAnnotationManager_11, e);                 
+                        e.printStackTrace();
+                    }                    
+                }
+                try {
+                    ICBreakpoint cbp = (ICBreakpoint)bp;
+                    cbp.refreshMessage();
+                }
+                catch (CoreException e) {
+                    IStatus status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                            NLS.bind(Messages.TCFAnnotationManager_7, null ),
+                            e);                                
+                    Activator.getDefault().getLog().log(status);                        
+                    e.printStackTrace();
+                }
+                
+                return Status.OK_STATUS;
+            }
+        };
+        job.setPriority(Job.INTERACTIVE);
+        job.setSystem(true);
+        job.setRule(changeRule);
+        job.schedule();
+    }    
+    
     /**
      * If a line BP was specified, and the lines do not match, update the marker
      * 
