@@ -34,7 +34,7 @@ import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
-import org.eclipse.tcf.te.tcf.filesystem.internal.preferences.TargetExplorerPreferencePage;
+import org.eclipse.tcf.te.tcf.filesystem.internal.preferences.PreferencePage;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.WorkbenchException;
@@ -176,7 +176,7 @@ public class PersistenceManager {
 	public boolean isAutoSaving() {
 		IPreferenceStore preferenceStore = UIPlugin.getDefault().getPreferenceStore();
 		boolean autoSaving = preferenceStore
-		                .getBoolean(TargetExplorerPreferencePage.PREF_AUTOSAVING);
+		                .getBoolean(PreferencePage.PREF_AUTOSAVING);
 		return autoSaving;
 	}
 
@@ -188,7 +188,7 @@ public class PersistenceManager {
 	public boolean isInPlaceEditor() {
 		IPreferenceStore preferenceStore = UIPlugin.getDefault().getPreferenceStore();
 		boolean autoSaving = preferenceStore
-		                .getBoolean(TargetExplorerPreferencePage.PREF_RENAMING_IN_PLACE_EDITOR);
+		                .getBoolean(PreferencePage.PREF_RENAMING_IN_PLACE_EDITOR);
 		return autoSaving;
 	}
 
@@ -200,7 +200,7 @@ public class PersistenceManager {
 	public boolean isCopyPermission() {
 		IPreferenceStore preferenceStore = UIPlugin.getDefault().getPreferenceStore();
 		boolean autoSaving = preferenceStore
-		                .getBoolean(TargetExplorerPreferencePage.PREF_COPY_PERMISSION);
+		                .getBoolean(PreferencePage.PREF_COPY_PERMISSION);
 		return autoSaving;
 	}
 
@@ -212,7 +212,7 @@ public class PersistenceManager {
 	public boolean isCopyOwnership() {
 		IPreferenceStore preferenceStore = UIPlugin.getDefault().getPreferenceStore();
 		boolean autoSaving = preferenceStore
-		                .getBoolean(TargetExplorerPreferencePage.PREF_COPY_OWNERSHIP);
+		                .getBoolean(PreferencePage.PREF_COPY_OWNERSHIP);
 		return autoSaving;
 	}
 

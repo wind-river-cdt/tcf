@@ -30,10 +30,10 @@ import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
 
 /**
- * Abstract UI event listener updating the target explorer view.
+ * Abstract UI event listener updating the main view.
  */
 public abstract class AbstractEventListener extends org.eclipse.tcf.te.ui.events.AbstractEventListener {
-	// Reference to the target explorer viewer instance
+	// Reference to the viewer instance
 	private CommonViewer viewer = null;
 	// Reference to the refresh job
 	private RefreshJob refreshJob = null;
@@ -41,9 +41,9 @@ public abstract class AbstractEventListener extends org.eclipse.tcf.te.ui.events
 	private UpdateJob updateJob = null;
 
 	/**
-	 * Returns the Target Explorer view.
+	 * Returns the main view.
 	 *
-	 * @return The Target Explorer view or <code>null</code>.
+	 * @return The main view or <code>null</code>.
 	 */
 	protected CommonViewer getViewer() {
 		if (viewer == null) {

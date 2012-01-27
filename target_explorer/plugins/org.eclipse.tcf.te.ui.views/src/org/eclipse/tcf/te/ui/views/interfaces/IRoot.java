@@ -12,7 +12,7 @@ package org.eclipse.tcf.te.ui.views.interfaces;
 import org.eclipse.core.runtime.IAdaptable;
 
 /**
- * Target Explorer root node.
+ * Main view root node.
  */
 public interface IRoot extends IAdaptable {
 

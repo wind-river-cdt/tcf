@@ -60,8 +60,7 @@ class ReaderThread(threading.Thread):
 
     def readString(self):
         del self.buf[:]
-        bytes = self.readBytes(0, self.buf)
-        return bytes.decode("UTF8")
+        return self.readBytes(0, self.buf).decode("UTF8")
 
     def run(self):
         try:
@@ -672,8 +671,8 @@ class AbstractChannel(object):
                             l.event(msg.name, msg.data)
                     self.__sendCongestionLevel()
             elif typeCode == 'F':
-                len = len(msg.data)
-                if len > 0 and msg.data[len - 1] == '\0': len -= 1
+                length = len(msg.data)
+                if length > 0 and msg.data[length - 1] == '\0': length -= 1
                 self.remote_congestion_level = int(msg.data)
             else:
                 assert False

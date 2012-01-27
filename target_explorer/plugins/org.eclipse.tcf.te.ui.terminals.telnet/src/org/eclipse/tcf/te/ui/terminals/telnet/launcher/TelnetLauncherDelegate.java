@@ -76,7 +76,7 @@ public class TelnetLauncherDelegate extends AbstractLauncherDelegate {
 		String host = properties.getStringProperty(ITerminalsConnectorConstants.PROP_IP_HOST);
 
 		if (host != null) {
-			DateFormat format = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG);
+			DateFormat format = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 			String date = format.format(new Date(System.currentTimeMillis()));
 			return NLS.bind(Messages.TelnetLauncherDelegate_terminalTitle, new String[]{host, date});
 		}

@@ -54,7 +54,7 @@ Terminal launcher delegates contributes terminal settings widget to the &lt;code
    <element name="delegate">
       <annotation>
          <documentation>
-            Declares a Target Explorer terminal launcher delegate contribution.
+            Declares a terminal launcher delegate contribution.
          </documentation>
       </annotation>
       <complexType>

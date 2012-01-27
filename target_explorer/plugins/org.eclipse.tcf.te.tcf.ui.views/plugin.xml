@@ -25,7 +25,7 @@
                moveable="true"
                ratio="0.4"
                relationship="bottom"
-               relative="org.eclipse.tcf.te.ui.views.TargetExplorer"
+               relative="org.eclipse.tcf.te.ui.views.View"
                showTitle="true"
                standalone="false"
                visible="false">

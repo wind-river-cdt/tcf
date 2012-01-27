@@ -13,8 +13,8 @@ import threading
 from tcf import protocol, channel
 
 class DelegatingEventListener(channel.EventListener):
-    def __init__(self, callable):
-        self._callable = callable
+    def __init__(self, _callable):
+        self._callable = _callable
     def event(self, name, data):
         try:
             args = channel.fromJSONSequence(data)

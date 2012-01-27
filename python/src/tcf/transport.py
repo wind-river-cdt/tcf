@@ -140,18 +140,18 @@ def sync(done):
 
     This is internal API, TCF clients should use protocol.sync().
     """
-    set = set()
+    tokenSet = set()
     class DoneSync(locator.DoneSync):
         def doneSync(self, token):
-            assert set.contains(token)
-            set.remove(token)
-            if len(set) == 0: done()
+            assert tokenSet.contains(token)
+            tokenSet.remove(token)
+            if len(tokenSet) == 0: done()
     done_sync = DoneSync()
     for c in _channels:
         if c.getState() == channel.STATE_OPEN:
             s = c.getRemoteService(locator.NAME)
-            if s: set.append(s.sync(done_sync))
-    if len(set) == 0: protocol.invokeLater(done)
+            if s: tokenSet.append(s.sync(done_sync))
+    if len(tokenSet) == 0: protocol.invokeLater(done)
 
 # initialize TCP transport
 addTransportProvider(TCPTransportProvider())

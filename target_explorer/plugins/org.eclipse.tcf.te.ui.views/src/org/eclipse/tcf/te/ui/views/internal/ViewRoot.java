@@ -13,7 +13,7 @@ import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.tcf.te.ui.views.interfaces.IRoot;
 
 /**
- * Target Explorer view root node implementation
+ * View root node implementation
  */
 public class ViewRoot extends PlatformObject implements IRoot {
 

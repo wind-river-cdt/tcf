@@ -44,14 +44,14 @@ public class PreferencesInitializer extends AbstractPreferenceInitializer {
 			prefs.putBoolean(IPreferenceKeys.PREF_FEATURE_ENABLE_EDITOR_CONTENT_CONTRIBUTION, true);
 		}
 		IPreferenceStore preferenceStore = UIPlugin.getDefault().getPreferenceStore();
-		preferenceStore.setDefault(TargetExplorerPreferencePage.PREF_AUTOSAVING, TargetExplorerPreferencePage.DEFAULT_AUTOSAVING);
-		preferenceStore.setDefault(TargetExplorerPreferencePage.PREF_RENAMING_IN_PLACE_EDITOR, TargetExplorerPreferencePage.DEFAULT_RENAMING_IN_PLACE_EDITOR);
-		preferenceStore.setDefault(TargetExplorerPreferencePage.PREF_COPY_PERMISSION, TargetExplorerPreferencePage.DEFAULT_COPY_PERMISSION);
-		preferenceStore.setDefault(TargetExplorerPreferencePage.PREF_COPY_OWNERSHIP, TargetExplorerPreferencePage.DEFAULT_COPY_OWNERSHIP);
+		preferenceStore.setDefault(PreferencePage.PREF_AUTOSAVING, PreferencePage.DEFAULT_AUTOSAVING);
+		preferenceStore.setDefault(PreferencePage.PREF_RENAMING_IN_PLACE_EDITOR, PreferencePage.DEFAULT_RENAMING_IN_PLACE_EDITOR);
+		preferenceStore.setDefault(PreferencePage.PREF_COPY_PERMISSION, PreferencePage.DEFAULT_COPY_PERMISSION);
+		preferenceStore.setDefault(PreferencePage.PREF_COPY_OWNERSHIP, PreferencePage.DEFAULT_COPY_OWNERSHIP);
 		preferenceStore.addPropertyChangeListener(new IPropertyChangeListener(){
 			@Override
             public void propertyChange(PropertyChangeEvent event) {
-				if (event.getProperty().equals(TargetExplorerPreferencePage.PREF_AUTOSAVING)) {
+				if (event.getProperty().equals(PreferencePage.PREF_AUTOSAVING)) {
 					// Refresh the tree nodes' decorations.
 					FSModel.notifyAllChanged();
 				}

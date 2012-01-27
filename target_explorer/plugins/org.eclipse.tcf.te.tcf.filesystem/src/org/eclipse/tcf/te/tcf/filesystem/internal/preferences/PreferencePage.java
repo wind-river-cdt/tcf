@@ -19,11 +19,11 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 /**
- * The preference page for configuring the preference options for Target
- * Explorer File System Explorer.
+ * The preference page for configuring the preference options for
+ * the TCF File System Explorer.
  *
  */
-public class TargetExplorerPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+public class PreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 	// The preference key to access the option of auto saving
 	public static final String PREF_AUTOSAVING = "PrefAutoSaving"; //$NON-NLS-1$
 	// The default value of the option of auto saving.
@@ -44,7 +44,7 @@ public class TargetExplorerPreferencePage extends FieldEditorPreferencePage impl
 	/***
 	 * Create a preference page for Target Explorer File System Explorer.
 	 */
-	public TargetExplorerPreferencePage() {
+	public PreferencePage() {
 		super(GRID);
 	}
 
@@ -56,13 +56,13 @@ public class TargetExplorerPreferencePage extends FieldEditorPreferencePage impl
 		UIPlugin plugin = UIPlugin.getDefault();
 		IPreferenceStore preferenceStore = plugin.getPreferenceStore();
 		setPreferenceStore(preferenceStore);
-		BooleanFieldEditor autoSaving = new BooleanFieldEditor(PREF_AUTOSAVING, Messages.TargetExplorerPreferencePage_AutoSavingText, getFieldEditorParent());
+		BooleanFieldEditor autoSaving = new BooleanFieldEditor(PREF_AUTOSAVING, Messages.PreferencePage_AutoSavingText, getFieldEditorParent());
 		addField(autoSaving);
-		BooleanFieldEditor renamingOption = new BooleanFieldEditor(PREF_RENAMING_IN_PLACE_EDITOR, Messages.TargetExplorerPreferencePage_RenamingOptionText, getFieldEditorParent());
+		BooleanFieldEditor renamingOption = new BooleanFieldEditor(PREF_RENAMING_IN_PLACE_EDITOR, Messages.PreferencePage_RenamingOptionText, getFieldEditorParent());
 		addField(renamingOption);
-		BooleanFieldEditor copyPermission = new BooleanFieldEditor(PREF_COPY_PERMISSION, Messages.TargetExplorerPreferencePage_CopyPermissionText, getFieldEditorParent());
+		BooleanFieldEditor copyPermission = new BooleanFieldEditor(PREF_COPY_PERMISSION, Messages.PreferencePage_CopyPermissionText, getFieldEditorParent());
 		addField(copyPermission);
-		BooleanFieldEditor copyOwnership = new BooleanFieldEditor(PREF_COPY_OWNERSHIP, Messages.TargetExplorerPreferencePage_CopyOwnershipText, getFieldEditorParent());
+		BooleanFieldEditor copyOwnership = new BooleanFieldEditor(PREF_COPY_OWNERSHIP, Messages.PreferencePage_CopyOwnershipText, getFieldEditorParent());
 		addField(copyOwnership);
 	}
 

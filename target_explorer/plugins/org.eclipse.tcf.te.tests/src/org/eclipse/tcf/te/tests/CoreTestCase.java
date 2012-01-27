@@ -343,7 +343,7 @@ public class CoreTestCase extends TestCase {
 	}
 
 	/**
-	 * Bring the Target Explorer view to front.
+	 * Bring the main view to front.
 	 * <p>
 	 * If the property {@link IConfigurationProperties#MAXIMIZE_VIEW} is set, the
 	 * view will be maximized.
@@ -357,14 +357,14 @@ public class CoreTestCase extends TestCase {
 		// Find the Eclipse Intro page and hide it.
 		hideView("org.eclipse.ui.internal.introview", perspectiveId); //$NON-NLS-1$
 
-		// Show the Target Explorer view
+		// Show the main view
 		setProperty(VIEW_ZOOM_STATE_CHANGED, false);
 		IViewPart part = showView(IUIConstants.ID_EXPLORER, perspectiveId);
-		assertNotNull("Target Explorer view is not available!", part); //$NON-NLS-1$
+		assertNotNull("Main view is not available!", part); //$NON-NLS-1$
 
 		// Get the view reference for setting the maximized state
 		IViewReference reference = findView(IUIConstants.ID_EXPLORER, perspectiveId);
-		assertNotNull("Failed to lookup view reference for Target Explorer view!", reference); //$NON-NLS-1$
+		assertNotNull("Failed to lookup view reference for main view!", reference); //$NON-NLS-1$
 		if (reference.getPage().getPartState(reference) != IWorkbenchPage.STATE_MAXIMIZED
 				&& isProperty(IConfigurationProperties.MAXIMIZE_VIEW, true)) {
 			reference.getPage().toggleZoom(reference);
@@ -382,7 +382,7 @@ public class CoreTestCase extends TestCase {
 	}
 
 	/**
-	 * Restore the Target Explorer view state.
+	 * Restore the main view state.
 	 */
 	protected void restoreView() {
 		// restore the original view zoom state

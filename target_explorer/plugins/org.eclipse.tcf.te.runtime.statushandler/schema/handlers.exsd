@@ -6,7 +6,7 @@
          <meta.schema plugin="org.eclipse.tcf.te.runtime.statushandler" id="handlers" name="Status Handler Extension Point"/>
       </appinfo>
       <documentation>
-         This extension point is used to allow the contribution of new Target Explorer status handler.
+         This extension point is used to allow the contribution of new status handler.
       </documentation>
    </annotation>
 
@@ -50,7 +50,7 @@
    <element name="handler">
       <annotation>
          <documentation>
-            Declares a Target Explorer status handler contribution.
+            Declares a status handler contribution.
          </documentation>
       </annotation>
       <complexType>

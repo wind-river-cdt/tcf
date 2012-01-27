@@ -52,7 +52,7 @@ import org.eclipse.ui.part.EditorInputTransfer;
 
 
 /**
- * Target Explorer, RCP: Workbench window advisor implementation.
+ * RCP: Workbench window advisor implementation.
  */
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	// (boolean) Prompt for exit confirmation when last window closed.

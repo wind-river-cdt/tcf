@@ -114,9 +114,9 @@ class MemContext(memory.MemoryContext):
                     e = memory.MemoryError(error.message)
                 else:
                     assert len(args) == 3
-                    bytes = channel.toByteArray(args[0])
-                    assert len(bytes) <= size
-                    buf[offs:offs+len(bytes)] = bytes
+                    byts = channel.toByteArray(args[0])
+                    assert len(byts) <= size
+                    buf[offs:offs+len(byts)] = byts
                     e = self.toMemoryError(args[1], args[2])
                 done.doneMemory(self.token, e)
         return GetCommand().token
