@@ -30,12 +30,12 @@ import org.eclipse.swt.widgets.Tree;
  * CommonViewerListener listens to the property change event from the
  *  tree and update the viewer accordingly.
  */
-public abstract class CommonViewerListener extends TimerTask implements IPropertyChangeListener {
+class CommonViewerListener extends TimerTask implements IPropertyChangeListener {
 	private static final long INTERVAL = 500;
 	private static final long MAX_IMMEDIATE_INTERVAL = 1000;
 	private static final Object NULL = new Object();
-	// The common viewer
-	private TreeViewer viewer;
+	// The content provider
+	private TreeContentProvider contentProvider;
 	// Last time that the property event was processed.
 	private long lastTime = 0;
 	// The timer that process the property events periodically.
@@ -44,12 +44,13 @@ public abstract class CommonViewerListener extends TimerTask implements IPropert
 	private Queue<Object> queue;
 
 	/***
-	 * Create an instance for the specified common viewer.
+	 * Create an instance for the specified tree content provider.
 	 *
-	 * @param viewer The common viewer.
+	 * @param contentProvider The tree content provider.
 	 */
-	public CommonViewerListener(TreeViewer viewer) {
-		this.viewer = viewer;
+	public CommonViewerListener(TreeContentProvider contentProvider) {
+		Assert.isNotNull(contentProvider);
+		this.contentProvider = contentProvider;
 		this.timer = new Timer();
 		this.timer.schedule(this, INTERVAL, INTERVAL);
 		this.queue = new ConcurrentLinkedQueue<Object>();
@@ -87,7 +88,7 @@ public abstract class CommonViewerListener extends TimerTask implements IPropert
 				}
 				else if (list.size() == 1) {
 					object = list.get(0);
-					if(isRootObject(object)) {
+					if(contentProvider.isRootObject(object)) {
 						object = NULL;
 					}
 				}
@@ -137,25 +138,17 @@ public abstract class CommonViewerListener extends TimerTask implements IPropert
 			return object2;
 		}
 		Object ancestor = null;
-		Object parent1 = getParent(object1);
+		Object parent1 = contentProvider.getParent(object1);
 		if(parent1 != null) {
 			ancestor = getCommonAncestor(parent1, object2);
 		}
 		if(ancestor != null) return ancestor;
-		Object parent2 = getParent(object2);
+		Object parent2 = contentProvider.getParent(object2);
 		if(parent2 != null) {
 			ancestor = getCommonAncestor(object1, parent2);
 		}
 		return ancestor;
 	}
-
-	/**
-	 * If the specified object is a root object;
-	 *
-	 * @param object The object to be tested.
-	 * @return true if it is root object.
-	 */
-	protected abstract boolean isRootObject(Object object);
 
 	/**
 	 * Merge the current objects into an ancestor object.
@@ -208,18 +201,10 @@ public abstract class CommonViewerListener extends TimerTask implements IPropert
 	 */
 	private boolean isAncestorOf(Object object1, Object object2) {
 		if (object2 == null) return false;
-		Object parent = getParent(object2);
+		Object parent = contentProvider.getParent(object2);
 		if (parent == object1) return true;
 		return isAncestorOf(object1, parent);
    }
-
-	/**
-	 * Get the element's parent object.
-	 *
-	 * @param element The element
-	 * @return The parent of the element.
-	 */
-	protected abstract Object getParent(Object element);
 
 	/**
 	 * Process the object node.
@@ -228,25 +213,28 @@ public abstract class CommonViewerListener extends TimerTask implements IPropert
 	 */
 	void processObject(final Object object) {
 		Assert.isNotNull(object);
-	    Tree tree = viewer.getTree();
-	    if (!tree.isDisposed()) {
-	    	Display display = tree.getDisplay();
-	    	if (display.getThread() == Thread.currentThread()) {
-	    		if (object != NULL) {
-	    			viewer.refresh(object);
-	    		}
-	    		else {
-	    			viewer.refresh();
-	    		}
-	    	}
-	    	else {
-	    		display.asyncExec(new Runnable() {
-	    			@Override
-	    			public void run() {
-	    				processObject(object);
-	    			}
-	    		});
-	    	}
-	    }
+		TreeViewer viewer = contentProvider.getTreeViewer();
+		if(viewer != null) {
+		    Tree tree = viewer.getTree();
+		    if (!tree.isDisposed()) {
+		    	Display display = tree.getDisplay();
+		    	if (display.getThread() == Thread.currentThread()) {
+		    		if (object != NULL) {
+		    			viewer.refresh(object);
+		    		}
+		    		else {
+		    			viewer.refresh();
+		    		}
+		    	}
+		    	else {
+		    		display.asyncExec(new Runnable() {
+		    			@Override
+		    			public void run() {
+		    				processObject(object);
+		    			}
+		    		});
+		    	}
+		    }
+		}
     }
 }

@@ -37,6 +37,13 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 	// The viewer
 	protected TreeViewer viewer;
 
+	/**
+	 * Create a tree content provider.
+	 */
+	public TreeContentProvider() {
+		commonViewerListener = new CommonViewerListener(this);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
@@ -76,15 +83,6 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		Assert.isTrue(viewer instanceof TreeViewer);
 		this.viewer = (TreeViewer) viewer; 
-		commonViewerListener = new CommonViewerListener(this.viewer) {
-			@Override
-            protected Object getParent(Object node) {
-	            return TreeContentProvider.this.getParent(node);
-            }
-			@Override
-            protected boolean isRootObject(Object object) {
-	            return TreeContentProvider.this.isRootObject(object);
-            }};
 	}
 	
 	/**
@@ -126,4 +124,8 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 	public Object[] getElements(Object inputElement) {
 		return getChildren(inputElement);
 	}
+
+	TreeViewer getTreeViewer() {
+	    return viewer;
+    }
 }

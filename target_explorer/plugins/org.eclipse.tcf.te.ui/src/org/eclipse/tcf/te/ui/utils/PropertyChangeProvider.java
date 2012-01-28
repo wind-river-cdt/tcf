@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -48,6 +49,7 @@ public class PropertyChangeProvider extends PlatformObject implements IPropertyC
 	 */
 	@Override
     public void addPropertyChangeListener(IPropertyChangeListener listener) {
+		Assert.isNotNull(listener);
 		if(!propertyChangeListeners.contains(listener)) {
 			propertyChangeListeners.add(listener);
 		}
@@ -59,6 +61,7 @@ public class PropertyChangeProvider extends PlatformObject implements IPropertyC
 	 */
 	@Override
     public void removePropertyChangeListener(IPropertyChangeListener listener) {
+		Assert.isNotNull(listener);
 		if(propertyChangeListeners.contains(listener)) {
 			propertyChangeListeners.remove(listener);
 		}
