@@ -165,6 +165,8 @@ public class UIPlugin extends AbstractUIPlugin {
 		registry.put(ImageConsts.BANNER_IMAGE, ImageDescriptor.createFromURL(url));
 		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OBJ + "error.gif"); //$NON-NLS-1$
 		registry.put(ImageConsts.ERROR_IMAGE, ImageDescriptor.createFromURL(url));
+		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OBJ + "pending.gif"); //$NON-NLS-1$
+		registry.put(ImageConsts.PENDING, ImageDescriptor.createFromURL(url));
 	}
 
 	/**
