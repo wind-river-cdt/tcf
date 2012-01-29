@@ -52,7 +52,7 @@ public class FSTreeElementLabelProvider extends LabelProvider {
 	public Image getImage(Object element) {
 		if (element instanceof FSTreeNode) {
 			FSTreeNode node = (FSTreeNode) element;
-			if ("FSPendingNode".equals(node.type)) { //$NON-NLS-1$
+			if (node.isPendingNode()) {
 				return UIPlugin.getImage(ImageConsts.PENDING);
 			}
 			else if (node.isSystemRoot()) {
