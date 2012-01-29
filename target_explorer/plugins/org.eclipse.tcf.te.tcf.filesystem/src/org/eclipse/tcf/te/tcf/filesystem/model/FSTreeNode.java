@@ -403,7 +403,7 @@ public final class FSTreeNode extends PropertyChangeProvider implements Cloneabl
 	 * @return true if this node is a root node.
 	 */
 	public boolean isRoot() {
-		return type.endsWith("FSRootDirNode"); //$NON-NLS-1$
+		return type != null && type.equals("FSRootDirNode"); //$NON-NLS-1$
 	}
 
 	/**
@@ -412,7 +412,7 @@ public final class FSTreeNode extends PropertyChangeProvider implements Cloneabl
 	 * @return true if this node is the system root.
 	 */
 	public boolean isSystemRoot() {
-		return type.endsWith("FSRootNode"); //$NON-NLS-1$
+		return type != null && type.equals("FSRootNode"); //$NON-NLS-1$
 	}
 
 	/**
