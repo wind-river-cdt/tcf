@@ -25,7 +25,7 @@ import org.eclipse.ui.IActionFilter;
 /**
  * The adapter factory of <code>FSTreeNode</code> over <code>IActionFilter</code>
  */
-public class NodeStateFilterFactory implements IAdapterFactory {
+public class FSTreeNodeAdapterFactory implements IAdapterFactory {
 	private static ILabelProvider nodeLabelProvider = new FSTreeElementLabelProvider();
 	private static IDeleteHandlerDelegate deleteDelegate = new DeleteHandlerDelegate();
 	private static IRefreshHandlerDelegate refreshDelegate = new RefreshHandlerDelegate();
@@ -37,7 +37,7 @@ public class NodeStateFilterFactory implements IAdapterFactory {
 	/**
 	 * Constructor.
 	 */
-	public NodeStateFilterFactory(){
+	public FSTreeNodeAdapterFactory(){
 		this.filters = Collections.synchronizedMap(new HashMap<FSTreeNode, NodeStateFilter>());
 	}
 
