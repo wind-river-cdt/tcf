@@ -61,7 +61,7 @@ class CommonViewerListener extends TimerTask implements IPropertyChangeListener 
 	 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
 	 */
 	@Override
-    public void propertyChange(final PropertyChangeEvent event) {
+    public synchronized void propertyChange(final PropertyChangeEvent event) {
 		long now = System.currentTimeMillis();
 		Object object = event.getSource();
 		if(object == null)
@@ -77,9 +77,10 @@ class CommonViewerListener extends TimerTask implements IPropertyChangeListener 
 	 * @see java.util.TimerTask#run()
 	 */
 	@Override
-	public void run() {
+	public synchronized void run() {
 		if (!queue.isEmpty()) {
 			Object[] objects = queue.toArray();
+			queue.clear();
 			Object object = mergeObjects(objects);
 			if (object instanceof List<?>) {
 				List<?> list = (List<?>) object;
@@ -99,7 +100,6 @@ class CommonViewerListener extends TimerTask implements IPropertyChangeListener 
 				}
 			}
 			processObject(object);
-			queue.clear();
 			lastTime = System.currentTimeMillis();
 		}
 	}
