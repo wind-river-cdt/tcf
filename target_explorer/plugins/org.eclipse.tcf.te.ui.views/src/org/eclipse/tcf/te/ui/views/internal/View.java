@@ -54,7 +54,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 
 /**
- * Target Explorer View implementation.
+ * View implementation.
  * <p>
  * The view is based on the Eclipse Common Navigator framework.
  */
@@ -169,12 +169,12 @@ public class View extends CommonNavigator implements ITabbedPropertySheetPageCon
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
 
-		// Add the additional custom Target Explorer toolbar groups
+		// Add the additional custom toolbar groups
 		addCustomToolbarGroups();
 	}
 
 	/**
-	 * Adds the custom Target Explorer toolbar groups to the view toolbar.
+	 * Adds the custom toolbar groups to the view toolbar.
 	 */
 	protected void addCustomToolbarGroups() {
 		if (getViewSite() != null && getViewSite().getActionBars() != null) {

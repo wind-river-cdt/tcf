@@ -39,7 +39,7 @@ public class AllCoreTests {
 	 * @return Any object of type <code>Test</code> containing the test to run.
 	 */
 	public static Test suite() {
-		TestSuite suite = new TestSuite("All Target Explorer Core Tests"); //$NON-NLS-1$
+		TestSuite suite = new TestSuite("All Core Tests"); //$NON-NLS-1$
 
 		suite.addTest(StatusHandlerTestCase.getTestSuite());
 		suite.addTest(StepperTestCase.getTestSuite());

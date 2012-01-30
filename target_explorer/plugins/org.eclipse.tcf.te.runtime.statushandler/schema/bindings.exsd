@@ -6,7 +6,7 @@
          <meta.schema plugin="org.eclipse.tcf.te.runtime.statushandler" id="bindings" name="Status Handler Bindings Extension Point"/>
       </appinfo>
       <documentation>
-         This extension point is used to declare the Target Explorer status handler bindings.
+         This extension point is used to declare the status handler bindings.
 &lt;p&gt;
 &lt;b&gt;Note:&lt;/b&gt; For the enablement expression evaluation, note that only the default variable is set and it is non-iterable. The default variable is set to the handler context, which is typically the object calling the status handler.
       </documentation>
@@ -54,7 +54,7 @@
    <element name="binding">
       <annotation>
          <documentation>
-            Declares a Target Explorer status handler binding.
+            Declares a status handler binding.
          </documentation>
       </annotation>
       <complexType>

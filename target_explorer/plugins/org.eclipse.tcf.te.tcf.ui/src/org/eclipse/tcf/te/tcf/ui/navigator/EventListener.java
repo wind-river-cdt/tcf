@@ -16,7 +16,7 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.ui.views.events.AbstractEventListener;
 
 /**
- * UI event listener updating the target explorer view.
+ * UI event listener updating the main view.
  */
 public class EventListener extends AbstractEventListener {
 

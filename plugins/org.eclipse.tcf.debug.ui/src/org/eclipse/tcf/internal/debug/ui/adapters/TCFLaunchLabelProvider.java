@@ -52,7 +52,7 @@ class TCFLaunchLabelProvider implements IElementLabelProvider {
                 result.setForeground(new RGB(255, 0, 0), 0);
             }
             else if (launch.isExited()) {
-                status += ": Exited";
+                status += ": All exited or detached";
                 int code = launch.getExitCode();
                 if (code > 0) status += ", exit code " + code;
                 if (code < 0) {

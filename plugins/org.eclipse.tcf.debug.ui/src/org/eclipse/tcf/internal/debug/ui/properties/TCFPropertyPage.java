@@ -42,5 +42,4 @@ public class TCFPropertyPage extends PropertyPage {
         fPage.selectionChanged(null, new StructuredSelection(getElement()));
         return composite;
     }
-
 }

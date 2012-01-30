@@ -33,7 +33,7 @@ public class TCFNodeAdapterFactory implements IAdapterFactory {
         if (obj instanceof TCFNode) {
             if (cls == IToggleBreakpointsTarget.class) return breakpoint_command;
             if (cls == IToggleBreakpointsTargetExtension.class) return breakpoint_command;
-            if (cls == IPropertySource.class) return new TCFNodePropertySource((TCFNode) obj);
+            if (cls == IPropertySource.class) return new TCFNodePropertySource((TCFNode)obj);
         }
         return null;
     }

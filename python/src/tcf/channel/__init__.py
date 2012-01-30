@@ -26,7 +26,7 @@ class TraceListener(object):
     def onChannelClosed(self, error):
         pass
 
-def Proxy(object):
+class Proxy(object):
     def onCommand(self, token, service, name, data):
         pass
 
@@ -151,11 +151,11 @@ def toJSONSequence(args):
         buf.write('\0')
     return buf.getvalue()
 
-def fromJSONSequence(bytes):
-    if bytes[-1] == 0:
-        del bytes[-1]
-    str = bytes.decode("UTF-8")
-    parts = str.split('\0')
+def fromJSONSequence(byteArray):
+    if byteArray[-1] == 0:
+        del byteArray[-1]
+    jsonStr = byteArray.decode("UTF-8")
+    parts = jsonStr.split('\0')
     objects = []
     for part in parts:
         if part:
@@ -164,8 +164,8 @@ def fromJSONSequence(bytes):
             objects.append(None)
     return objects
 
-def dumpJSONObject(object, buf):
-        json.dump(object, buf, separators=(',', ':'), cls=TCFJSONEncoder)
+def dumpJSONObject(obj, buf):
+        json.dump(obj, buf, separators=(',', ':'), cls=TCFJSONEncoder)
 
 def toByteArray(data):
     if data is None: return None

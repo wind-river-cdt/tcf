@@ -268,13 +268,15 @@ public class Messages extends NLS {
 	public static String StateManager_TCFNotProvideFSMessage2;
 	public static String StateManager_UpdateFailureTitle;
 
-	public static String TargetExplorerPreferencePage_AutoSavingText;
-	public static String TargetExplorerPreferencePage_CopyOwnershipText;
-	public static String TargetExplorerPreferencePage_CopyPermissionText;
-	public static String TargetExplorerPreferencePage_RenamingOptionText;
+	public static String PreferencePage_AutoSavingText;
+	public static String PreferencePage_CopyOwnershipText;
+	public static String PreferencePage_CopyPermissionText;
+	public static String PreferencePage_RenamingOptionText;
+
 	public static String TargetSelectionPage_Description;
 	public static String TargetSelectionPage_Targets;
 	public static String TargetSelectionPage_Title;
+
 	public static String TcfInputStream_CloseTimeout;
 	public static String TcfInputStream_NoDataAvailable;
 	public static String TcfInputStream_NoFileReturned;

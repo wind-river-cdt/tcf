@@ -16,11 +16,9 @@ import org.eclipse.debug.internal.ui.viewers.model.provisional.IElementLabelProv
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IModelProxyFactory;
 import org.eclipse.debug.ui.contexts.ISuspendTrigger;
 import org.eclipse.tcf.internal.debug.model.TCFLaunch;
-import org.eclipse.tcf.internal.debug.ui.Activator;
 import org.eclipse.tcf.internal.debug.ui.model.TCFModel;
-import org.eclipse.tcf.protocol.Protocol;
-import org.eclipse.tcf.util.TCFTask;
-
+import org.eclipse.tcf.internal.debug.ui.model.TCFModelManager;
+import org.eclipse.ui.views.properties.IPropertySource;
 
 public class TCFLaunchAdapterFactory implements IAdapterFactory {
 
@@ -29,28 +27,21 @@ public class TCFLaunchAdapterFactory implements IAdapterFactory {
         IElementContentProvider.class,
         IModelProxyFactory.class,
         ISuspendTrigger.class,
+        IPropertySource.class,
     };
 
     private static final IElementLabelProvider launch_label_provider = new TCFLaunchLabelProvider();
 
     @SuppressWarnings("rawtypes")
-    private static Object getModelAdapter(Object from, Class to) {
-        TCFLaunch launch = (TCFLaunch)from;
-        TCFModel model = Activator.getModelManager().getModel(launch);
-        if (model != null && to.isInstance(model)) return model;
-        return null;
-    }
-
-    @SuppressWarnings("rawtypes")
     public Object getAdapter(final Object from, final Class to) {
         if (from instanceof TCFLaunch) {
             if (to == IElementLabelProvider.class) return launch_label_provider;
-            if (Protocol.isDispatchThread()) return getModelAdapter(from, to);
-            return new TCFTask<Object>() {
-                public void run() {
-                    done(getModelAdapter(from, to));
-                }
-            }.getE();
+            TCFModel model = TCFModelManager.getModelSync((TCFLaunch)from);
+            if (model != null) {
+                if (to.isInstance(model)) return model;
+                if (to == IPropertySource.class) return new TCFNodePropertySource(model.getRootNode());
+            }
+            return null;
         }
         return null;
     }

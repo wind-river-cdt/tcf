@@ -17,10 +17,8 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.tcf.internal.debug.model.TCFLaunch;
-import org.eclipse.tcf.internal.debug.ui.Activator;
-import org.eclipse.tcf.internal.debug.ui.model.TCFModel;
+import org.eclipse.tcf.internal.debug.ui.model.TCFModelManager;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNode;
-import org.eclipse.tcf.util.TCFTask;
 import org.eclipse.ui.IActionDelegate2;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IViewActionDelegate;
@@ -111,20 +109,7 @@ implements IViewActionDelegate, IActionDelegate2, IWorkbenchWindowActionDelegate
         if (selection instanceof IStructuredSelection) {
             final Object o = ((IStructuredSelection)selection).getFirstElement();
             if (o instanceof TCFNode) return (TCFNode)o;
-            if (o instanceof TCFLaunch) {
-                return new TCFTask<TCFNode>() {
-                    public void run() {
-                        TCFLaunch launch = (TCFLaunch)o;
-                        TCFModel model = Activator.getModelManager().getModel(launch);
-                        if (model != null) {
-                            done(model.getRootNode());
-                        }
-                        else {
-                            done(null);
-                        }
-                    }
-                }.getE();
-            }
+            if (o instanceof TCFLaunch) return TCFModelManager.getRootNodeSync((TCFLaunch)o);
         }
         return null;
     }
@@ -139,18 +124,8 @@ implements IViewActionDelegate, IActionDelegate2, IWorkbenchWindowActionDelegate
                         list.add((TCFNode)o);
                     }
                     else if (o instanceof TCFLaunch) {
-                        list.add(new TCFTask<TCFNode>() {
-                            public void run() {
-                                TCFLaunch launch = (TCFLaunch)o;
-                                TCFModel model = Activator.getModelManager().getModel(launch);
-                                if (model != null) {
-                                    done(model.getRootNode());
-                                }
-                                else {
-                                    done(null);
-                                }
-                            }
-                        }.getE());
+                        TCFNode n = TCFModelManager.getRootNodeSync((TCFLaunch)o);
+                        if (n != null) list.add(n);
                     }
                 }
             }

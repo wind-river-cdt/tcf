@@ -29,6 +29,12 @@ public interface ImageConsts {
     public final static String  IMAGE_DIR_EVIEW = "eview16/"; //$NON-NLS-1$
 
     /**
+     * The directory where to load enabled toolbar images from,
+     * relative to the image root directory.
+     */
+    public final static String  IMAGE_DIR_ETOOL = "etool16/"; //$NON-NLS-1$
+
+    /**
      * The directory where to load model object images from,
      * relative to the image root directory.
      */
@@ -37,22 +43,27 @@ public interface ImageConsts {
     // ***** The image constants *****
 
     /**
-     * The key to access the Target Explorer editor image.
+     * The key to access the editor image.
      */
-    public static final String  EDITOR = "TargetExplorerEditor"; //$NON-NLS-1$
+    public static final String  EDITOR = "Editor"; //$NON-NLS-1$
 
     /**
-     * The key to access the Target Explorer view image.
+     * The key to access the view image.
      */
-    public static final String  VIEW = "TargetExplorerView"; //$NON-NLS-1$
+    public static final String  VIEW = "View"; //$NON-NLS-1$
 
     /**
-     * The key to access the Target Explorer working sets image.
+     * The key to access the working sets image.
      */
-    public static final String  WORKING_SETS = "TargetExplorerWorkingSets"; //$NON-NLS-1$
+    public static final String  WORKING_SETS = "WorkingSets"; //$NON-NLS-1$
 
     /**
-     * The key to access the Target Explorer working set image.
+     * The key to access the working set image.
      */
-    public static final String  WORKING_SET = "TargetExplorerWorkingSet"; //$NON-NLS-1$
+    public static final String  WORKING_SET = "WorkingSet"; //$NON-NLS-1$
+
+    /**
+     * The key to access the help action image.
+     */
+    public static final String  HELP = "HelpAction"; //$NON-NLS-1$
 }

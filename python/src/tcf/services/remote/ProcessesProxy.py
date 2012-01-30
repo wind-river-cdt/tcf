@@ -208,8 +208,8 @@ def _toEnvStringArray(map):
 def _toEnvMap(arr):
     map = {}
     if not arr: return map
-    for str in arr:
-        i = str.find('=')
-        if i >= 0: map[str[:i]] = str[i + 1:]
-        else: map[str] = ""
+    for env in arr:
+        i = env.find('=')
+        if i >= 0: map[env[:i]] = env[i + 1:]
+        else: map[env] = ""
     return map

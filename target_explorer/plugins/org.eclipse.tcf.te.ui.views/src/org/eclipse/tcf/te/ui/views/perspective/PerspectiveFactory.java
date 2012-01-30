@@ -21,7 +21,7 @@ import org.eclipse.ui.PlatformUI;
  */
 public class PerspectiveFactory extends PlatformObject implements IPerspectiveFactory {
 	private final static String[] VIEWS_FOR_LEFT_AREA = new String[] {
-		"org.eclipse.tcf.te.ui.views.TargetExplorer", //$NON-NLS-1$
+		"org.eclipse.tcf.te.ui.views.View", //$NON-NLS-1$
 		"org.eclipse.ui.navigator.ProjectExplorer" //$NON-NLS-1$
 	};
 

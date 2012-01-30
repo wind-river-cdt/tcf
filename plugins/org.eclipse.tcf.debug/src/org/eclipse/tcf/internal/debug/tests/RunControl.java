@@ -252,6 +252,20 @@ class RunControl {
                                 ok = true;
                             }
                         }
+                        if (!ok && rnd.nextInt(4) == 0) {
+                            IRunControl.RunControlContext ctx = ctx_map.get(test_id);
+                            if (ctx != null && ctx.canDetach()) {
+                                resume_cmds.put(id, ctx.detach(new IRunControl.DoneCommand() {
+                                    public void doneCommand(IToken token, Exception error) {
+                                        assert resume_cmds.get(id) == token;
+                                        resume_cmds.remove(id);
+                                        if (enable_trace) System.out.println("" + channel_id + " done detach " + error);
+                                        if (error != null && ctx_map.get(test_id) != null) exit(error);
+                                    }
+                                }));
+                                ok = true;
+                            }
+                        }
                         if (!ok) {
                             IDiagnostics diag = channel.getRemoteService(IDiagnostics.class);
                             resume_cmds.put(id, diag.cancelTest(test_id, new IDiagnostics.DoneCancelTest() {
@@ -290,8 +304,17 @@ class RunControl {
         });
     }
 
-    void cancel(String thread_id, String test_id) {
-        test_suite.getCanceledTests().put(thread_id, test_id);
-        resume(thread_id, 0);
+    void cancel(String test_id) {
+        for (IRunControl.RunControlContext ctx : ctx_map.values()) {
+            if (ctx.hasState()) {
+                if (test_id.equals(ctx.getID()) ||
+                        test_id.equals(ctx.getParentID()) ||
+                        test_id.equals(ctx.getCreatorID())) {
+                    String thread_id = ctx.getID();
+                    test_suite.getCanceledTests().put(thread_id, test_id);
+                    resume(thread_id, 0);
+                }
+            }
+        }
     }
 }

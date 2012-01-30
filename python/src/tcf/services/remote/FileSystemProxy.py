@@ -1,5 +1,5 @@
 # *******************************************************************************
-# * Copyright (c) 2011 Wind River Systems, Inc. and others.
+# * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others.
 # * All rights reserved. This program and the accompanying materials
 # * are made available under the terms of the Eclipse Public License v1.0
 # * which accompanies this distribution, and is available at
@@ -44,17 +44,20 @@ class FileSystemCommand(Command):
         super(FileSystemCommand, self).__init__(service.channel, service, command, args)
 
     def _toSFError(self, data):
-        if data is None: return None
-        error_code = map.get(errors.ERROR_CODE)
+        if data is None:
+            return None
+        error_code = data.get(errors.ERROR_CODE)
         cmd = self.getCommandString()
-        if len(cmd) > 72: cmd = cmd[0, 72] + "..."
+        if len(cmd) > 72:
+            cmd = cmd[0:72] + "..."
         s = Status(error_code,
                 "TCF command exception:" +
                 "\nCommand: " + cmd +
-                "\nException: " + self.toErrorString(data) +
-                "\nError code: " + error_code, map)
-        caused_by = map.get(errors.ERROR_CAUSED_BY)
-        if caused_by is not None: s.initCause(self.toError(caused_by, False))
+                "\nException: " + errors.toErrorString(data) +
+                "\nError code: " + str(error_code), data)
+        caused_by = data.get(errors.ERROR_CAUSED_BY)
+        if caused_by is not None:
+            s.initCause(self.toError(caused_by, False))
         return s
 
 class FileSystemProxy(filesystem.FileSystemService):
@@ -203,7 +206,7 @@ class FileSystemProxy(filesystem.FileSystemService):
                 else:
                     assert len(args) == 2
                     s = self._toSFError(args[0])
-                    if not s: h = self._toFileHandle(args[1])
+                    if not s: h = service._toFileHandle(args[1])
                 done.doneOpen(self.token, s, h)
         return OpenCommand().token
 
@@ -221,18 +224,19 @@ class FileSystemProxy(filesystem.FileSystemService):
                 else:
                     assert len(args) == 2
                     s = self._toSFError(args[0])
-                    if not s: h = self._toFileHandle(args[1])
+                    if not s: h = service._toFileHandle(args[1])
                 done.doneOpen(self.token, s, h)
         return OpenDirCommand().token
 
-    def read(self, handle, offset, len, done):
+    def read(self, handle, offset, length, done):
         assert handle.getService() is self
         done = self._makeCallback(done)
-        id = handle.id
+        handleID = handle.id
         service = self
         class ReadCommand(FileSystemCommand):
             def __init__(self):
-                super(ReadCommand, self).__init__(service, "read", (id, offset, len))
+                super(ReadCommand, self).__init__(service, "read",
+                                                  (handleID, offset, length))
             def done(self, error, args):
                 s = None
                 b = None
@@ -396,7 +400,7 @@ class FileSystemProxy(filesystem.FileSystemService):
         assert handle.getService() is self
         done = self._makeCallback(done)
         id = handle.id
-        binary = bytearray(data[data_pos:data_pos+data_size])
+        binary = bytearray(data[data_pos:data_pos + data_size])
         service = self
         class WriteCommand(FileSystemCommand):
             def __init__(self):
@@ -458,15 +462,15 @@ def _toObject(attrs):
     m = {}
     if attrs.attributes is not None: m.update(attrs.attributes)
     if (attrs.flags & filesystem.ATTR_SIZE) != 0:
-        m.put("Size", attrs.size)
+        m["Size"] = attrs.size
     if (attrs.flags & filesystem.ATTR_UIDGID) != 0:
-        m.put("UID", attrs.uid)
-        m.put("GID", attrs.gid)
+        m["UID"] = attrs.uid
+        m["GID"] = attrs.gid
     if (attrs.flags & filesystem.ATTR_PERMISSIONS) != 0:
-        m.put("Permissions", attrs.permissions)
+        m["Permissions"] = attrs.permissions
     if (attrs.flags & filesystem.ATTR_ACMODTIME) != 0:
-        m.put("ATime", attrs.atime)
-        m.put("MTime", attrs.mtime)
+        m["ATime"] = attrs.atime
+        m["MTime"] = attrs.mtime
     return m
 
 def _toFileAttrs(m):

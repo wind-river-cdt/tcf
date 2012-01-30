@@ -19,7 +19,7 @@ import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.navigator.CommonViewerSorter;
 
 /**
- * Target Explorer common viewer implementation.
+ * View common viewer implementation.
  */
 public class ViewViewer extends CommonViewer {
 	// Flag to mark the viewer silent. In silent mode, no

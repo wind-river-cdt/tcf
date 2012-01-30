@@ -10,17 +10,17 @@
 package org.eclipse.tcf.te.ui.views.interfaces.workingsets;
 
 /**
- * Target Explorer working set ID constants.
+ * Working set ID constants.
  */
 public interface IWorkingSetIDs {
 
 	/**
-	 * Target Explorer working set id.
+	 * Working set id.
 	 */
-	public final static String ID_WS_TARGET_EXPLORER = "org.eclipse.tcf.te.ui.views.workingset"; //$NON-NLS-1$
+	public final static String ID_WS_TARGET = "org.eclipse.tcf.te.ui.views.workingset"; //$NON-NLS-1$
 
 	/**
-	 * Target Explorer "Others" working set id.
+	 * "Others" working set id.
 	 */
 	public final static String ID_WS_OTHERS = "org.eclipse.tcf.te.ui.views.workingset.others"; //$NON-NLS-1$
 }

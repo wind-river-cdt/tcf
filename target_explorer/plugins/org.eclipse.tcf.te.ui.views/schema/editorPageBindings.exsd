@@ -3,10 +3,10 @@
 <schema targetNamespace="org.eclipse.tcf.te.ui.views" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.eclipse.tcf.te.ui.views" id="editorPageBindings" name="Target Explorer Editor Page Bindings Extension Point"/>
+         <meta.schema plugin="org.eclipse.tcf.te.ui.views" id="editorPageBindings" name="Editor Page Bindings Extension Point"/>
       </appinfo>
       <documentation>
-         This extension point is used to declare the Target Explorer editor page bindings.
+         This extension point is used to declare the editor page bindings.
 &lt;p&gt;
 &lt;b&gt;Note:&lt;/b&gt; For the enablement expression evaluation, note that the default variable and the &quot;activeEditorInput&quot; variable are the same and non-iterable.
       </documentation>
@@ -54,7 +54,7 @@
    <element name="editorPageBinding">
       <annotation>
          <documentation>
-            Declares a Target Explorer editor page binding.
+            Declares a editor page binding.
          </documentation>
       </annotation>
       <complexType>

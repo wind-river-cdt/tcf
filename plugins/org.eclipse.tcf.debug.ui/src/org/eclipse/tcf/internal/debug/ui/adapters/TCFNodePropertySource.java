@@ -15,21 +15,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.internal.debug.model.TCFContextState;
+import org.eclipse.tcf.internal.debug.model.TCFLaunch;
 import org.eclipse.tcf.internal.debug.model.TCFSourceRef;
 import org.eclipse.tcf.internal.debug.ui.Activator;
 import org.eclipse.tcf.internal.debug.ui.model.TCFModel;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNode;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExecContext;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeLaunch;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeModule;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeRegister;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExecContext.MemoryRegion;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNodeStackFrame;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.JSON;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.IRegisters;
 import org.eclipse.tcf.services.IRunControl;
 import org.eclipse.tcf.services.IStackTrace;
 import org.eclipse.tcf.util.TCFDataCache;
@@ -64,21 +70,72 @@ public class TCFNodePropertySource implements IPropertySource {
 
     public IPropertyDescriptor[] getPropertyDescriptors() {
         if (descriptors == null) {
+            if (node == null) {
+                // A disconnected TCF launch was selected
+                return descriptors = new IPropertyDescriptor[0];
+            }
             try {
                 final List<IPropertyDescriptor> list = new ArrayList<IPropertyDescriptor>();
                 descriptors = new TCFTask<IPropertyDescriptor[]>(node.getChannel()) {
                     public void run() {
                         list.clear();
                         properties.clear();
-                        if (node instanceof TCFNodeExecContext) {
+                        if (node instanceof TCFNodeLaunch) {
+                            getLaunchDescriptors((TCFNodeLaunch)node);
+                        }
+                        else if (node instanceof TCFNodeExecContext) {
                             getExecContextDescriptors((TCFNodeExecContext)node);
                         }
                         else if (node instanceof TCFNodeStackFrame) {
                             getFrameDescriptors((TCFNodeStackFrame)node);
                         }
+                        else if (node instanceof TCFNodeRegister) {
+                            getRegisterDescriptors((TCFNodeRegister)node);
+                        }
+                        else if (node instanceof TCFNodeModule) {
+                            getModuleDescriptors((TCFNodeModule)node);
+                        }
                         else {
                             done(list.toArray(new IPropertyDescriptor[list.size()]));
                         }
+                    }
+
+                    private void getModuleDescriptors(TCFNodeModule mod_node) {
+                        TCFDataCache<MemoryRegion> mod_cache = mod_node.getRegion();
+                        if (!mod_cache.validate(this)) return;
+                        Throwable error = mod_cache.getError();
+                        if (error != null) addDescriptor("Module Properties", "Error", TCFModel.getErrorMessage(error, false));
+                        MemoryRegion ctx = mod_cache.getData();
+                        if (ctx != null && ctx.region != null) {
+                            Map<String, Object> props = ctx.region.getProperties();
+                            for (String key : props.keySet()) {
+                                Object value = props.get(key);
+                                if (value instanceof Number) {
+                                    value = toHexAddrString((Number)value);
+                                }
+                                addDescriptor("Module Properties", key, value);
+                            }
+                        }
+                        done(list.toArray(new IPropertyDescriptor[list.size()]));
+                    }
+
+                    private void getRegisterDescriptors(TCFNodeRegister reg_node) {
+                        TCFDataCache<IRegisters.RegistersContext> ctx_cache = reg_node.getContext();
+                        if (!ctx_cache.validate(this)) return;
+                        Throwable error = ctx_cache.getError();
+                        if (error != null) addDescriptor("Register Properties", "Error", TCFModel.getErrorMessage(error, false));
+                        IRegisters.RegistersContext ctx = ctx_cache.getData();
+                        if (ctx != null) {
+                            Map<String, Object> props = ctx.getProperties();
+                            for (String key : props.keySet()) {
+                                Object value = props.get(key);
+                                if (value instanceof Number) {
+                                    value = toHexAddrString((Number)value);
+                                }
+                                addDescriptor("Register Properties", key, value);
+                            }
+                        }
+                        done(list.toArray(new IPropertyDescriptor[list.size()]));
                     }
 
                     private void getFrameDescriptors(TCFNodeStackFrame frameNode) {
@@ -93,7 +150,7 @@ public class TCFNodePropertySource implements IPropertySource {
                                 if (value instanceof Number) {
                                     value = toHexAddrString((Number)value);
                                 }
-                                addDescriptor("Context", key, value);
+                                addDescriptor("Stack Frame Properties", key, value);
                             }
                         }
                         TCFSourceRef ref = line_info_cache.getData();
@@ -143,21 +200,17 @@ public class TCFNodePropertySource implements IPropertySource {
                                 }
                             }
                         }
-                        MemoryRegion[] mem_map = mem_map_cache.getData();
-                        if (mem_map != null && mem_map.length > 0) {
-                            int idx = 0;
-                            for (MemoryRegion region : mem_map) {
-                                Map<String, Object> props = region.region.getProperties();
-                                for (String key : props.keySet()) {
-                                    Object value = props.get(key);
-                                    if (value instanceof Number) {
-                                        value = toHexAddrString((Number)value);
-                                    }
-                                    addDescriptor("MemoryRegion[" + idx + ']', key, value);
-                                }
-                                idx++;
-                            }
+                        done(list.toArray(new IPropertyDescriptor[list.size()]));
+                    }
+
+                    private void getLaunchDescriptors(TCFNodeLaunch launch_node) {
+                        IChannel channel = launch_node.getChannel();
+                        for (String s : channel.getRemoteServices()) {
+                            addDescriptor("Target Services", s, "");
                         }
+                        TCFLaunch launch = launch_node.getModel().getLaunch();
+                        Set<String> filter = launch.getContextFilter();
+                        if (filter != null) addDescriptor("Context Filter", "Context IDs", filter.toString());
                         done(list.toArray(new IPropertyDescriptor[list.size()]));
                     }
 
@@ -169,7 +222,7 @@ public class TCFNodePropertySource implements IPropertySource {
                         properties.put(id, value);
                     }
 
-                    boolean validateAll(TCFDataCache<?>... caches) {
+                    private boolean validateAll(TCFDataCache<?>... caches) {
                         TCFDataCache<?> pending = null;
                         for (TCFDataCache<?> cache : caches) {
                             if (!cache.validate()) pending = cache;
@@ -179,6 +232,11 @@ public class TCFNodePropertySource implements IPropertySource {
                             return false;
                         }
                         return true;
+                    }
+                    @Override
+                    public void done(IPropertyDescriptor[] r) {
+                        need_refresh = true;
+                        super.done(r);
                     }
                 }.get();
             }
@@ -219,9 +277,11 @@ public class TCFNodePropertySource implements IPropertySource {
     private static final long REFRESH_DELAY = 250;
     private static boolean refresh_posted = false;
     private static long refresh_time = 0;
+    private static boolean need_refresh = false;
 
     public static void refresh(TCFNode node) {
         assert Protocol.isDispatchThread();
+        if (!need_refresh) return;
         refresh_time = System.currentTimeMillis();
         if (refresh_posted) return;
         refresh_posted = true;
@@ -233,6 +293,7 @@ public class TCFNodePropertySource implements IPropertySource {
                     return;
                 }
                 refresh_posted = false;
+                need_refresh = false;
                 synchronized (Device.class) {
                     Display display = Display.getDefault();
                     if (!display.isDisposed()) {

@@ -11,6 +11,7 @@
 package org.eclipse.tcf.internal.debug.ui.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -19,12 +20,16 @@ import java.util.Map;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchesListener;
+import org.eclipse.debug.core.Launch;
 import org.eclipse.tcf.internal.debug.model.TCFLaunch;
 import org.eclipse.tcf.internal.debug.ui.Activator;
 import org.eclipse.tcf.protocol.Protocol;
 
 
 public class TCFModelManager {
+
+    private static final Map<TCFLaunch,TCFModel> sync_model_map =
+            Collections.synchronizedMap(new HashMap<TCFLaunch,TCFModel>());
 
     public interface ModelManagerListener {
         public void onConnected(TCFLaunch launch, TCFModel model);
@@ -41,6 +46,7 @@ public class TCFModelManager {
             assert models.get(launch) == null;
             TCFModel model = new TCFModel(launch);
             models.put(launch, model);
+            sync_model_map.put(launch, model);
         }
 
         public void onConnected(TCFLaunch launch) {
@@ -106,7 +112,10 @@ public class TCFModelManager {
                 public void run() {
                     for (ILaunch launch : launches) {
                         TCFModel model = models.remove(launch);
-                        if (model != null) model.dispose();
+                        if (model != null) {
+                            sync_model_map.remove(launch);
+                            model.dispose();
+                        }
                     }
                 }
             });
@@ -125,6 +134,7 @@ public class TCFModelManager {
         TCFLaunch.removeListener(tcf_launch_listener);
         for (Iterator<TCFModel> i = models.values().iterator(); i.hasNext();) {
             TCFModel model = i.next();
+            sync_model_map.remove(model.getLaunch());
             model.dispose();
             i.remove();
         }
@@ -144,7 +154,7 @@ public class TCFModelManager {
         return models.get(launch);
     }
 
-    public TCFNode getRootNode(TCFLaunch launch) {
+    public TCFNodeLaunch getRootNode(TCFLaunch launch) {
         TCFModel model = getModel(launch);
         if (model == null) return null;
         return model.getRootNode();
@@ -152,5 +162,24 @@ public class TCFModelManager {
 
     public static TCFModelManager getModelManager() {
         return Activator.getModelManager();
+    }
+
+    /**
+     * Synchronized and thread-safe method to map a launch to TCFModel.
+     */
+    public static TCFModel getModelSync(Launch launch) {
+        if (launch instanceof TCFLaunch) return sync_model_map.get((TCFLaunch)launch);
+        return null;
+    }
+
+    /**
+     * Synchronized and thread-safe method to map a launch to TCFNode.
+     */
+    public static TCFNodeLaunch getRootNodeSync(Launch launch) {
+        if (launch instanceof TCFLaunch) {
+            TCFModel model = sync_model_map.get((TCFLaunch)launch);
+            if (model != null) return model.getRootNode();
+        }
+        return null;
     }
 }

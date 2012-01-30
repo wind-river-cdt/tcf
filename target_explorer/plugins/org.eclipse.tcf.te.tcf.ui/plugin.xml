@@ -26,7 +26,7 @@
 
 <!-- Common navigator contributions -->
    <extension point="org.eclipse.ui.navigator.viewer">
-      <viewerContentBinding viewerId="org.eclipse.tcf.te.ui.views.TargetExplorer">
+      <viewerContentBinding viewerId="org.eclipse.tcf.te.ui.views.View">
          <includes>
             <contentExtension
                   isRoot="true"
@@ -144,7 +144,7 @@
 
 <!-- Menu contributions -->
    <extension point="org.eclipse.ui.menus">
-      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.TargetExplorer#Popup?after=group.redirect">
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.redirect">
          <command
                commandId="org.eclipse.tcf.te.tcf.ui.command.redirect"
                helpContextId="org.eclipse.tcf.te.tcf.ui.command_Redirect"
@@ -212,7 +212,7 @@
             commandId="org.eclipse.tcf.te.tcf.ui.command.redirect">
             <activeWhen>
                <with variable="activePartId">
-                  <equals value="org.eclipse.tcf.te.ui.views.TargetExplorer"/>
+                  <equals value="org.eclipse.tcf.te.ui.views.View"/>
                </with>
             </activeWhen>
             <enabledWhen>
@@ -233,7 +233,7 @@
             commandId="org.eclipse.tcf.te.tcf.ui.command.resetredirect">
             <activeWhen>
                <with variable="activePartId">
-                  <equals value="org.eclipse.tcf.te.ui.views.TargetExplorer"/>
+                  <equals value="org.eclipse.tcf.te.ui.views.View"/>
                </with>
             </activeWhen>
             <enabledWhen>
@@ -254,7 +254,7 @@
    <extension point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
       <propertyTabs contributorId="org.eclipse.tcf.te.ui">
          <propertyTab
-               category="target_explorer"
+               category="org.eclipse.tcf.te"
                id="org.eclipse.tcf.te.ui.views.propertyTab.peer.general"
                label="%propertyTab.general.label">
          </propertyTab>

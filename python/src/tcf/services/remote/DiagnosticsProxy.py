@@ -25,11 +25,11 @@ class DiagnosticsProxy(diagnostics.DiagnosticsService):
             def __init__(self):
                 super(EchoCommand, self).__init__(service.channel, service, "echo", (s,))
             def done(self, error, args):
-                str = None
+                result = None
                 if not error:
                     assert len(args) == 1
-                    str = args[0]
-                done.doneEcho(self.token, error, str)
+                    result = args[0]
+                done.doneEcho(self.token, error, result)
         return EchoCommand().token
 
     def echoFP(self, n, done):
@@ -63,12 +63,12 @@ class DiagnosticsProxy(diagnostics.DiagnosticsService):
                 super(EchoERRCommand, self).__init__(service.channel, service, "echoERR", (map,))
             def done(self, error, args):
                 err = None
-                str = None
+                result = None
                 if not error:
                     assert len(args) == 2
                     err = self.toError(args[0])
-                    str = args[1]
-                done.doneEchoERR(self.token, error, err, str)
+                    result = args[1]
+                done.doneEchoERR(self.token, error, err, result)
         return EchoERRCommand().token
 
     def getTestList(self, done):
@@ -93,12 +93,12 @@ class DiagnosticsProxy(diagnostics.DiagnosticsService):
             def __init__(self):
                 super(RunTestCommand, self).__init__(service.channel, service, "runTest", (s,))
             def done(self, error, args):
-                str = None
+                result = None
                 if not error:
                     assert len(args) == 2
                     error = self.toError(args[0])
-                    str = args[1]
-                done.doneRunTest(self.token, error, str)
+                    result = args[1]
+                done.doneRunTest(self.token, error, result)
         return RunTestCommand().token
 
     def cancelTest(self, s, done):

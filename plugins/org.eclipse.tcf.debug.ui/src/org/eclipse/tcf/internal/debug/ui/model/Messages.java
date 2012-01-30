@@ -16,6 +16,7 @@ public class Messages extends NLS {
     public static String TCFAnnotationManager_8;
     public static String TCFAnnotationManager_9;
     public static String TCFAnnotationManager_10;
+    public static String TCFAnnotationManager_11;
 
     static {
         // initialize resource bundle

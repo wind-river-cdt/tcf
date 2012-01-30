@@ -19,14 +19,14 @@ import org.eclipse.core.runtime.IExtension;
  * The comparator assure that extension are read in a predictable order.
  * <p>
  * The order of the extensions is defined as following:<br>
- * <ul><li>Extensions contributed by Target Explorer plug-ins (<code>org.eclipse.tcf.te.*</code>)
+ * <ul><li>Extensions contributed by our own plug-ins (<code>org.eclipse.tcf.te.*</code>)
  *         in ascending alphabetic order and</li>
  *     <li>Extensions contributed by any other plug-in in ascending alphabetic order.</li>
  *     <li>Extensions contributed by the same plug-in in ascending alphabetic order by the
  *         extensions unique id</li>
  */
 public class ExtensionPointComparator implements Comparator<IExtension> {
-	private final static String TARGET_EXPLORER_PLUGINS_PATTERN = "org.eclipse.tcf.te."; //$NON-NLS-1$
+	private final static String OWN_PLUGINS_PATTERN = "org.eclipse.tcf.te."; //$NON-NLS-1$
 
 	/* (non-Javadoc)
 	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
@@ -42,12 +42,12 @@ public class ExtensionPointComparator implements Comparator<IExtension> {
 		String contributor1 = o1.getContributor().getName();
 		String contributor2 = o2.getContributor().getName();
 
-		// Contributions from Target Explorer plug-ins comes before 3rdParty plug-ins
-		if (contributor1.startsWith(TARGET_EXPLORER_PLUGINS_PATTERN) && !contributor2.startsWith(TARGET_EXPLORER_PLUGINS_PATTERN))
+		// Contributions from our own plug-ins comes before 3rdParty plug-ins
+		if (contributor1.startsWith(OWN_PLUGINS_PATTERN) && !contributor2.startsWith(OWN_PLUGINS_PATTERN))
 			return -1;
-		if (!contributor1.startsWith(TARGET_EXPLORER_PLUGINS_PATTERN) && contributor2.startsWith(TARGET_EXPLORER_PLUGINS_PATTERN))
+		if (!contributor1.startsWith(OWN_PLUGINS_PATTERN) && contributor2.startsWith(OWN_PLUGINS_PATTERN))
 			return 1;
-		if (contributor1.startsWith(TARGET_EXPLORER_PLUGINS_PATTERN) && contributor2.startsWith(TARGET_EXPLORER_PLUGINS_PATTERN)) {
+		if (contributor1.startsWith(OWN_PLUGINS_PATTERN) && contributor2.startsWith(OWN_PLUGINS_PATTERN)) {
 			int value = contributor1.compareTo(contributor2);
 			// Within the same plug-in, the extension are sorted by their unique id (if available)
 			if (value == 0 && o1.getUniqueIdentifier() != null && o2.getUniqueIdentifier() != null)

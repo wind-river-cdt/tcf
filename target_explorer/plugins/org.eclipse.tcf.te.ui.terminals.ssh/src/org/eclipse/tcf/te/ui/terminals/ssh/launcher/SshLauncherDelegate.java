@@ -77,7 +77,7 @@ public class SshLauncherDelegate extends AbstractLauncherDelegate {
 		String user = properties.getStringProperty(ITerminalsConnectorConstants.PROP_SSH_USER);
 
 		if (host != null && user!= null) {
-			DateFormat format = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG);
+			DateFormat format = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 			String date = format.format(new Date(System.currentTimeMillis()));
 			return NLS.bind(Messages.SshLauncherDelegate_terminalTitle, new String[]{user, host, date});
 		}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2011 Wind River Systems, Inc. and others.
+ * Copyright (c) 2008, 2012 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,9 @@ import java.util.Map;
 import org.eclipse.tcf.protocol.IService;
 import org.eclipse.tcf.protocol.IToken;
 
+/**
+ * TCF symbols service interface.
+ */
 public interface ISymbols extends IService {
 
     /**
@@ -439,9 +442,25 @@ public interface ISymbols extends IService {
                 Object[] fp_cmds, Map<String,Object[]> reg_cmds);
     }
 
+    /**
+     * Get symbol file info for a module that contains given address in a memory space.
+     * @param context_id - a memory space (process) ID.
+     * @param address - an address in the memory space.
+     * @param done - call back interface called when operation is completed.
+     * @return - pending command handle.
+     */
     IToken getSymFileInfo(String context_id, Number address, DoneGetSymFileInfo done);
 
+    /**
+     * Client call back interface for getSymFileInfo().
+     */
     interface DoneGetSymFileInfo {
+        /**
+         * Called when symbol file information retrieval is done.
+         * @param token - command handle.
+         * @param error – error description if operation failed, null if succeeded.
+         * @param props - symbol file properties.
+         */
         void doneGetSymFileInfo(IToken token, Exception error, Map<String,Object> props);
     }
 }

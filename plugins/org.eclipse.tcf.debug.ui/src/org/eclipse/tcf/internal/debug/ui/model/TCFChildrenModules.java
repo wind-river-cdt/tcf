@@ -26,6 +26,7 @@ public class TCFChildrenModules extends TCFChildren {
     }
 
     void onMemoryMapChanged() {
+        for (TCFNode n : getNodes()) ((TCFNodeModule)n).onMemoryMapChanged();
         reset();
     }
 
@@ -37,11 +38,10 @@ public class TCFChildrenModules extends TCFChildren {
         MemoryRegion[] map = map_cache.getData();
         Map<String, TCFNode> data = new HashMap<String, TCFNode>();
         if (map != null) {
-            for (MemoryRegion region : map) {
-                String id = node.id + ".Module-" + region.region.getFileName() + '@' + region.region.getAddress();
-                TCFNodeModule module = (TCFNodeModule) node.model.getNode(id);
-                if (module == null) module = new TCFNodeModule(node, id);
-                module.setRegion(region.region);
+            for (int index = 0; index < map.length; index++) {
+                String id = exe.id + ".Module-" + index;
+                TCFNodeModule module = (TCFNodeModule)node.model.getNode(id);
+                if (module == null) module = new TCFNodeModule(exe, id, index);
                 data.put(id, module);
             }
         }

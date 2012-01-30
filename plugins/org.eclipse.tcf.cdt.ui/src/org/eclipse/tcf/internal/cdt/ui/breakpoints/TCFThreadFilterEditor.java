@@ -393,8 +393,7 @@ public class TCFThreadFilterEditor {
         result = new TCFTask<Context[]>(launch.getChannel()) {
             public void run() {
                 List<Context> containers = new ArrayList<Context>();
-                TCFModel model = TCFModelManager.getModelManager().getModel(launch);
-                TCFChildren children = model.getRootNode().getChildren();
+                TCFChildren children = TCFModelManager.getModelManager().getRootNode(launch).getChildren();
                 if (!children.validate(this)) return;
                 Map<String, TCFNode> childMap = children.getData();
                 for (TCFNode node : childMap.values()) {

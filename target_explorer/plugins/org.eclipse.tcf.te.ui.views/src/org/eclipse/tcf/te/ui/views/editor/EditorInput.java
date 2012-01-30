@@ -109,7 +109,7 @@ public final class EditorInput implements IEditorInput, IPersistableElement {
 	}
 
 	/**
-	 * Get the common viewer used by the Target Explorer view instance.
+	 * Get the common viewer used by the main view instance.
 	 *
 	 * @return The common viewer or <code>null</code>
 	 */
