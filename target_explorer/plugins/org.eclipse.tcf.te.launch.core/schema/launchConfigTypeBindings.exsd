@@ -1,0 +1,305 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.tcf.te.launch.core" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="org.eclipse.tcf.te.launch.core" id="launchConfigTypeBindings" name="Launch Configuration Type Bindings"/>
+      </appinfo>
+      <documentation>
+         This extension point is used to describe the bindings between a given launch configuration type, the executable steps and/or step groups and when the launch configuration type is enabled.
+      </documentation>
+   </annotation>
+
+   <include schemaLocation="schema://org.eclipse.core.expressions/schema/expressionLanguage.exsd"/>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence minOccurs="1" maxOccurs="unbounded">
+            <element ref="launchConfigTypeBinding"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="launchConfigTypeBinding">
+      <annotation>
+         <documentation>
+            Each launch configuration type needs at least one launchConfigTypeBinding.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="launchManagerDelegate" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="launchModeVariantDelegate" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="stepper" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="step" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="stepGroup" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="enablement" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="launchConfigTypeId" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The launch config type id.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.debug.core.launchConfigurationTypes/launchConfigurationType/@id"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="launchManagerDelegate">
+      <annotation>
+         <documentation>
+            A launch manager delegate could be bound to a launch configuration type for each available launch mode. If no launch mode is specified, the launch manager delegate is used for all launch modes he supports.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The id of the launch manager delegate to bind.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.tcf.te.launch.core.launchManagerDelegates/delegate/@id"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="overwrites" type="string">
+            <annotation>
+               <documentation>
+                  The id of a previousely bound launch manager delegate to overwrite with the launchManagerDelegateId. A comma separated list can be specified to overwrite multiple launch manager delegates.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="modes" type="string">
+            <annotation>
+               <documentation>
+                  The launch mode to use the launch manager delegate for. If not specified, the launch manager delegate is used for all undefined launch modes, for which the launch configuration type can be used.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="launchModeVariantDelegate">
+      <annotation>
+         <documentation>
+            A launch mode variant delegate could be bound to a launch configuration type for each available launch mode. If no launch mode is specified, the launch mode variant delegate is used for all launch modes.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The unique id of the launch mode variant delegate.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.tcf.te.launch.core.launchModeVariantDelegates/delegate/@id"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="overwrites" type="string">
+            <annotation>
+               <documentation>
+                  The id of a previousely bound launch mode variant delegate to overwrite with the launchModeVariantDelegateId. A comma separated list can be specified to overwrite multiple launch mode variant delegates.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="modes" type="string">
+            <annotation>
+               <documentation>
+                  The launch mode to use the launch mode varianat delegate for. If not specified, the launch mode variant delegate is used for all undefined launch modes, for which the launch configuration type can be used.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="stepper">
+      <annotation>
+         <documentation>
+            A stepper could be bound to a launch configuration type for each available launch mode. If no launch mode is specified, the stepper is used for all launch modes the launch configuration type supports.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The id of the stepper to use.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.tcf.te.runtime.stepper.steppers/stepper/@id"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="overwrites" type="string">
+            <annotation>
+               <documentation>
+                  The id of a previousely bound stepper to overwrite with the id. A comma separated list can be specified to overwrite multiple stepper.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="modes" type="string">
+            <annotation>
+               <documentation>
+                  The launch mode to use the stepper for. If not specified, the stepper is used for all undefined launch modes, for which the launch configuration type can be used.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="step">
+      <annotation>
+         <documentation>
+            A step could be bound to a launch configuration type for each available launch mode. If no launch mode is specified, the step is used for all launch modes the launch configuration type supports.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The id of the step to use.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.tcf.te.runtime.stepper.steps/step/@id"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="modes" type="string">
+            <annotation>
+               <documentation>
+                  The comma separated list of launch modes to use the step for. If not specified, the step is used for all undefined launch modes, for which the launch configuration type can be used.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="stepGroup">
+      <annotation>
+         <documentation>
+            A step group could be bound to a launch configuration type for each available launch mode. If no launch mode is specified, the step group is used for all launch modes the launch configuration type supports.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The id of the step group to use.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.tcf.te.runtime.stepper.stepGroups/stepGroup/@id"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="overwrites" type="string">
+            <annotation>
+               <documentation>
+                  The id of a previousely bound step group to overwrite with the id. A comma separated list can be specified to overwrite multiple step groups.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="modes" type="string">
+            <annotation>
+               <documentation>
+                  The launch mode to use the step group for. If not specified, the step group is used for all undefined launch modes, for which the launch configuration type can be used.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="variants" type="string">
+            <annotation>
+               <documentation>
+                  The comma separated list of launch mode variants to use the step group for. If not specified, the step group is used for all undefined launch mode variants, for which the launch configuration type can be used.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         Target Explorer 1.0.0
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         The following is an example of this extension point&apos;s usage:
+
+&lt;p&gt;
+&lt;pre&gt;
+  &lt;extension point=&quot;org.eclipse.tcf.te.launch.core.launchConfigTypeBindings&quot;&gt;
+      &lt;launchConfigTypeBinding launchConfigTypeId=&quot;org.eclipse.tcf.te.launch.linux.process&quot;&gt;
+
+         &lt;launchManagerDelegateBindings&gt;
+            &lt;launchManagerDelegateBinding launchManagerDelegateId=&quot;org.eclipse.tcf.te.launch.linux.process.launchManagerDelegate&quot;/&gt;
+         &lt;/launchManagerDelegateBindings&gt;      
+
+         &lt;launchStepperBindings&gt;
+            &lt;launchStepperBinding launchStepperId=&quot;org.eclipse.tcf.te.runtime.stepper.multiContext&quot;/&gt;
+         &lt;/launchStepperBindings&gt;
+
+         &lt;enablement&gt;
+            ...
+         &lt;/enablement&gt;
+      &lt;/launchConfigTypeBinding&gt;
+   &lt;/extension&gt;
+&lt;/pre&gt;
+      </documentation>
+   </annotation>
+
+
+
+   <annotation>
+      <appinfo>
+         <meta.section type="copyright"/>
+      </appinfo>
+      <documentation>
+         Copyright (c) 2012 Wind River Systems, Inc. and others.
+
+All rights reserved.
+
+This program and the accompanying materials are made available under the terms
+of the Eclipse Public License v1.0 which accompanies this distribution, and is
+available at http://www.eclipse.org/legal/epl-v10.html.
+      </documentation>
+   </annotation>
+
+</schema>
