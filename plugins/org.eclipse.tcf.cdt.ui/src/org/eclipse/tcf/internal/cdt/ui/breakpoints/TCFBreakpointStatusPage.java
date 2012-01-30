@@ -20,6 +20,7 @@ import java.util.Set;
 import java.text.MessageFormat;
 
 import org.eclipse.cdt.debug.core.model.ICBreakpoint;
+import org.eclipse.cdt.debug.core.model.ICLineBreakpoint2;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
@@ -168,12 +169,12 @@ public class TCFBreakpointStatusPage extends PropertyPage {
                                     z.children.add(z2);
                                 }
 
-                                String req_file = marker.getAttribute(ICBreakpoint.ATTR_REQUESTED_FILE, (String)null);
+                                String req_file = marker.getAttribute(ICLineBreakpoint2.REQUESTED_LINE, (String)null);
 
                                 if ( req_file != null) {
                                     StatusItem orig_file_item = new StatusItem();
                                     StatusItem file_item = null;
-                                    int line_num = marker.getAttribute(ICBreakpoint.ATTR_REQUESTED_LINE, -1);
+                                    int line_num = marker.getAttribute(ICLineBreakpoint2.REQUESTED_LINE, -1);
                                     String file = marker.getAttribute(ICBreakpoint.SOURCE_HANDLE, (String)null);
                                     int current_line_num = marker.getAttribute(IMarker.LINE_NUMBER, -1);
                                     Object[] req_args = {req_file, line_num};
