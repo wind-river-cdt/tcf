@@ -70,8 +70,10 @@ public class FSClipboard extends PropertyChangeProvider {
 	public void cutFiles(List<FSTreeNode> files) {
 		operation = CUT;
 		this.files = files;
-		PropertyChangeEvent event = new PropertyChangeEvent(this, "cut", null, null); //$NON-NLS-1$
-		firePropertyChange(event);
+		for (FSTreeNode file : files) {
+			PropertyChangeEvent event = new PropertyChangeEvent(file, "cut", null, null); //$NON-NLS-1$
+			firePropertyChange(event);
+		}
 	}
 
 	/**
@@ -82,8 +84,10 @@ public class FSClipboard extends PropertyChangeProvider {
 	public void copyFiles(List<FSTreeNode> files) {
 		operation = COPY;
 		this.files = files;
-		PropertyChangeEvent event = new PropertyChangeEvent(this, "copy", null, null); //$NON-NLS-1$
-		firePropertyChange(event);
+		for (FSTreeNode file : files) {
+			PropertyChangeEvent event = new PropertyChangeEvent(file, "copy", null, null); //$NON-NLS-1$
+			firePropertyChange(event);
+		}
 	}
 
 	/**
@@ -91,8 +95,11 @@ public class FSClipboard extends PropertyChangeProvider {
 	 */
 	public void clear() {
 		operation = NONE;
+		List<FSTreeNode> nodes = files;
 		this.files = null;
-		PropertyChangeEvent event = new PropertyChangeEvent(this, "clear", null, null); //$NON-NLS-1$
-		firePropertyChange(event);
+		for (FSTreeNode node : nodes) {
+			PropertyChangeEvent event = new PropertyChangeEvent(node, "clear", null, null); //$NON-NLS-1$
+			firePropertyChange(event);
+		}
 	}
 }

@@ -31,12 +31,8 @@ public class FSNavigatorContentProvider extends TreeContentProvider {
 	@Override
 	public Object getParent(Object element) {
 		if (element instanceof FSTreeNode) {
-			FSTreeNode parent = ((FSTreeNode)element).parent;
-			// If the parent is a root node, return the associated peer node
-			if (parent != null) {
-				return parent;
-			}
-			return ((FSTreeNode) element).peerNode;
+			FSTreeNode node = (FSTreeNode) element;
+			return node.parent != null ? node.parent : node.peerNode;
 		}
 		return null;
 	}

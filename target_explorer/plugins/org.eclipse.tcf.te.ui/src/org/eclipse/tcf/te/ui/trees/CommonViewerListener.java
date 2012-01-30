@@ -66,10 +66,9 @@ class CommonViewerListener extends TimerTask implements IPropertyChangeListener 
 	 */
 	@Override
     public synchronized void propertyChange(final PropertyChangeEvent event) {
-		long now = System.currentTimeMillis();
 		Object object = event.getSource();
-		if(object == null)
-			object = NULL;
+		Assert.isTrue(object != null);
+		long now = System.currentTimeMillis();
 		queue.offer(object);
 		if(now - lastTime > MAX_IMMEDIATE_INTERVAL) {
 			run();
@@ -85,25 +84,39 @@ class CommonViewerListener extends TimerTask implements IPropertyChangeListener 
 		if (!queue.isEmpty()) {
 			Object[] objects = queue.toArray();
 			queue.clear();
-			Object object = mergeObjects(objects);
-			if (object instanceof List<?>) {
-				List<?> list = (List<?>) object;
-				if (list.isEmpty()) {
-					object = NULL;
-				}
-				else if (list.size() == 1) {
-					object = list.get(0);
-				}
-				else {
-					// If there are multiple root nodes, then select NULL as the final root.
-					object = getCommonAncestor((List<?>)object);
-					if(object == null) object = NULL;
-				}
-			}
+			List<Object> list = mergeObjects(objects);
+			Object object = getRefreshRoot(list);
 			processObject(object);
 			lastTime = System.currentTimeMillis();
 		}
 	}
+
+	/**
+	 * Get the refreshing root for the object list.
+	 * 
+	 * @param objects The objects to be refreshed.
+	 * @return The root of these objects.
+	 */
+	private Object getRefreshRoot(List<Object> objects) {
+		if (objects.isEmpty()) {
+	    	return NULL;
+	    }
+	    else if (objects.size() == 1) {
+	    	Object object = objects.get(0);
+	    	if (contentProvider.getParent(object) == null) {
+	    		return NULL;
+	    	}
+	    	return object;
+	    }
+	    else {
+	    	// If there are multiple root nodes, then select NULL as the final root.
+			Object object = getCommonAncestor(objects);
+			if (object == null || contentProvider.getParent(object) == null) {
+				return NULL;
+			}
+			return object;
+	    }
+    }
 
 	/**
 	 * Get a object which is the common ancestor of the specified objects.
@@ -111,7 +124,7 @@ class CommonViewerListener extends TimerTask implements IPropertyChangeListener 
 	 * @param objects The object list.
 	 * @return The common ancestor.
 	 */
-	private Object getCommonAncestor(List<?> objects) {
+	private Object getCommonAncestor(List<Object> objects) {
 		Assert.isTrue(objects.size() > 1);
 		Object object1 = objects.get(0);
 		for (int i = 1; i < objects.size(); i++) {
@@ -157,10 +170,14 @@ class CommonViewerListener extends TimerTask implements IPropertyChangeListener 
 	 * @param objects The objects to be merged.
 	 * @return NULL or a list presenting the top objects.
 	 */
-	private Object mergeObjects(Object[] objects) {
+	private List<Object> mergeObjects(Object[] objects) {
 		// If one object is NULL, then return NULL
+		List<Object> result = new ArrayList<Object>();
 		for (Object object : objects) {
-			if (object == NULL) return NULL;
+			if (object == NULL) {
+				result.add(NULL);
+				return result;
+			}
 		}
 		// Remove duplicates.
 		List<Object> list = Arrays.asList(objects);
@@ -168,7 +185,6 @@ class CommonViewerListener extends TimerTask implements IPropertyChangeListener 
 		objects = set.toArray();
 
 		list = Arrays.asList(objects);
-		List<Object> result = new ArrayList<Object>();
 		for (Object object : list) {
 			if (!hasAncestor(object, list)) {
 				result.add(object);
