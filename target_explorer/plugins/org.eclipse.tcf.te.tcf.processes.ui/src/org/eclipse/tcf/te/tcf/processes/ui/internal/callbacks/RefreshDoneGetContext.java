@@ -59,11 +59,11 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext, IProce
 			childNode = new ProcessTreeNode(parentNode, context);
             final int index = searchChild(childNode);
 			if (index != -1) {
-				ProcessTreeNode node = parentNode.children.get(index);
+				ProcessTreeNode node = parentNode.getChildren().get(index);
 				node.updateData(context);
 				childNode = node;
 			}
-			else parentNode.children.add(childNode);
+			else parentNode.addChild(childNode);
 			newNodes.add(childNode);
 		}
 		sysMonitorDone = true;
@@ -82,7 +82,7 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext, IProce
      * @return The index of the child node or -1 if no such node.
      */
 	private int searchChild(ProcessTreeNode childNode) {
-		return searchInList(childNode, parentNode.children);
+		return searchInList(childNode, parentNode.getChildren());
     }    
 
     /**

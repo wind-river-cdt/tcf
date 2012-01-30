@@ -20,7 +20,6 @@ import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
-import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 
@@ -67,7 +66,6 @@ public abstract class FSCreate extends FSOperation {
 				create(service);
 				addNode(service);
 				refresh(service);
-				FSModel.firePropertyChange(folder);
 			}
 			else {
 				String message = NLS.bind(Messages.FSOperation_NoFileSystemError, folder.peerNode.getPeerId());
@@ -131,7 +129,7 @@ public abstract class FSCreate extends FSOperation {
 	void addNode(final IFileSystem service) throws TCFFileSystemException {
 		if (Protocol.isDispatchThread()) {
 			node = newTreeNode();
-			getCurrentChildren(folder).add(node);
+			folder.addChild(node);
 		}
 		else {
 			final TCFFileSystemException[] errors = new TCFFileSystemException[1];

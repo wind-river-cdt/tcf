@@ -208,7 +208,6 @@ public class ProcessModel implements IPreferenceConsts{
 		Tcf.getChannelManager().openChannel(parentNode.peerNode.getPeer(), false, new RefreshDoneOpenChannel(new Runnable(){
 			@Override
             public void run() {
-				firePropertyChanged(parentNode);
 	            if(callback != null) {
 	            	callback.run();
 	            }
@@ -308,15 +307,6 @@ public class ProcessModel implements IPreferenceConsts{
 	IPeerModel getPeerModel() {
 		return peerModel;
 	}
-	
-	/**
-	 * Fire a property change event.
-	 */
-	public void firePropertyChanged(ProcessTreeNode node) {
-		IViewerInput  provider = (IViewerInput) peerModel.getAdapter(IViewerInput.class);
-		PropertyChangeEvent event = new PropertyChangeEvent(node, "state", null, null); //$NON-NLS-1$
-		provider.firePropertyChange(event);
-    }
 
 	/**
 	 * Refresh the children without refreshing itself.

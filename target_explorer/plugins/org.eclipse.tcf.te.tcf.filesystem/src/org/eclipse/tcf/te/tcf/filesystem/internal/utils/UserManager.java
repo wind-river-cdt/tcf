@@ -94,25 +94,28 @@ public class UserManager {
 	 * @return The client user account's information.
 	 */
 	public UserAccount getUserAccount(IPeerModel peerNode) {
-		UserAccount account = getUserFromPeer(peerNode);
-		if (account == null) {
-			IChannel channel = null;
-			try {
-				channel = FSOperation.openChannel(peerNode.getPeer());
-				if (channel != null) {
-					account = getUserByChannel(channel);
-					if (account != null) setUserToPeer(peerNode, account);
+		if(peerNode != null) {
+			UserAccount account = getUserFromPeer(peerNode);
+			if (account == null) {
+				IChannel channel = null;
+				try {
+					channel = FSOperation.openChannel(peerNode.getPeer());
+					if (channel != null) {
+						account = getUserByChannel(channel);
+						if (account != null) setUserToPeer(peerNode, account);
+					}
+				}
+				catch (TCFException e) {
+					Shell parent = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+					MessageDialog.openError(parent, Messages.UserManager_UserAccountTitle, e.getLocalizedMessage());
+				}
+				finally {
+					if (channel != null) Tcf.getChannelManager().closeChannel(channel);
 				}
 			}
-			catch (TCFException e) {
-				Shell parent = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-				MessageDialog.openError(parent, Messages.UserManager_UserAccountTitle, e.getLocalizedMessage());
-			}
-			finally {
-				if (channel != null) Tcf.getChannelManager().closeChannel(channel);
-			}
+			return account;
 		}
-		return account;
+		return null;
 	}
 
 	/**
@@ -124,6 +127,7 @@ public class UserManager {
 	 * @return The user account if it exists or null if not.
 	 */
 	private UserAccount getUserFromPeer(final IPeerModel peer) {
+		Assert.isNotNull(peer);
 		if (Protocol.isDispatchThread()) {
 			return (UserAccount) peer.getProperty(USER_ACCOUNT_KEY);
 		}

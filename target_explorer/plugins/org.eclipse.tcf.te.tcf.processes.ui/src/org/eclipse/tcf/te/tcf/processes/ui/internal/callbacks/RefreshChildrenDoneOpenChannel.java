@@ -20,7 +20,6 @@ import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
-import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 
 /**
@@ -47,18 +46,16 @@ public class RefreshChildrenDoneOpenChannel implements IChannelManager.DoneOpenC
 		if (error == null && channel != null) {
 			ISysMonitor service = channel.getRemoteService(ISysMonitor.class);
 			if (service != null) {
-				final ProcessModel model = ProcessModel.getProcessModel(parentNode.peerNode);
 				CallbackMonitor monitor = new CallbackMonitor(new Runnable(){
 					@Override
                     public void run() {
 						Tcf.getChannelManager().closeChannel(channel);
-						model.firePropertyChanged(parentNode);
                     }}, getChildrenIds());
-				for (ProcessTreeNode child : parentNode.children) {
+				for (ProcessTreeNode child : parentNode.getChildren()) {
 					if (!child.childrenQueried && !child.childrenQueryRunning) {
-						Runnable callback = new RefreshChildrenDoneCallback(child.id, parentNode, monitor, model);
+						Runnable callback = new RefreshChildrenDoneCallback(child.id, monitor);
 						Queue<ProcessTreeNode> queue = new ConcurrentLinkedQueue<ProcessTreeNode>();
-						ISysMonitor.DoneGetChildren done = new RefreshDoneGetChildren(model, callback, queue, channel, service, child);
+						ISysMonitor.DoneGetChildren done = new RefreshDoneGetChildren(callback, queue, channel, service, child);
 						service.getChildren(child.id, done);
 					}
 				}
@@ -72,7 +69,7 @@ public class RefreshChildrenDoneOpenChannel implements IChannelManager.DoneOpenC
      */
 	private Object[] getChildrenIds() {
         List<Object> ids = new ArrayList<Object>();
-        for (ProcessTreeNode child : parentNode.children) {
+        for (ProcessTreeNode child : parentNode.getChildren()) {
         	ids.add(child.id);
         }
         return ids.toArray(new Object[ids.size()]);

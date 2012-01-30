@@ -116,7 +116,7 @@ public class FSOperation {
 		}
 		FSTreeNode parent = node.parent;
 		if (parent != null) {
-			getCurrentChildren(parent).remove(node);
+			parent.removeChild(node);
 		}
 	}
 
@@ -170,7 +170,7 @@ public class FSOperation {
 		PersistenceManager.getInstance().removeBaseTimestamp(node.getLocationURL());
 		FSTreeNode parent = node.parent;
 		if (parent != null) {
-			getCurrentChildren(parent).remove(node);
+			parent.removeChild(node);
 		}
 	}
 
@@ -251,7 +251,7 @@ public class FSOperation {
 				count++;
 			}
 			else if (node.isDirectory()) {
-				List<FSTreeNode> children = new ArrayList<FSTreeNode>(getChildren(node, service));
+				List<FSTreeNode> children = getChildren(node, service);
 				count += count(service, children) + 1;
 			}
 		}
@@ -299,14 +299,14 @@ public class FSOperation {
 	}
 	
 	/**
-	 * Get the current children of the specified folder node.
+	 * Get the current children copy of the specified folder node.
 	 *
 	 * @param node The folder node.
 	 * @return The children of the folder node.
 	 */
 	public static List<FSTreeNode> getCurrentChildren(final FSTreeNode node) {
 		if (Protocol.isDispatchThread()) {
-			return node.getChildren();
+			return new ArrayList<FSTreeNode>(node.getChildren());
 		}
 		final List<List<FSTreeNode>> result = new ArrayList<List<FSTreeNode>>();
 		Protocol.invokeAndWait(new Runnable() {
@@ -318,7 +318,6 @@ public class FSOperation {
 		return result.get(0);
 	}
 
-
 	/**
 	 * Load the children of the specified folder node using the file system service.
 	 *
@@ -328,10 +327,7 @@ public class FSOperation {
 	 */
 	protected void loadChildren(final FSTreeNode node, final IFileSystem service) throws TCFFileSystemException {
 		List<FSTreeNode> children = queryChildren(node, service);
-		List<FSTreeNode> current = getCurrentChildren(node);
-		for (FSTreeNode childNode : children) {
-			current.add(childNode);
-		}
+		node.addChidren(children);
 		node.childrenQueried = true;
 	}
 
@@ -413,7 +409,10 @@ public class FSOperation {
 	 */
 	protected void removeChild(final IFileSystem service, final FSTreeNode folder, final FSTreeNode child) throws TCFFileSystemException {
 		if (Protocol.isDispatchThread()) {
-			getChildren(folder, service).remove(child);
+			if (!folder.childrenQueried) {
+				loadChildren(folder, service);
+			}
+			folder.removeChild(child);
 			child.parent = null;
 		}
 		else {
@@ -444,7 +443,7 @@ public class FSOperation {
 	 * @throws TCFFileSystemException Thrown when querying the children.
 	 */
 	protected FSTreeNode findChild(IFileSystem service, FSTreeNode folder, String name) throws TCFFileSystemException {
-		List<FSTreeNode> children = new ArrayList<FSTreeNode>(getChildren(folder, service));
+		List<FSTreeNode> children = getChildren(folder, service);
 		for (FSTreeNode child : children) {
 			if (child.name.equals(name)) return child;
 		}
@@ -553,8 +552,11 @@ public class FSOperation {
 	 */
 	protected void addChild(final IFileSystem service, final FSTreeNode folder, final FSTreeNode child) throws TCFFileSystemException {
 		if (Protocol.isDispatchThread()) {
-			getChildren(folder, service).add(child);
+			if (!folder.childrenQueried) {
+				loadChildren(folder, service);
+			}
 			child.parent = folder;
+			folder.addChild(child);
 		}
 		else {
 			final TCFFileSystemException[] errors = new TCFFileSystemException[1];

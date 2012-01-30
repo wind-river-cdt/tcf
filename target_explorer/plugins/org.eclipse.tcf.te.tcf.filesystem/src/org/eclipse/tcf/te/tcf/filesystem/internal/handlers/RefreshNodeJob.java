@@ -19,7 +19,6 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSRefresh;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.PersistenceManager;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.StateManager;
-import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 
@@ -52,7 +51,6 @@ public class RefreshNodeJob extends Job {
 		else if (node.isFile() && !PersistenceManager.getInstance().isAutoSaving()) {
 			try {
 				StateManager.getInstance().refreshState(node);
-				FSModel.firePropertyChange(node);
 			}
 			catch (TCFException e) {
 				return new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), Messages.StateManager_RefreshFailureTitle, e);

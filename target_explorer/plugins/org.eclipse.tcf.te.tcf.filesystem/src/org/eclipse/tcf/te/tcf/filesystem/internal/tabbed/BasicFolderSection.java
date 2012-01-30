@@ -19,7 +19,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
-import org.eclipse.tcf.te.ui.interfaces.IPropertyChangeProvider;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
 import org.eclipse.tcf.te.ui.views.tabbed.BaseTitledSection;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
@@ -64,7 +64,7 @@ public class BasicFolderSection extends BaseTitledSection {
 	 * @see org.eclipse.tcf.te.ui.views.tabbed.BaseTitledSection#updateData(org.eclipse.tcf.te.ui.interfaces.IPropertyChangeProvider)
 	 */
 	@Override
-    protected void updateInput(IPropertyChangeProvider input) {
+    protected void updateInput(IPeerModelProvider input) {
          Assert.isTrue(input instanceof FSTreeNode);
          this.node = (FSTreeNode) input;
          this.clone = (FSTreeNode) node.clone();

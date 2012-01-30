@@ -94,7 +94,7 @@ public class NameValidator extends Validator {
 	private List<FSTreeNode> getChildren() {
 		final FSTreeNode folder = wizard.getInputDir();
 		if (folder.childrenQueried) {
-			return new ArrayList<FSTreeNode>(FSOperation.getCurrentChildren(folder));
+			return FSOperation.getCurrentChildren(folder);
 		}
 		final List<FSTreeNode> result = new ArrayList<FSTreeNode>();
 		SafeRunner.run(new SafeRunnable() {

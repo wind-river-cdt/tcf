@@ -20,7 +20,6 @@ import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
-import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 import org.eclipse.ui.PlatformUI;
@@ -72,8 +71,6 @@ public class FSRefresh extends FSOperation {
 			}
 			finally {
 				if (channel != null) Tcf.getChannelManager().closeChannel(channel);
-				// Refresh the file system tree.
-				FSModel.firePropertyChange(node);
 			}
 		}
 		return true;
@@ -89,7 +86,7 @@ public class FSRefresh extends FSOperation {
 	private void refresh(final FSTreeNode node, final IFileSystem service) throws TCFFileSystemException {
 		if ((node.isSystemRoot() || node.isDirectory()) && node.childrenQueried) {
 			if (!node.isSystemRoot()) updateChildren(node, service);
-			List<FSTreeNode> children = new ArrayList<FSTreeNode>(getCurrentChildren(node));
+			List<FSTreeNode> children = getCurrentChildren(node);
 			for (FSTreeNode child : children) {
 				refresh(child, service);
 			}
@@ -107,14 +104,10 @@ public class FSRefresh extends FSOperation {
 	protected void updateChildren(final FSTreeNode node, final IFileSystem service) throws TCFFileSystemException {
 		List<FSTreeNode> current = getCurrentChildren(node);
 		List<FSTreeNode> latest = queryChildren(node, service);
-		List<FSTreeNode> newNodes = diff(latest, new ArrayList<FSTreeNode>(current));
-		List<FSTreeNode> deleted = diff(new ArrayList<FSTreeNode>(current), latest);
-		for (FSTreeNode aNode : deleted) {
-			current.remove(aNode);
-		}
-		for (FSTreeNode aNode : newNodes) {
-			current.add(aNode);
-		}
+		List<FSTreeNode> newNodes = diff(latest, current);
+		List<FSTreeNode> deleted = diff(current, latest);
+		node.removeChildren(deleted);
+		node.addChidren(newNodes);
 	}
 
 	/**

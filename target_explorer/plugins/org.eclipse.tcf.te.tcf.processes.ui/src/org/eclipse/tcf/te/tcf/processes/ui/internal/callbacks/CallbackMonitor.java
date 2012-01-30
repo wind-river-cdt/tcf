@@ -92,8 +92,6 @@ public class CallbackMonitor {
 	private Runnable callback;
 	// The lock map containing the keys and the corresponding values.
 	private Map<Object, Boolean> locks;
-	// The count of the currently unlocked locks.
-	private int unlocked_count = 0;
 	
 	/**
 	 * Create a callback monitor with the specified callback.
@@ -151,7 +149,6 @@ public class CallbackMonitor {
 	public synchronized void unlock(Object key) {
 		Assert.isNotNull(key);
 		locks.put(key, Boolean.TRUE);
-		unlocked_count++;
 		if (isComplete()) {
 			callback.run();
 		}
@@ -169,14 +166,5 @@ public class CallbackMonitor {
 			if (!value.booleanValue()) return false;
 		}
 		return true;
-	}
-
-	/**
-	 * Get the count of the currently unlocked locks.
-	 *  
-	 * @return The count of the unlocked locks.
-	 */
-	public synchronized int getUnlockedCount() {
-		return unlocked_count;
 	}
 }

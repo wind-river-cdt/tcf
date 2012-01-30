@@ -10,7 +10,6 @@
 package org.eclipse.tcf.te.tcf.filesystem.internal.operations;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -28,7 +27,6 @@ import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.dialogs.TimeTriggeredProgressMonitorDialog;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
-import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 import org.eclipse.ui.PlatformUI;
@@ -64,8 +62,6 @@ public class FSMove extends FSOperation {
 		if(nodes.isEmpty()) {
 			// Clear the clip board.
 			UIPlugin.getDefault().getClipboard().clear();
-			// Refresh the file system tree.
-			FSModel.firePropertyChange(dest);
 			return true;
 		}
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
@@ -99,8 +95,6 @@ public class FSMove extends FSOperation {
 					// Clear the clip board.
 					UIPlugin.getDefault().getClipboard().clear();
 					if (channel != null) Tcf.getChannelManager().closeChannel(channel);
-					// Refresh the file system tree.
-					FSModel.firePropertyChange(dest);
 					monitor.done();
 				}
 			}
@@ -138,7 +132,7 @@ public class FSMove extends FSOperation {
 		FSTreeNode copy = findChild(service, dest, node.name);
 		if (copy == null || !copy.equals(node) && confirmReplace(node)) {
 			if (copy != null && copy.isDirectory() && node.isDirectory()) {
-				List<FSTreeNode> children = new ArrayList<FSTreeNode>(getChildren(node, service));
+				List<FSTreeNode> children = getChildren(node, service);
 				for (FSTreeNode child : children) {
 					moveNode(monitor, service, child, copy);
 				}
@@ -198,8 +192,8 @@ public class FSMove extends FSOperation {
 		}
 		else if (node.isDirectory()) {
 			super.cleanUpFolder(node);
-			List<FSTreeNode> children = new ArrayList<FSTreeNode>(getCurrentChildren(node));
-			getCurrentChildren(copyNode).addAll(children);
+			List<FSTreeNode> children = getCurrentChildren(node);
+			copyNode.addChidren(children);
 			for (FSTreeNode child : children) {
 				child.parent = copyNode;
 			}

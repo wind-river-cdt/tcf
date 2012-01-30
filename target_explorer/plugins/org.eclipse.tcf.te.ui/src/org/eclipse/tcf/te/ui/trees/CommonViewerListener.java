@@ -22,6 +22,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
@@ -34,8 +35,10 @@ class CommonViewerListener extends TimerTask implements IPropertyChangeListener 
 	private static final long INTERVAL = 500;
 	private static final long MAX_IMMEDIATE_INTERVAL = 1000;
 	private static final Object NULL = new Object();
+	// The tree viewer
+	private TreeViewer viewer;
 	// The content provider
-	private TreeContentProvider contentProvider;
+	private ITreeContentProvider contentProvider;
 	// Last time that the property event was processed.
 	private long lastTime = 0;
 	// The timer that process the property events periodically.
@@ -46,11 +49,12 @@ class CommonViewerListener extends TimerTask implements IPropertyChangeListener 
 	/***
 	 * Create an instance for the specified tree content provider.
 	 *
-	 * @param contentProvider The tree content provider.
+	 * @param viewer The tree content provider.
 	 */
-	public CommonViewerListener(TreeContentProvider contentProvider) {
-		Assert.isNotNull(contentProvider);
-		this.contentProvider = contentProvider;
+	public CommonViewerListener(TreeViewer viewer) {
+		Assert.isNotNull(viewer);
+		this.viewer = viewer;
+		this.contentProvider = (ITreeContentProvider) this.viewer.getContentProvider();
 		this.timer = new Timer();
 		this.timer.schedule(this, INTERVAL, INTERVAL);
 		this.queue = new ConcurrentLinkedQueue<Object>();
@@ -89,9 +93,6 @@ class CommonViewerListener extends TimerTask implements IPropertyChangeListener 
 				}
 				else if (list.size() == 1) {
 					object = list.get(0);
-					if(contentProvider.isRootObject(object)) {
-						object = NULL;
-					}
 				}
 				else {
 					// If there are multiple root nodes, then select NULL as the final root.
@@ -213,28 +214,25 @@ class CommonViewerListener extends TimerTask implements IPropertyChangeListener 
 	 */
 	void processObject(final Object object) {
 		Assert.isNotNull(object);
-		TreeViewer viewer = contentProvider.getTreeViewer();
-		if(viewer != null) {
-		    Tree tree = viewer.getTree();
-		    if (!tree.isDisposed()) {
-		    	Display display = tree.getDisplay();
-		    	if (display.getThread() == Thread.currentThread()) {
-		    		if (object != NULL) {
-		    			viewer.refresh(object);
-		    		}
-		    		else {
-		    			viewer.refresh();
-		    		}
-		    	}
-		    	else {
-		    		display.asyncExec(new Runnable() {
-		    			@Override
-		    			public void run() {
-		    				processObject(object);
-		    			}
-		    		});
-		    	}
-		    }
-		}
+	    Tree tree = viewer.getTree();
+	    if (!tree.isDisposed()) {
+	    	Display display = tree.getDisplay();
+	    	if (display.getThread() == Thread.currentThread()) {
+	    		if (object != NULL) {
+	    			viewer.refresh(object);
+	    		}
+	    		else {
+	    			viewer.refresh();
+	    		}
+	    	}
+	    	else {
+	    		display.asyncExec(new Runnable() {
+	    			@Override
+	    			public void run() {
+	    				processObject(object);
+	    			}
+	    		});
+	    	}
+	    }
     }
 }

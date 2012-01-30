@@ -32,7 +32,7 @@ public class SingleThreadFilter extends ViewerFilter {
 		if(parentElement instanceof ProcessTreeNode && element instanceof ProcessTreeNode) {
 			ProcessTreeNode parent = (ProcessTreeNode) parentElement;
 			ProcessTreeNode child = (ProcessTreeNode) element;
-			if(parent.children.size() == 1) {
+			if(parent.getChildren().size() == 1) {
 				if(parent.pid == child.pid) {
 					if (parent.name != null) {
 						return !parent.name.equals(child.name);

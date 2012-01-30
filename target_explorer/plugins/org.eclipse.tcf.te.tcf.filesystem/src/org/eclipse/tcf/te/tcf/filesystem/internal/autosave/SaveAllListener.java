@@ -22,8 +22,11 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.CacheManager;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.PersistenceManager;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.StateManager;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.ui.IEditorInput;
@@ -38,7 +41,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
  */
 public class SaveAllListener implements IExecutionListener {
 	// Dirty nodes that should be saved and synchronized.
-	private List<FSTreeNode> fDirtyNodes;
+	List<FSTreeNode> fDirtyNodes;
 	/**
 	 * Create the listener listening to command "SAVE ALL".
 	 */
@@ -56,8 +59,13 @@ public class SaveAllListener implements IExecutionListener {
 				CacheManager.getInstance().upload(fDirtyNodes.toArray(new FSTreeNode[fDirtyNodes.size()]), false);
 			}
 			else {
-				FSTreeNode dirtyNode = fDirtyNodes.get(0);
-				FSModel.firePropertyChange(dirtyNode);
+				SafeRunner.run(new SafeRunnable(){
+					@Override
+                    public void run() throws Exception {
+						for (FSTreeNode dirtyNode : fDirtyNodes) {
+							StateManager.getInstance().refreshState(dirtyNode);
+						}
+                    }});
 			}
 		}
 	}

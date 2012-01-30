@@ -84,7 +84,7 @@ public class FSCreateRoot extends FSOperation {
 						if (error == null) {
 							for (DirEntry entry : entries) {
 								FSTreeNode node = new FSTreeNode(rootNode, entry, true);
-								rootNode.getChildren().add(node);
+								rootNode.addChild(node);
 							}
 						}
 					}

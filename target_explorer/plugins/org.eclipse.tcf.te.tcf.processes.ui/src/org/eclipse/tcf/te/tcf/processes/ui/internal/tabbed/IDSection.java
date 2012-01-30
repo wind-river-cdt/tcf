@@ -12,9 +12,9 @@ package org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
-import org.eclipse.tcf.te.ui.interfaces.IPropertyChangeProvider;
 import org.eclipse.tcf.te.ui.views.tabbed.BaseTitledSection;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
@@ -51,7 +51,7 @@ public class IDSection extends BaseTitledSection {
 	 * @see org.eclipse.tcf.te.ui.views.tabbed.BaseTitledSection#updateData(org.eclipse.tcf.te.ui.interfaces.IPropertyChangeProvider)
 	 */
 	@Override
-    protected void updateInput(IPropertyChangeProvider input) {
+    protected void updateInput(IPeerModelProvider input) {
         Assert.isTrue(input instanceof ProcessTreeNode);
         this.node = (ProcessTreeNode) input;
     }

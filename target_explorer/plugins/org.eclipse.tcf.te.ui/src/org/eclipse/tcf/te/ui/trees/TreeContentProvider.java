@@ -10,30 +10,34 @@
 package org.eclipse.tcf.te.ui.trees;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.tcf.te.ui.interfaces.IPropertyChangeProvider;
 import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 
 /**
  * The base tree content provider that defines several default methods.
  */
 public abstract class TreeContentProvider implements ITreeContentProvider {
-
+	private static Map<TreeViewer, CommonViewerListener> listeners = Collections.synchronizedMap(new HashMap<TreeViewer, CommonViewerListener>());
 	/**
 	 * Static reference to the return value representing no elements.
 	 */
 	protected final static Object[] NO_ELEMENTS = new Object[0];
 
 	// The listener to refresh the common viewer when properties change.
-	private CommonViewerListener commonViewerListener;
+	protected CommonViewerListener commonViewerListener;
 	// The viewer inputs that have been added a property change listener.
-	private Set<IViewerInput> viewerInputs = Collections.synchronizedSet(new HashSet<IViewerInput>());
+	private Set<IPropertyChangeProvider> providers = Collections.synchronizedSet(new HashSet<IPropertyChangeProvider>());
 	// The viewer
 	protected TreeViewer viewer;
 
@@ -41,7 +45,6 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 	 * Create a tree content provider.
 	 */
 	public TreeContentProvider() {
-		commonViewerListener = new CommonViewerListener(this);
 	}
 
 	/*
@@ -50,10 +53,11 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 	 */
 	@Override
     public void dispose() {
-		for(IViewerInput viewerInput : viewerInputs) {
-			viewerInput.removePropertyChangeListener(commonViewerListener);
+		for(IPropertyChangeProvider provider : providers) {
+			provider.removePropertyChangeListener(commonViewerListener);
 		}
 		commonViewerListener.cancel();
+		providers.clear();
     }
 	
 	/**
@@ -77,32 +81,47 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 	
 	/*
 	 * (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
+	 */
+	@Override
+    public Object[] getChildren(Object parentElement) {
+		Assert.isNotNull(parentElement);
+
+		if (parentElement instanceof IAdaptable) {
+			IAdaptable adaptable = (IAdaptable) parentElement;
+			IViewerInput viewerInput = (IViewerInput) adaptable.getAdapter(IViewerInput.class);
+			if (viewerInput != null) {
+				installPropertyChangeListener(viewerInput);
+			}
+		}
+		
+		return null;
+    }
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
 	 */
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		Assert.isTrue(viewer instanceof TreeViewer);
-		this.viewer = (TreeViewer) viewer; 
+		this.viewer = (TreeViewer) viewer;
+		commonViewerListener = listeners.get(this.viewer);
+		if(commonViewerListener == null) {
+			commonViewerListener = new CommonViewerListener(this.viewer);
+			listeners.put(this.viewer, commonViewerListener);
+		}
 	}
-	
-	/**
-	 * If the specified object is a root object;
-	 * 
-	 * @param object The object to be tested.
-	 * @return true if it is root object.
-	 */
-	protected abstract boolean isRootObject(Object object);
 	
 	/**
 	 * Install a property change listener to the specified element.
 	 * 
-	 * @param element The element node.
+	 * @param provider The element node.
 	 */
-    protected void installPropertyChangeListener(Object element) {
-		IViewerInput viewerInput = ViewerStateManager.getViewerInput(element);
-		if(viewerInput != null && !viewerInputs.contains(viewerInput)) {
-			viewerInput.addPropertyChangeListener(commonViewerListener);
-			viewerInputs.add(viewerInput);
+    private void installPropertyChangeListener(IPropertyChangeProvider provider) {
+		if(provider != null && !providers.contains(provider) && commonViewerListener != null) {
+			provider.addPropertyChangeListener(commonViewerListener);
+			providers.add(provider);
 		}
     }
 
@@ -124,8 +143,4 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 	public Object[] getElements(Object inputElement) {
 		return getChildren(inputElement);
 	}
-
-	TreeViewer getTreeViewer() {
-	    return viewer;
-    }
 }

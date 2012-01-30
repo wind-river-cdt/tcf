@@ -15,7 +15,6 @@ import org.eclipse.tcf.services.IFileSystem.DirEntry;
 import org.eclipse.tcf.services.IFileSystem.DoneRoots;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.te.tcf.core.Tcf;
-import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 
 /**
@@ -45,15 +44,19 @@ public class QueryDoneRoots implements DoneRoots {
 	@Override
 	public void doneRoots(IToken token, FileSystemException error, DirEntry[] entries) {
 		if (error == null) {
-			for (DirEntry entry : entries) {
-				FSTreeNode node = new FSTreeNode(parentNode, entry, true);
-				parentNode.getChildren().add(node);
+			if (entries.length > 0) {
+				for (DirEntry entry : entries) {
+					FSTreeNode node = new FSTreeNode(parentNode, entry, true);
+					parentNode.addChild(node);
+				}
+			}
+			else {
+				parentNode.clearChildren();
 			}
 
 			// Reset the children query markers
 			parentNode.childrenQueryRunning = false;
 			parentNode.childrenQueried = true;
-			FSModel.firePropertyChange(parentNode);
 		}
 		// Close the channel, not needed anymore
 		Tcf.getChannelManager().closeChannel(channel);

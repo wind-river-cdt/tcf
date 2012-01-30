@@ -9,7 +9,6 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.celleditor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -73,7 +72,7 @@ public class FSCellValidator implements ICellEditorValidator {
 	 * @return true if it has a child with the name.
 	 */
 	private boolean hasChild(FSTreeNode folder, String name) {
-		List<FSTreeNode> nodes = new ArrayList<FSTreeNode>(FSOperation.getCurrentChildren(folder.parent));
+		List<FSTreeNode> nodes = FSOperation.getCurrentChildren(folder.parent);
 		for (FSTreeNode node : nodes) {
 			if (node.isWindowsNode()) {
 				if (node.name.equalsIgnoreCase(name)) return true;

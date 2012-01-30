@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.tcf.protocol.Protocol;
@@ -37,7 +38,8 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.url.TcfURLConnection;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.UserManager;
 import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
-import org.eclipse.tcf.te.ui.utils.PropertyChangeProvider;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
+import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 
 /**
  * Representation of a file system tree node.
@@ -45,8 +47,10 @@ import org.eclipse.tcf.te.ui.utils.PropertyChangeProvider;
  * <b>Note:</b> Node construction and child list access is limited to the TCF
  * event dispatch thread.
  */
-public final class FSTreeNode extends PropertyChangeProvider implements Cloneable {
+public final class FSTreeNode extends PlatformObject implements Cloneable, IPeerModelProvider {
+	// The pending node constant.
 	public static final FSTreeNode PENDING_NODE = createPendingNode();
+	// The constant to access the Windows Attributes.
 	private static final String KEY_WIN32_ATTRS = "Win32Attrs"; //$NON-NLS-1$
 
 	private final UUID uniqueId = UUID.randomUUID();
@@ -91,6 +95,14 @@ public final class FSTreeNode extends PropertyChangeProvider implements Cloneabl
 	 */
 	public boolean childrenQueryRunning = false;
 
+	/**
+	 * Create a folder node using the specified parent node, the directory entry
+	 * and the flag to indicate if it is a root node.
+	 * 
+	 * @param parentNode The parent node.
+	 * @param entry The directory entry.
+	 * @param entryIsRootNode If this folder is root folder.
+	 */
 	public FSTreeNode(FSTreeNode parentNode, DirEntry entry, boolean entryIsRootNode) {
 		Assert.isNotNull(entry);
 		children = Collections.synchronizedList(new ArrayList<FSTreeNode>());
@@ -547,6 +559,20 @@ public final class FSTreeNode extends PropertyChangeProvider implements Cloneabl
 	}
 	
 	/**
+	 * Fire a property change event to notify one of the node's property has changed.
+	 * 
+	 * @param event The property change event.
+	 */
+	protected void firePropertyChange(PropertyChangeEvent event) {
+		if(peerNode != null) {
+			IViewerInput viewerInput = (IViewerInput) peerNode.getAdapter(IViewerInput.class);
+			viewerInput.firePropertyChange(event);
+		} else if(parent != null) {
+			parent.firePropertyChange(event);
+		}
+    }
+
+	/**
 	 * Set the file's new name and trigger property change event.
 	 * 
 	 * @param name The new name.
@@ -648,5 +674,67 @@ public final class FSTreeNode extends PropertyChangeProvider implements Cloneabl
 		node.peerNode = folder.peerNode;
 		node.type = type;
 	    return node;
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider#getPeerModel()
+	 */
+	@Override
+    public IPeerModel getPeerModel() {
+	    return peerNode;
+    }
+
+	/**
+	 * Add the specified nodes to the children list.
+	 * 
+	 * @param nodes The nodes to be added.
+	 */
+	public void addChidren(List<FSTreeNode> nodes) {
+		children.addAll(nodes);
+		PropertyChangeEvent event = new PropertyChangeEvent(this, "addChildren", null, null); //$NON-NLS-1$
+		firePropertyChange(event);
+    }
+
+	/**
+	 * Remove the specified nodes from the children list.
+	 * 
+	 * @param nodes The nodes to be removed.
+	 */
+	public void removeChildren(List<FSTreeNode> nodes) {
+		children.removeAll(nodes);
+		PropertyChangeEvent event = new PropertyChangeEvent(this, "removeChildren", null, null); //$NON-NLS-1$
+		firePropertyChange(event);
+    }
+
+	/**
+	 * Add the specified the node to the children list.
+	 * 
+	 * @param node The child node to be added.
+	 */
+	public void addChild(FSTreeNode node) {
+		children.add(node);
+		PropertyChangeEvent event = new PropertyChangeEvent(this, "addChild", null, null); //$NON-NLS-1$
+		firePropertyChange(event);
+    }
+
+	/**
+	 * Remove the specified child node from its children list.
+	 * 
+	 * @param node The child node to be removed.
+	 */
+	public void removeChild(FSTreeNode node) {
+		children.remove(node);
+		PropertyChangeEvent event = new PropertyChangeEvent(this, "removeChild", null, null); //$NON-NLS-1$
+		firePropertyChange(event);
+    }
+
+	/**
+	 * Clear the children of this folder.
+	 */
+	public void clearChildren() {
+		children.clear();
+		PropertyChangeEvent event = new PropertyChangeEvent(this, "clearChildren", null, null); //$NON-NLS-1$
+		firePropertyChange(event);
     }
 }
