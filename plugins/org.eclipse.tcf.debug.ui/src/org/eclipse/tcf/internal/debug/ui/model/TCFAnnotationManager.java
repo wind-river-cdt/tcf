@@ -21,7 +21,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.cdt.debug.core.model.ICBreakpoint;
 import org.eclipse.cdt.debug.core.model.ICLineBreakpoint2;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -418,10 +417,21 @@ public class TCFAnnotationManager {
      * @param  bp - Registered Breakpoint 
      * @param  area - Resolved location for status
      */    
-    private void updateBPMarker(IBreakpoint bp, ILineNumbers.CodeArea area ) {
-        final IBreakpoint breakpoint = bp;
-        final ILineNumbers.CodeArea larea = area;
-        
+    private void updateBPMarker(final IBreakpoint bp, final ILineNumbers.CodeArea area ) {
+        try {
+            if ( !(bp instanceof ICLineBreakpoint2) ||
+                 area.start_line == ((ICLineBreakpoint2) bp).getLineNumber()) 
+            {
+                return; // No line change
+            }
+        } catch (CoreException e) {
+            IStatus status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                    NLS.bind(Messages.TCFAnnotationManager_6, IMarker.LINE_NUMBER, bp.toString()),
+                    e);                                
+            Activator.getDefault().getLog().log(status);
+            return; // Breakpoint being disposed.
+        }
+
         IResource resources = bp.getMarker().getResource();
         ISchedulingRule changeRule = null;
         IResourceRuleFactory ruleFactory = ResourcesPlugin.getWorkspace().getRuleFactory();
@@ -431,33 +441,14 @@ public class TCFAnnotationManager {
         WorkspaceJob job = new WorkspaceJob(Messages.TCFAnnotationManager_5) { //$NON_NLS-1$
             @Override
             public IStatus runInWorkspace(IProgressMonitor monitor) {
-                IMarker bpMarker = breakpoint.getMarker();
-                int bp_line = bpMarker.getAttribute(IMarker.LINE_NUMBER, -1);
-
-                if (bp_line != larea.start_line) {
-                    try {
-                        bpMarker.setAttribute(IMarker.LINE_NUMBER, larea.start_line);
-                    }
-                    catch (CoreException e) {
-                        IStatus status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
-                                NLS.bind(Messages.TCFAnnotationManager_6, IMarker.LINE_NUMBER, breakpoint.toString()),
-                                e);                                
-                        Activator.getDefault().getLog().log(status);
-                        e.printStackTrace();
-                    }
-                    try {
-                        if (breakpoint instanceof ICLineBreakpoint2) {
-                            ICLineBreakpoint2 cbp2 = (ICLineBreakpoint2)breakpoint;
-                            cbp2.refreshMessage();
-                        }
-                    }
-                    catch (CoreException e) {
-                        IStatus status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
-                                NLS.bind(Messages.TCFAnnotationManager_7, null ),
-                                e);                                
-                        Activator.getDefault().getLog().log(status);                        
-                        e.printStackTrace();
-                    }
+                try {
+                    ((ICLineBreakpoint2)bp).setInstalledLine(area.start_line);
+                }
+                catch (CoreException e) {
+                    IStatus status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                            NLS.bind(Messages.TCFAnnotationManager_6, IMarker.LINE_NUMBER, bp.toString()),
+                            e);                                
+                    Activator.getDefault().getLog().log(status);
                 }
                 return Status.OK_STATUS;
             }
