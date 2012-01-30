@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.cdt.debug.core.model.ICBreakpoint;
 import org.eclipse.cdt.debug.core.model.ICLineBreakpoint2;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -462,8 +463,10 @@ public class TCFAnnotationManager {
                     }                    
                 }
                 try {
-                    ICBreakpoint cbp = (ICBreakpoint)bp;
-                    cbp.refreshMessage();
+                    if (bp instanceof ICLineBreakpoint2) {
+                        ICLineBreakpoint2 cbp = (ICLineBreakpoint2)bp;
+                        cbp.refreshMessage();
+                    }
                 }
                 catch (CoreException e) {
                     IStatus status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
@@ -513,7 +516,7 @@ public class TCFAnnotationManager {
             @Override
             public IStatus runInWorkspace(IProgressMonitor monitor) {
                 try {
-                    ((ICLineBreakpoint2)bp).setInstalledLine(area.start_line);
+                    ((ICLineBreakpoint2)bp).setInstalledLineNumber(area.start_line);
                 }
                 catch (CoreException e) {
                     IStatus status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
