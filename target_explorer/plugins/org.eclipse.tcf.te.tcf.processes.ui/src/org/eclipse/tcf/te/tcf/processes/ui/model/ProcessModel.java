@@ -119,7 +119,7 @@ public class ProcessModel implements IPreferenceConsts{
 			this.stopped = stopped;
 			Boolean oldValue = Boolean.valueOf(old);
 			Boolean newValue = Boolean.valueOf(stopped);
-			PropertyChangeEvent event = new PropertyChangeEvent(root, "stopped", oldValue, newValue); //$NON-NLS-1$
+			PropertyChangeEvent event = new PropertyChangeEvent(peerModel, "stopped", oldValue, newValue); //$NON-NLS-1$
 			IViewerInput viewerInput = (IViewerInput) peerModel.getAdapter(IViewerInput.class);
 			viewerInput.firePropertyChange(event);
 		}

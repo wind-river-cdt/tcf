@@ -874,22 +874,25 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 */
 	@Override
 	public void propertyChange(final PropertyChangeEvent event) {
-		ToolBar toolbar = toolbarManager.getControl();
-		if (!toolbar.isDisposed()) {
-			Display display = toolbar.getDisplay();
-			if (display.getThread() == Thread.currentThread()) {
-				IContributionItem[] items = toolbarManager.getItems();
-				for (IContributionItem item : items) {
-					item.update();
-				}
-			}
-			else {
-				display.asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						propertyChange(event);
+		Object object = event.getSource();
+		if (object == viewer.getInput()) {
+			ToolBar toolbar = toolbarManager.getControl();
+			if (!toolbar.isDisposed()) {
+				Display display = toolbar.getDisplay();
+				if (display.getThread() == Thread.currentThread()) {
+					IContributionItem[] items = toolbarManager.getItems();
+					for (IContributionItem item : items) {
+						item.update();
 					}
-				});
+				}
+				else {
+					display.asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							propertyChange(event);
+						}
+					});
+				}
 			}
 		}
 	}
