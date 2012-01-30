@@ -10,9 +10,7 @@
 package org.eclipse.tcf.te.ui.trees;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
@@ -28,7 +26,6 @@ import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
  * The base tree content provider that defines several default methods.
  */
 public abstract class TreeContentProvider implements ITreeContentProvider {
-	private static Map<TreeViewer, CommonViewerListener> listeners = Collections.synchronizedMap(new HashMap<TreeViewer, CommonViewerListener>());
 	/**
 	 * Static reference to the return value representing no elements.
 	 */
@@ -106,11 +103,7 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		Assert.isTrue(viewer instanceof TreeViewer);
 		this.viewer = (TreeViewer) viewer;
-		commonViewerListener = listeners.get(this.viewer);
-		if(commonViewerListener == null) {
-			commonViewerListener = new CommonViewerListener(this.viewer);
-			listeners.put(this.viewer, commonViewerListener);
-		}
+		commonViewerListener = new CommonViewerListener(this.viewer, this);
 	}
 	
 	/**

@@ -31,7 +31,12 @@ import org.eclipse.swt.widgets.Tree;
  * CommonViewerListener listens to the property change event from the
  *  tree and update the viewer accordingly.
  */
-class CommonViewerListener extends TimerTask implements IPropertyChangeListener {
+class CommonViewerListener implements IPropertyChangeListener {
+	// The timer that process the property events periodically.
+	private static Timer viewerTimer;
+	static {
+		viewerTimer = new Timer("Viewer_Refresher", true); //$NON-NLS-1$
+	}
 	private static final long INTERVAL = 500;
 	private static final long MAX_IMMEDIATE_INTERVAL = 1000;
 	private static final Object NULL = new Object();
@@ -41,22 +46,26 @@ class CommonViewerListener extends TimerTask implements IPropertyChangeListener 
 	private ITreeContentProvider contentProvider;
 	// Last time that the property event was processed.
 	private long lastTime = 0;
-	// The timer that process the property events periodically.
-	private Timer timer;
 	// The current queued property event sources.
 	private Queue<Object> queue;
+	// The timer task to process the property events periodically.
+	private TimerTask task;
 
 	/***
 	 * Create an instance for the specified tree content provider.
 	 *
 	 * @param viewer The tree content provider.
 	 */
-	public CommonViewerListener(TreeViewer viewer) {
+	public CommonViewerListener(TreeViewer viewer, ITreeContentProvider contentProvider) {
 		Assert.isNotNull(viewer);
 		this.viewer = viewer;
-		this.contentProvider = (ITreeContentProvider) this.viewer.getContentProvider();
-		this.timer = new Timer();
-		this.timer.schedule(this, INTERVAL, INTERVAL);
+		this.contentProvider = contentProvider;
+		this.task = new TimerTask(){
+			@Override
+            public void run() {
+				handleEvent();
+            }};
+		viewerTimer.schedule(this.task, INTERVAL, INTERVAL);
 		this.queue = new ConcurrentLinkedQueue<Object>();
 	}
 
@@ -65,25 +74,34 @@ class CommonViewerListener extends TimerTask implements IPropertyChangeListener 
 	 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
 	 */
 	@Override
-    public synchronized void propertyChange(final PropertyChangeEvent event) {
+    public void propertyChange(final PropertyChangeEvent event) {
 		Object object = event.getSource();
 		Assert.isTrue(object != null);
 		long now = System.currentTimeMillis();
-		queue.offer(object);
+		synchronized (queue) {
+			queue.offer(object);
+		}
 		if(now - lastTime > MAX_IMMEDIATE_INTERVAL) {
-			run();
+			TimerTask temp = new TimerTask() {
+				@Override
+                public void run() {
+					handleEvent();
+                }
+			};
+			viewerTimer.schedule(temp, 0);
 		}
     }
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.TimerTask#run()
+	/**
+	 * Handle the current events in the event queue.
 	 */
-	@Override
-	public synchronized void run() {
-		if (!queue.isEmpty()) {
-			Object[] objects = queue.toArray();
+	void handleEvent() {
+		Object[] objects;
+		synchronized (queue) {
+			objects = queue.toArray();
 			queue.clear();
+		}
+		if (objects.length > 0) {
 			List<Object> list = mergeObjects(objects);
 			Object object = getRefreshRoot(list);
 			processObject(object);
@@ -250,5 +268,12 @@ class CommonViewerListener extends TimerTask implements IPropertyChangeListener 
 	    		});
 	    	}
 	    }
+    }
+
+	/**
+	 * Cancel the current task and the current timer.
+	 */
+	public void cancel() {
+		task.cancel();
     }
 }
