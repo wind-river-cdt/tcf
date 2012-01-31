@@ -59,7 +59,7 @@ public class RefreshDoneGetChildren implements ISysMonitor.DoneGetChildren {
 				Runnable monitorCallback = new RefreshDoneMonitorCallback(newNodes, parentNode, queue, callback, service, channel);
 				CallbackMonitor monitor = new CallbackMonitor(monitorCallback, (Object[])contextIds);
 				for (String contextId : contextIds) {
-					RefreshDoneGetContext done = new RefreshDoneGetContext(newNodes, contextId, monitor, parentNode);
+					RefreshDoneGetContext done = new RefreshDoneGetContext(channel, newNodes, contextId, monitor, parentNode);
 					service.getContext(contextId, done);
 					pService.getContext(contextId, done);
 				}

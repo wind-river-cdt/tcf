@@ -35,6 +35,8 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext, IProcess
 	ProcessTreeNode childNode;
 	// The process context of this child node.
 	IProcesses.ProcessContext pContext;
+	// The system monitor context of this child node.
+	ISysMonitor.SysMonitorContext sContext;
 	// The flag to indicate if the system monitor service has returned. 
 	volatile boolean sysMonitorDone;
 	// The flag to indicate if the process service has returned.
@@ -59,7 +61,7 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext, IProcess
     @Override
 	public void doneGetContext(IToken token, Exception error, ISysMonitor.SysMonitorContext context) {
 		if (error == null && context != null) {
-			childNode = new ProcessTreeNode(parentNode, context);
+			sContext = context;
 		}
 		sysMonitorDone = true;
 		refreshChildren();
@@ -69,11 +71,22 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext, IProcess
      * Refresh the children under this child node.
      */
     private void refreshChildren() {
-		if (sysMonitorDone && processesDone && childNode != null) {
-			ISysMonitor service = channel.getRemoteService(ISysMonitor.class);
-			if (service != null) {
-				Queue<ProcessTreeNode> queue = new ConcurrentLinkedQueue<ProcessTreeNode>();
-				service.getChildren(childNode.id, new RefreshDoneGetChildren(this, queue, channel, service, childNode));
+		if (sysMonitorDone && processesDone) {
+			if(sContext != null) {
+				childNode = new ProcessTreeNode(parentNode, sContext);
+				childNode.setProcessContext(pContext);
+			} else if(pContext != null) {
+				childNode = new ProcessTreeNode(parentNode, pContext);
+				childNode.setSysMonitorContext(sContext);
+			}
+			if (childNode != null) {
+				ISysMonitor service = channel.getRemoteService(ISysMonitor.class);
+				if (service != null) {
+					Queue<ProcessTreeNode> queue = new ConcurrentLinkedQueue<ProcessTreeNode>();
+					service.getChildren(childNode.id, new RefreshDoneGetChildren(this, queue, channel, service, childNode));
+				}
+			} else {
+				run();
 			}
 		}
     }
@@ -97,9 +110,8 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext, IProcess
 	 */
 	@Override
     public void run() {
-		if (childNode != null) {
+		if(childNode != null) {
 			parentNode.addChild(childNode);
-			childNode.setProcessContext(pContext);
 		}
 		monitor.unlock(contextId);
     }

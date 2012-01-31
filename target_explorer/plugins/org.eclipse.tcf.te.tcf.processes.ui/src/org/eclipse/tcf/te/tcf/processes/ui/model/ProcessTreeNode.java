@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IProcesses;
+import org.eclipse.tcf.services.IProcesses.ProcessContext;
 import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.services.ISysMonitor.SysMonitorContext;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
@@ -163,6 +164,27 @@ public final class ProcessTreeNode extends PlatformObject implements IPeerModelP
 	}
 	
 	/**
+	 * Create process node with its parent node and a process context.
+	 * 
+	 * @param parentNode The parent node.
+	 * @param aContext The process context.
+	 */
+	public ProcessTreeNode(ProcessTreeNode parentNode, ProcessContext aContext) {
+		Assert.isTrue(Protocol.isDispatchThread());
+		Assert.isNotNull(aContext);
+		context = null;
+		pContext = aContext;
+		name = aContext.getName();
+		type = "ProcNode";  //$NON-NLS-1$
+		id = aContext.getID();
+		pid = -1;
+		ppid = -1;
+		parentId = aContext.getParentID();
+		parent = parentNode;
+		peerNode = parentNode.peerNode;
+    }
+
+	/**
 	 * Return if this node is a pending node.
 	 * 
 	 * @return true if this node is a pending node.
@@ -181,12 +203,12 @@ public final class ProcessTreeNode extends PlatformObject implements IPeerModelP
 	}
 
     /**
-     * Update the destination node's data with the source node's data.
+     * Update this process' data with a new system monitor context.
      *
-     * @param src The source node.
-     * @param dest The destination node.
+     * @param aContext the new context.
      */
-	public void updateData(SysMonitorContext aContext) {
+	public void updateSysMonitorContext(SysMonitorContext aContext) {
+		Assert.isNotNull(aContext);
 		SysMonitorContext oldContext = this.context;
 		this.context = aContext;
 		name = aContext.getFile();
@@ -201,6 +223,23 @@ public final class ProcessTreeNode extends PlatformObject implements IPeerModelP
 		}
 	}
 
+    /**
+     * Update this process' data with a new system monitor context.
+     *
+     * @param aContext the new context.
+     */
+	public void updateProcessContext(ProcessContext aContext) {
+		Assert.isNotNull(aContext);
+		ProcessContext oldContext = this.pContext;
+		this.pContext = aContext;
+		name = aContext.getName();
+		id = aContext.getID();
+		parentId = aContext.getParentID();
+		if (oldContext != aContext) {
+			firePropertyChange(new PropertyChangeEvent(this, "pContext", oldContext, aContext)); //$NON-NLS-1$
+		}
+    }
+	
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
@@ -306,4 +345,16 @@ public final class ProcessTreeNode extends PlatformObject implements IPeerModelP
     public IPeerModel getPeerModel() {
 	    return peerNode;
     }
+
+	/**
+	 * Set the system monitor context and fire a property change event.
+	 */
+	public void setSysMonitorContext(SysMonitorContext sContext) {
+		SysMonitorContext oldContext = this.context;
+		this.context = sContext;
+		if (oldContext != sContext) {
+			firePropertyChange(new PropertyChangeEvent(this, "sContext", oldContext, context)); //$NON-NLS-1$
+		}
+    }
+
 }

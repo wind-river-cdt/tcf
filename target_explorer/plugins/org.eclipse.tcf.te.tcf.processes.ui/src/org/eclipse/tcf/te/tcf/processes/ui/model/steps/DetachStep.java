@@ -100,7 +100,7 @@ public class DetachStep {
 													monService.getContext(node.id, new ISysMonitor.DoneGetContext() {
 														@Override
 														public void doneGetContext(IToken token, Exception error, SysMonitorContext context) {
-															node.updateData(context);
+															node.updateSysMonitorContext(context);
 
 															service.getContext(node.pContext.getID(), new IProcesses.DoneGetContext() {
 																@Override

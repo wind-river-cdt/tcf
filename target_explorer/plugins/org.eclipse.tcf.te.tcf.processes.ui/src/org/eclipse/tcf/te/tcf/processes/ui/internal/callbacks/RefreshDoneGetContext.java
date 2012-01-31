@@ -10,7 +10,11 @@
 package org.eclipse.tcf.te.tcf.processes.ui.internal.callbacks;
 
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.IProcesses.ProcessContext;
@@ -20,7 +24,7 @@ import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 /**
  * The callback handler that handles the result of service.getContext when refreshing.
  */
-public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext, IProcesses.DoneGetContext {
+public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext, IProcesses.DoneGetContext, Runnable {
 	// The current context id.
 	String contextId;
 	// The parent node to be refreshed.
@@ -31,16 +35,22 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext, IProce
 	ProcessTreeNode childNode;
 	// The process context of this child node.
 	ProcessContext pContext;
+	// The system monitor context of this child node.
+	ISysMonitor.SysMonitorContext sContext;
 	// The flag to indicate if the system monitor service has returned. 
 	volatile boolean sysMonitorDone;
 	// The flag to indicate if the process service has returned.
 	volatile boolean processesDone;
 	// The callback monitor
 	CallbackMonitor monitor;
+	// The TCF channel
+	IChannel channel;
+	
 	/**
 	 * Create an instance with the field parameters.
 	 */
-	public RefreshDoneGetContext(List<ProcessTreeNode> newNodes, String contextId,  CallbackMonitor monitor, ProcessTreeNode parentNode) {
+	public RefreshDoneGetContext(IChannel channel, List<ProcessTreeNode> newNodes, String contextId,  CallbackMonitor monitor, ProcessTreeNode parentNode) {
+		this.channel = channel;
 		this.contextId = contextId;
 		this.parentNode = parentNode;
 		this.monitor = monitor;
@@ -56,23 +66,10 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext, IProce
     @Override
 	public void doneGetContext(IToken token, Exception error, ISysMonitor.SysMonitorContext context) {
 		if (error == null && context != null) {
-			childNode = new ProcessTreeNode(parentNode, context);
-            final int index = searchChild(childNode);
-			if (index != -1) {
-				ProcessTreeNode node = parentNode.getChildren().get(index);
-				node.updateData(context);
-				childNode = node;
-			}
-			else parentNode.addChild(childNode);
-			newNodes.add(childNode);
+			sContext = context;
 		}
 		sysMonitorDone = true;
-		if(sysMonitorDone && processesDone) {
-			if (childNode != null) {
-				childNode.setProcessContext(pContext);
-			}
-			monitor.unlock(contextId);
-		}
+		packNode();
 	}
 
     /**
@@ -113,11 +110,58 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext, IProce
 			pContext = context;
 		}
 		processesDone = true;
-		if(sysMonitorDone && processesDone) {
-			if (childNode != null) {
+		packNode();
+    }
+
+	/**
+	 * Pack the child node with parent node and refresh the node if it is a newly
+	 * created node.
+	 */
+	private void packNode() {
+		if (sysMonitorDone && processesDone) {
+			if (sContext != null) {
+				childNode = new ProcessTreeNode(parentNode, sContext);
 				childNode.setProcessContext(pContext);
 			}
-			monitor.unlock(contextId);
+			else if (pContext != null) {
+				childNode = new ProcessTreeNode(parentNode, pContext);
+				childNode.setSysMonitorContext(sContext);
+			}
+			if (childNode != null) {
+				final int index = searchChild(childNode);
+				if (index != -1) {
+					ProcessTreeNode node = parentNode.getChildren().get(index);
+					if (sContext != null) {
+						node.updateSysMonitorContext(sContext);
+					}
+					if (pContext != null) {
+						node.setProcessContext(pContext);
+					}
+					childNode = node;
+					newNodes.add(childNode);
+					monitor.unlock(contextId);
+				}
+				else {
+					ISysMonitor service = channel.getRemoteService(ISysMonitor.class);
+					Assert.isNotNull(service);
+					Queue<ProcessTreeNode> queue = new ConcurrentLinkedQueue<ProcessTreeNode>();
+					service.getChildren(childNode.id, new RefreshDoneGetChildren(this, queue, channel, service, childNode));
+				}
+			}
+			else {
+				monitor.unlock(contextId);
+			}
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Runnable#run()
+	 */
+	@Override
+    public void run() {
+		parentNode.addChild(childNode);
+		newNodes.add(childNode);
+		monitor.unlock(contextId);
     }
 }
