@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.cdt.debug.core.model.ICBreakpoint;
+import org.eclipse.cdt.debug.core.model.ICBreakpoint2;
 import org.eclipse.cdt.debug.core.model.ICLineBreakpoint2;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -463,8 +464,8 @@ public class TCFAnnotationManager {
                     }                    
                 }
                 try {
-                    if (bp instanceof ICLineBreakpoint2) {
-                        ICLineBreakpoint2 cbp = (ICLineBreakpoint2)bp;
+                    if (bp instanceof ICBreakpoint2) {
+                        ICBreakpoint2 cbp = (ICBreakpoint2)bp;
                         cbp.refreshMessage();
                     }
                 }
