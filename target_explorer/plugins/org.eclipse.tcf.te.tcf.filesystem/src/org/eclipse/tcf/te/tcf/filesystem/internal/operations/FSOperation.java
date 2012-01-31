@@ -269,7 +269,7 @@ public class FSOperation {
 	 */
 	public List<FSTreeNode> getChildren(final FSTreeNode node, final IFileSystem service) throws TCFFileSystemException {
 		if (node.childrenQueried) {
-			return getCurrentChildren(node);
+			return node.unsafeGetChildren();
 		}
 		loadChildren(node, service);
 		return getChildren(node, service);
@@ -296,26 +296,6 @@ public class FSOperation {
 		finally {
 			if (channel != null) Tcf.getChannelManager().closeChannel(channel);
 		}
-	}
-	
-	/**
-	 * Get the current children copy of the specified folder node.
-	 *
-	 * @param node The folder node.
-	 * @return The children of the folder node.
-	 */
-	public static List<FSTreeNode> getCurrentChildren(final FSTreeNode node) {
-		if (Protocol.isDispatchThread()) {
-			return new ArrayList<FSTreeNode>(node.getChildren());
-		}
-		final List<List<FSTreeNode>> result = new ArrayList<List<FSTreeNode>>();
-		Protocol.invokeAndWait(new Runnable() {
-			@Override
-			public void run() {
-				result.add(getCurrentChildren(node));
-			}
-		});
-		return result.get(0);
 	}
 
 	/**

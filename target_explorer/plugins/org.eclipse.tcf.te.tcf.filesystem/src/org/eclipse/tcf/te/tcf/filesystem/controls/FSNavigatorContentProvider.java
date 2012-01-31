@@ -13,7 +13,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
-import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
@@ -96,11 +95,11 @@ public class FSNavigatorContentProvider extends TreeContentProvider {
 					FSModel model = FSModel.getFSModel(node.peerNode);
 					model.queryChildren(node);
 				}
-				if(FSOperation.getCurrentChildren(node).isEmpty()) {
+				if(node.unsafeGetChildren().isEmpty()) {
 					return new Object[] {FSTreeNode.PENDING_NODE};
 				}
 			}
-			return FSOperation.getCurrentChildren(node).toArray();
+			return node.unsafeGetChildren().toArray();
 		}
 
 		return NO_ELEMENTS;

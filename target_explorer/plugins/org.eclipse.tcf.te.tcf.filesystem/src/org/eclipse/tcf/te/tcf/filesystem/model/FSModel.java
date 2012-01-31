@@ -164,7 +164,7 @@ public final class FSModel {
 			root = fsRoot.create();
 			fsModel.setRoot(root);
 		}
-		Object[] elements = FSOperation.getCurrentChildren(root).toArray();
+		Object[] elements = root.unsafeGetChildren().toArray();
 		if (elements != null && elements.length != 0 && path.length() != 0) {
 			final FSTreeNode[] children = new FSTreeNode[elements.length];
 			System.arraycopy(elements, 0, children, 0, elements.length);
@@ -238,7 +238,7 @@ public final class FSModel {
 	 */
 	static private FSTreeNode[] getUpdatedChildren(IPeer peer, final FSTreeNode folder) throws TCFException {
 		if (folder.childrenQueried) {
-			List<FSTreeNode> list = FSOperation.getCurrentChildren(folder);
+			List<FSTreeNode> list = folder.unsafeGetChildren();
 			return list.toArray(new FSTreeNode[list.size()]);
 		}
 		IChannel channel = FSOperation.openChannel(folder.peerNode.getPeer());

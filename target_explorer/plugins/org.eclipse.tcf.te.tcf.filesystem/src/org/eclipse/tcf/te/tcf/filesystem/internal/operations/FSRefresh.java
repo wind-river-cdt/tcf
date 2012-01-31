@@ -86,7 +86,7 @@ public class FSRefresh extends FSOperation {
 	private void refresh(final FSTreeNode node, final IFileSystem service) throws TCFFileSystemException {
 		if ((node.isSystemRoot() || node.isDirectory()) && node.childrenQueried) {
 			if (!node.isSystemRoot()) updateChildren(node, service);
-			List<FSTreeNode> children = getCurrentChildren(node);
+			List<FSTreeNode> children = node.unsafeGetChildren();
 			for (FSTreeNode child : children) {
 				refresh(child, service);
 			}
@@ -102,7 +102,7 @@ public class FSRefresh extends FSOperation {
 	 * @throws TCFFileSystemException Thrown during querying the children nodes.
 	 */
 	protected void updateChildren(final FSTreeNode node, final IFileSystem service) throws TCFFileSystemException {
-		List<FSTreeNode> current = getCurrentChildren(node);
+		List<FSTreeNode> current = node.unsafeGetChildren();
 		List<FSTreeNode> latest = queryChildren(node, service);
 		List<FSTreeNode> newNodes = diff(latest, current);
 		List<FSTreeNode> deleted = diff(current, latest);

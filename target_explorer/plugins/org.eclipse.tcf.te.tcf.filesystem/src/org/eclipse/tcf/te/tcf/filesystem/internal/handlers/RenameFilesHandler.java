@@ -21,7 +21,6 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.te.tcf.filesystem.internal.celleditor.FSCellValidator;
-import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSRename;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.PersistenceManager;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
@@ -117,7 +116,7 @@ public class RenameFilesHandler extends AbstractHandler {
 	 */
 	private String[] getUsedNames(FSTreeNode folder) {
 		List<String> usedNames = new ArrayList<String>();
-		List<FSTreeNode> nodes = FSOperation.getCurrentChildren(folder.parent);
+		List<FSTreeNode> nodes = folder.parent.unsafeGetChildren();
 		for (FSTreeNode node : nodes) {
 			usedNames.add(node.name);
 		}

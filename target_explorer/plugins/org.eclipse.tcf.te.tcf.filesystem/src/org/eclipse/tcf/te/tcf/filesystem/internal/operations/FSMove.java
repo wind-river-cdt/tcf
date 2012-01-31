@@ -192,7 +192,7 @@ public class FSMove extends FSOperation {
 		}
 		else if (node.isDirectory()) {
 			super.cleanUpFolder(node);
-			List<FSTreeNode> children = getCurrentChildren(node);
+			List<FSTreeNode> children = node.unsafeGetChildren();
 			copyNode.addChidren(children);
 			for (FSTreeNode child : children) {
 				child.parent = copyNode;

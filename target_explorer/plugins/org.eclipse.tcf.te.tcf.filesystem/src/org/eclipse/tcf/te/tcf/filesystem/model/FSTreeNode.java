@@ -212,6 +212,15 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 		Assert.isTrue(Protocol.isDispatchThread());
 		return children;
 	}
+	
+	/**
+	 * Returns the children outside of TCF thread.
+	 * 
+	 * @return The children list.
+	 */
+	public List<FSTreeNode> unsafeGetChildren() {
+		return new ArrayList<FSTreeNode>(children);
+	}
 
 	/*
 	 * (non-Javadoc)

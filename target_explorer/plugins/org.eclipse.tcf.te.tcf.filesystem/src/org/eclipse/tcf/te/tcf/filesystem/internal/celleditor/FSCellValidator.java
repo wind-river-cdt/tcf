@@ -15,7 +15,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ICellEditorValidator;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 
@@ -72,7 +71,7 @@ public class FSCellValidator implements ICellEditorValidator {
 	 * @return true if it has a child with the name.
 	 */
 	private boolean hasChild(FSTreeNode folder, String name) {
-		List<FSTreeNode> nodes = FSOperation.getCurrentChildren(folder.parent);
+		List<FSTreeNode> nodes = folder.parent.unsafeGetChildren();
 		for (FSTreeNode node : nodes) {
 			if (node.isWindowsNode()) {
 				if (node.name.equalsIgnoreCase(name)) return true;
