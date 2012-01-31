@@ -47,23 +47,30 @@ public interface ISymbols extends IService {
     }
 
     static final int
-        SYM_FLAG_PARAMETER      = 0x00001,
-        SYM_FLAG_TYPEDEF        = 0x00002,
-        SYM_FLAG_CONST_TYPE     = 0x00004,
-        SYM_FLAG_PACKET_TYPE    = 0x00008,
-        SYM_FLAG_SUBRANGE_TYPE  = 0x00010,
-        SYM_FLAG_VOLATILE_TYPE  = 0x00020,
-        SYM_FLAG_RESTRICT_TYPE  = 0x00040,
-        SYM_FLAG_UNION_TYPE     = 0x00080,
-        SYM_FLAG_CLASS_TYPE     = 0x00100,
-        SYM_FLAG_INTERFACE_TYPE = 0x00200,
-        SYM_FLAG_SHARED_TYPE    = 0x00400,
-        SYM_FLAG_REFERENCE      = 0x00800,
-        SYM_FLAG_BIG_ENDIAN     = 0x01000,
-        SYM_FLAG_LITTLE_ENDIAN  = 0x02000,
-        SYM_FLAG_OPTIONAL       = 0x04000,
-        SYM_FLAG_EXTERNAL       = 0x08000,
-        SYM_FLAG_VARARG         = 0x10000;
+        SYM_FLAG_PARAMETER      = 0x000001,
+        SYM_FLAG_TYPEDEF        = 0x000002,
+        SYM_FLAG_CONST_TYPE     = 0x000004,
+        SYM_FLAG_PACKET_TYPE    = 0x000008,
+        SYM_FLAG_SUBRANGE_TYPE  = 0x000010,
+        SYM_FLAG_VOLATILE_TYPE  = 0x000020,
+        SYM_FLAG_RESTRICT_TYPE  = 0x000040,
+        SYM_FLAG_UNION_TYPE     = 0x000080,
+        SYM_FLAG_CLASS_TYPE     = 0x000100,
+        SYM_FLAG_INTERFACE_TYPE = 0x000200,
+        SYM_FLAG_SHARED_TYPE    = 0x000400,
+        SYM_FLAG_REFERENCE      = 0x000800,
+        SYM_FLAG_BIG_ENDIAN     = 0x001000,
+        SYM_FLAG_LITTLE_ENDIAN  = 0x002000,
+        SYM_FLAG_OPTIONAL       = 0x004000,
+        SYM_FLAG_EXTERNAL       = 0x008000,
+        SYM_FLAG_VARARG         = 0x010000,
+        SYM_FLAG_ARTIFICIAL     = 0x020000,
+        SYM_FLAG_TYPE_PARAMETER = 0x040000,
+        SYM_FLAG_PRIVATE        = 0x080000,
+        SYM_FLAG_PROTECTED      = 0x100000,
+        SYM_FLAG_PUBLIC         = 0x200000,
+        SYM_FLAG_ENUM_TYPE      = 0x400000,
+        SYM_FLAG_STRUCT_TYPE    = 0x800000;
 
     /**
      * Symbol context interface.
