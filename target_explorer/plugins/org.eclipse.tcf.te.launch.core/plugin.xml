@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+<!-- Extension points -->
+   <extension-point id="launchConfigTypeBindings" name="Launch Configuration Type Bindings" schema="schema/launchConfigTypeBindings.exsd"/>
+   <extension-point id="launchManagerDelegates" name="Launch Manager Delegates" schema="schema/launchManagerDelegates.exsd"/>
+   <extension-point id="launchModeVariantDelegates" name="Launch Mode Variant Delegates" schema="schema/launchModeVariantDelegates.exsd"/>
+
+</plugin>

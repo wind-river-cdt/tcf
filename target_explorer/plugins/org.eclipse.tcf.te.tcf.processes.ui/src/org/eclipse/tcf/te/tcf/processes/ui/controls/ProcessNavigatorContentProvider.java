@@ -18,7 +18,6 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 import org.eclipse.tcf.te.ui.trees.TreeContentProvider;
-import org.eclipse.tcf.te.ui.views.interfaces.IRoot;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.navigator.NavigatorFilterService;
@@ -42,15 +41,8 @@ public class ProcessNavigatorContentProvider  extends TreeContentProvider implem
 	@Override
 	public Object getParent(Object element) {
 		if (element instanceof ProcessTreeNode) {
-			ProcessTreeNode parent = ((ProcessTreeNode) element).parent;
-			// If the parent is a root node, return the associated peer node
-			if (parent != null) {
-				if (parent.type != null && parent.isRootNode()) {
-					return parent.peerNode;
-				}
-				return parent;
-			}
-			return ((ProcessTreeNode) element).peerNode;
+			ProcessTreeNode node = (ProcessTreeNode) element;
+			return node.parent != null ? node.parent : node.peerNode;
 		}
 		return null;
 	}
@@ -63,7 +55,8 @@ public class ProcessNavigatorContentProvider  extends TreeContentProvider implem
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 	    super.inputChanged(viewer, oldInput, newInput);
 	    this.viewer.addTreeListener(this);
-    }
+		refreshChildren(newInput);
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -81,11 +74,10 @@ public class ProcessNavigatorContentProvider  extends TreeContentProvider implem
 	 */
 	@Override
 	public Object[] getChildren(Object parentElement) {
-		Assert.isNotNull(parentElement);
+		super.getChildren(parentElement);
 
 		if (parentElement instanceof IPeerModel) {
 			IPeerModel peerModel = (IPeerModel) parentElement;
-			installPropertyChangeListener(peerModel);
 			ProcessModel model = ProcessModel.getProcessModel(peerModel);
 			if(model.getRoot() == null) {
 				model.createRoot(peerModel);
@@ -105,11 +97,11 @@ public class ProcessNavigatorContentProvider  extends TreeContentProvider implem
 					ProcessModel model = ProcessModel.getProcessModel(node.peerNode);
 					model.queryChildren(node);
 				}
-				if(node.children.isEmpty()) {
+				if(node.getChildren().isEmpty()) {
 					return new Object[] {ProcessTreeNode.PENDING_NODE};
 				}
 			}
-			return node.children.toArray();
+			return node.getChildren().toArray();
 		}
 		return NO_ELEMENTS;
 	}
@@ -211,24 +203,20 @@ public class ProcessNavigatorContentProvider  extends TreeContentProvider implem
 	@Override
     public void treeExpanded(TreeExpansionEvent event) {
 		Object element = event.getElement();
-		if(element instanceof ProcessTreeNode) {
-			ProcessTreeNode parent = (ProcessTreeNode) element;
+		refreshChildren(element);
+    }
+
+	/**
+	 * Refresh the element's children if it is a process node and its children has
+	 * already been queried.
+	 */
+	private void refreshChildren(Object object) {
+	    if(object instanceof ProcessTreeNode) {
+			final ProcessTreeNode parent = (ProcessTreeNode) object;
 			if (parent.childrenQueried && !parent.childrenQueryRunning) {
 				final ProcessModel model = ProcessModel.getProcessModel(parent.peerNode);
 				model.refreshChildren(parent);
 			}
 		}
     }
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.trees.TreeContentProvider#isRootObject(java.lang.Object)
-	 */
-	@Override
-    protected boolean isRootObject(Object object) {
-		if(object instanceof IRoot) {
-			return true;
-		}
-	    return false;
-    }	
 }

@@ -1,5 +1,5 @@
-# *******************************************************************************
-# * Copyright (c) 2011 Wind River Systems, Inc. and others.
+# *****************************************************************************
+# * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others.
 # * All rights reserved. This program and the accompanying materials
 # * are made available under the terms of the Eclipse Public License v1.0
 # * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
 # *
 # * Contributors:
 # *     Wind River Systems - initial API and implementation
-# *******************************************************************************
+# ****************************************************************************
 
 """
 File System service provides file transfer (and more generally file
@@ -239,7 +239,7 @@ class FileSystemException(IOError):
     The class to represent File System error reports.
     """
     def __init__(self, message_or_exception):
-        if isinstance(message_or_exception, str):
+        if isinstance(message_or_exception, (str, unicode)):
             super(FileSystemException, self).__init__(message_or_exception)
         elif isinstance(message_or_exception, Exception):
             self.caused_by = message_or_exception
@@ -283,7 +283,7 @@ class FileSystemService(services.Service):
         """
         Read bytes from an open file.
         In response to this request, the server will read as many bytes as it
-        can from the file (up to 'len'), and return them in a byte array.
+        can from the file (up to 'length'), and return them in a byte array.
         If an error occurs or EOF is encountered, the server may return
         fewer bytes then requested. Call back method doneRead() argument 'error'
         will be not None in case of error, and argument 'eof' will be

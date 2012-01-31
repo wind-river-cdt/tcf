@@ -21,7 +21,7 @@ import org.eclipse.tcf.te.ui.interfaces.IPropertyChangeProvider;
 
 /**
  * The base property change provider implementation. Classes that want to implement
- * IPropertyChangeProvider should extend this class to facilitate the implementation.
+ * IPropertyChangeProvider should extend this class to facilitate the implementation.  
  */
 public class PropertyChangeProvider extends PlatformObject implements IPropertyChangeProvider {
 
@@ -29,7 +29,7 @@ public class PropertyChangeProvider extends PlatformObject implements IPropertyC
 	 * The property change listeners added to this node.
 	 */
 	private List<IPropertyChangeListener> propertyChangeListeners = Collections.synchronizedList(new ArrayList<IPropertyChangeListener>());
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.tcf.te.ui.interfaces.IViewerInput#firePropertyChange(org.eclipse.jface.util.PropertyChangeEvent)
@@ -42,27 +42,27 @@ public class PropertyChangeProvider extends PlatformObject implements IPropertyC
 			}
 		}
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.tcf.te.ui.interfaces.IViewerInput#addPropertyChangeListener(org.eclipse.jface.util.IPropertyChangeListener)
 	 */
 	@Override
-	public void addPropertyChangeListener(IPropertyChangeListener listener) {
+    public void addPropertyChangeListener(IPropertyChangeListener listener) {
 		Assert.isNotNull(listener);
-		if (!propertyChangeListeners.contains(listener)) {
+		if(!propertyChangeListeners.contains(listener)) {
 			propertyChangeListeners.add(listener);
 		}
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.tcf.te.ui.interfaces.IViewerInput#removePropertyChangeListener(org.eclipse.jface.util.IPropertyChangeListener)
 	 */
 	@Override
-	public void removePropertyChangeListener(IPropertyChangeListener listener) {
+    public void removePropertyChangeListener(IPropertyChangeListener listener) {
 		Assert.isNotNull(listener);
-		if (propertyChangeListeners.contains(listener)) {
+		if(propertyChangeListeners.contains(listener)) {
 			propertyChangeListeners.remove(listener);
 		}
 	}

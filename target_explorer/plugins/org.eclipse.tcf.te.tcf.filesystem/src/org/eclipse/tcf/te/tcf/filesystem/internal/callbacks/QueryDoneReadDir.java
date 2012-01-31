@@ -16,7 +16,6 @@ import org.eclipse.tcf.services.IFileSystem.DirEntry;
 import org.eclipse.tcf.services.IFileSystem.DoneReadDir;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.te.tcf.core.Tcf;
-import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 
 /**
@@ -54,10 +53,15 @@ public class QueryDoneReadDir implements DoneReadDir {
 	@Override
 	public void doneReadDir(IToken token, FileSystemException error, DirEntry[] entries, boolean eof) {
 		// Process the returned data
-		if (error == null && entries != null && entries.length > 0) {
-			for (DirEntry entry : entries) {
-				FSTreeNode node = new FSTreeNode(parentNode, entry, false);
-				parentNode.getChildren().add(node);
+		if (error == null) {
+			if (entries != null && entries.length > 0) {
+				for (DirEntry entry : entries) {
+					FSTreeNode node = new FSTreeNode(parentNode, entry, false);
+					parentNode.addChild(node);
+				}
+			}
+			else {
+				parentNode.clearChildren();
 			}
 		}
 
@@ -77,6 +81,5 @@ public class QueryDoneReadDir implements DoneReadDir {
 			// And invoke ourself again
 			service.readdir(handle, new QueryDoneReadDir(channel, service, handle, parentNode));
 		}
-		FSModel.firePropertyChange(parentNode);
 	}
 }

@@ -14,28 +14,35 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.tcf.te.ui.interfaces.IPropertyChangeProvider;
 import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 
 /**
  * The base tree content provider that defines several default methods.
  */
 public abstract class TreeContentProvider implements ITreeContentProvider {
-
 	/**
 	 * Static reference to the return value representing no elements.
 	 */
 	protected final static Object[] NO_ELEMENTS = new Object[0];
 
 	// The listener to refresh the common viewer when properties change.
-	private CommonViewerListener commonViewerListener;
+	protected CommonViewerListener commonViewerListener;
 	// The viewer inputs that have been added a property change listener.
-	private Set<IViewerInput> viewerInputs = Collections.synchronizedSet(new HashSet<IViewerInput>());
+	private Set<IPropertyChangeProvider> providers = Collections.synchronizedSet(new HashSet<IPropertyChangeProvider>());
 	// The viewer
 	protected TreeViewer viewer;
+
+	/**
+	 * Create a tree content provider.
+	 */
+	public TreeContentProvider() {
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -43,16 +50,17 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 	 */
 	@Override
     public void dispose() {
-		for(IViewerInput viewerInput : viewerInputs) {
-			viewerInput.removePropertyChangeListener(commonViewerListener);
+		for(IPropertyChangeProvider provider : providers) {
+			provider.removePropertyChangeListener(commonViewerListener);
 		}
 		commonViewerListener.cancel();
+		providers.clear();
     }
-
+	
 	/**
 	 * Get the filtered children of the parent using the
 	 * filters registered in the viewer.
-	 *
+	 * 
 	 * @param parent The parent element.
 	 * @return The children after filtering.
 	 */
@@ -67,6 +75,25 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 		}
 		return result;
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
+	 */
+	@Override
+    public Object[] getChildren(Object parentElement) {
+		Assert.isNotNull(parentElement);
+
+		if (parentElement instanceof IAdaptable) {
+			IAdaptable adaptable = (IAdaptable) parentElement;
+			IViewerInput viewerInput = (IViewerInput) adaptable.getAdapter(IViewerInput.class);
+			if (viewerInput != null) {
+				installPropertyChangeListener(viewerInput);
+			}
+		}
+		
+		return null;
+    }
 
 	/*
 	 * (non-Javadoc)
@@ -76,37 +103,18 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		Assert.isTrue(viewer instanceof TreeViewer);
 		this.viewer = (TreeViewer) viewer;
-		commonViewerListener = new CommonViewerListener(this.viewer) {
-			@Override
-            protected Object getParent(Object node) {
-	            return TreeContentProvider.this.getParent(node);
-            }
-			@Override
-            protected boolean isRootObject(Object object) {
-	            return TreeContentProvider.this.isRootObject(object);
-            }};
+		commonViewerListener = new CommonViewerListener(this.viewer, this);
 	}
-
-	/**
-	 * If the specified object is a root object;
-	 *
-	 * @param object The object to be tested.
-	 * @return true if it is root object.
-	 */
-	protected abstract boolean isRootObject(Object object);
-
+	
 	/**
 	 * Install a property change listener to the specified element.
-	 *
-	 * @param element The element node.
+	 * 
+	 * @param provider The element node.
 	 */
-    protected void installPropertyChangeListener(Object element) {
-		IViewerInput viewerInput = ViewerStateManager.getViewerInput(element);
-		if(viewerInput != null && !viewerInputs.contains(viewerInput)) {
-			if (commonViewerListener != null) {
-				viewerInput.addPropertyChangeListener(commonViewerListener);
-			}
-			viewerInputs.add(viewerInput);
+    private void installPropertyChangeListener(IPropertyChangeProvider provider) {
+		if(provider != null && !providers.contains(provider) && commonViewerListener != null) {
+			provider.addPropertyChangeListener(commonViewerListener);
+			providers.add(provider);
 		}
     }
 

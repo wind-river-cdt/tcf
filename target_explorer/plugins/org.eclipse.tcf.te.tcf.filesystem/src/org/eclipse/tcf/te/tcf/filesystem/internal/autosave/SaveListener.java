@@ -20,8 +20,11 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.CacheManager;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.PersistenceManager;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.StateManager;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.ui.IEditorInput;
@@ -34,7 +37,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
  */
 public class SaveListener implements IExecutionListener {
 	// Dirty node that should be committed or merged.
-	private FSTreeNode dirtyNode;
+	FSTreeNode dirtyNode;
 
 	/**
 	 * Create a SaveListener listening to command "SAVE".
@@ -52,7 +55,11 @@ public class SaveListener implements IExecutionListener {
 				CacheManager.getInstance().upload(new FSTreeNode[]{dirtyNode}, false);
 			}
 			else {
-				FSModel.firePropertyChange(dirtyNode);
+				SafeRunner.run(new SafeRunnable(){
+					@Override
+                    public void run() throws Exception {
+						StateManager.getInstance().refreshState(dirtyNode);
+                    }});
 			}
 		}
 	}

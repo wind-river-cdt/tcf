@@ -17,7 +17,6 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSClipboard;
-import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.ui.handlers.HandlerUtil;
 
@@ -37,9 +36,6 @@ public class CutFilesHandler extends AbstractHandler {
 			List<FSTreeNode> nodes = selection.toList();
 			// Cut these files to the clip board.
 			cb.cutFiles(nodes);
-			// Refresh the file system tree to display the decorations of the cut nodes.
-			FSTreeNode node = (FSTreeNode) selection.getFirstElement();
-			FSModel.firePropertyChange(node);
 		}
 		return null;
 	}

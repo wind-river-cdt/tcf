@@ -35,7 +35,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.dialogs.TimeTriggeredProgressMonitorDialog;
 import org.eclipse.tcf.te.tcf.filesystem.internal.url.TcfURLConnection;
-import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 import org.eclipse.ui.PlatformUI;
@@ -223,11 +222,10 @@ public class CacheManager {
 								if (file.exists()) {
 									// If downloading is successful, update the attributes of the file and
 									// set the last modified time to that of its corresponding file.
-									StateManager.getInstance().refreshState(node);
 									PersistenceManager.getInstance().setBaseTimestamp(node.getLocationURL(), node.attr.mtime);
 									file.setLastModified(node.attr.mtime);
 									if (!node.isWritable()) file.setReadOnly();
-									FSModel.firePropertyChange(node);
+									StateManager.getInstance().refreshState(node);
 								}
 							}
 						});
@@ -395,13 +393,12 @@ public class CacheManager {
 					SafeRunner.run(new SafeRunnable() {
 						@Override
 						public void run() throws Exception {
-							StateManager.getInstance().refreshState(node);
 							PersistenceManager.getInstance().setBaseTimestamp(node.getLocationURL(), node.attr.mtime);
 							if(sync) {
 								File file = getCacheFile(node);
 								file.setLastModified(node.attr.mtime);
 							}
-							FSModel.firePropertyChange(node);
+							StateManager.getInstance().refreshState(node);
 						}
 					});
 				}

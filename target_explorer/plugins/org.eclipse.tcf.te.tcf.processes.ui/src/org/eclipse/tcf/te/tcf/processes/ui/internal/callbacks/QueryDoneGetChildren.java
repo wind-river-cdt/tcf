@@ -14,7 +14,6 @@ import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.te.tcf.core.Tcf;
-import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 
 /**
@@ -27,13 +26,10 @@ public class QueryDoneGetChildren implements ISysMonitor.DoneGetChildren, Runnab
 	ISysMonitor service;
 	// The parent node to be queried.
 	ProcessTreeNode parentNode;
-	// The process model attached.
-	ProcessModel model;
 	/**
 	 * Create an instance with the field parameters.
 	 */
-	public QueryDoneGetChildren(ProcessModel model, IChannel channel, ISysMonitor service, ProcessTreeNode parentNode) {
-		this.model = model;
+	public QueryDoneGetChildren(IChannel channel, ISysMonitor service, ProcessTreeNode parentNode) {
 		this.channel = channel;
 		this.service = service;
 		this.parentNode = parentNode;
@@ -45,15 +41,21 @@ public class QueryDoneGetChildren implements ISysMonitor.DoneGetChildren, Runnab
 	 */
     @Override
     public void doneGetChildren(IToken token, Exception error, String[] contextIds) {
-        if (error == null && contextIds != null && contextIds.length > 0) {
-			IProcesses pService = channel.getRemoteService(IProcesses.class);
-			if (pService != null) {
-				CallbackMonitor monitor = new CallbackMonitor(this, (Object[])contextIds);
-				for (String contextId : contextIds) {
-					QueryDoneGetContext done = new QueryDoneGetContext(model, contextId, channel, monitor, parentNode); 
-					service.getContext(contextId, done);
-					pService.getContext(contextId, done);
+        if (error == null) {
+			if (contextIds != null && contextIds.length > 0) {
+				IProcesses pService = channel.getRemoteService(IProcesses.class);
+				if (pService != null) {
+					CallbackMonitor monitor = new CallbackMonitor(this, (Object[]) contextIds);
+					for (String contextId : contextIds) {
+						QueryDoneGetContext done = new QueryDoneGetContext(contextId, channel, monitor, parentNode);
+						service.getContext(contextId, done);
+						pService.getContext(contextId, done);
+					}
 				}
+			}
+			else {
+				parentNode.clearChildren();
+				run();
 			}
     	} else {
     		run();
@@ -68,7 +70,6 @@ public class QueryDoneGetChildren implements ISysMonitor.DoneGetChildren, Runnab
     public void run() {
 		parentNode.childrenQueryRunning = false;
 		parentNode.childrenQueried = true;
-		model.firePropertyChanged(parentNode);
 		Tcf.getChannelManager().closeChannel(channel);
     }
 }

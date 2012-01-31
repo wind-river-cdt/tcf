@@ -371,7 +371,7 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 			// stepper must be initialized before executing
 			if (!isInitialized()) {
 				throw new CoreException(new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
-					Messages.AbstractContextStepper_error_initializeNotCalled));
+												   Messages.AbstractContextStepper_error_initializeNotCalled));
 			}
 
 			// Create a container for collecting the non-severe status objects
@@ -434,7 +434,7 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 		// If no step group id is available, throw an exception
 		if (stepGroupId == null) {
 			throw new CoreException(new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
-							   NLS.bind(Messages.AbstractContextStepper_error_missingStepGroupId, getName())));
+							   				   NLS.bind(Messages.AbstractContextStepper_error_missingStepGroupId, getName())));
 		}
 
 		// Get the step group

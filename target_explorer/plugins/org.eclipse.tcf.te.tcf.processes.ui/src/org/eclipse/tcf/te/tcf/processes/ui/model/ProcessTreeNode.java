@@ -14,19 +14,21 @@ import java.util.List;
 import java.util.UUID;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.services.ISysMonitor.SysMonitorContext;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
+import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 import org.eclipse.tcf.te.ui.nls.Messages;
-import org.eclipse.tcf.te.ui.utils.PropertyChangeProvider;
 
 /**
  * Representation of a process tree node.
  */
-public final class ProcessTreeNode extends PropertyChangeProvider {
+public final class ProcessTreeNode extends PlatformObject implements IPeerModelProvider{
 	public static final ProcessTreeNode PENDING_NODE = createPendingNode();
 	
 	/**
@@ -114,7 +116,7 @@ public final class ProcessTreeNode extends PropertyChangeProvider {
 	/**
 	 * The tree node children.
 	 */
-	public List<ProcessTreeNode> children = new ArrayList<ProcessTreeNode>();
+	private List<ProcessTreeNode> children = new ArrayList<ProcessTreeNode>();
 
 	/**
 	 * Flag to mark once the children of the node got queried
@@ -241,4 +243,67 @@ public final class ProcessTreeNode extends PropertyChangeProvider {
 			firePropertyChange(new PropertyChangeEvent(this, "pContext", oldContext, pContext)); //$NON-NLS-1$
 		}
 	}
+
+	/**
+	 * Fire a property change event to notify one of the node's property has changed.
+	 * 
+	 * @param event The property change event.
+	 */
+	protected void firePropertyChange(PropertyChangeEvent event) {
+		if(peerNode != null) {
+			IViewerInput viewerInput = (IViewerInput) peerNode.getAdapter(IViewerInput.class);
+			viewerInput.firePropertyChange(event);
+		} else if(parent != null) {
+			parent.firePropertyChange(event);
+		}
+    }
+
+	/**
+	 * Add the specified the node to the children list.
+	 * 
+	 * @param node The child node to be added.
+	 */
+	public void addChild(ProcessTreeNode child) {
+		children.add(child);
+		PropertyChangeEvent event = new PropertyChangeEvent(this, "state", null, null); //$NON-NLS-1$
+		firePropertyChange(event);
+    }
+
+	/**
+	 * Remove the specified child node from its children list.
+	 * 
+	 * @param node The child node to be removed.
+	 */
+	public void removeChild(ProcessTreeNode child) {
+		children.remove(child);
+		PropertyChangeEvent event = new PropertyChangeEvent(this, "state", null, null); //$NON-NLS-1$
+		firePropertyChange(event);
+    }
+
+	/**
+	 * Clear the children of this folder.
+	 */
+	public void clearChildren() {
+		children.clear();
+		PropertyChangeEvent event = new PropertyChangeEvent(this, "state", null, null); //$NON-NLS-1$
+		firePropertyChange(event);
+    }
+	
+	/**
+	 * Get the children process list.
+	 * 
+	 * @return The children process list.
+	 */
+	public List<ProcessTreeNode> getChildren() {
+	    return children;
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider#getPeerModel()
+	 */
+	@Override
+    public IPeerModel getPeerModel() {
+	    return peerNode;
+    }
 }

@@ -23,7 +23,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.tcf.te.ui.interfaces.IPropertyChangeProvider;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
+import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
@@ -38,10 +40,12 @@ public abstract class BaseTitledSection extends AbstractPropertySection implemen
 
 	// The main composite used to create the section content.
 	protected Composite composite;
+
+	protected IViewerInput viewerInput;
 	
 	// The input node.
-	protected IPropertyChangeProvider provider;
-
+	protected IPeerModelProvider provider;
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#setInput(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
@@ -49,18 +53,21 @@ public abstract class BaseTitledSection extends AbstractPropertySection implemen
 	@Override
     public void setInput(IWorkbenchPart part, ISelection selection) {
         super.setInput(part, selection);
+		if (this.viewerInput != null) {
+			this.viewerInput.removePropertyChangeListener(this);
+		}
         Assert.isTrue(selection instanceof IStructuredSelection);
         Object input = ((IStructuredSelection) selection).getFirstElement();
-		if (this.provider != null) {
-			this.provider.removePropertyChangeListener(this);
-		}
-		if (input instanceof IPropertyChangeProvider) {
-			this.provider = (IPropertyChangeProvider) input;
-			if (this.provider != null) {
-				this.provider.addPropertyChangeListener(this);
+		if (input instanceof IPeerModelProvider) {
+			this.provider = (IPeerModelProvider) input;
+			IPeerModel peerNode = this.provider.getPeerModel();
+			this.viewerInput = (IViewerInput) peerNode.getAdapter(IViewerInput.class);
+			if (this.viewerInput != null) {
+				this.viewerInput.addPropertyChangeListener(this);
 			}
 		} else {
 			this.provider = null;
+			this.viewerInput = null;
 		}
 		updateInput(provider);
     }
@@ -70,7 +77,7 @@ public abstract class BaseTitledSection extends AbstractPropertySection implemen
 	 * 
 	 * @param input The input node.
 	 */
-	protected void updateInput(IPropertyChangeProvider input) {
+	protected void updateInput(IPeerModelProvider input) {
 	}
 
 	/*
@@ -79,8 +86,8 @@ public abstract class BaseTitledSection extends AbstractPropertySection implemen
 	 */
 	@Override
     public void aboutToBeHidden() {
-		if(this.provider != null) {
-			this.provider.removePropertyChangeListener(this);
+		if(this.viewerInput != null) {
+			this.viewerInput.removePropertyChangeListener(this);
 		}
     }
 	
@@ -217,13 +224,16 @@ public abstract class BaseTitledSection extends AbstractPropertySection implemen
 	 */
 	@Override
     public void propertyChange(PropertyChangeEvent event) {
-		updateInput(provider);
-		Display display = getPart().getSite().getShell().getDisplay();
-		display.asyncExec(new Runnable(){
-			@Override
-            public void run() {
-				refresh();
-			}});
+		if (event.getSource() == provider) {
+			updateInput(provider);
+			Display display = getPart().getSite().getShell().getDisplay();
+			display.asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					refresh();
+				}
+			});
+		}
     }
 
 	/**

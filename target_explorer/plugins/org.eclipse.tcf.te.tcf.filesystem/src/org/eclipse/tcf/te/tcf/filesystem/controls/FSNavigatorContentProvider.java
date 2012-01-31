@@ -10,12 +10,14 @@
 package org.eclipse.tcf.te.tcf.filesystem.controls;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.ui.trees.TreeContentProvider;
-import org.eclipse.tcf.te.ui.views.interfaces.IRoot;
 
 
 /**
@@ -29,30 +31,48 @@ public class FSNavigatorContentProvider extends TreeContentProvider {
 	@Override
 	public Object getParent(Object element) {
 		if (element instanceof FSTreeNode) {
-			FSTreeNode parent = ((FSTreeNode)element).parent;
-			// If the parent is a root node, return the associated peer node
-			if (parent != null) {
-				if (parent.isSystemRoot()) {
-					return parent.peerNode;
-				}
-				return parent;
-			}
-			return ((FSTreeNode) element).peerNode;
+			FSTreeNode node = (FSTreeNode) element;
+			return node.parent != null ? node.parent : node.peerNode;
 		}
 		return null;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.trees.TreeContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+	 */
+	@Override
+    public void inputChanged(final Viewer viewer, Object oldInput, Object newInput) {
+	    super.inputChanged(viewer, oldInput, newInput);
+	    UIPlugin plugin = UIPlugin.getDefault();
+		plugin.getClipboard().addPropertyChangeListener(commonViewerListener);
+		IPreferenceStore preferenceStore = plugin.getPreferenceStore();
+		preferenceStore.addPropertyChangeListener(commonViewerListener);
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.trees.TreeContentProvider#dispose()
+	 */
+	@Override
+    public void dispose() {
+	    UIPlugin plugin = UIPlugin.getDefault();
+	    plugin.getClipboard().removePropertyChangeListener(commonViewerListener);
+		IPreferenceStore preferenceStore = plugin.getPreferenceStore();
+		preferenceStore.removePropertyChangeListener(commonViewerListener);
+	    super.dispose();
+    }
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
 	 */
 	@Override
 	public Object[] getChildren(Object parentElement) {
-		Assert.isNotNull(parentElement);
+		super.getChildren(parentElement);
 
 		// For the file system, we need the peer node
 		if (parentElement instanceof IPeerModel) {
 			final IPeerModel peerNode = (IPeerModel)parentElement;
-			installPropertyChangeListener(peerNode);
 			// Get the file system model root node, if already stored
 			FSModel model = FSModel.getFSModel(peerNode);
 
@@ -134,16 +154,4 @@ public class FSNavigatorContentProvider extends TreeContentProvider {
 	protected boolean isRootNodeVisible() {
 		return true;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.trees.TreeContentProvider#isRootObject(java.lang.Object)
-	 */
-	@Override
-    protected boolean isRootObject(Object object) {
-		if(object instanceof IRoot) {
-			return true;
-		}
-	    return false;
-    }	
 }

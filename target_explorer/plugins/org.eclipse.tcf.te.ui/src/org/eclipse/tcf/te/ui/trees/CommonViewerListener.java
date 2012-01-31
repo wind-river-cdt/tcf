@@ -22,6 +22,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
@@ -30,28 +31,41 @@ import org.eclipse.swt.widgets.Tree;
  * CommonViewerListener listens to the property change event from the
  *  tree and update the viewer accordingly.
  */
-public abstract class CommonViewerListener extends TimerTask implements IPropertyChangeListener {
+class CommonViewerListener implements IPropertyChangeListener {
+	// The timer that process the property events periodically.
+	private static Timer viewerTimer;
+	static {
+		viewerTimer = new Timer("Viewer_Refresher", true); //$NON-NLS-1$
+	}
 	private static final long INTERVAL = 500;
 	private static final long MAX_IMMEDIATE_INTERVAL = 1000;
 	private static final Object NULL = new Object();
-	// The common viewer
+	// The tree viewer
 	private TreeViewer viewer;
+	// The content provider
+	private ITreeContentProvider contentProvider;
 	// Last time that the property event was processed.
 	private long lastTime = 0;
-	// The timer that process the property events periodically.
-	private Timer timer;
 	// The current queued property event sources.
 	private Queue<Object> queue;
+	// The timer task to process the property events periodically.
+	private TimerTask task;
 
 	/***
-	 * Create an instance for the specified common viewer.
+	 * Create an instance for the specified tree content provider.
 	 *
-	 * @param viewer The common viewer.
+	 * @param viewer The tree content provider.
 	 */
-	public CommonViewerListener(TreeViewer viewer) {
+	public CommonViewerListener(TreeViewer viewer, ITreeContentProvider contentProvider) {
+		Assert.isNotNull(viewer);
 		this.viewer = viewer;
-		this.timer = new Timer();
-		this.timer.schedule(this, INTERVAL, INTERVAL);
+		this.contentProvider = contentProvider;
+		this.task = new TimerTask(){
+			@Override
+            public void run() {
+				handleEvent();
+            }};
+		viewerTimer.schedule(this.task, INTERVAL, INTERVAL);
 		this.queue = new ConcurrentLinkedQueue<Object>();
 	}
 
@@ -61,47 +75,66 @@ public abstract class CommonViewerListener extends TimerTask implements IPropert
 	 */
 	@Override
     public void propertyChange(final PropertyChangeEvent event) {
-		long now = System.currentTimeMillis();
 		Object object = event.getSource();
-		if(object == null)
-			object = NULL;
-		queue.offer(object);
+		Assert.isTrue(object != null);
+		long now = System.currentTimeMillis();
+		synchronized (queue) {
+			queue.offer(object);
+		}
 		if(now - lastTime > MAX_IMMEDIATE_INTERVAL) {
-			run();
+			TimerTask temp = new TimerTask() {
+				@Override
+                public void run() {
+					handleEvent();
+                }
+			};
+			viewerTimer.schedule(temp, 0);
 		}
     }
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.TimerTask#run()
+	/**
+	 * Handle the current events in the event queue.
 	 */
-	@Override
-	public void run() {
-		if (!queue.isEmpty()) {
-			Object[] objects = queue.toArray();
-			Object object = mergeObjects(objects);
-			if (object instanceof List<?>) {
-				List<?> list = (List<?>) object;
-				if (list.isEmpty()) {
-					object = NULL;
-				}
-				else if (list.size() == 1) {
-					object = list.get(0);
-					if(isRootObject(object)) {
-						object = NULL;
-					}
-				}
-				else {
-					// If there are multiple root nodes, then select NULL as the final root.
-					object = getCommonAncestor((List<?>)object);
-					if(object == null) object = NULL;
-				}
-			}
-			processObject(object);
+	void handleEvent() {
+		Object[] objects;
+		synchronized (queue) {
+			objects = queue.toArray();
 			queue.clear();
+		}
+		if (objects.length > 0) {
+			List<Object> list = mergeObjects(objects);
+			Object object = getRefreshRoot(list);
+			processObject(object);
 			lastTime = System.currentTimeMillis();
 		}
 	}
+
+	/**
+	 * Get the refreshing root for the object list.
+	 * 
+	 * @param objects The objects to be refreshed.
+	 * @return The root of these objects.
+	 */
+	private Object getRefreshRoot(List<Object> objects) {
+		if (objects.isEmpty()) {
+	    	return NULL;
+	    }
+	    else if (objects.size() == 1) {
+	    	Object object = objects.get(0);
+	    	if (contentProvider.getParent(object) == null) {
+	    		return NULL;
+	    	}
+	    	return object;
+	    }
+	    else {
+	    	// If there are multiple root nodes, then select NULL as the final root.
+			Object object = getCommonAncestor(objects);
+			if (object == null || contentProvider.getParent(object) == null) {
+				return NULL;
+			}
+			return object;
+	    }
+    }
 
 	/**
 	 * Get a object which is the common ancestor of the specified objects.
@@ -109,7 +142,7 @@ public abstract class CommonViewerListener extends TimerTask implements IPropert
 	 * @param objects The object list.
 	 * @return The common ancestor.
 	 */
-	private Object getCommonAncestor(List<?> objects) {
+	private Object getCommonAncestor(List<Object> objects) {
 		Assert.isTrue(objects.size() > 1);
 		Object object1 = objects.get(0);
 		for (int i = 1; i < objects.size(); i++) {
@@ -137,12 +170,12 @@ public abstract class CommonViewerListener extends TimerTask implements IPropert
 			return object2;
 		}
 		Object ancestor = null;
-		Object parent1 = getParent(object1);
+		Object parent1 = contentProvider.getParent(object1);
 		if(parent1 != null) {
 			ancestor = getCommonAncestor(parent1, object2);
 		}
 		if(ancestor != null) return ancestor;
-		Object parent2 = getParent(object2);
+		Object parent2 = contentProvider.getParent(object2);
 		if(parent2 != null) {
 			ancestor = getCommonAncestor(object1, parent2);
 		}
@@ -150,23 +183,19 @@ public abstract class CommonViewerListener extends TimerTask implements IPropert
 	}
 
 	/**
-	 * If the specified object is a root object;
-	 *
-	 * @param object The object to be tested.
-	 * @return true if it is root object.
-	 */
-	protected abstract boolean isRootObject(Object object);
-
-	/**
 	 * Merge the current objects into an ancestor object.
 	 *
 	 * @param objects The objects to be merged.
 	 * @return NULL or a list presenting the top objects.
 	 */
-	private Object mergeObjects(Object[] objects) {
+	private List<Object> mergeObjects(Object[] objects) {
 		// If one object is NULL, then return NULL
+		List<Object> result = new ArrayList<Object>();
 		for (Object object : objects) {
-			if (object == NULL) return NULL;
+			if (object == NULL) {
+				result.add(NULL);
+				return result;
+			}
 		}
 		// Remove duplicates.
 		List<Object> list = Arrays.asList(objects);
@@ -174,7 +203,6 @@ public abstract class CommonViewerListener extends TimerTask implements IPropert
 		objects = set.toArray();
 
 		list = Arrays.asList(objects);
-		List<Object> result = new ArrayList<Object>();
 		for (Object object : list) {
 			if (!hasAncestor(object, list)) {
 				result.add(object);
@@ -208,18 +236,10 @@ public abstract class CommonViewerListener extends TimerTask implements IPropert
 	 */
 	private boolean isAncestorOf(Object object1, Object object2) {
 		if (object2 == null) return false;
-		Object parent = getParent(object2);
+		Object parent = contentProvider.getParent(object2);
 		if (parent == object1) return true;
 		return isAncestorOf(object1, parent);
    }
-
-	/**
-	 * Get the element's parent object.
-	 *
-	 * @param element The element
-	 * @return The parent of the element.
-	 */
-	protected abstract Object getParent(Object element);
 
 	/**
 	 * Process the object node.
@@ -248,5 +268,12 @@ public abstract class CommonViewerListener extends TimerTask implements IPropert
 	    		});
 	    	}
 	    }
+    }
+
+	/**
+	 * Cancel the current task and the current timer.
+	 */
+	public void cancel() {
+		task.cancel();
     }
 }

@@ -10,7 +10,6 @@
 package org.eclipse.tcf.te.tcf.filesystem.internal.operations;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -28,7 +27,6 @@ import org.eclipse.tcf.te.tcf.filesystem.dialogs.TimeTriggeredProgressMonitorDia
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.PersistenceManager;
-import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 import org.eclipse.ui.PlatformUI;
@@ -90,8 +88,6 @@ public class FSCopy extends FSOperation {
 				}
 				finally {
 					if (channel != null) Tcf.getChannelManager().closeChannel(channel);
-					// Refresh the file system tree.
-					FSModel.firePropertyChange(head);
 					monitor.done();
 				}
 			}
@@ -174,7 +170,7 @@ public class FSCopy extends FSOperation {
 	 * @throws InterruptedException The exception thrown when the operation is canceled.
 	 */
 	private void copyChildren(IProgressMonitor monitor, IFileSystem service, FSTreeNode node, FSTreeNode dest) throws TCFFileSystemException, InterruptedException {
-	    List<FSTreeNode> children = new ArrayList<FSTreeNode>(getChildren(node, service));
+	    List<FSTreeNode> children = getChildren(node, service);
 	    if (!children.isEmpty()) {
 	    	for (FSTreeNode child : children) {
 	    		// Iterate and copy its children nodes.

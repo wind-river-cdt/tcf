@@ -409,6 +409,14 @@
             id="org.eclipse.tcf.te.ui.controls.viewer.processes"
             menuId="org.eclipse.tcf.te.ui.controls.menu.processes"
             persistent="true">
+         <creation>
+            <style
+                  name="SWT.FULL_SELECTION">
+            </style>
+            <style
+                  name="SWT.MULTI">
+            </style>
+         </creation>
       </viewer>
       <columnContribution
       		viewerId="org.eclipse.tcf.te.ui.controls.viewer.processes">

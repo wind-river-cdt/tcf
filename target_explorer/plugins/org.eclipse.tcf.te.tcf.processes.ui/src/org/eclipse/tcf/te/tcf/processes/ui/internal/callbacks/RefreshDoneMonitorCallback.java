@@ -15,7 +15,6 @@ import java.util.Queue;
 
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.services.ISysMonitor;
-import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 
 /**
@@ -33,8 +32,6 @@ public class RefreshDoneMonitorCallback implements Runnable {
 	Runnable callback;
 	// The service used to fetch process context.
 	ISysMonitor service;
-	// The process model used to fire property change events.
-	ProcessModel model;
 	// The TCF channel.
 	IChannel channel;
 
@@ -42,13 +39,12 @@ public class RefreshDoneMonitorCallback implements Runnable {
 	 * Create an instance with parameters to initialize the fields.
 	 */
 	public RefreshDoneMonitorCallback(List<ProcessTreeNode> newNodes, ProcessTreeNode parentNode, 
-					Queue<ProcessTreeNode> queue, Runnable callback, ISysMonitor service, ProcessModel model, IChannel channel) {
+					Queue<ProcessTreeNode> queue, Runnable callback, ISysMonitor service, IChannel channel) {
 		this.newNodes = newNodes;
 		this.parentNode = parentNode;
 		this.queue = queue;
 		this.callback = callback;
 		this.service = service;
-		this.model = model;
 		this.channel = channel;
 	}
 
@@ -61,7 +57,7 @@ public class RefreshDoneMonitorCallback implements Runnable {
 		parentNode.childrenQueryRunning = false;
 		parentNode.childrenQueried = true;
 		removeDead();
-		for (ProcessTreeNode node : parentNode.children) {
+		for (ProcessTreeNode node : parentNode.getChildren()) {
 			if (node.childrenQueried && !node.childrenQueryRunning) {
 				queue.offer(node);
 			}
@@ -73,7 +69,7 @@ public class RefreshDoneMonitorCallback implements Runnable {
 		}
 		else {
 			ProcessTreeNode node = queue.poll();
-			service.getChildren(node.id, new RefreshDoneGetChildren(model, callback, queue, channel, service, node));
+			service.getChildren(node.id, new RefreshDoneGetChildren(callback, queue, channel, service, node));
 		}
 	}
 
@@ -82,14 +78,14 @@ public class RefreshDoneMonitorCallback implements Runnable {
 	 */
 	private void removeDead() {
 		List<ProcessTreeNode> dead = new ArrayList<ProcessTreeNode>();
-		for (ProcessTreeNode node : parentNode.children) {
+		for (ProcessTreeNode node : parentNode.getChildren()) {
 			int index = searchInList(node, newNodes);
 			if (index == -1) {
 				dead.add(node);
 			}
 		}
 		for (ProcessTreeNode node : dead) {
-			parentNode.children.remove(node);
+			parentNode.removeChild(node);
 		}
 	}
 

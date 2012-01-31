@@ -13,11 +13,8 @@ import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.interfaces.preferences.IPreferenceKeys;
-import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 
 
 /**
@@ -48,13 +45,5 @@ public class PreferencesInitializer extends AbstractPreferenceInitializer {
 		preferenceStore.setDefault(PreferencePage.PREF_RENAMING_IN_PLACE_EDITOR, PreferencePage.DEFAULT_RENAMING_IN_PLACE_EDITOR);
 		preferenceStore.setDefault(PreferencePage.PREF_COPY_PERMISSION, PreferencePage.DEFAULT_COPY_PERMISSION);
 		preferenceStore.setDefault(PreferencePage.PREF_COPY_OWNERSHIP, PreferencePage.DEFAULT_COPY_OWNERSHIP);
-		preferenceStore.addPropertyChangeListener(new IPropertyChangeListener(){
-			@Override
-            public void propertyChange(PropertyChangeEvent event) {
-				if (event.getProperty().equals(PreferencePage.PREF_AUTOSAVING)) {
-					// Refresh the tree nodes' decorations.
-					FSModel.notifyAllChanged();
-				}
-            }});
 	}
 }

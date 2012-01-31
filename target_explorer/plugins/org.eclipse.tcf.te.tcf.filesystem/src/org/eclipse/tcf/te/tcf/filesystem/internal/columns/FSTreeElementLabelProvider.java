@@ -50,33 +50,34 @@ public class FSTreeElementLabelProvider extends LabelProvider {
 	 */
 	@Override
 	public Image getImage(Object element) {
-		if (element != null) {
-			if (element instanceof FSTreeNode) {
-				FSTreeNode node = (FSTreeNode) element;
-				if (node.isSystemRoot()) {
-					return UIPlugin.getImage(ImageConsts.ROOT);
-				}
-				else if (node.isRoot()) {
-					return UIPlugin.getImage(ImageConsts.ROOT_DRIVE);
-				}
-				else if (node.isDirectory()) {
-					return UIPlugin.getImage(ImageConsts.FOLDER);
-				}
-				else if (node.isFile()) {
-					String key = node.name;
-					Image image = UIPlugin.getImage(key);
-					if (image == null) {
-						ImageDescriptor descriptor = getEditorRegistry().getImageDescriptor(key);
-						if (descriptor == null) {
-							descriptor = getEditorRegistry().getSystemExternalEditorImageDescriptor(key);
-						}
-						if (descriptor != null) {
-							UIPlugin.getDefault().getImageRegistry().put(key, descriptor);
-						}
-						image = UIPlugin.getImage(key);
+		if (element instanceof FSTreeNode) {
+			FSTreeNode node = (FSTreeNode) element;
+			if (node.isPendingNode()) {
+				return UIPlugin.getImage(ImageConsts.PENDING);
+			}
+			else if (node.isSystemRoot()) {
+				return UIPlugin.getImage(ImageConsts.ROOT);
+			}
+			else if (node.isRoot()) {
+				return UIPlugin.getImage(ImageConsts.ROOT_DRIVE);
+			}
+			else if (node.isDirectory()) {
+				return UIPlugin.getImage(ImageConsts.FOLDER);
+			}
+			else if (node.isFile()) {
+				String key = node.name;
+				Image image = UIPlugin.getImage(key);
+				if (image == null) {
+					ImageDescriptor descriptor = getEditorRegistry().getImageDescriptor(key);
+					if (descriptor == null) {
+						descriptor = getEditorRegistry().getSystemExternalEditorImageDescriptor(key);
 					}
-					return image;
+					if (descriptor != null) {
+						UIPlugin.getDefault().getImageRegistry().put(key, descriptor);
+					}
+					image = UIPlugin.getImage(key);
 				}
+				return image;
 			}
 		}
 

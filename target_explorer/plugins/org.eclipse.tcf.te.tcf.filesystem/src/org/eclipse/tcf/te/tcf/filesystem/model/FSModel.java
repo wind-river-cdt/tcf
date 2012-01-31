@@ -10,14 +10,11 @@
 package org.eclipse.tcf.te.tcf.filesystem.model;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.SafeRunner;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
@@ -34,41 +31,12 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.testers.TargetPropertyTester;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.CacheManager;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.model.Model;
-import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 
 /**
  * The file system model implementation.
  */
 public final class FSModel {
 	/* default */static final String FSMODEL_KEY = UIPlugin.getUniqueIdentifier() + ".file.system"; //$NON-NLS-1$
-	// All of the file system models used for global notification.
-	private static List<FSModel> allModels;
-
-	/**
-	 * Add a file system model to the list.
-	 * 
-	 * @param model The new file system model.
-	 */
-	private static void addModel(FSModel model) {
-		if (allModels == null) {
-			allModels = Collections.synchronizedList(new ArrayList<FSModel>());
-		}
-		allModels.add(model);
-	}
-
-	/**
-	 * Notify all the file system model that the model has changed.
-	 */
-	public static void notifyAllChanged() {
-		if (allModels != null) {
-			for (FSModel model : allModels) {
-				IViewerInput viewerInput = (IViewerInput) model.peerModel.getAdapter(IViewerInput.class);
-				FSTreeNode root = FSModel.getFSModel(model.peerModel).getRoot();
-				PropertyChangeEvent event = new PropertyChangeEvent(root, "state", null, null); //$NON-NLS-1$
-				viewerInput.firePropertyChange(event);
-			}
-		}
-	}
 
 	/**
 	 * Get the file system model of the peer model. If it does not
@@ -101,13 +69,10 @@ public final class FSModel {
 
 	// The root node of the peer model
 	private FSTreeNode root;
-	private IPeerModel peerModel;
 	/**
 	 * Create a File System Model.
 	 */
 	private FSModel(IPeerModel peerModel) {
-		this.peerModel = peerModel;
-		addModel(this);
 	}
 
 	/**
@@ -298,16 +263,6 @@ public final class FSModel {
 		}
 		return null;
 	}
-	
-
-	/**
-	 * Fire a property change event for the node.
-	 */
-	public static void firePropertyChange(FSTreeNode node) {
-		IViewerInput viewerInput = (IViewerInput) node.peerNode.getAdapter(IViewerInput.class);
-		PropertyChangeEvent event = new PropertyChangeEvent(node, "state", null, null); //$NON-NLS-1$
-		viewerInput.firePropertyChange(event);
-    }
 
 	/**
 	 * Create a root node for the specified peer.

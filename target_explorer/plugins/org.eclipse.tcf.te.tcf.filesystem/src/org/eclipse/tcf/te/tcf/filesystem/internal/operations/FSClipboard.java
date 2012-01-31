@@ -11,12 +11,14 @@ package org.eclipse.tcf.te.tcf.filesystem.internal.operations;
 
 import java.util.List;
 
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
+import org.eclipse.tcf.te.ui.utils.PropertyChangeProvider;
 
 /**
  * The clip board to which copy or cut files/folders.
  */
-public class FSClipboard {
+public class FSClipboard extends PropertyChangeProvider {
 	// The constants to define the current operation type of the clip board.
 	public static final int NONE = -1;
 	public static final int CUT = 0;
@@ -68,6 +70,10 @@ public class FSClipboard {
 	public void cutFiles(List<FSTreeNode> files) {
 		operation = CUT;
 		this.files = files;
+		for (FSTreeNode file : files) {
+			PropertyChangeEvent event = new PropertyChangeEvent(file, "cut", null, null); //$NON-NLS-1$
+			firePropertyChange(event);
+		}
 	}
 
 	/**
@@ -78,6 +84,10 @@ public class FSClipboard {
 	public void copyFiles(List<FSTreeNode> files) {
 		operation = COPY;
 		this.files = files;
+		for (FSTreeNode file : files) {
+			PropertyChangeEvent event = new PropertyChangeEvent(file, "copy", null, null); //$NON-NLS-1$
+			firePropertyChange(event);
+		}
 	}
 
 	/**
@@ -85,6 +95,11 @@ public class FSClipboard {
 	 */
 	public void clear() {
 		operation = NONE;
+		List<FSTreeNode> nodes = files;
 		this.files = null;
+		for (FSTreeNode node : nodes) {
+			PropertyChangeEvent event = new PropertyChangeEvent(node, "clear", null, null); //$NON-NLS-1$
+			firePropertyChange(event);
+		}
 	}
 }
