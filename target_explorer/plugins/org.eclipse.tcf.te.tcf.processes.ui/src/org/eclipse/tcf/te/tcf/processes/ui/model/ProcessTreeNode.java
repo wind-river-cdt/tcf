@@ -177,12 +177,37 @@ public final class ProcessTreeNode extends PlatformObject implements IPeerModelP
 		name = aContext.getName();
 		type = "ProcNode";  //$NON-NLS-1$
 		id = aContext.getID();
-		pid = -1;
-		ppid = -1;
+		if(id != null) {
+			pid = parsePID(id);
+		} else {
+			pid = -1;
+		}
 		parentId = aContext.getParentID();
+		if(parentId != null) {
+			ppid = parsePID(parentId);
+		} else {
+			ppid = -1;
+		}
 		parent = parentNode;
 		peerNode = parentNode.peerNode;
     }
+	
+	/**
+	 * Parse a process id from string to long.
+	 * 
+	 * @param string The string expression of the process id.
+	 * @return a long process id or -1 if it is not able to be parsed.
+	 */
+	private long parsePID(String string) {
+		if(string.startsWith("P")) { //$NON-NLS-1$
+			string = string.substring(1);
+		}
+		try {
+			return Long.parseLong(string);
+		} catch(NumberFormatException nfe) {
+			return -1;
+		}
+	}
 
 	/**
 	 * Return if this node is a pending node.
