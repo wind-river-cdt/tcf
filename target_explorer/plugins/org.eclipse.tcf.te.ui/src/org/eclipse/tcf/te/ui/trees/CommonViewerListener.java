@@ -13,11 +13,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -38,16 +36,13 @@ class CommonViewerListener implements IPropertyChangeListener {
 		viewerTimer = new Timer("Viewer_Refresher", true); //$NON-NLS-1$
 	}
 	private static final long INTERVAL = 500;
-	private static final long MAX_IMMEDIATE_INTERVAL = 1000;
 	private static final Object NULL = new Object();
 	// The tree viewer
 	private TreeViewer viewer;
 	// The content provider
 	private ITreeContentProvider contentProvider;
-	// Last time that the property event was processed.
-	private long lastTime = 0;
 	// The current queued property event sources.
-	private Queue<Object> queue;
+	private List<Object> queue;
 	// The timer task to process the property events periodically.
 	private TimerTask task;
 
@@ -56,17 +51,17 @@ class CommonViewerListener implements IPropertyChangeListener {
 	 *
 	 * @param viewer The tree content provider.
 	 */
-	public CommonViewerListener(TreeViewer viewer, ITreeContentProvider contentProvider) {
+	public CommonViewerListener(TreeViewer viewer) {
 		Assert.isNotNull(viewer);
 		this.viewer = viewer;
-		this.contentProvider = contentProvider;
+		this.contentProvider = (ITreeContentProvider) viewer.getContentProvider();
 		this.task = new TimerTask(){
 			@Override
             public void run() {
 				handleEvent();
             }};
 		viewerTimer.schedule(this.task, INTERVAL, INTERVAL);
-		this.queue = new ConcurrentLinkedQueue<Object>();
+		this.queue = new ArrayList<Object>();
 	}
 
 	/*
@@ -74,38 +69,32 @@ class CommonViewerListener implements IPropertyChangeListener {
 	 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
 	 */
 	@Override
-    public void propertyChange(final PropertyChangeEvent event) {
+    public synchronized void propertyChange(PropertyChangeEvent event) {
 		Object object = event.getSource();
 		Assert.isTrue(object != null);
-		long now = System.currentTimeMillis();
-		synchronized (queue) {
-			queue.offer(object);
-		}
-		if(now - lastTime > MAX_IMMEDIATE_INTERVAL) {
-			TimerTask temp = new TimerTask() {
-				@Override
-                public void run() {
-					handleEvent();
-                }
-			};
-			viewerTimer.schedule(temp, 0);
-		}
+		queue.add(object);
     }
+	
+	/**
+	 * Get and empty the queued objects.
+	 * 
+	 * @return The objects in current queue.
+	 */
+	synchronized Object[] emptyQueue() {
+		Object[] objects = queue.toArray();
+		queue.clear();
+		return objects;
+	}
 
 	/**
 	 * Handle the current events in the event queue.
 	 */
 	void handleEvent() {
-		Object[] objects;
-		synchronized (queue) {
-			objects = queue.toArray();
-			queue.clear();
-		}
+		Object[] objects = emptyQueue();
 		if (objects.length > 0) {
 			List<Object> list = mergeObjects(objects);
 			Object object = getRefreshRoot(list);
 			processObject(object);
-			lastTime = System.currentTimeMillis();
 		}
 	}
 

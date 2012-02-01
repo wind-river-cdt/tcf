@@ -23,8 +23,8 @@ import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.services.ISysMonitor.SysMonitorContext;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
+import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
-import org.eclipse.tcf.te.ui.nls.Messages;
 
 /**
  * Representation of a process tree node.
@@ -54,6 +54,7 @@ public final class ProcessTreeNode extends PlatformObject implements IPeerModelP
 		ProcessTreeNode node = new ProcessTreeNode();
 		node.type = "ProcRootNode"; //$NON-NLS-1$
 		node.peerNode = peerModel;
+		node.name = Messages.ProcessLabelProvider_RootNodeLabel;
 		return node;
 	}
 	
@@ -381,5 +382,4 @@ public final class ProcessTreeNode extends PlatformObject implements IPeerModelP
 			firePropertyChange(new PropertyChangeEvent(this, "sContext", oldContext, context)); //$NON-NLS-1$
 		}
     }
-
 }

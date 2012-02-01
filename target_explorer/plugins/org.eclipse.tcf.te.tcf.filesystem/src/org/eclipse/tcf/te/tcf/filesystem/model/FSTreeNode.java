@@ -609,7 +609,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 		FSTreeNode node = new FSTreeNode();
 		node.type = "FSRootNode"; //$NON-NLS-1$
 		node.peerNode = peerNode;
-		node.name = org.eclipse.tcf.te.tcf.filesystem.nls.Messages.FSTreeNodeContentProvider_rootNode_label;
+		node.name = Messages.FSTreeNodeContentProvider_rootNode_label;
 	    return node;
     }
 
@@ -631,7 +631,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 	static FSTreeNode createPendingNode() {
 		if (Protocol.isDispatchThread()) {
 			FSTreeNode pendingNode = new FSTreeNode();
-			pendingNode.name = org.eclipse.tcf.te.ui.nls.Messages.PendingOperation_label;
+			pendingNode.name = Messages.PendingOperation_label;
 			pendingNode.type = "FSPendingNode"; //$NON-NLS-1$
 			return pendingNode;
 		}

@@ -327,4 +327,5 @@ public class Messages extends NLS {
 	public static String NewNodeWizardPage_LstatTimedout;
 	public static String NewNodeWizardPage_PromptFolderLabel;
 	public static String WindowsAttributesSection_Attributes;
+	public static String PendingOperation_label;
 }

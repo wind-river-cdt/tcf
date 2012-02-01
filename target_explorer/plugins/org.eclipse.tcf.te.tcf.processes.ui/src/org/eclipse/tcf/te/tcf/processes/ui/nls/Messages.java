@@ -19,6 +19,7 @@ public class Messages extends NLS {
 	// The plug-in resource bundle name
 	private static final String BUNDLE_NAME = "org.eclipse.tcf.te.tcf.processes.ui.nls.Messages"; //$NON-NLS-1$
 
+
 	/**
 	 * Static constructor.
 	 */
@@ -195,4 +196,6 @@ public class Messages extends NLS {
 	public static String GeneralInformationPage_Type;
 
 	public static String GeneralInformationPage_User;
+	
+	public static String PendingOperation_label;
 }
