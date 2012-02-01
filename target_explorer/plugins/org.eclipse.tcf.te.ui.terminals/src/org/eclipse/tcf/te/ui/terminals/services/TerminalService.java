@@ -62,8 +62,8 @@ public class TerminalService extends AbstractService implements ITerminalService
 	 * Executes the given runnable operation and invokes the given callback, if any,
 	 * after the operation finished.
 	 *
-	 * @param properties The terminal properties. Must be not <code>null</code>.
-	 * @param runnable The terminal service runnable. Must be not <code>null</code>.
+	 * @param properties The terminal properties. Must not be <code>null</code>.
+	 * @param runnable The terminal service runnable. Must not be <code>null</code>.
 	 * @param callback The target callback to invoke if the operation has been finished or <code>null</code>.
 	 */
 	protected final void executeServiceOperation(final IPropertiesContainer properties, final TerminalServiceRunnable runnable, final ICallback callback) {
@@ -140,7 +140,7 @@ public class TerminalService extends AbstractService implements ITerminalService
 	/**
 	 * Creates the terminal connector configured within the given properties.
 	 *
-	 * @param properties The terminal console properties. Must be not <code>null</code>.
+	 * @param properties The terminal console properties. Must not be <code>null</code>.
 	 * @return The terminal connector or <code>null</code>.
 	 */
 	protected ITerminalConnector createTerminalConnector(IPropertiesContainer properties) {

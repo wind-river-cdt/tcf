@@ -187,7 +187,7 @@ public abstract class AbstractContextStep extends ExecutableExtension implements
 	 * delayed states are available and the callback is invoked not with an error status, the
 	 * delayed states will be reported instead.
 	 *
-	 * @param status The status to delay. Must be not <code>null</code> and either a warning or info status.
+	 * @param status The status to delay. Must not be <code>null</code> and either a warning or info status.
 	 */
 	protected void delayStatus(IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IStatus status) {
 		Assert.isNotNull(status);

@@ -226,7 +226,7 @@ public class TerminalsView extends ViewPart implements ITerminalsView {
 	/**
 	 * Creates the tab folder manager.
 	 *
-	 * @param parentView The parent view instance. Must be not <code>null</code>.
+	 * @param parentView The parent view instance. Must not be <code>null</code>.
 	 * @return The tab folder manager. Must never be <code>null</code>.
 	 */
 	protected TabFolderManager doCreateTabFolderManager(ITerminalsView parentView) {
@@ -237,7 +237,7 @@ public class TerminalsView extends ViewPart implements ITerminalsView {
 	/**
 	 * Creates the tab folder menu handler.
 	 *
-	 * @param parentView The parent view instance. Must be not <code>null</code>.
+	 * @param parentView The parent view instance. Must not be <code>null</code>.
 	 * @return The tab folder menu handler. Must never be <code>null</code>.
 	 */
 	protected TabFolderMenuHandler doCreateTabFolderMenuHandler(ITerminalsView parentView) {
@@ -258,7 +258,7 @@ public class TerminalsView extends ViewPart implements ITerminalsView {
 	/**
 	 * Creates the tab folder toolbar handler.
 	 *
-	 * @param parentView The parent view instance. Must be not <code>null</code>.
+	 * @param parentView The parent view instance. Must not be <code>null</code>.
 	 * @return The tab folder toolbar handler. Must never be <code>null</code>.
 	 */
 	protected TabFolderToolbarHandler doCreateTabFolderToolbarHandler(ITerminalsView parentView) {

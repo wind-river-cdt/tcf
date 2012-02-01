@@ -88,7 +88,7 @@ public abstract class AbstractExtensionPointManager<V> {
 	 * <p>
 	 * For the order of the extensions, see {@link ExtensionPointComparator}.
 	 *
-	 * @param point The extension point. Must be not <code>null</code>.
+	 * @param point The extension point. Must not be <code>null</code>.
 	 * @return The extensions in sorted order or an empty array if the extension point has no extensions.
 	 */
 	protected IExtension[] getExtensionsSorted(IExtensionPoint point) {

@@ -458,10 +458,10 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 	/**
 	 * Executes a step group.
 	 *
-	 * @param stepGroup The step group. Must be not <code>null</code>.
-	 * @param statusContainer A list holding the warnings occurred during the execution. Must be not <code>null</code>.
-	 * @param executedSteps A list holding the id's of the steps executed before. Must be not <code>null</code>.
-	 * @param fullQualifiedGroupId The hierarchy of all parent step group id's separated by "::". Must be not <code>null</code>.
+	 * @param stepGroup The step group. Must not be <code>null</code>.
+	 * @param statusContainer A list holding the warnings occurred during the execution. Must not be <code>null</code>.
+	 * @param executedSteps A list holding the id's of the steps executed before. Must not be <code>null</code>.
+	 * @param fullQualifiedGroupId The hierarchy of all parent step group id's separated by "::". Must not be <code>null</code>.
 	 *
 	 * @throws CoreException If the execution fails.
 	 */
@@ -524,10 +524,10 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 	 * Executes a step groupable. The groupable might encapsulate a
 	 * step or a step group.
 	 *
-	 * @param step The step groupable. Must be not <code>null</code>.
-	 * @param statusContainer A list holding the warnings occurred during the execution. Must be not <code>null</code>.
-	 * @param executedSteps A list holding the id's of the steps executed before. Must be not <code>null</code>.
-	 * @param fullQualifiedParentId The hierarchy of all parent step group id's separated by "::". Must be not <code>null</code>.
+	 * @param step The step groupable. Must not be <code>null</code>.
+	 * @param statusContainer A list holding the warnings occurred during the execution. Must not be <code>null</code>.
+	 * @param executedSteps A list holding the id's of the steps executed before. Must not be <code>null</code>.
+	 * @param fullQualifiedParentId The hierarchy of all parent step group id's separated by "::". Must not be <code>null</code>.
 	 *
 	 * @throws CoreException If the execution failed.
 	 */
@@ -613,8 +613,8 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 	 * Checks if all required dependencies have been executed before. If not, the method
 	 * will throw an error status.
 	 *
-	 * @param groupable The groupable. Must be not <code>null</code>.
-	 * @param executedSteps A list holding the id's of the steps executed before. Must be not <code>null</code>.
+	 * @param groupable The groupable. Must not be <code>null</code>.
+	 * @param executedSteps A list holding the id's of the steps executed before. Must not be <code>null</code>.
 	 *
 	 * @throws CoreException If a dependency has not been executed before.
 	 */
@@ -705,7 +705,7 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 	 * steps returns {@link IProgressMonitor#UNKNOWN}, the total work will
 	 * be unknown for the whole step group.
 	 *
-	 * @param stepGroup The step group. Must be not <code>null</code>.
+	 * @param stepGroup The step group. Must not be <code>null</code>.
 	 * @return The total work required or {@link IProgressMonitor#UNKNOWN}.
 	 *
 	 * @throws CoreException If the total work of the step group cannot be determined.
@@ -756,8 +756,8 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 	 * If the associated status contains a CANCEL status object, the passed in
 	 * exception and the associated status objects are returned unmodified.
 	 *
-	 * @param e The core exception. Must be not <code>null</code>.
-	 * @param statusContainer The list of non-severe status objects. Must be not <code>null</code>.
+	 * @param e The core exception. Must not be <code>null</code>.
+	 * @param statusContainer The list of non-severe status objects. Must not be <code>null</code>.
 	 * @return The exception to re-throw or <code>null</code>.
 	 */
 	private CoreException normalizeStatus(Exception e, List<IStatus> statusContainer) {

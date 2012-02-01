@@ -22,7 +22,7 @@ public interface ITerminalService extends IService {
 	/**
 	 * Opens a terminal asynchronously and invokes the given callback if done.
 	 *
-	 * @param properties The terminal properties. Must be not <code>null</code>.
+	 * @param properties The terminal properties. Must not be <code>null</code>.
 	 * @param callback The target callback to invoke if finished or <code>null</code>.
 	 */
 	public void openConsole(IPropertiesContainer properties, ICallback callback);
@@ -30,7 +30,7 @@ public interface ITerminalService extends IService {
 	/**
 	 * Close the terminal asynchronously and invokes the given callback if done.
 	 *
-	 * @param properties The terminal properties. Must be not <code>null</code>.
+	 * @param properties The terminal properties. Must not be <code>null</code>.
 	 * @param callback The target callback to invoke if finished or <code>null</code>.
 	 */
 	public void closeConsole(IPropertiesContainer properties, ICallback callback);
@@ -38,7 +38,7 @@ public interface ITerminalService extends IService {
 	/**
 	 * Terminate (disconnect) the terminal asynchronously and invokes the given callback if done.
 	 *
-	 * @param properties The terminal properties. Must be not <code>null</code>.
+	 * @param properties The terminal properties. Must not be <code>null</code>.
 	 * @param callback The target callback to invoke if finished or <code>null</code>.
 	 */
 	public void terminateConsole(IPropertiesContainer properties, ICallback callback);

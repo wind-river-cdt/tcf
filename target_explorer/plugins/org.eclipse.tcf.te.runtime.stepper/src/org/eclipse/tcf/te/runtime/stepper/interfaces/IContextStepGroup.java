@@ -31,7 +31,7 @@ public interface IContextStepGroup extends IExecutableExtension {
 	 * Returns the list of steps or step groups enlisted and enabled in the group for the
 	 * given contexts.
 	 *
-	 * @param contexts The array of context objects. Must be not <code>null</code>.
+	 * @param contexts The array of context objects. Must not be <code>null</code>.
 	 * @return The list of steps and step groups or an empty array.
 	 *
 	 * @throws CoreException If the steps cannot be determined.

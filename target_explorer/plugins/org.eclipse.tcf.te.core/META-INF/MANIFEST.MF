@@ -18,7 +18,6 @@ Bundle-Localization: plugin
 Export-Package: org.eclipse.tcf.te.core.activator;x-internal:=true,
  org.eclipse.tcf.te.core.adapters,
  org.eclipse.tcf.te.core.async,
- org.eclipse.tcf.te.core.async.interfaces,
  org.eclipse.tcf.te.core.nls;x-internal:=true,
  org.eclipse.tcf.te.core.nodes.interfaces.wire,
  org.eclipse.tcf.te.core.utils.text

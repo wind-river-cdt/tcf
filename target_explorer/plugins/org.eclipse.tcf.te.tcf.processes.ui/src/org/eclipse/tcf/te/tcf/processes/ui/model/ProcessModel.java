@@ -187,7 +187,7 @@ public class ProcessModel implements IPreferenceConsts{
 	/**
 	 * Query the children of the given process context.
 	 * 
-	 * @param parentNode The process context node. Must be not <code>null</code>.
+	 * @param parentNode The process context node. Must not be <code>null</code>.
 	 */
 	public void queryChildren(ProcessTreeNode parentNode) {
 		Assert.isNotNull(parentNode);
@@ -199,7 +199,7 @@ public class ProcessModel implements IPreferenceConsts{
 	 * Recursively refresh the children of the given process context with a callback, which is
 	 * called when whole process is finished.
 	 * 
-	 * @param parentNode The process context node. Must be not <code>null</code>.
+	 * @param parentNode The process context node. Must not be <code>null</code>.
 	 * @param callback The callback object, or <code>null</code> when callback is not needed.
 	 */
 	public void refresh(final ProcessTreeNode parentNode, final Runnable callback) {
@@ -217,7 +217,7 @@ public class ProcessModel implements IPreferenceConsts{
 	/**
 	 * Recursively refresh the children of the given process context.
 	 * 
-	 * @param parentNode The process context node. Must be not <code>null</code>.
+	 * @param parentNode The process context node. Must not be <code>null</code>.
 	 */
 	public void refresh(final ProcessTreeNode parentNode) {
 		refresh(parentNode, null);

@@ -22,7 +22,7 @@ public class TabFolderSelectionListener implements SelectionListener {
 	/**
 	 * Constructor.
 	 *
-	 * @param parentTabFolderManager The parent tab folder manager. Must be not <code>null</code>
+	 * @param parentTabFolderManager The parent tab folder manager. Must not be <code>null</code>
 	 */
 	public TabFolderSelectionListener(TabFolderManager parentTabFolderManager) {
 		Assert.isNotNull(parentTabFolderManager);

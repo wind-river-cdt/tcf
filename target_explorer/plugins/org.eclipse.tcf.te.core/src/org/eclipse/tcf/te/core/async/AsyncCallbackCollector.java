@@ -68,7 +68,7 @@ public class AsyncCallbackCollector extends AsyncCallbackHandler {
 		/**
 		 * Constructor.
 		 *
-		 * @param collector The parent asynchronous callback collector. Must be not
+		 * @param collector The parent asynchronous callback collector. Must not be
 		 *            <code>null</code>.
 		 */
 		public SimpleCollectorCallback(AsyncCallbackCollector collector) {
@@ -237,7 +237,7 @@ public class AsyncCallbackCollector extends AsyncCallbackHandler {
 	 * the collector is finished and the error is set as the error to pass on with the callback. If
 	 * the collector is already finished, the method will return immediately.
 	 *
-	 * @param error The error to handle. Must be not <code>null</code>.
+	 * @param error The error to handle. Must not be <code>null</code>.
 	 */
 	public final synchronized void handleError(final Throwable error) {
 		Assert.isNotNull(error);

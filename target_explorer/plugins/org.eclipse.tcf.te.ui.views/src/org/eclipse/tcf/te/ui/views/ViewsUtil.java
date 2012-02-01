@@ -117,7 +117,7 @@ public class ViewsUtil {
 	/**
 	 * Opens the properties editor or dialog on the given selection.
 	 *
-	 * @param selection The selection. Must be not <code>null</code>.
+	 * @param selection The selection. Must not be <code>null</code>.
 	 */
 	public static void openProperties(final ISelection selection) {
 		Assert.isNotNull(selection);

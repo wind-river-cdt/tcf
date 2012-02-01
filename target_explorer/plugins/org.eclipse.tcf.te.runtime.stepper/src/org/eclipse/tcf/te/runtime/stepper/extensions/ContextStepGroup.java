@@ -732,7 +732,7 @@ public class ContextStepGroup extends AbstractContextStepGroup {
 	 * and valid for the given type id and mode.
 	 *
 	 * @param step The step. Must not be <code>null</code>.
-	 * @param contexts The array of context objects. Must be not <code>null</code>.
+	 * @param contexts The array of context objects. Must not be <code>null</code>.
 	 *
 	 * @throws CoreException If a required step or step group is not available or not valid.
 	 */

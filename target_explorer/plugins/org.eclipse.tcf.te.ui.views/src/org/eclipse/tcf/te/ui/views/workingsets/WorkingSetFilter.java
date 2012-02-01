@@ -107,7 +107,7 @@ public class WorkingSetFilter extends ViewerFilter {
      * itself.
      *
      * @param element The element to test for enclosure by a working set element
-     * @param workingSetElement The working set element. Must be not <code>null</code>.
+     * @param workingSetElement The working set element. Must not be <code>null</code>.
      *
      * @return true if element is enclosed by a working set element and false otherwise.
      */

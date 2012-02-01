@@ -22,10 +22,10 @@ public interface IContextStepGroupIterator extends IExecutableExtension {
 	/**
 	 * Initialize the iterator.
 	 *
-	 * @param context The context. Must be not <code>null</code>.
-	 * @param data The data. Must be not <code>null</code>.
-	 * @param fullQualifiedId The full qualified id for this step. Must be not <code>null</code>.
-	 * @param monitor The progress monitor. Must be not <code>null</code>.
+	 * @param context The context. Must not be <code>null</code>.
+	 * @param data The data. Must not be <code>null</code>.
+	 * @param fullQualifiedId The full qualified id for this step. Must not be <code>null</code>.
+	 * @param monitor The progress monitor. Must not be <code>null</code>.
 	 */
 	public void initialize(IContext context, IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor);
 
@@ -38,10 +38,10 @@ public interface IContextStepGroupIterator extends IExecutableExtension {
 	/**
 	 * Check if there is a next iteration possible.
 	 *
-	 * @param context The context. Must be not <code>null</code>.
-	 * @param data The data. Must be not <code>null</code>.
-	 * @param fullQualifiedId The full qualified id for this step. Must be not <code>null</code>.
-	 * @param monitor The progress monitor. Must be not <code>null</code>.
+	 * @param context The context. Must not be <code>null</code>.
+	 * @param data The data. Must not be <code>null</code>.
+	 * @param fullQualifiedId The full qualified id for this step. Must not be <code>null</code>.
+	 * @param monitor The progress monitor. Must not be <code>null</code>.
 	 * @return <code>true</code> if another iteration is possible.
 	 */
 	public boolean hasNext(IContext context, IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor);
@@ -49,10 +49,10 @@ public interface IContextStepGroupIterator extends IExecutableExtension {
 	/**
 	 * Set the next iteration to the data using the full qualified id.
 	 *
-	 * @param context The context. Must be not <code>null</code>.
-	 * @param data The data. Must be not <code>null</code>.
-	 * @param fullQualifiedId The full qualified id for this step. Must be not <code>null</code>.
-	 * @param monitor The progress monitor. Must be not <code>null</code>.
+	 * @param context The context. Must not be <code>null</code>.
+	 * @param data The data. Must not be <code>null</code>.
+	 * @param fullQualifiedId The full qualified id for this step. Must not be <code>null</code>.
+	 * @param monitor The progress monitor. Must not be <code>null</code>.
 	 * @throws CoreException
 	 */
 	public void next(IContext context, IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor) throws CoreException;

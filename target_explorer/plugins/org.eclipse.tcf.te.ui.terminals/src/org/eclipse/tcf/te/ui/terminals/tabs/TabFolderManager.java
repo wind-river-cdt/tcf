@@ -83,7 +83,7 @@ public class TabFolderManager extends PlatformObject implements ISelectionProvid
 		/**
 		 * Constructor.
 		 *
-		 * @param terminal The terminal control. Must be not <code>null</code>.
+		 * @param terminal The terminal control. Must not be <code>null</code>.
 		 */
 		public TerminalControlSelectionListener(ITerminalViewControl terminal) {
 			Assert.isNotNull(terminal);
@@ -215,7 +215,7 @@ public class TabFolderManager extends PlatformObject implements ISelectionProvid
 	/**
 	 * Constructor.
 	 *
-	 * @param parentView The parent terminal console view. Must be not <code>null</code>.
+	 * @param parentView The parent terminal console view. Must not be <code>null</code>.
 	 */
 	public TabFolderManager(ITerminalsView parentView) {
 		super();
@@ -237,7 +237,7 @@ public class TabFolderManager extends PlatformObject implements ISelectionProvid
 	/**
 	 * Creates the terminal console tab folder selection listener instance.
 	 *
-	 * @param parent The parent terminal console tab folder manager. Must be not <code>null</code>.
+	 * @param parent The parent terminal console tab folder manager. Must not be <code>null</code>.
 	 * @return The selection listener instance.
 	 */
 	protected TabFolderSelectionListener doCreateTabFolderSelectionListener(TabFolderManager parent) {
@@ -287,8 +287,8 @@ public class TabFolderManager extends PlatformObject implements ISelectionProvid
 	/**
 	 * Creates a new tab item with the given title and connector.
 	 *
-	 * @param title The tab title. Must be not <code>null</code>.
-	 * @param connector The terminal connector. Must be not <code>null</code>.
+	 * @param title The tab title. Must not be <code>null</code>.
+	 * @param connector The terminal connector. Must not be <code>null</code>.
 	 * @param data The custom terminal data node or <code>null</code>.
 	 *
 	 * @return The created tab item or <code>null</code> if failed.
@@ -383,7 +383,7 @@ public class TabFolderManager extends PlatformObject implements ISelectionProvid
 	/**
 	 * Generate a unique title string based on the given proposal.
 	 *
-	 * @param proposal The proposal. Must be not <code>null</code>.
+	 * @param proposal The proposal. Must not be <code>null</code>.
 	 * @return The unique title string.
 	 */
 	protected String makeUniqueTitle(String proposal, CTabFolder tabFolder) {
@@ -410,7 +410,7 @@ public class TabFolderManager extends PlatformObject implements ISelectionProvid
 	/**
 	 * Setup the terminal console tab item listeners.
 	 *
-	 * @param item The tab item. Must be not <code>null</code>.
+	 * @param item The tab item. Must not be <code>null</code>.
 	 */
 	protected void setupTerminalTabListeners(final CTabItem item) {
 		Assert.isNotNull(item);
@@ -465,7 +465,7 @@ public class TabFolderManager extends PlatformObject implements ISelectionProvid
 	/**
 	 * Creates a new terminal console tab terminal listener instance.
 	 *
-	 * @param item The tab item. Must be not <code>null</code>.
+	 * @param item The tab item. Must not be <code>null</code>.
 	 * @return The terminal listener instance.
 	 */
 	protected ITerminalListener doCreateTerminalTabTerminalListener(CTabItem item) {
@@ -476,7 +476,7 @@ public class TabFolderManager extends PlatformObject implements ISelectionProvid
 	/**
 	 * Creates a new terminal console tab dispose listener instance.
 	 *
-	 * @param parent The parent terminal console tab folder manager. Must be not <code>null</code>.
+	 * @param parent The parent terminal console tab folder manager. Must not be <code>null</code>.
 	 * @return The dispose listener instance.
 	 */
 	protected DisposeListener doCreateTerminalTabDisposeListener(TabFolderManager parent) {
@@ -487,7 +487,7 @@ public class TabFolderManager extends PlatformObject implements ISelectionProvid
 	/**
 	 * Creates a new terminal console tab property change listener instance.
 	 *
-	 * @param item The tab item. Must be not <code>null</code>.
+	 * @param item The tab item. Must not be <code>null</code>.
 	 * @return The property change listener instance.
 	 */
 	protected IPropertyChangeListener doCreateTerminalTabPropertyChangeListener(CTabItem item) {
@@ -498,7 +498,7 @@ public class TabFolderManager extends PlatformObject implements ISelectionProvid
 	/**
 	 * Returns the tab item image.
 	 *
-	 * @param connector The terminal connector. Must be not <code>null</code>.
+	 * @param connector The terminal connector. Must not be <code>null</code>.
 	 * @param data The custom terminal data node or <code>null</code>.
 	 *
 	 * @return The tab item image or <code>null</code>.
@@ -513,8 +513,8 @@ public class TabFolderManager extends PlatformObject implements ISelectionProvid
 	 * <p>
 	 * <b>Note:</b> The method will handle unified tab item titles itself.
 	 *
-	 * @param title The tab item title. Must be not <code>null</code>.
-	 * @param connector The terminal connector. Must be not <code>null</code>.
+	 * @param title The tab item title. Must not be <code>null</code>.
+	 * @param connector The terminal connector. Must not be <code>null</code>.
 	 * @param data The custom terminal data node or <code>null</code>.
 	 *
 	 * @return The corresponding tab item or <code>null</code>.
@@ -560,7 +560,7 @@ public class TabFolderManager extends PlatformObject implements ISelectionProvid
 	/**
 	 * Make the given tab item the active tab and bring the tab to the top.
 	 *
-	 * @param item The tab item. Must be not <code>null</code>.
+	 * @param item The tab item. Must not be <code>null</code>.
 	 */
 	public void bringToTop(CTabItem item) {
 		Assert.isNotNull(item);

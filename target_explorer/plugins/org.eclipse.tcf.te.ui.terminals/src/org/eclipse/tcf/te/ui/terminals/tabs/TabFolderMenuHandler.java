@@ -149,7 +149,7 @@ public class TabFolderMenuHandler extends PlatformObject {
 	/**
 	 * Adds the given action to the context menu actions list.
 	 *
-	 * @param action The action instance. Must be not <code>null</code>.
+	 * @param action The action instance. Must not be <code>null</code>.
 	 */
 	protected final void add(AbstractTerminalAction action) {
 		Assert.isNotNull(action);

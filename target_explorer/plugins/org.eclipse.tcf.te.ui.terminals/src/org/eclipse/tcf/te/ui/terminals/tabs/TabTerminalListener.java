@@ -74,7 +74,7 @@ public class TabTerminalListener implements ITerminalListener {
 	 * <b>Note:</b> This method is called from {@link #setState(TerminalState)} and
 	 *              is expected to by called within the UI thread.
 	 *
-	 * @param state The terminal state. Must be not <code>null</code>.
+	 * @param state The terminal state. Must not be <code>null</code>.
 	 * @return The terminal console tab title to set or <code>null</code> to leave the title unchanged.
 	 */
 	protected String getTerminalConsoleTabTitle(TerminalState state) {

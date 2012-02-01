@@ -102,10 +102,10 @@ public abstract class AbstractChannelCommandHandler extends AbstractHandler {
 	/**
 	 * Executes the command handler logic.
 	 *
-	 * @param event The execution event. Must be not <code>null</code>.
-	 * @param channel The channel. Must be not <code>null</code>.
-	 * @param node The selected node. Must be not <code>null</code>.
-	 * @param callback The callback to invoke if the execution finished. Must be not <code>null</code>.
+	 * @param event The execution event. Must not be <code>null</code>.
+	 * @param channel The channel. Must not be <code>null</code>.
+	 * @param node The selected node. Must not be <code>null</code>.
+	 * @param callback The callback to invoke if the execution finished. Must not be <code>null</code>.
 	 */
 	protected abstract void execute(ExecutionEvent event, IChannel channel, IPeerModel node, DoneExecute callback);
 
@@ -126,7 +126,7 @@ public abstract class AbstractChannelCommandHandler extends AbstractHandler {
 	 * Closes the given channel and handle the given exception.
 	 *
 	 * @param channel The channel instance or <code>null</code>.
-	 * @param exception The exception to handle. Must be not <code>null</code>.
+	 * @param exception The exception to handle. Must not be <code>null</code>.
 	 */
 	protected void handleException(IChannel channel, Throwable exception) {
 		Assert.isNotNull(exception);
