@@ -16,7 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.osgi.util.NLS;
@@ -128,12 +130,16 @@ public class FSOperation {
 	 * @param file The file that is opened.
 	 */
 	protected void closeEditor(final File file) {
-		Assert.isNotNull(Display.findDisplay(Thread.currentThread()));
+		Assert.isNotNull(Display.getCurrent());
 		final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		IEditorReference[] refs = page.getEditorReferences();
 		for (IEditorReference ref : refs) {
 			final IEditorReference editorRef = ref;
 			SafeRunner.run(new SafeRunnable() {
+				@Override
+                public void handleException(Throwable e) {
+					// Ignore exception
+                }
 				@Override
 				public void run() throws Exception {
 					IEditorInput input = editorRef.getEditorInput();
@@ -615,9 +621,9 @@ public class FSOperation {
 	/**
 	 * Do the actual operation.
 	 *
-	 * @return true if it is successful.
+	 * @return Status.OK_STATUS if it is successful.
 	 */
-	public boolean doit(){
-		return false;
+	public IStatus doit(){
+		return Status.OK_STATUS;
 	}
 }

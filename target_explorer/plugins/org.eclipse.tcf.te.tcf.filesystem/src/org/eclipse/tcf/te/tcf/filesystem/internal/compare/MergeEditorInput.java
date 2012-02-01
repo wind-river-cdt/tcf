@@ -256,6 +256,10 @@ public class MergeEditorInput extends CompareEditorInput implements
 				final ICompareInputChangeListener listener = (ICompareInputChangeListener) allListeners[i];
 				SafeRunner.run(new SafeRunnable() {
 					@Override
+                    public void handleException(Throwable e) {
+						// Ignore exception
+                    }
+					@Override
 					public void run() throws Exception {
 						listener.compareInputChanged(getCompareResult());
 					}

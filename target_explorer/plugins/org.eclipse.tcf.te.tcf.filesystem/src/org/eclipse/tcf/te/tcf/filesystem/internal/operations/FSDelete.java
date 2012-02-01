@@ -12,8 +12,11 @@ package org.eclipse.tcf.te.tcf.filesystem.internal.operations;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.util.SafeRunnable;
@@ -58,7 +61,8 @@ public class FSDelete extends FSOperation {
 	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation#doit()
 	 */
 	@Override
-	public boolean doit() {
+	public IStatus doit() {
+		Assert.isNotNull(Display.getCurrent());
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
@@ -102,11 +106,12 @@ public class FSDelete extends FSOperation {
 			// Display the error message during deleting.
 			Throwable throwable = e.getTargetException() != null ? e.getTargetException() : e;
 			MessageDialog.openError(parent, Messages.FSDelete_DeleteFileFolderTitle, throwable.getLocalizedMessage());
+			return new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), throwable.getLocalizedMessage(), throwable);
 		}
 		catch (InterruptedException e) {
 			// It is canceled.
 		}
-		return true;
+		return Status.OK_STATUS;
 	}
 
 	/**
@@ -217,6 +222,10 @@ public class FSDelete extends FSOperation {
 			}
 			// Make the file writable.
 			SafeRunner.run(new SafeRunnable() {
+				@Override
+                public void handleException(Throwable e) {
+					// Ignore exception
+                }
 				@Override
 				public void run() throws Exception {
 					StateManager.getInstance().setFileAttrs(node, clone.attr);

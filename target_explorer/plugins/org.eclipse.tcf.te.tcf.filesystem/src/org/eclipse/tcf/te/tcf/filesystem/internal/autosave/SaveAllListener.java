@@ -61,6 +61,10 @@ public class SaveAllListener implements IExecutionListener {
 			else {
 				SafeRunner.run(new SafeRunnable(){
 					@Override
+                    public void handleException(Throwable e) {
+						// Ignore exception
+                    }
+					@Override
                     public void run() throws Exception {
 						for (FSTreeNode dirtyNode : fDirtyNodes) {
 							StateManager.getInstance().refreshState(dirtyNode);

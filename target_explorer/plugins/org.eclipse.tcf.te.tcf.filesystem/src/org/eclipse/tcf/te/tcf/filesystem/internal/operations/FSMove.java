@@ -12,10 +12,14 @@ package org.eclipse.tcf.te.tcf.filesystem.internal.operations;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
@@ -56,13 +60,14 @@ public class FSMove extends FSOperation {
 	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation#doit()
 	 */
 	@Override
-	public boolean doit() {
+	public IStatus doit() {
+		Assert.isNotNull(Display.getCurrent());
 		// Remove its self from the clipped nodes.
 		nodes.remove(dest);
 		if(nodes.isEmpty()) {
 			// Clear the clip board.
 			UIPlugin.getDefault().getClipboard().clear();
-			return true;
+			return Status.OK_STATUS;
 		}
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			@Override
@@ -109,11 +114,12 @@ public class FSMove extends FSOperation {
 			// Display the error reported during moving.
 			Throwable throwable = e.getTargetException() != null ? e.getTargetException() : e;
 			MessageDialog.openError(parent, Messages.FSMove_MoveFileFolderTitle, throwable.getLocalizedMessage());
+			return new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), throwable.getLocalizedMessage(), throwable);
 		}
 		catch (InterruptedException e) {
 			// It is canceled.
 		}
-		return true;
+		return Status.OK_STATUS;
 	}
 
 	/**

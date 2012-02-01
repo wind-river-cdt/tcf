@@ -831,6 +831,10 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 			final Command command = cmd;
 			SafeRunner.run(new SafeRunnable(){
 				@Override
+                public void handleException(Throwable e) {
+					// Ignore exception
+                }
+				@Override
                 public void run() throws Exception {
 					ISelection selection = event.getSelection();
 					EvaluationContext ctx = new EvaluationContext(null, selection);

@@ -114,6 +114,10 @@ public class TreeViewerExtension {
 		}
 		SafeRunner.run(new SafeRunnable() {
 			@Override
+            public void handleException(Throwable e) {
+				// Ignore exception
+            }
+			@Override
 			public void run() throws Exception {
 				ITreeContentProvider contentProvider = (ITreeContentProvider) configuration.createExecutableExtension("contentProvider"); //$NON-NLS-1$
 				descriptor.setContentProvider(contentProvider);
@@ -224,6 +228,10 @@ public class TreeViewerExtension {
 			descriptors.add(descriptor);
 			SafeRunner.run(new SafeRunnable() {
 				@Override
+                public void handleException(Throwable e) {
+					// Ignore exception
+                }
+				@Override
 				public void run() throws Exception {
 					initFilter(descriptor, configuration);
 				}
@@ -284,6 +292,10 @@ public class TreeViewerExtension {
 			columns.add(column);
 			SafeRunner.run(new SafeRunnable() {
 				@Override
+                public void handleException(Throwable e) {
+					// Ignore exception
+                }
+				@Override
 				public void run() throws Exception {
 					initColumn(column, configuration);
 					column.setOrder(columns.size());
@@ -311,6 +323,10 @@ public class TreeViewerExtension {
 		context.addVariable("input", input); //$NON-NLS-1$
 		final boolean[] result = new boolean[1];
 		SafeRunner.run(new SafeRunnable() {
+			@Override
+            public void handleException(Throwable e) {
+				// Ignore exception
+            }
 			@Override
 			public void run() throws Exception {
 				Expression expression = ExpressionConverter.getDefault().perform(config);
@@ -543,6 +559,10 @@ public class TreeViewerExtension {
 		final AtomicReference<DragSourceListener> reference = new AtomicReference<DragSourceListener>();
 		SafeRunner.run(new SafeRunnable(){
 			@Override
+            public void handleException(Throwable e) {
+				// Ignore exception
+            }
+			@Override
             public void run() throws Exception {
 				reference.set((DragSourceListener) createExecutableExtension(DragSourceListener.class, viewer, configuration));
             }});
@@ -587,6 +607,10 @@ public class TreeViewerExtension {
 	public DropTargetListener parseDropTargetListener(final TreeViewer viewer, final IConfigurationElement configuration) {
 		final AtomicReference<DropTargetListener> reference = new AtomicReference<DropTargetListener>();
 		SafeRunner.run(new SafeRunnable(){
+			@Override
+            public void handleException(Throwable e) {
+				// Ignore exception
+            }
 			@Override
             public void run() throws Exception {
 				reference.set((DropTargetListener) createExecutableExtension(DropTargetListener.class, viewer, configuration));

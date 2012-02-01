@@ -171,6 +171,10 @@ public final class FSModel {
 			final FSTreeNode[] result = new FSTreeNode[1];
 			SafeRunner.run(new SafeRunnable() {
 				@Override
+                public void handleException(Throwable e) {
+					// Ignore exception
+                }
+				@Override
 				public void run() throws Exception {
 					result[0] = findPath(peer.getPeer(), children, path);
 				}

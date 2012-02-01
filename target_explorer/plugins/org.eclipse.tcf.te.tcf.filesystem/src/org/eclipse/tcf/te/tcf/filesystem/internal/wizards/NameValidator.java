@@ -99,6 +99,10 @@ public class NameValidator extends Validator {
 		final List<FSTreeNode> result = new ArrayList<FSTreeNode>();
 		SafeRunner.run(new SafeRunnable() {
 			@Override
+            public void handleException(Throwable e) {
+				// Ignore exception
+            }
+			@Override
 			public void run() throws Exception {
 				result.addAll(new FSOperation().getChildren(folder));
 			}

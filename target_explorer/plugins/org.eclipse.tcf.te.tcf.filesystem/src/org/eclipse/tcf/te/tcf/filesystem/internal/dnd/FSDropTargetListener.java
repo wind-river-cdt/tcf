@@ -11,6 +11,7 @@ package org.eclipse.tcf.te.tcf.filesystem.internal.dnd;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -89,7 +90,11 @@ public class FSDropTargetListener extends ViewerDropAdapter {
 			FSTreeNode dest = getCopyDestination(hovered, nodes);
 			operation = new FSCopy(nodes, dest);
 		}
-		return (operation != null && operation.doit()) ;
+		if(operation != null) {
+			IStatus status = operation.doit();
+			return status != null && status.isOK();
+		}
+		return false;
 	}
 
 	/**

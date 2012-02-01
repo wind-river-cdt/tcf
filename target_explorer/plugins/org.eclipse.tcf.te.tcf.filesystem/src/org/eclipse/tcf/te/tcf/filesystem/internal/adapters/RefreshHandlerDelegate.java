@@ -10,15 +10,17 @@
 package org.eclipse.tcf.te.tcf.filesystem.internal.adapters;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
-import org.eclipse.tcf.te.tcf.filesystem.internal.handlers.RefreshNodeJob;
+import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
+import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
+import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSRefresh;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.PersistenceManager;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.StateManager;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
+import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 import org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate;
 
 /**
@@ -48,18 +50,28 @@ public class RefreshHandlerDelegate implements IRefreshHandlerDelegate {
 		Assert.isNotNull(state);
 
 		if (canRefresh(element)) {
-			Job job = new RefreshNodeJob((FSTreeNode) element);
-			job.addJobChangeListener(new JobChangeAdapter(){
-				@Override
-                public void done(IJobChangeEvent event) {
-					if(callback != null) {
-						callback.done(this, event.getResult());
-					}
-                }});
-			job.schedule();
+			FSTreeNode node = (FSTreeNode) element;
+			if (node.isSystemRoot() || node.isRoot() || node.isDirectory()) {
+				FSRefresh refresh = new FSRefresh(node, callback);
+				refresh.doit();
+			}
+			else if (node.isFile() && !PersistenceManager.getInstance().isAutoSaving()) {
+				IStatus status = Status.OK_STATUS;
+				try {
+					StateManager.getInstance().refreshState(node);
+				}
+				catch (TCFException e) {
+					status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), Messages.StateManager_RefreshFailureTitle, e);
+				}
+				if (callback != null) {
+					callback.done(this, status);
+				}
+			}
 		}
 		else {
-			if (callback != null) callback.done(this, Status.OK_STATUS);
+			if (callback != null) {
+				callback.done(this, Status.OK_STATUS);
+			}
 		}
 	}
 }

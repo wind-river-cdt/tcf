@@ -9,15 +9,22 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.wizards;
 
-import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.te.runtime.callback.Callback;
+import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSCreate;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
+import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
 import org.eclipse.tcf.te.ui.wizards.AbstractWizard;
@@ -27,6 +34,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * The base wizard class to create a new file/folder in the file system of Target Explorer.
@@ -40,6 +48,7 @@ public abstract class NewNodeWizard extends AbstractWizard implements INewWizard
 	private NewNodeWizardPage newPage;
 	// The workbench
 	private IWorkbench workbench;
+
 	/**
 	 * Create an instance.
 	 */
@@ -126,37 +135,65 @@ public abstract class NewNodeWizard extends AbstractWizard implements INewWizard
 			// Get the new name and create the node.
 			String name = newPage.getNodeName();
 			FSTreeNode dest = newPage.getInputDir();
-			FSCreate create = getCreateOp(dest, name);
-			boolean doit = create.doit();
-			if (!doit) {
-				// The the error message generated during creation.
-				newPage.setMessage(create.getError(), IMessageProvider.ERROR);
-				return false;
-			}
-			// Select the new node created.
-			FSTreeNode node = create.getNode();
-			IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-			if (window != null) {
-				IWorkbenchPage page = window.getActivePage();
-				if (page != null) {
-					IWorkbenchPart part = page.getActivePart();
-					if (part != null) {
-						IWorkbenchPartSite site = part.getSite();
-						ISelectionProvider selProvider = site.getSelectionProvider();
-						ISelection selection = new StructuredSelection(node);
-						if (selProvider instanceof Viewer) {
-							// Select and make it visible.
-							((Viewer) selProvider).setSelection(selection, true);
-						}
-						else {
-							selProvider.setSelection(selection);
-						}
-					}
-				}
-			}
+			FSCreate create = getCreateOp(dest, name, new Callback(){
+				@Override
+                protected void internalDone(Object caller, IStatus status) {
+					doneCreation(caller, status);
+                }
+			});
+			IStatus status = create.doit();
+			return status.isOK();
 		}
 		return true;
 	}
+
+	/**
+	 * Called when the creation is done.
+	 * 
+	 * @param caller The caller, i.e., the FSCreate object.
+	 * @param status The creation result.
+	 */
+	protected void doneCreation(Object caller, IStatus status) {
+		Assert.isNotNull(Display.getCurrent());
+		if (!status.isOK()) {
+			String message = status.getMessage();
+			Shell parent = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+			MessageDialog.openError(parent, Messages.FSCreate_CreationFailed, message);
+		}
+		else {
+			Assert.isTrue(caller instanceof FSCreate);
+			FSCreate create = (FSCreate) caller;
+			FSTreeNode newNode = create.getNode();
+			selectNewNode(newNode);
+		}
+    }
+	
+	/**
+	 * Select the specified node in the selection provider.
+	 * 
+	 * @param node The node to be selected.
+	 */
+	private void selectNewNode(FSTreeNode node) {
+		IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+		if (window != null) {
+			IWorkbenchPage page = window.getActivePage();
+			if (page != null) {
+				IWorkbenchPart part = page.getActivePart();
+				if (part != null) {
+					IWorkbenchPartSite site = part.getSite();
+					ISelectionProvider selProvider = site.getSelectionProvider();
+					ISelection selection = new StructuredSelection(node);
+					if (selProvider instanceof Viewer) {
+						// Select and make it visible.
+						((Viewer) selProvider).setSelection(selection, true);
+					}
+					else {
+						selProvider.setSelection(selection);
+					}
+				}
+			}
+		}	    
+    }
 
 	/**
 	 * Create a wizard page to create a new node.
@@ -170,9 +207,10 @@ public abstract class NewNodeWizard extends AbstractWizard implements INewWizard
 	 * 
 	 * @param folder The folder in which the new node is created.
 	 * @param name The name of the new node.
+	 * @param callback The callback called when the creation is done.
 	 * @return a FSCreate instance to do the creation.
 	 */
-	protected abstract FSCreate getCreateOp(FSTreeNode folder, String name);
+	protected abstract FSCreate getCreateOp(FSTreeNode folder, String name, ICallback callback);
 
 	/**
 	 * The wizard's title to be used.

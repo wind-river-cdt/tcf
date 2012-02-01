@@ -15,6 +15,7 @@ import org.eclipse.tcf.services.IFileSystem.DoneClose;
 import org.eclipse.tcf.services.IFileSystem.DoneOpen;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.services.IFileSystem.IFileHandle;
+import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
@@ -29,9 +30,10 @@ public class FSCreateFile extends FSCreate {
 	 *
 	 * @param folder The folder in which the file is to be created.
 	 * @param name The new file's name.
+	 * @param callback The callback
 	 */
-	public FSCreateFile(FSTreeNode folder, String name) {
-		super(folder, name);
+	public FSCreateFile(FSTreeNode folder, String name, ICallback callback) {
+		super(folder, name, callback);
 	}
 
 	/*

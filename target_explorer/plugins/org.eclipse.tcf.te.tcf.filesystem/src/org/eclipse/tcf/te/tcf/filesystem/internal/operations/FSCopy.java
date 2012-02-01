@@ -12,10 +12,14 @@ package org.eclipse.tcf.te.tcf.filesystem.internal.operations;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
@@ -23,6 +27,7 @@ import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.DoneCopy;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.te.tcf.core.Tcf;
+import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.dialogs.TimeTriggeredProgressMonitorDialog;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
@@ -56,7 +61,8 @@ public class FSCopy extends FSOperation {
 	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation#doit()
 	 */
 	@Override
-	public boolean doit() {
+	public IStatus doit() {
+		Assert.isNotNull(Display.getCurrent());
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
@@ -102,11 +108,12 @@ public class FSCopy extends FSOperation {
 			// Display the error during copy.
 			Throwable throwable = e.getTargetException() != null ? e.getTargetException() : e;
 			MessageDialog.openError(parent, Messages.FSCopy_CopyFileFolderTitle, throwable.getLocalizedMessage());
+			return new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), throwable.getLocalizedMessage(), throwable);
 		}
 		catch (InterruptedException e) {
 			// It is canceled.
 		}
-		return true;
+		return Status.OK_STATUS;
 	}
 
 	/**

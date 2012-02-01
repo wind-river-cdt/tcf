@@ -464,6 +464,10 @@ public class LocalFileSaveable extends Saveable implements
 			final Object object = allListeners[i];
 			SafeRunner.run(new SafeRunnable() {
 				@Override
+                public void handleException(Throwable e) {
+					// Ignore exception
+                }
+				@Override
 				public void run() throws Exception {
 					((IPropertyListener) object).propertyChanged(
 							LocalFileSaveable.this, property);

@@ -12,7 +12,7 @@ package org.eclipse.tcf.te.tcf.filesystem.internal.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSRefresh;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
@@ -35,8 +35,8 @@ public class RefreshViewerHandler extends AbstractHandler {
 		if (peer != null) {
 			FSTreeNode root = FSModel.getFSModel(peer).getRoot();
 			if (root != null) {
-				Job job = new RefreshNodeJob(root);
-				job.schedule();
+				FSRefresh refresh = new FSRefresh(root);
+				refresh.doit();
 			}
 		}
 		return null;

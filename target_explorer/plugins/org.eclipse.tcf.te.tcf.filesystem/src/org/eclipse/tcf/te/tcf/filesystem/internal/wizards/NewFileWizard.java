@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.wizards;
 
+import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSCreate;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSCreateFile;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
@@ -30,11 +31,11 @@ public class NewFileWizard extends NewNodeWizard {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.wizards.NewNodeWizard#getCreateOp(org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode, java.lang.String)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.wizards.NewNodeWizard#getCreateOp(org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode, java.lang.String, org.eclipse.tcf.te.runtime.interfaces.callback.ICallback)
 	 */
 	@Override
-	protected FSCreate getCreateOp(FSTreeNode folder, String name) {
-		return new FSCreateFile(folder, name);
+	protected FSCreate getCreateOp(FSTreeNode folder, String name, ICallback callback) {
+		return new FSCreateFile(folder, name, callback);
 	}
 
 	/*

@@ -137,6 +137,10 @@ public class ViewerStateManager {
 		if (stateFile.exists()) {
 			SafeRunner.run(new SafeRunnable() {
 				@Override
+                public void handleException(Throwable e) {
+					// Ignore exception
+                }
+				@Override
 				public void run() throws Exception {
 					BufferedReader reader = null;
 					try {
@@ -216,6 +220,10 @@ public class ViewerStateManager {
 		final XMLMemento root = XMLMemento.createWriteRoot("viewerStates"); //$NON-NLS-1$
 		storeViewerStates(root);
 		SafeRunner.run(new SafeRunnable() {
+			@Override
+            public void handleException(Throwable e) {
+				// Ignore exception
+            }
 			@Override
 			public void run() throws Exception {
 				BufferedWriter writer = null;

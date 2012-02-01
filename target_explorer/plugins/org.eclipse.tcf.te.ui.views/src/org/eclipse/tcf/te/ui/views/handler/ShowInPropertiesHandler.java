@@ -36,6 +36,10 @@ public class ShowInPropertiesHandler extends AbstractHandler {
 		final IWorkbenchPage activePage = workbench.getActivePage();
 		SafeRunner.run(new SafeRunnable(){
 			@Override
+            public void handleException(Throwable e) {
+				// Ignore exception
+            }
+			@Override
             public void run() throws Exception {
 		        activePage.showView(PROP_VIEW_ID);
             }});

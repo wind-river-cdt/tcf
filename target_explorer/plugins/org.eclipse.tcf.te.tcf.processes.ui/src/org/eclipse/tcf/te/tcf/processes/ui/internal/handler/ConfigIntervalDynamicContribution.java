@@ -145,6 +145,10 @@ public class ConfigIntervalDynamicContribution extends CompoundContributionItem 
 					final Command command = cmd;
 					SafeRunner.run(new SafeRunnable() {
 						@Override
+	                    public void handleException(Throwable e) {
+							// Ignore exception
+	                    }
+						@Override
 						public void run() throws Exception {
 							EvaluationContext ctx = new EvaluationContext(null, StructuredSelection.EMPTY);
 							IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();

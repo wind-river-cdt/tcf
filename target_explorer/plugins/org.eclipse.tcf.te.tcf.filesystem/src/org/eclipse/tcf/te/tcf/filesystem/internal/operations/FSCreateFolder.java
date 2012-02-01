@@ -13,6 +13,7 @@ import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.DoneMkDir;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
+import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 
@@ -26,9 +27,10 @@ public class FSCreateFolder extends FSCreate {
 	 *
 	 * @param folder The folder in which the new folder is to be created.
 	 * @param name The name of the new folder.
+	 * @param callback The callback
 	 */
-	public FSCreateFolder(FSTreeNode folder, String name) {
-		super(folder, name);
+	public FSCreateFolder(FSTreeNode folder, String name, ICallback callback) {
+		super(folder, name, callback);
 	}
 
 	/*

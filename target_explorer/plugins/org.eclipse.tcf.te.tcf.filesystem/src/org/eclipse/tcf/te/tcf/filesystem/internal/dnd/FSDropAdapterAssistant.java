@@ -89,7 +89,7 @@ public class FSDropAdapterAssistant extends CommonDropAdapterAssistant {
 			FSTreeNode dest = getCopyDestination(hovered, nodes);
 			operation = new FSCopy(nodes, dest);
 		}
-		return (operation != null && operation.doit()) ? Status.OK_STATUS : Status.CANCEL_STATUS;
+		return operation != null ? operation.doit() : Status.CANCEL_STATUS;
 	}
 
 	/**

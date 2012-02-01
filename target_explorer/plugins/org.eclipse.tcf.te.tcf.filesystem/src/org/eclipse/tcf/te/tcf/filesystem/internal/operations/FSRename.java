@@ -11,6 +11,13 @@ package org.eclipse.tcf.te.tcf.filesystem.internal.operations;
 
 import java.io.File;
 
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
@@ -21,6 +28,7 @@ import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.DoneRename;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.te.tcf.core.Tcf;
+import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.CacheManager;
@@ -55,39 +63,70 @@ public class FSRename extends FSOperation {
 	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation#doit()
 	 */
 	@Override
-	public boolean doit() {
-		IChannel channel = null;
-		try {
-			channel = openChannel(node.peerNode.getPeer());
-			if (channel != null) {
-				IFileSystem service = getBlockingFileSystem(channel);
-				if (service != null) {
-					renameNode(service);
+	public IStatus doit() {
+		Assert.isNotNull(Display.getCurrent());
+		Job job = new Job(Messages.FSRename_RenameFileFolderTitle) {
+			@Override
+            protected IStatus run(IProgressMonitor monitor) {
+				IChannel channel = null;
+				try {
+					channel = openChannel(node.peerNode.getPeer());
+					if (channel != null) {
+						IFileSystem service = getBlockingFileSystem(channel);
+						if (service != null) {
+							renameNode(service);
+						}
+						else {
+							String message = NLS.bind(Messages.FSOperation_NoFileSystemError, node.peerNode.getPeerId());
+							throw new TCFFileSystemException(message);
+						}
+						return Status.OK_STATUS;
+					}
 				}
-				else {
-					String message = NLS.bind(Messages.FSOperation_NoFileSystemError, node.peerNode.getPeerId());
-					throw new TCFFileSystemException(message);
+				catch (TCFException e) {
+					return new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), e.getLocalizedMessage(), e);
 				}
-				return true;
-			}
-		}
-		catch (TCFException e) {
-			Shell parent = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-			MessageDialog.openError(parent, Messages.FSRename_RenameFileFolderTitle, e.getLocalizedMessage());
-		}
-		finally {
-			if (channel != null) Tcf.getChannelManager().closeChannel(channel);
-		}
-		return false;
+				finally {
+					if (channel != null) Tcf.getChannelManager().closeChannel(channel);
+				}
+				return Status.OK_STATUS;
+			}};
+		job.addJobChangeListener(new JobChangeAdapter(){
+			@Override
+            public void done(final IJobChangeEvent event) {
+				Display display = PlatformUI.getWorkbench().getDisplay();
+				display.asyncExec(new Runnable(){
+					@Override
+                    public void run() {
+						doneRename(event);
+                    }});
+            }});
+		job.schedule();
+		return Status.OK_STATUS;
 	}
 
+	/**
+	 * Called when the renaming is done. Must be called within UI-thread.
+	 * 
+	 * @param event The job change event.
+	 */
+	void doneRename(IJobChangeEvent event) {
+		Assert.isNotNull(Display.getCurrent());
+		IStatus status = event.getResult();
+		if (!status.isOK()) {
+			String message = status.getMessage();
+			Shell parent = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+			MessageDialog.openError(parent, Messages.FSRename_RenameFileFolderTitle, message);
+		}
+	}
+	
 	/**
 	 * Rename the node using the new name.
 	 *
 	 * @param service File system service used to rename.
 	 * @throws TCFFileSystemException The exception thrown during renaming.
 	 */
-	private void renameNode(IFileSystem service) throws TCFFileSystemException {
+	void renameNode(IFileSystem service) throws TCFFileSystemException {
 		String src_path = node.getLocation(true);
 		String oldName = node.name;
 		node.name = newName;

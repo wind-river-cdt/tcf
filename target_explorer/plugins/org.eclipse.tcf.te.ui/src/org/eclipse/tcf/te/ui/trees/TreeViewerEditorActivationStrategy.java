@@ -99,6 +99,10 @@ public class TreeViewerEditorActivationStrategy extends ColumnViewerEditorActiva
 			final Expression exp = expression;
 			SafeRunner.run(new SafeRunnable() {
 				@Override
+                public void handleException(Throwable e) {
+					// Ignore exception
+                }
+				@Override
 				public void run() throws Exception {
 					EvaluationResult evaluate = exp.evaluate(context);
 					if (evaluate == EvaluationResult.TRUE) {
@@ -157,6 +161,10 @@ public class TreeViewerEditorActivationStrategy extends ColumnViewerEditorActiva
 		Assert.isTrue(children != null && children.length == 1);
 		final IConfigurationElement config = children[0];
 		SafeRunner.run(new SafeRunnable() {
+			@Override
+            public void handleException(Throwable e) {
+				// Ignore exception
+            }
 			@Override
 			public void run() throws Exception {
 				Expression expression = ExpressionConverter.getDefault().perform(config);

@@ -57,6 +57,10 @@ public class FSCreateRoot extends FSOperation {
 		});
 		SafeRunner.run(new SafeRunnable() {
 			@Override
+            public void handleException(Throwable e) {
+				// Ignore exception
+            }
+			@Override
 			public void run() throws Exception {
 				queryRootNodes(result[0]);
 			}

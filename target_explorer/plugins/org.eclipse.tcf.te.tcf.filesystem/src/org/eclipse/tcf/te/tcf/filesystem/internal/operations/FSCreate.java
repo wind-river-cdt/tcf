@@ -9,7 +9,15 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.operations;
 
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.protocol.Protocol;
@@ -17,11 +25,14 @@ import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.DoneStat;
 import org.eclipse.tcf.services.IFileSystem.FileAttrs;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
+import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.core.Tcf;
+import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * The base file operation class for creating a file or a folder in the file system of Target
@@ -34,18 +45,20 @@ public abstract class FSCreate extends FSOperation {
 	protected FSTreeNode node;
 	// The name of the node to be created.
 	protected String name;
-	// The error generated when creating the node.
-	protected String error;
+	// The callback
+	protected ICallback callback;
 
 	/**
 	 * Create an FSCreate instance with the specified folder and the name of the new node.
 	 *
 	 * @param folder The folder in which the new node is going to be created.
 	 * @param name The new node's name.
+	 * @param callback called when the creation is done.
 	 */
-	public FSCreate(FSTreeNode folder, String name) {
+	public FSCreate(FSTreeNode folder, String name, ICallback callback) {
 		this.folder = folder;
 		this.name = name;
+		this.callback = callback;
 	}
 
 	/*
@@ -53,51 +66,73 @@ public abstract class FSCreate extends FSOperation {
 	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation#doit()
 	 */
 	@Override
-	public boolean doit() {
-		IChannel channel = null;
-		try {
-			channel = openChannel(folder.peerNode.getPeer());
-			IFileSystem service = getBlockingFileSystem(channel);
-			if (service != null) {
-				if (!folder.childrenQueried) {
-					// If the children of folder is not queried, load it first.
-					loadChildren(folder, service);
+	public IStatus doit() {
+		Assert.isNotNull(Display.getCurrent());
+		Job job = new Job(Messages.FSCreate_JobTitle) {
+			@Override
+            protected IStatus run(IProgressMonitor monitor) {
+				IChannel channel = null;
+				try {
+					channel = openChannel(folder.peerNode.getPeer());
+					IFileSystem service = getBlockingFileSystem(channel);
+					if (service != null) {
+						if (!folder.childrenQueried) {
+							// If the children of folder is not queried, load it first.
+							loadChildren(folder, service);
+						}
+						create(service);
+						addNode(service);
+						refresh(service);
+					}
+					else {
+						String message = NLS.bind(Messages.FSOperation_NoFileSystemError, folder.peerNode.getPeerId());
+						throw new TCFFileSystemException(message);
+					}
 				}
-				create(service);
-				addNode(service);
-				refresh(service);
-			}
-			else {
-				String message = NLS.bind(Messages.FSOperation_NoFileSystemError, folder.peerNode.getPeerId());
-				throw new TCFFileSystemException(message);
-			}
-		}
-		catch (TCFException e) {
-			error = e.getLocalizedMessage();
-			return false;
-		}
-		finally {
-			if (channel != null) Tcf.getChannelManager().closeChannel(channel);
-		}
-		return true;
+				catch (TCFException e) {
+					return new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), e.getLocalizedMessage(), e);
+				}
+				finally {
+					if (channel != null) Tcf.getChannelManager().closeChannel(channel);
+				}
+				return Status.OK_STATUS;
+            }
+		};
+		job.addJobChangeListener(new JobChangeAdapter(){
+			@Override
+            public void done(final IJobChangeEvent event) {
+				Display display = PlatformUI.getWorkbench().getDisplay();
+				display.asyncExec(new Runnable(){
+					@Override
+                    public void run() {
+						doneCreate(event);
+                    }});
+            }});
+		job.schedule();
+		return Status.OK_STATUS;
 	}
+
 
 	/**
-	 * Get the error message generated during creating.
-	 *
-	 * @return The error message.
+	 * Called when the creation is done. Must be called within UI-thread.
+	 * 
+	 * @param event The job change event.
 	 */
-	public String getError() {
-		return error;
+	void doneCreate(IJobChangeEvent event) {
+		Assert.isNotNull(Display.getCurrent());
+		IStatus status = event.getResult();
+		if(callback != null) {
+			callback.done(this, status);
+		}
 	}
-
+	
 	/**
 	 * Refresh new node's stat using the file system service.
 	 *
 	 * @param service The file system service.
 	 * @throws TCFFileSystemException Thrown when refreshing the new node's stat.
 	 */
-	private void refresh(final IFileSystem service) throws TCFFileSystemException {
+	void refresh(final IFileSystem service) throws TCFFileSystemException {
 		if (node != null) {
 			final TCFFileSystemException[] errors = new TCFFileSystemException[1];
 			String path = node.getLocation(true);

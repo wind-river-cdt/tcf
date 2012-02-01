@@ -23,6 +23,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.text.DecimalFormat;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -31,6 +32,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.dialogs.TimeTriggeredProgressMonitorDialog;
@@ -189,6 +191,7 @@ public class CacheManager {
 	 *         canceled.
 	 */
 	public boolean download(final FSTreeNode node) {
+		Assert.isNotNull(Display.getCurrent());
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
@@ -216,6 +219,10 @@ public class CacheManager {
 					}
 					if(!monitor.isCanceled()){
 						SafeRunner.run(new SafeRunnable() {
+							@Override
+		                    public void handleException(Throwable e) {
+								// Ignore exception
+		                    }
 							@Override
 							public void run() throws Exception {
 								File file = getCachePath(node).toFile();
@@ -266,6 +273,7 @@ public class CacheManager {
 	 *         canceled.
 	 */
 	public boolean upload(final FSTreeNode[] nodes, final boolean sync) {
+		Assert.isNotNull(Display.getCurrent());
 		Shell parent = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 		try {
 			IRunnableWithProgress runnable = new IRunnableWithProgress() {
@@ -391,6 +399,10 @@ public class CacheManager {
 					// Once upload is successful, synchronize the modified time.
 					final FSTreeNode node = nodes[i];
 					SafeRunner.run(new SafeRunnable() {
+						@Override
+	                    public void handleException(Throwable e) {
+							// Ignore exception
+	                    }
 						@Override
 						public void run() throws Exception {
 							PersistenceManager.getInstance().setBaseTimestamp(node.getLocationURL(), node.attr.mtime);
