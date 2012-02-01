@@ -11,9 +11,9 @@
 package org.eclipse.tcf.te.tcf.filesystem.internal.utils;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.protocol.Protocol;
@@ -23,12 +23,10 @@ import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.internal.UserAccount;
-import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation;
 import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * A facility class to retrieve the user's information for a target file system.
@@ -63,7 +61,7 @@ public class UserManager {
 	 *            The channel connected to the remote target.
 	 * @return The user account information or null if it fails.
 	 */
-	private UserAccount getUserByChannel(final IChannel channel) throws TCFFileSystemException {
+	UserAccount getUserByChannel(final IChannel channel) throws TCFFileSystemException {
 		IFileSystem service = FSOperation.getBlockingFileSystem(channel);
 		if (service != null) {
 			final TCFFileSystemException[] errors = new TCFFileSystemException[1];
@@ -93,25 +91,31 @@ public class UserManager {
 	 *
 	 * @return The client user account's information.
 	 */
-	public UserAccount getUserAccount(IPeerModel peerNode) {
+	public UserAccount getUserAccount(final IPeerModel peerNode) {
 		if(peerNode != null) {
 			UserAccount account = getUserFromPeer(peerNode);
 			if (account == null) {
-				IChannel channel = null;
-				try {
-					channel = FSOperation.openChannel(peerNode.getPeer());
-					if (channel != null) {
-						account = getUserByChannel(channel);
-						if (account != null) setUserToPeer(peerNode, account);
-					}
-				}
-				catch (TCFException e) {
-					Shell parent = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-					MessageDialog.openError(parent, Messages.UserManager_UserAccountTitle, e.getLocalizedMessage());
-				}
-				finally {
-					if (channel != null) Tcf.getChannelManager().closeChannel(channel);
-				}
+				final UserAccount[] accounts = new UserAccount[1];
+				SafeRunner.run(new SafeRunnable(){
+					@Override
+                    public void handleException(Throwable e) {
+						// Just ignore it.
+                    }
+					@Override
+                    public void run() throws Exception {
+						IChannel channel = null;
+						try {
+							channel = FSOperation.openChannel(peerNode.getPeer());
+							if (channel != null) {
+								accounts[0] = getUserByChannel(channel);
+								if (accounts[0] != null) setUserToPeer(peerNode, accounts[0]);
+							}
+						}
+						finally {
+							if (channel != null) Tcf.getChannelManager().closeChannel(channel);
+						}
+                    }});
+				return accounts[0];
 			}
 			return account;
 		}
@@ -148,7 +152,7 @@ public class UserManager {
 	 * @param peer
 	 *            The peer model to which the user account is saved.
 	 */
-	private void setUserToPeer(final IPeerModel peer, final UserAccount account) {
+	void setUserToPeer(final IPeerModel peer, final UserAccount account) {
 		Assert.isNotNull(peer);
 		Assert.isNotNull(account);
 
