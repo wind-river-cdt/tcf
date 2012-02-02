@@ -17,7 +17,7 @@ public interface IPreferenceKeys {
 	/**
 	 * Common prefix for all core preference keys
 	 */
-	public final String PREFIX = "tcf.log.core."; //$NON-NLS-1$
+	public final String PREFIX = "te.tcf.log.core."; //$NON-NLS-1$
 
 	/**
 	 * If set to <code>true</code>, back-end communication is logged.

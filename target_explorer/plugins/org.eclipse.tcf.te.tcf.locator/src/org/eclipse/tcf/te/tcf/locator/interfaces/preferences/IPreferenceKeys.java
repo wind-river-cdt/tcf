@@ -18,7 +18,7 @@ public interface IPreferenceKeys {
 	/**
 	 * Common prefix for all core preference keys
 	 */
-	public final String PREFIX = "tcf.locator.core."; //$NON-NLS-1$
+	public final String PREFIX = "te.tcf.locator.core."; //$NON-NLS-1$
 
 	/**
 	 * If set to <code>true</code>, peers having the same agent id are filtered.
