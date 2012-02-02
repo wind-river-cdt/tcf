@@ -42,6 +42,7 @@ public class FSCopy extends FSUIOperation {
 	 * @param dest The destination folder to be copied to.
 	 */
 	public FSCopy(List<FSTreeNode> nodes, FSTreeNode dest) {
+		super(Messages.FSCopy_CopyFileFolderTitle);
 		this.nodes = getTopNodes(nodes);
 		this.dest = dest;
 	}

@@ -48,6 +48,7 @@ public class FSDelete extends FSUIOperation {
 	 * @param nodes The nodes to be deleted.
 	 */
 	public FSDelete(List<FSTreeNode> nodes) {
+		super(Messages.FSDelete_DeleteFileFolderTitle);
 		this.nodes = getTopNodes(nodes);
 	}
 

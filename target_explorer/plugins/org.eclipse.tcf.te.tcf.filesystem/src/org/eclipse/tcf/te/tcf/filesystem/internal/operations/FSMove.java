@@ -42,6 +42,7 @@ public class FSMove extends FSUIOperation {
 	 * @param dest the destination folder to move to.
 	 */
 	public FSMove(List<FSTreeNode> nodes, FSTreeNode dest) {
+		super(Messages.FSMove_MovingFile);
 		this.nodes = getTopNodes(nodes);
 		this.dest = dest;
 	}

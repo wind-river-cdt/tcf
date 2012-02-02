@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
-import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 import org.eclipse.ui.PlatformUI;
 
 /**
@@ -25,14 +24,17 @@ import org.eclipse.ui.PlatformUI;
  */
 public class FSJobOperation extends FSOperation {
 	// The callback
-	protected ICallback callback;
+	private ICallback callback;
+	// Job title
+	private String jobName;
 
 	/**
 	 * Create an instance with the specified callback.
 	 *
 	 * @param callback called when the creation is done.
 	 */
-	public FSJobOperation(ICallback callback) {
+	public FSJobOperation(String jobName, ICallback callback) {
+		this.jobName = jobName;
 		this.callback = callback;
 	}
 	
@@ -43,7 +45,7 @@ public class FSJobOperation extends FSOperation {
 	@Override
 	public IStatus doit() {
 		Assert.isNotNull(Display.getCurrent());
-		Job job = new RunnableJob(Messages.FSCreate_JobTitle, this);
+		Job job = new RunnableJob(jobName, this);
 		job.addJobChangeListener(new JobChangeAdapter(){
 			@Override
             public void done(final IJobChangeEvent event) {

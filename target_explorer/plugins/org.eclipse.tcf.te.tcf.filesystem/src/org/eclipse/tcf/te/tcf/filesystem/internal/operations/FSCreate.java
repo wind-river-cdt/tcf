@@ -46,7 +46,7 @@ public abstract class FSCreate extends FSJobOperation {
 	 * @param name The new node's name.
 	 */
 	public FSCreate(FSTreeNode folder, String name, ICallback callback) {
-		super(callback);
+		super(Messages.FSCreate_JobTitle, callback);
 		this.folder = folder;
 		this.name = name;
 	}

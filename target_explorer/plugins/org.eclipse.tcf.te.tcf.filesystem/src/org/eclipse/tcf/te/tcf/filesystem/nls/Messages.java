@@ -210,6 +210,7 @@ public class Messages extends NLS {
 	public static String FSDelete_DeleteFileFolderTitle;
 
 	public static String FSRename_CannotRename;
+	public static String FSRename_JobTitle;
 	public static String FSRename_RenameFileFolderTitle;
 
 	public static String FSOperation_CannotCreateDirectory;

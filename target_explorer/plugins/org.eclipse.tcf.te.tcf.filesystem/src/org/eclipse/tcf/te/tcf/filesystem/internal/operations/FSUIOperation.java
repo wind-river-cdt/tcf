@@ -19,7 +19,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.dialogs.TimeTriggeredProgressMonitorDialog;
-import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 import org.eclipse.ui.PlatformUI;
 
 /**
@@ -27,6 +26,11 @@ import org.eclipse.ui.PlatformUI;
  */
 public class FSUIOperation extends FSOperation {
 
+	private String msgDialogTitle;
+	
+	public FSUIOperation(String msgDialogTitle) {
+		this.msgDialogTitle = msgDialogTitle;
+	}
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation#doit()
@@ -43,7 +47,7 @@ public class FSUIOperation extends FSOperation {
 		catch (InvocationTargetException e) {
 			// Display the error during copy.
 			Throwable throwable = e.getTargetException() != null ? e.getTargetException() : e;
-			MessageDialog.openError(parent, Messages.FSCopy_CopyFileFolderTitle, throwable.getLocalizedMessage());
+			MessageDialog.openError(parent, msgDialogTitle, throwable.getLocalizedMessage());
 			return new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), throwable.getLocalizedMessage(), throwable);
 		}
 		catch (InterruptedException e) {

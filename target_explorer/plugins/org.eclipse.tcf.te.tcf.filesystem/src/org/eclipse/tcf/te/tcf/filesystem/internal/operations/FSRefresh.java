@@ -51,7 +51,7 @@ public class FSRefresh extends FSJobOperation {
 	 * @param callback The callback
 	 */
 	public FSRefresh(FSTreeNode node, ICallback callback) {
-		super(callback);
+		super(Messages.RefreshDirectoryHandler_RefreshJobTitle, callback);
 		this.node = node;
 	}
 

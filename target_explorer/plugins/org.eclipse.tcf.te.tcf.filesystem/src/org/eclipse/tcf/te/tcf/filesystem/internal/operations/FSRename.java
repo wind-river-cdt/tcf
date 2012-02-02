@@ -51,7 +51,7 @@ public class FSRename extends FSJobOperation {
 	 * @param newName The new name of this node.
 	 */
 	public FSRename(FSTreeNode node, String newName) {
-		super(new RenameCallback());
+		super(Messages.FSRename_JobTitle, new RenameCallback());
 		this.node = node;
 		this.newName = newName;
 	}
