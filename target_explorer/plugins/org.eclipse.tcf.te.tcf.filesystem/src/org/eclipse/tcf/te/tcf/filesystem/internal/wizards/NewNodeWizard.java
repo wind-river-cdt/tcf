@@ -134,21 +134,19 @@ public abstract class NewNodeWizard extends AbstractWizard implements INewWizard
 			FSCreate create = getCreateOp(dest, name);
 			try {
 	            getContainer().run(false, false, create);
+				final FSTreeNode newNode = create.getNode();
+				getShell().getDisplay().asyncExec(new Runnable(){
+					@Override
+	                public void run() {
+						selectNewNode(newNode);
+	                }});
+				return true;
             }
             catch (InvocationTargetException e) {
     			newPage.setErrorMessage(e.getLocalizedMessage());
-	            return false;
             }
             catch (InterruptedException e) {
-	            return false;
             }
-			final FSTreeNode newNode = create.getNode();
-			getShell().getDisplay().asyncExec(new Runnable(){
-				@Override
-                public void run() {
-					selectNewNode(newNode);
-                }});
-			return true;
 		}
 		return false;
 	}
