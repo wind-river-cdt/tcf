@@ -20,7 +20,6 @@ import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.DoneStat;
 import org.eclipse.tcf.services.IFileSystem.FileAttrs;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
-import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
@@ -31,7 +30,7 @@ import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
  * The base file operation class for creating a file or a folder in the file system of Target
  * Explorer.
  */
-public abstract class FSCreate extends FSJobOperation {
+public abstract class FSCreate extends FSOperation {
 	// The folder in which a file/folder is going to be created.
 	protected FSTreeNode folder;
 	// The node that is created after the operation.
@@ -45,8 +44,7 @@ public abstract class FSCreate extends FSJobOperation {
 	 * @param folder The folder in which the new node is going to be created.
 	 * @param name The new node's name.
 	 */
-	public FSCreate(FSTreeNode folder, String name, ICallback callback) {
-		super(Messages.FSCreate_JobTitle, callback);
+	public FSCreate(FSTreeNode folder, String name) {
 		this.folder = folder;
 		this.name = name;
 	}
@@ -59,16 +57,24 @@ public abstract class FSCreate extends FSJobOperation {
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 		IChannel channel = null;
 		try {
+			int total = folder.childrenQueried ? 5 : 6;
+			monitor.beginTask(NLS.bind(Messages.FSCreate_TaskName, name), total);
 			channel = openChannel(folder.peerNode.getPeer());
+			monitor.worked(1);
 			IFileSystem service = getBlockingFileSystem(channel);
 			if (service != null) {
 				if (!folder.childrenQueried) {
 					// If the children of folder is not queried, load it first.
 					loadChildren(folder, service);
+					monitor.worked(1);
 				}
+				monitor.worked(1);
 				create(service);
+				monitor.worked(1);
 				addNode(service);
+				monitor.worked(1);
 				refresh(service);
+				monitor.worked(1);
 			}
 			else {
 				String message = NLS.bind(Messages.FSOperation_NoFileSystemError, folder.peerNode.getPeerId());
@@ -76,13 +82,13 @@ public abstract class FSCreate extends FSJobOperation {
 			}
 		}
 		catch (TCFException e) {
-			throw new InvocationTargetException(e);
+			throw new InvocationTargetException(e, e.getLocalizedMessage());
 		}
 		finally {
 			if (channel != null) Tcf.getChannelManager().closeChannel(channel);
 		}
-	}
-	
+	}	
+
 	/**
 	 * Refresh new node's stat using the file system service.
 	 *

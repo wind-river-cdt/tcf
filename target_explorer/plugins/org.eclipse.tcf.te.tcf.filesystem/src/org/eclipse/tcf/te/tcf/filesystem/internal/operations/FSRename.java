@@ -92,7 +92,7 @@ public class FSRename extends FSJobOperation {
 			}
 		}
 		catch (TCFException e) {
-			throw new InvocationTargetException(e);
+			throw new InvocationTargetException(e, e.getLocalizedMessage());
 		}
 		finally {
 			if (channel != null) Tcf.getChannelManager().closeChannel(channel);

@@ -199,6 +199,7 @@ public class Messages extends NLS {
 
 	public static String FSCreate_CreationFailed;
 	public static String FSCreate_JobTitle;
+	public static String FSCreate_TaskName;
 	public static String FSMove_CannotMove;
 	public static String FSMove_FileExistsError;
 	public static String FSMove_FolderExistsError;

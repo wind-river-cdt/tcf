@@ -77,7 +77,7 @@ public class FSCopy extends FSUIOperation {
 			}
 		}
 		catch (TCFException e) {
-			throw new InvocationTargetException(e);
+			throw new InvocationTargetException(e, e.getLocalizedMessage());
 		}
 		finally {
 			if (channel != null) Tcf.getChannelManager().closeChannel(channel);

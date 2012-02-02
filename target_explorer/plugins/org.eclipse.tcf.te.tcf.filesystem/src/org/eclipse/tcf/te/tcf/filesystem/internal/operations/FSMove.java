@@ -72,16 +72,14 @@ public class FSMove extends FSUIOperation {
 						}
 					}
 					else {
-						String message = NLS
-						                .bind(Messages.FSOperation_NoFileSystemError, head.peerNode
-						                                .getPeerId());
+						String message = NLS.bind(Messages.FSOperation_NoFileSystemError, head.peerNode.getPeerId());
 						throw new TCFFileSystemException(message);
 					}
 				}
 			}
 		}
 		catch (TCFException e) {
-			throw new InvocationTargetException(e);
+			throw new InvocationTargetException(e, e.getLocalizedMessage());
 		}
 		finally {
 			// Clear the clip board.
