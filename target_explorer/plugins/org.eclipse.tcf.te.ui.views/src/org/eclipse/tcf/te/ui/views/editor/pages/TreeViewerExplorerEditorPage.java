@@ -124,7 +124,7 @@ public class TreeViewerExplorerEditorPage extends AbstractCustomFormToolkitEdito
 	 *
 	 * @return The associated tree control or <code>null</code>.
 	 */
-	protected final TreeControl getTreeControl() {
+	public final TreeControl getTreeControl() {
 		return treeControl;
 	}
 }

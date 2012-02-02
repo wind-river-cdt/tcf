@@ -12,22 +12,24 @@ package org.eclipse.tcf.te.tcf.filesystem.internal.wizards;
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSCreate;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
+import org.eclipse.tcf.te.ui.views.editor.pages.TreeViewerExplorerEditorPage;
 import org.eclipse.tcf.te.ui.wizards.AbstractWizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.forms.editor.FormEditor;
+import org.eclipse.ui.forms.editor.IFormPage;
+import org.eclipse.ui.navigator.CommonNavigator;
 
 /**
  * The base wizard class to create a new file/folder in the file system of Target Explorer.
@@ -140,8 +142,12 @@ public abstract class NewNodeWizard extends AbstractWizard implements INewWizard
             catch (InterruptedException e) {
 	            return false;
             }
-			FSTreeNode newNode = create.getNode();
-			selectNewNode(newNode);
+			final FSTreeNode newNode = create.getNode();
+			getShell().getDisplay().asyncExec(new Runnable(){
+				@Override
+                public void run() {
+					selectNewNode(newNode);
+                }});
 			return true;
 		}
 		return false;
@@ -152,27 +158,41 @@ public abstract class NewNodeWizard extends AbstractWizard implements INewWizard
 	 * 
 	 * @param node The node to be selected.
 	 */
-	private void selectNewNode(FSTreeNode node) {
+	void selectNewNode(FSTreeNode node) {
+		TreeViewer viewer = getFocusedViewer();
+		if(viewer != null) {
+			viewer.refresh(folder);
+			ISelection selection = new StructuredSelection(node);
+			viewer.setSelection(selection, true);
+		}
+    }
+	
+	/**
+	 * Get currently focused tree viewer.
+	 * 
+	 * @return currently focused tree viewer or null.
+	 */
+	TreeViewer getFocusedViewer() {
 		IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
 		if (window != null) {
 			IWorkbenchPage page = window.getActivePage();
 			if (page != null) {
 				IWorkbenchPart part = page.getActivePart();
-				if (part != null) {
-					IWorkbenchPartSite site = part.getSite();
-					ISelectionProvider selProvider = site.getSelectionProvider();
-					ISelection selection = new StructuredSelection(node);
-					if (selProvider instanceof Viewer) {
-						// Select and make it visible.
-						((Viewer) selProvider).setSelection(selection, true);
+				if (part instanceof FormEditor) {
+					FormEditor formEditor = (FormEditor) part;
+					IFormPage formPage = formEditor.getActivePageInstance();
+					if (formPage instanceof TreeViewerExplorerEditorPage) {
+						TreeViewerExplorerEditorPage viewerPage = (TreeViewerExplorerEditorPage) formPage;
+						return (TreeViewer) viewerPage.getTreeControl().getViewer();
 					}
-					else {
-						selProvider.setSelection(selection);
-					}
+				} else if (part instanceof CommonNavigator) {
+					CommonNavigator navigator = (CommonNavigator) part;
+					return navigator.getCommonViewer();
 				}
 			}
-		}	    
-    }
+		}
+		return null;
+	}
 
 	/**
 	 * Create a wizard page to create a new node.
