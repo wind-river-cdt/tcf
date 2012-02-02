@@ -16,7 +16,7 @@ public interface IPreferenceKeys {
 	/**
 	 * Common prefix for all core preference keys
 	 */
-	public final String PREFIX = "tcf.filesystem.core."; //$NON-NLS-1$
+	public final String PREFIX = "te.tcf.filesystem.core."; //$NON-NLS-1$
 
 	/**
 	 * If set to <code>true</code>, the file system content contribution to the target

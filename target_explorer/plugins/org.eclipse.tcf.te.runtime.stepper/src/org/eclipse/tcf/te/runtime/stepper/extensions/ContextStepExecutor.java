@@ -100,7 +100,7 @@ public class ContextStepExecutor extends AbstractContextStepExecutor {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.windriver.ide.target.core.stepper.AbstractTargetContextStepExecutor#isExceptionMessageFormatted(java.lang.String)
+	 * @see org.eclipse.tcf.te.runtime.stepper.extensions.AbstractContextStepExecutor#isExceptionMessageFormatted(java.lang.String)
 	 */
 	@Override
 	protected boolean isExceptionMessageFormatted(String message) {

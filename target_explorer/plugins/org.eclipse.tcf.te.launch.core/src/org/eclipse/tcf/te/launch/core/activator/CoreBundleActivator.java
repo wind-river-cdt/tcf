@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.launch.core.activator;
 
+import org.eclipse.tcf.te.runtime.preferences.ScopedEclipsePreferences;
 import org.eclipse.tcf.te.runtime.tracing.TraceHandler;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -19,6 +20,8 @@ import org.osgi.framework.BundleContext;
 public class CoreBundleActivator implements BundleActivator {
 	// The bundle context
 	private static BundleContext context;
+	// The scoped preferences instance
+	private static ScopedEclipsePreferences scopedPreferences = null;
 	// The trace handler instance
 	private static TraceHandler traceHandler;
 
@@ -39,6 +42,16 @@ public class CoreBundleActivator implements BundleActivator {
 			return getContext().getBundle().getSymbolicName();
 		}
 		return null;
+	}
+
+	/**
+	 * Return the scoped preferences for this plugin.
+	 */
+	public static ScopedEclipsePreferences getScopedPreferences() {
+		if (scopedPreferences == null) {
+			scopedPreferences = new ScopedEclipsePreferences(getUniqueIdentifier());
+		}
+		return scopedPreferences;
 	}
 
 	/**
@@ -69,6 +82,7 @@ public class CoreBundleActivator implements BundleActivator {
 	@Override
     public void stop(BundleContext bundleContext) throws Exception {
 		CoreBundleActivator.context = null;
+		scopedPreferences = null;
 		traceHandler = null;
 	}
 

@@ -7,4 +7,21 @@
    <extension-point id="launchManagerDelegates" name="Launch Manager Delegates" schema="schema/launchManagerDelegates.exsd"/>
    <extension-point id="launchModeVariantDelegates" name="Launch Mode Variant Delegates" schema="schema/launchModeVariantDelegates.exsd"/>
 
+<!-- Adapter factory contributions -->
+   <extension point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.tcf.te.launch.core.selection.interfaces.ISelectionContext"
+            class="org.eclipse.tcf.te.launch.core.adapters.internal.AdapterFactory">
+         <adapter type="org.eclipse.core.expressions.IIterable"/>
+         <adapter type="org.eclipse.core.expressions.ICountable"/>
+      </factory>
+   </extension>
+
+<!-- Preference contributions -->
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.tcf.te.launch.core.preferences.PreferencesInitializer">
+      </initializer>
+   </extension>
+
 </plugin>

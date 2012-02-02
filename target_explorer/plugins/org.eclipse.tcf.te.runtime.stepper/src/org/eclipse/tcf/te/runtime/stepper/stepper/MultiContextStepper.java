@@ -20,8 +20,8 @@ import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.stepper.StepperAttributeUtil;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IContext;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextManipulator;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepper;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId;
 
 /**
  * A stepper implementation capable of handling multiple contexts.
@@ -91,7 +91,7 @@ public class MultiContextStepper extends SingleContextStepper {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.windriver.ide.target.core.stepper.AbstractTargetContextStepper#internalExecute(java.util.List)
+	 * @see org.eclipse.tcf.te.runtime.stepper.extensions.AbstractContextStepper#internalExecute(java.util.List)
 	 */
 	@Override
 	protected void internalExecute(List<IStatus> statusContainer) throws CoreException {

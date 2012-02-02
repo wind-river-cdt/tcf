@@ -29,4 +29,12 @@ public class Messages extends NLS {
 
 	// **** Declare externalized string id's down here *****
 
+	public static String DefaultLaunchManagerDelegate_defaultLaunchName;
+
+	public static String LaunchManager_error_invalidExtensionPoint;
+	public static String LaunchManager_error_noLaunchConfigType;
+	public static String LaunchManager_error_failedToCreateConfig;
+	public static String LaunchManager_error_failedToUpdateConfig;
+	public static String LaunchManager_error_deleteLaunchConfig;
+
 }

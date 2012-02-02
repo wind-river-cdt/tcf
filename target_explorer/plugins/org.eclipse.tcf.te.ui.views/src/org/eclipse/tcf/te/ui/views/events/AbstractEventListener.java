@@ -235,7 +235,7 @@ public abstract class AbstractEventListener extends org.eclipse.tcf.te.ui.events
 		}
 
 		/* (non-Javadoc)
-		 * @see com.windriver.te.tcf.softice.ui.internal.events.EventListener.AbstractJob#newRunnable(java.lang.Object)
+		 * @see org.eclipse.tcf.te.ui.views.events.AbstractEventListener.AbstractJob#newRunnable(java.lang.Object)
 		 */
 		@Override
 		protected Runnable newRunnable(final Object node) {
@@ -270,7 +270,7 @@ public abstract class AbstractEventListener extends org.eclipse.tcf.te.ui.events
 
 
 		/* (non-Javadoc)
-		 * @see com.windriver.te.tcf.softice.ui.internal.events.EventListener.AbstractJob#newRunnable(java.lang.Object)
+		 * @see org.eclipse.tcf.te.ui.views.events.AbstractEventListener.AbstractJob#newRunnable(java.lang.Object)
 		 */
 		@Override
 		protected Runnable newRunnable(final Object node) {
