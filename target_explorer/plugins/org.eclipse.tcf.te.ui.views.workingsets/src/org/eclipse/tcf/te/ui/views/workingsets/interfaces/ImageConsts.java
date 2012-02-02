@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * Copyright (c) 2012 Wind River Systems, Inc. and others. All rights reserved.
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.ui.views.interfaces;
+package org.eclipse.tcf.te.ui.views.workingsets.interfaces;
 
 /**
  * Image registry constants.
@@ -43,17 +43,12 @@ public interface ImageConsts {
     // ***** The image constants *****
 
     /**
-     * The key to access the editor image.
+     * The key to access the working sets image.
      */
-    public static final String  EDITOR = "Editor"; //$NON-NLS-1$
+    public static final String  WORKING_SETS = "WorkingSets"; //$NON-NLS-1$
 
     /**
-     * The key to access the view image.
+     * The key to access the working set image.
      */
-    public static final String  VIEW = "View"; //$NON-NLS-1$
-
-    /**
-     * The key to access the help action image.
-     */
-    public static final String  HELP = "HelpAction"; //$NON-NLS-1$
+    public static final String  WORKING_SET = "WorkingSet"; //$NON-NLS-1$
 }

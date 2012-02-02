@@ -47,7 +47,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.te.ui.views.interfaces.workingsets.IWorkingSetIDs;
-import org.eclipse.tcf.te.ui.views.nls.Messages;
+import org.eclipse.tcf.te.ui.views.workingsets.nls.Messages;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.IWorkingSetManager;
 import org.eclipse.ui.dialogs.IWorkingSetEditWizard;

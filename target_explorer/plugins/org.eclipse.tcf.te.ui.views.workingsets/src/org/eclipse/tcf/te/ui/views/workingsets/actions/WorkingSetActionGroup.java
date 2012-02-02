@@ -22,10 +22,10 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.tcf.te.ui.views.activator.UIPlugin;
-import org.eclipse.tcf.te.ui.views.interfaces.ImageConsts;
-import org.eclipse.tcf.te.ui.views.nls.Messages;
 import org.eclipse.tcf.te.ui.views.workingsets.WorkingSetsContentProvider;
+import org.eclipse.tcf.te.ui.views.workingsets.activator.UIPlugin;
+import org.eclipse.tcf.te.ui.views.workingsets.interfaces.ImageConsts;
+import org.eclipse.tcf.te.ui.views.workingsets.nls.Messages;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.actions.ActionGroup;
@@ -186,11 +186,12 @@ public class WorkingSetActionGroup extends ActionGroup {
 		}
 	}
 
-	private IAction[] createActions() {
+	@SuppressWarnings("restriction")
+    private IAction[] createActions() {
 
 		elementsAction = new TopLevelContentAction(false);
 		elementsAction.setText(Messages.WorkingSetActionGroup_Elements);
-		elementsAction.setImageDescriptor(UIPlugin.getImageDescriptor(ImageConsts.VIEW));
+		elementsAction.setImageDescriptor(org.eclipse.tcf.te.ui.views.activator.UIPlugin.getImageDescriptor(org.eclipse.tcf.te.ui.views.interfaces.ImageConsts.VIEW));
 
 		workingSetsAction = new TopLevelContentAction(true);
 		workingSetsAction.setText(Messages.WorkingSetActionGroup_Working_Set);

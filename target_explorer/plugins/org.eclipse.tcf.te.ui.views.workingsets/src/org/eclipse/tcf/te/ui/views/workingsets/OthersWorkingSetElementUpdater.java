@@ -14,8 +14,8 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.tcf.te.runtime.interfaces.workingsets.IWorkingSetElement;
-import org.eclipse.tcf.te.ui.views.internal.View;
 import org.eclipse.tcf.te.ui.views.internal.ViewRoot;
 import org.eclipse.tcf.te.ui.views.internal.ViewViewer;
 import org.eclipse.ui.IWorkingSet;
@@ -70,7 +70,7 @@ public class OthersWorkingSetElementUpdater extends WorkingSetElementUpdater {
 		Object[] elements = viewer.getNavigatorContentService().createCommonContentProvider().getElements(ViewRoot.getInstance());
 
 		// Get all working sets
-		WorkingSetViewStateManager manager = viewer.getCommonNavigator() instanceof View ? ((View)viewer.getCommonNavigator()).getStateManager() : null;
+		WorkingSetViewStateManager manager = (WorkingSetViewStateManager)Platform.getAdapterManager().getAdapter(viewer.getCommonNavigator(), WorkingSetViewStateManager.class);
 		IWorkingSet[] allWorkingSets = manager != null ? manager.getAllWorkingSets() : new IWorkingSet[0];
 
 		// Loop the elements and check if they are contained in a working set

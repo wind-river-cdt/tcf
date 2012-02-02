@@ -16,6 +16,7 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -24,13 +25,12 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.tcf.te.runtime.events.EventManager;
 import org.eclipse.tcf.te.runtime.interfaces.workingsets.IWorkingSetElement;
-import org.eclipse.tcf.te.ui.views.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.views.events.ViewerContentChangeEvent;
 import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
 import org.eclipse.tcf.te.ui.views.interfaces.workingsets.IWorkingSetIDs;
-import org.eclipse.tcf.te.ui.views.internal.View;
 import org.eclipse.tcf.te.ui.views.internal.ViewRoot;
-import org.eclipse.tcf.te.ui.views.nls.Messages;
+import org.eclipse.tcf.te.ui.views.workingsets.activator.UIPlugin;
+import org.eclipse.tcf.te.ui.views.workingsets.nls.Messages;
 import org.eclipse.ui.ILocalWorkingSetManager;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IWorkingSet;
@@ -144,10 +144,8 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 	@Override
 	public void restoreState(IMemento memento) {
 		// Determine the view local working set manager instance
-		ILocalWorkingSetManager manager = null;
-		if (viewer.getCommonNavigator() instanceof View) {
-			manager = ((View)viewer.getCommonNavigator()).getStateManager().getLocalWorkingSetManager();
-		}
+		WorkingSetViewStateManager mng = (WorkingSetViewStateManager)Platform.getAdapterManager().getAdapter(viewer.getCommonNavigator(), WorkingSetViewStateManager.class);
+		ILocalWorkingSetManager manager = mng != null ? mng.getLocalWorkingSetManager() : null;
 
 		// Recreate the local automatic working sets
 		if (manager != null) {
@@ -224,35 +222,33 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 	 */
 	@Override
 	public Object getParent(Object element) {
+		CommonNavigator navigator = viewer.getCommonNavigator();
+		WorkingSetViewStateManager manager = navigator != null ? (WorkingSetViewStateManager)Platform.getAdapterManager().getAdapter(navigator, WorkingSetViewStateManager.class) : null;
+
 		if (element instanceof IWorkingSet) {
-			CommonNavigator navigator = viewer.getCommonNavigator();
-			if (navigator instanceof View) {
-				WorkingSetViewStateManager manager = ((View)navigator).getStateManager();
-				List<IWorkingSet> allWorkingSets = Arrays.asList(manager.getAllWorkingSets());
-				if (allWorkingSets.contains(element)) {
-					return manager;
-				}
+			List<IWorkingSet> allWorkingSets = manager != null ? Arrays.asList(manager.getAllWorkingSets()) : new ArrayList<IWorkingSet>();
+			if (allWorkingSets.contains(element)) {
+				return manager;
 			}
 		}
 		else if (element instanceof WorkingSetElementHolder) {
 			String wsName = ((WorkingSetElementHolder)element).getWorkingSetName();
 			if (wsName != null) {
 				IWorkingSet ws = PlatformUI.getWorkbench().getWorkingSetManager().getWorkingSet(wsName);
-				if (ws == null && viewer.getCommonNavigator() instanceof View) {
-					ws = ((View)viewer.getCommonNavigator()).getStateManager().getLocalWorkingSetManager().getWorkingSet(wsName);
+				if (ws == null && manager != null) {
+					ws = manager.getLocalWorkingSetManager().getWorkingSet(wsName);
 				}
 				return ws;
 			}
 		}
 		else if (element instanceof IWorkingSetElement) {
-			CommonNavigator navigator = viewer.getCommonNavigator();
 			if (navigator != null) {
 				if (navigator.getRootMode() == IUIConstants.MODE_WORKING_SETS) {
 					IWorkingSet[] workingSets = PlatformUI.getWorkbench().getWorkingSetManager().getAllWorkingSets();
 					List<IWorkingSet> list = new ArrayList<IWorkingSet>();
 					list.addAll(Arrays.asList(workingSets));
-					ILocalWorkingSetManager wsManager = ((View) viewer.getCommonNavigator()).getStateManager().getLocalWorkingSetManager();
-					workingSets = wsManager.getAllWorkingSets();
+					ILocalWorkingSetManager wsManager = manager != null ? manager.getLocalWorkingSetManager() : null;
+					workingSets = wsManager != null ? wsManager.getAllWorkingSets() : new IWorkingSet[0];
 					list.addAll(Arrays.asList(workingSets));
 					for (IWorkingSet workingSet : list) {
 						IAdaptable[] wsElements = getWorkingSetElements(workingSet);
@@ -312,7 +308,7 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 		boolean filterActive;
 		if (extensionStateModel.getBooleanProperty(SHOW_TOP_LEVEL_WORKING_SETS)) {
 			navigator.setRootMode(IUIConstants.MODE_WORKING_SETS);
-			newInput = ((View)navigator).getStateManager();
+			newInput = Platform.getAdapterManager().getAdapter(navigator, WorkingSetViewStateManager.class);
 			filterActive = true;
 		}
 		else {

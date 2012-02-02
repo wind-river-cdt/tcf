@@ -29,52 +29,11 @@ public class Messages extends NLS {
 
 	// **** Declare externalized string id's down here *****
 
-	public static String View_toolTip;
-	public static String View_toolTip2;
-	public static String View_toolTip3;
-	public static String View_workingSetModel;
-
 	public static String NewActionProvider_NewMenu_label;
 	public static String NewActionProvider_NewWizardCommandAction_label;
 	public static String NewActionProvider_NewWizardCommandAction_tooltip;
 
-	public static String WorkingSetActionProvider_multipleWorkingSets;
-
-	public static String WorkingSetActionGroup_Top_Level_Element;
-	public static String WorkingSetActionGroup_Elements;
-	public static String WorkingSetActionGroup_Working_Set;
-
-	public static String ViewStateManager_others_name;
-
-	public static String ConfigureWorkingSetAction_text;
-	public static String ConfigureWorkingSetAction_toolTip;
-
 	public static String PropertiesCommandHandler_error_initPartFailed;
-
-	public static String TargetWorkingSetPage_workingSet_name;
-	public static String TargetWorkingSetPage_workspace_content;
-	public static String TargetWorkingSetPage_add_button;
-	public static String TargetWorkingSetPage_addAll_button;
-	public static String TargetWorkingSetPage_remove_button;
-	public static String TargetWorkingSetPage_removeAll_button;
-	public static String TargetWorkingSetPage_workingSet_content;
-	public static String TargetWorkingSetPage_warning_nameWhitespace;
-	public static String TargetWorkingSetPage_warning_nameMustNotBeEmpty;
-	public static String TargetWorkingSetPage_warning_workingSetExists;
-	public static String TargetWorkingSetPage_warning_resourceMustBeChecked;
-	public static String TargetWorkingSetPage_title;
-	public static String TargetWorkingSetPage_workingSet_description;
-
-	public static String WorkingSetConfigurationDialog_down_label;
-	public static String WorkingSetConfigurationDialog_up_label;
-	public static String WorkingSetConfigurationDialog_title;
-	public static String WorkingSetConfigurationDialog_selectAll_label;
-	public static String WorkingSetConfigurationDialog_edit_label;
-	public static String WorkingSetConfigurationDialog_message;
-	public static String WorkingSetConfigurationDialog_deselectAll_label;
-	public static String WorkingSetConfigurationDialog_new_label;
-	public static String WorkingSetConfigurationDialog_sort_working_sets;
-	public static String WorkingSetConfigurationDialog_remove_label;
 
 	public static String AbstractCustomFormToolkitEditorPage_HelpAction_label;
 	public static String AbstractCustomFormToolkitEditorPage_HelpAction_tooltip;

@@ -9,9 +9,9 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.views.workingsets;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.tcf.te.ui.trees.TreeViewerSorter;
-import org.eclipse.tcf.te.ui.views.internal.View;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.internal.WorkingSetComparator;
 import org.eclipse.ui.navigator.CommonViewer;
@@ -30,8 +30,8 @@ public class WorkingSetViewerSorter extends TreeViewerSorter {
 	protected int doCompare(Viewer viewer, Object node1, Object node2, String sortColumn, int index, int inverter) {
 		if (node1 instanceof IWorkingSet && node2 instanceof IWorkingSet) {
 			WorkingSetViewStateManager manager = null;
-			if (viewer instanceof CommonViewer && ((CommonViewer)viewer).getCommonNavigator() instanceof View) {
-				manager = ((View)((CommonViewer)viewer).getCommonNavigator()).getStateManager();
+			if (viewer instanceof CommonViewer && ((CommonViewer)viewer).getCommonNavigator() != null) {
+				manager = (WorkingSetViewStateManager)Platform.getAdapterManager().getAdapter(((CommonViewer)viewer).getCommonNavigator(), WorkingSetViewStateManager.class);
 			}
 			if (manager != null) {
 				if (manager.isSortedWorkingSet()) return wsComparator.compare(node1, node2);

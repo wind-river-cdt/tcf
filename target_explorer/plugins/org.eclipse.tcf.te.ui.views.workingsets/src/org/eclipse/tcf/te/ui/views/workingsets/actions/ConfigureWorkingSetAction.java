@@ -16,15 +16,15 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.tcf.te.ui.views.interfaces.workingsets.IWorkingSetIDs;
-import org.eclipse.tcf.te.ui.views.internal.View;
-import org.eclipse.tcf.te.ui.views.nls.Messages;
 import org.eclipse.tcf.te.ui.views.workingsets.CustomizedOrderComparator;
 import org.eclipse.tcf.te.ui.views.workingsets.WorkingSetViewStateManager;
 import org.eclipse.tcf.te.ui.views.workingsets.dialogs.WorkingSetConfigurationDialog;
+import org.eclipse.tcf.te.ui.views.workingsets.nls.Messages;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.IWorkingSetManager;
 import org.eclipse.ui.PlatformUI;
@@ -79,7 +79,7 @@ public class ConfigureWorkingSetAction extends Action {
 	@Override
 	public void run() {
 		// Get the view working set state manager
-		WorkingSetViewStateManager manager = ((View)((CommonViewer)viewer).getCommonNavigator()).getStateManager();
+		WorkingSetViewStateManager manager = (WorkingSetViewStateManager)Platform.getAdapterManager().getAdapter(((CommonViewer)viewer).getCommonNavigator(), WorkingSetViewStateManager.class);
 		// Get the workbench wide working set manager
 		IWorkingSetManager workingSetManager = PlatformUI.getWorkbench().getWorkingSetManager();
 

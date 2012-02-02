@@ -110,10 +110,6 @@ public class UIPlugin extends AbstractUIPlugin {
 		registry.put(ImageConsts.EDITOR, ImageDescriptor.createFromURL(url));
 		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_EVIEW + "targets_view.gif"); //$NON-NLS-1$
 		registry.put(ImageConsts.VIEW, ImageDescriptor.createFromURL(url));
-		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OBJ + "workingset.gif"); //$NON-NLS-1$
-		registry.put(ImageConsts.WORKING_SET, ImageDescriptor.createFromURL(url));
-		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OBJ + "workingsets.gif"); //$NON-NLS-1$
-		registry.put(ImageConsts.WORKING_SETS, ImageDescriptor.createFromURL(url));
 		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_ETOOL + "help.gif"); //$NON-NLS-1$
 		registry.put(ImageConsts.HELP, ImageDescriptor.createFromURL(url));
 	}

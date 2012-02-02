@@ -141,6 +141,8 @@ tests/plugins/org.eclipse.tcf.debug.test/bin
 /target_explorer/plugins/org.eclipse.tcf.te.ui.terminals.telnet/bin
 /target_explorer/plugins/org.eclipse.tcf.te.ui.views/target
 /target_explorer/plugins/org.eclipse.tcf.te.ui.views/bin
+/target_explorer/plugins/org.eclipse.tcf.te.ui.views.workingsets/target
+/target_explorer/plugins/org.eclipse.tcf.te.ui.views.workingsets/bin
 /target_explorer/features/org.eclipse.tcf.te.feature/target
 /target_explorer/features/org.eclipse.tcf.te.feature/bin
 /target_explorer/features/org.eclipse.tcf.te.cdt.feature/target

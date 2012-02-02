@@ -26,24 +26,17 @@ import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TreeViewerEditor;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tcf.te.ui.trees.TreeViewerEditorActivationStrategy;
 import org.eclipse.tcf.te.ui.views.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.views.interfaces.IRoot;
 import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
-import org.eclipse.tcf.te.ui.views.nls.Messages;
-import org.eclipse.tcf.te.ui.views.workingsets.WorkingSetViewStateManager;
 import org.eclipse.ui.IAggregateWorkingSet;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbenchActionConstants;
-import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
-import org.eclipse.ui.internal.navigator.framelist.Frame;
-import org.eclipse.ui.internal.navigator.framelist.FrameList;
-import org.eclipse.ui.internal.navigator.framelist.TreeFrame;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
@@ -58,7 +51,6 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  * <p>
  * The view is based on the Eclipse Common Navigator framework.
  */
-@SuppressWarnings("restriction")
 public class View extends CommonNavigator implements ITabbedPropertySheetPageContributor{
 	// The view root mode
 	private int rootMode = IUIConstants.MODE_NORMAL;
@@ -70,16 +62,10 @@ public class View extends CommonNavigator implements ITabbedPropertySheetPageCon
 	private String workingSetLabel;
 
 	/**
-	 * The working set view state manager.
-	 */
-	private final WorkingSetViewStateManager stateManager;
-
-	/**
 	 * Constructor.
 	 */
 	public View() {
 		super();
-		stateManager = new WorkingSetViewStateManager(this);
 	}
 
 	/* (non-Javadoc)
@@ -132,21 +118,11 @@ public class View extends CommonNavigator implements ITabbedPropertySheetPageCon
 		return workingSetLabel;
 	}
 
-	/**
-	 * Returns the working set view state manager instance.
-	 *
-	 * @return The working set view state manager instance.
-	 */
-	public final WorkingSetViewStateManager getStateManager() {
-		return stateManager;
-	}
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.navigator.CommonNavigator#dispose()
 	 */
 	@Override
 	public void dispose() {
-		stateManager.dispose();
 	    super.dispose();
 	}
 
@@ -247,7 +223,7 @@ public class View extends CommonNavigator implements ITabbedPropertySheetPageCon
 			IWorkbenchAdapter adapter = (IWorkbenchAdapter) ((IAdaptable) input).getAdapter(IWorkbenchAdapter.class);
 			if (adapter != null) contentDescription = adapter.getLabel(input);
 		}
-		else if (input instanceof IRoot || input instanceof WorkingSetViewStateManager) {
+		else if (input instanceof IRoot || (input != null && "WorkingSetViewStateManager".equals(input.getClass().getSimpleName()))) { //$NON-NLS-1$
 			// The root node does not have a content description
 		}
 		else if (input != null && !(input instanceof IAggregateWorkingSet)) {
@@ -257,61 +233,8 @@ public class View extends CommonNavigator implements ITabbedPropertySheetPageCon
 		setContentDescription(contentDescription != null ? contentDescription : ""); //$NON-NLS-1$
 	}
 
-	/**
-	 * Returns the tool tip text for the given element.
-	 *
-	 * @param element The element or <code>null</code>.
-	 * @return The tooltip or <code>null</code>.
-	 */
-    @Override
-	public String getFrameToolTipText(Object element) {
-		String result;
 
-		if (element instanceof IAggregateWorkingSet) {
-			result = Messages.View_workingSetModel;
-		}
-		else if (element instanceof IWorkingSet) {
-			result = ((IWorkingSet) element).getLabel();
-		}
-		else {
-			result = super.getFrameToolTipText(element);
-		}
-
-		if (rootMode == IUIConstants.MODE_NORMAL) {
-			if (workingSetLabel == null) return result;
-			if (result.length() == 0) return NLS.bind(Messages.View_toolTip, workingSetLabel);
-			return NLS.bind(Messages.View_toolTip2, result, workingSetLabel);
-		}
-
-		// Working set mode. During initialization element and viewer can be null.
-		if (element != null && !(element instanceof IWorkingSet) && getCommonViewer() != null) {
-			FrameList frameList = getCommonViewer().getFrameList();
-			// Happens during initialization
-			if (frameList == null) return result;
-			int index = frameList.getCurrentIndex();
-			IWorkingSet ws = null;
-			while (index >= 0) {
-				Frame frame = frameList.getFrame(index);
-				if (frame instanceof TreeFrame) {
-					Object input = ((TreeFrame) frame).getInput();
-					if (input instanceof IWorkingSet && !(input instanceof IAggregateWorkingSet)) {
-						ws = (IWorkingSet) input;
-						break;
-					}
-				}
-				index--;
-			}
-			if (ws != null) {
-				return NLS.bind(Messages.View_toolTip3, ws.getLabel(), result);
-			}
-			return result;
-		}
-		return result;
-
-	}
-
-    /*
-     * (non-Javadoc)
+    /* (non-Javadoc)
      * @see org.eclipse.ui.navigator.CommonNavigator#getAdapter(java.lang.Class)
      */
 	@Override
