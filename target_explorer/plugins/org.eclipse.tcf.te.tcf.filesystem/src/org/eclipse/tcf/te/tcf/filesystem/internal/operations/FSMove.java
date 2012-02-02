@@ -12,15 +12,8 @@ package org.eclipse.tcf.te.tcf.filesystem.internal.operations;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IFileSystem;
@@ -28,17 +21,15 @@ import org.eclipse.tcf.services.IFileSystem.DoneRename;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
-import org.eclipse.tcf.te.tcf.filesystem.dialogs.TimeTriggeredProgressMonitorDialog;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * FSMove moves specified tree nodes to a destination folder.
  */
-public class FSMove extends FSOperation {
+public class FSMove extends FSUIOperation {
 	// The file/folder nodes to be moved.
 	List<FSTreeNode> nodes;
 	// The destination folder to be moved to.
@@ -57,69 +48,46 @@ public class FSMove extends FSOperation {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation#doit()
+	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation#run(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public IStatus doit() {
-		Assert.isNotNull(Display.getCurrent());
+	public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 		// Remove its self from the clipped nodes.
 		nodes.remove(dest);
-		if(nodes.isEmpty()) {
-			// Clear the clip board.
-			UIPlugin.getDefault().getClipboard().clear();
-			return Status.OK_STATUS;
-		}
-		IRunnableWithProgress runnable = new IRunnableWithProgress() {
-			@Override
-			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+		IChannel channel = null;
+		try {
+			if (!nodes.isEmpty()) {
 				FSTreeNode head = nodes.get(0);
-				IChannel channel = null;
-				try {
-					channel = openChannel(head.peerNode.getPeer());
-					if (channel != null) {
-						IFileSystem service = getBlockingFileSystem(channel);
-						if (service != null) {
-							monitor.beginTask(Messages.FSMove_PrepareToMove, IProgressMonitor.UNKNOWN);
-							monitor.worked(1);
-							monitor.beginTask(Messages.FSMove_MovingFile, nodes.size());
-							for (FSTreeNode node : nodes) {
-								// Move each node.
-								moveNode(monitor, service, node, dest);
-							}
-						}
-						else {
-							String message = NLS.bind(Messages.FSOperation_NoFileSystemError, head.peerNode.getPeerId());
-							throw new TCFFileSystemException(message);
+				channel = openChannel(head.peerNode.getPeer());
+				if (channel != null) {
+					IFileSystem service = getBlockingFileSystem(channel);
+					if (service != null) {
+						monitor.beginTask(Messages.FSMove_PrepareToMove, IProgressMonitor.UNKNOWN);
+						monitor.worked(1);
+						monitor.beginTask(Messages.FSMove_MovingFile, nodes.size());
+						for (FSTreeNode node : nodes) {
+							// Move each node.
+							moveNode(monitor, service, node, dest);
 						}
 					}
-				}
-				catch (TCFException e) {
-					throw new InvocationTargetException(e);
-				}
-				finally {
-					// Clear the clip board.
-					UIPlugin.getDefault().getClipboard().clear();
-					if (channel != null) Tcf.getChannelManager().closeChannel(channel);
-					monitor.done();
+					else {
+						String message = NLS
+						                .bind(Messages.FSOperation_NoFileSystemError, head.peerNode
+						                                .getPeerId());
+						throw new TCFFileSystemException(message);
+					}
 				}
 			}
-		};
-		Shell parent = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-		TimeTriggeredProgressMonitorDialog dialog = new TimeTriggeredProgressMonitorDialog(parent, 250);
-		dialog.setCancelable(true);
-		try {
-			dialog.run(true, true, runnable);
 		}
-		catch (InvocationTargetException e) {
-			// Display the error reported during moving.
-			Throwable throwable = e.getTargetException() != null ? e.getTargetException() : e;
-			MessageDialog.openError(parent, Messages.FSMove_MoveFileFolderTitle, throwable.getLocalizedMessage());
-			return new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), throwable.getLocalizedMessage(), throwable);
+		catch (TCFException e) {
+			throw new InvocationTargetException(e);
 		}
-		catch (InterruptedException e) {
-			// It is canceled.
+		finally {
+			// Clear the clip board.
+			UIPlugin.getDefault().getClipboard().clear();
+			if (channel != null) Tcf.getChannelManager().closeChannel(channel);
+			monitor.done();
 		}
-		return Status.OK_STATUS;
 	}
 
 	/**

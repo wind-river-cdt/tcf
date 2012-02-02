@@ -10,14 +10,11 @@
 package org.eclipse.tcf.te.tcf.filesystem.internal.operations;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
@@ -27,8 +24,8 @@ import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.DoneRename;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
+import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.tcf.core.Tcf;
-import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.CacheManager;
@@ -41,7 +38,7 @@ import org.eclipse.ui.PlatformUI;
  * new name.
  *
  */
-public class FSRename extends FSOperation {
+public class FSRename extends FSJobOperation {
 	// The file/folder node to be renamed.
 	FSTreeNode node;
 	// The new name the file/folder is renamed to.
@@ -54,69 +51,51 @@ public class FSRename extends FSOperation {
 	 * @param newName The new name of this node.
 	 */
 	public FSRename(FSTreeNode node, String newName) {
+		super(new RenameCallback());
 		this.node = node;
 		this.newName = newName;
+	}
+	
+	/**
+	 * The callback called after the renaming is done. 
+	 */
+	static class RenameCallback extends Callback {
+		@Override
+        protected void internalDone(Object caller, IStatus status) {
+			Assert.isNotNull(Display.getCurrent());
+			if (!status.isOK()) {
+				String message = status.getMessage();
+				Shell parent = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+				MessageDialog.openError(parent, Messages.FSRename_RenameFileFolderTitle, message);
+			}
+		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation#doit()
+	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation#run(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public IStatus doit() {
-		Assert.isNotNull(Display.getCurrent());
-		Job job = new Job(Messages.FSRename_RenameFileFolderTitle) {
-			@Override
-            protected IStatus run(IProgressMonitor monitor) {
-				IChannel channel = null;
-				try {
-					channel = openChannel(node.peerNode.getPeer());
-					if (channel != null) {
-						IFileSystem service = getBlockingFileSystem(channel);
-						if (service != null) {
-							renameNode(service);
-						}
-						else {
-							String message = NLS.bind(Messages.FSOperation_NoFileSystemError, node.peerNode.getPeerId());
-							throw new TCFFileSystemException(message);
-						}
-						return Status.OK_STATUS;
-					}
+    public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+		IChannel channel = null;
+		try {
+			channel = openChannel(node.peerNode.getPeer());
+			if (channel != null) {
+				IFileSystem service = getBlockingFileSystem(channel);
+				if (service != null) {
+					renameNode(service);
 				}
-				catch (TCFException e) {
-					return new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), e.getLocalizedMessage(), e);
+				else {
+					String message = NLS.bind(Messages.FSOperation_NoFileSystemError, node.peerNode.getPeerId());
+					throw new TCFFileSystemException(message);
 				}
-				finally {
-					if (channel != null) Tcf.getChannelManager().closeChannel(channel);
-				}
-				return Status.OK_STATUS;
-			}};
-		job.addJobChangeListener(new JobChangeAdapter(){
-			@Override
-            public void done(final IJobChangeEvent event) {
-				Display display = PlatformUI.getWorkbench().getDisplay();
-				display.asyncExec(new Runnable(){
-					@Override
-                    public void run() {
-						doneRename(event);
-                    }});
-            }});
-		job.schedule();
-		return Status.OK_STATUS;
-	}
-
-	/**
-	 * Called when the renaming is done. Must be called within UI-thread.
-	 * 
-	 * @param event The job change event.
-	 */
-	void doneRename(IJobChangeEvent event) {
-		Assert.isNotNull(Display.getCurrent());
-		IStatus status = event.getResult();
-		if (!status.isOK()) {
-			String message = status.getMessage();
-			Shell parent = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-			MessageDialog.openError(parent, Messages.FSRename_RenameFileFolderTitle, message);
+			}
+		}
+		catch (TCFException e) {
+			throw new InvocationTargetException(e);
+		}
+		finally {
+			if (channel != null) Tcf.getChannelManager().closeChannel(channel);
 		}
 	}
 	

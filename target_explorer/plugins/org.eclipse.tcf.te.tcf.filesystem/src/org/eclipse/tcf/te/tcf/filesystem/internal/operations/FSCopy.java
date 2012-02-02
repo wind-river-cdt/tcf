@@ -12,34 +12,24 @@ package org.eclipse.tcf.te.tcf.filesystem.internal.operations;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.DoneCopy;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.te.tcf.core.Tcf;
-import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
-import org.eclipse.tcf.te.tcf.filesystem.dialogs.TimeTriggeredProgressMonitorDialog;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.PersistenceManager;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * FSCopy copies selected FSTreeNodes to a specify destination folder.
  */
-public class FSCopy extends FSOperation {
+public class FSCopy extends FSUIOperation {
 	// The nodes to be copied.
 	List<FSTreeNode> nodes;
 	// The destination folder to be copied to.
@@ -58,62 +48,40 @@ public class FSCopy extends FSOperation {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation#doit()
+	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation#run(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public IStatus doit() {
-		Assert.isNotNull(Display.getCurrent());
-		IRunnableWithProgress runnable = new IRunnableWithProgress() {
-			@Override
-			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-				FSTreeNode head = nodes.get(0);
-				IChannel channel = null;
-				try {
-					channel = openChannel(head.peerNode.getPeer());
-					if (channel != null) {
-						IFileSystem service = getBlockingFileSystem(channel);
-						if (service != null) {
-							monitor.beginTask(Messages.FSCopy_PrepareToCopy, IProgressMonitor.UNKNOWN);
-							monitor.worked(1);
-							int count = count(service, nodes);
-							monitor.beginTask(Messages.FSCopy_CopyingFile, count);
-							for (FSTreeNode node : nodes) {
-								// Iterate the nodes and copy each of them to the destination
-								// folder.
-								copyNode(monitor, service, node, dest);
-							}
-						}
-						else {
-							String message = NLS.bind(Messages.FSOperation_NoFileSystemError, head.peerNode.getPeerId());
-							throw new TCFFileSystemException(message);
-						}
+    public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+		FSTreeNode head = nodes.get(0);
+		IChannel channel = null;
+		try {
+			channel = openChannel(head.peerNode.getPeer());
+			if (channel != null) {
+				IFileSystem service = getBlockingFileSystem(channel);
+				if (service != null) {
+					monitor.beginTask(Messages.FSCopy_PrepareToCopy, IProgressMonitor.UNKNOWN);
+					monitor.worked(1);
+					int count = count(service, nodes);
+					monitor.beginTask(Messages.FSCopy_CopyingFile, count);
+					for (FSTreeNode node : nodes) {
+						// Iterate the nodes and copy each of them to the destination
+						// folder.
+						copyNode(monitor, service, node, dest);
 					}
 				}
-				catch (TCFException e) {
-					throw new InvocationTargetException(e);
-				}
-				finally {
-					if (channel != null) Tcf.getChannelManager().closeChannel(channel);
-					monitor.done();
+				else {
+					String message = NLS.bind(Messages.FSOperation_NoFileSystemError, head.peerNode.getPeerId());
+					throw new TCFFileSystemException(message);
 				}
 			}
-		};
-		Shell parent = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-		TimeTriggeredProgressMonitorDialog dialog = new TimeTriggeredProgressMonitorDialog(parent, 250);
-		dialog.setCancelable(true);
-		try {
-			dialog.run(true, true, runnable);
 		}
-		catch (InvocationTargetException e) {
-			// Display the error during copy.
-			Throwable throwable = e.getTargetException() != null ? e.getTargetException() : e;
-			MessageDialog.openError(parent, Messages.FSCopy_CopyFileFolderTitle, throwable.getLocalizedMessage());
-			return new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), throwable.getLocalizedMessage(), throwable);
+		catch (TCFException e) {
+			throw new InvocationTargetException(e);
 		}
-		catch (InterruptedException e) {
-			// It is canceled.
+		finally {
+			if (channel != null) Tcf.getChannelManager().closeChannel(channel);
+			monitor.done();
 		}
-		return Status.OK_STATUS;
 	}
 
 	/**

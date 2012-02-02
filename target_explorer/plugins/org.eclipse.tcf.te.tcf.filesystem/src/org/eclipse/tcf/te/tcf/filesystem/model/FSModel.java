@@ -16,10 +16,8 @@ import java.util.Map;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.util.SafeRunnable;
-import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
-import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.te.runtime.utils.Host;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
@@ -219,7 +217,8 @@ public final class FSModel {
 		}
 		else if (node != null) {
 			if (node.isDirectory()) {
-				children = getUpdatedChildren(peer, node);
+				List<FSTreeNode> nodes= new FSOperation().getChildren(node);
+				children = nodes.toArray(new FSTreeNode[nodes.size()]);
 			}
 			else {
 				children = null;
@@ -229,26 +228,6 @@ public final class FSModel {
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * Get the updated children of the directory node. If the node is already updated, i.e., its
-	 * children are queried, then return its current children. If the node is not yet queried, then
-	 * query its children before getting its children.
-	 * 
-	 * @param folder The directory node.
-	 * @return The nodes of the updated children.
-	 * @throws TCFException Thrown during updating.
-	 */
-	static private FSTreeNode[] getUpdatedChildren(IPeer peer, final FSTreeNode folder) throws TCFException {
-		if (folder.childrenQueried) {
-			List<FSTreeNode> list = folder.unsafeGetChildren();
-			return list.toArray(new FSTreeNode[list.size()]);
-		}
-		IChannel channel = FSOperation.openChannel(folder.peerNode.getPeer());
-		IFileSystem service = FSOperation.getBlockingFileSystem(channel);
-		List<FSTreeNode> list = new FSOperation().getChildren(folder, service);
-		return list.toArray(new FSTreeNode[list.size()]);
 	}
 
 	/**

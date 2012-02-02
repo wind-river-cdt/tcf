@@ -9,42 +9,31 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.operations;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SafeRunner;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.core.Tcf;
-import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * FSRefresh refreshes a specified tree node and its children and grand children recursively.
  */
-public class FSRefresh extends FSOperation {
+public class FSRefresh extends FSJobOperation {
 	/**
 	 * The root node to be refreshed.
 	 */
 	FSTreeNode node;
-
-	// The callback when everything is done
-	ICallback callback;
 
 	/**
 	 * Create an FSRefresh to refresh the specified node and its descendants.
@@ -52,7 +41,7 @@ public class FSRefresh extends FSOperation {
 	 * @param node The root node to be refreshed.
 	 */
 	public FSRefresh(FSTreeNode node) {
-		this.node = node;
+		this(node, null);
 	}
 
 	/**
@@ -62,68 +51,37 @@ public class FSRefresh extends FSOperation {
 	 * @param callback The callback
 	 */
 	public FSRefresh(FSTreeNode node, ICallback callback) {
+		super(callback);
 		this.node = node;
-		this.callback = callback;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation#doit()
+	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation#run(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public IStatus doit() {
-		Assert.isNotNull(Display.getCurrent());
-		Job job = new Job(NLS.bind(Messages.RefreshDirectoryHandler_RefreshJobTitle, node.name)){
-			@Override
-            protected IStatus run(IProgressMonitor monitor) {
-				if (node.childrenQueried) {
-					IChannel channel = null;
-					try {
-						channel = openChannel(node.peerNode.getPeer());
-						if (channel != null) {
-							IFileSystem service = getBlockingFileSystem(channel);
-							if (service != null) {
-								refresh(node, service);
-							}
-							else {
-								String message = NLS.bind(Messages.FSOperation_NoFileSystemError, node.peerNode.getPeerId());
-								throw new TCFFileSystemException(message);
-							}
-						}
+    public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+		if (node.childrenQueried) {
+			IChannel channel = null;
+			try {
+				channel = openChannel(node.peerNode.getPeer());
+				if (channel != null) {
+					IFileSystem service = getBlockingFileSystem(channel);
+					if (service != null) {
+						refresh(node, service);
 					}
-					catch (TCFException e) {
-						return new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), e.getMessage(), e);
-					}
-					finally {
-						if (channel != null) Tcf.getChannelManager().closeChannel(channel);
+					else {
+						String message = NLS.bind(Messages.FSOperation_NoFileSystemError, node.peerNode.getPeerId());
+						throw new TCFFileSystemException(message);
 					}
 				}
-	            return Status.OK_STATUS;
-            }};
-        job.addJobChangeListener(new JobChangeAdapter(){
-			@Override
-            public void done(final IJobChangeEvent event) {
-				Display display = PlatformUI.getWorkbench().getDisplay();
-				display.asyncExec(new Runnable(){
-					@Override
-                    public void run() {
-						doneRefresh(event);
-                    }});
-            }});
-        job.schedule();
-		return Status.OK_STATUS;
-	}
-
-	/**
-	 * Called when the refresh is done. Must be called within UI-thread.
-	 * 
-	 * @param event The job change event.
-	 */
-	void doneRefresh(IJobChangeEvent event) {
-		Assert.isNotNull(Display.getCurrent());
-		IStatus status = event.getResult();
-		if (callback != null) {
-			callback.done(this, status);
+			}
+			catch (TCFException e) {
+				throw new InvocationTargetException(e);
+			}
+			finally {
+				if (channel != null) Tcf.getChannelManager().closeChannel(channel);
+			}
 		}
 	}
 	

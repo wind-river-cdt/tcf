@@ -12,13 +12,9 @@ package org.eclipse.tcf.te.tcf.filesystem.internal.operations;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SafeRunner;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
@@ -31,7 +27,6 @@ import org.eclipse.tcf.services.IFileSystem.DoneRemove;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
-import org.eclipse.tcf.te.tcf.filesystem.dialogs.TimeTriggeredProgressMonitorDialog;
 import org.eclipse.tcf.te.tcf.filesystem.internal.ImageConsts;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFFileSystemException;
@@ -43,7 +38,7 @@ import org.eclipse.ui.PlatformUI;
 /**
  * FSDelete deletes the selected FSTreeNode list.
  */
-public class FSDelete extends FSOperation {
+public class FSDelete extends FSUIOperation {
 	//The nodes to be deleted.
 	List<FSTreeNode> nodes;
 
@@ -58,60 +53,38 @@ public class FSDelete extends FSOperation {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation#doit()
+	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation#run(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public IStatus doit() {
-		Assert.isNotNull(Display.getCurrent());
-		IRunnableWithProgress runnable = new IRunnableWithProgress() {
-			@Override
-			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-				FSTreeNode head = nodes.get(0);
-				IChannel channel = null;
-				try {
-					channel = openChannel(head.peerNode.getPeer());
-					if (channel != null) {
-						IFileSystem service = getBlockingFileSystem(channel);
-						if (service != null) {
-							monitor.beginTask(Messages.FSDelete_PrepareToDelete, IProgressMonitor.UNKNOWN);
-							monitor.worked(1);
-							int count = count(service, nodes);
-							monitor.beginTask(Messages.FSDelete_Deleting, count);
-							for (FSTreeNode node : nodes) {
-								remove(monitor, node, service);
-							}
-						}
-						else {
-							String message = NLS.bind(Messages.FSOperation_NoFileSystemError, head.peerNode.getPeerId());
-							throw new TCFFileSystemException(message);
-						}
+    public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+		FSTreeNode head = nodes.get(0);
+		IChannel channel = null;
+		try {
+			channel = openChannel(head.peerNode.getPeer());
+			if (channel != null) {
+				IFileSystem service = getBlockingFileSystem(channel);
+				if (service != null) {
+					monitor.beginTask(Messages.FSDelete_PrepareToDelete, IProgressMonitor.UNKNOWN);
+					monitor.worked(1);
+					int count = count(service, nodes);
+					monitor.beginTask(Messages.FSDelete_Deleting, count);
+					for (FSTreeNode node : nodes) {
+						remove(monitor, node, service);
 					}
 				}
-				catch (TCFException e) {
-					throw new InvocationTargetException(e);
-				}
-				finally {
-					if (channel != null) Tcf.getChannelManager().closeChannel(channel);
-					monitor.done();
+				else {
+					String message = NLS.bind(Messages.FSOperation_NoFileSystemError, head.peerNode.getPeerId());
+					throw new TCFFileSystemException(message);
 				}
 			}
-		};
-		Shell parent = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-		TimeTriggeredProgressMonitorDialog dialog = new TimeTriggeredProgressMonitorDialog(parent, 250);
-		dialog.setCancelable(true);
-		try {
-			dialog.run(true, true, runnable);
 		}
-		catch (InvocationTargetException e) {
-			// Display the error message during deleting.
-			Throwable throwable = e.getTargetException() != null ? e.getTargetException() : e;
-			MessageDialog.openError(parent, Messages.FSDelete_DeleteFileFolderTitle, throwable.getLocalizedMessage());
-			return new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), throwable.getLocalizedMessage(), throwable);
+		catch (TCFException e) {
+			throw new InvocationTargetException(e);
 		}
-		catch (InterruptedException e) {
-			// It is canceled.
+		finally {
+			if (channel != null) Tcf.getChannelManager().closeChannel(channel);
+			monitor.done();
 		}
-		return Status.OK_STATUS;
 	}
 
 	/**

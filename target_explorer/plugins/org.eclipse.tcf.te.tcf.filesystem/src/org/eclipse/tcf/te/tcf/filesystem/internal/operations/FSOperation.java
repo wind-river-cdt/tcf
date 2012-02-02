@@ -10,16 +10,19 @@
 package org.eclipse.tcf.te.tcf.filesystem.internal.operations;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.net.ConnectException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
@@ -61,7 +64,7 @@ import org.eclipse.ui.PlatformUI;
  * FSOperation is the base class of file system operation classes including FSCopy, FSDelete, FSMove
  * and FSRename.
  */
-public class FSOperation {
+public class FSOperation implements IRunnableWithProgress{
 	// The flag indicating if the following action should be executed without asking.
 	protected boolean yes2All;
 
@@ -273,7 +276,7 @@ public class FSOperation {
 	 * @return The children of the folder node.
 	 * @throws TCFFileSystemException Thrown during querying the children nodes.
 	 */
-	public List<FSTreeNode> getChildren(final FSTreeNode node, final IFileSystem service) throws TCFFileSystemException {
+	protected List<FSTreeNode> getChildren(final FSTreeNode node, final IFileSystem service) throws TCFFileSystemException {
 		if (node.childrenQueried) {
 			return node.unsafeGetChildren();
 		}
@@ -289,6 +292,9 @@ public class FSOperation {
 	 * @throws TCFException Thrown during querying the children nodes.
 	 */
 	public List<FSTreeNode> getChildren(final FSTreeNode node) throws TCFException {
+		if(node.childrenQueried) {
+			return node.unsafeGetChildren();
+		}
 		IChannel channel = null;
 		try {
 			channel = openChannel(node.peerNode.getPeer());
@@ -626,4 +632,12 @@ public class FSOperation {
 	public IStatus doit(){
 		return Status.OK_STATUS;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.operation.IRunnableWithProgress#run(org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	@Override
+    public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+    }
 }
