@@ -1,5 +1,5 @@
-# *******************************************************************************
-# * Copyright (c) 2011 Wind River Systems, Inc. and others.
+# *****************************************************************************
+# * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others.
 # * All rights reserved. This program and the accompanying materials
 # * are made available under the terms of the Eclipse Public License v1.0
 # * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
 # *
 # * Contributors:
 # *     Wind River Systems - initial API and implementation
-# *******************************************************************************
+# *****************************************************************************
 
 """
 ITerminalsService allows to launch a new terminal on the remote target system.
@@ -20,28 +20,28 @@ NAME = "Terminals"
 
 # Context property names.
 # The TCF context ID
-PROP_ID = "ID",
+PROP_ID = "ID"
 
 # The process ID of the login process of the terminal
-PROP_PROCESS_ID = "ProcessID",
+PROP_PROCESS_ID = "ProcessID"
 
 # The PTY type
-PROP_PTY_TYPE = "PtyType",
+PROP_PTY_TYPE = "PtyType"
 
 # terminal encoding
-PROP_ENCODING = "Encoding",
+PROP_ENCODING = "Encoding"
 
 # window width size
-PROP_WIDTH = "Width",
+PROP_WIDTH = "Width"
 
 # window height size
-PROP_HEIGHT = "Height",
+PROP_HEIGHT = "Height"
 
 # Process standard input stream ID
-PROP_STDIN_ID = "StdInID",
+PROP_STDIN_ID = "StdInID"
 
 # Process standard output stream ID
-PROP_STDOUT_ID = "StdOutID",
+PROP_STDOUT_ID = "StdOutID"
 
 # Process standard error stream ID
 PROP_STDERR_ID = "StdErrID"
@@ -212,7 +212,7 @@ class TerminalsListener(object):
         """
         pass
 
-    def winSizeChanged (self, terminal_id, newWidth, newHeight):
+    def winSizeChanged(self, terminal_id, newWidth, newHeight):
         """
         Called when a terminal exits.
         @param terminal_id - terminal context ID
