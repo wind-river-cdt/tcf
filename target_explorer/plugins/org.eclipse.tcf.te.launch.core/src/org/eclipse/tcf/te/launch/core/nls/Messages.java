@@ -37,4 +37,9 @@ public class Messages extends NLS {
 	public static String LaunchManager_error_failedToUpdateConfig;
 	public static String LaunchManager_error_deleteLaunchConfig;
 
+	public static String LaunchConfigurationDelegate_error_failedToGetStepper;
+	public static String LaunchConfigurationDelegate_error_failedToCloneStepper;
+	public static String LaunchConfigurationDelegate_error_inaccessibleReferencedProject;
+
+	public static String AbstractLaunchConfigurationDelegate_scoped_incremental_build;
 }
