@@ -1,5 +1,5 @@
-# *******************************************************************************
-# * Copyright (c) 2011 Wind River Systems, Inc. and others.
+# *****************************************************************************
+# * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others.
 # * All rights reserved. This program and the accompanying materials
 # * are made available under the terms of the Eclipse Public License v1.0
 # * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
 # *
 # * Contributors:
 # *     Wind River Systems - initial API and implementation
-# *******************************************************************************
+# *****************************************************************************
 
 from tcf.services import terminals
 from tcf import channel
@@ -21,10 +21,11 @@ class TerminalContext(terminals.TerminalContext):
     def exit(self, done):
         service = self.service
         done = service._makeCallback(done)
-        id = self.getID()
+        context_id = self.getID()
         class ExitCommand(Command):
-            def __init__(self, cmd, args):
-                super(ExitCommand, self).__init__(service.channel, service, "exit", id)
+            def __init__(self):
+                super(ExitCommand, self).__init__(
+                    service.channel, service, "exit", (context_id,))
             def done(self, error, args):
                 if not error:
                     assert len(args) == 1
@@ -43,7 +44,8 @@ class TerminalsProxy(terminals.TerminalsService):
         service = self
         class GetContextCommand(Command):
             def __init__(self):
-                super(GetContextCommand, self).__init__(service.channel, service, "getContext", (id,))
+                super(GetContextCommand, self).__init__(
+                    service.channel, service, "getContext", (id,))
             def done(self, error, args):
                 ctx = None
                 if not error:
@@ -53,12 +55,12 @@ class TerminalsProxy(terminals.TerminalsService):
                 done.doneGetContext(self.token, error, ctx)
         return GetContextCommand().token
 
-    def launch(self, type, encoding, environment, done):
+    def launch(self, terminal_type, encoding, environment, done):
         done = self._makeCallback(done)
         service = self
         class LaunchCommand(Command):
             def __init__(self):
-                super(LaunchCommand, self).__init__(service.channel, service, "launch", (type, encoding, environment))
+                super(LaunchCommand, self).__init__(service.channel, service, "launch", (terminal_type, encoding, environment))
             def done(self, error, args):
                 ctx = None
                 if not error:
@@ -95,7 +97,7 @@ class TerminalsProxy(terminals.TerminalsService):
         return ExitCommand().token
 
     def addListener(self, listener):
-        l = ChannelEventListener()
+        l = ChannelEventListener(self, listener)
         self.channel.addEventListener(self, l)
         self.listeners[listener] = l
 
