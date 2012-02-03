@@ -44,4 +44,13 @@
       </image>
    </extension>
 
+<!-- Launch configuration type contributions -->
+   <extension point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+      <launchConfigurationTypeImage
+            configTypeID="org.eclipse.tcf.te.launch.type.linux.app"
+            icon="icons/obj16/penguin_obj.gif"
+            id="org.eclipse.tcf.te.launch.type.linux.app.image">
+      </launchConfigurationTypeImage>
+   </extension>
+
 </plugin>
