@@ -50,6 +50,10 @@
                      name="org.eclipse.ui.navigator.hideLinkWithEditorAction"
                      value="true">
                </property>
+               <property
+                     name="org.eclipse.ui.navigator.enforceHasChildren"
+                     value="true">
+               </property>
             </options>
       </viewer>
 
