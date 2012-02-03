@@ -285,7 +285,10 @@ public class TraceView extends ViewPart implements Protocol.ChannelOpenListener 
                 p.text.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
                 p.text.addKeyListener(new KeyListener() {
                     public void keyReleased(KeyEvent e) {
-                        p.key_pressed--;
+                        if (p.key_pressed > 0) p.key_pressed--;
+                        if (e.character == SWT.ESC) {
+                            p.key_pressed = 0;
+                        }
                         p.updateScrollLock();
                     }
                     public void keyPressed(KeyEvent e) {
