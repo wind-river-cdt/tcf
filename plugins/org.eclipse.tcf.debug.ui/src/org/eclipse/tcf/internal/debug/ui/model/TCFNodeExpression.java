@@ -752,14 +752,14 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
                 }
                 else if (!type_symbol.getID().equals(type_symbol.getTypeID())) {
                     // modified type without name, like "volatile int"
-                    StringBuffer sb = new StringBuffer();
                     TCFDataCache<ISymbols.Symbol> base_type_cache = model.getSymbolInfoCache(type_symbol.getTypeID());
-                    if (!getTypeName(sb, base_type_cache, done)) return false;
-                    s = sb.toString();
+                    if (base_type_cache != null) {
+                        StringBuffer sb = new StringBuffer();
+                        if (!getTypeName(sb, base_type_cache, done)) return false;
+                        s = sb.toString();
+                    }
                 }
-                else {
-                    s = getTypeName(type_symbol.getTypeClass(), type_symbol.getSize());
-                }
+                if (s == null) s = getTypeName(type_symbol.getTypeClass(), type_symbol.getSize());
                 if (s == null) {
                     switch (type_symbol.getTypeClass()) {
                     case pointer:
