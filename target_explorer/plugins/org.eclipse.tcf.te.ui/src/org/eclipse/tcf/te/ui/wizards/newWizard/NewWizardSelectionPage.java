@@ -138,6 +138,7 @@ public class NewWizardSelectionPage extends WizardPage {
 							ISelection selection = new StructuredSelection(element);
 							EvaluationContext evalContext = new EvaluationContext(null, selection);
 							evalContext.addVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME, selection);
+							evalContext.setAllowPluginActivation(true);
 							if (!expression.evaluate(evalContext).equals(EvaluationResult.TRUE)) {
 								return false;
 							}

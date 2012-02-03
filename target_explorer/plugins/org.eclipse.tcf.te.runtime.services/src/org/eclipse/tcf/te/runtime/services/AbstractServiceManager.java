@@ -222,6 +222,8 @@ public abstract class AbstractServiceManager {
 			if (enablement != null) {
 				// Set the default variable to the service context.
 				EvaluationContext evalContext = new EvaluationContext(null, context);
+				// Allow plugin activation
+				evalContext.setAllowPluginActivation(true);
 				// Evaluate the expression
 				try {
 					enabled = enablement.evaluate(evalContext).equals(EvaluationResult.TRUE);

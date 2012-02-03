@@ -189,6 +189,7 @@ public class View extends CommonNavigator implements ITabbedPropertySheetPageCon
 				ctx.addVariable(ISources.ACTIVE_PART_NAME, this);
 				ctx.addVariable(ISources.ACTIVE_SITE_NAME, getViewSite());
 				ctx.addVariable(ISources.ACTIVE_SHELL_NAME, getViewSite().getShell());
+				ctx.setAllowPluginActivation(true);
 				ExecutionEvent event = new ExecutionEvent(command, Collections.EMPTY_MAP, this, ctx);
 				command.executeWithChecks(event);
 			} catch (Exception e) {

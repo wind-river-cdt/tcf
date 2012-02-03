@@ -136,6 +136,8 @@ public class ViewsUtil {
 						context.addVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME, selection);
 						context.addVariable(ISources.ACTIVE_MENU_SELECTION_NAME, selection);
 						context.addVariable(ISources.ACTIVE_WORKBENCH_WINDOW_NAME, PlatformUI.getWorkbench().getActiveWorkbenchWindow());
+						// Allow plugin activation
+						context.setAllowPluginActivation(true);
 						// Construct the execution event
 						ExecutionEvent execEvent = new ExecutionEvent(command, Collections.EMPTY_MAP, this, context);
 						// And execute the event

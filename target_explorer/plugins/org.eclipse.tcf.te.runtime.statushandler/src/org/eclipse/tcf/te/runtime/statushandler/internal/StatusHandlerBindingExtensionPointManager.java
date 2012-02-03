@@ -111,6 +111,8 @@ public class StatusHandlerBindingExtensionPointManager extends AbstractExtension
 				if (context != null) {
 					// Set the default variable to the handler context.
 					EvaluationContext evalContext = new EvaluationContext(null, context);
+					// Allow plugin activation
+					evalContext.setAllowPluginActivation(true);
 					// Evaluate the expression
 					try {
 						isApplicable = enablement.evaluate(evalContext).equals(EvaluationResult.TRUE);

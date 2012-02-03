@@ -53,7 +53,7 @@ public class TreeViewerEditorActivationStrategy extends ColumnViewerEditorActiva
 
 	/**
 	 * Create an instance with the specified viewer id and the common viewer.
-	 * 
+	 *
 	 * @param viewerId
 	 * @param viewer
 	 */
@@ -84,8 +84,8 @@ public class TreeViewerEditorActivationStrategy extends ColumnViewerEditorActiva
 	/**
 	 * Get an appropriate cell editor factory based on the event and the current
 	 * selection in the viewer.
-	 *  
-	 * @param event the event triggering the action 
+	 *
+	 * @param event the event triggering the action
 	 * @return The cell editor factory is appropriate.
 	 */
 	private IViewerCellEditorFactory getFactory(ColumnViewerEditorActivationEvent event) {
@@ -94,6 +94,7 @@ public class TreeViewerEditorActivationStrategy extends ColumnViewerEditorActiva
 		final EvaluationContext context = new EvaluationContext(null, selection);
 		context.addVariable("selection", selection); //$NON-NLS-1$
 		context.addVariable("event", event); //$NON-NLS-1$
+		context.setAllowPluginActivation(true);
 		final IViewerCellEditorFactory[] result = new IViewerCellEditorFactory[1];
 		for (Expression expression : factories.keySet()) {
 			final Expression exp = expression;
@@ -132,10 +133,10 @@ public class TreeViewerEditorActivationStrategy extends ColumnViewerEditorActiva
 			}
 		}
 	}
-	
+
 	/**
 	 * If the configuration has a contribution viewer that has the same id with the specified viewerId.
-	 * 
+	 *
 	 * @param configuration The cellEditor element.
 	 * @return true if it has a specified viewer element.
 	 */

@@ -125,6 +125,8 @@ public final class StepBindingsExtensionPointManager extends AbstractExtensionPo
 					EvaluationContext evalContext = new EvaluationContext(null, variableValue);
 					// Initialize the evaluation context named variables
 					evalContext.addVariable("activeContexts", variableValue); //$NON-NLS-1$
+					// Allow plugin activation
+					evalContext.setAllowPluginActivation(true);
 					// Evaluate the expression
 					try {
 						enabled = enablement.evaluate(evalContext).equals(EvaluationResult.TRUE);

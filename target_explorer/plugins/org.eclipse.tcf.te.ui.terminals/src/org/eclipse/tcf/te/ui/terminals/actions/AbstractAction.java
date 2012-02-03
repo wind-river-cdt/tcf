@@ -111,6 +111,8 @@ public abstract class AbstractAction extends AbstractTerminalAction {
 				// Apply the selection to the "activeMenuSelection" and "selection" variable too
 				context.addVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME, selection);
 				context.addVariable(ISources.ACTIVE_MENU_SELECTION_NAME, selection);
+				// Allow plugin activation
+				context.setAllowPluginActivation(true);
 				// Construct the execution event
 				ExecutionEvent execEvent = new ExecutionEvent(command, Collections.EMPTY_MAP, this, context);
 				// And execute the event

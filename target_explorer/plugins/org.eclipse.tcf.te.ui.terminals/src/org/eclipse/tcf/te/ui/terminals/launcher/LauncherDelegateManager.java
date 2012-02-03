@@ -131,6 +131,8 @@ public class LauncherDelegateManager extends AbstractExtensionPointManager<ILaun
 					EvaluationContext context = new EvaluationContext(null, selection);
 					// Set the "selection" variable to the selection.
 					context.addVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME, selection);
+					// Allow plugin activation
+					context.setAllowPluginActivation(true);
 					// Evaluate the expression
 					try {
 						isApplicable = enablement.evaluate(context).equals(EvaluationResult.TRUE);

@@ -57,9 +57,9 @@ public class TreeViewerExtension {
 	private String viewerId;
 
 	/**
-	 * Create an instance and parse all tree viewer extensions to get the 
+	 * Create an instance and parse all tree viewer extensions to get the
 	 * column descriptors and filter descriptors for the specified viewer.
-	 * 
+	 *
 	 * @param viewerId The tree viewer's id.
 	 * @param viewer The tree viewer to parse the extension for.
 	 */
@@ -69,7 +69,7 @@ public class TreeViewerExtension {
 
 	/**
 	 * Parse the viewer extensions and return the descriptor of the tree viewer.
-	 * 
+	 *
 	 * @return The viewer descriptor.
 	 */
 	public ViewerDescriptor parseViewer() {
@@ -88,10 +88,10 @@ public class TreeViewerExtension {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Create a viewer descriptor from the given configuration element.
-	 * 
+	 *
 	 * @param configuration The configuration element that defines the viewer.
 	 * @return The viewer descriptor.
 	 */
@@ -152,9 +152,9 @@ public class TreeViewerExtension {
 	}
 
 	/**
-	 * Parse the column declarations of this extension point and return the 
+	 * Parse the column declarations of this extension point and return the
 	 * column descriptors.
-	 * 
+	 *
 	 * @param input The input used to initialize the columns.
 	 * @return The column descriptors from this extension point.
 	 */
@@ -182,9 +182,9 @@ public class TreeViewerExtension {
 	}
 
 	/**
-	 * Parse the viewer filter declarations of this extension point and return the 
+	 * Parse the viewer filter declarations of this extension point and return the
 	 * filter descriptors.
-	 * 
+	 *
 	 * @param input the new input
 	 * @return The column descriptors from this extension point.
 	 */
@@ -212,9 +212,9 @@ public class TreeViewerExtension {
 	}
 
 	/**
-	 * Create an filter descriptor from the specified configuration element and 
+	 * Create an filter descriptor from the specified configuration element and
 	 * add it to the filter list.
-	 * 
+	 *
 	 * @param input the input of the viewer to initialize the descriptors.
 	 * @param descriptors The filter list to add the created descriptor to.
 	 * @param configuration The extension configuration element to create the descriptor from.
@@ -241,7 +241,7 @@ public class TreeViewerExtension {
 
 	/**
 	 * Initialize the filter descriptor from the specified configuration element.
-	 * 
+	 *
 	 * @param descriptor The new descriptor to be initialized.
 	 * @param configuration The configuration element to initialize the filter.
 	 * @throws CoreException Thrown during parsing.
@@ -279,7 +279,7 @@ public class TreeViewerExtension {
 	/**
 	 * Create a column descriptor from the specified configuration element and add it to
 	 * the column descriptor list.
-	 * 
+	 *
 	 * @param input the new input.
 	 * @param columns The column descriptor.
 	 * @param configuration The configuration element to read the descriptor from.
@@ -303,10 +303,10 @@ public class TreeViewerExtension {
 			});
 		}
 	}
-	
+
 	/**
 	 * If the specified configuration element is activated under the current input.
-	 * 
+	 *
 	 * @param input The input object.
 	 * @param configuration The configuration element that defines the activation element.
 	 * @return true if it is activated.
@@ -321,6 +321,7 @@ public class TreeViewerExtension {
 		final IConfigurationElement config = children[0];
 		final EvaluationContext context = new EvaluationContext(null, input);
 		context.addVariable("input", input); //$NON-NLS-1$
+		context.setAllowPluginActivation(true);
 		final boolean[] result = new boolean[1];
 		SafeRunner.run(new SafeRunnable() {
 			@Override
@@ -341,7 +342,7 @@ public class TreeViewerExtension {
 
 	/**
 	 * Initialize the column descriptor by reading the attributes from the configuration element.
-	 * 
+	 *
 	 * @param column The column descriptor to be initialized.
 	 * @param configuration The configuration element.
 	 * @throws CoreException Thrown during parsing.
@@ -405,7 +406,7 @@ public class TreeViewerExtension {
 
 	/**
 	 * Parse the alignment attribute from a string to integer value.
-	 * 
+	 *
 	 * @param attribute The attribute value.
 	 * @return The alignment/style value.
 	 */
@@ -421,10 +422,10 @@ public class TreeViewerExtension {
 		}
 		return SWT.NONE;
 	}
-	
+
 	/**
 	 * Parse the style name from a string to integer value.
-	 * 
+	 *
 	 * @param attribute The attribute value.
 	 * @return The alignment/style value.
 	 */
@@ -452,10 +453,10 @@ public class TreeViewerExtension {
 		}
 		return SWT.NONE;
 	}
-	
+
 	/**
 	 * Parse the DND operation style and return a operation.
-	 * 
+	 *
 	 * @param name The name of the DND operation.
 	 * @return an integer that represents the operation.
 	 */
@@ -469,12 +470,12 @@ public class TreeViewerExtension {
 		else if("DND.DROP_LINK".equals(name)) { //$NON-NLS-1$
 			return DND.DROP_LINK;
 		}
-		return 0;	
+		return 0;
 	}
-	
+
 	/**
 	 * Parse and calculate the style from the give configuration element.
-	 * 
+	 *
 	 * @param configuration The configuration element that defines the styles.
 	 * @return An integer that represents the defined styles.
 	 */
@@ -491,7 +492,7 @@ public class TreeViewerExtension {
 	/**
 	 * Parse the DND operation including DROP_COPY,
 	 * DROP_MOVE, DROP_LINK
-	 * 
+	 *
 	 * @param configuration The configuration element in which the DND operation is defined.
 	 * @return The operations.
 	 */
@@ -509,7 +510,7 @@ public class TreeViewerExtension {
 
 	/**
 	 * Parse the transfer type from the give configuration element.
-	 * 
+	 *
 	 * @param configuration The configuration element.
 	 * @return An array of transfer object that represents the transfer types.
 	 */
@@ -528,7 +529,7 @@ public class TreeViewerExtension {
 
 	/**
 	 * Translate the transfer type from this element.
-	 * 
+	 *
 	 * @param name The attribute name.
 	 * @return The transfer instance.
 	 */
@@ -550,8 +551,8 @@ public class TreeViewerExtension {
 
 	/**
 	 * Parse a DragSourceListener and return its instance.
-	 * 
-	 * @param viewer The tree viewer to create an element. 
+	 *
+	 * @param viewer The tree viewer to create an element.
 	 * @param configuration The configuration that wraps the instance.
 	 * @return The drag source listener created.
 	 */
@@ -568,11 +569,11 @@ public class TreeViewerExtension {
             }});
 	    return reference.get();
     }
-	
+
 	/**
 	 * Create an executable instance from the given configuration element, with the tree viewer
 	 * as the constructor parameter.
-	 * 
+	 *
 	 * @param aInterface The interface of the element should implement.
 	 * @param viewer The tree viewer to be passed
 	 * @param configuration The configuration element.
@@ -599,8 +600,8 @@ public class TreeViewerExtension {
 
 	/**
 	 * Parse a DropTargetListener and return its instance.
-	 * 
-	 * @param viewer The tree viewer to create an element. 
+	 *
+	 * @param viewer The tree viewer to create an element.
 	 * @param configuration The configuration that wraps the instance.
 	 * @return The drop target listener created.
 	 */

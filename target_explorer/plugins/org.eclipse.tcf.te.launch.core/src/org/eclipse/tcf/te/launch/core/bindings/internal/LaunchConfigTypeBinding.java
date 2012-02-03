@@ -239,6 +239,8 @@ public class LaunchConfigTypeBinding {
 			EvaluationContext evalContext = new EvaluationContext(null, context);
 			evalContext.addVariable("selection", context); //$NON-NLS-1$
 			evalContext.addVariable("mode", mode); //$NON-NLS-1$
+			// Allow plugin activation
+			evalContext.setAllowPluginActivation(true);
 			// Evaluate the expression
 			try {
 				valresult = expression.evaluate(evalContext);

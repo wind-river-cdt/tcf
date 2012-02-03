@@ -849,6 +849,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 						ctx.addVariable(ISources.ACTIVE_SITE_NAME, site);
 						ctx.addVariable(ISources.ACTIVE_SHELL_NAME, site.getShell());
 					}
+					ctx.setAllowPluginActivation(true);
 					ExecutionEvent executionEvent = new ExecutionEvent(command, Collections.EMPTY_MAP, part, ctx);
 					command.executeWithChecks(executionEvent);
                 }});

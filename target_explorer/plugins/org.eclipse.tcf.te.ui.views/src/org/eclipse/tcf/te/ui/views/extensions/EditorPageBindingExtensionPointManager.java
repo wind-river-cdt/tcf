@@ -20,9 +20,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.tcf.te.ui.views.activator.UIPlugin;
 import org.eclipse.tcf.te.runtime.extensions.AbstractExtensionPointManager;
 import org.eclipse.tcf.te.runtime.extensions.ExecutableExtensionProxy;
+import org.eclipse.tcf.te.ui.views.activator.UIPlugin;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.ISources;
 
@@ -117,6 +117,8 @@ public class EditorPageBindingExtensionPointManager extends AbstractExtensionPoi
 					EvaluationContext context = new EvaluationContext(null, node);
 					// Set the "activeEditorInput" variable to the data source model node instance.
 					context.addVariable(ISources.ACTIVE_EDITOR_INPUT_NAME, node);
+					// Allow plugin activation
+					context.setAllowPluginActivation(true);
 					// Evaluate the expression
 					try {
 						isApplicable = enablement.evaluate(context).equals(EvaluationResult.TRUE);

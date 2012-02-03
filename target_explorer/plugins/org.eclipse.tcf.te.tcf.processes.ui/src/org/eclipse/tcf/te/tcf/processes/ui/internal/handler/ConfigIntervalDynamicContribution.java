@@ -55,7 +55,7 @@ public class ConfigIntervalDynamicContribution extends CompoundContributionItem 
 		private int seconds;
 		/**
 		 * Constructor
-		 * 
+		 *
 		 * @param model The process model.
 		 * @param seconds The interval time.
 		 */
@@ -67,7 +67,7 @@ public class ConfigIntervalDynamicContribution extends CompoundContributionItem 
 				setChecked(true);
 			}
 		}
-		
+
 		/*
 		 * (non-Javadoc)
 		 * @see org.eclipse.jface.action.Action#run()
@@ -91,7 +91,7 @@ public class ConfigIntervalDynamicContribution extends CompoundContributionItem 
 
 		/**
 		 * Constructor
-		 * 
+		 *
 		 * @param model The process model.
 		 * @param name The grade name.
 		 * @param seconds The interval time.
@@ -101,7 +101,7 @@ public class ConfigIntervalDynamicContribution extends CompoundContributionItem 
 			this.model = model;
 			this.seconds = seconds;
 		}
-		
+
 		/*
 		 * (non-Javadoc)
 		 * @see org.eclipse.jface.action.Action#run()
@@ -122,15 +122,15 @@ public class ConfigIntervalDynamicContribution extends CompoundContributionItem 
 	class CustomAction extends Action {
 		/**
 		 * Constructor
-		 * 
+		 *
 		 * @param model The process model.
 		 * @param name The grade name.
 		 * @param seconds The interval time.
 		 */
 		public CustomAction() {
-			super(Messages.ConfigIntervalDynamicContribution_Custom, AS_RADIO_BUTTON); 
+			super(Messages.ConfigIntervalDynamicContribution_Custom, AS_RADIO_BUTTON);
 		}
-		
+
 		/*
 		 * (non-Javadoc)
 		 * @see org.eclipse.jface.action.Action#run()
@@ -138,7 +138,7 @@ public class ConfigIntervalDynamicContribution extends CompoundContributionItem 
 		@Override
 		public void run() {
 			if (isChecked()) {
-				final IWorkbench workbench = PlatformUI.getWorkbench();				
+				final IWorkbench workbench = PlatformUI.getWorkbench();
 				ICommandService service = (ICommandService) workbench.getService(ICommandService.class);
 				Command cmd = service != null ? service.getCommand(CUSTOM_COMMAND_ID) : null;
 				if (cmd != null && cmd.isDefined() && cmd.isEnabled()) {
@@ -156,6 +156,7 @@ public class ConfigIntervalDynamicContribution extends CompoundContributionItem 
 							ctx.addVariable(ISources.ACTIVE_SHELL_NAME, shell);
 							IEditorInput editorInput = window.getActivePage().getActiveEditor().getEditorInput();
 							ctx.addVariable(ISources.ACTIVE_EDITOR_INPUT_NAME, editorInput);
+							ctx.setAllowPluginActivation(true);
 							ExecutionEvent executionEvent = new ExecutionEvent(command, Collections.EMPTY_MAP, CustomAction.this, ctx);
 							command.executeWithChecks(executionEvent);
 						}
@@ -164,7 +165,7 @@ public class ConfigIntervalDynamicContribution extends CompoundContributionItem 
 			}
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.actions.CompoundContributionItem#getContributionItems()
@@ -188,10 +189,10 @@ public class ConfigIntervalDynamicContribution extends CompoundContributionItem 
 		}
 		return items.toArray(new IContributionItem[items.size()]);
 	}
-	
+
 	/**
 	 * Create and return the speed grade actions.
-	 * 
+	 *
 	 * @param model The current process model.
 	 * @return The grade action list.
 	 */
@@ -227,7 +228,7 @@ public class ConfigIntervalDynamicContribution extends CompoundContributionItem 
 
 	/**
 	 * Create and return the most recently used actions.
-	 * 
+	 *
 	 * @param model The current process model.
 	 * @return The MRU action list.
 	 */
