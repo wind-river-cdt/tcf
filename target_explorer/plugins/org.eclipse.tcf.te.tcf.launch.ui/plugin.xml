@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+<!-- Launch configuration type contributions -->
+   <extension point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+      <launchConfigurationTypeImage
+            configTypeID="org.eclipse.tcf.te.tcf.launch.type.linux.app"
+            icon="icons/obj16/penguin_obj.gif"
+            id="org.eclipse.tcf.te.tcf.launch.type.linux.app.image">
+      </launchConfigurationTypeImage>
+   </extension>
+
+</plugin>

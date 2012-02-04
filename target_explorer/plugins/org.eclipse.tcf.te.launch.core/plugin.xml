@@ -24,15 +24,4 @@
       </initializer>
    </extension>
 
-<!-- Launch Configuration Type contributions -->
-   <extension point="org.eclipse.debug.core.launchConfigurationTypes">
-      <launchConfigurationType
-            category="org.eclipse.tcf.te.launch.category.linux"
-            delegate="org.eclipse.tcf.te.launch.core.delegates.LaunchConfigurationDelegate"
-            id="org.eclipse.tcf.te.launch.type.linux.app"
-            modes="run,debug"
-            name="%LaunchType.Linux.App.name">
-      </launchConfigurationType>
-   </extension>
-
 </plugin>
