@@ -9,46 +9,46 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.launch.core.selection;
 
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.tcf.te.launch.core.selection.interfaces.ITargetSelectionContext;
+import org.eclipse.tcf.te.launch.core.selection.interfaces.IRemoteContextSelectionContext;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IContext;
 
 /**
- * Target selection context implementation.
+ * Remote context selection context implementation.
  */
-public class TargetSelectionContext extends AbstractSelectionContext implements ITargetSelectionContext {
-	// The target context
-	private IAdaptable targetCtx = null;
+public class RemoteContextSelectionContext extends AbstractSelectionContext implements IRemoteContextSelectionContext {
+	// The remote context
+	private IContext remoteCtx = null;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param target The target context or <code>null</code>.
+	 * @param remoteCtx The remote context or <code>null</code>.
 	 * @param isPreferred <code>True</code> to mark the selection context the preferred context,
 	 *            <code>false</code> otherwise.
 	 */
-	public TargetSelectionContext(IAdaptable target, boolean isPreferred) {
-		this(target, null, isPreferred);
+	public RemoteContextSelectionContext(IContext remoteCtx, boolean isPreferred) {
+		this(remoteCtx, null, isPreferred);
 	}
 
 	/**
 	 * Constructor.
 	 *
-	 * @param target The target context or <code>null</code>.
+	 * @param remoteCtx The remote context or <code>null</code>.
 	 * @param selections The selected objects or <code>null</code>.
 	 * @param isPreferred <code>True</code> to mark the selection context the preferred context,
 	 *            <code>false</code> otherwise.
 	 */
-	public TargetSelectionContext(IAdaptable target, Object[] selections, boolean isPreferred) {
+	public RemoteContextSelectionContext(IContext remoteCtx, Object[] selections, boolean isPreferred) {
 		super(selections, isPreferred);
-		this.targetCtx = target;
+		this.remoteCtx = remoteCtx;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.launch.core.selection.interfaces.ITargetSelectionContext#getTargetCtx()
+	 * @see org.eclipse.tcf.te.launch.core.selection.interfaces.IRemoteContextSelectionContext#getRemoteCtx()
 	 */
 	@Override
-	public IAdaptable getTargetCtx() {
-	    return targetCtx;
+	public IContext getRemoteCtx() {
+	    return remoteCtx;
 	}
 
 	/* (non-Javadoc)
@@ -58,8 +58,8 @@ public class TargetSelectionContext extends AbstractSelectionContext implements 
 	public String toString() {
 		StringBuffer toString = new StringBuffer();
 
-		if (targetCtx != null) {
-			toString.append(targetCtx.toString());
+		if (remoteCtx != null) {
+			toString.append(remoteCtx.toString());
 		}
 		toString.append(toString.length() > 0 ? " " : ""); //$NON-NLS-1$ //$NON-NLS-2$
 		toString.append(super.toString());

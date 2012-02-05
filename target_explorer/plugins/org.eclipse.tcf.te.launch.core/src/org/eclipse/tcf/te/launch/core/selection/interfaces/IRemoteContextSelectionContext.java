@@ -9,17 +9,17 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.launch.core.selection.interfaces;
 
-import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IContext;
 
 /**
- * A selection context providing the target context for the launch.
+ * A selection context providing the remote context for the launch.
  */
-public interface ITargetSelectionContext extends ISelectionContext {
+public interface IRemoteContextSelectionContext extends ISelectionContext {
 
 	/**
-	 * Returns the target context.
+	 * Returns the remote context.
 	 *
-	 * @return The target context or <code>null</code>.
+	 * @return The remote context or <code>null</code>.
 	 */
-	public IAdaptable getTargetCtx();
+	public IContext getRemoteCtx();
 }
