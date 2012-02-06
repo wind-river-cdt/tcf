@@ -40,8 +40,12 @@ below are steps to create and populate Eclipse workspace with TCF projects:</p>
        <li><b>RSE (Remote System Explorer) SDK 3.2</b> or later, last tested with 3.2.1, recommended 3.2.1<br>
        <a href='http://download.eclipse.org/tm/downloads/'>http://download.eclipse.org/tm/downloads/</a>
        </ul>
-   <li>Checkout TCF code from <a href='http://dev.eclipse.org/svnroot/dsdp/org.eclipse.tm.tcf/trunk'>Eclipse SVN repository</a>:
-       <pre>svn co svn://dev.eclipse.org/svnroot/dsdp/org.eclipse.tm.tcf/trunk tcf</pre>
+   <li>Clone TCF Java code from <a href='http://git.eclipse.org/c/tcf/org.eclipse.tcf.git'>Eclipse GIT repository</a>, using one of the following commands:
+     <pre>
+git clone git://git.eclipse.org/gitroot/tcf/org.eclipse.tcf.git
+git clone ssh://&lt;user&gt;@git.eclipse.org/gitroot/tcf/org.eclipse.tcf.git
+git clone http://git.eclipse.org/gitroot/tcf/org.eclipse.tcf.git
+     </pre>
    <li>Run Eclipse:
       <pre>eclipse.exe -vm &lt;JDK path&gt;/bin/javaw.exe -data &lt;Workspace path&gt; -vmargs -Xmx400M</pre>
    <li>Open "Java" perspective.
@@ -98,6 +102,13 @@ Examples source code is stored in <code>&lt;TCF Root&gt;\examples</code> directo
 </dl>
 
 <h2><a name='Agent'>Building TCF Agent</a></h2>
+
+Clone TCF C code from <a href='http://git.eclipse.org/c/tcf/org.eclipse.tcf.agent.git'>Eclipse GIT repository</a>, using one of the following commands:
+<pre>
+git clone git://git.eclipse.org/gitroot/tcf/org.eclipse.tcf.agent.git
+git clone ssh://&lt;user&gt;@git.eclipse.org/gitroot/tcf/org.eclipse.tcf.agent.git
+git clone http://git.eclipse.org/gitroot/tcf/org.eclipse.tcf.agent.git
+</pre>
 
 <p><b>CDT</b> can be used to build TCF agent.
 CDT .project file is located in <code>&lt;TCF Root&gt;/agent</code> directory.
