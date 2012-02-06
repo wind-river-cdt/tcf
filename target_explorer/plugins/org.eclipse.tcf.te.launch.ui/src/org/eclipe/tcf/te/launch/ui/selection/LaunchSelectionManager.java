@@ -32,6 +32,7 @@ import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.tcf.te.core.cdt.elf.ElfUtils;
 import org.eclipse.tcf.te.launch.core.selection.LaunchSelection;
 import org.eclipse.tcf.te.launch.core.selection.ProjectSelectionContext;
 import org.eclipse.tcf.te.launch.core.selection.RemoteContextSelectionContext;
@@ -251,7 +252,7 @@ public class LaunchSelectionManager {
 					if (getLocation(file) != null) {
 						File filePath = getLocation(file).toFile();
 						try {
-							int elfType = UIPlugin.getDefault().getELFType(filePath);
+							int elfType = ElfUtils.getELFType(filePath);
 							if (file.exists() &&
 								(elfType == Attribute.ELF_TYPE_EXE || elfType == Attribute.ELF_TYPE_OBJ)) {
 								location = file.getLocation();
@@ -273,7 +274,7 @@ public class LaunchSelectionManager {
 						location = getLocation(resource);
 						if (location != null) {
 							try {
-								int elfType = UIPlugin.getDefault().getELFType(location.toFile());
+								int elfType = ElfUtils.getELFType(location.toFile());
 								if (elfType != Attribute.ELF_TYPE_EXE && elfType != Attribute.ELF_TYPE_OBJ) {
 									location = null;
 								}

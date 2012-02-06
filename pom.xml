@@ -61,6 +61,7 @@
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.runtime.statushandler</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.runtime.stepper</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.core</module>
+	  <module>target_explorer/plugins/org.eclipse.tcf.te.core.cdt</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.launch.core</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.launch.ui</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.ui</module>

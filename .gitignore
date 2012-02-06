@@ -67,6 +67,8 @@ tests/plugins/org.eclipse.tcf.debug.test/bin
 # target explorer
 /target_explorer/plugins/org.eclipse.tcf.te.core/target
 /target_explorer/plugins/org.eclipse.tcf.te.core/bin
+/target_explorer/plugins/org.eclipse.tcf.te.core.cdt/target
+/target_explorer/plugins/org.eclipse.tcf.te.core.cdt/bin
 /target_explorer/plugins/org.eclipse.tcf.te.launch.core/target
 /target_explorer/plugins/org.eclipse.tcf.te.launch.core/bin
 /target_explorer/plugins/org.eclipse.tcf.te.launch.ui/target

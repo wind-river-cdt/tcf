@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %pluginName
+Bundle-SymbolicName: org.eclipse.tcf.te.core.cdt;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.eclipse.tcf.te.core.cdt.activator.CoreBundleActivator
+Bundle-Vendor: %providerName
+Require-Bundle: org.eclipse.core.runtime;bundle-version="3.7.0",
+ org.eclipse.cdt.core;bundle-version="5.3.1";visibility:=reexport,
+ org.eclipse.tcf.te.runtime;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Bundle-Localization: plugin
+Export-Package: org.eclipse.tcf.te.core.cdt.activator;x-internal:=true,
+ org.eclipse.tcf.te.core.cdt.elf,
+ org.eclipse.tcf.te.core.cdt.nls;x-internal:=true
