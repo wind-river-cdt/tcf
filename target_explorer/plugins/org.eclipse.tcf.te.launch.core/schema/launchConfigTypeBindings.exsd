@@ -268,13 +268,9 @@
   &lt;extension point=&quot;org.eclipse.tcf.te.launch.core.launchConfigTypeBindings&quot;&gt;
       &lt;launchConfigTypeBinding launchConfigTypeId=&quot;org.eclipse.tcf.te.launch.linux.process&quot;&gt;
 
-         &lt;launchManagerDelegateBindings&gt;
-            &lt;launchManagerDelegateBinding launchManagerDelegateId=&quot;org.eclipse.tcf.te.launch.linux.process.launchManagerDelegate&quot;/&gt;
-         &lt;/launchManagerDelegateBindings&gt;      
+         &lt;launchManagerDelegate id=&quot;org.eclipse.tcf.te.launch.linux.process.launchManagerDelegate&quot;/&gt;
 
-         &lt;launchStepperBindings&gt;
-            &lt;launchStepperBinding launchStepperId=&quot;org.eclipse.tcf.te.runtime.stepper.multiContext&quot;/&gt;
-         &lt;/launchStepperBindings&gt;
+         &lt;stepper id=&quot;org.eclipse.tcf.te.runtime.stepper.multiContext&quot;/&gt;
 
          &lt;enablement&gt;
             ...

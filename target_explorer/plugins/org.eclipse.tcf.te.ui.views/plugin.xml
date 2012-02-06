@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+
+<!-- Extension Points -->
    <extension-point id="editorPageBindings" name="%ExtensionPoint.editorPageBindings.name" schema="schema/editorPageBindings.exsd"/>
    <extension-point id="editorPages" name="%ExtensionPoint.editorPages.name" schema="schema/editorPages.exsd"/>
 

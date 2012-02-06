@@ -238,7 +238,7 @@ public class LaunchConfigTypeBindingsManager {
 	 * @param id The launch step id. Must not be <code>null</code>.
 	 * @return The launch step or <code>null</code> if no step is registered for the specified id.
 	 */
-	public IContextStep getLaunchStep(String id) {
+	public IContextStep getStep(String id) {
 		Assert.isNotNull(id);
 		return StepperManager.getInstance().getStepExtManager().getStep(id, true);
 	}
@@ -254,7 +254,7 @@ public class LaunchConfigTypeBindingsManager {
 	 *
 	 * @return <code>True</code> if the launch step id is valid, <code>false</code> otherwise.
 	 */
-	public boolean isValidLaunchStep(String id, String typeId, String mode) {
+	public boolean isValidStep(String id, String typeId, String mode) {
 		Assert.isNotNull(id);
 		Assert.isNotNull(typeId);
 		Assert.isNotNull(mode);
@@ -277,7 +277,7 @@ public class LaunchConfigTypeBindingsManager {
 	 */
 	private void loadBindingsExtensions() {
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IExtensionPoint point = registry.getExtensionPoint("org.eclipse.tcf.te.launch.core.Bindings"); //$NON-NLS-1$
+		IExtensionPoint point = registry.getExtensionPoint("org.eclipse.tcf.te.launch.core.launchConfigTypeBindings"); //$NON-NLS-1$
 		if (point != null) {
 			IExtension[] bindings = point.getExtensions();
 			Arrays.sort(bindings, new ExtensionPointComparator());
