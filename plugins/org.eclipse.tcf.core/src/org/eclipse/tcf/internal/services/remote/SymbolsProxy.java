@@ -214,6 +214,36 @@ public class SymbolsProxy implements ISymbols {
         }.token;
     }
 
+    public IToken findByName(String context_id, Number ip, String name, final DoneFindAll done) {
+        return new Command(channel, this, "findByName", new Object[]{ context_id, ip, name }) {
+            @Override
+            public void done(Exception error, Object[] args) {
+                String[] ids = null;
+                if (error == null) {
+                    assert args.length == 2;
+                    error = toError(args[0]);
+                    ids = toStringArray(args[1]);
+                }
+                done.doneFind(token, error, ids);
+            }
+        }.token;
+    }
+
+    public IToken findInScope(String context_id, Number ip, String scope_id, String name, final DoneFindAll done) {
+        return new Command(channel, this, "findInScope", new Object[]{ context_id, ip, scope_id, name }) {
+            @Override
+            public void done(Exception error, Object[] args) {
+                String[] ids = null;
+                if (error == null) {
+                    assert args.length == 2;
+                    error = toError(args[0]);
+                    ids = toStringArray(args[1]);
+                }
+                done.doneFind(token, error, ids);
+            }
+        }.token;
+    }
+
     public IToken findByAddr(String context_id, Number addr, final DoneFind done) {
         return new Command(channel, this, "findByAddr", new Object[]{ context_id, addr }) {
             @Override
@@ -284,6 +314,7 @@ public class SymbolsProxy implements ISymbols {
     @SuppressWarnings("unchecked")
     private String[] toStringArray(Object o) {
         if (o == null) return null;
+        if (o instanceof String) return new String[]{ (String)o };
         Collection<String> c = (Collection<String>)o;
         return (String[])c.toArray(new String[c.size()]);
     }

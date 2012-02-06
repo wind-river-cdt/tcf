@@ -30,7 +30,9 @@ public interface ISymbols extends IService {
         value,                  // constant value
         reference,              // variable data object
         function,               // function body
-        type                    // a type
+        type,                   // a type
+        comp_unit,              // compilation unit
+        block                   // lexical block
     }
 
     enum TypeClass {
@@ -323,6 +325,7 @@ public interface ISymbols extends IService {
 
     /**
      * Search symbol with given name in given context.
+     * Return first symbol that matches.
      * The context can be memory space, process, thread or stack frame.
      *
      * @param context_id – a search scope.
@@ -332,6 +335,19 @@ public interface ISymbols extends IService {
      * @return - pending command handle.
      */
     IToken find(String context_id, Number ip, String name, DoneFind done);
+
+    /**
+     * Search symbol with given name in given context.
+     * Return all symbol that matches, starting with current scope and going up to compilation unit global scope.
+     * The context can be memory space, process, thread or stack frame.
+     *
+     * @param context_id – a search scope.
+     * @param ip - instruction pointer - ignored if context_id is a stack frame ID
+     * @param name – symbol name.
+     * @param done - call back interface called when operation is completed.
+     * @return - pending command handle.
+     */
+    IToken findByName(String context_id, Number ip, String name, DoneFindAll done);
 
     /**
      * Search symbol with given address in given context.
@@ -345,7 +361,20 @@ public interface ISymbols extends IService {
     IToken findByAddr(String context_id, Number addr, DoneFind done);
 
     /**
-     * Client call back interface for find().
+     * Search symbol with given address in given context.
+     * The context can be memory space, process, thread or stack frame.
+     *
+     * @param context_id – a search scope.
+     * @param ip - instruction pointer - ignored if context_id is a stack frame ID
+     * @param scope_id – a symbols ID of visibility scope.
+     * @param name – symbol name.
+     * @param done - call back interface called when operation is completed.
+     * @return - pending command handle.
+     */
+    IToken findInScope(String context_id, Number ip, String scope_id, String name, DoneFindAll done);
+
+    /**
+     * Client call back interface for find()and findByAddr().
      */
     interface DoneFind {
         /**
@@ -355,6 +384,19 @@ public interface ISymbols extends IService {
          * @param symbol_id - symbol ID.
          */
         void doneFind(IToken token, Exception error, String symbol_id);
+    }
+
+    /**
+     * Client call back interface for findByName() and findInScope().
+     */
+    interface DoneFindAll {
+        /**
+         * Called when symbol search is done.
+         * @param token - command handle.
+         * @param error – error description if operation failed, null if succeeded.
+         * @param symbol_id - symbol ID.
+         */
+        void doneFind(IToken token, Exception error, String[] symbol_ids);
     }
 
     /**
