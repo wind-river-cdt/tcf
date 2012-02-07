@@ -14,11 +14,25 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.dnd.ByteArrayTransfer;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DragSource;
+import org.eclipse.swt.dnd.DragSourceEvent;
+import org.eclipse.swt.dnd.DragSourceListener;
+import org.eclipse.swt.dnd.DropTarget;
+import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.dnd.DropTargetListener;
+import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.dnd.TransferData;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.tcf.te.ui.terminals.interfaces.ITerminalsView;
 import org.eclipse.tcf.te.ui.terminals.tabs.TabFolderManager;
 import org.eclipse.tcf.te.ui.terminals.tabs.TabFolderMenuHandler;
@@ -37,9 +51,9 @@ public class TerminalsView extends ViewPart implements ITerminalsView {
 	// Reference to the main page book control
 	private PageBook pageBookControl;
 	// Reference to the tab folder maintaining the consoles
-	private CTabFolder tabFolderControl;
+	/* default */ CTabFolder tabFolderControl;
 	// Reference to the tab folder manager
-	private TabFolderManager tabFolderManager;
+	/* default */ TabFolderManager tabFolderManager;
 	// Reference to the tab folder menu handler
 	private TabFolderMenuHandler tabFolderMenuHandler;
 	// Reference to the tab folder toolbar handler
@@ -50,28 +64,253 @@ public class TerminalsView extends ViewPart implements ITerminalsView {
 	private boolean pinned = false;
 
 	/**
+	 * "dummy" transfer just to store the information needed for the DnD
+	 *
+	 */
+	private static class TerminalTransfer extends ByteArrayTransfer {
+		// The static terminal transfer type name. Unique per terminals view instance.
+		private static final String TYPE_NAME = "terminal-transfer-format:" + System.currentTimeMillis() + ":" + LazyInstanceHolder.instance.hashCode(); //$NON-NLS-2$//$NON-NLS-1$
+		// Register the type name and remember the associated unique type id.
+		private static final int TYPEID = registerType(TYPE_NAME);
+
+		private CTabItem draggedFolderItem;
+		private TabFolderManager draggedTabFolderManager;
+
+		/*
+		 * Thread save singleton instance creation.
+		 */
+		private static class LazyInstanceHolder {
+			public static TerminalTransfer instance = new TerminalTransfer();
+		}
+
+		/**
+		 * Constructor.
+		 */
+		TerminalTransfer() {
+		}
+
+		/**
+		 * Returns the singleton terminal transfer instance.
+		 * @return
+		 */
+		public static TerminalTransfer getInstance() {
+			return LazyInstanceHolder.instance;
+		}
+
+		/**
+		 * Sets the dragged folder item.
+		 *
+		 * @param tabFolderItem The dragged folder item or <code>null</code>.
+		 */
+		public void setDraggedFolderItem(CTabItem tabFolderItem) {
+			draggedFolderItem = tabFolderItem;
+		}
+
+		/**
+		 * Returns the dragged folder item.
+		 *
+		 * @return The dragged folder item or <code>null</code>.
+		 */
+		public CTabItem getDraggedFolderItem() {
+			return draggedFolderItem;
+		}
+
+		/**
+		 * Sets the tab folder manager the associated folder item is dragged from.
+		 *
+		 * @param tabFolderManager The tab folder manager or <code>null</code>.
+		 */
+		public void setTabFolderManager(TabFolderManager tabFolderManager) {
+			draggedTabFolderManager = tabFolderManager;
+		}
+
+		/**
+		 * Returns the tab folder manager the associated folder item is dragged from.
+		 *
+		 * @return The tab folder manager or <code>null</code>.
+		 */
+		public TabFolderManager getTabFolderManager() {
+			return draggedTabFolderManager;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.swt.dnd.Transfer#getTypeIds()
+		 */
+		@Override
+		protected int[] getTypeIds() {
+			return new int[] { TYPEID };
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.swt.dnd.Transfer#getTypeNames()
+		 */
+		@Override
+		protected String[] getTypeNames() {
+			return new String[] { TYPE_NAME };
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.swt.dnd.ByteArrayTransfer#javaToNative(java.lang.Object, org.eclipse.swt.dnd.TransferData)
+		 */
+		@Override
+		public void javaToNative(Object data, TransferData transferData) {
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.swt.dnd.ByteArrayTransfer#nativeToJava(org.eclipse.swt.dnd.TransferData)
+		 */
+		@Override
+		public Object nativeToJava(TransferData transferData) {
+			return null;
+		}
+	}
+
+	/**
 	 * Constructor.
 	 */
 	public TerminalsView() {
 		super();
 	}
 
-	/* (non-Javadoc)
+	/**
+	 * Initialize the drag support.
+	 */
+	private void addDragSupport() {
+		// The event listener is registered as filter. It will receive events from all widgets.
+		PlatformUI.getWorkbench().getDisplay().addFilter(SWT.DragDetect, new Listener() {
+			/* (non-Javadoc)
+			 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
+			 */
+			@Override
+			public void handleEvent(Event event) {
+				// Handle events where a CTabFolder is the source only
+				if (!(event.widget instanceof CTabFolder)) return;
+
+				// only for own tab folders
+				if (event.widget != tabFolderControl) return;
+
+				final CTabFolder draggedFolder = (CTabFolder) event.widget;
+
+				int operations = DND.DROP_MOVE | DND.DROP_DEFAULT;
+				final DragSource dragSource = new DragSource(draggedFolder, operations);
+
+				// Initialize the terminal transfer type data
+				TerminalTransfer.getInstance().setDraggedFolderItem(tabFolderManager.getActiveTabItem());
+				TerminalTransfer.getInstance().setTabFolderManager(tabFolderManager);
+
+				Transfer[] transferTypes = new Transfer[] { TerminalTransfer.getInstance() };
+				dragSource.setTransfer(transferTypes);
+
+				// Add a drag source listener to cleanup after the drag operation finished
+				dragSource.addDragListener(new DragSourceListener() {
+					@Override
+					public void dragStart(DragSourceEvent event) {
+					}
+
+					@Override
+					public void dragSetData(DragSourceEvent event) {
+					}
+
+					@Override
+					public void dragFinished(DragSourceEvent event) {
+						// dispose this drag-source-listener by disposing its drag-source
+						dragSource.dispose();
+
+						// Inhibit the action of CTabFolder's default DragDetect-listeners,
+						// fire a mouse-click event on the widget that was dragged.
+						draggedFolder.notifyListeners(SWT.MouseUp, null);
+					}
+				});
+			}
+		});
+	}
+
+	/**
+	 * Initialize the drop support on the terminals page book control.
+	 */
+	private void addDropSupport() {
+		int operations = DND.DROP_MOVE | DND.DROP_DEFAULT;
+		final DropTarget target = new DropTarget(pageBookControl, operations);
+
+		Transfer[] transferTypes = new Transfer[] { TerminalTransfer.getInstance() };
+		target.setTransfer(transferTypes);
+
+		target.addDropListener(new DropTargetListener() {
+			@Override
+			public void dragEnter(DropTargetEvent event) {
+				// only if the drop target is different then the drag source
+				if (TerminalTransfer.getInstance().getTabFolderManager() == tabFolderManager) {
+					event.detail = DND.DROP_NONE;
+				}
+				else {
+					event.detail = DND.DROP_MOVE;
+				}
+			}
+
+			@Override
+			public void dragOver(DropTargetEvent event) {
+			}
+
+			@Override
+			public void dragOperationChanged(DropTargetEvent event) {
+			}
+
+			@Override
+			public void dragLeave(DropTargetEvent event) {
+			}
+
+			@Override
+			public void dropAccept(DropTargetEvent event) {
+			}
+
+			@Override
+			public void drop(DropTargetEvent event) {
+				if (TerminalTransfer.getInstance().getDraggedFolderItem() != null) {
+					CTabItem draggedItem = TerminalTransfer.getInstance().getDraggedFolderItem();
+
+					CTabItem item = tabFolderManager.cloneTabItemAfterDrop(draggedItem);
+					tabFolderManager.bringToTop(item);
+					switchToTabFolderControl();
+
+					// need to remove the dispose listener first
+					DisposeListener disposeListener = (DisposeListener) draggedItem.getData("disposeListener"); //$NON-NLS-1$
+					draggedItem.removeDisposeListener(disposeListener);
+					draggedItem.dispose();
+
+					// make sure the "new" terminals view has the focus after dragging a terminal
+					setFocus();
+				}
+			}
+		});
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
 	 */
 	@Override
 	public void dispose() {
 		// Dispose the tab folder manager
-		if (tabFolderManager != null) { tabFolderManager.dispose(); tabFolderManager = null; }
+		if (tabFolderManager != null) {
+			tabFolderManager.dispose();
+			tabFolderManager = null;
+		}
 		// Dispose the tab folder menu handler
-		if (tabFolderMenuHandler != null) { tabFolderMenuHandler.dispose(); tabFolderMenuHandler = null; }
+		if (tabFolderMenuHandler != null) {
+			tabFolderMenuHandler.dispose();
+			tabFolderMenuHandler = null;
+		}
 		// Dispose the tab folder toolbar handler
-		if (tabFolderToolbarHandler != null) { tabFolderToolbarHandler.dispose(); tabFolderToolbarHandler = null; }
+		if (tabFolderToolbarHandler != null) {
+			tabFolderToolbarHandler.dispose();
+			tabFolderToolbarHandler = null;
+		}
 
 		super.dispose();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
 	@Override
@@ -113,12 +352,16 @@ public class TerminalsView extends ViewPart implements ITerminalsView {
 		// Show the empty page control by default
 		switchToEmptyPageControl();
 
-		String secondaryId=((IViewSite)getSite()).getSecondaryId();
-		if(secondaryId!=null){
-			String defaultTitle=getPartName();
+		String secondaryId = ((IViewSite) getSite()).getSecondaryId();
+		if (secondaryId != null) {
+			String defaultTitle = getPartName();
 			// set title
-			setPartName(defaultTitle+ " "+secondaryId); //$NON-NLS-1$
+			setPartName(defaultTitle + " " + secondaryId); //$NON-NLS-1$
 		}
+
+		// Initialize DnD support
+		addDragSupport();
+		addDropSupport();
 	}
 
 	/**
@@ -139,8 +382,7 @@ public class TerminalsView extends ViewPart implements ITerminalsView {
 	protected void doConfigurePageBookControl(PageBook pagebook) {
 		Assert.isNotNull(pagebook);
 
-		if (getContextHelpId() != null)
-			PlatformUI.getWorkbench().getHelpSystem().setHelp(pagebook, getContextHelpId());
+		if (getContextHelpId() != null) PlatformUI.getWorkbench().getHelpSystem().setHelp(pagebook, getContextHelpId());
 	}
 
 	/**
@@ -201,10 +443,9 @@ public class TerminalsView extends ViewPart implements ITerminalsView {
 		// Set the tab gradient coloring from the global preferences
 		if (useGradientTabBackgroundColor()) {
 			tabFolder.setSelectionBackground(new Color[] {
-					JFaceResources.getColorRegistry().get("org.eclipse.ui.workbench.ACTIVE_TAB_BG_START"), //$NON-NLS-1$
-					JFaceResources.getColorRegistry().get("org.eclipse.ui.workbench.ACTIVE_TAB_BG_END") //$NON-NLS-1$
-			},
-			new int[] {100}, true);
+													JFaceResources.getColorRegistry().get("org.eclipse.ui.workbench.ACTIVE_TAB_BG_START"), //$NON-NLS-1$
+													JFaceResources.getColorRegistry().get("org.eclipse.ui.workbench.ACTIVE_TAB_BG_END") //$NON-NLS-1$
+												}, new int[] { 100 }, true);
 		}
 		// Apply the tab folder selection foreground color
 		tabFolder.setSelectionForeground(JFaceResources.getColorRegistry().get("org.eclipse.ui.workbench.ACTIVE_TAB_TEXT_COLOR")); //$NON-NLS-1$
@@ -214,8 +455,8 @@ public class TerminalsView extends ViewPart implements ITerminalsView {
 	}
 
 	/**
-	 * If <code>True</code> is returned, the inner tabs are colored with
-	 * gradient coloring set in the Eclipse workbench color settings.
+	 * If <code>True</code> is returned, the inner tabs are colored with gradient coloring set in
+	 * the Eclipse workbench color settings.
 	 *
 	 * @return <code>True</code> to use gradient tab colors, <code>false</code> otherwise.
 	 */
@@ -307,11 +548,14 @@ public class TerminalsView extends ViewPart implements ITerminalsView {
 	public Object getAdapter(Class adapter) {
 		if (CTabFolder.class.isAssignableFrom(adapter)) {
 			return tabFolderControl;
-		} else if (TabFolderManager.class.isAssignableFrom(adapter)) {
+		}
+		else if (TabFolderManager.class.isAssignableFrom(adapter)) {
 			return tabFolderManager;
-		} else if (TabFolderMenuHandler.class.isAssignableFrom(adapter)) {
+		}
+		else if (TabFolderMenuHandler.class.isAssignableFrom(adapter)) {
 			return tabFolderMenuHandler;
-		} else if (TabFolderToolbarHandler.class.isAssignableFrom(adapter)) {
+		}
+		else if (TabFolderToolbarHandler.class.isAssignableFrom(adapter)) {
 			return tabFolderToolbarHandler;
 		}
 
@@ -322,8 +566,8 @@ public class TerminalsView extends ViewPart implements ITerminalsView {
 	 * @see org.eclipse.tcf.te.ui.terminals.interfaces.ITerminalsView#setPinned(boolean)
 	 */
 	@Override
-    public void setPinned(boolean pin) {
-        this.pinned = pin;
+	public void setPinned(boolean pin) {
+		this.pinned = pin;
 	}
 
 	/* (non-Javadoc)

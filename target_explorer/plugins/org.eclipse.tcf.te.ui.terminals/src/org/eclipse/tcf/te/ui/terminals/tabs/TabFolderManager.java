@@ -49,7 +49,9 @@ import org.eclipse.tcf.te.ui.terminals.interfaces.ImageConsts;
 import org.eclipse.tm.internal.terminal.control.ITerminalListener;
 import org.eclipse.tm.internal.terminal.control.ITerminalViewControl;
 import org.eclipse.tm.internal.terminal.control.TerminalViewControlFactory;
+import org.eclipse.tm.internal.terminal.emulator.VT100TerminalControl;
 import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
+import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
 import org.eclipse.tm.internal.terminal.view.TerminalPreferencePage;
 import org.eclipse.tm.internal.terminal.view.TerminalViewPlugin;
@@ -381,6 +383,108 @@ public class TabFolderManager extends PlatformObject implements ISelectionProvid
 	}
 
 	/**
+ 	 * Used for DnD of terminal tab items between terminal views
+ 	 * <p>
+	 * Create a new tab item in the "dropped" terminal view using the
+	 * information stored in the given item.
+	 *
+	 * @param oldItem The old dragged tab item. Must not be <code>null</code>.
+	 * @return The new dropped tab item.
+	 */
+	public CTabItem cloneTabItemAfterDrop(CTabItem oldItem) {
+		Assert.isNotNull(oldItem);
+
+		ITerminalViewControl terminal = (ITerminalViewControl)oldItem.getData();
+		ITerminalConnector connector = terminal.getTerminalConnector();
+		Object data=oldItem.getData("customData"); //$NON-NLS-1$
+		String title=oldItem.getText();
+
+		// The result tab item
+		CTabItem item = null;
+
+		// Get the tab folder from the parent viewer
+		CTabFolder tabFolder = getTabFolder();
+		if (tabFolder != null) {
+			// Generate a unique title string for the new tab item (must be called before creating the item itself)
+			title = makeUniqueTitle(title, tabFolder);
+			// Create the tab item
+			item = new CTabItem(tabFolder, SWT.CLOSE);
+			// Set the tab item title
+			item.setText(title);
+			// Set the tab icon
+			Image image = getTabItemImage(connector, data);
+			if (image != null) item.setImage(image);
+
+			// Setup the tab item listeners
+			setupTerminalTabListeners(item);
+
+			// Create the composite to create the terminal control within
+			Composite composite = new Composite(tabFolder, SWT.NONE);
+			composite.setLayout(new FillLayout());
+			// Associate the composite with the tab item
+			item.setControl(composite);
+
+			// Refresh the layout
+			tabFolder.getParent().layout(true);
+
+			// change the "parent".
+			//
+			// Note: We have to cast to VT100TerminalControl here until setupTerminal is
+			//       re-exposed to clients via the ITerminalControl.
+			Assert.isTrue(terminal instanceof VT100TerminalControl);
+			((VT100TerminalControl)terminal).setupTerminal(composite);
+
+			item.setData(terminal);
+
+			// Associated the custom data node with the tab item (if any)
+			if (data != null) item.setData("customData", data); //$NON-NLS-1$
+
+			// Overwrite the text canvas help id
+			String contextHelpId = getParentView().getContextHelpId();
+			if (contextHelpId != null) {
+				PlatformUI.getWorkbench().getHelpSystem().setHelp(terminal.getControl(), contextHelpId);
+			}
+
+			// Set the context menu
+			TabFolderMenuHandler menuHandler = (TabFolderMenuHandler)getParentView().getAdapter(TabFolderMenuHandler.class);
+			if (menuHandler != null) {
+				Menu menu = (Menu)menuHandler.getAdapter(Menu.class);
+				if (menu != null) {
+					// One weird occurrence of IllegalArgumentException: Widget has wrong parent.
+					// Inspecting the code, this seem extremely unlikely. The terminal is created
+					// from a composite parent, the composite parent from the tab folder and the menu
+					// from the tab folder. Means, at the end all should have the same menu shell, shouldn't they?
+					try {
+						terminal.getControl().setMenu(menu);
+					} catch (IllegalArgumentException e) {
+						// Log exception only if debug mode is set to 1.
+						if (UIPlugin.getTraceHandler().isSlotEnabled(1, null)) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+
+			// Select the created item within the tab folder
+			tabFolder.setSelection(item);
+
+			// Set the connector
+			terminal.setConnector(connector);
+
+			// needed to get the focus and cursor
+			Assert.isTrue(terminal instanceof ITerminalControl);
+			((ITerminalControl)terminal).setState(TerminalState.CONNECTED);
+
+			// Fire selection changed event
+			fireSelectionChanged();
+		}
+
+		// Return the create tab item finally.
+		return item;
+	}
+
+
+	/**
 	 * Generate a unique title string based on the given proposal.
 	 *
 	 * @param proposal The proposal. Must not be <code>null</code>.
@@ -416,7 +520,11 @@ public class TabFolderManager extends PlatformObject implements ISelectionProvid
 		Assert.isNotNull(item);
 
 		// Create and associate the disposal listener
-		item.addDisposeListener(doCreateTerminalTabDisposeListener(this));
+		DisposeListener disposeListener=doCreateTerminalTabDisposeListener(this);
+
+		// store the listener to make access easier e.g. needed in DnD
+		item.setData("disposeListener", disposeListener); //$NON-NLS-1$
+		item.addDisposeListener(disposeListener);
 
 		// Create and register the property change listener
 		final IPropertyChangeListener propertyChangeListener = doCreateTerminalTabPropertyChangeListener(item);

@@ -432,6 +432,9 @@ public class ConsoleManager {
 
 		// Show the tab folder page
 		view.switchToTabFolderControl();
+		
+		// make sure the terminals view has the focus after opening a new terminal
+		view.setFocus();
 	}
 
 	/**
