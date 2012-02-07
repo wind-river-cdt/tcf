@@ -77,6 +77,8 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
     private int mem_seq_no;
     private int exe_seq_no;
 
+    private static final TCFNode[] empty_node_array = new TCFNode[0];
+
     /*
      * LookupCacheTimer is executed periodically to dispose least-recently
      * accessed entries in line_info_lookup_cache and func_info_lookup_cache.
@@ -819,6 +821,18 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
         return false;
     }
 
+    private boolean okToShowLastStack() {
+        return resume_pending && last_stack_trace != null;
+    }
+
+    private boolean okToHideStack() {
+        TCFContextState state_data = state.getData();
+        if (state_data == null) return true;
+        if (!state_data.is_suspended) return true;
+        if (state_data.isNotActive()) return true;
+        return false;
+    }
+
     @Override
     protected boolean getData(IChildrenCountUpdate result, Runnable done) {
         TCFChildren children = null;
@@ -827,18 +841,13 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
             if (!run_context.validate(done)) return false;
             IRunControl.RunControlContext ctx = run_context.getData();
             if (ctx != null && ctx.hasState()) {
-                if (resume_pending && last_stack_trace != null) {
+                if (okToShowLastStack()) {
                     result.setChildCount(last_stack_trace.length);
                     return true;
                 }
                 if (!state.validate(done)) return false;
-                if (isNotActive()) {
-                    last_stack_trace = new TCFNode[0];
-                    result.setChildCount(0);
-                    return true;
-                }
-                TCFContextState state_data = state.getData();
-                if (state_data != null && !state_data.is_suspended) {
+                if (okToHideStack()) {
+                    last_stack_trace = empty_node_array;
                     result.setChildCount(0);
                     return true;
                 }
@@ -904,17 +913,13 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
             if (!run_context.validate(done)) return false;
             IRunControl.RunControlContext ctx = run_context.getData();
             if (ctx != null && ctx.hasState()) {
-                if (resume_pending && last_stack_trace != null) {
+                if (okToShowLastStack()) {
                     setResultChildren(result, last_stack_trace);
                     return true;
                 }
                 if (!state.validate(done)) return false;
-                if (isNotActive()) {
-                    last_stack_trace = new TCFNode[0];
-                    return true;
-                }
-                TCFContextState state_data = state.getData();
-                if (state_data != null && !state_data.is_suspended) {
+                if (okToHideStack()) {
+                    last_stack_trace = empty_node_array;
                     return true;
                 }
                 children = children_stack;
@@ -967,19 +972,14 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
             if (!run_context.validate(done)) return false;
             IRunControl.RunControlContext ctx = run_context.getData();
             if (ctx != null && ctx.hasState()) {
-                if (resume_pending && last_stack_trace != null) {
+                if (okToShowLastStack()) {
                     result.setHasChilren(last_stack_trace.length > 0);
                     return true;
                 }
                 if (!state.validate(done)) return false;
-                if (isNotActive()) {
-                    last_stack_trace = new TCFNode[0];
+                if (okToHideStack()) {
+                    last_stack_trace = empty_node_array;
                     result.setHasChilren(false);
-                    return true;
-                }
-                TCFContextState state_data = state.getData();
-                if (state_data != null) {
-                    result.setHasChilren(state_data.is_suspended);
                     return true;
                 }
                 children = children_stack;
@@ -1403,7 +1403,7 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
                 postAllAndParentsChangedDelta();
             }
             else {
-                final int cnt = ++resumed_cnt;
+                final int cnt = resumed_cnt;
                 Protocol.invokeLater(500, new Runnable() {
                     public void run() {
                         if (cnt != resumed_cnt) return;
@@ -1428,7 +1428,6 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
                 public void run() {
                     if (cnt != resumed_cnt) return;
                     if (isDisposed()) return;
-                    children_stack.onResumed();
                     resume_pending = false;
                     postAllAndParentsChangedDelta();
                     model.onContextRunning();

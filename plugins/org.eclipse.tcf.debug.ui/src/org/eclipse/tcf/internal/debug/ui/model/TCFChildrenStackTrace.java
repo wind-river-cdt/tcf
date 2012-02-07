@@ -65,10 +65,6 @@ public class TCFChildrenStackTrace extends TCFChildren {
         reset();
     }
 
-    void onResumed() {
-        reset(null);
-    }
-
     void onPreferencesChanged() {
         reset();
     }
@@ -152,8 +148,8 @@ public class TCFChildrenStackTrace extends TCFChildren {
                         }
                     }
                     if (data.size() == 0) addEmulatedTopFrame(data);
+                    set(token, error, data);
                 }
-                set(token, error, data);
             }
         });
         return false;
