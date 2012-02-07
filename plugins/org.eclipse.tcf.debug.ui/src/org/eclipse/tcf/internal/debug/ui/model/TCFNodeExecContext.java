@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2011 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2012 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,7 +35,6 @@ import org.eclipse.tcf.internal.debug.model.TCFFunctionRef;
 import org.eclipse.tcf.internal.debug.model.TCFSourceRef;
 import org.eclipse.tcf.internal.debug.model.TCFSymFileRef;
 import org.eclipse.tcf.internal.debug.ui.ImageCache;
-import org.eclipse.tcf.protocol.IErrorReport;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.protocol.JSON;
 import org.eclipse.tcf.protocol.Protocol;
@@ -810,20 +809,13 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
 
     /**
      * Return true if this context cannot be accessed because it is not active.
-     * Not active means the target is suspended but this context is not one that is
-     * currently scheduled to run on a target CPU.
-     * Some debuggers don't support access to register values and other properties of such contexts.
+     * Not active means the target is suspended, but this context is not one that is
+     * currently scheduled to run on a target CPU, and the debuggers don't support
+     * access to register values and other properties of such contexts.
      */
     public boolean isNotActive() {
         TCFContextState state_data = state.getData();
-        if (state_data != null && state_data.suspend_params != null) {
-            @SuppressWarnings("unchecked")
-            Map<String,Object> attrs = (Map<String,Object>)state_data.suspend_params.get(IRunControl.STATE_PC_ERROR);
-            if (attrs != null) {
-                Number n = (Number)attrs.get(IErrorReport.ERROR_CODE);
-                if (n != null) return n.intValue() == IErrorReport.TCF_ERROR_NOT_ACTIVE;
-            }
-        }
+        if (state_data != null) return state_data.isNotActive();
         return false;
     }
 
@@ -1065,13 +1057,24 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
                 if (ctx.hasState() && !TCFModel.ID_PINNED_VIEW.equals(result.getPresentationContext().getId())) {
                     // Thread
                     if (resume_pending && resumed_by_action || model.getActiveAction(id) != null) {
-                        image_name = ImageCache.IMG_THREAD_RUNNNIG;
+                        if (!state.validate(done)) return false;
+                        TCFContextState state_data = state.getData();
+                        image_name = ImageCache.IMG_THREAD_UNKNOWN_STATE;
+                        if (state_data != null && !state_data.is_suspended) {
+                            if (state_data.isReversing()) {
+                                image_name = ImageCache.IMG_THREAD_REVERSING;
+                                label.append(" (Reversing)");
+                            }
+                            else {
+                                image_name = ImageCache.IMG_THREAD_RUNNNIG;
+                                label.append(" (Running)");
+                            }
+                        }
                         if (resume_pending && last_label != null) {
                             result.setImageDescriptor(ImageCache.getImageDescriptor(image_name), 0);
                             result.setLabel(last_label, 0);
                             return true;
                         }
-                        label.append(" (Running)");
                     }
                     else if (resume_pending && last_label != null && last_image != null) {
                         result.setImageDescriptor(last_image, 0);
@@ -1090,14 +1093,20 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
                             }
                         }
                         else {
-                            if (state_data == null) image_name = ImageCache.IMG_THREAD_UNKNOWN_STATE;
-                            else if (state_data.is_suspended) image_name = ImageCache.IMG_THREAD_SUSPENDED;
-                            else image_name = ImageCache.IMG_THREAD_RUNNNIG;
+                            image_name = ImageCache.IMG_THREAD_UNKNOWN_STATE;
                             if (state_data != null) {
                                 if (!state_data.is_suspended) {
-                                    label.append(" (Running)");
+                                    if (state_data.isReversing()) {
+                                        image_name = ImageCache.IMG_THREAD_REVERSING;
+                                        label.append(" (Reversing)");
+                                    }
+                                    else {
+                                        image_name = ImageCache.IMG_THREAD_RUNNNIG;
+                                        label.append(" (Running)");
+                                    }
                                 }
                                 else {
+                                    image_name = ImageCache.IMG_THREAD_SUSPENDED;
                                     String s = null;
                                     String r = model.getContextActionResult(id);
                                     if (r == null) {
@@ -1409,7 +1418,7 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
 
     void onContextResumed() {
         assert !isDisposed();
-        state.reset(new TCFContextState());
+        state.reset();
         if (!resume_pending) {
             final int cnt = ++resumed_cnt;
             resume_pending = true;

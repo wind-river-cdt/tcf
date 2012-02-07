@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2010 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2012 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -209,7 +209,8 @@ public interface IRunControl extends IService {
         STATE_SIGNAL_NAME = "SignalName",
         STATE_SIGNAL_DESCRIPTION = "SignalDescription",
         STATE_BREAKPOINT_IDS = "BPs",
-        STATE_PC_ERROR = "PCError";
+        STATE_PC_ERROR = "PCError",
+        STATE_REVERSING = "Reversing";
 
     /**
      * Optional parameters of resume command.

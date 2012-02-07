@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2011 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2012 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -409,9 +409,11 @@ public class TCFNodeStackFrame extends TCFNode {
             }
             if (bf.length() == 0) bf.append("...");
             result.setLabel(bf.toString(), 0);
-            String image_name =  state != null && state.is_suspended ?
-                    ImageCache.IMG_STACK_FRAME_SUSPENDED :
-                    ImageCache.IMG_STACK_FRAME_RUNNING;
+            String image_name = null;
+            if (state == null) image_name = ImageCache.IMG_STACK_FRAME_SUSPENDED;
+            else if (state.is_suspended) image_name = ImageCache.IMG_STACK_FRAME_SUSPENDED;
+            else if (state.isReversing()) image_name = ImageCache.IMG_STACK_FRAME_REVERSING;
+            else image_name = ImageCache.IMG_STACK_FRAME_RUNNING;
             result.setImageDescriptor(ImageCache.getImageDescriptor(image_name), 0);
         }
         return true;

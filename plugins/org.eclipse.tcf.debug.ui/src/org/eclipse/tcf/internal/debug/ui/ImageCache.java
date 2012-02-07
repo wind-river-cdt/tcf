@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2011 Wind River Systems, Inc. and others.
+ * Copyright (c) 2008, 2012 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,6 +38,7 @@ public class ImageCache {
         IMG_THREAD_TERMINATED = "icons/full/obj16/threadt_obj.gif",
         IMG_THREAD_SUSPENDED = "icons/full/obj16/threads_obj.gif",
         IMG_THREAD_RUNNNIG = "icons/full/obj16/thread_obj.gif",
+        IMG_THREAD_REVERSING = "icons/thread_reversing.gif",
         IMG_THREAD_NOT_ACTIVE = "icons/thread_not_active.gif",
         IMG_THREAD_UNKNOWN_STATE = "icons/thread_not_active.gif",
 
@@ -58,6 +59,7 @@ public class ImageCache {
 
         IMG_STACK_FRAME_SUSPENDED = "icons/full/obj16/stckframe_obj.gif",
         IMG_STACK_FRAME_RUNNING = "icons/full/obj16/stckframe_running_obj.gif",
+        IMG_STACK_FRAME_REVERSING = "icons/stckframe_reversing.gif",
 
         IMG_BREAKPOINT_ENABLED = "icons/full/obj16/brkp_obj.gif",
         IMG_BREAKPOINT_DISABLED = "icons/full/obj16/brkpd_obj.gif",
