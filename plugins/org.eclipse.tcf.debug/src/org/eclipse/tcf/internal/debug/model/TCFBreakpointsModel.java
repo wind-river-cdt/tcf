@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2011 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2012 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -55,6 +55,7 @@ public class TCFBreakpointsModel {
     public static final String
         ATTR_ID            = ITCFConstants.ID_TCF_DEBUG_MODEL + '.' + IBreakpoints.PROP_ID,
         ATTR_STATUS        = ITCFConstants.ID_TCF_DEBUG_MODEL + '.' + "Status",
+        ATTR_MESSAGE       = IMarker.MESSAGE,
         ATTR_ENABLED       = IBreakpoint.ENABLED,
         ATTR_INSTALL_COUNT = "org.eclipse.cdt.debug.core.installCount",
         ATTR_ADDRESS       = "org.eclipse.cdt.debug.core.address",
@@ -65,12 +66,17 @@ public class TCFBreakpointsModel {
         ATTR_SIZE          = "org.eclipse.cdt.debug.core.range",
         ATTR_FILE          = "org.eclipse.cdt.debug.core.sourceHandle",
         ATTR_LINE          = IMarker.LINE_NUMBER,
+        ATTR_CHAR          = IMarker.CHAR_START,
+        ATTR_REQESTED_FILE = "requestedSourceHandle",
+        ATTR_REQESTED_LINE = "requestedLine",
+        ATTR_REQESTED_CHAR = "requestedCharStart",
         ATTR_CONDITION     = "org.eclipse.cdt.debug.core.condition",
         ATTR_IGNORE_COUNT  = "org.eclipse.cdt.debug.core.ignoreCount",
         ATTR_CONTEXTNAMES  = ITCFConstants.ID_TCF_DEBUG_MODEL + '.' + IBreakpoints.PROP_CONTEXTNAMES,
         ATTR_CONTEXTIDS    = ITCFConstants.ID_TCF_DEBUG_MODEL + '.' + IBreakpoints.PROP_CONTEXTIDS,
         ATTR_EXE_PATHS     = ITCFConstants.ID_TCF_DEBUG_MODEL + '.' + IBreakpoints.PROP_EXECUTABLEPATHS,
-        ATTR_STOP_GROUP    = ITCFConstants.ID_TCF_DEBUG_MODEL + '.' + IBreakpoints.PROP_STOP_GROUP;
+        ATTR_STOP_GROUP    = ITCFConstants.ID_TCF_DEBUG_MODEL + '.' + IBreakpoints.PROP_STOP_GROUP,
+        ATTR_CONTEXT_QUERY = ITCFConstants.ID_TCF_DEBUG_MODEL + '.' + IBreakpoints.PROP_CONTEXT_QUERY;
 
     private final IBreakpointManager bp_manager = DebugPlugin.getDefault().getBreakpointManager();
     private final HashMap<IChannel,Map<String,Object>> channels = new HashMap<IChannel,Map<String,Object>>();
@@ -173,7 +179,11 @@ public class TCFBreakpointsModel {
                 if (v0 != null && !v0.equals(v1)) continue;
                 i.remove();
             }
+            if (marker.getAttribute(ATTR_REQESTED_FILE, "").length() > 0) keys.remove(ATTR_FILE);
+            if (marker.getAttribute(ATTR_REQESTED_LINE, -1) >= 0) keys.remove(ATTR_LINE);
+            if (marker.getAttribute(ATTR_REQESTED_CHAR, -1) >= 0) keys.remove(ATTR_CHAR);
             keys.remove(ATTR_INSTALL_COUNT);
+            keys.remove(ATTR_MESSAGE);
             keys.remove(ATTR_STATUS);
             return keys;
         }
@@ -518,7 +528,7 @@ public class TCFBreakpointsModel {
         m.put(IBreakpoint.ID, ITCFConstants.ID_TCF_DEBUG_MODEL);
         String msg = "";
         if (location != null) msg += location;
-        m.put(IMarker.MESSAGE, "Breakpoint: " + msg);
+        m.put(ATTR_MESSAGE, "Breakpoint: " + msg);
         String file = (String)p.get(IBreakpoints.PROP_FILE);
         if (file != null && file.length() > 0) {
             m.put(ATTR_FILE, file);
@@ -586,7 +596,8 @@ public class TCFBreakpointsModel {
         if (enabled != null && enabled.booleanValue() && bp_manager.isEnabled()) {
             m.put(IBreakpoints.PROP_ENABLED, enabled);
         }
-        if (file == null) file = (String)p.get(ATTR_FILE);
+        if (file == null) file = (String)p.get(ATTR_REQESTED_FILE);
+        if (file == null || file.length() == 0) file = (String)p.get(ATTR_FILE);
         if (file != null && file.length() > 0) {
             String name = file;
             boolean file_mapping = false;
@@ -601,11 +612,13 @@ public class TCFBreakpointsModel {
                 else if (i < j) name = file.substring(j + 1);
             }
             m.put(IBreakpoints.PROP_FILE, name);
-            Integer line = (Integer)p.get(ATTR_LINE);
-            if (line != null) {
+            Integer line = (Integer)p.get(ATTR_REQESTED_LINE);
+            if (line == null || line < 0) line = (Integer)p.get(ATTR_LINE);
+            if (line != null && line >= 0) {
                 m.put(IBreakpoints.PROP_LINE, new Integer(line.intValue()));
-                Integer column = (Integer)p.get(IMarker.CHAR_START);
-                if (column != null) m.put(IBreakpoints.PROP_COLUMN, column);
+                Integer column = (Integer)p.get(ATTR_REQESTED_CHAR);
+                if (column == null || column < 0) column = (Integer)p.get(ATTR_CHAR);
+                if (column != null && column >= 0) m.put(IBreakpoints.PROP_COLUMN, column);
             }
         }
         if (p.get(ATTR_EXPRESSION) != null) {
