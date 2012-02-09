@@ -274,7 +274,7 @@ public abstract class NewNodeWizardPage extends AbstractValidatingWizardPage {
 	 */
 	public void setPeer(IPeerModel peer) {
 		if (peer != null) {
-			treeViewer.setInput(peer);
+			setInput(peer);
 		}
 	}
 
