@@ -50,6 +50,9 @@ public class ClipboardPropertyTester extends PropertyTester {
 					if (node.isDirectory() && moving) {
 						hovered = node;
 					}
+					else if (node.isRoot()) {
+						hovered = node;
+					}
 					else {
 						hovered = node.parent;
 					}
