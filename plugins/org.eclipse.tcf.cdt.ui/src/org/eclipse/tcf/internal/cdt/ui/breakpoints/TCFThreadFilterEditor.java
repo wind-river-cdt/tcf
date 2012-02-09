@@ -373,15 +373,13 @@ public class TCFThreadFilterEditor {
         }
         if (checkedIds.size() == fContexts.size()) {
             threadIds = null;
-        } else {
+        }
+        else {
             threadIds = checkedIds.toArray(new String[checkedIds.size()]);
         }
         TCFBreakpointScopeExtension filterExtension = fPage.getFilterExtension();
-        if (filterExtension == null) {
-            return;
-        }
+        if (filterExtension == null) return;
         filterExtension.setThreadFilter(threadIds);
-        DebugPlugin.getDefault().getBreakpointManager().fireBreakpointChanged(fPage.getBreakpoint());
     }
 
     private Context[] syncGetContainers(final TCFLaunch launch) {
@@ -461,5 +459,4 @@ public class TCFThreadFilterEditor {
         }
         return null;
     }
-
 }
