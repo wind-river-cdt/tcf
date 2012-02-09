@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -24,6 +25,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * CommonViewerListener listens to the property change event from the
@@ -110,7 +112,7 @@ class CommonViewerListener implements IPropertyChangeListener {
 	    }
 	    else if (objects.size() == 1) {
 	    	Object object = objects.get(0);
-	    	if (contentProvider.getParent(object) == null) {
+	    	if (getParent(object) == null) {
 	    		return NULL;
 	    	}
 	    	return object;
@@ -118,7 +120,7 @@ class CommonViewerListener implements IPropertyChangeListener {
 	    else {
 	    	// If there are multiple root nodes, then select NULL as the final root.
 			Object object = getCommonAncestor(objects);
-			if (object == null || contentProvider.getParent(object) == null) {
+			if (object == null || getParent(object) == null) {
 				return NULL;
 			}
 			return object;
@@ -159,12 +161,12 @@ class CommonViewerListener implements IPropertyChangeListener {
 			return object2;
 		}
 		Object ancestor = null;
-		Object parent1 = contentProvider.getParent(object1);
+		Object parent1 = getParent(object1);
 		if(parent1 != null) {
 			ancestor = getCommonAncestor(parent1, object2);
 		}
 		if(ancestor != null) return ancestor;
-		Object parent2 = contentProvider.getParent(object2);
+		Object parent2 = getParent(object2);
 		if(parent2 != null) {
 			ancestor = getCommonAncestor(object1, parent2);
 		}
@@ -225,10 +227,29 @@ class CommonViewerListener implements IPropertyChangeListener {
 	 */
 	private boolean isAncestorOf(Object object1, Object object2) {
 		if (object2 == null) return false;
-		Object parent = contentProvider.getParent(object2);
+		Object parent = getParent(object2);
 		if (parent == object1) return true;
 		return isAncestorOf(object1, parent);
    }
+	
+	/**
+	 * Get the parent of the specified object in the display thread.
+	 * 
+	 * @param object The object
+	 * @return its parent.
+	 */
+	Object getParent(final Object object) {
+		if(Display.getCurrent() != null) {
+			return contentProvider.getParent(object);
+		}
+		final AtomicReference<Object> ref = new AtomicReference<Object>();
+		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable(){
+			@Override
+            public void run() {
+				ref.set(getParent(object));
+            }});
+		return ref.get();
+	}
 
 	/**
 	 * Process the object node.
