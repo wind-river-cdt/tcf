@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others.
+ * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.internal.cdt.ui.breakpoints;
 
+import java.io.File;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.cdt.debug.core.model.ICBreakpoint;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -37,6 +39,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.tcf.internal.cdt.ui.ImageCache;
+import org.eclipse.tcf.internal.debug.model.TCFBreakpointsModel;
 import org.eclipse.tcf.internal.debug.model.TCFBreakpointsStatus;
 import org.eclipse.tcf.internal.debug.model.TCFLaunch;
 import org.eclipse.tcf.internal.debug.model.TCFSourceRef;
@@ -59,11 +62,24 @@ public class TCFBreakpointStatusPage extends PropertyPage {
 
     private static class StatusItem implements Comparable<StatusItem> {
         Object object;
+        IMarker marker;
         String text;
         boolean has_state;
         boolean planted_ok;
         List<StatusItem> children;
         StatusItem parent;
+
+        void add(StatusItem i) {
+            i.parent = this;
+            if (children == null) children = new ArrayList<StatusItem>();
+            children.add(i);
+        }
+
+        void add(String text) {
+            StatusItem i = new StatusItem();
+            i.text = text;
+            add(i);
+        }
 
         @SuppressWarnings({ "rawtypes", "unchecked" })
         public int compareTo(StatusItem n) {
@@ -118,17 +134,19 @@ public class TCFBreakpointStatusPage extends PropertyPage {
                         StatusItem y = getNodeItem(x, model.getNode(ctx_id));
                         if (y != null) {
                             StatusItem z = new StatusItem();
+                            z.marker = getBreakpoint().getMarker();
                             z.text = (String)m.get(IBreakpoints.INSTANCE_ERROR);
                             if (z.text == null) {
+                                z.text = "Not planted";
                                 Number addr = (Number)m.get(IBreakpoints.INSTANCE_ADDRESS);
                                 if (addr != null) {
-                                    BigInteger i = JSON.toBigInteger(addr);
-                                    z.text = "Planted at 0x" + i.toString(16);
                                     z.planted_ok = true;
+                                    BigInteger i = JSON.toBigInteger(addr);
+                                    z.text = "0x" +  i.toString(16) + ": " + z.marker.getAttribute(TCFBreakpointsModel.ATTR_MESSAGE, "");;
                                     Number size = (Number)m.get(IBreakpoints.INSTANCE_SIZE);
-                                    if (size != null) z.text += "; Size " + size;
+                                    if (size != null) z.add("Size: " + size);
                                     String type = (String)m.get(IBreakpoints.INSTANCE_TYPE);
-                                    if (type != null) z.text += "; Type: " + type;
+                                    if (type != null) z.add("Type: " + type);
                                     if (y.object instanceof TCFNode) {
                                         TCFDataCache<TCFNodeExecContext> mem = model.searchMemoryContext((TCFNode)y.object);
                                         if (mem != null) {
@@ -144,11 +162,7 @@ public class TCFBreakpointStatusPage extends PropertyPage {
                                                             pending = ln_cache;
                                                         }
                                                         else {
-                                                            TCFSourceRef ref = ln_cache.getData();
-                                                            if (ref != null && ref.area != null && ref.area.file != null) {
-                                                                z.text += "; " + ref.area.file + ":" + ref.area.start_line;
-                                                                if (ref.area.start_column > 0) z.text += "." + ref.area.start_column;
-                                                            }
+                                                            addLocationInfo(z, ln_cache.getData());
                                                         }
                                                     }
                                                 }
@@ -157,9 +171,7 @@ public class TCFBreakpointStatusPage extends PropertyPage {
                                     }
                                 }
                             }
-                            z.parent = y;
-                            if (y.children == null) y.children = new ArrayList<StatusItem>();
-                            y.children.add(z);
+                            y.add(z);
                         }
                     }
                 }
@@ -172,12 +184,43 @@ public class TCFBreakpointStatusPage extends PropertyPage {
             if (error != null) {
                 StatusItem y = new StatusItem();
                 y.text = error;
-                y.parent = x;
-                x.children = new ArrayList<StatusItem>();
-                x.children.add(y);
+                x.add(y);
             }
             set(null, null, x);
             return true;
+        }
+
+        private void addLocationInfo(StatusItem z, TCFSourceRef ref) {
+            if (ref == null) return;
+            if (ref.area == null) return;
+            if (ref.area.file == null) return;
+
+            String req_file = z.marker.getAttribute(TCFBreakpointsModel.ATTR_REQESTED_FILE, null);
+            if (req_file == null) req_file = z.marker.getAttribute(TCFBreakpointsModel.ATTR_FILE, null);
+
+            int req_line = z.marker.getAttribute(TCFBreakpointsModel.ATTR_REQESTED_LINE, -1);
+            if (req_line < 0) req_line = z.marker.getAttribute(TCFBreakpointsModel.ATTR_LINE, -1);
+
+            int req_char = z.marker.getAttribute(TCFBreakpointsModel.ATTR_REQESTED_CHAR, -1);
+            if (req_char < 0) req_char = z.marker.getAttribute(TCFBreakpointsModel.ATTR_CHAR, -1);
+
+            if (req_file != null && req_line >= 0) {
+                String req_file_name = new File(req_file).getName();
+                String file_name = new File(ref.area.file).getName();
+                if (!req_file_name.equals(file_name) || req_line != ref.area.start_line) {
+                    addLocationInfo(z, "Requested location", req_file, req_line, req_char);
+                    addLocationInfo(z, "Adjusted location", ref.area.file, ref.area.start_line, ref.area.start_column);
+                    return;
+                }
+            }
+            addLocationInfo(z, "Source location", ref.area.file, ref.area.start_line, ref.area.start_column);
+        }
+
+        private void addLocationInfo(StatusItem z, String name, String file, int line, int column) {
+            String text = name + ": " + file;
+            text += "; line: " + line;
+            if (column > 0) text += "; column: " + column;
+            z.add(text);
         }
 
         private StatusItem getNodeItem(StatusItem root, TCFNode node) {
@@ -191,9 +234,10 @@ public class TCFBreakpointStatusPage extends PropertyPage {
             }
             if (x == null) x = getNodeItem(root, parent);
             if (x == null) return null;
-            if (x.children == null) x.children = new ArrayList<StatusItem>();
-            for (StatusItem y : x.children) {
-                if (y.object == node) return y;
+            if (x.children != null) {
+                for (StatusItem y : x.children) {
+                    if (y.object == node) return y;
+                }
             }
             StatusItem y = new StatusItem();
             y.object = node;
@@ -209,8 +253,7 @@ public class TCFBreakpointStatusPage extends PropertyPage {
                 }
                 if (y.text == null) y.text = node.getID();
             }
-            y.parent = x;
-            x.children.add(y);
+            x.add(y);
             return y;
         }
     }
@@ -257,8 +300,11 @@ public class TCFBreakpointStatusPage extends PropertyPage {
             }
             if (x.has_state) return DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_THREAD_RUNNING);
             if (x.object != null) return DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_DEBUG_TARGET);
-            if (x.planted_ok) return DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_BREAKPOINT);
-            return DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_BREAKPOINT_DISABLED);
+            if (x.marker != null) {
+                if (x.planted_ok) return DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_BREAKPOINT);
+                return DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_BREAKPOINT_DISABLED);
+            }
+            return null;
         }
 
         @Override
