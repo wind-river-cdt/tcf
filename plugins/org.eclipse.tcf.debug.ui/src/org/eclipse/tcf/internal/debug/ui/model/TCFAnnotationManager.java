@@ -41,6 +41,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.internal.debug.launch.TCFSourceLookupDirector;
 import org.eclipse.tcf.internal.debug.model.ITCFBreakpointListener;
+import org.eclipse.tcf.internal.debug.model.TCFBreakpointsModel;
 import org.eclipse.tcf.internal.debug.model.TCFBreakpointsStatus;
 import org.eclipse.tcf.internal.debug.model.TCFContextState;
 import org.eclipse.tcf.internal.debug.model.TCFLaunch;
@@ -52,6 +53,7 @@ import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IBreakpoints;
 import org.eclipse.tcf.services.ILineNumbers;
 import org.eclipse.tcf.services.IRunControl;
+import org.eclipse.tcf.services.IStackTrace;
 import org.eclipse.tcf.util.TCFDataCache;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -543,10 +545,15 @@ public class TCFAnnotationManager {
                                         }
                                     }
                                     if (area != null) {
+                                        String bp_name = "Breakpoint";
+                                        IBreakpoint bp = TCFBreakpointsModel.getBreakpointsModel().getBreakpoint(id);
+                                        if (bp != null && area.start_line != bp.getMarker().getAttribute(TCFBreakpointsModel.ATTR_LINE, -1)) {
+                                            bp_name = bp.getMarker().getAttribute(TCFBreakpointsModel.ATTR_MESSAGE, bp_name);
+                                        }
                                         if (error != null) {
                                             TCFAnnotation a = new TCFAnnotation(memory.id, area,
                                                     ImageCache.getImage(ImageCache.IMG_BREAKPOINT_ERROR),
-                                                    "Cannot plant breakpoint at 0x" + addr.toString(16) + ": " + error,
+                                                    bp_name + " failed to plant at 0x" + addr.toString(16) + ": " + error,
                                                     TYPE_BP_INSTANCE);
                                             set.add(a);
                                             error = null;
@@ -554,7 +561,7 @@ public class TCFAnnotationManager {
                                         else {
                                             TCFAnnotation a = new TCFAnnotation(memory.id, area,
                                                     ImageCache.getImage(ImageCache.IMG_BREAKPOINT_INSTALLED),
-                                                    "Breakpoint planted at 0x" + addr.toString(16),
+                                                    bp_name + " planted at 0x" + addr.toString(16),
                                                     TYPE_BP_INSTANCE);
                                             set.add(a);
                                         }
@@ -571,16 +578,28 @@ public class TCFAnnotationManager {
                     TCFSourceRef line_data = line_cache.getData();
                     if (line_data != null && line_data.area != null) {
                         TCFAnnotation a = null;
+                        String addr_str = "";
+                        TCFDataCache<BigInteger> addr_cache = frame.getAddress();
+                        if (!addr_cache.validate(this)) return;
+                        BigInteger addr_data = addr_cache.getData();
+                        if (addr_data != null) addr_str += ", IP: 0x" + addr_data.toString(16);
+                        TCFDataCache<IStackTrace.StackTraceContext> frame_cache = frame.getStackTraceContext();
+                        if (!frame_cache.validate(this)) return;
+                        IStackTrace.StackTraceContext frame_data = frame_cache.getData();
+                        if (frame_data != null) {
+                            BigInteger i = JSON.toBigInteger(frame_data.getFrameAddress());
+                            if (i != null) addr_str += ", FP: 0x" + i.toString(16);
+                        }
                         if (frame.getFrameNo() == 0) {
                             a = new TCFAnnotation(line_data.context_id, line_data.area,
                                     DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_INSTRUCTION_POINTER_TOP),
-                                    "Current Instruction Pointer",
+                                    "Current Instruction Pointer" + addr_str,
                                     TYPE_TOP_FRAME);
                         }
                         else {
                             a = new TCFAnnotation(line_data.context_id, line_data.area,
                                     DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_INSTRUCTION_POINTER),
-                                    "Stack Frame",
+                                    "Call Stack Frame" + addr_str,
                                     TYPE_STACK_FRAME);
                         }
                         set.add(a);
