@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.launch.core.bindings.internal;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.te.launch.core.bindings.interfaces.IOverwritableLaunchBinding;
 
 /**
@@ -49,7 +50,7 @@ public class OverwritableLaunchBinding extends VaryableLaunchBinding implements 
 	 */
 	@Override
 	public boolean overwrites(String id) {
-		assert id != null;
+		Assert.isNotNull(id);
 		for (int i = 0; i < overwrites.length; i++) {
 			if (id.equals(overwrites[i])) {
 				return true;

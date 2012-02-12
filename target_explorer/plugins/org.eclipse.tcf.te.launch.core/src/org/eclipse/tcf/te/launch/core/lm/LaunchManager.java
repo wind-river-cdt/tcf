@@ -81,7 +81,8 @@ public class LaunchManager extends PlatformObject {
 	 * @return The corresponding launch manager delegate instance.
 	 */
 	public ILaunchManagerDelegate getLaunchManagerDelegate(ILaunchConfigurationType launchConfigType, String launchMode) {
-		assert launchConfigType != null && launchMode != null;
+		Assert.isNotNull(launchConfigType);
+		Assert.isNotNull(launchMode);
 		return LaunchConfigTypeBindingsManager.getInstance().getLaunchManagerDelegate(launchConfigType.getIdentifier(), launchMode);
 	}
 
@@ -184,8 +185,8 @@ public class LaunchManager extends PlatformObject {
 	 * the configuration with the given launch specification. Attributes not listed by the given
 	 * launch specification will be initialized with default values.
 	 *
-	 * @param launchConfig A launch config to update or <code>null</code> if a new launch config
-	 *            should be created.
+	 * @param launchConfig A launch configuration to update or <code>null</code> if a new launch
+	 * 			  configuration should be created.
 	 * @param launchSpec A set of non default launch configuration attributes.
 	 * @param validateSpec Validate the launch specification in the <code>launchSpec</code>
 	 *            parameter. If <code>false</code>, it will attempt to create the launch
@@ -199,7 +200,7 @@ public class LaunchManager extends PlatformObject {
 	 * @since 3.2
 	 */
 	public ILaunchConfiguration createOrUpdateLaunchConfiguration(ILaunchConfiguration launchConfig, ILaunchSpecification launchSpec, boolean validateSpec) throws LaunchServiceException {
-		assert launchSpec != null;
+		Assert.isNotNull(launchSpec);
 
 		String launchConfigTypeId = launchSpec.getLaunchConfigurationTypeId();
 		String launchMode = launchSpec.getLaunchMode();

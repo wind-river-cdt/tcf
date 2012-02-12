@@ -263,7 +263,7 @@ public class DefaultStatusHandler extends AbstractStatusHandler {
 	 * @param keyDontAskAgain The unique key for the stored result value or <code>null</code>.
 	 * @param helpContextId The help context id or <code>null</code>.
 	 *
-	 * @return {@link Boolean} if the severity is {@link IWRMessageStatusHandler#QUESTION}, <code>null</code> otherwise.
+	 * @return {@link Boolean} if the severity is {@link IStatusHandlerConstants#QUESTION}, <code>null</code> otherwise.
 	 */
 	protected Object doOpenMessageDialog(Shell shell, String title, String message, String[] buttonLabel, int severity, String keyDontAskAgain, String helpContextId) {
 		Assert.isNotNull(shell);

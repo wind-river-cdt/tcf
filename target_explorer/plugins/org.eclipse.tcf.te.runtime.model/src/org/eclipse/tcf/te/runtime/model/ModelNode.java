@@ -176,7 +176,14 @@ public class ModelNode extends PropertiesContainer implements IModelNode, IModel
 	@Override
 	protected boolean dropEvent(Object source, String key, Object oldValue, Object newValue) {
 		boolean drop = super.dropEvent(source, key, oldValue, newValue);
-		if (drop) return true;
+		if (drop || PROPERTY_IS_GHOST.equals(key)) {
+			if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITraceIds.TRACE_EVENTS)) {
+				CoreBundleActivator.getTraceHandler().trace("Drop change event (hidden property)\n\t\t" + //$NON-NLS-1$
+															"for eventId = " + key, //$NON-NLS-1$
+															0, ITraceIds.TRACE_EVENTS, IStatus.WARNING, this);
+			}
+			return true;
+		}
 
 		// If the parent is null, it must be allowed to fire change events explicitly
 		if (parent == null && suppressEventsOnNullParent) {

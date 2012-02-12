@@ -60,7 +60,8 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 	 */
 	@Override
 	public void initLaunchConfigAttributes(ILaunchConfigurationWorkingCopy wc, ILaunchSpecification launchSpec) {
-		assert wc != null && launchSpec != null;
+		Assert.isNotNull(wc);
+		Assert.isNotNull(launchSpec);
 		validateLaunchSpecification(launchSpec);
 	}
 
@@ -69,7 +70,8 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 	 */
 	@Override
 	public void updateLaunchConfigAttributes(ILaunchConfigurationWorkingCopy wc, ILaunchSpecification launchSpec) {
-		assert wc != null && launchSpec != null;
+		Assert.isNotNull(wc);
+		Assert.isNotNull(launchSpec);
 		validateLaunchSpecification(launchSpec);
 	}
 
@@ -78,7 +80,9 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 	 */
 	@Override
 	public boolean isDefaultAttribute(String attributeKey, Object attributeValue, ILaunchConfiguration launchConfig, String launchMode) {
-		assert attributeKey != null && launchConfig != null && launchMode != null;
+		Assert.isNotNull(attributeKey);
+		Assert.isNotNull(launchConfig);
+		Assert.isNotNull(launchMode);
 		return false;
 	}
 
@@ -216,7 +220,8 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 	 * @return The launch specification with attributes from the selection context.
 	 */
 	protected ILaunchSpecification addLaunchSpecAttributes(ILaunchSpecification launchSpec, String launchConfigTypeId, ISelectionContext selectionContext) {
-		assert launchSpec != null && launchConfigTypeId != null;
+		Assert.isNotNull(launchSpec);
+		Assert.isNotNull(launchConfigTypeId);
 		return launchSpec;
 	}
 
@@ -582,18 +587,19 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 		// if launch specification value is null,
 		// values are equal if launch configuration value is default
 		else if (specValue == null) {
-			assert confValue != null;
+			Assert.isNotNull(confValue);
 			return isDefaultAttribute(attributeKey, confValue, launchConfig, launchSpec.getLaunchMode()) ? FULL_MATCH : NO_MATCH;
 		}
 		// if launch configuration value is default,
 		// values are equal if launch specification value is default too
 		else if (isDefaultAttribute(attributeKey, confValue, launchConfig, launchSpec.getLaunchMode()) || confValue == null) {
-			assert specValue != null;
+			Assert.isNotNull(specValue);
 			return isDefaultAttribute(attributeKey, specValue, launchConfig, launchSpec.getLaunchMode()) ? FULL_MATCH : NO_MATCH;
 		}
 		// use object.equals as default
 		else {
-			assert specValue != null && confValue != null;
+			Assert.isNotNull(specValue);
+			Assert.isNotNull(confValue);
 			return equals(attributeKey, specValue, confValue, launchSpec, launchConfig, launchSpec.getLaunchMode());
 		}
 	}

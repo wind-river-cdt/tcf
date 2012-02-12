@@ -12,6 +12,7 @@ package org.eclipse.tcf.te.launch.core.extensions.internal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.te.runtime.extensions.AbstractExtensionPointManager;
 import org.eclipse.tcf.te.runtime.extensions.ExecutableExtensionProxy;
 import org.eclipse.tcf.te.runtime.interfaces.extensions.IExecutableExtension;
@@ -80,7 +81,7 @@ public class LaunchModeVariantDelegateExtensionPointManager extends AbstractExte
 	 * @param id The id of the launch mode variant delegate. Must not be <code>null</code>.
 	 */
 	public IVariantDelegate getLaunchModeVariantDelegate(String id) {
-		assert id != null;
+		Assert.isNotNull(id);
 		IVariantDelegate delegate = null;
 		if (getExtensions().containsKey(id)) {
 			delegate = getExtensions().get(id).getInstance();

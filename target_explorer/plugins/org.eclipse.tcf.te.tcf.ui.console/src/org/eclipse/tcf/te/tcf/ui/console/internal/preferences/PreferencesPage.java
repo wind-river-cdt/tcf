@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.ui.console.internal.preferences;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.ColorFieldEditor;
@@ -158,7 +159,9 @@ public class PreferencesPage extends FieldEditorPreferencePage implements IWorkb
 	 * @param parent The field editor parent. Must not be <code>null</code>.
 	 */
 	private ColorFieldEditor createColorFieldEditor(String slotId, String label, Composite parent) {
-		assert slotId != null && label != null && parent != null;
+		Assert.isNotNull(slotId);
+		Assert.isNotNull(label);
+		Assert.isNotNull(parent);
 
 		// Create the color field editor
 		ColorFieldEditor editor = new ColorFieldEditor(slotId, label, parent);

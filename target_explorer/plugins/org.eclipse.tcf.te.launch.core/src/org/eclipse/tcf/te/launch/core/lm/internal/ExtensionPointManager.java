@@ -12,6 +12,7 @@ package org.eclipse.tcf.te.launch.core.lm.internal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.te.launch.core.lm.delegates.DefaultLaunchManagerDelegate;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchManagerDelegate;
 import org.eclipse.tcf.te.runtime.extensions.AbstractExtensionPointManager;
@@ -82,7 +83,7 @@ public class ExtensionPointManager extends AbstractExtensionPointManager<ILaunch
 	 * @param id The id of the launch manager delegate.
 	 */
 	public ILaunchManagerDelegate getLaunchManagerDelegate(String id) {
-		assert id != null;
+		Assert.isNotNull(id);
 		ILaunchManagerDelegate delegate = null;
 		if (getExtensions().containsKey(id)) {
 			delegate = getExtensions().get(id).getInstance();

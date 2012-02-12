@@ -92,7 +92,7 @@ public abstract class AbstractExtensionPointManager<V> {
 	 * @return The extensions in sorted order or an empty array if the extension point has no extensions.
 	 */
 	protected IExtension[] getExtensionsSorted(IExtensionPoint point) {
-		assert point != null;
+		Assert.isNotNull(point);
 
 		List<IExtension> extensions = new ArrayList<IExtension>(Arrays.asList(point.getExtensions()));
 		if (extensions.size() > 0) {

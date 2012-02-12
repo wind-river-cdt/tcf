@@ -152,7 +152,7 @@ public class ScannerRunnable implements Runnable, IChannel.IChannelListener {
 		                @Override
 		                public void done(Exception error, Object[] args) {
 		                    if (error == null) {
-		                        assert args.length == 2;
+		                        Assert.isTrue(args.length == 2);
 		                        error = toError(args[0]);
 		                    }
 		                    // If the error is still null here, process the returned peers

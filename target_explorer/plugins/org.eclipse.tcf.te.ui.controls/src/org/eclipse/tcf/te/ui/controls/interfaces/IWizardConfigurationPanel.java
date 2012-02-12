@@ -14,6 +14,7 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.events.TypedEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
+import org.eclipse.tcf.te.ui.controls.validator.Validator;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
@@ -49,7 +50,7 @@ public interface IWizardConfigurationPanel extends IMessageProvider {
 	/**
 	 * Validates the control and sets the message text and type so the parent
 	 * page or control is able to display validation result informations.
-	 * The validation should be done by implementations of {@link WRValidator}!
+	 * The validation should be done by implementations of {@link Validator}!
 	 * The default implementation of this method does nothing.
 	 *
 	 * @return Result of validation.

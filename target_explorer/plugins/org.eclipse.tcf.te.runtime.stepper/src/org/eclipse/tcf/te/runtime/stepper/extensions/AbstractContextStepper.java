@@ -663,7 +663,7 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 
 	/**
 	 * Rollback the steps previously executed to the failed step. The rollback
-	 * is executed in reverse order and the step must be of type {@link IWRExtendedTargetContextStep}
+	 * is executed in reverse order and the step must be of type {@link IExtendedContextStep}
 	 * to participate in the rollback.
 	 *
 	 * @param executedSteps

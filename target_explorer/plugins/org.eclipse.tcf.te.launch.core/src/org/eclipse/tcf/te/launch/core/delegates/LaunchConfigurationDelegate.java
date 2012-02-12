@@ -250,7 +250,7 @@ public class LaunchConfigurationDelegate extends AbstractLaunchConfigurationDele
 	 * @return The list of project resources or an empty list.
 	 */
 	protected List<IProject> findProjectResources(List<String> projectNames) throws CoreException {
-		assert projectNames != null;
+		Assert.isNotNull(projectNames);
 
 		List<IProject> projects = new ArrayList<IProject>();
 
@@ -281,7 +281,7 @@ public class LaunchConfigurationDelegate extends AbstractLaunchConfigurationDele
 	 * @param projects The list of project resources. Must be not <code>null</code>.
 	 */
 	protected void checkForDuplicatesAndSubProjects(List<IProject> projects) {
-		assert projects != null;
+		Assert.isNotNull(projects);
 
 		// The list of already processed project names
 		List<String> processedProjectNames = new ArrayList<String>();

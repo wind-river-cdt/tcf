@@ -60,6 +60,16 @@ public interface IModelNode extends IPropertiesContainer, ISchedulingRule {
 	public static final String PROPERTY_ERROR = "error"; //$NON-NLS-1$
 
 	/**
+	 * Property: Model node is a ghost node. Ghost nodes may be used to add
+	 *           elements to the model without "committing" them. The creator
+	 *           of the ghost node is fully responsible for managing the life
+	 *           cycle of this node types!
+	 *           <p>
+	 *           <i>Change notifications for this property are suppressed!</i>
+	 */
+	public static final String PROPERTY_IS_GHOST = "isghost"; //$NON-NLS-1$
+
+	/**
 	 * Returns the parent model node.
 	 *
 	 * @return The model parent

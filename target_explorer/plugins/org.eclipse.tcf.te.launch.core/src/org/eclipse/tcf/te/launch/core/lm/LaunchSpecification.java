@@ -112,7 +112,7 @@ public class LaunchSpecification extends PlatformObject implements ILaunchSpecif
 	 */
 	@Override
     public boolean hasAttribute(String key) {
-		assert key != null;
+		Assert.isNotNull(key);
 		return attributes.containsKey(key);
 	}
 
@@ -121,7 +121,7 @@ public class LaunchSpecification extends PlatformObject implements ILaunchSpecif
 	 */
 	@Override
     public Object removeAttribute(String key) {
-		assert key != null;
+		Assert.isNotNull(key);
 		if (isReadOnly()) return null;
 		return attributes.remove(key);
 	}
@@ -131,7 +131,7 @@ public class LaunchSpecification extends PlatformObject implements ILaunchSpecif
 	 */
 	@Override
     public boolean isCreateOnlyAttribute(String key) {
-		assert key != null;
+		Assert.isNotNull(key);
 		ILaunchAttribute attribute = getAttribute(key);
 		return attribute != null && attribute.isCreateOnlyAttribute();
 	}
@@ -141,7 +141,7 @@ public class LaunchSpecification extends PlatformObject implements ILaunchSpecif
 	 */
 	@Override
     public Object getAttribute(String key, Object defaultValue) {
-		assert key != null;
+		Assert.isNotNull(key);
 		ILaunchAttribute attribute = getAttribute(key);
 		return (attribute != null && attribute.getValue() != null) ? attribute.getValue() : defaultValue;
 	}
@@ -178,7 +178,7 @@ public class LaunchSpecification extends PlatformObject implements ILaunchSpecif
 	 */
 	@Override
     public ILaunchAttribute getAttribute(String key) {
-		assert key != null;
+		Assert.isNotNull(key);
 		return attributes.get(key);
 	}
 

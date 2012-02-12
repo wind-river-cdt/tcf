@@ -55,7 +55,7 @@ public class AbstractConsole extends MessageConsole implements IConsoleListener,
 		 * @param messageType The message type.
 		 */
 		public ConsoleBufferLine(String message, char messageType) {
-			assert message != null;
+			Assert.isNotNull(message);
 			this.message = message;
 			this.messageType = messageType;
 		}
@@ -96,7 +96,7 @@ public class AbstractConsole extends MessageConsole implements IConsoleListener,
 		 * @param line The line. Must not be <code>null</code>.
 		 */
 		public void addLine(ConsoleBufferLine line) {
-			assert line != null;
+			Assert.isNotNull(line);
 
 			// If the limit has been reached, we have to remove the oldest buffered line first.
 			while (bufferLimit > 0 && charactersConsumed + line.message.length() >= bufferLimit) {

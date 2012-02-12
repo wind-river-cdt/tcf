@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.runtime.stepper.extensions;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -104,7 +105,7 @@ public class ContextStepExecutor extends AbstractContextStepExecutor {
 	 */
 	@Override
 	protected boolean isExceptionMessageFormatted(String message) {
-		assert message != null;
+		Assert.isNotNull(message);
 		return message.startsWith(Messages.ContextStepExecutor_checkPoint_normalizationNeeded);
 	}
 

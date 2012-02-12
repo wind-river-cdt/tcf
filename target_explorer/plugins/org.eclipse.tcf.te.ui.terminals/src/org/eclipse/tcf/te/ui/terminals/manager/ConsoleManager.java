@@ -432,7 +432,7 @@ public class ConsoleManager {
 
 		// Show the tab folder page
 		view.switchToTabFolderControl();
-		
+
 		// make sure the terminals view has the focus after opening a new terminal
 		view.setFocus();
 	}
@@ -539,8 +539,9 @@ public class ConsoleManager {
 	 * @param data The custom terminal data node or <code>null</code>.
 	 */
 	public void terminateConsole(String id, String title, ITerminalConnector connector, Object data) {
-		assert title != null && connector != null;
-		assert Display.findDisplay(Thread.currentThread()) != null;
+		Assert.isNotNull(title);
+		Assert.isNotNull(connector);
+		Assert.isNotNull(Display.findDisplay(Thread.currentThread()));
 
 		// Lookup the console
 		CTabItem console = findConsoleForTerminalConnector(id, title, connector, data);

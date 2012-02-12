@@ -11,6 +11,7 @@ package org.eclipse.tcf.te.launch.core.persistence;
 
 import java.util.EventObject;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.tcf.te.runtime.events.EventManager;
 
@@ -38,7 +39,7 @@ public class LaunchConfigurationChangedEvent extends EventObject {
 	public LaunchConfigurationChangedEvent(ILaunchConfiguration source, String attributeName, Object oldValue, Object newValue) {
 		super(source);
 
-		assert attributeName != null;
+		Assert.isNotNull(attributeName);
 		this.attributeName = attributeName;
 		this.oldValue = oldValue;
 		this.newValue = newValue;
@@ -81,7 +82,7 @@ public class LaunchConfigurationChangedEvent extends EventObject {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.windriver.ide.common.core.event.WRAbstractNotificationEvent#toString()
+	 * @see java.util.EventObject#toString()
 	 */
 	@Override
 	public String toString() {
