@@ -33,7 +33,7 @@ public class RedirectPeersFilter extends ViewerFilter {
 			Runnable runnable = new Runnable() {
 				@Override
 				public void run() {
-					parent.set(((IPeerModel)element).getParentNode());
+					parent.set(((IPeerModel)element).getParent(IPeerModel.class));
 				}
 			};
 			Assert.isTrue(!Protocol.isDispatchThread());

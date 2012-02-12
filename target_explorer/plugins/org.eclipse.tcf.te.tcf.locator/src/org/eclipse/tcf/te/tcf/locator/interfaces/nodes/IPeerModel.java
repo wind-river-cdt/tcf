@@ -10,7 +10,7 @@
 package org.eclipse.tcf.te.tcf.locator.interfaces.nodes;
 
 import org.eclipse.tcf.protocol.IPeer;
-import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
+import org.eclipse.tcf.te.runtime.model.interfaces.IContainerModelNode;
 
 /**
  * The peer model is an extension to the TCF peer representation, implementing the {@link IPeer}
@@ -19,7 +19,7 @@ import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
  * <p>
  * <b>Note:</b> Read and write access to the peer model must happen within the TCF dispatch thread.
  */
-public interface IPeerModel extends IPropertiesContainer {
+public interface IPeerModel extends IContainerModelNode {
 
 	/**
 	 * Returns the parent locator model instance.
@@ -54,18 +54,4 @@ public interface IPeerModel extends IPropertiesContainer {
 	 * @return <code>True</code> if the peer attributes are complete, <code>false</code> otherwise.
 	 */
 	public boolean isComplete();
-
-	/**
-	 * Sets the parent peer model node.
-	 *
-	 * @param node The parent peer model node or <code>null</code>.
-	 */
-	public void setParentNode(IPeerModel node);
-
-	/**
-	 * Returns the parent peer model node.
-	 *
-	 * @return The parent peer model node or <code>null</code>.
-	 */
-	public IPeerModel getParentNode();
 }

@@ -159,7 +159,7 @@ public class RedirectHandler extends AbstractHandler {
 			peerModel.setProperty(IPeerModelProperties.PROP_INSTANCE, redirector);
 
 			// Associate proxy (parent) and peer model (child)
-			peerModel.setParentNode(proxy);
+			peerModel.setParent(proxy);
 			Model.getModel().getService(ILocatorModelUpdateService.class).addChild(peerModel);
 
 			// Trigger a refresh of the locator model in a later dispatch cycle

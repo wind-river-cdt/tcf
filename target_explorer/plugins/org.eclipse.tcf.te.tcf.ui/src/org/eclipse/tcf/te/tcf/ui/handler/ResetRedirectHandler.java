@@ -103,7 +103,7 @@ public class ResetRedirectHandler extends AbstractHandler {
 
 				// Reset proxy (parent) and peer model (child) association
 				Model.getModel().getService(ILocatorModelUpdateService.class).removeChild(peerModel);
-				peerModel.setParentNode(null);
+				peerModel.setParent(null);
 
 				// Trigger a refresh of the locator model in a later dispatch cycle
 				Protocol.invokeLater(new Runnable() {

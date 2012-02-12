@@ -125,7 +125,7 @@ public class LocatorModelUpdateService extends AbstractLocatorModelService imple
 		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 
 		// Determine the parent node
-		final IPeerModel parent = child.getParentNode();
+		final IPeerModel parent = child.getParent(IPeerModel.class);
 		if (parent == null) return;
 
 		// Determine the peer id of the parent
@@ -152,7 +152,7 @@ public class LocatorModelUpdateService extends AbstractLocatorModelService imple
 		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 
 		// Determine the parent node
-		final IPeerModel parent = child.getParentNode();
+		final IPeerModel parent = child.getParent(IPeerModel.class);
 		if (parent == null) return;
 
 		// Determine the peer id of the parent

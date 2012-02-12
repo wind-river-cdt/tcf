@@ -175,7 +175,7 @@ public class ScannerRunnable implements Runnable, IChannel.IChannelListener {
 									if (peerNode == null) {
 										// Not yet known -> add it
 										peerNode = new PeerModel(model, peer);
-										peerNode.setParentNode(ScannerRunnable.this.peerNode);
+										peerNode.setParent(ScannerRunnable.this.peerNode);
 										// Validate the peer node before adding
 										peerNode = model.validateChildPeerNodeForAdd(peerNode);
 										if (peerNode != null) {
@@ -187,7 +187,7 @@ public class ScannerRunnable implements Runnable, IChannel.IChannelListener {
 										}
 									} else {
 										// The parent node should be set and match
-										Assert.isTrue(peerNode.getParentNode() != null && peerNode.getParentNode().equals(ScannerRunnable.this.peerNode));
+										Assert.isTrue(peerNode.getParent(IPeerModel.class) != null && peerNode.getParent(IPeerModel.class).equals(ScannerRunnable.this.peerNode));
 										// Peer node found, update the peer instance
 										peerNode.setProperty(IPeerModelProperties.PROP_INSTANCE, peer);
 										// And remove it from the old child list

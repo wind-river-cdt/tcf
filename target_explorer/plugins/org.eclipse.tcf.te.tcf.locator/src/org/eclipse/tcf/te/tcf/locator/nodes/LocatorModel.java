@@ -472,7 +472,7 @@ public class LocatorModel extends PlatformObject implements ILocatorModel {
 
 		// Determine the parent node. If null, the child node is invalid
 		// and cannot be added
-		final IPeerModel parent = node.getParentNode();
+		final IPeerModel parent = node.getParent(IPeerModel.class);
 		if (parent == null) return null;
 
 		return validateChildPeerNodeForAdd(parent, node);
@@ -505,8 +505,8 @@ public class LocatorModel extends PlatformObject implements ILocatorModel {
 
 		// If the parent node is child node by itself, validate the
 		// child node against the parent parent node.
-		if (parent.getParentNode() != null) {
-			IPeerModel parentParentNode = parent.getParentNode();
+		if (parent.getParent(IPeerModel.class) != null) {
+			IPeerModel parentParentNode = parent.getParent(IPeerModel.class);
 			if (doValidateChildPeerNodeForAdd(parentParentNode, node) == null) {
 				return null;
 			}

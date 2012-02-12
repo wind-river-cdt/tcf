@@ -293,7 +293,7 @@ public class LocatorModelRefreshService extends AbstractLocatorModelService impl
 				IPeerModel proxy = model.getService(ILocatorModelLookupService.class).lkupPeerModelById(proxyPeerId);
 				Assert.isNotNull(proxy);
 
-				peerModel.setParentNode(proxy);
+				peerModel.setParent(proxy);
 				model.getService(ILocatorModelUpdateService.class).addChild(peerModel);
 			}
 		}

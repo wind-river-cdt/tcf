@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.runtime.interfaces.workingsets.IWorkingSetElement;
-import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
+import org.eclipse.tcf.te.runtime.model.ContainerModelNode;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
@@ -25,11 +25,9 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
 /**
  * Default peer model implementation.
  */
-public class PeerModel extends PropertiesContainer implements IPeerModel, IWorkingSetElement {
+public class PeerModel extends ContainerModelNode implements IPeerModel, IWorkingSetElement {
 	// Reference to the parent locator model
 	private final ILocatorModel model;
-	// Reference to the parent peer model node
-	private IPeerModel node;
 	// Reference to the peer id (cached for performance optimization)
 	private String peerId;
 
@@ -53,6 +51,9 @@ public class PeerModel extends PropertiesContainer implements IPeerModel, IWorki
 		// Initialize the peer id
 		peerId = peer.getID();
 		Assert.isNotNull(peerId);
+
+		// Peer model nodes can change the node parent at any time
+		allowSetParentOnNonNullParent = true;
 
 		// Enable change events
 		setChangeEventsEnabled(true);
@@ -96,24 +97,6 @@ public class PeerModel extends PropertiesContainer implements IPeerModel, IWorki
 	@Override
 	public String getPeerId() {
 	    return peerId;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel#setParentNode(org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel)
-	 */
-	@Override
-	public void setParentNode(IPeerModel node) {
-		Assert.isTrue(checkThreadAccess(), "Illegal Thread Access"); //$NON-NLS-1$
-		this.node = node;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel#getParentNode()
-	 */
-	@Override
-	public IPeerModel getParentNode() {
-		Assert.isTrue(checkThreadAccess(), "Illegal Thread Access"); //$NON-NLS-1$
-	    return node;
 	}
 
 	/* (non-Javadoc)

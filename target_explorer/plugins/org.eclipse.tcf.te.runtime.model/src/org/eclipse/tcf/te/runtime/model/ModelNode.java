@@ -40,6 +40,10 @@ public class ModelNode extends PropertiesContainer implements IModelNode, IModel
 	// Flag to control if property change events are suppressed
 	// until the model node is added to a parent container model node.
 	protected boolean suppressEventsOnNullParent = true;
+	// Flag to control if the node parent can change after set
+	// to a non-null value. Default is that the node parent cannot
+	// change after set to a non-null value.
+	protected boolean allowSetParentOnNonNullParent = false;
 
 	/**
 	 * Constructor.
@@ -79,7 +83,7 @@ public class ModelNode extends PropertiesContainer implements IModelNode, IModel
 	@Override
 	public final void setParent(IContainerModelNode parent) {
 		Assert.isTrue(checkThreadAccess(), "Illegal Thread Access"); //$NON-NLS-1$
-		if (this.parent != null) {
+		if (this.parent != null && !allowSetParentOnNonNullParent) {
 			throw new IllegalStateException("Model node already associated with a parent container model node!"); //$NON-NLS-1$
 		}
 		this.parent = parent;
