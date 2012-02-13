@@ -106,6 +106,8 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 	@Override
 	public void init(ICommonContentExtensionSite config) {
 		NavigatorContentService cs = (NavigatorContentService) config.getService();
+		if (!(cs.getViewer() instanceof CommonViewer)) return;
+
 		viewer = (CommonViewer) cs.getViewer();
 
 		// Get the filter service to activate the working set viewer filter
@@ -287,7 +289,7 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 	 */
 	@Override
 	public void dispose() {
-		extensionStateModel.removePropertyChangeListener(rootModeListener);
+		if (extensionStateModel != null) extensionStateModel.removePropertyChangeListener(rootModeListener);
 	}
 
 	/* (non-Javadoc)

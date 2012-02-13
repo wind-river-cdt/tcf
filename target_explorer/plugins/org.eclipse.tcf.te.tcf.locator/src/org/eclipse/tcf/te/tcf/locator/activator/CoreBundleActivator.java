@@ -81,8 +81,10 @@ public class CoreBundleActivator extends Plugin {
 					model.dispose();
 				}
 			};
-			if (Protocol.isDispatchThread()) runnable.run();
-			else Protocol.invokeAndWait(runnable);
+			try {
+				if (Protocol.isDispatchThread()) runnable.run();
+				else Protocol.invokeAndWait(runnable);
+			} catch (IllegalStateException e) { /* ignored on purpose */ }
 		}
 
 		super.stop(context);

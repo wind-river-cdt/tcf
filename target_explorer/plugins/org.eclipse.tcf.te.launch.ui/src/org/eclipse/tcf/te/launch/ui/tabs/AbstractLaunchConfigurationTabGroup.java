@@ -4,9 +4,8 @@
  *
  * Copyright 2006, 2008 Wind River Systems Inc. All rights reserved.
  */
-package org.eclipe.tcf.te.launch.ui.tabs;
+package org.eclipse.tcf.te.launch.ui.tabs;
 
-import org.eclipe.tcf.te.launch.ui.selection.LaunchSelectionManager;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
@@ -16,6 +15,7 @@ import org.eclipse.tcf.te.launch.core.lm.LaunchManager;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchManagerDelegate;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification;
 import org.eclipse.tcf.te.launch.core.selection.interfaces.ILaunchSelection;
+import org.eclipse.tcf.te.launch.ui.selection.LaunchSelectionManager;
 
 /**
  * Abstract launch configuration tab group default implementation.

@@ -12,7 +12,9 @@ package org.eclipse.tcf.te.tcf.locator.internal.services;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.runtime.services.AbstractService;
@@ -62,6 +64,32 @@ public class PropertiesAccessService extends AbstractService implements IPropert
 		}
 
 		return !result.isEmpty() ? Collections.unmodifiableMap(result) : null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.services.interfaces.IPropertiesAccessService#getProperty(java.lang.Object, java.lang.String)
+	 */
+	@Override
+	public Object getProperty(final Object context, final String key) {
+		Assert.isNotNull(context);
+		Assert.isNotNull(key);
+
+		final AtomicReference<Object> value = new AtomicReference<Object>();
+		if (context instanceof IPeerModel) {
+			final IPeerModel peerModel = (IPeerModel) context;
+
+			Runnable runnable = new Runnable() {
+				@Override
+				public void run() {
+					value.set(peerModel.getProperty(key));
+				}
+			};
+
+			if (Protocol.isDispatchThread()) runnable.run();
+			else Protocol.invokeAndWait(runnable);
+		}
+
+	    return value.get();
 	}
 
 }

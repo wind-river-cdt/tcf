@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipe.tcf.te.launch.ui.selection;
+package org.eclipse.tcf.te.launch.ui.selection;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,8 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipe.tcf.te.launch.ui.activator.UIPlugin;
-import org.eclipe.tcf.te.launch.ui.nls.Messages;
 import org.eclipse.cdt.utils.elf.Elf.Attribute;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -38,6 +36,8 @@ import org.eclipse.tcf.te.launch.core.selection.ProjectSelectionContext;
 import org.eclipse.tcf.te.launch.core.selection.RemoteContextSelectionContext;
 import org.eclipse.tcf.te.launch.core.selection.interfaces.ILaunchSelection;
 import org.eclipse.tcf.te.launch.core.selection.interfaces.ISelectionContext;
+import org.eclipse.tcf.te.launch.ui.activator.UIPlugin;
+import org.eclipse.tcf.te.launch.ui.nls.Messages;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNodeProvider;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IContext;

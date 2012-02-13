@@ -7,13 +7,18 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipe.tcf.te.launch.ui.activator;
+package org.eclipse.tcf.te.launch.ui.activator;
 
+import java.net.URL;
+
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.tcf.te.launch.ui.internal.ImageConsts;
 import org.eclipse.tcf.te.runtime.tracing.TraceHandler;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -62,8 +67,7 @@ public class UIPlugin extends AbstractUIPlugin {
 		return traceHandler;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
 	@Override
@@ -72,8 +76,7 @@ public class UIPlugin extends AbstractUIPlugin {
 		plugin = this;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	@Override
@@ -88,6 +91,13 @@ public class UIPlugin extends AbstractUIPlugin {
 	 */
 	@Override
 	protected void initializeImageRegistry(ImageRegistry registry) {
+		Bundle bundle = Platform.getBundle("org.eclipse.ui"); //$NON-NLS-1$
+		if (bundle != null) {
+			URL url = bundle.getEntry(ImageConsts.IMAGE_DIR_ROOT + "full/" + ImageConsts.IMAGE_DIR_ELCL + "refresh_nav.gif"); //$NON-NLS-1$ //$NON-NLS-2$
+			registry.put(ImageConsts.ACTION_Refresh_Enabled, ImageDescriptor.createFromURL(url));
+			url = bundle.getEntry(ImageConsts.IMAGE_DIR_ROOT + "full/" + ImageConsts.IMAGE_DIR_DLCL + "refresh_nav.gif"); //$NON-NLS-1$ //$NON-NLS-2$
+			registry.put(ImageConsts.ACTION_Refresh_Disabled, ImageDescriptor.createFromURL(url));
+		}
 	}
 
 	/**

@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipe.tcf.te.launch.ui.tabs;
+package org.eclipse.tcf.te.launch.ui.tabs;
 
 import java.util.List;
 import java.util.Map;

@@ -11,4 +11,11 @@
       </launchConfigurationTypeImage>
    </extension>
 
+   <extension point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="org.eclipse.tcf.te.tcf.launch.ui.linux.app.LaunchConfigurationTabGroup"
+            id="org.eclipse.tcf.te.tcf.launch.type.linux.app.tabgroup"
+            type="org.eclipse.tcf.te.tcf.launch.type.linux.app">
+      </launchConfigurationTabGroup>
+   </extension>
 </plugin>

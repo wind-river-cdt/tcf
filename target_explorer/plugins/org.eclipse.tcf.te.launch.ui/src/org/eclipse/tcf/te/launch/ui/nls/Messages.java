@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipe.tcf.te.launch.ui.nls;
+package org.eclipse.tcf.te.launch.ui.nls;
 
 import org.eclipse.osgi.util.NLS;
 
@@ -30,4 +30,11 @@ public class Messages extends NLS {
 	// **** Declare externalized string id's down here *****
 
 	public static String LaunchSelectionManager_error_failedToDetermineElfType;
+
+	public static String ModelContextSelectorControl_toolbar_refresh_tooltip;
+
+	public static String LaunchContextSelectorTab_name;
+
+	public static String ContextSelectorSection_title;
+	public static String ContextSelectorSection_description;
 }

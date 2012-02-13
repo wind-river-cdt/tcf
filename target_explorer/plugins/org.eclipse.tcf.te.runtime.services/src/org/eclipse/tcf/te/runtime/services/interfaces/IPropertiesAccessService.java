@@ -38,4 +38,15 @@ public interface IPropertiesAccessService extends IService {
 	 * @return The unmodifiable map containing the target addresses and ports, or <code>null</code>.
 	 */
 	public Map<String, String> getTargetAddress(Object context);
+
+	/**
+	 * Returns the property value stored under the given property key. If the property
+	 * does not exist, <code>null</code> is returned.
+	 *
+	 * @param context The context to get the property from. Must not be <code>null</code>.
+	 * @param key The property key. Must not be <code>null</code>.
+	 *
+	 * @return The stored property value or <code>null</code>.
+	 */
+	public Object getProperty(Object context, String key);
 }

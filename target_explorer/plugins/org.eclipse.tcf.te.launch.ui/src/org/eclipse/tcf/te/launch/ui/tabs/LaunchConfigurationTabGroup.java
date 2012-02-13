@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipe.tcf.te.launch.ui.tabs;
+package org.eclipse.tcf.te.launch.ui.tabs;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +15,7 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
+import org.eclipse.tcf.te.launch.ui.tabs.selector.LaunchContextSelectorTab;
 
 /**
  * Default launch configuration tab group implementation.
@@ -23,7 +24,7 @@ public class LaunchConfigurationTabGroup extends AbstractLaunchConfigurationTabG
 
 
 	/* (non-Javadoc)
-	 * @see org.eclipe.tcf.te.launch.ui.tabs.AbstractLaunchConfigurationTabGroup#createTabs(org.eclipse.debug.ui.ILaunchConfigurationDialog, java.lang.String)
+	 * @see org.eclipse.tcf.te.launch.ui.tabs.AbstractLaunchConfigurationTabGroup#createTabs(org.eclipse.debug.ui.ILaunchConfigurationDialog, java.lang.String)
 	 */
 	@Override
 	public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
@@ -33,12 +34,27 @@ public class LaunchConfigurationTabGroup extends AbstractLaunchConfigurationTabG
 		List<ILaunchConfigurationTab> tabs = new ArrayList<ILaunchConfigurationTab>();
 
 		// Create the default launch tabs
+		createContextSelectorTab(dialog, tabs, mode);
 
 		// Create and add any additional launch tabs
 		createAdditionalTabs(dialog, tabs, mode);
 
 		// Apply the tabs
 		setTabs(tabs.toArray(new ILaunchConfigurationTab[tabs.size()]));
+	}
+
+	/**
+	 * Create the context selector tab.
+	 *
+	 * @param dialog The launch configuration dialog this tab group is contained in.
+	 * @param tabs The list of launch configuration tabs. Must not be <code>null</code>.
+	 * @param mode The mode the launch configuration dialog was opened in.
+	 */
+	public void createContextSelectorTab(ILaunchConfigurationDialog dialog, List<ILaunchConfigurationTab> tabs, String mode) {
+		Assert.isNotNull(tabs);
+
+		ILaunchConfigurationTab tab = new LaunchContextSelectorTab();
+		tabs.add(tab);
 	}
 
 	/**

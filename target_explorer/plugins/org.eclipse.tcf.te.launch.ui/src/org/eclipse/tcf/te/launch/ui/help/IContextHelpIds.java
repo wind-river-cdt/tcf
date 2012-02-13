@@ -7,9 +7,9 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipe.tcf.te.launch.ui.help;
+package org.eclipse.tcf.te.launch.ui.help;
 
-import org.eclipe.tcf.te.launch.ui.activator.UIPlugin;
+import org.eclipse.tcf.te.launch.ui.activator.UIPlugin;
 
 /**
  * Context help id definitions.
