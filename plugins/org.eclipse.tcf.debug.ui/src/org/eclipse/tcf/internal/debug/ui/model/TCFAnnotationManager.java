@@ -17,8 +17,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.eclipse.core.resources.IWorkspaceRunnable;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -626,7 +629,16 @@ public class TCFAnnotationManager {
                         if (update_task != win_info.update_task) return;
                         assert win_info.update_node == node;
                         win_info.update_task = null;
-                        updateAnnotations(window, node, res);
+                        try {
+                            ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
+                                public void run(IProgressMonitor monitor) throws CoreException {
+                                    updateAnnotations(window, node, res);
+                                }
+                            }, null);
+                        }
+                        catch (Exception e) {
+                            Activator.log(e);
+                        }
                     }
                 });
             }

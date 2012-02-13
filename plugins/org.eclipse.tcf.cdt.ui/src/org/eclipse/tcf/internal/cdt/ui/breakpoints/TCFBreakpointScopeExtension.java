@@ -13,7 +13,6 @@ package org.eclipse.tcf.internal.cdt.ui.breakpoints;
 import org.eclipse.cdt.debug.core.model.ICBreakpoint;
 import org.eclipse.cdt.debug.core.model.ICBreakpointExtension;
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -38,32 +37,29 @@ public class TCFBreakpointScopeExtension implements ICBreakpointExtension {
     public void setThreadFilter(String[] threadIds) {
         fContextIds = threadIds;
         if (fBreakpoint == null) return;
-        final IMarker m = fBreakpoint.getMarker();
-        if (m == null || !m.exists()) return;
-        String contextIdAttr = null;
-        if (threadIds != null) {
-            if (threadIds.length == 0) {
-                // empty string is filtered out in TCFBreakpointsModel
-                contextIdAttr = " ";
-            }
-            else {
-                StringBuilder buf = new StringBuilder();
-                for (int i = 0; i < threadIds.length - 1; i++) {
-                    buf.append(threadIds[i]).append(',');
-                }
-                buf.append(threadIds[threadIds.length - 1]);
-                contextIdAttr = buf.toString();
-            }
-        }
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        final String IDAttr = contextIdAttr;
-        IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
-            public void run(IProgressMonitor monitor) throws CoreException {
-                m.setAttribute(TCFBreakpointsModel.ATTR_CONTEXTIDS, IDAttr);
-            }
-        };
         try {
-            workspace.run(runnable, null);
+            ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
+                public void run(IProgressMonitor monitor) throws CoreException {
+                    final IMarker m = fBreakpoint.getMarker();
+                    if (m == null || !m.exists()) return;
+                    String attr = null;
+                    if (fContextIds != null) {
+                        if (fContextIds.length == 0) {
+                            // empty string is filtered out in TCFBreakpointsModel
+                            attr = " ";
+                        }
+                        else {
+                            StringBuilder buf = new StringBuilder();
+                            for (int i = 0; i < fContextIds.length - 1; i++) {
+                                buf.append(fContextIds[i]).append(',');
+                            }
+                            buf.append(fContextIds[fContextIds.length - 1]);
+                            attr = buf.toString();
+                        }
+                    }
+                    m.setAttribute(TCFBreakpointsModel.ATTR_CONTEXTIDS, attr);
+                }
+            }, null);
         }
         catch (Exception e) {
             Activator.log(e);
