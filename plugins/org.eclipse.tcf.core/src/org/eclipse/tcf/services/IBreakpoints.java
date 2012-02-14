@@ -130,6 +130,7 @@ public interface IBreakpoints extends IService {
         CAPABILITY_CONTEXTIDS = "ContextIds",           // Boolean
         CAPABILITY_CONTEXTNAMES = "ContextNames",       // Boolean
         CAPABILITY_STOP_GROUP = "StopGroup",            // Boolean
+        CAPABILITY_TEMPORARY = "Temporary",             // Boolean
         CAPABILITY_IGNORECOUNT = "IgnoreCount",         // Boolean
         CAPABILITY_ACCESSMODE = "AccessMode",           // Number
         CAPABILITY_CLIENT_DATA = "ClientData";          // Boolean

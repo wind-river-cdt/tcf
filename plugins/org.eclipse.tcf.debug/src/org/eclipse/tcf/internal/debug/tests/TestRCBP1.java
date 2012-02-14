@@ -100,6 +100,9 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
     private boolean data_bp_area_done;
     private ILineNumbers.CodeArea data_bp_area;
     private String data_bp_id;
+    private String temp_bp_id;
+    private boolean temp_bp_removed;
+    private int temp_bp_cnt;
     private int data_bp_cnt;
     private boolean mem_map_test_running;
     private boolean mem_map_test_done;
@@ -178,8 +181,17 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
             if (!bp_change_done) return;
             for (String id : ids) {
                 if (bp_list.get(id) != null) {
-                    exit(new Exception("Invalid Breakpoints.contextRemoved event"));
-                    return;
+                    if (id.equals(temp_bp_id)) {
+                        if (bp_cnt != 3 || temp_bp_removed) {
+                            exit(new Exception("Invalid Breakpoints.contextRemoved event for temporary breakpoint"));
+                            return;
+                        }
+                        temp_bp_removed = true;
+                    }
+                    else {
+                        exit(new Exception("Invalid Breakpoints.contextRemoved event"));
+                        return;
+                    }
                 }
             }
         }
@@ -187,8 +199,8 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
         private boolean checkBPData(Map<String,Object> m0, Map<String,Object> m1) {
             if (m1 == null) return true;
             m0 = new HashMap<String,Object>(m0);
-            if (m0.get(IBreakpoints.PROP_ENABLED) == null) m0.put(IBreakpoints.PROP_ENABLED, Boolean.FALSE);
-            if (m1.get(IBreakpoints.PROP_ENABLED) == null) m1.put(IBreakpoints.PROP_ENABLED, Boolean.FALSE);
+            if (m0.get(IBreakpoints.PROP_ENABLED) == null) m0.put(IBreakpoints.PROP_ENABLED, false);
+            if (m1.get(IBreakpoints.PROP_ENABLED) == null) m1.put(IBreakpoints.PROP_ENABLED, false);
             if (!m1.equals(m0)) {
                 exit(new Exception("Invalid data in Breakpoints event: " + m0 + " != " + m1));
                 return false;
@@ -532,11 +544,11 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
     private void iniBreakpoints() {
         assert !bp_set_done;
         assert bp_list.isEmpty();
-        Map<String,Object> m[] = new Map[8];
+        Map<String,Object> m[] = new Map[9];
         for (int i = 0; i < m.length; i++) {
             m[i] = new HashMap<String,Object>();
             m[i].put(IBreakpoints.PROP_ID, "TcfTestBP" + i + "" + channel_id);
-            m[i].put(IBreakpoints.PROP_ENABLED, Boolean.TRUE);
+            m[i].put(IBreakpoints.PROP_ENABLED, true);
             switch (i) {
             case 0:
                 m[i].put(IBreakpoints.PROP_LOCATION, sym_list.get("tcf_test_func0").getValue().toString());
@@ -561,12 +573,12 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
             case 4:
                 // Disabled breakpoint
                 m[i].put(IBreakpoints.PROP_LOCATION, "tcf_test_func2");
-                m[i].put(IBreakpoints.PROP_ENABLED, Boolean.FALSE);
+                m[i].put(IBreakpoints.PROP_ENABLED, false);
                 break;
             case 5:
                 // Breakpoint that will be enabled with "enable" command
                 m[i].put(IBreakpoints.PROP_LOCATION, "tcf_test_func2");
-                m[i].put(IBreakpoints.PROP_ENABLED, Boolean.FALSE);
+                m[i].put(IBreakpoints.PROP_ENABLED, false);
                 break;
             case 6:
                 m[i].put(IBreakpoints.PROP_LOCATION, "tcf_test_func3");
@@ -582,9 +594,23 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
                     data_bp_id = (String)m[i].get(IBreakpoints.PROP_ID);
                 }
                 else {
-                    m[i].put(IBreakpoints.PROP_ENABLED, Boolean.FALSE);
+                    m[i].put(IBreakpoints.PROP_ENABLED, false);
                 }
                 break;
+            case 8:
+                // Temporary breakpoint
+                m[i].put(IBreakpoints.PROP_LOCATION, "tcf_test_func3");
+                Boolean ct = (Boolean)bp_capabilities.get(IBreakpoints.CAPABILITY_TEMPORARY);
+                if (ct != null && ct.booleanValue()) {
+                    ArrayList<String> l = new ArrayList<String>();
+                    l.add(test_context.getProcessID());
+                    m[i].put(IBreakpoints.PROP_CONTEXTIDS, l);
+                    m[i].put(IBreakpoints.PROP_TEMPORARY, true);
+                    temp_bp_id = (String)m[i].get(IBreakpoints.PROP_ID);
+                }
+                else {
+                    m[i].put(IBreakpoints.PROP_ENABLED, false);
+                }
             }
             bp_list.put((String)m[i].get(IBreakpoints.PROP_ID), m[i]);
         }
@@ -796,8 +822,8 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
                     }
                     HashMap<String,Object> m0 = new HashMap<String,Object>(properties);
                     HashMap<String,Object> m1 = (HashMap<String,Object>)bp_list.get(id);
-                    if (m0.get(IBreakpoints.PROP_ENABLED) == null) m0.put(IBreakpoints.PROP_ENABLED, Boolean.FALSE);
-                    if (m1.get(IBreakpoints.PROP_ENABLED) == null) m1.put(IBreakpoints.PROP_ENABLED, Boolean.FALSE);
+                    if (m0.get(IBreakpoints.PROP_ENABLED) == null) m0.put(IBreakpoints.PROP_ENABLED, false);
+                    if (m1.get(IBreakpoints.PROP_ENABLED) == null) m1.put(IBreakpoints.PROP_ENABLED, false);
                     if (!m1.equals(m0)) {
                         exit(new Exception("Invalid data returned by Breakpoints.getProperties: " + m0 + " != " + m1));
                         return;
@@ -820,7 +846,7 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
                     exit(new Exception("Protocol.sync() test failed"));
                     return;
                 }
-                m.put(IBreakpoints.PROP_ENABLED, Boolean.TRUE);
+                m.put(IBreakpoints.PROP_ENABLED, true);
                 srv_breakpoints.enable(new String[]{ bp_id }, new IBreakpoints.DoneCommand() {
                     public void doneCommand(IToken token, Exception error) {
                         if (error != null) exit(error);
@@ -933,6 +959,9 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
                 if (data_bp_id != null && data_bp_cnt != 10) {
                     exit(new Exception("Test main thread data breakpoint count = " + data_bp_cnt + ", expected 10"));
                 }
+                if (temp_bp_id != null && temp_bp_cnt != 1) {
+                    exit(new Exception("Temporary breakpoint count = " + temp_bp_cnt + ", expected 1"));
+                }
                 srv_run_ctrl.removeListener(this);
                 // Reset breakpoint list
                 bp_list.clear();
@@ -1044,6 +1073,7 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
             else if ("tcf_test_func3".equals(sp_sym)) {
                 checkSuspendedContext(sc, "tcf_test_func0");
             }
+            if (isMyTempBreakpoint(sc)) temp_bp_cnt++;
         }
         else if (isMyDataBreakpoint(sc)) {
             if (sc.id.equals(main_thread_id)) data_bp_cnt++;
@@ -1107,6 +1137,20 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
             @SuppressWarnings("unchecked")
             Collection<String> c = (Collection<String>)ids;
             if (c.contains(data_bp_id)) return true;
+        }
+        return false;
+    }
+
+    private boolean isMyTempBreakpoint(SuspendedContext sc) {
+        // Check if the context is suspended by our temporary breakpoint
+        if (temp_bp_id == null) return false;
+        if (!"Breakpoint".equals(sc.reason)) return false;
+        if (sc.params == null) return false;
+        Object ids = sc.params.get(IRunControl.STATE_BREAKPOINT_IDS);
+        if (ids != null) {
+            @SuppressWarnings("unchecked")
+            Collection<String> c = (Collection<String>)ids;
+            if (c.contains(temp_bp_id)) return true;
         }
         return false;
     }
