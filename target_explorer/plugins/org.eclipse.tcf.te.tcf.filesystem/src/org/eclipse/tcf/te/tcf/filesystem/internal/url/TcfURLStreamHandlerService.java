@@ -31,7 +31,7 @@ public class TcfURLStreamHandlerService extends AbstractURLStreamHandlerService 
 	 * WIN_PATH = <strong>DISK_SEG</strong> / (<strong>RELATIVE_PATH</strong>)? 
 	 * DISK_SEG = [a-zA-Z]: 
 	 * RELATIVE_PATH = <strong>PATH_SEG</strong> | <strong>PATH_SEG</strong>/<strong>RELATIVE_PATH</strong> 
-	 * PATH_SEG = (.^[/:])+
+	 * PATH_SEG = (.^[/])+
 	 * </pre>
 	 */
 	@Override
