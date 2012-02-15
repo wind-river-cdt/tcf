@@ -132,15 +132,13 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
         @SuppressWarnings("unchecked")
         public void breakpointStatusChanged(String id, Map<String,Object> status) {
             if (bp_list.get(id) != null && test_context != null && bp_cnt < 40) {
-                if (test_context != null) {
-                    String prs = test_context.getProcessID();
-                    if (prs != null) {
-                        for (ITCFTest test : test_suite.getActiveTests()) {
-                            if (test instanceof TestRCBP1) {
-                                TestRCBP1 rcbp = (TestRCBP1)test;
-                                if (!rcbp.mem_map_test_running) continue;
-                                if (prs.equals(rcbp.test_context.getProcessID())) return;
-                            }
+                String prs = test_context.getProcessID();
+                if (prs != null) {
+                    for (ITCFTest test : test_suite.getActiveTests()) {
+                        if (test instanceof TestRCBP1) {
+                            TestRCBP1 rcbp = (TestRCBP1)test;
+                            if (!rcbp.mem_map_test_running) continue;
+                            if (prs.equals(rcbp.test_context.getProcessID())) return;
                         }
                     }
                 }
@@ -544,7 +542,7 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
     private void iniBreakpoints() {
         assert !bp_set_done;
         assert bp_list.isEmpty();
-        Map<String,Object> m[] = new Map[9];
+        Map<String,Object> m[] = new Map[10];
         for (int i = 0; i < m.length; i++) {
             m[i] = new HashMap<String,Object>();
             m[i].put(IBreakpoints.PROP_ID, "TcfTestBP" + i + "" + channel_id);
@@ -611,6 +609,11 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
                 else {
                     m[i].put(IBreakpoints.PROP_ENABLED, false);
                 }
+                break;
+            case 9:
+                // Invalid breakpoint that should not be planted
+                m[i].put("Unknown property", "Unknown value");
+                break;
             }
             bp_list.put((String)m[i].get(IBreakpoints.PROP_ID), m[i]);
         }
