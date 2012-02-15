@@ -35,6 +35,7 @@ import org.eclipse.tcf.te.tcf.filesystem.interfaces.IWindowsFileAttributes;
 import org.eclipse.tcf.te.tcf.filesystem.internal.UserAccount;
 import org.eclipse.tcf.te.tcf.filesystem.internal.testers.TargetPropertyTester;
 import org.eclipse.tcf.te.tcf.filesystem.internal.url.TcfURLConnection;
+import org.eclipse.tcf.te.tcf.filesystem.internal.url.TcfURLStreamHandlerService;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.UserManager;
 import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
@@ -400,9 +401,10 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 
 	/**
 	 * Get the URL of the file or folder. The URL's format is created in the
-	 * following way: tcf:///<TCF_AGENT_ID>/remote/path/to/the/resource... See
+	 * following way: tcf:/<TCF_AGENT_ID>/remote/path/to/the/resource... See
 	 * {@link TcfURLConnection#TcfURLConnection(URL)}
 	 *
+	 * @see TcfURLStreamHandlerService#parseURL(URL, String, int, int)
 	 * @return The URL of the file/folder.
 	 * @throws MalformedURLException
 	 */

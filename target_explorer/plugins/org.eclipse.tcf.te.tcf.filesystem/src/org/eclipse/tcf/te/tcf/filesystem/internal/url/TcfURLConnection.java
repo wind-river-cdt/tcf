@@ -69,25 +69,20 @@ public class TcfURLConnection extends URLConnection {
 
 	/**
 	 * Create a TCF URL Connection using the specified url. The format of this
-	 * URL should be: tcf:///<TCF_AGENT_ID>/remote/path/to/the/resource... The
+	 * URL should be: tcf:/<TCF_AGENT_ID>/remote/path/to/the/resource... The
 	 * stream protocol schema is designed in this way in order to retrieve the
 	 * agent peer ID without knowing the structure of a TCF peer id.
 	 *
+	 * @see TcfURLStreamHandlerService#parseURL(URL, String, int, int)
 	 * @param url
 	 *            The URL of the resource.
 	 */
 	public TcfURLConnection(URL url) {
 		super(url);
-		// The path should have already contained the peer's id like:
-		// /<TCF_AGENT_ID>/remote/path/to/the/resource...
+		// The peerId is stored as the host name in URL. See TcfURLStreamHandlerService#parseURL for details.
+		String peerId = url.getHost();
+		peer = Protocol.getLocator().getPeers().get(peerId);
 		path = url.getPath();
-		int slash = path.indexOf("/", 1); //$NON-NLS-1$
-		if (slash != -1){
-			String peerId = path.substring(1, slash);
-			peer = Protocol.getLocator().getPeers().get(peerId);
-			path = path.substring(slash);
-			if (path.matches("/[A-Za-z]:.*")) path = path.substring(1); //$NON-NLS-1$
-		}
 		// Set default timeout.
 		setConnectTimeout(DEFAULT_CONNECT_TIMEOUT);
 		setOpenTimeout(DEFAULT_OPEN_TIMEOUT);

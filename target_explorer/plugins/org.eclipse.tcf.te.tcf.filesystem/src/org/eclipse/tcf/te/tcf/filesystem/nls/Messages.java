@@ -299,6 +299,7 @@ public class Messages extends NLS {
 	public static String TcfURLConnection_NoSuchTcfAgent;
 	public static String TcfURLConnection_OpenFileTimeout;
 	public static String TcfURLConnection_OpenTCFChannelTimeout;
+	public static String TcfURLStreamHandlerService_ErrorURLFormat;
 
 	public static String OpeningChannelFailureMessage;
 	public static String OpeningChannelFailureTitle;

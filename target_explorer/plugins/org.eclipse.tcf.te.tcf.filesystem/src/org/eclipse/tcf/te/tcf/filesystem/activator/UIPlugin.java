@@ -11,9 +11,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.activator;
 
-import java.io.IOException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.Hashtable;
 
 import org.eclipse.core.commands.Command;
@@ -26,6 +24,7 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.autosave.SaveAllListener;
 import org.eclipse.tcf.te.tcf.filesystem.internal.autosave.SaveListener;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSClipboard;
 import org.eclipse.tcf.te.tcf.filesystem.internal.url.TcfURLConnection;
+import org.eclipse.tcf.te.tcf.filesystem.internal.url.TcfURLStreamHandlerService;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.PersistenceManager;
 import org.eclipse.tcf.te.ui.jface.images.AbstractImageDescriptor;
 import org.eclipse.ui.IWorkbenchCommandConstants;
@@ -34,7 +33,6 @@ import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.url.AbstractURLStreamHandlerService;
 import org.osgi.service.url.URLConstants;
 import org.osgi.service.url.URLStreamHandlerService;
 
@@ -90,14 +88,7 @@ public class UIPlugin extends AbstractUIPlugin {
 		// Register the "tcf" URL stream handler service.
 		Hashtable<String, String[]> properties = new Hashtable<String, String[]>();
 		properties.put(URLConstants.URL_HANDLER_PROTOCOL, new String[] { TcfURLConnection.PROTOCOL_SCHEMA });
-		regURLStreamHandlerService = context.registerService(
-				URLStreamHandlerService.class.getName(),
-				new AbstractURLStreamHandlerService() {
-					@Override
-					public URLConnection openConnection(URL u) throws IOException {
-						return new TcfURLConnection(u);
-					}
-				}, properties);
+		regURLStreamHandlerService = context.registerService(URLStreamHandlerService.class.getName(), new TcfURLStreamHandlerService(), properties);
 		// Add the two execution listeners to command "SAVE" and "SAVE ALL".
 		ICommandService commandService = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
 		if (commandService != null) {
