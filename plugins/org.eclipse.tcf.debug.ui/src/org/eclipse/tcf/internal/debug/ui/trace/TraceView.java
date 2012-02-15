@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2010 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2012 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,42 +13,93 @@ package org.eclipse.tcf.internal.debug.ui.trace;
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
+import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.ILaunch;
+import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchConfigurationListener;
+import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.jface.resource.ColorRegistry;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabFolder2Adapter;
+import org.eclipse.swt.custom.CTabFolderEvent;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tcf.core.AbstractChannel;
+import org.eclipse.tcf.internal.debug.model.TCFLaunch;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.JSON;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.util.TCFTask;
+import org.eclipse.ui.IWorkbenchPreferenceConstants;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 
 public class TraceView extends ViewPart implements Protocol.ChannelOpenListener {
 
     private Composite parent;
-    private TabFolder tabs;
+    private CTabFolder tabs;
     private Label no_data;
-    private final Map<TabItem,Page> tab2page = new HashMap<TabItem,Page>();
+    private final Map<CTabItem,Page> tab2page = new HashMap<CTabItem,Page>();
+    private final ILaunchManager launch_manager = DebugPlugin.getDefault().getLaunchManager();
+
+    private final ILaunchConfigurationListener launch_conf_listener = new ILaunchConfigurationListener() {
+
+        public void launchConfigurationAdded(ILaunchConfiguration cfg) {
+            cfg = launch_manager.getMovedFrom(cfg);
+            if (cfg != null) launchConfigurationChanged(cfg);
+        }
+
+        public void launchConfigurationChanged(final ILaunchConfiguration cfg) {
+            HashSet<IChannel> set = new HashSet<IChannel>();
+            for (final ILaunch launch : launch_manager.getLaunches()) {
+                if (launch instanceof TCFLaunch && cfg.equals(launch.getLaunchConfiguration())) {
+                    set.add(((TCFLaunch)launch).getChannel());
+                }
+            }
+            for (final IChannel channel : set) {
+                parent.getDisplay().asyncExec(new Runnable() {
+                    public void run() {
+                        for (final Page p : tab2page.values()) {
+                            if (p.channel == channel) {
+                                p.tab.setToolTipText(new TCFTask<String>(p.channel) {
+                                    public void run() {
+                                        done(getPageToolTipText(p.channel));
+                                    }
+                                }.getE());
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        public void launchConfigurationRemoved(ILaunchConfiguration cfg) {
+        }
+    };
 
     private class Page implements AbstractChannel.TraceListener {
 
         final AbstractChannel channel;
 
-        private TabItem tab;
+        private CTabItem tab;
         private Text text;
 
         private final StringBuffer bf = new StringBuffer();
@@ -91,7 +142,7 @@ public class TraceView extends ViewPart implements Protocol.ChannelOpenListener 
                                     text.append(str);
                                 }
                             };
-                            getSite().getShell().getDisplay().asyncExec(r);
+                            parent.getDisplay().asyncExec(r);
                         }
                         try {
                             Page.this.wait(1000);
@@ -145,7 +196,7 @@ public class TraceView extends ViewPart implements Protocol.ChannelOpenListener 
 
         public synchronized void onChannelClosed(Throwable error) {
             if (error == null) {
-                getSite().getShell().getDisplay().asyncExec(new Runnable() {
+                parent.getDisplay().asyncExec(new Runnable() {
                     public void run() {
                         dispose();
                     }
@@ -229,6 +280,7 @@ public class TraceView extends ViewPart implements Protocol.ChannelOpenListener 
             }
         });
         if (tab2page.size() == 0) hideTabs();
+        launch_manager.addLaunchConfigurationListener(launch_conf_listener);
     }
 
     @Override
@@ -238,6 +290,7 @@ public class TraceView extends ViewPart implements Protocol.ChannelOpenListener 
 
     @Override
     public void dispose() {
+        launch_manager.removeLaunchConfigurationListener(launch_conf_listener);
         final Page[] pages = tab2page.values().toArray(new Page[tab2page.size()]);
         Protocol.invokeAndWait(new Runnable() {
             public void run() {
@@ -257,31 +310,68 @@ public class TraceView extends ViewPart implements Protocol.ChannelOpenListener 
         super.dispose();
     }
 
+    private String getPageTitle(IChannel c) {
+        IPeer rp = c.getRemotePeer();
+        String title = rp.getName();
+        String host = rp.getAttributes().get(IPeer.ATTR_IP_HOST);
+        String port = rp.getAttributes().get(IPeer.ATTR_IP_PORT);
+        if (host != null) {
+            title += ", " + host;
+            if (port != null) {
+                title += ":" + port;
+            }
+        }
+        return title;
+    }
+
+    private String getPageToolTipText(IChannel c) {
+        StringBuffer bf = new StringBuffer();
+        for (ILaunch launch : launch_manager.getLaunches()) {
+            if (launch instanceof TCFLaunch && ((TCFLaunch)launch).getChannel() == c) {
+                if (bf.length() > 0) bf.append('\n');
+                bf.append("Launch configuration: ");
+                bf.append(launch.getLaunchConfiguration().getName());
+            }
+        }
+        IPeer rp = c.getRemotePeer();
+        String host = rp.getAttributes().get(IPeer.ATTR_IP_HOST);
+        if (host != null) {
+            if (bf.length() > 0) bf.append('\n');
+            bf.append("Agent address: ");
+            bf.append(host);
+            String port = rp.getAttributes().get(IPeer.ATTR_IP_PORT);
+            if (port != null) {
+                bf.append(':');
+                bf.append(port);
+            }
+        }
+        if (bf.length() > 0) bf.append('\n');
+        bf.append("Agent name: ");
+        bf.append(rp.getName());
+        String user_name = rp.getAttributes().get(IPeer.ATTR_USER_NAME);
+        if (user_name != null) {
+            bf.append('\n');
+            bf.append("Agent user: ");
+            bf.append(user_name);
+        }
+        return bf.toString();
+    }
+
     public void onChannelOpen(final IChannel channel) {
         if (!(channel instanceof AbstractChannel)) return;
         AbstractChannel c = (AbstractChannel)channel;
-        IPeer rp = c.getRemotePeer();
-        final String name = rp.getName();
-        final String host = rp.getAttributes().get(IPeer.ATTR_IP_HOST);
-        final String port = rp.getAttributes().get(IPeer.ATTR_IP_PORT);
         final Page p = new Page(c);
         c.addTraceListener(p);
-        getSite().getShell().getDisplay().asyncExec(new Runnable() {
+        final String title = getPageTitle(c);
+        final String tool_tip = getPageToolTipText(c);
+        parent.getDisplay().asyncExec(new Runnable() {
             public void run() {
                 showTabs();
-                p.tab = new TabItem(tabs, SWT.NONE);
+                p.tab = new CTabItem(tabs, SWT.NONE);
                 tab2page.put(p.tab, p);
-                String title = name;
-                if (host != null) {
-                    title += ", " + host;
-                    if (port != null) {
-                        title += ":" + port;
-                    }
-                }
                 p.tab.setText(title);
-                p.text = new Text(tabs, SWT.H_SCROLL | SWT.V_SCROLL |
-                        SWT.BORDER | SWT.READ_ONLY | SWT.MULTI);
-                p.tab.setControl(p.text);
+                p.tab.setToolTipText(tool_tip);
+                p.text = new Text(tabs, SWT.H_SCROLL | SWT.V_SCROLL | SWT.READ_ONLY | SWT.MULTI);
                 p.text.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
                 p.text.addKeyListener(new KeyListener() {
                     public void keyReleased(KeyEvent e) {
@@ -311,6 +401,8 @@ public class TraceView extends ViewPart implements Protocol.ChannelOpenListener 
                     public void mouseDoubleClick(MouseEvent e) {
                     }
                 });
+                p.tab.setControl(p.text);
+                if (tabs.getSelection() == null) tabs.setSelection(p.tab);
             }
         });
     }
@@ -412,7 +504,22 @@ public class TraceView extends ViewPart implements Protocol.ChannelOpenListener 
             b = true;
         }
         if (tabs == null) {
-            tabs = new TabFolder(parent, SWT.NONE);
+            tabs = new CTabFolder(parent, SWT.FLAT | SWT.CLOSE);
+            ColorRegistry reg = JFaceResources.getColorRegistry();
+            Color c1 = reg.get("org.eclipse.ui.workbench.ACTIVE_TAB_BG_START"); //$NON-NLS-1$
+            Color c2 = reg.get("org.eclipse.ui.workbench.ACTIVE_TAB_BG_END"); //$NON-NLS-1$
+            tabs.setSelectionBackground(new Color[]{c1, c2}, new int[]{100}, true);
+            tabs.setSelectionForeground(reg.get("org.eclipse.ui.workbench.ACTIVE_TAB_TEXT_COLOR")); //$NON-NLS-1$
+            tabs.setSimple(PlatformUI.getPreferenceStore().getBoolean(IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS));
+            tabs.addCTabFolder2Listener(new CTabFolder2Adapter() {
+                public void close(CTabFolderEvent event) {
+                    CTabItem s = (CTabItem)event.item;
+                    Page p = tab2page.get(s);
+                    if (p != null) p.dispose();
+                    else s.dispose();
+                    event.doit = false;
+                }
+            });
             Menu menu = new Menu(tabs);
             MenuItem mi_close = new MenuItem(menu, SWT.NONE);
             mi_close.setText("Close");
@@ -421,12 +528,10 @@ public class TraceView extends ViewPart implements Protocol.ChannelOpenListener 
                 }
                 public void widgetSelected(SelectionEvent e) {
                     if (tabs == null) return;
-                    TabItem[] s = tabs.getSelection();
-                    for (TabItem i : s) {
-                        Page p = tab2page.get(i);
-                        if (p != null) p.dispose();
-                        else i.dispose();
-                    }
+                    CTabItem s = tabs.getSelection();
+                    Page p = tab2page.get(s);
+                    if (p != null) p.dispose();
+                    else s.dispose();
                 }
             });
             MenuItem mi_close_all = new MenuItem(menu, SWT.NONE);
@@ -436,8 +541,8 @@ public class TraceView extends ViewPart implements Protocol.ChannelOpenListener 
                 }
                 public void widgetSelected(SelectionEvent e) {
                     if (tabs == null) return;
-                    TabItem[] s = tabs.getItems();
-                    for (TabItem i : s) {
+                    CTabItem[] s = tabs.getItems();
+                    for (CTabItem i : s) {
                         Page p = tab2page.get(i);
                         if (p != null) p.dispose();
                         else i.dispose();
