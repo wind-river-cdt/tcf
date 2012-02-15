@@ -68,6 +68,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.eclipse.ui.texteditor.MarkerAnnotation;
 
 public class TCFAnnotationManager {
 
@@ -79,6 +80,7 @@ public class TCFAnnotationManager {
     class TCFAnnotation extends Annotation {
 
         final String ctx;
+        final String bp_id;
         final ILineNumbers.CodeArea area;
         final Image image;
         final String text;
@@ -86,16 +88,17 @@ public class TCFAnnotationManager {
         final int hash_code;
 
         IAnnotationModel model;
+        IBreakpoint breakpoint;
 
-        TCFAnnotation(String ctx, ILineNumbers.CodeArea area, Image image, String text, String type) {
+        TCFAnnotation(String ctx, String bp_id, ILineNumbers.CodeArea area, Image image, String text, String type) {
+            super(type, false, text);
             this.ctx = ctx;
+            this.bp_id = bp_id;
             this.area = area;
             this.image = image;
             this.text = text;
             this.type = type;
             hash_code = area.hashCode() + image.hashCode() + text.hashCode() + type.hashCode();
-            setText(text);
-            setType(type);
         }
 
         protected Image getImage() {
@@ -115,6 +118,10 @@ public class TCFAnnotationManager {
             if (!(o instanceof TCFAnnotation)) return false;
             TCFAnnotation a = (TCFAnnotation)o;
             if (!ctx.equals(a.ctx)) return false;
+            if (bp_id != a.bp_id) {
+                if (bp_id == null) return false;
+                if (!bp_id.equals(a.bp_id)) return false;
+            }
             if (!area.equals(a.area)) return false;
             if (!image.equals(a.image)) return false;
             if (!text.equals(a.text)) return false;
@@ -391,13 +398,30 @@ public class TCFAnnotationManager {
                 ILineNumbers.CodeArea area = new ILineNumbers.CodeArea(null, file,
                         line.intValue(), 0, line.intValue() + 1, 0,
                         null, null, 0, false, false, false, false);
-                TCFAnnotation a = new TCFAnnotation(ctx, area,
+                TCFAnnotation a = new TCFAnnotation(ctx, id, area,
                         ImageCache.getImage(ImageCache.IMG_BREAKPOINT_ERROR),
                         "Cannot plant breakpoint: " + error,
                         TYPE_BP_INSTANCE);
                 set.add(a);
             }
         }
+    }
+
+    private boolean hidePlantingAnnotation(IAnnotationModel model, IBreakpoint bp, Position p) {
+        // Check if a breakpoint annotation does not need to be shown
+        // since it has same position as the breakpoint marker.
+        @SuppressWarnings("rawtypes")
+        Iterator i = model.getAnnotationIterator();
+        while (i.hasNext()) {
+            Annotation a = (Annotation)i.next();
+            if (a instanceof MarkerAnnotation) {
+                Position q = model.getPosition(a);
+                if (q != null && p.getOffset() == q.getOffset()) {
+                    if (bp.getMarker().equals(((MarkerAnnotation)a).getMarker())) return true;
+                }
+            }
+        }
+        return false;
     }
 
     private void updateAnnotations(IWorkbenchWindow window, TCFNode node, HashSet<TCFAnnotation> set) {
@@ -449,8 +473,11 @@ public class TCFAnnotationManager {
                 doc_provider.disconnect(editor_input);
             }
             if (region == null) continue;
-            ann_model.addAnnotation(a, new Position(region.getOffset(), region.getLength()));
-            a.model = ann_model;
+            Position p = new Position(region.getOffset(), region.getLength());
+            if (a.breakpoint == null || !hidePlantingAnnotation(ann_model, a.breakpoint, p)) {
+                ann_model.addAnnotation(a, p);
+                a.model = ann_model;
+            }
             win_info.annotations.add(a);
         }
     }
@@ -550,11 +577,9 @@ public class TCFAnnotationManager {
                                     if (area != null) {
                                         String bp_name = "Breakpoint";
                                         IBreakpoint bp = TCFBreakpointsModel.getBreakpointsModel().getBreakpoint(id);
-                                        if (bp != null && area.start_line != bp.getMarker().getAttribute(TCFBreakpointsModel.ATTR_LINE, -1)) {
-                                            bp_name = bp.getMarker().getAttribute(TCFBreakpointsModel.ATTR_MESSAGE, bp_name);
-                                        }
+                                        if (bp != null) bp_name = bp.getMarker().getAttribute(TCFBreakpointsModel.ATTR_MESSAGE, bp_name);
                                         if (error != null) {
-                                            TCFAnnotation a = new TCFAnnotation(memory.id, area,
+                                            TCFAnnotation a = new TCFAnnotation(memory.id, id,  area,
                                                     ImageCache.getImage(ImageCache.IMG_BREAKPOINT_ERROR),
                                                     bp_name + " failed to plant at 0x" + addr.toString(16) + ": " + error,
                                                     TYPE_BP_INSTANCE);
@@ -562,10 +587,11 @@ public class TCFAnnotationManager {
                                             error = null;
                                         }
                                         else {
-                                            TCFAnnotation a = new TCFAnnotation(memory.id, area,
+                                            TCFAnnotation a = new TCFAnnotation(memory.id, id, area,
                                                     ImageCache.getImage(ImageCache.IMG_BREAKPOINT_INSTALLED),
                                                     bp_name + " planted at 0x" + addr.toString(16),
                                                     TYPE_BP_INSTANCE);
+                                            a.breakpoint = bp;
                                             set.add(a);
                                         }
                                     }
@@ -594,13 +620,13 @@ public class TCFAnnotationManager {
                             if (i != null) addr_str += ", FP: 0x" + i.toString(16);
                         }
                         if (frame.getFrameNo() == 0) {
-                            a = new TCFAnnotation(line_data.context_id, line_data.area,
+                            a = new TCFAnnotation(line_data.context_id, null, line_data.area,
                                     DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_INSTRUCTION_POINTER_TOP),
                                     "Current Instruction Pointer" + addr_str,
                                     TYPE_TOP_FRAME);
                         }
                         else {
-                            a = new TCFAnnotation(line_data.context_id, line_data.area,
+                            a = new TCFAnnotation(line_data.context_id, null, line_data.area,
                                     DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_INSTRUCTION_POINTER),
                                     "Call Stack Frame" + addr_str,
                                     TYPE_STACK_FRAME);
@@ -613,7 +639,7 @@ public class TCFAnnotationManager {
                     if (!line_cache.validate(this)) return;
                     TCFSourceRef line_data = line_cache.getData();
                     if (line_data != null && line_data.area != null) {
-                        TCFAnnotation a = new TCFAnnotation(line_data.context_id, line_data.area,
+                        TCFAnnotation a = new TCFAnnotation(line_data.context_id, null, line_data.area,
                                 DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_INSTRUCTION_POINTER),
                                 "Last Instruction Pointer position",
                                 TYPE_STACK_FRAME);
