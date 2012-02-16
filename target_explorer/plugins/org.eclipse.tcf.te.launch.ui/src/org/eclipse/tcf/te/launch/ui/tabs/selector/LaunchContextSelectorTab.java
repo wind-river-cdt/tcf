@@ -51,6 +51,7 @@ public class LaunchContextSelectorTab extends AbstractFormsLaunchConfigurationTa
 		layout.numColumns = 1;
 		panel.setLayout(layout);
 		panel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		panel.setBackground(parent.getBackground());
 
 		selectorSection = new ContextSelectorSection(getManagedForm(), panel);
 		selectorSection.getSection().setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB, TableWrapData.TOP));

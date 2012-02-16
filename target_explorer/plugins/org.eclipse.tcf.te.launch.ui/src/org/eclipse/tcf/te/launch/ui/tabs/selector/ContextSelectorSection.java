@@ -65,6 +65,7 @@ public class ContextSelectorSection extends AbstractSection {
 	 */
 	public ContextSelectorSection(IManagedForm form, Composite parent) {
 		super(form, parent, ExpandableComposite.TWISTIE | ExpandableComposite.EXPANDED);
+		getSection().setBackground(parent.getBackground());
 		createClient(getSection(), form.getToolkit());
 	}
 
@@ -84,6 +85,7 @@ public class ContextSelectorSection extends AbstractSection {
 		Composite client = createClientContainer(section, 1, toolkit);
 		Assert.isNotNull(client);
 		section.setClient(client);
+		client.setBackground(section.getBackground());
 
 		// Create a toolbar for the section
 		createSectionToolbar(section, toolkit);
