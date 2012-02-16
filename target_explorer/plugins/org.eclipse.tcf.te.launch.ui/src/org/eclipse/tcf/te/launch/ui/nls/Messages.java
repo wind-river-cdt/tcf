@@ -9,6 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.launch.ui.nls;
 
+import java.lang.reflect.Field;
+
 import org.eclipse.osgi.util.NLS;
 
 /**
@@ -27,14 +29,54 @@ public class Messages extends NLS {
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 
+	/**
+	 * Returns if or if not this NLS manager contains a constant for
+	 * the given externalized strings key.
+	 *
+	 * @param key The externalized strings key or <code>null</code>.
+	 * @return <code>True</code> if a constant for the given key exists, <code>false</code> otherwise.
+	 */
+	public static boolean hasString(String key) {
+		if (key != null) {
+			try {
+				Field field = Messages.class.getDeclaredField(key);
+				return field != null;
+			} catch (NoSuchFieldException e) { /* ignored on purpose */ }
+		}
+
+		return false;
+	}
+
+	/**
+	 * Returns the corresponding string for the given externalized strings
+	 * key or <code>null</code> if the key does not exist.
+	 *
+	 * @param key The externalized strings key or <code>null</code>.
+	 * @return The corresponding string or <code>null</code>.
+	 */
+	public static String getString(String key) {
+		if (key != null) {
+			try {
+				Field field = Messages.class.getDeclaredField(key);
+				if (field != null) {
+					return (String)field.get(null);
+				}
+			} catch (Exception e) { /* ignored on purpose */ }
+		}
+
+		return null;
+	}
+
 	// **** Declare externalized string id's down here *****
 
 	public static String LaunchSelectionManager_error_failedToDetermineElfType;
 
-	public static String ModelContextSelectorControl_toolbar_refresh_tooltip;
+	public static String ContextSelectorControl_toolbar_refresh_tooltip;
 
 	public static String LaunchContextSelectorTab_name;
 
 	public static String ContextSelectorSection_title;
-	public static String ContextSelectorSection_description;
+
+	public static String RemoteContextSelectorControl_error_noContextSelected_single;
+	public static String RemoteContextSelectorControl_error_noContextSelected_multi;
 }

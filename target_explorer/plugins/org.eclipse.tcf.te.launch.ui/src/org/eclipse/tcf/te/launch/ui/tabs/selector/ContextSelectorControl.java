@@ -30,24 +30,13 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Item;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
-import org.eclipse.tcf.te.launch.ui.activator.UIPlugin;
-import org.eclipse.tcf.te.launch.ui.internal.ImageConsts;
-import org.eclipse.tcf.te.launch.ui.nls.Messages;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
@@ -59,12 +48,11 @@ import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
 import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
 import org.eclipse.tcf.te.ui.views.internal.ViewRoot;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
-import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.internal.navigator.NavigatorContentService;
 import org.eclipse.ui.navigator.CommonViewerSorter;
 
 /**
- * Model context selector control.
+ * Context selector control.
  * <p>
  * Allows to present a configurable set of elements from the data model from which the user can
  * select one or more elements.
@@ -72,7 +60,6 @@ import org.eclipse.ui.navigator.CommonViewerSorter;
  * Default properties:
  * <ul>
  * <li>PROPERTY_SHOW_GHOST_MODEL_NODES = false</li>
- * <li>PROPERTY_HAS_TOOLBAR = false</li>
  * </ul>
  */
 @SuppressWarnings("restriction")
@@ -82,11 +69,6 @@ public class ContextSelectorControl extends BaseDialogPageControl implements ISe
 	 * Property: If set to <code>true</code>, ghost model nodes will be shown within the tree.
 	 */
 	public static final String PROPERTY_SHOW_GHOST_MODEL_NODES = "showGhostModelNodes"; //$NON-NLS-1$
-
-	/**
-	 * Property: If set to <code>true</code>, a toolbar will be added to the control.
-	 */
-	public static final String PROPERTY_HAS_TOOLBAR = "hasToolbar"; //$NON-NLS-1$
 
 	/**
 	 * List of selection changed listeners.
@@ -103,8 +85,6 @@ public class ContextSelectorControl extends BaseDialogPageControl implements ISe
 	private TreeViewer viewer;
 	// The current selection within the tree viewer.
 	/* default */ ISelection selection;
-	// Reference to the tree viewers toolbar control if any.
-	private ToolBar toolbar;
 
 	// Reference to the navigator content service used
     private NavigatorContentService contentService;
@@ -125,9 +105,9 @@ public class ContextSelectorControl extends BaseDialogPageControl implements ISe
 	private ICheckStateListener listener;
 
 	/**
-	 * Default implementation of the model context selector controls tree viewer.
+	 * Default implementation of the context selector controls tree viewer.
 	 */
-	protected class ModelContextSelectorTreeViewer extends ContainerCheckedTreeViewer {
+	protected class ContextSelectorTreeViewer extends ContainerCheckedTreeViewer {
 
 		/**
 		 * Constructor.
@@ -135,7 +115,7 @@ public class ContextSelectorControl extends BaseDialogPageControl implements ISe
 		 * @param parent The parent control.
 		 * @param style The SWT style bits used to create the tree.
 		 */
-		public ModelContextSelectorTreeViewer(Composite parent, int style) {
+		public ContextSelectorTreeViewer(Composite parent, int style) {
 			// make sure that the passed in style bits are not contaminated
 			// by the CheckboxTreeViewer.
 			this(new Tree(parent, style));
@@ -146,7 +126,7 @@ public class ContextSelectorControl extends BaseDialogPageControl implements ISe
 		 *
 		 * @param parent The parent control.
 		 */
-		public ModelContextSelectorTreeViewer(Composite parent) {
+		public ContextSelectorTreeViewer(Composite parent) {
 			super(parent);
 		}
 
@@ -155,12 +135,11 @@ public class ContextSelectorControl extends BaseDialogPageControl implements ISe
 		 *
 		 * @param tree The tree control.
 		 */
-		public ModelContextSelectorTreeViewer(Tree tree) {
+		public ContextSelectorTreeViewer(Tree tree) {
 			super(tree);
 		}
 
-		/*
-		 * (non-Javadoc)
+		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.TreeViewer#isExpandable(java.lang.Object)
 		 */
 		@Override
@@ -183,10 +162,8 @@ public class ContextSelectorControl extends BaseDialogPageControl implements ISe
 			return getChildren(item);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * @see
-		 * org.eclipse.ui.dialogs.ContainerCheckedTreeViewer#doCheckStateChanged(java.lang.Object)
+		/* (non-Javadoc)
+		 * @see org.eclipse.ui.dialogs.ContainerCheckedTreeViewer#doCheckStateChanged(java.lang.Object)
 		 */
 		@Override
 		protected void doCheckStateChanged(Object element) {
@@ -270,24 +247,25 @@ public class ContextSelectorControl extends BaseDialogPageControl implements ISe
 	}
 
 	/**
-	 * Default implementation of the model context selector controls check state listener.
+	 * Default implementation of the context selector controls check state listener.
 	 */
-	protected class ModelContextSelectedCheckStateListener implements ICheckStateListener {
+	protected class ContextSelectedCheckStateListener implements ICheckStateListener {
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.ICheckStateListener#checkStateChanged(org.eclipse.jface.viewers.CheckStateChangedEvent)
 		 */
 		@Override
 		public void checkStateChanged(CheckStateChangedEvent event) {
 			Object element = event.getElement();
-			if (element instanceof IModelNode) onModelNodeCheckStateChanged((IModelNode) element, event
-			                .getChecked());
+			if (element instanceof IModelNode) {
+				onModelNodeCheckStateChanged((IModelNode) element, event.getChecked());
+			}
 		}
 	}
 
 	/**
-	 * Default implementation of the model context selector controls viewer filter.
+	 * Default implementation of the context selector controls viewer filter.
 	 */
-	protected class ModelContextSelectorViewerFilter extends ViewerFilter {
+	protected class ContextSelectorViewerFilter extends ViewerFilter {
 
 		/**
 		 * Returns if or if not ghost model elements should be visible within the model context
@@ -344,7 +322,6 @@ public class ContextSelectorControl extends BaseDialogPageControl implements ISe
 	protected void initializeProperties(IPropertiesContainer properties) {
 		Assert.isNotNull(properties);
 		properties.setProperty(PROPERTY_SHOW_GHOST_MODEL_NODES, false);
-		properties.setProperty(PROPERTY_HAS_TOOLBAR, false);
 	}
 
 	/**
@@ -364,17 +341,6 @@ public class ContextSelectorControl extends BaseDialogPageControl implements ISe
 	 */
 	@Override
 	public void dispose() {
-		// Remove the action proxy items from the viewer
-		if (toolbar != null) {
-			ToolItem[] items = toolbar.getItems();
-			for (ToolItem item : items) {
-				if (item.getData() instanceof ActionToolItemProxy) {
-					viewer.removeSelectionChangedListener((ActionToolItemProxy) item.getData());
-				}
-			}
-			toolbar = null;
-		}
-
 		// Dispose the navigator content service
 		if (contentService != null) {
 			contentService.dispose();
@@ -470,12 +436,8 @@ public class ContextSelectorControl extends BaseDialogPageControl implements ISe
 		Composite composite = doCreateTopContainerComposite(parent);
 		Assert.isNotNull(composite);
 
-		// Create the toolbar control (but not the items)
-		if (getPropertiesContainer().getBooleanProperty(PROPERTY_HAS_TOOLBAR)) toolbar = createToolBarControl(doCreateToolBarComposite(composite));
 		// Create the viewer
 		viewer = createTreeViewerControl(composite);
-		// and than create the toolbar items (as they may need the viewer)
-		if (getPropertiesContainer().getBooleanProperty(PROPERTY_HAS_TOOLBAR)) createToolBarItems(toolbar);
 
 		// And now configure the listeners
 		configureControlListener();
@@ -540,7 +502,7 @@ public class ContextSelectorControl extends BaseDialogPageControl implements ISe
 	 * @return The tree viewer instance. Must not be <code>null</code>.
 	 */
 	protected CheckboxTreeViewer doCreateNewTreeViewerControl(Composite parent, int style) {
-		return new ModelContextSelectorTreeViewer(parent, style);
+		return new ContextSelectorTreeViewer(parent, style);
 	}
 
 	/**
@@ -633,7 +595,7 @@ public class ContextSelectorControl extends BaseDialogPageControl implements ISe
 	 * @return The viewer filters to associate or <code>null</code> if none.
 	 */
 	protected ViewerFilter[] doCreateViewerFilters() {
-		return new ViewerFilter[] { new ModelContextSelectorViewerFilter() };
+		return new ViewerFilter[] { new ContextSelectorViewerFilter() };
 	}
 
 	/**
@@ -658,7 +620,7 @@ public class ContextSelectorControl extends BaseDialogPageControl implements ISe
 	 */
 	protected ICheckStateListener doCreateViewerCheckStateListener(CheckboxTreeViewer viewer) {
 		Assert.isNotNull(viewer);
-		return new ModelContextSelectedCheckStateListener();
+		return new ContextSelectedCheckStateListener();
 	}
 
 	/**
@@ -706,7 +668,7 @@ public class ContextSelectorControl extends BaseDialogPageControl implements ISe
 	 */
 	protected void doEnableControl(TreeViewer viewer) {
 		Assert.isNotNull(viewer);
-		SWTControlUtil.setEnabled(viewer.getTree(), viewer.getTree().getItemCount() > 1);
+		SWTControlUtil.setEnabled(viewer.getTree(), viewer.getTree().getItemCount() > 0);
 	}
 
 	/**
@@ -718,133 +680,6 @@ public class ContextSelectorControl extends BaseDialogPageControl implements ISe
 			viewer.refresh(true);
 			doEnableControl(viewer);
 		}
-	}
-
-	/**
-	 * Returns the toolbar control (if enabled).
-	 *
-	 * @return The toolbar control or <code>null</code>.
-	 */
-	protected ToolBar getToolBar() {
-		return toolbar;
-	}
-
-	/**
-	 * Creates the toolbar control (if enabled). Override to return a custom toolbar control or
-	 * composite layout.
-	 *
-	 * @param parent The parent composite to create the toolbar control in. Must not be
-	 *            <code>null</code>.
-	 * @return The toolbar control. Must be never <code>null</code>.
-	 */
-	protected ToolBar createToolBarControl(Composite parent) {
-		// Create the toolbar control
-		ToolBar toolbar = new ToolBar(parent, SWT.FLAT | SWT.HORIZONTAL | SWT.RIGHT);
-
-		// The cursor within the toolbar shall change to an hand
-		final Cursor handCursor = new Cursor(parent.getDisplay(), SWT.CURSOR_HAND);
-		toolbar.setCursor(handCursor);
-		// Cursor needs to be explicitly disposed
-		toolbar.addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(DisposeEvent e) {
-				if (handCursor.isDisposed() == false) {
-					handCursor.dispose();
-				}
-			}
-		});
-
-		// If the parent composite is a forms section, set the toolbar
-		// as text client to the section header
-		if (parent instanceof Section) {
-			Section section = (Section) parent;
-			// Set the toolbar as text client
-			section.setTextClient(toolbar);
-		}
-		else {
-			// If not embedded within a forms section, attach standard
-			// grid layout and grid layout data to the toolbar control.
-			GridLayout layout = new GridLayout();
-			layout.marginHeight = 0;
-			layout.marginWidth = 0;
-			toolbar.setLayout(layout);
-			toolbar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.HORIZONTAL_ALIGN_END | GridData.VERTICAL_ALIGN_CENTER));
-		}
-
-		// Return the toolbar control.
-		return toolbar;
-	}
-
-	/**
-	 * Create the composite container for the toolbar control. This method is called from
-	 * {@link #createToolBarControl(Composite)}.
-	 * <p>
-	 * The default implementation creates a composite which is shared between the control title and
-	 * the toolbar, if a default title is set and the control is not created within a form.
-	 *
-	 * @param parent The parent composite. Must not be <code>null</code>.
-	 * @return The composite to create the toolbar control in. Must not be <code>null</code>.
-	 */
-	protected Composite doCreateToolBarComposite(Composite parent) {
-		Composite composite = parent;
-
-		// In case a default title is set, the control title and the
-		// toolbar should share the same composite for align them on the
-		// same horizontal level.
-		if (getDefaultTitle() != null && getDefaultTitle().trim().length() > 0) {
-			composite = new Composite(parent, SWT.NONE);
-			GridLayout layout = new GridLayout(2, false);
-			layout.marginHeight = 0;
-			layout.marginWidth = 0;
-			composite.setLayout(layout);
-			composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-			Label label = new Label(composite, SWT.HORIZONTAL);
-			label.setText(getDefaultTitle() + ":"); //$NON-NLS-1$
-		}
-
-		return composite;
-	}
-
-	/**
-	 * Create the toolbar items to be added to the toolbar. Override to add the wanted toolbar
-	 * items. The default implementation adds a refresh toolbar item only.
-	 *
-	 * @param toolbar The toolbar to add the toolbar items too. Must not be <code>null</code>.
-	 */
-	protected void createToolBarItems(ToolBar toolbar) {
-		Assert.isNotNull(toolbar);
-		createRefreshItem(toolbar);
-	}
-
-	/**
-	 * Creates the default refresh toolbar item. Override to customize the default behavior.
-	 *
-	 * @param toolbar The toolbar to create the refresh toolbar item within. Must not be <code>null</code>.
-	 */
-	protected void createRefreshItem(ToolBar toolbar) {
-		Assert.isNotNull(toolbar);
-
-		ToolItem item = new ToolItem(toolbar, SWT.PUSH);
-		item.setToolTipText(Messages.ModelContextSelectorControl_toolbar_refresh_tooltip);
-		item.setImage(UIPlugin.getImage(ImageConsts.ACTION_Refresh_Enabled));
-		item.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				refresh();
-			}
-		});
-	}
-
-	/**
-	 * Creates a separator toolbar item.
-	 *
-	 * @param toolbar The toolbar. Must not be <code>null</code>.
-	 */
-	@SuppressWarnings("unused")
-    protected void createSeparatorItem(ToolBar toolbar) {
-		Assert.isNotNull(toolbar);
-		new ToolItem(toolbar, SWT.SEPARATOR);
 	}
 
 	/**

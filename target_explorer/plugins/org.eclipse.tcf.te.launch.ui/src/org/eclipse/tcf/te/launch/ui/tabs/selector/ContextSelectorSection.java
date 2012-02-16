@@ -10,9 +10,14 @@
 package org.eclipse.tcf.te.launch.ui.tabs.selector;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tcf.te.launch.ui.activator.UIPlugin;
+import org.eclipse.tcf.te.launch.ui.internal.ImageConsts;
 import org.eclipse.tcf.te.launch.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.forms.parts.AbstractSection;
 import org.eclipse.ui.forms.IManagedForm;
@@ -25,7 +30,32 @@ import org.eclipse.ui.forms.widgets.Section;
  */
 public class ContextSelectorSection extends AbstractSection {
 	// Reference to the section sub controls
-	private ContextSelectorControl selector;
+	/* default */ RemoteContextSelectorControl selector;
+
+	/**
+	 * Context selector control refresh action implementation.
+	 */
+	protected class RefreshAction extends Action {
+
+		/**
+         * Constructor.
+         */
+        public RefreshAction() {
+        	super(null, IAction.AS_PUSH_BUTTON);
+        	setImageDescriptor(UIPlugin.getImageDescriptor(ImageConsts.ACTION_Refresh_Enabled));
+        	setToolTipText(Messages.ContextSelectorControl_toolbar_refresh_tooltip);
+        }
+
+        /* (non-Javadoc)
+         * @see org.eclipse.jface.action.Action#run()
+         */
+        @Override
+        public void run() {
+        	if (selector != null && selector.getViewer() != null) {
+        		selector.getViewer().refresh();
+        	}
+        }
+	}
 
 	/**
 	 * Constructor.
@@ -34,7 +64,7 @@ public class ContextSelectorSection extends AbstractSection {
 	 * @param parent The parent composite. Must not be <code>null</code>.
 	 */
 	public ContextSelectorSection(IManagedForm form, Composite parent) {
-		super(form, parent, Section.DESCRIPTION | ExpandableComposite.CLIENT_INDENT);
+		super(form, parent, ExpandableComposite.TWISTIE | ExpandableComposite.EXPANDED);
 		createClient(getSection(), form.getToolkit());
 	}
 
@@ -48,8 +78,6 @@ public class ContextSelectorSection extends AbstractSection {
 
 		// Configure the section
 		section.setText(Messages.ContextSelectorSection_title);
-		section.setDescription(Messages.ContextSelectorSection_description);
-
 		section.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
 		// Create the section client
@@ -57,7 +85,11 @@ public class ContextSelectorSection extends AbstractSection {
 		Assert.isNotNull(client);
 		section.setClient(client);
 
-		selector = new ContextSelectorControl(null);
+		// Create a toolbar for the section
+		createSectionToolbar(section, toolkit);
+
+		// Create the section sub controls
+		selector = new RemoteContextSelectorControl(null);
 		selector.setFormToolkit(toolkit);
 		selector.setupPanel(client);
 	}
@@ -69,5 +101,14 @@ public class ContextSelectorSection extends AbstractSection {
 	public void dispose() {
 		if (selector != null) { selector.dispose(); selector = null; }
 	    super.dispose();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.forms.parts.AbstractSection#createSectionToolbarItems(org.eclipse.ui.forms.widgets.Section, org.eclipse.ui.forms.widgets.FormToolkit, org.eclipse.jface.action.ToolBarManager)
+	 */
+	@Override
+	protected void createSectionToolbarItems(Section section, FormToolkit toolkit, ToolBarManager tlbMgr) {
+	    super.createSectionToolbarItems(section, toolkit, tlbMgr);
+	    tlbMgr.add(new RefreshAction());
 	}
 }

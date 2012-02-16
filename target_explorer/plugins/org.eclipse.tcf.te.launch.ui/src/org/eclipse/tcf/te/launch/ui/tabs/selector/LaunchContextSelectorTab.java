@@ -48,7 +48,7 @@ public class LaunchContextSelectorTab extends AbstractFormsLaunchConfigurationTa
 		Composite panel = toolkit.getFormToolkit().createComposite(parent);
 		TableWrapLayout layout = new TableWrapLayout();
 		layout.makeColumnsEqualWidth = true;
-		layout.numColumns = 2;
+		layout.numColumns = 1;
 		panel.setLayout(layout);
 		panel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 

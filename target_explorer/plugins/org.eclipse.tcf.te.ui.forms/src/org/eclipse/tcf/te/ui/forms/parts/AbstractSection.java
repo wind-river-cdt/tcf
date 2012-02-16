@@ -14,11 +14,17 @@ import java.lang.reflect.Field;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.tcf.te.ui.forms.FormLayoutFactory;
 import org.eclipse.tcf.te.ui.jface.interfaces.IValidatable;
 import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
@@ -109,6 +115,56 @@ public abstract class AbstractSection extends SectionPart implements IAdaptable,
 		emptySpace.setLayoutData(layoutData);
 
 		return emptySpace;
+	}
+
+	/**
+	 * Convenience method to create a section toolbar.
+	 *
+	 * @param section The section. Must not be <code>null</code>.
+	 * @param toolkit The form toolkit or <code>null</code>.
+	 */
+	protected void createSectionToolbar(Section section, FormToolkit toolkit) {
+		Assert.isNotNull(section);
+
+		// Create the toolbar manager and the toolbar control
+		ToolBarManager tlbMgr = new ToolBarManager(SWT.FLAT);
+		ToolBar tlb = tlbMgr.createControl(section);
+
+		// If the user moves over the toolbar area, change the cursor to become a hand
+		final Cursor cursor = new Cursor(Display.getCurrent(), SWT.CURSOR_HAND);
+		tlb.setCursor(cursor);
+
+		// Cursor needs to be explicitly disposed
+		tlb.addDisposeListener(new DisposeListener() {
+			@Override
+            public void widgetDisposed(DisposeEvent e) {
+				if (cursor.isDisposed() == false) {
+					cursor.dispose();
+				}
+			}
+		});
+
+		// Create the toolbar items
+		createSectionToolbarItems(section, toolkit, tlbMgr);
+
+		// Update the toolbar manager
+		tlbMgr.update(true);
+		// Associate the toolbar control with the section
+		section.setTextClient(tlb);
+	}
+
+	/**
+	 * Convenience method to create section toolbar items.
+	 * <p>
+	 * This method is called from {@link #createSectionToolbar(Section, FormToolkit)}.
+	 *
+	 * @param section The section. Must not be <code>null</code>.
+	 * @param toolkit The form toolkit or <code>null</code>.
+	 * @param tlbMgr The toolbar manager. Must not be <code>null</code>.
+	 */
+	protected void createSectionToolbarItems(Section section, FormToolkit toolkit, ToolBarManager tlbMgr) {
+		Assert.isNotNull(section);
+		Assert.isNotNull(tlbMgr);
 	}
 
 	/* (non-Javadoc)
