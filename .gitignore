@@ -19,6 +19,7 @@ features/org.eclipse.tcf.cdt.sdk.feature/target
 
 # features/org.eclipse.tcf.feature/
 features/org.eclipse.tcf.feature/target
+features/org.eclipse.tcf.sdk.feature/target
 
 # features/org.eclipse.tcf.headless.build/
 features/org.eclipse.tcf.headless.build/build-directory
