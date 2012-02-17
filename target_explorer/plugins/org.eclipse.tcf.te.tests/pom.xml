@@ -6,9 +6,9 @@
 
 	<parent>
 		<groupId>org.eclipse.tcf</groupId>
-		<artifactId>tcf-parent</artifactId>
+		<artifactId>tcf-tests-parent</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
-		<relativePath>../../../pom.xml</relativePath>
+		<relativePath>../../../pom-tests.xml</relativePath>
 	</parent>
 
 	<version>1.0.0.qualifier</version>
