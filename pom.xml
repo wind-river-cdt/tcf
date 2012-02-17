@@ -15,7 +15,7 @@
 	<name>TCF Parent</name>
 
 	<properties>
-		<tycho-version>0.13.0</tycho-version>
+		<tycho-version>0.14.0</tycho-version>
 		<platform-version>4.2milestones</platform-version>
 		<platform-site>http://download.eclipse.org/eclipse/updates/${platform-version}</platform-site>
 		<cdt-site>http://download.eclipse.org/tools/cdt/builds/hudson/cdt-nightly</cdt-site>
@@ -189,26 +189,11 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-source-plugin</artifactId>
-				<version>${tycho-version}</version>
-				<configuration>
-					<encoding>UTF-8</encoding>
-				</configuration>
-				<executions>
-					<execution>
-						<id>attach-source</id>
-						<goals>
-							<goal>plugin-source</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>findbugs-maven-plugin</artifactId>
 				<version>2.4.1-SNAPSHOT</version>
 				<configuration>
+					<encoding>UTF-8</encoding>
 					<effort>Max</effort>
 					<threshold>Low</threshold>
 					<xmlOutput>true</xmlOutput>
