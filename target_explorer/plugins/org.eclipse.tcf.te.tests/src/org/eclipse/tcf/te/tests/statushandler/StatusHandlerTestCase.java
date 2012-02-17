@@ -15,10 +15,10 @@ import java.util.List;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import org.eclipse.tcf.te.tests.CoreTestCase;
-import org.eclipse.tcf.te.tests.interfaces.IInterruptCondition;
 import org.eclipse.tcf.te.runtime.statushandler.StatusHandlerManager;
 import org.eclipse.tcf.te.runtime.statushandler.interfaces.IStatusHandler;
+import org.eclipse.tcf.te.tests.CoreTestCase;
+import org.eclipse.tcf.te.tests.interfaces.IInterruptCondition;
 
 /**
  * Status handler test cases.
@@ -71,8 +71,8 @@ public class StatusHandlerTestCase extends CoreTestCase {
 			handlerIds.add(handler.getId());
 		}
 
-		assertTrue("Global enabled test status handler not active.", handlerIds.contains("org.eclipse.tcf.te.tests.handler1")); //$NON-NLS-1$ //$NON-NLS-2$
-		assertFalse("Context enabled test status handler is active.", handlerIds.contains("org.eclipse.tcf.te.tests.handler2")); //$NON-NLS-1$ //$NON-NLS-2$
+		assertTrue("Test case enabled test status handler not active.", handlerIds.contains("org.eclipse.tcf.te.tests.handler1")); //$NON-NLS-1$ //$NON-NLS-2$
+		assertFalse("Interrupt condition enabled test status handler is active.", handlerIds.contains("org.eclipse.tcf.te.tests.handler2")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		handlerIds.clear();
 
@@ -93,7 +93,7 @@ public class StatusHandlerTestCase extends CoreTestCase {
 			handlerIds.add(handler.getId());
 		}
 
-		assertTrue("Global enabled test status handler not active.", handlerIds.contains("org.eclipse.tcf.te.tests.handler1")); //$NON-NLS-1$ //$NON-NLS-2$
-		assertTrue("Context enabled test status handler not active.", handlerIds.contains("org.eclipse.tcf.te.tests.handler2")); //$NON-NLS-1$ //$NON-NLS-2$
+		assertTrue("Test case enabled test status handler not active.", handlerIds.contains("org.eclipse.tcf.te.tests.handler1")); //$NON-NLS-1$ //$NON-NLS-2$
+		assertTrue("Interrupt condition enabled test status handler not active.", handlerIds.contains("org.eclipse.tcf.te.tests.handler2")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

@@ -20,7 +20,10 @@
             handlerId="org.eclipse.tcf.te.tests.handler1"
             id="org.eclipse.tcf.te.tests.binding1">
             <enablement>
-               <instanceof value="org.eclipse.tcf.te.tests.CoreTestCase"/>
+               <or>
+                  <instanceof value="org.eclipse.tcf.te.tests.CoreTestCase"/>
+                  <instanceof value="org.eclipse.tcf.te.tests.interfaces.IInterruptCondition"/>
+               </or>
             </enablement>
       </binding>
       
