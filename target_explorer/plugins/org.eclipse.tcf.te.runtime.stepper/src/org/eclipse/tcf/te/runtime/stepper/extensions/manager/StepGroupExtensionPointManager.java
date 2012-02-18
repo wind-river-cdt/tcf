@@ -19,12 +19,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.tcf.te.runtime.extensions.AbstractExtensionPointManager;
 import org.eclipse.tcf.te.runtime.extensions.ExecutableExtensionProxy;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroup;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroup;
 
 /**
  * Step group extension manager implementation.
  */
-public final class StepGroupExtensionPointManager extends AbstractExtensionPointManager<IContextStepGroup> {
+public final class StepGroupExtensionPointManager extends AbstractExtensionPointManager<IStepGroup> {
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.runtime.extensions.AbstractExtensionPointManager#getExtensionPointId()
@@ -46,7 +46,7 @@ public final class StepGroupExtensionPointManager extends AbstractExtensionPoint
 	 * @see org.eclipse.tcf.te.runtime.extensions.AbstractExtensionPointManager#doCreateExtensionProxy(org.eclipse.core.runtime.IConfigurationElement)
 	 */
 	@Override
-	protected ExecutableExtensionProxy<IContextStepGroup> doCreateExtensionProxy(IConfigurationElement element) throws CoreException {
+	protected ExecutableExtensionProxy<IStepGroup> doCreateExtensionProxy(IConfigurationElement element) throws CoreException {
 		return new StepGroupExtensionProxy(element);
 	}
 
@@ -58,17 +58,17 @@ public final class StepGroupExtensionPointManager extends AbstractExtensionPoint
 	 *
 	 * @return The list of contributed step groups, or an empty array.
 	 */
-	public IContextStepGroup[] getStepGroups(boolean unique) {
-		List<IContextStepGroup> contributions = new ArrayList<IContextStepGroup>();
-		Collection<ExecutableExtensionProxy<IContextStepGroup>> delegates = getExtensions().values();
-		for (ExecutableExtensionProxy<IContextStepGroup> delegate : delegates) {
-			IContextStepGroup instance = unique ? delegate.newInstance() : delegate.getInstance();
+	public IStepGroup[] getStepGroups(boolean unique) {
+		List<IStepGroup> contributions = new ArrayList<IStepGroup>();
+		Collection<ExecutableExtensionProxy<IStepGroup>> delegates = getExtensions().values();
+		for (ExecutableExtensionProxy<IStepGroup> delegate : delegates) {
+			IStepGroup instance = unique ? delegate.newInstance() : delegate.getInstance();
 			if (instance != null && !contributions.contains(instance)) {
 				contributions.add(instance);
 			}
 		}
 
-		return contributions.toArray(new IContextStepGroup[contributions.size()]);
+		return contributions.toArray(new IStepGroup[contributions.size()]);
 	}
 
 	/**
@@ -80,11 +80,11 @@ public final class StepGroupExtensionPointManager extends AbstractExtensionPoint
 	 *
 	 * @return The step group instance or <code>null</code>.
 	 */
-	public IContextStepGroup getStepGroup(String id, boolean unique) {
+	public IStepGroup getStepGroup(String id, boolean unique) {
 		Assert.isNotNull(id);
-		IContextStepGroup contribution = null;
+		IStepGroup contribution = null;
 		if (getExtensions().containsKey(id)) {
-			ExecutableExtensionProxy<IContextStepGroup> proxy = getExtensions().get(id);
+			ExecutableExtensionProxy<IStepGroup> proxy = getExtensions().get(id);
 			// Get the extension instance
 			contribution = unique ? proxy.newInstance() : proxy.getInstance();
 		}
@@ -96,7 +96,7 @@ public final class StepGroupExtensionPointManager extends AbstractExtensionPoint
 	 * @see org.eclipse.tcf.te.runtime.extensions.AbstractExtensionPointManager#doStoreExtensionTo(java.util.Map, org.eclipse.tcf.te.runtime.extensions.ExecutableExtensionProxy, org.eclipse.core.runtime.IConfigurationElement)
 	 */
 	@Override
-	protected void doStoreExtensionTo(Map<String, ExecutableExtensionProxy<IContextStepGroup>> extensions, ExecutableExtensionProxy<IContextStepGroup> candidate, IConfigurationElement element) throws CoreException {
+	protected void doStoreExtensionTo(Map<String, ExecutableExtensionProxy<IStepGroup>> extensions, ExecutableExtensionProxy<IStepGroup> candidate, IConfigurationElement element) throws CoreException {
 		Assert.isNotNull(extensions);
 		Assert.isNotNull(candidate);
 		Assert.isNotNull(element);
@@ -112,6 +112,7 @@ public final class StepGroupExtensionPointManager extends AbstractExtensionPoint
 		else {
 			super.doStoreExtensionTo(extensions, candidate, element);
 		}
-	}
 
+	    super.doStoreExtensionTo(extensions, candidate, element);
+	}
 }

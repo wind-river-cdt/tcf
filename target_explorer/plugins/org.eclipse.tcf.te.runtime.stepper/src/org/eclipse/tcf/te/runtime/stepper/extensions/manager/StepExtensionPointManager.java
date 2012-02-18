@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others. All rights reserved.
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -16,12 +16,12 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.te.runtime.extensions.AbstractExtensionPointManager;
 import org.eclipse.tcf.te.runtime.extensions.ExecutableExtensionProxy;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStep;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStep;
 
 /**
  * Step extension point manager implementation.
  */
-public final class StepExtensionPointManager extends AbstractExtensionPointManager<IContextStep> {
+public final class StepExtensionPointManager extends AbstractExtensionPointManager<IStep> {
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.runtime.extensions.AbstractExtensionPointManager#getExtensionPointId()
@@ -47,17 +47,17 @@ public final class StepExtensionPointManager extends AbstractExtensionPointManag
 	 *
 	 * @return The list of contributed steps, or an empty array.
 	 */
-	public IContextStep[] getSteps(boolean unique) {
-		List<IContextStep> contributions = new ArrayList<IContextStep>();
-		Collection<ExecutableExtensionProxy<IContextStep>> delegates = getExtensions().values();
-		for (ExecutableExtensionProxy<IContextStep> delegate : delegates) {
-			IContextStep instance = unique ? delegate.newInstance() : delegate.getInstance();
+	public IStep[] getSteps(boolean unique) {
+		List<IStep> contributions = new ArrayList<IStep>();
+		Collection<ExecutableExtensionProxy<IStep>> delegates = getExtensions().values();
+		for (ExecutableExtensionProxy<IStep> delegate : delegates) {
+			IStep instance = unique ? delegate.newInstance() : delegate.getInstance();
 			if (instance != null && !contributions.contains(instance)) {
 				contributions.add(instance);
 			}
 		}
 
-		return contributions.toArray(new IContextStep[contributions.size()]);
+		return contributions.toArray(new IStep[contributions.size()]);
 	}
 
 	/**
@@ -69,11 +69,11 @@ public final class StepExtensionPointManager extends AbstractExtensionPointManag
 	 *
 	 * @return The step instance or <code>null</code>.
 	 */
-	public IContextStep getStep(String id, boolean unique) {
+	public IStep getStep(String id, boolean unique) {
 		Assert.isNotNull(id);
-		IContextStep contribution = null;
+		IStep contribution = null;
 		if (getExtensions().containsKey(id)) {
-			ExecutableExtensionProxy<IContextStep> proxy = getExtensions().get(id);
+			ExecutableExtensionProxy<IStep> proxy = getExtensions().get(id);
 			// Get the extension instance
 			contribution = unique ? proxy.newInstance() : proxy.getInstance();
 		}

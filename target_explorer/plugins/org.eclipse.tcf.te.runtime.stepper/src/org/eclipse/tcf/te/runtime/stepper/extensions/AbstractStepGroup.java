@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others. All rights reserved.
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -11,33 +11,33 @@ package org.eclipse.tcf.te.runtime.stepper.extensions;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroup;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroupIterator;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroupable;
 import org.eclipse.tcf.te.runtime.extensions.ExecutableExtension;
 import org.eclipse.tcf.te.runtime.extensions.ExecutableExtensionProxy;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroup;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroupIterator;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroupable;
 
 /**
- * Abstract context step group implementation.
+ * Abstract step group implementation.
  */
-public abstract class AbstractContextStepGroup extends ExecutableExtension implements IContextStepGroup {
+public abstract class AbstractStepGroup extends ExecutableExtension implements IStepGroup {
 
-	private ExecutableExtensionProxy<IContextStepGroupIterator> iteratorProxy = null;
+	private ExecutableExtensionProxy<IStepGroupIterator> iteratorProxy = null;
 
 	/**
 	 * Constant to be returned in case the step group contains no steps.
 	 */
-	protected final static IContextStepGroupable[] NO_STEPS = new IContextStepGroupable[0];
+	protected final static IStepGroupable[] NO_STEPS = new IStepGroupable[0];
 
 	/**
 	 * Constructor.
 	 */
-	public AbstractContextStepGroup() {
+	public AbstractStepGroup() {
 		super();
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroup#isLocked()
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroup#isLocked()
 	 */
 	@Override
     public boolean isLocked() {
@@ -52,7 +52,7 @@ public abstract class AbstractContextStepGroup extends ExecutableExtension imple
 	    super.doSetInitializationData(config, propertyName, data);
 
 		if (iteratorProxy == null) {
-			iteratorProxy = new ExecutableExtensionProxy<IContextStepGroupIterator>(config) {
+			iteratorProxy = new ExecutableExtensionProxy<IStepGroupIterator>(config) {
 				@Override
 				protected String getExecutableExtensionAttributeName() {
 					return "iterator"; //$NON-NLS-1$
@@ -62,10 +62,10 @@ public abstract class AbstractContextStepGroup extends ExecutableExtension imple
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroup#getStepGroupIterator()
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroup#getStepGroupIterator()
 	 */
 	@Override
-    public IContextStepGroupIterator getStepGroupIterator() {
+    public IStepGroupIterator getStepGroupIterator() {
 		return iteratorProxy != null ? iteratorProxy.newInstance() : null;
 	}
 }

@@ -9,17 +9,17 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.launch.core.selection.interfaces;
 
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContext;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
 
 /**
- * A selection context providing the remote context for the launch.
+ * A selection context providing the step context for the launch.
  */
-public interface IRemoteContextSelectionContext extends ISelectionContext {
+public interface IStepContextSelectionContext extends ISelectionContext {
 
 	/**
-	 * Returns the remote context.
+	 * Returns the step context.
 	 *
-	 * @return The remote context or <code>null</code>.
+	 * @return The step context or <code>null</code>.
 	 */
-	public IContext getRemoteCtx();
+	public IStepContext getStepCtx();
 }

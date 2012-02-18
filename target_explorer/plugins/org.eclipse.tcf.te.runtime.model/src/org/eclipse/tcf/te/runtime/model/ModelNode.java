@@ -22,9 +22,9 @@ import org.eclipse.tcf.te.runtime.model.interfaces.IModelNodeProvider;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
 
 /**
- * A common (data) model node implementation.
+ * A common model node implementation.
  * <p>
- * <b>Note:</b> The (data) model node implementation is not thread-safe. Clients requiring
+ * <b>Note:</b> The model node implementation is not thread-safe. Clients requiring
  *              a thread-safe implementation should subclass the properties container and
  *              overwrite {@link #checkThreadAccess()}.
  */
@@ -32,9 +32,9 @@ public class ModelNode extends PropertiesContainer implements IModelNode, IModel
 	// Reference to the parent model node
 	private IContainerModelNode parent = null;
 
-	// Flag to remember the dirty state of the (data) model node.
+	// Flag to remember the dirty state of the model node.
 	private boolean dirty;
-	// Flag to remember the pending state of the (data) model node.
+	// Flag to remember the pending state of the model node.
 	private boolean pending;
 
 	// Flag to control if property change events are suppressed

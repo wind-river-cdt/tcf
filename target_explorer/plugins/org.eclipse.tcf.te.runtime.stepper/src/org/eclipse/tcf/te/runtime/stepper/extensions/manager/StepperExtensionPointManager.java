@@ -16,12 +16,12 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.te.runtime.extensions.AbstractExtensionPointManager;
 import org.eclipse.tcf.te.runtime.extensions.ExecutableExtensionProxy;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepper;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper;
 
 /**
  * Stepper extension point manager implementation.
  */
-public final class StepperExtensionPointManager extends AbstractExtensionPointManager<IContextStepper> {
+public final class StepperExtensionPointManager extends AbstractExtensionPointManager<IStepper> {
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.runtime.extensions.AbstractExtensionPointManager#getExtensionPointId()
@@ -47,17 +47,17 @@ public final class StepperExtensionPointManager extends AbstractExtensionPointMa
 	 *
 	 * @return The list of contributed stepper, or an empty array.
 	 */
-	public IContextStepper[] getStepper(boolean unique) {
-		List<IContextStepper> contributions = new ArrayList<IContextStepper>();
-		Collection<ExecutableExtensionProxy<IContextStepper>> delegates = getExtensions().values();
-		for (ExecutableExtensionProxy<IContextStepper> delegate : delegates) {
-			IContextStepper instance = unique ? delegate.newInstance() : delegate.getInstance();
+	public IStepper[] getStepper(boolean unique) {
+		List<IStepper> contributions = new ArrayList<IStepper>();
+		Collection<ExecutableExtensionProxy<IStepper>> delegates = getExtensions().values();
+		for (ExecutableExtensionProxy<IStepper> delegate : delegates) {
+			IStepper instance = unique ? delegate.newInstance() : delegate.getInstance();
 			if (instance != null && !contributions.contains(instance)) {
 				contributions.add(instance);
 			}
 		}
 
-		return contributions.toArray(new IContextStepper[contributions.size()]);
+		return contributions.toArray(new IStepper[contributions.size()]);
 	}
 
 	/**
@@ -69,11 +69,11 @@ public final class StepperExtensionPointManager extends AbstractExtensionPointMa
 	 *
 	 * @return The stepper instance or <code>null</code>.
 	 */
-	public IContextStepper getStepper(String id, boolean unique) {
+	public IStepper getStepper(String id, boolean unique) {
 		Assert.isNotNull(id);
-		IContextStepper contribution = null;
+		IStepper contribution = null;
 		if (getExtensions().containsKey(id)) {
-			ExecutableExtensionProxy<IContextStepper> proxy = getExtensions().get(id);
+			ExecutableExtensionProxy<IStepper> proxy = getExtensions().get(id);
 			// Get the extension instance
 			contribution = unique ? proxy.newInstance() : proxy.getInstance();
 		}

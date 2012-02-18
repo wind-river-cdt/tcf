@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others. All rights reserved.
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -27,7 +27,7 @@ import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
  * <p>
  * Stepper must run in worker threads.
  */
-public interface IContextStepper extends IExecutableExtension {
+public interface IStepper extends IExecutableExtension {
 
 	public static final String ID_TYPE_STEPPER_ID = "Stepper"; //$NON-NLS-1$
 	public static final String ID_TYPE_CONTEXT_ID = "Context"; //$NON-NLS-1$
@@ -39,14 +39,14 @@ public interface IContextStepper extends IExecutableExtension {
 	 * Condition Tester to test for finished execution of the associated stepper.
 	 */
 	public static class ExecutionFinishedConditionTester implements IConditionTester {
-		private final IContextStepper stepper;
+		private final IStepper stepper;
 
 		/**
 		 * Constructor.
 		 *
 		 * @param stepper The stepper. Must not be <code>null</code>.
 		 */
-		public ExecutionFinishedConditionTester(IContextStepper stepper) {
+		public ExecutionFinishedConditionTester(IStepper stepper) {
 			Assert.isNotNull(stepper);
 			this.stepper = stepper;
 		}

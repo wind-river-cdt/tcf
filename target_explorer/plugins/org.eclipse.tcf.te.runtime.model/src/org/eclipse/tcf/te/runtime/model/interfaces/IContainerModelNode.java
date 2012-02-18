@@ -13,7 +13,7 @@ import java.util.List;
 
 
 /**
- * A container (data) model node.
+ * A container model node.
  * <p>
  * The container can have both container model node and model node
  * children. Container model nodes can be used as synchronization

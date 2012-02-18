@@ -37,9 +37,9 @@ import org.eclipse.tcf.te.launch.core.selection.interfaces.ILaunchSelection;
 import org.eclipse.tcf.te.launch.core.selection.interfaces.ISelectionContext;
 import org.eclipse.tcf.te.runtime.extensions.ExtensionPointComparator;
 import org.eclipse.tcf.te.runtime.stepper.StepperManager;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStep;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroup;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepper;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStep;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroup;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IVariantDelegate;
 
 
@@ -180,11 +180,11 @@ public class LaunchConfigTypeBindingsManager {
 	 * @return The stepper or <code>null</code> if no stepper is registered for the
 	 *         given launch configuration type id and launch mode.
 	 */
-	public IContextStepper getStepper(String typeId, String mode) {
+	public IStepper getStepper(String typeId, String mode) {
 		Assert.isNotNull(typeId);
 		Assert.isNotNull(mode);
 
-		IContextStepper stepper = null;
+		IStepper stepper = null;
 
 		LaunchConfigTypeBinding binding = bindings.get(typeId);
 		if (binding != null) {
@@ -207,7 +207,7 @@ public class LaunchConfigTypeBindingsManager {
 	 * @return The launch step group or <code>null</code> if no step group is registered for the
 	 *         given launch configuration type id and launch mode.
 	 */
-	public IContextStepGroup getStepGroup(String typeId, String mode, String variant) {
+	public IStepGroup getStepGroup(String typeId, String mode, String variant) {
 		Assert.isNotNull(typeId);
 		Assert.isNotNull(mode);
 
@@ -227,7 +227,7 @@ public class LaunchConfigTypeBindingsManager {
 	 * @param id The step group id. Must not be <code>null</code>.
 	 * @return The step group or <code>null</code>, if no step group is registered for the specified id.
 	 */
-	public IContextStepGroup getStepGroup(String id) {
+	public IStepGroup getStepGroup(String id) {
 		Assert.isNotNull(id);
 		return StepperManager.getInstance().getStepGroupExtManager().getStepGroup(id, true);
 	}
@@ -238,7 +238,7 @@ public class LaunchConfigTypeBindingsManager {
 	 * @param id The launch step id. Must not be <code>null</code>.
 	 * @return The launch step or <code>null</code> if no step is registered for the specified id.
 	 */
-	public IContextStep getStep(String id) {
+	public IStep getStep(String id) {
 		Assert.isNotNull(id);
 		return StepperManager.getInstance().getStepExtManager().getStep(id, true);
 	}

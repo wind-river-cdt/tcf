@@ -9,19 +9,20 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.runtime.stepper.interfaces;
 
-import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
+import org.eclipse.tcf.te.runtime.model.interfaces.IModelNodeProvider;
 
 /**
  * Interface to be implemented by objects representing a context for a step.
  */
-public interface IContext extends IAdaptable {
+public interface IStepContext extends IModelNodeProvider {
 
 	/**
 	 * Returns the context id.
 	 *
 	 * @return The context id or <code>null</code>.
 	 */
-	public String getContextId();
+	public String getId();
 
 	/**
 	 * Returns a name/label to be used within the UI to represent this context
@@ -29,13 +30,14 @@ public interface IContext extends IAdaptable {
 	 *
 	 * @return The name or <code>null</code>.
 	 */
-	public String getContextName();
+	public String getName();
 
 	/**
 	 * Returns a possible multi-line string providing detail information
 	 * about the context which shall be included in failure messages.
 	 *
+	 * @param data The step data. Must not be <code>null</code>.
 	 * @return The context information or <code>null</code>.
 	 */
-	public String getContextInfo();
+	public String getInfo(IPropertiesContainer data);
 }

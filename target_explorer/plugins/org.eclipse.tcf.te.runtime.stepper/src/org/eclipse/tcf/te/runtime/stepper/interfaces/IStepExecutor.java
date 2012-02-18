@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others. All rights reserved.
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -16,7 +16,7 @@ import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 /**
  * A step executor.
  */
-public interface IContextStepExecutor {
+public interface IStepExecutor {
 
 	/**
 	 * Executes the associated step.
@@ -29,5 +29,5 @@ public interface IContextStepExecutor {
 	 *
 	 * @throws CoreException if the execution cannot be continue. The associated status should describe the failure cause.
 	 */
-	public void execute(IContextStep step, IFullQualifiedId id, IContext context, IPropertiesContainer data, IProgressMonitor monitor) throws CoreException;
+	public void execute(IStep step, IFullQualifiedId id, IStepContext context, IPropertiesContainer data, IProgressMonitor monitor) throws CoreException;
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others. All rights reserved.
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -29,39 +29,39 @@ public class Messages extends NLS {
 
 	// **** Declare externalized string id's down here *****
 
-	public static String AbstractContextStep_error_missingRequiredAttribute;
-	public static String AbstractContextStep_warning_stepFinishedWithWarnings;
+	public static String AbstractStep_error_missingRequiredAttribute;
+	public static String AbstractStep_warning_stepFinishedWithWarnings;
 
-	public static String AbstractContextStepper_error_stepGroup;
-	public static String AbstractContextStepper_error_step;
-	public static String AbstractContextStepper_error_referencedBaseGroup;
-	public static String AbstractContextStepper_error_referencedStepOrGroup;
-	public static String AbstractContextStepper_error_requiredStepOrGroup;
-	public static String AbstractContextStepper_error_requiredStep;
-	public static String AbstractContextStepper_error_initializeNotCalled;
-	public static String AbstractContextStepper_error_missingStepGroupId;
-	public static String AbstractContextStepper_error_missingStepGroup;
-	public static String AbstractContextStepper_error_missingSteps;
-	public static String AbstractContextStepper_multiStatus_finishedWithWarnings;
-	public static String AbstractContextStepper_multiStatus_finishedWithErrors;
-	public static String AbstractContextStepper_error_missingRequiredStep;
-	public static String AbstractContextStepper_error_requiredStepNotExecuted;
+	public static String AbstractStepper_error_stepGroup;
+	public static String AbstractStepper_error_step;
+	public static String AbstractStepper_error_referencedBaseGroup;
+	public static String AbstractStepper_error_referencedStepOrGroup;
+	public static String AbstractStepper_error_requiredStepOrGroup;
+	public static String AbstractStepper_error_requiredStep;
+	public static String AbstractStepper_error_initializeNotCalled;
+	public static String AbstractStepper_error_missingStepGroupId;
+	public static String AbstractStepper_error_missingStepGroup;
+	public static String AbstractStepper_error_missingSteps;
+	public static String AbstractStepper_multiStatus_finishedWithWarnings;
+	public static String AbstractStepper_multiStatus_finishedWithErrors;
+	public static String AbstractStepper_error_missingRequiredStep;
+	public static String AbstractStepper_error_requiredStepNotExecuted;
 
-	public static String ContextStepGroup_error_missingBaseStepGroup;
-	public static String ContextStepGroup_error_missingReferencedStep;
-	public static String ContextStepGroup_error_missingRequiredStep;
-	public static String ContextStepGroup_error_invalidRequiredStep;
-	public static String ContextStepGroup_error_multipleSingletonOccurrences;
-	public static String ContextStepGroup_error_step;
-	public static String ContextStepGroup_error_stepGroup;
-	public static String ContextStepGroup_error_requiredStep;
-	public static String ContextStepGroup_error_referencedBaseGroup;
-	public static String ContextStepGroup_error_referencedStepOrGroup;
-	public static String ContextStepGroup_error_requiredStepOrGroup;
+	public static String StepGroup_error_missingBaseStepGroup;
+	public static String StepGroup_error_missingReferencedStep;
+	public static String StepGroup_error_missingRequiredStep;
+	public static String StepGroup_error_invalidRequiredStep;
+	public static String StepGroup_error_multipleSingletonOccurrences;
+	public static String StepGroup_error_step;
+	public static String StepGroup_error_stepGroup;
+	public static String StepGroup_error_requiredStep;
+	public static String StepGroup_error_referencedBaseGroup;
+	public static String StepGroup_error_referencedStepOrGroup;
+	public static String StepGroup_error_requiredStepOrGroup;
 
-	public static String ContextStepExecutor_checkPoint_normalizationNeeded;
-	public static String ContextStepExecutor_info_stepFailed;
-	public static String ContextStepExecutor_warning_stepFailed;
-	public static String ContextStepExecutor_error_stepFailed;
-	public static String ContextStepExecutor_stepFailed_debugInfo;
+	public static String StepExecutor_checkPoint_normalizationNeeded;
+	public static String StepExecutor_info_stepFailed;
+	public static String StepExecutor_warning_stepFailed;
+	public static String StepExecutor_error_stepFailed;
+	public static String StepExecutor_stepFailed_debugInfo;
 }

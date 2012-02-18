@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others. All rights reserved.
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -18,7 +18,7 @@ import org.eclipse.tcf.te.runtime.interfaces.extensions.IExecutableExtension;
  * <p>
  * A step group is a set of single steps or other step groups.
  */
-public interface IContextStepGroup extends IExecutableExtension {
+public interface IStepGroup extends IExecutableExtension {
 
 	/**
 	 * Returns if or if not the step group is locked for user modifications.
@@ -36,11 +36,11 @@ public interface IContextStepGroup extends IExecutableExtension {
 	 *
 	 * @throws CoreException If the steps cannot be determined.
 	 */
-	public IContextStepGroupable[] getSteps(IContext[] contexts) throws CoreException;
+	public IStepGroupable[] getSteps(IStepContext[] contexts) throws CoreException;
 
 	/**
 	 * Return the step group iterator or <code>null</code>. The step group iterator can be used to
 	 * generate loops and conditions for a step group.
 	 */
-	public IContextStepGroupIterator getStepGroupIterator();
+	public IStepGroupIterator getStepGroupIterator();
 }

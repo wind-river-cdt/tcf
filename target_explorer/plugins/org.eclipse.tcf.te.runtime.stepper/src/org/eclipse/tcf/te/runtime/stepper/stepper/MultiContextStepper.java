@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others. All rights reserved.
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -18,9 +18,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.stepper.StepperAttributeUtil;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContext;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextManipulator;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepper;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId;
 
 /**
@@ -31,7 +31,7 @@ import org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId;
  */
 public class MultiContextStepper extends SingleContextStepper {
 
-	private List<IContextStepper> steppers = new ArrayList<IContextStepper>();
+	private List<IStepper> steppers = new ArrayList<IStepper>();
 
 	public static final String CONTEXT_COUNT = "contextCount"; //$NON-NLS-1$
 	public static final String CONTEXT_INDEX = "contextIndex"; //$NON-NLS-1$
@@ -44,18 +44,18 @@ public class MultiContextStepper extends SingleContextStepper {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.extensions.AbstractContextStepper#onInitialize(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.tcf.te.runtime.stepper.extensions.AbstractStepper#onInitialize(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	protected void onInitialize(IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor) {
 	    super.onInitialize(data, fullQualifiedId, monitor);
 
-	    IContext[] contexts = getContexts();
-	    for (IContext context : contexts) {
+	    IStepContext[] contexts = getContexts();
+	    for (IStepContext context : contexts) {
 	    	if (context == null) continue;
 
 	    	// Get the stepper to be used for this context object
-	    	IContextStepper stepper = getStepper(context);
+	    	IStepper stepper = getStepper(context);
 	    	Assert.isNotNull(stepper);
 
 	    	// Build up a new fully qualified id
@@ -68,7 +68,7 @@ public class MultiContextStepper extends SingleContextStepper {
 
 			// Associate the context and context id with the calculated id
 			StepperAttributeUtil.setProperty(IContextManipulator.CONTEXT, id, data, context);
-			StepperAttributeUtil.setProperty(IContextManipulator.CONTEXT_ID, id, data, context.getContextId());
+			StepperAttributeUtil.setProperty(IContextManipulator.CONTEXT_ID, id, data, context.getId());
 
 			// Add the stepper to the list
 			steppers.add(stepper);
@@ -85,19 +85,19 @@ public class MultiContextStepper extends SingleContextStepper {
 	 * @param context The context. Must not be <code>null</code>.
 	 * @return The stepper instance.
 	 */
-	protected IContextStepper getStepper(IContext context) {
+	protected IStepper getStepper(IStepContext context) {
 		Assert.isNotNull(context);
 		return new SingleContextStepper();
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.extensions.AbstractContextStepper#internalExecute(java.util.List)
+	 * @see org.eclipse.tcf.te.runtime.stepper.extensions.AbstractStepper#internalExecute(java.util.List)
 	 */
 	@Override
 	protected void internalExecute(List<IStatus> statusContainer) throws CoreException {
 		int i = 0;
 		StepperAttributeUtil.setProperty(CONTEXT_COUNT, null, getData(), steppers.size());
-		for (IContextStepper stepper : steppers) {
+		for (IStepper stepper : steppers) {
 			StepperAttributeUtil.setProperty(CONTEXT_INDEX, null, getData(), i++);
 			try {
 				stepper.execute();
@@ -112,13 +112,13 @@ public class MultiContextStepper extends SingleContextStepper {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.extensions.AbstractContextStepper#cleanup()
+	 * @see org.eclipse.tcf.te.runtime.stepper.extensions.AbstractStepper#cleanup()
 	 */
 	@Override
 	public void cleanup() {
 		super.cleanup();
 
-		for (IContextStepper stepper : steppers) {
+		for (IStepper stepper : steppers) {
 			stepper.cleanup();
 		}
 		steppers.clear();

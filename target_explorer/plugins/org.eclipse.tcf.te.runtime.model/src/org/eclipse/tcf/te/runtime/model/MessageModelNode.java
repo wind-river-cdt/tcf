@@ -13,9 +13,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.tcf.te.runtime.model.activator.CoreBundleActivator;
 
 /**
- * A common (data) model node representing a message.
+ * A common model node representing a message.
  * <p>
- * <b>Note:</b> The (data) model node implementation is not thread-safe. Clients requiring
+ * <b>Note:</b> The model node implementation is not thread-safe. Clients requiring
  *              a thread-safe implementation should subclass the model node.
  */
 public class MessageModelNode extends ModelNode {

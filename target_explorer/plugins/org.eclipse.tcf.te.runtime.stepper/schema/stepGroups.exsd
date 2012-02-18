@@ -97,12 +97,12 @@ A step group bundles a set of single steps and/or other step groups into a more 
          <attribute name="iterator" type="string">
             <annotation>
                <documentation>
-                  The class that implements &lt;code&gt;org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroupIterator&lt;/code&gt;.
+                  The class that implements &lt;code&gt;org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroupIterator&lt;/code&gt;.
 &lt;p&gt;
 The step group iterator implementation class can be specified either by the iterator attribute or the iterator child element!
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroupIterator"/>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroupIterator"/>
                </appinfo>
             </annotation>
          </attribute>
@@ -130,12 +130,12 @@ The step group iterator implementation class can be specified either by the iter
          <attribute name="class" type="string">
             <annotation>
                <documentation>
-                  The class that implements &lt;code&gt;org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroupIterator&lt;/code&gt;.
+                  The class that implements &lt;code&gt;org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroupIterator&lt;/code&gt;.
 &lt;p&gt;
 The step group iterator implementation class can be specified either by the iterator attribute or the iterator child element!
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroupIterator"/>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroupIterator"/>
                </appinfo>
             </annotation>
          </attribute>
@@ -342,7 +342,7 @@ Use the form &lt;i&gt;&amp;quot;id##secondaryId&amp;quot;&lt;/i&gt; to identify 
          <meta.section type="apiinfo"/>
       </appinfo>
       <documentation>
-         The provider of a step group must implement &lt;samp&gt;org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroup&lt;/samp&gt;.
+         The provider of a step group must implement &lt;samp&gt;org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroup&lt;/samp&gt;.
       </documentation>
    </annotation>
 

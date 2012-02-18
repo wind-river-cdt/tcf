@@ -18,13 +18,13 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.tcf.te.runtime.extensions.ExecutableExtensionProxy;
 import org.eclipse.tcf.te.runtime.stepper.activator.CoreBundleActivator;
-import org.eclipse.tcf.te.runtime.stepper.extensions.ContextStepGroup;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroup;
+import org.eclipse.tcf.te.runtime.stepper.extensions.StepGroup;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroup;
 
 /**
  * Step group extension proxy implementation.
  */
-public final class StepGroupExtensionProxy extends ExecutableExtensionProxy<IContextStepGroup> {
+public final class StepGroupExtensionProxy extends ExecutableExtensionProxy<IStepGroup> {
 	private List<IConfigurationElement> groupExtensions = new ArrayList<IConfigurationElement>();
 
 	/**
@@ -50,9 +50,9 @@ public final class StepGroupExtensionProxy extends ExecutableExtensionProxy<ICon
 	 * @see org.eclipse.tcf.te.runtime.extensions.ExecutableExtensionProxy#newInstance()
 	 */
 	@Override
-	public IContextStepGroup newInstance() {
+	public IStepGroup newInstance() {
 		// Create the instance
-		ContextStepGroup instance = new ContextStepGroup();
+		StepGroup instance = new StepGroup();
 		// and initialize
 		try {
 			instance.setInitializationData(getConfigurationElement(), getConfigurationElement().getName(), null);

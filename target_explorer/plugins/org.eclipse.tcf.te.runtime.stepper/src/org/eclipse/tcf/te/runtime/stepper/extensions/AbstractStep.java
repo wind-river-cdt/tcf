@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others. All rights reserved.
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -20,21 +20,21 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.tcf.te.runtime.stepper.StepperAttributeUtil;
-import org.eclipse.tcf.te.runtime.stepper.activator.CoreBundleActivator;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContext;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStep;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IExtendedContextStep;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId;
-import org.eclipse.tcf.te.runtime.stepper.nls.Messages;
 import org.eclipse.tcf.te.runtime.extensions.ExecutableExtension;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
+import org.eclipse.tcf.te.runtime.stepper.StepperAttributeUtil;
+import org.eclipse.tcf.te.runtime.stepper.activator.CoreBundleActivator;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IExtendedStep;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStep;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
+import org.eclipse.tcf.te.runtime.stepper.nls.Messages;
 
 /**
  * An abstract step implementation.
  */
-public abstract class AbstractContextStep extends ExecutableExtension implements IExtendedContextStep {
+public abstract class AbstractStep extends ExecutableExtension implements IExtendedStep {
 	// List of string id's of the step dependencies.
 	private final List<String> dependencies = new ArrayList<String>();
 
@@ -57,7 +57,7 @@ public abstract class AbstractContextStep extends ExecutableExtension implements
 	public final static String SUFFIX_OPERATIONAL = "operational"; //$NON-NLS-1$
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IExtendedContextStep#isSingleton()
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IExtendedStep#isSingleton()
 	 */
 	@Override
     public boolean isSingleton() {
@@ -80,7 +80,7 @@ public abstract class AbstractContextStep extends ExecutableExtension implements
 				throw new CoreException(new Status(IStatus.ERROR,
 												   CoreBundleActivator.getUniqueIdentifier(),
 												   0,
-												   NLS.bind(Messages.AbstractContextStep_error_missingRequiredAttribute, "dependency id (requires)",  getLabel()), //$NON-NLS-1$
+												   NLS.bind(Messages.AbstractStep_error_missingRequiredAttribute, "dependency id (requires)",  getLabel()), //$NON-NLS-1$
 												   null));
 			}
 			if (!dependencies.contains(value.trim())) {
@@ -90,10 +90,10 @@ public abstract class AbstractContextStep extends ExecutableExtension implements
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IExtendedContextStep#initializeFrom(org.eclipse.tcf.te.runtime.stepper.interfaces.IContext, org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IExtendedStep#initializeFrom(org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext, org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-    public void initializeFrom(IContext context, IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor) {
+    public void initializeFrom(IStepContext context, IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor) {
 		Assert.isNotNull(context);
 		Assert.isNotNull(data);
 		Assert.isNotNull(fullQualifiedId);
@@ -104,32 +104,32 @@ public abstract class AbstractContextStep extends ExecutableExtension implements
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IExtendedContextStep#cleanup(org.eclipse.tcf.te.runtime.stepper.interfaces.IContext, org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IExtendedStep#cleanup(org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext, org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-    public void cleanup(IContext context, IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor) {
+    public void cleanup(IStepContext context, IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor) {
 		StepperAttributeUtil.setProperty(SUFFIX_DELAYED_STATUS, fullQualifiedId, data, false);
 		StepperAttributeUtil.setProperty(SUFFIX_OPERATIONAL, fullQualifiedId, data, false);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IExtendedContextStep#rollback(org.eclipse.tcf.te.runtime.stepper.interfaces.IContext, org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.core.runtime.IStatus, org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId, org.eclipse.core.runtime.IProgressMonitor, org.eclipse.tcf.te.runtime.interfaces.callback.ICallback)
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IExtendedStep#rollback(org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext, org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.core.runtime.IStatus, org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId, org.eclipse.core.runtime.IProgressMonitor, org.eclipse.tcf.te.runtime.interfaces.callback.ICallback)
 	 */
 	@Override
-    public void rollback(IContext context, IPropertiesContainer data, IStatus status, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor, ICallback callback) {
+    public void rollback(IStepContext context, IPropertiesContainer data, IStatus status, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor, ICallback callback) {
 		if (callback != null) callback.done(this, Status.OK_STATUS);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStep#getTotalWork(org.eclipse.tcf.te.runtime.stepper.interfaces.IContext, org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStep#getTotalWork(org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext, org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
 	 */
 	@Override
-    public int getTotalWork(IContext context, IPropertiesContainer data) {
+    public int getTotalWork(IStepContext context, IPropertiesContainer data) {
 		return 10;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStep#getDependencies()
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStep#getDependencies()
 	 */
 	@Override
     public String[] getDependencies() {
@@ -163,7 +163,7 @@ public abstract class AbstractContextStep extends ExecutableExtension implements
 				if (delayedStati.length > 0) {
 					if (!(status instanceof MultiStatus))  {
 						status = new MultiStatus(CoreBundleActivator.getUniqueIdentifier(), 0,
-												 NLS.bind(Messages.AbstractContextStep_warning_stepFinishedWithWarnings, getLabel()),
+												 NLS.bind(Messages.AbstractStep_warning_stepFinishedWithWarnings, getLabel()),
 												 null);
 
 					}
@@ -178,7 +178,7 @@ public abstract class AbstractContextStep extends ExecutableExtension implements
 		}
 
 		// Finally invoke the callback
-		callback.setProperty(IContextStep.CALLBACK_PROPERTY_DATA, data);
+		callback.setProperty(IStep.CALLBACK_PROPERTY_DATA, data);
 		callback.done(this, status);
 	}
 

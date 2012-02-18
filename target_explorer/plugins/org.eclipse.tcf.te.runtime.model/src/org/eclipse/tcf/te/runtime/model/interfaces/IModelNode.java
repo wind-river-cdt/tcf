@@ -15,7 +15,7 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 
 /**
- * A common (data) model node.
+ * A common model node.
  * <p>
  * Each model node is capable of dealing with generic properties, provides
  * it's own image and label for representation within the UI and can be used

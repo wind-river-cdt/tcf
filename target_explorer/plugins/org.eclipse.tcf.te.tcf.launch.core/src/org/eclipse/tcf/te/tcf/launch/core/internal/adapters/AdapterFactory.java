@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * Copyright (c) 2012 Wind River Systems, Inc. and others. All rights reserved.
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -7,29 +7,28 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.services.contexts.internal;
+package org.eclipse.tcf.te.tcf.launch.core.internal.adapters;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IAdapterFactory;
-import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.te.runtime.interfaces.IDisposable;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.listener.ModelAdapter;
 import org.eclipse.tcf.te.tcf.locator.model.Model;
-import org.eclipse.tcf.te.tcf.services.contexts.interfaces.IContextService;
 
 /**
- * Context service adapter factory implementation.
+ * Adapter factory implementation.
  */
 public class AdapterFactory implements IAdapterFactory {
-	// Maintain a map of contexts service adapters per peer
-	/* default */ Map<IPeer, IContextService> adapters = new HashMap<IPeer, IContextService>();
+	// Maintain a map of step context adapters per peer model
+	/* default */ Map<IPeerModel, IStepContext> adapters = new HashMap<IPeerModel, IStepContext>();
 
 	private static final Class<?>[] CLASSES = new Class[] {
-		IContextService.class
+		IStepContext.class
 	};
 
 	/**
@@ -42,9 +41,9 @@ public class AdapterFactory implements IAdapterFactory {
     		 */
     		@Override
     		public void locatorModelChanged(ILocatorModel model, IPeerModel peer, boolean added) {
-    			// If a peer gets removed, remove the context service proxy
-    			if (peer != null && peer.getPeer() != null && !added) {
-    				IContextService adapter = adapters.remove(peer.getPeer());
+    			// If a peer gets removed, remove the step context adapter too
+    			if (peer != null && !added) {
+    				IStepContext adapter = adapters.remove(peer);
     				if (adapter instanceof IDisposable) ((IDisposable)adapter).dispose();
     			}
     		}
@@ -56,15 +55,17 @@ public class AdapterFactory implements IAdapterFactory {
 	 */
 	@Override
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
-		if (adaptableObject instanceof IPeer) {
-			// Lookup the adapter
-			IContextService adapter = adapters.get(adaptableObject);
-			// No adapter yet -> create a new one for this peer
-			if (adapter == null) {
-				adapter = new ContextServiceAdapter((IPeer)adaptableObject);
-				adapters.put((IPeer)adaptableObject, adapter);
+		if (adaptableObject instanceof IPeerModel) {
+			if (IStepContext.class.equals(adapterType)) {
+				// Lookup the adapter
+				IStepContext adapter = adapters.get(adaptableObject);
+				// No adapter yet -> create a new one for this peer
+				if (adapter == null) {
+					adapter = new StepContextAdapter((IPeerModel)adaptableObject);
+					adapters.put((IPeerModel)adaptableObject, adapter);
+				}
+				return adapter;
 			}
-			return adapter;
 		}
 		return null;
 	}

@@ -21,9 +21,9 @@ import org.eclipse.tcf.te.runtime.model.interfaces.IContainerModelNode;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
 
 /**
- * A common (data) model container node implementation.
+ * A common model container node implementation.
  * <p>
- * <b>Note:</b> The (data) model node implementation is not thread-safe. Clients requiring
+ * <b>Note:</b> The model node implementation is not thread-safe. Clients requiring
  *              a thread-safe implementation should subclass the properties container and
  *              overwrite {@link #checkThreadAccess()}.
  */

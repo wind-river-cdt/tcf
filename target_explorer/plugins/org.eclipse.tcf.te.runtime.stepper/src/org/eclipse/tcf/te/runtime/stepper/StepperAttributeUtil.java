@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others. All rights reserved.
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -10,9 +10,8 @@
 package org.eclipse.tcf.te.runtime.stepper;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId;
 
 /**
  * A stepper attributes utility provides a set of static methods
@@ -27,27 +26,11 @@ public class StepperAttributeUtil {
 	 * @param data The data.
 	 * @return The full qualified key.
 	 */
-	protected final static String getFullQualifiedKey(String key, IFullQualifiedId fullQualifiedId, Object data) {
+	protected final static String getFullQualifiedKey(String key, IFullQualifiedId fullQualifiedId, IPropertiesContainer data) {
 		Assert.isNotNull(key);
 		Assert.isNotNull(data);
 
 		return (fullQualifiedId != null ? fullQualifiedId.toString() : "") + key; //$NON-NLS-1$
-	}
-
-	/**
-	 * Returns the properties container for the given data object.
-	 *
-	 * @param data The data object or <code>null</code>.
-	 * @return The properties container or <code>null</code> if the container cannot be determined.
-	 */
-	private static IPropertiesContainer getPropertiesContainer(Object data) {
-		if (data instanceof IPropertiesContainer) {
-			return (IPropertiesContainer) data;
-		}
-		if (data instanceof IAdaptable) {
-			return (IPropertiesContainer)((IAdaptable)data).getAdapter(IPropertiesContainer.class);
-		}
-		return null;
 	}
 
 	/**
@@ -60,19 +43,14 @@ public class StepperAttributeUtil {
 	 * @return The property value or <code>null</code> if either the data has no property container
 	 *         or the property is not set.
 	 */
-	public final static Object getProperty(String key, IFullQualifiedId fullQualifiedId, Object data) {
+	public final static Object getProperty(String key, IFullQualifiedId fullQualifiedId, IPropertiesContainer data) {
 		Assert.isNotNull(key);
 		Assert.isNotNull(data);
 
-		IPropertiesContainer container = getPropertiesContainer(data);
-		if (container == null) {
-			return null;
+		if (fullQualifiedId == null || data.getProperty(getFullQualifiedKey(key, fullQualifiedId, data)) != null) {
+			return data.getProperty(getFullQualifiedKey(key, fullQualifiedId, data));
 		}
-		if (fullQualifiedId == null || container
-		                .getProperty(getFullQualifiedKey(key, fullQualifiedId, data)) != null) {
-			return container.getProperty(getFullQualifiedKey(key, fullQualifiedId, data));
-		}
-		return container.getProperty(getFullQualifiedKey(key, fullQualifiedId.getParentId(), data));
+		return data.getProperty(getFullQualifiedKey(key, fullQualifiedId.getParentId(), data));
 	}
 
 	/**
@@ -85,18 +63,14 @@ public class StepperAttributeUtil {
 	 * @return The string property value or <code>null</code> if either the data has no property
 	 *         container or the property is not set.
 	 */
-	public final static String getStringProperty(String key, IFullQualifiedId fullQualifiedId, Object data) {
+	public final static String getStringProperty(String key, IFullQualifiedId fullQualifiedId, IPropertiesContainer data) {
 		Assert.isNotNull(key);
 		Assert.isNotNull(data);
 
-		IPropertiesContainer container = getPropertiesContainer(data);
-		if (container == null) {
-			return null;
+		if (fullQualifiedId == null || data.getProperty(getFullQualifiedKey(key, fullQualifiedId, data)) != null) {
+			return data.getStringProperty(getFullQualifiedKey(key, fullQualifiedId, data));
 		}
-		if (fullQualifiedId == null || container.getProperty(getFullQualifiedKey(key, fullQualifiedId, data)) != null) {
-			return container.getStringProperty(getFullQualifiedKey(key, fullQualifiedId, data));
-		}
-		return container.getStringProperty(getFullQualifiedKey(key, fullQualifiedId.getParentId(), data));
+		return data.getStringProperty(getFullQualifiedKey(key, fullQualifiedId.getParentId(), data));
 	}
 
 	/**
@@ -109,18 +83,14 @@ public class StepperAttributeUtil {
 	 * @return The boolean property value or <code>false</code> if either the data has no property
 	 *         container or the property is not set.
 	 */
-	public final static boolean getBooleanProperty(String key, IFullQualifiedId fullQualifiedId, Object data) {
+	public final static boolean getBooleanProperty(String key, IFullQualifiedId fullQualifiedId, IPropertiesContainer data) {
 		Assert.isNotNull(key);
 		Assert.isNotNull(data);
 
-		IPropertiesContainer container = getPropertiesContainer(data);
-		if (container == null) {
-			return false;
+		if (fullQualifiedId == null || data.getProperty(getFullQualifiedKey(key, fullQualifiedId, data)) != null) {
+			return data.getBooleanProperty(getFullQualifiedKey(key, fullQualifiedId, data));
 		}
-		if (fullQualifiedId == null || container.getProperty(getFullQualifiedKey(key, fullQualifiedId, data)) != null) {
-			return container.getBooleanProperty(getFullQualifiedKey(key, fullQualifiedId, data));
-		}
-		return container.getBooleanProperty(getFullQualifiedKey(key, fullQualifiedId.getParentId(), data));
+		return data.getBooleanProperty(getFullQualifiedKey(key, fullQualifiedId.getParentId(), data));
 	}
 
 	/**
@@ -132,18 +102,14 @@ public class StepperAttributeUtil {
 	 * @return The int property value or <code>-1</code> if either the data has no property
 	 *         container or the property is not set.
 	 */
-	public final static int getIntProperty(String key, IFullQualifiedId fullQualifiedId, Object data) {
+	public final static int getIntProperty(String key, IFullQualifiedId fullQualifiedId, IPropertiesContainer data) {
 		Assert.isNotNull(key);
 		Assert.isNotNull(data);
 
-		IPropertiesContainer container = getPropertiesContainer(data);
-		if (container == null) {
-			return -1;
+		if (fullQualifiedId == null || data.getProperty(getFullQualifiedKey(key, fullQualifiedId, data)) != null) {
+			return data.getIntProperty(getFullQualifiedKey(key, fullQualifiedId, data));
 		}
-		if (fullQualifiedId == null || container.getProperty(getFullQualifiedKey(key, fullQualifiedId, data)) != null) {
-			return container.getIntProperty(getFullQualifiedKey(key, fullQualifiedId, data));
-		}
-		return container.getIntProperty(getFullQualifiedKey(key, fullQualifiedId.getParentId(), data));
+		return data.getIntProperty(getFullQualifiedKey(key, fullQualifiedId.getParentId(), data));
 	}
 
 	/**
@@ -154,15 +120,11 @@ public class StepperAttributeUtil {
 	 * @param data The data.
 	 * @return <code>true</code> if a property value is set.
 	 */
-	public final static boolean isPropertySet(String key, IFullQualifiedId fullQualifiedId, Object data) {
+	public final static boolean isPropertySet(String key, IFullQualifiedId fullQualifiedId, IPropertiesContainer data) {
 		Assert.isNotNull(key);
 		Assert.isNotNull(data);
 
-		IPropertiesContainer container = getPropertiesContainer(data);
-		if (container == null) {
-			return false;
-		}
-		return container.getProperty(getFullQualifiedKey(key, fullQualifiedId, data)) != null;
+		return data.getProperty(getFullQualifiedKey(key, fullQualifiedId, data)) != null;
 	}
 
 	/**
@@ -174,7 +136,7 @@ public class StepperAttributeUtil {
 	 * @param value The new value.
 	 * @return <code>true</code> if the value was set.
 	 */
-	public final static boolean setProperty(String key, IFullQualifiedId fullQualifiedId, Object data, Object value) {
+	public final static boolean setProperty(String key, IFullQualifiedId fullQualifiedId, IPropertiesContainer data, Object value) {
 		return setProperty(key, fullQualifiedId, data, value, false);
 	}
 
@@ -189,18 +151,14 @@ public class StepperAttributeUtil {
 	 *            qualified id to share the value with other steps within the same parent (group).
 	 * @return <code>true</code> if the value was set.
 	 */
-	public final static boolean setProperty(String key, IFullQualifiedId fullQualifiedId, Object data, Object value, boolean share) {
+	public final static boolean setProperty(String key, IFullQualifiedId fullQualifiedId, IPropertiesContainer data, Object value, boolean share) {
 		Assert.isNotNull(key);
 		Assert.isNotNull(data);
 
-		IPropertiesContainer container = getPropertiesContainer(data);
-		if (container == null) {
-			return false;
-		}
 		if (share && fullQualifiedId != null) {
-			container.setProperty(getFullQualifiedKey(key, fullQualifiedId.getParentId(), data), value);
+			data.setProperty(getFullQualifiedKey(key, fullQualifiedId.getParentId(), data), value);
 		}
-		return container.setProperty(getFullQualifiedKey(key, fullQualifiedId, data), value);
+		return data.setProperty(getFullQualifiedKey(key, fullQualifiedId, data), value);
 	}
 
 	/**
@@ -212,7 +170,7 @@ public class StepperAttributeUtil {
 	 * @param value The new boolean value.
 	 * @return <code>true</code> if the value was set.
 	 */
-	public final static boolean setProperty(String key, IFullQualifiedId fullQualifiedId, Object data, boolean value) {
+	public final static boolean setProperty(String key, IFullQualifiedId fullQualifiedId, IPropertiesContainer data, boolean value) {
 		return setProperty(key, fullQualifiedId, data, value, false);
 	}
 
@@ -228,18 +186,14 @@ public class StepperAttributeUtil {
 	 *            qualified id to share the value with other steps within the same parent (group).
 	 * @return <code>true</code> if the value was set.
 	 */
-	public final static boolean setProperty(String key, IFullQualifiedId fullQualifiedId, Object data, boolean value, boolean share) {
+	public final static boolean setProperty(String key, IFullQualifiedId fullQualifiedId, IPropertiesContainer data, boolean value, boolean share) {
 		Assert.isNotNull(key);
 		Assert.isNotNull(data);
 
-		IPropertiesContainer container = getPropertiesContainer(data);
-		if (container == null) {
-			return false;
-		}
 		if (share && fullQualifiedId != null) {
-			container.setProperty(getFullQualifiedKey(key, fullQualifiedId.getParentId(), data), value);
+			data.setProperty(getFullQualifiedKey(key, fullQualifiedId.getParentId(), data), value);
 		}
-		return container.setProperty(getFullQualifiedKey(key, fullQualifiedId, data), value);
+		return data.setProperty(getFullQualifiedKey(key, fullQualifiedId, data), value);
 	}
 
 	/**
@@ -251,7 +205,7 @@ public class StepperAttributeUtil {
 	 * @param value The new int value.
 	 * @return <code>true</code> if the value was set.
 	 */
-	public final static boolean setProperty(String key, IFullQualifiedId fullQualifiedId, Object data, int value) {
+	public final static boolean setProperty(String key, IFullQualifiedId fullQualifiedId, IPropertiesContainer data, int value) {
 		return setProperty(key, fullQualifiedId, data, value, false);
 	}
 
@@ -267,17 +221,13 @@ public class StepperAttributeUtil {
 	 *            qualified id to share the value with other steps within the same parent (group).
 	 * @return <code>true</code> if the value was set.
 	 */
-	public final static boolean setProperty(String key, IFullQualifiedId fullQualifiedId, Object data, int value, boolean share) {
+	public final static boolean setProperty(String key, IFullQualifiedId fullQualifiedId, IPropertiesContainer data, int value, boolean share) {
 		Assert.isNotNull(key);
 		Assert.isNotNull(data);
 
-		IPropertiesContainer container = getPropertiesContainer(data);
-		if (container == null) {
-			return false;
-		}
 		if (share && fullQualifiedId != null) {
-			container.setProperty(getFullQualifiedKey(key, fullQualifiedId.getParentId(), data), value);
+			data.setProperty(getFullQualifiedKey(key, fullQualifiedId.getParentId(), data), value);
 		}
-		return container.setProperty(getFullQualifiedKey(key, fullQualifiedId, data), value);
+		return data.setProperty(getFullQualifiedKey(key, fullQualifiedId, data), value);
 	}
 }

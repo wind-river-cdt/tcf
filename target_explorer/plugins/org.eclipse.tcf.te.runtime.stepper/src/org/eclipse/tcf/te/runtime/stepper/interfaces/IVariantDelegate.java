@@ -27,5 +27,5 @@ public interface IVariantDelegate extends IExecutableExtension {
 	 *
 	 * @return The valid variants or an empty array.
 	 */
-	public String[] getValidVariants(IContext context, IPropertiesContainer data);
+	public String[] getValidVariants(IStepContext context, IPropertiesContainer data);
 }

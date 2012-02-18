@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others. All rights reserved.
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -30,16 +30,16 @@ import org.eclipse.tcf.te.runtime.interfaces.ISharedConstants;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.stepper.StepperAttributeUtil;
 import org.eclipse.tcf.te.runtime.stepper.activator.CoreBundleActivator;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContext;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextManipulator;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStep;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepExecutor;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroup;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroupIterator;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroupable;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepper;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IExtendedContextStep;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroup;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroupIterator;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IExtendedStep;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStep;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepExecutor;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroupable;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.tracing.ITraceIds;
 import org.eclipse.tcf.te.runtime.stepper.nls.Messages;
 import org.eclipse.tcf.te.runtime.utils.ProgressHelper;
@@ -48,7 +48,7 @@ import org.eclipse.tcf.te.runtime.utils.StatusHelper;
 /**
  * An abstract stepper implementation.
  */
-public abstract class AbstractContextStepper extends ExecutableExtension implements IContextStepper, IContextManipulator {
+public abstract class AbstractStepper extends ExecutableExtension implements IStepper, IContextManipulator {
 
 	private boolean initialized = false;
 	private boolean finished = false;
@@ -56,7 +56,7 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 	private IFullQualifiedId fullQualifiedId = null;
 	private IProgressMonitor monitor = null;
 	private String activeContextId = null;
-	private IContext activeContext = null;
+	private IStepContext activeContext = null;
 	private boolean cancelable = true;
 
 	/**
@@ -64,9 +64,9 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 	 */
 	protected final class ExecutedContextStep {
 		final IFullQualifiedId id;
-		final IContextStep step;
+		final IStep step;
 
-		public ExecutedContextStep(IFullQualifiedId id, IContextStep step) {
+		public ExecutedContextStep(IFullQualifiedId id, IStep step) {
 			this.id = id;
 			this.step = step;
 		}
@@ -75,7 +75,7 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 	/**
 	 * Constructor.
 	 */
-	public AbstractContextStepper() {
+	public AbstractStepper() {
 		super();
 	}
 
@@ -91,7 +91,7 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 	 *
 	 * @return An array of context objects or an empty list.
 	 */
-	protected abstract IContext[] getContexts();
+	protected abstract IStepContext[] getContexts();
 
 	/**
 	 * Creates a new instance of the step executor to use for executing a step.
@@ -102,7 +102,7 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 	 *
 	 * @return The step executor instance.
 	 */
-	protected abstract IContextStepExecutor doCreateStepExecutor(IContextStep step, String secondaryId, IFullQualifiedId fullQualifiedStepId);
+	protected abstract IStepExecutor doCreateStepExecutor(IStep step, String secondaryId, IFullQualifiedId fullQualifiedStepId);
 
 	/**
 	 * Returns the id of the step group to execute by the stepper.
@@ -117,10 +117,10 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 	 * @param The step group id. Must not be <code>null</code>:
 	 * @return The step group or <code>null</code>.
 	 */
-	protected abstract IContextStepGroup getStepGroup(String id);
+	protected abstract IStepGroup getStepGroup(String id);
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepper#initialize(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper#initialize(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
     public final void initialize(IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor) throws IllegalStateException {
@@ -150,7 +150,7 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 
 		setInitialized();
 
-		CoreBundleActivator.getTraceHandler().trace("AbstractContextStepper#initialize:" //$NON-NLS-1$
+		CoreBundleActivator.getTraceHandler().trace("AbstractStepper#initialize:" //$NON-NLS-1$
 													+ " data = " + data, //$NON-NLS-1$
 													0, ITraceIds.TRACE_STEPPING, IStatus.WARNING, this);
 	}
@@ -176,7 +176,7 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepper#isInitialized()
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper#isInitialized()
 	 */
 	@Override
     public final boolean isInitialized() {
@@ -206,7 +206,7 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 	 *
 	 * @param context The active context or <code>null</code>.
 	 */
-	protected final void setActiveContext(IContext context) {
+	protected final void setActiveContext(IStepContext context) {
 		// do not use equals() here!!!
 		if (activeContext != context) {
 			if (activeContext instanceof IPropertiesContainer) {
@@ -224,16 +224,16 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 	 *
 	 * @return The active context or <code>null</code>.
 	 */
-	protected IContext getActiveContext() {
+	protected IStepContext getActiveContext() {
 		if (isInitialized() && activeContext == null) {
-			IContext newContext = (IContext)StepperAttributeUtil.getProperty(IContextManipulator.CONTEXT, getFullQualifiedId(), getData());
+			IStepContext newContext = (IStepContext)StepperAttributeUtil.getProperty(IContextManipulator.CONTEXT, getFullQualifiedId(), getData());
 			if (newContext != null) {
 				setActiveContext(newContext);
 			}
 			if (activeContext == null) {
-				IContext[] contexts =	getContexts();
+				IStepContext[] contexts =	getContexts();
 				if (contexts != null && contexts.length > 0) {
-					for (IContext context : contexts) {
+					for (IStepContext context : contexts) {
 						setActiveContext(context);
 						StepperAttributeUtil.setProperty(IContextManipulator.CONTEXT, getFullQualifiedId(), getData(), activeContext);
 						break;
@@ -265,9 +265,9 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 				activeContextId = newContextId.trim();
 			}
 			if (activeContextId == null) {
-				IContext context = getActiveContext();
+				IStepContext context = getActiveContext();
 				if (context != null) {
-					activeContextId = context.getContextId();
+					activeContextId = context.getId();
 					StepperAttributeUtil.setProperty(IContextManipulator.CONTEXT_ID, getFullQualifiedId(), getData(), activeContextId);
 				}
 			}
@@ -315,7 +315,7 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepper#isFinished()
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper#isFinished()
 	 */
 	@Override
     public final boolean isFinished() {
@@ -323,7 +323,7 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepper#cleanup()
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper#cleanup()
 	 */
 	@Override
     public void cleanup() {
@@ -355,13 +355,13 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepper#execute()
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper#execute()
 	 */
 	@Override
     public final void execute() throws CoreException {
 		long startTime = System.currentTimeMillis();
 
-		CoreBundleActivator.getTraceHandler().trace("AbstractContextStepper#execute: *** ENTERED", //$NON-NLS-1$
+		CoreBundleActivator.getTraceHandler().trace("AbstractStepper#execute: *** ENTERED", //$NON-NLS-1$
 													0, ITraceIds.TRACE_STEPPING, IStatus.WARNING, this);
 		CoreBundleActivator.getTraceHandler().trace(" [" + ISharedConstants.TIME_FORMAT.format(new Date(startTime)) + "]" //$NON-NLS-1$ //$NON-NLS-2$
 													+ " ***", //$NON-NLS-1$
@@ -371,7 +371,7 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 			// stepper must be initialized before executing
 			if (!isInitialized()) {
 				throw new CoreException(new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
-												   Messages.AbstractContextStepper_error_initializeNotCalled));
+												   Messages.AbstractStepper_error_initializeNotCalled));
 			}
 
 			// Create a container for collecting the non-severe status objects
@@ -392,7 +392,7 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 				if (statusContainer.size() > 1) {
 					MultiStatus multiStatus =
 						new MultiStatus(CoreBundleActivator.getUniqueIdentifier(), 0,
-										NLS.bind(Messages.AbstractContextStepper_multiStatus_finishedWithWarnings, getName()), null);
+										NLS.bind(Messages.AbstractStepper_multiStatus_finishedWithWarnings, getName()), null);
 					for (IStatus subStatus : statusContainer) {
 						multiStatus.merge(subStatus);
 					}
@@ -410,7 +410,7 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 			setFinished();
 
 			long endTime = System.currentTimeMillis();
-			CoreBundleActivator.getTraceHandler().trace("AbstractContextStepper#execute: *** DONE", //$NON-NLS-1$
+			CoreBundleActivator.getTraceHandler().trace("AbstractStepper#execute: *** DONE", //$NON-NLS-1$
 														0, ITraceIds.TRACE_STEPPING, IStatus.WARNING, this);
 			CoreBundleActivator.getTraceHandler().trace(" [" + ISharedConstants.TIME_FORMAT.format(new Date(endTime)) //$NON-NLS-1$
 														+ " , delay = " + (endTime - startTime) + " ms]" //$NON-NLS-1$ //$NON-NLS-2$
@@ -434,16 +434,16 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 		// If no step group id is available, throw an exception
 		if (stepGroupId == null) {
 			throw new CoreException(new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
-							   				   NLS.bind(Messages.AbstractContextStepper_error_missingStepGroupId, getName())));
+							   				   NLS.bind(Messages.AbstractStepper_error_missingStepGroupId, getName())));
 		}
 
 		// Get the step group
-		IContextStepGroup stepGroup = getStepGroup(stepGroupId);
+		IStepGroup stepGroup = getStepGroup(stepGroupId);
 
 		// If no step group could be found for any of the valid variants, throw an exception
 		if (stepGroup == null) {
 			throw new CoreException(new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
-											   NLS.bind(Messages.AbstractContextStepper_error_missingStepGroup, stepGroupId)));
+											   NLS.bind(Messages.AbstractStepper_error_missingStepGroup, stepGroupId)));
 		}
 
 		// Initialize the progress monitor
@@ -465,7 +465,7 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 	 *
 	 * @throws CoreException If the execution fails.
 	 */
-	private void executeStepGroup(IContextStepGroup stepGroup, List<IStatus> statusContainer, List<ExecutedContextStep> executedSteps, IFullQualifiedId fullQualifiedGroupId) throws CoreException {
+	private void executeStepGroup(IStepGroup stepGroup, List<IStatus> statusContainer, List<ExecutedContextStep> executedSteps, IFullQualifiedId fullQualifiedGroupId) throws CoreException {
 		Assert.isNotNull(stepGroup);
 		Assert.isNotNull(statusContainer);
 		Assert.isNotNull(executedSteps);
@@ -477,13 +477,13 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 			throw new CoreException(StatusHelper.getStatus(new OperationCanceledException()));
 		}
 
-		CoreBundleActivator.getTraceHandler().trace("AbstractContextStepper#executeStepGroup: step group: '" + stepGroup.getLabel() + "'", //$NON-NLS-1$ //$NON-NLS-2$
+		CoreBundleActivator.getTraceHandler().trace("AbstractStepper#executeStepGroup: step group: '" + stepGroup.getLabel() + "'", //$NON-NLS-1$ //$NON-NLS-2$
 													0, ITraceIds.TRACE_STEPPING, IStatus.WARNING, this);
 
 		// Resolve the steps to execute
-		IContextStepGroupable[] groupables = stepGroup.getSteps(getContexts());
+		IStepGroupable[] groupables = stepGroup.getSteps(getContexts());
 
-		IContextStepGroupIterator iterator = stepGroup.getStepGroupIterator();
+		IStepGroupIterator iterator = stepGroup.getStepGroupIterator();
 		IFullQualifiedId fullQualifiedIterationId = fullQualifiedGroupId;
 		int iteration = 0;
 
@@ -498,8 +498,8 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 				iterator.next(getActiveContext(), getData(), fullQualifiedIterationId, getMonitor());
 				// set the active context if the step has manipulated it
 				if (iterator instanceof IContextManipulator) {
-					IContext newContext =
-						(IContext)StepperAttributeUtil.getProperty(IContextManipulator.CONTEXT, fullQualifiedIterationId, getData());
+					IStepContext newContext =
+						(IStepContext)StepperAttributeUtil.getProperty(IContextManipulator.CONTEXT, fullQualifiedIterationId, getData());
 					String newContextId =
 						StepperAttributeUtil.getStringProperty(IContextManipulator.CONTEXT_ID, fullQualifiedIterationId, getData());
 					if (newContext != null) {
@@ -512,7 +512,7 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 				}
 			}
 			// Execute the steps or step groups.
-			for (IContextStepGroupable groupable : groupables) {
+			for (IStepGroupable groupable : groupables) {
 				executeGroupable(groupable, statusContainer, executedSteps, fullQualifiedIterationId);
 			}
 			iteration++;
@@ -531,7 +531,7 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 	 *
 	 * @throws CoreException If the execution failed.
 	 */
-	private void executeGroupable(IContextStepGroupable groupable, List<IStatus> statusContainer, List<ExecutedContextStep> executedSteps, IFullQualifiedId fullQualifiedParentId) throws CoreException {
+	private void executeGroupable(IStepGroupable groupable, List<IStatus> statusContainer, List<ExecutedContextStep> executedSteps, IFullQualifiedId fullQualifiedParentId) throws CoreException {
 		Assert.isNotNull(groupable);
 		Assert.isNotNull(statusContainer);
 		Assert.isNotNull(executedSteps);
@@ -545,7 +545,7 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 
 		// If the passed in groupable is disabled -> we are done immediately
 		if (groupable.isDisabled()) {
-			CoreBundleActivator.getTraceHandler().trace("AbstractContextStepper#executeGroupable: DROPPED DISABLED groupable: id = '" + groupable.getExtension().getId() + "'" //$NON-NLS-1$ //$NON-NLS-2$
+			CoreBundleActivator.getTraceHandler().trace("AbstractStepper#executeGroupable: DROPPED DISABLED groupable: id = '" + groupable.getExtension().getId() + "'" //$NON-NLS-1$ //$NON-NLS-2$
 														+ ", secondaryId = '" + groupable.getSecondaryId() + "'", //$NON-NLS-1$ //$NON-NLS-2$
 														0, ITraceIds.TRACE_STEPPING, IStatus.WARNING, this);
 			return;
@@ -554,22 +554,22 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 		// Check if all dependencies of the groupable have been executed before
 		checkForDependenciesExecuted(groupable, executedSteps);
 
-		if (groupable.getExtension() instanceof IContextStepGroup) {
+		if (groupable.getExtension() instanceof IStepGroup) {
 			IFullQualifiedId id = fullQualifiedParentId.createChildId(ID_TYPE_STEP_GROUP_ID, groupable.getExtension().getId(), groupable.getSecondaryId());
 			// If the passed in groupable is associated with a step group
 			// -> get the groupable from that group and execute them
-			executeStepGroup((IContextStepGroup)groupable.getExtension(), statusContainer, executedSteps, id);
+			executeStepGroup((IStepGroup)groupable.getExtension(), statusContainer, executedSteps, id);
 		}
-		else if (groupable.getExtension() instanceof IContextStep) {
+		else if (groupable.getExtension() instanceof IStep) {
 			// If the passed in groupable is associated with a step
 			// -> check if the required steps have been executed before,
 			//    create a step executor and invoke the executor.
-			IContextStep step = (IContextStep)groupable.getExtension();
+			IStep step = (IStep)groupable.getExtension();
 
 			IFullQualifiedId id = fullQualifiedParentId.createChildId(ID_TYPE_STEP_ID, step.getId(), groupable.getSecondaryId());
 
 			// Create the step executor now
-			IContextStepExecutor executor = doCreateStepExecutor(step, groupable.getSecondaryId(), id);
+			IStepExecutor executor = doCreateStepExecutor(step, groupable.getSecondaryId(), id);
 			Assert.isNotNull(executor);
 
 			try {
@@ -578,7 +578,7 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 				executor.execute(step, id, getActiveContext(), getData(), getMonitor());
 				// set the active context if the step has manipulated it
 				if (step instanceof IContextManipulator) {
-					IContext newContext = (IContext)StepperAttributeUtil.getProperty(IContextManipulator.CONTEXT, id, getData());
+					IStepContext newContext = (IStepContext)StepperAttributeUtil.getProperty(IContextManipulator.CONTEXT, id, getData());
 					String newContextId = StepperAttributeUtil.getStringProperty(IContextManipulator.CONTEXT_ID, id, getData());
 					if (newContext != null) {
 						setActiveContext(newContext);
@@ -618,15 +618,15 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 	 *
 	 * @throws CoreException If a dependency has not been executed before.
 	 */
-	protected void checkForDependenciesExecuted(IContextStepGroupable groupable, List<ExecutedContextStep> executedSteps) throws CoreException {
+	protected void checkForDependenciesExecuted(IStepGroupable groupable, List<ExecutedContextStep> executedSteps) throws CoreException {
 		Assert.isNotNull(groupable);
 		Assert.isNotNull(executedSteps);
 
 		// Build up the complete list of dependencies.
 		List<String> dependencies = new ArrayList<String>(Arrays.asList(groupable.getDependencies()));
 		// If the groupable wraps a step, the step can have additional dependencies to check
-		if (groupable.getExtension() instanceof IContextStep) {
-			dependencies.addAll(Arrays.asList(((IContextStep)groupable.getExtension()).getDependencies()));
+		if (groupable.getExtension() instanceof IStep) {
+			dependencies.addAll(Arrays.asList(((IStep)groupable.getExtension()).getDependencies()));
 		}
 
 		// Check each dependency now.
@@ -647,10 +647,10 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 
 			if (!requiredStepExecuted) {
 				throw new CoreException(new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
-					MessageFormat.format(Messages.AbstractContextStepper_error_requiredStepNotExecuted,
-										 NLS.bind((groupable.getExtension() instanceof IContextStep
-										 				? Messages.AbstractContextStepper_error_step
-										 				: Messages.AbstractContextStepper_error_requiredStepOrGroup), dependency)
+					MessageFormat.format(Messages.AbstractStepper_error_requiredStepNotExecuted,
+										 NLS.bind((groupable.getExtension() instanceof IStep
+										 				? Messages.AbstractStepper_error_step
+										 				: Messages.AbstractStepper_error_requiredStepOrGroup), dependency)
 										 		 )));
 			}
 
@@ -663,7 +663,7 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 
 	/**
 	 * Rollback the steps previously executed to the failed step. The rollback
-	 * is executed in reverse order and the step must be of type {@link IExtendedContextStep}
+	 * is executed in reverse order and the step must be of type {@link IExtendedStep}
 	 * to participate in the rollback.
 	 *
 	 * @param executedSteps
@@ -681,8 +681,8 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 				if (!executedSteps.isEmpty()) {
 					setProperty(PROPERTY_IS_DONE, false);
 					ExecutedContextStep executedStep = executedSteps.remove(executedSteps.size()-1);
-					if (executedStep.step instanceof IExtendedContextStep) {
-						IExtendedContextStep step = (IExtendedContextStep)executedStep.step;
+					if (executedStep.step instanceof IExtendedStep) {
+						IExtendedStep step = (IExtendedStep)executedStep.step;
 						step.rollback(getActiveContext(), getData(), rollBackStatus, executedStep.id, rollbackProgress, this);
 					}
 					else {
@@ -710,18 +710,18 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 	 *
 	 * @throws CoreException If the total work of the step group cannot be determined.
 	 */
-	protected int calculateTotalWork(IContextStepGroup stepGroup) throws CoreException {
+	protected int calculateTotalWork(IStepGroup stepGroup) throws CoreException {
 		Assert.isNotNull(stepGroup);
 
 		int totalWork = 0;
 
 		// Loop the group steps and summarize the returned total work
-		IContextStepGroupable[] groupables = stepGroup.getSteps(getContexts());
-		for (IContextStepGroupable groupable : groupables) {
-			int work = groupable.getExtension() instanceof IContextStep
-								? ((IContextStep)groupable.getExtension()).getTotalWork(getActiveContext(), getData())
-								: groupable.getExtension() instanceof IContextStepGroup
-										? calculateTotalWork((IContextStepGroup)groupable.getExtension())
+		IStepGroupable[] groupables = stepGroup.getSteps(getContexts());
+		for (IStepGroupable groupable : groupables) {
+			int work = groupable.getExtension() instanceof IStep
+								? ((IStep)groupable.getExtension()).getTotalWork(getActiveContext(), getData())
+								: groupable.getExtension() instanceof IStepGroup
+										? calculateTotalWork((IStepGroup)groupable.getExtension())
 									    : IProgressMonitor.UNKNOWN;
 
 			if (work == IProgressMonitor.UNKNOWN) {
@@ -804,7 +804,7 @@ public abstract class AbstractContextStepper extends ExecutableExtension impleme
 			//          a new MultiStatus.
 			if (!statusContainer.isEmpty()) {
 				MultiStatus multiStatus = new MultiStatus(status.getPlugin(), status.getCode(),
-														  NLS.bind(Messages.AbstractContextStepper_multiStatus_finishedWithErrors, getName()), null);
+														  NLS.bind(Messages.AbstractStepper_multiStatus_finishedWithErrors, getName()), null);
 				for (IStatus stat : statusContainer) {
 					multiStatus.merge(stat);
 				}

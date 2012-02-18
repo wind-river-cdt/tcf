@@ -13,14 +13,14 @@ import org.eclipse.core.runtime.IAdaptable;
 
 /**
  * Interface to implement from objects which are associated
- * with (data) model nodes and providing access to them.
+ * with model nodes and providing access to them.
  */
 public interface IModelNodeProvider extends IAdaptable {
 
 	/**
-	 * Returns the associated (data) model node.
+	 * Returns the associated model node.
 	 *
-	 * @return The (data) model node or <code>null</code>.
+	 * @return The model node or <code>null</code>.
 	 */
 	public IModelNode getModelNode();
 }

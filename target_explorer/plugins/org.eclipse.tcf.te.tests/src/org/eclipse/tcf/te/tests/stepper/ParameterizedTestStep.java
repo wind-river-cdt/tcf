@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others. All rights reserved.
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -21,7 +21,7 @@ public class ParameterizedTestStep extends TestStep {
 	public Map<?,?> params = null;
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.extensions.AbstractContextStep#doSetInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
+	 * @see org.eclipse.tcf.te.runtime.stepper.extensions.AbstractStep#doSetInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
 	 */
 	@Override
 	public void doSetInitializationData(IConfigurationElement config, String propertyName, Object data) throws CoreException {

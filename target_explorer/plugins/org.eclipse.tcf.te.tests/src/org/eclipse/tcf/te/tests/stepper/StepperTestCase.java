@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others. All rights reserved.
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -16,11 +16,11 @@ import junit.framework.TestSuite;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.tcf.te.runtime.stepper.StepperManager;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContext;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStep;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroup;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroupable;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepper;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStep;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroup;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroupable;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper;
 import org.eclipse.tcf.te.tests.CoreTestCase;
 
 /**
@@ -54,8 +54,8 @@ public class StepperTestCase extends CoreTestCase {
 		boolean multiContext = false;
 		boolean singleContext = false;
 
-		IContextStepper[] steppers = StepperManager.getInstance().getStepperExtManager().getStepper(false);
-		for (IContextStepper stepper : steppers) {
+		IStepper[] steppers = StepperManager.getInstance().getStepperExtManager().getStepper(false);
+		for (IStepper stepper : steppers) {
 			if (stepper.getId().equals("org.eclipse.tcf.te.runtime.stepper.multiContext")) { //$NON-NLS-1$
 				multiContext = true;
 			}
@@ -75,10 +75,10 @@ public class StepperTestCase extends CoreTestCase {
 		assertNotNull("Unexpected return value 'null'.", StepperManager.getInstance()); //$NON-NLS-1$
 		assertNotNull("Unexpected return value 'null'.", StepperManager.getInstance().getStepExtManager()); //$NON-NLS-1$
 
-		IContextStep[] steps = StepperManager.getInstance().getStepExtManager().getSteps(false);
+		IStep[] steps = StepperManager.getInstance().getStepExtManager().getSteps(false);
 		int testStepCount = 0;
 
-		for (IContextStep step : steps) {
+		for (IStep step : steps) {
 			if (step.getId().startsWith("org.eclipse.tcf.te.tests.stepper.step")) { //$NON-NLS-1$
 				testStepCount++;
 			} else {
@@ -92,8 +92,8 @@ public class StepperTestCase extends CoreTestCase {
 				assertEquals("Unexpected number of dependencies found.", 0, step.getDependencies().length); //$NON-NLS-1$
 
 				assertTrue("Step is not enabled but should.", StepperManager.getInstance().getStepBindingsExtManager().isStepEnabled(step.getId(), null)); //$NON-NLS-1$
-				assertTrue("Step is not enabled but should.", StepperManager.getInstance().getStepBindingsExtManager().isStepEnabled(step.getId(), new IContext[0])); //$NON-NLS-1$
-				assertTrue("Step is not enabled but should.", StepperManager.getInstance().getStepBindingsExtManager().isStepEnabled(step.getId(), new IContext[1])); //$NON-NLS-1$
+				assertTrue("Step is not enabled but should.", StepperManager.getInstance().getStepBindingsExtManager().isStepEnabled(step.getId(), new IStepContext[0])); //$NON-NLS-1$
+				assertTrue("Step is not enabled but should.", StepperManager.getInstance().getStepBindingsExtManager().isStepEnabled(step.getId(), new IStepContext[1])); //$NON-NLS-1$
 			}
 
 			if (step.getId().endsWith(".step2")) { //$NON-NLS-1$
@@ -131,8 +131,8 @@ public class StepperTestCase extends CoreTestCase {
 				assertEquals("Unexpected number of dependencies found.", 0, step.getDependencies().length); //$NON-NLS-1$
 
 				assertFalse("Step is enabled but should not.", StepperManager.getInstance().getStepBindingsExtManager().isStepEnabled(step.getId(), null)); //$NON-NLS-1$
-				assertFalse("Step is enabled but should not.", StepperManager.getInstance().getStepBindingsExtManager().isStepEnabled(step.getId(), new IContext[0])); //$NON-NLS-1$
-				assertTrue("Step is not enabled but should.", StepperManager.getInstance().getStepBindingsExtManager().isStepEnabled(step.getId(), new IContext[1])); //$NON-NLS-1$
+				assertFalse("Step is enabled but should not.", StepperManager.getInstance().getStepBindingsExtManager().isStepEnabled(step.getId(), new IStepContext[0])); //$NON-NLS-1$
+				assertTrue("Step is not enabled but should.", StepperManager.getInstance().getStepBindingsExtManager().isStepEnabled(step.getId(), new IStepContext[1])); //$NON-NLS-1$
 			}
 		}
 
@@ -146,10 +146,10 @@ public class StepperTestCase extends CoreTestCase {
 		assertNotNull("Unexpected return value 'null'.", StepperManager.getInstance()); //$NON-NLS-1$
 		assertNotNull("Unexpected return value 'null'.", StepperManager.getInstance().getStepGroupExtManager()); //$NON-NLS-1$
 
-		IContextStepGroup[] stepGroups = StepperManager.getInstance().getStepGroupExtManager().getStepGroups(false);
+		IStepGroup[] stepGroups = StepperManager.getInstance().getStepGroupExtManager().getStepGroups(false);
 		int testStepGroupCount = 0;
 
-		for (IContextStepGroup stepGroup : stepGroups) {
+		for (IStepGroup stepGroup : stepGroups) {
 			if (stepGroup.getId().startsWith("org.eclipse.tcf.te.tests.stepper.stepGroup")) { //$NON-NLS-1$
 				testStepGroupCount++;
 			} else {
@@ -158,7 +158,7 @@ public class StepperTestCase extends CoreTestCase {
 
 			Throwable error = null;
 			String message = null;
-			IContextStepGroupable[] steps = null;
+			IStepGroupable[] steps = null;
 
 			if (stepGroup.getId().endsWith(".stepGroup1")) { //$NON-NLS-1$
 				assertEquals("Unexpected step group label found.", "Test Step Group 1", stepGroup.getLabel()); //$NON-NLS-1$ //$NON-NLS-2$
@@ -167,7 +167,7 @@ public class StepperTestCase extends CoreTestCase {
 				assertNull("Unexpected non-null value.", stepGroup.getStepGroupIterator()); //$NON-NLS-1$
 
 				try {
-					steps = stepGroup.getSteps(new IContext[0]);
+					steps = stepGroup.getSteps(new IStepContext[0]);
 				} catch (CoreException e) {
 					error = e;
 					message = e.getLocalizedMessage();
@@ -185,7 +185,7 @@ public class StepperTestCase extends CoreTestCase {
 
 				error = null; message = null; steps = null;
 				try {
-					steps = stepGroup.getSteps(new IContext[0]);
+					steps = stepGroup.getSteps(new IStepContext[0]);
 				} catch (CoreException e) {
 					error = e;
 					message = e.getLocalizedMessage();
@@ -203,7 +203,7 @@ public class StepperTestCase extends CoreTestCase {
 
 				error = null; message = null; steps = null;
 				try {
-					steps = stepGroup.getSteps(new IContext[0]);
+					steps = stepGroup.getSteps(new IStepContext[0]);
 				} catch (CoreException e) {
 					error = e;
 					message = e.getLocalizedMessage();
@@ -227,7 +227,7 @@ public class StepperTestCase extends CoreTestCase {
 
 				error = null; message = null; steps = null;
 				try {
-					steps = stepGroup.getSteps(new IContext[0]);
+					steps = stepGroup.getSteps(new IStepContext[0]);
 				} catch (CoreException e) {
 					error = e;
 					message = e.getLocalizedMessage();
@@ -243,7 +243,7 @@ public class StepperTestCase extends CoreTestCase {
 
 				error = null; message = null; steps = null;
 				try {
-					steps = stepGroup.getSteps(new IContext[1]);
+					steps = stepGroup.getSteps(new IStepContext[1]);
 				} catch (CoreException e) {
 					error = e;
 					message = e.getLocalizedMessage();

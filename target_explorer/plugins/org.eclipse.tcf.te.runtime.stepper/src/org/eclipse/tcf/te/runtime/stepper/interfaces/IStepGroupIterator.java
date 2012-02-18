@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others. All rights reserved.
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -17,7 +17,7 @@ import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 /**
  * A step group iterator.
  */
-public interface IContextStepGroupIterator extends IExecutableExtension {
+public interface IStepGroupIterator extends IExecutableExtension {
 
 	/**
 	 * Initialize the iterator.
@@ -27,7 +27,7 @@ public interface IContextStepGroupIterator extends IExecutableExtension {
 	 * @param fullQualifiedId The full qualified id for this step. Must not be <code>null</code>.
 	 * @param monitor The progress monitor. Must not be <code>null</code>.
 	 */
-	public void initialize(IContext context, IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor);
+	public void initialize(IStepContext context, IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor);
 
 	/**
 	 * Return the number of calculated iterations. If the iterator was not initialized,
@@ -44,7 +44,7 @@ public interface IContextStepGroupIterator extends IExecutableExtension {
 	 * @param monitor The progress monitor. Must not be <code>null</code>.
 	 * @return <code>true</code> if another iteration is possible.
 	 */
-	public boolean hasNext(IContext context, IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor);
+	public boolean hasNext(IStepContext context, IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor);
 
 	/**
 	 * Set the next iteration to the data using the full qualified id.
@@ -55,5 +55,5 @@ public interface IContextStepGroupIterator extends IExecutableExtension {
 	 * @param monitor The progress monitor. Must not be <code>null</code>.
 	 * @throws CoreException
 	 */
-	public void next(IContext context, IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor) throws CoreException;
+	public void next(IStepContext context, IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor) throws CoreException;
 }

@@ -26,7 +26,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.tcf.te.runtime.extensions.AbstractExtensionPointManager;
 import org.eclipse.tcf.te.runtime.extensions.ExecutableExtensionProxy;
 import org.eclipse.tcf.te.runtime.stepper.activator.CoreBundleActivator;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContext;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
 
 
 /**
@@ -96,7 +96,7 @@ public final class StepBindingsExtensionPointManager extends AbstractExtensionPo
 	 * @param contexts The context objects or <code>null</code>.
 	 * @return The list of applicable editor page bindings or an empty array.
 	 */
-	public boolean isStepEnabled(String stepId, IContext[] contexts) {
+	public boolean isStepEnabled(String stepId, IStepContext[] contexts) {
 		Assert.isNotNull(stepId);
 
 		// Flag is set to true at the first binding matching the given step id
@@ -120,7 +120,7 @@ public final class StepBindingsExtensionPointManager extends AbstractExtensionPo
 				if (contexts != null) {
 					// To satisfy the "isIterable" and "isCountable" needs of the expression
 					// evaluator, pass on the contexts as collection.
-					List<IContext> variableValue = Arrays.asList(contexts);
+					List<IStepContext> variableValue = Arrays.asList(contexts);
 					// Set the default variable to the context.
 					EvaluationContext evalContext = new EvaluationContext(null, variableValue);
 					// Initialize the evaluation context named variables

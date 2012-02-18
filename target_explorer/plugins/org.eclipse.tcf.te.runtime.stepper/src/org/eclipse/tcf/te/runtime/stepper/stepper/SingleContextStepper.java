@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others. All rights reserved.
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -13,14 +13,14 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.tcf.te.runtime.stepper.StepperManager;
 import org.eclipse.tcf.te.runtime.stepper.activator.CoreBundleActivator;
-import org.eclipse.tcf.te.runtime.stepper.extensions.AbstractContextStepper;
-import org.eclipse.tcf.te.runtime.stepper.extensions.ContextStepExecutor;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContext;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStep;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepExecutor;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroup;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepperProperties;
+import org.eclipse.tcf.te.runtime.stepper.extensions.AbstractStepper;
+import org.eclipse.tcf.te.runtime.stepper.extensions.StepExecutor;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroup;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepperProperties;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStep;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepExecutor;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.tracing.ITraceIds;
 
 /**
@@ -47,7 +47,7 @@ import org.eclipse.tcf.te.runtime.stepper.interfaces.tracing.ITraceIds;
  * <li><i>org.eclipse.tcf.te.runtime.stepper/profile/stepping</i></li>
  * </ul>
  */
-public class SingleContextStepper extends AbstractContextStepper {
+public class SingleContextStepper extends AbstractStepper {
 
 	/**
 	 * Constructor.
@@ -57,34 +57,34 @@ public class SingleContextStepper extends AbstractContextStepper {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.extensions.AbstractContextStepper#getName()
+	 * @see org.eclipse.tcf.te.runtime.stepper.extensions.AbstractStepper#getName()
 	 */
 	@Override
 	protected String getName() {
-		return getData() != null ? getData().getStringProperty(IContextStepperProperties.PROP_NAME) : null;
+		return getData() != null ? getData().getStringProperty(IStepperProperties.PROP_NAME) : null;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.extensions.AbstractContextStepper#getContexts()
+	 * @see org.eclipse.tcf.te.runtime.stepper.extensions.AbstractStepper#getContexts()
 	 */
 	@Override
-	protected IContext[] getContexts() {
-	    return getData() != null && getData().getProperty(IContextStepperProperties.PROP_CONTEXTS) != null ? (IContext[])getData().getProperty(IContextStepperProperties.PROP_CONTEXTS) : new IContext[0];
+	protected IStepContext[] getContexts() {
+	    return getData() != null && getData().getProperty(IStepperProperties.PROP_CONTEXTS) != null ? (IStepContext[])getData().getProperty(IStepperProperties.PROP_CONTEXTS) : new IStepContext[0];
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.extensions.AbstractContextStepper#getStepGroupId()
+	 * @see org.eclipse.tcf.te.runtime.stepper.extensions.AbstractStepper#getStepGroupId()
 	 */
 	@Override
 	protected String getStepGroupId() {
-		return getData() != null ? getData().getStringProperty(IContextStepperProperties.PROP_STEP_GROUP_ID) : null;
+		return getData() != null ? getData().getStringProperty(IStepperProperties.PROP_STEP_GROUP_ID) : null;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.extensions.AbstractContextStepper#getStepGroup(java.lang.String)
+	 * @see org.eclipse.tcf.te.runtime.stepper.extensions.AbstractStepper#getStepGroup(java.lang.String)
 	 */
 	@Override
-	protected IContextStepGroup getStepGroup(String id) {
+	protected IStepGroup getStepGroup(String id) {
 		Assert.isNotNull(id);
 
 		CoreBundleActivator.getTraceHandler().trace("SingleContextStepper#getStepGroup:" //$NON-NLS-1$
@@ -95,13 +95,13 @@ public class SingleContextStepper extends AbstractContextStepper {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.extensions.AbstractContextStepper#doCreateStepExecutor(org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStep, java.lang.String, org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId)
+	 * @see org.eclipse.tcf.te.runtime.stepper.extensions.AbstractStepper#doCreateStepExecutor(org.eclipse.tcf.te.runtime.stepper.interfaces.IStep, java.lang.String, org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId)
 	 */
 	@Override
-	protected IContextStepExecutor doCreateStepExecutor(IContextStep step, String secondaryId, IFullQualifiedId fullQualifiedStepId) {
+	protected IStepExecutor doCreateStepExecutor(IStep step, String secondaryId, IFullQualifiedId fullQualifiedStepId) {
 		Assert.isNotNull(step);
 		Assert.isNotNull(secondaryId);
 		Assert.isNotNull(fullQualifiedStepId);
-	    return new ContextStepExecutor();
+	    return new StepExecutor();
 	}
 }

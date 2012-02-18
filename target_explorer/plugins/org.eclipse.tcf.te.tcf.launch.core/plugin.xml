@@ -2,6 +2,15 @@
 <?eclipse version="3.4"?>
 <plugin>
 
+<!-- Adapter factory contributions -->
+   <extension point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"
+            class="org.eclipse.tcf.te.tcf.launch.core.internal.adapters.AdapterFactory">
+         <adapter type="org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext"/>
+      </factory>
+   </extension>
+
 <!-- Service contributions -->
    <extension point="org.eclipse.tcf.te.runtime.services.services">
       <service

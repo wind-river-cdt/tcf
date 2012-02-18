@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others. All rights reserved.
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -15,12 +15,12 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.te.runtime.interfaces.extensions.IExecutableExtension;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroupable;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroupable;
 
 /**
  * Context step groupable implementation.
  */
-public class ContextStepGroupable implements IContextStepGroupable {
+public class StepGroupable implements IStepGroupable {
 	private String secondaryId = null;
 	private boolean disabled = false;
 	private boolean hidden = false;
@@ -35,7 +35,7 @@ public class ContextStepGroupable implements IContextStepGroupable {
 	 *
 	 * @param extension The grouped extension. Must not be <code>null</code>.
 	 */
-	public ContextStepGroupable(IExecutableExtension extension) {
+	public StepGroupable(IExecutableExtension extension) {
 		this(extension, null);
 	}
 
@@ -45,14 +45,14 @@ public class ContextStepGroupable implements IContextStepGroupable {
 	 * @param extension The grouped extension. Must not be <code>null</code>.
 	 * @param secondaryId The groupable secondaryId or <code>null</code>.
 	 */
-	public ContextStepGroupable(IExecutableExtension extension, String secondaryId) {
+	public StepGroupable(IExecutableExtension extension, String secondaryId) {
 		super();
 		setExtension(extension);
 		setSecondaryId(secondaryId);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroupable#getExtension()
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroupable#getExtension()
 	 */
 	@Override
 	public IExecutableExtension getExtension() {
@@ -70,7 +70,7 @@ public class ContextStepGroupable implements IContextStepGroupable {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroupable#getSecondaryId()
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroupable#getSecondaryId()
 	 */
 	@Override
 	public String getSecondaryId() {
@@ -87,7 +87,7 @@ public class ContextStepGroupable implements IContextStepGroupable {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroupable#isDisabled()
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroupable#isDisabled()
 	 */
 	@Override
 	public boolean isDisabled() {
@@ -108,7 +108,7 @@ public class ContextStepGroupable implements IContextStepGroupable {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroupable#isHidden()
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroupable#isHidden()
 	 */
 	@Override
 	public boolean isHidden() {
@@ -129,7 +129,7 @@ public class ContextStepGroupable implements IContextStepGroupable {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroupable#isRemovable()
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroupable#isRemovable()
 	 */
 	@Override
 	public boolean isRemovable() {
@@ -150,7 +150,7 @@ public class ContextStepGroupable implements IContextStepGroupable {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroupable#isSingleton()
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroupable#isSingleton()
 	 */
 	@Override
 	public boolean isSingleton() {
@@ -169,7 +169,7 @@ public class ContextStepGroupable implements IContextStepGroupable {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepGroupable#getDependencies()
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroupable#getDependencies()
 	 */
 	@Override
 	public String[] getDependencies() {

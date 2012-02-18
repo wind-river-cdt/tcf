@@ -42,7 +42,7 @@ import org.eclipse.tcf.te.runtime.extensions.ExecutableExtension;
 import org.eclipse.tcf.te.runtime.interfaces.ISharedConstants;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.stepper.FullQualifiedId;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IContextStepper;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.tracing.ITraceIds;
 
@@ -95,7 +95,7 @@ public class LaunchConfigurationDelegate extends AbstractLaunchConfigurationDele
 		launch.setAttribute(ICommonLaunchAttributes.ILAUNCH_ATTRIBUTE_LAUNCH_SEQUENCE_COMPLETED, Boolean.FALSE.toString());
 
 		// The stepper instance to be used
-		IContextStepper stepper = null;
+		IStepper stepper = null;
 		IStatus status = null;
 
 		try {
@@ -116,7 +116,7 @@ public class LaunchConfigurationDelegate extends AbstractLaunchConfigurationDele
 			if (stepper.isInitialized()) {
 				try {
 					// Create a new stepper instance
-					IContextStepper candidate = stepper.getClass().newInstance();
+					IStepper candidate = stepper.getClass().newInstance();
 					// Note: If the stepper is an instance of ExecutableExtension, the candidate has to be too.
 					if (stepper instanceof ExecutableExtension) {
 						((ExecutableExtension)stepper).cloneInitializationData((ExecutableExtension)candidate);
@@ -130,7 +130,7 @@ public class LaunchConfigurationDelegate extends AbstractLaunchConfigurationDele
 				}
 			}
 
-			IFullQualifiedId fullQualifiedId = new FullQualifiedId(IContextStepper.ID_TYPE_STEPPER_ID, stepper.getId(), null);
+			IFullQualifiedId fullQualifiedId = new FullQualifiedId(IStepper.ID_TYPE_STEPPER_ID, stepper.getId(), null);
 			// Get the launch properties container
 			IPropertiesContainer properties = (IPropertiesContainer)launch.getAdapter(IPropertiesContainer.class);
 			Assert.isNotNull(properties);
@@ -141,7 +141,7 @@ public class LaunchConfigurationDelegate extends AbstractLaunchConfigurationDele
 			stepper.execute();
 
 			// Wait for the stepper to be finished
-			ExecutorsUtil.waitAndExecute(0, new IContextStepper.ExecutionFinishedConditionTester(stepper));
+			ExecutorsUtil.waitAndExecute(0, new IStepper.ExecutionFinishedConditionTester(stepper));
 		} catch (CoreException e) {
 			// We have to catch the CoreException here as we do want to open the
 			// launch configurations dialog on ERROR only.
