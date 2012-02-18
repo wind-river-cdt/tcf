@@ -10,6 +10,8 @@
 package org.eclipse.tcf.te.launch.ui.tabs.selector;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.ToolBarManager;
@@ -17,6 +19,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tcf.te.launch.ui.activator.UIPlugin;
+import org.eclipse.tcf.te.launch.ui.interfaces.ILaunchConfigurationTabFormPart;
 import org.eclipse.tcf.te.launch.ui.internal.ImageConsts;
 import org.eclipse.tcf.te.launch.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.forms.parts.AbstractSection;
@@ -28,9 +31,9 @@ import org.eclipse.ui.forms.widgets.Section;
 /**
  * Context selector section implementation.
  */
-public class ContextSelectorSection extends AbstractSection {
+public class ContextSelectorSection extends AbstractSection implements ILaunchConfigurationTabFormPart {
 	// Reference to the section sub controls
-	/* default */ RemoteContextSelectorControl selector;
+	/* default */ StepContextSelectorControl selector;
 
 	/**
 	 * Context selector control refresh action implementation.
@@ -91,7 +94,7 @@ public class ContextSelectorSection extends AbstractSection {
 		createSectionToolbar(section, toolkit);
 
 		// Create the section sub controls
-		selector = new RemoteContextSelectorControl(null);
+		selector = new StepContextSelectorControl(null);
 		selector.setFormToolkit(toolkit);
 		selector.setupPanel(client);
 	}
@@ -112,5 +115,27 @@ public class ContextSelectorSection extends AbstractSection {
 	protected void createSectionToolbarItems(Section section, FormToolkit toolkit, ToolBarManager tlbMgr) {
 	    super.createSectionToolbarItems(section, toolkit, tlbMgr);
 	    tlbMgr.add(new RefreshAction());
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.launch.ui.interfaces.ILaunchConfigurationTabFormPart#initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
+	 */
+	@Override
+	public void initializeFrom(ILaunchConfiguration configuration) {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.launch.ui.interfaces.ILaunchConfigurationTabFormPart#performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
+	 */
+	@Override
+	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.launch.ui.interfaces.ILaunchConfigurationTabFormPart#isValid(org.eclipse.debug.core.ILaunchConfiguration)
+	 */
+	@Override
+	public boolean isValid(ILaunchConfiguration configuration) {
+	    return true;
 	}
 }

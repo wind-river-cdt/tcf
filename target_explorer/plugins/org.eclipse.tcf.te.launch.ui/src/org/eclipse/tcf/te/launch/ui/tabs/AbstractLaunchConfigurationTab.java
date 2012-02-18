@@ -37,7 +37,7 @@ public abstract class AbstractLaunchConfigurationTab extends org.eclipse.debug.u
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	@Override
-    public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
+    public final void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		// defaults are set within the tab group using the default settings of the launch manager delegate.
 	}
 

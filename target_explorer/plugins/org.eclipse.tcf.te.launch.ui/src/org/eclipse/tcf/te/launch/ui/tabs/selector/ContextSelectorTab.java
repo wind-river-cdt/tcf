@@ -10,7 +10,6 @@
 package org.eclipse.tcf.te.launch.ui.tabs.selector;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -21,9 +20,9 @@ import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
 
 /**
- * Launch context selector tab implementation.
+ * Context selector launch configuration tab implementation.
  */
-public class LaunchContextSelectorTab extends AbstractFormsLaunchConfigurationTab {
+public class ContextSelectorTab extends AbstractFormsLaunchConfigurationTab {
 	// References to the tab sub sections
 	private ContextSelectorSection selectorSection;
 
@@ -56,13 +55,6 @@ public class LaunchContextSelectorTab extends AbstractFormsLaunchConfigurationTa
 		selectorSection = new ContextSelectorSection(getManagedForm(), panel);
 		selectorSection.getSection().setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB, TableWrapData.TOP));
 		getManagedForm().addPart(selectorSection);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
-	 */
-	@Override
-	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 	}
 
 	/* (non-Javadoc)

@@ -11,12 +11,15 @@ package org.eclipse.tcf.te.launch.ui.tabs;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.tcf.te.launch.ui.interfaces.ILaunchConfigurationTabFormPart;
 import org.eclipse.tcf.te.ui.forms.CustomFormToolkit;
 import org.eclipse.tcf.te.ui.forms.FormLayoutFactory;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.forms.IFormPart;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.ManagedForm;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -208,7 +211,55 @@ public abstract class AbstractFormsLaunchConfigurationTab extends AbstractLaunch
 	 */
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration) {
-		if (mform != null) mform.setInput(configuration);
+		if (mform != null) {
+			// Set the launch configuration as input element to make
+			// it accessible to the form parts outside the life cycle methods.
+			mform.setInput(configuration);
+
+			// Get all registered form parts
+			IFormPart[] parts = mform.getParts();
+			for (IFormPart part : parts) {
+				if (part instanceof ILaunchConfigurationTabFormPart) {
+					((ILaunchConfigurationTabFormPart)part).initializeFrom(configuration);
+				}
+			}
+		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
+	 */
+	@Override
+	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
+		if (mform != null) {
+			// Get all registered form parts
+			IFormPart[] parts = mform.getParts();
+			for (IFormPart part : parts) {
+				if (part instanceof ILaunchConfigurationTabFormPart) {
+					((ILaunchConfigurationTabFormPart)part).performApply(configuration);
+				}
+			}
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#isValid(org.eclipse.debug.core.ILaunchConfiguration)
+	 */
+	@Override
+	public boolean isValid(ILaunchConfiguration configuration) {
+	    boolean valid = super.isValid(configuration);
+
+		if (mform != null) {
+			// Get all registered form parts
+			IFormPart[] parts = mform.getParts();
+			for (IFormPart part : parts) {
+				if (part instanceof ILaunchConfigurationTabFormPart) {
+					valid &= ((ILaunchConfigurationTabFormPart)part).isValid(configuration);
+					if (!valid) break;
+				}
+			}
+		}
+
+	    return valid;
+	}
 }

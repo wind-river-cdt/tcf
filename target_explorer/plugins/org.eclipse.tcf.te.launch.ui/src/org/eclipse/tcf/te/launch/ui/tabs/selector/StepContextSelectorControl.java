@@ -22,7 +22,7 @@ import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
 import org.eclipse.tcf.te.ui.jface.interfaces.IValidatingContainer;
 
 /**
- * Remote context selector control implementation.
+ * Step context selector control implementation.
  * <p>
  * Default properties:
  * <ul>
@@ -30,7 +30,7 @@ import org.eclipse.tcf.te.ui.jface.interfaces.IValidatingContainer;
  * 	<li>PROPERTY_MULTI_CONTEXT_SELECTOR = true</li>
  * </ul>
  */
-public class RemoteContextSelectorControl extends ContextSelectorControl {
+public class StepContextSelectorControl extends ContextSelectorControl {
 	/**
 	 * Property: If set to <code>true</code>, the control will be created as multi
 	 *           context control. That means that more than one tree item will be
@@ -50,7 +50,7 @@ public class RemoteContextSelectorControl extends ContextSelectorControl {
 	 * @param parentPage The parent target connection page this control is embedded in. Might be
 	 *            		 <code>null</code> if the control is not associated with a page.
      */
-    public RemoteContextSelectorControl(IDialogPage parentPage) {
+    public StepContextSelectorControl(IDialogPage parentPage) {
 	    super(parentPage);
     }
 
@@ -101,7 +101,7 @@ public class RemoteContextSelectorControl extends ContextSelectorControl {
 	 */
 	@Override
 	protected int getTreeViewerStyle() {
-		// For the remote context selector we do want to have checkboxes in front
+		// For the step context selector we do want to have checkboxes in front
 		// of the tree items and allow for multi-selection.
 		return  super.getTreeViewerStyle() & ~SWT.SINGLE | SWT.CHECK | SWT.MULTI;
 	}
@@ -137,7 +137,7 @@ public class RemoteContextSelectorControl extends ContextSelectorControl {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.windriver.ide.target.ui.wizard.controls.WRBaseTargetConnectionPageControl#isValid()
+	 * @see org.eclipse.tcf.te.ui.controls.BaseControl#isValid()
 	 */
 	@Override
 	public boolean isValid() {
