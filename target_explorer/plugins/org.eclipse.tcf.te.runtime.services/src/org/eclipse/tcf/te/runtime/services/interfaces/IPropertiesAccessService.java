@@ -14,8 +14,8 @@ import java.util.Map;
 /**
  * Properties access service.
  * <p>
- * Allows generic access to properties of a given context without having
- * to know all the details and limitations for accessing the desired properties.
+ * Allows generic access to properties of a given context without having to know all the details and
+ * limitations for accessing the desired properties.
  */
 public interface IPropertiesAccessService extends IService {
 
@@ -40,8 +40,8 @@ public interface IPropertiesAccessService extends IService {
 	public Map<String, String> getTargetAddress(Object context);
 
 	/**
-	 * Returns the property value stored under the given property key. If the property
-	 * does not exist, <code>null</code> is returned.
+	 * Returns the property value stored under the given property key. If the property does not
+	 * exist, <code>null</code> is returned.
 	 *
 	 * @param context The context to get the property from. Must not be <code>null</code>.
 	 * @param key The property key. Must not be <code>null</code>.
@@ -49,4 +49,12 @@ public interface IPropertiesAccessService extends IService {
 	 * @return The stored property value or <code>null</code>.
 	 */
 	public Object getProperty(Object context, String key);
+
+	/**
+	 * Returns the direct parent node of the given context object.
+	 *
+	 * @param context The context to get the parent from. Must not be <code>null</code>.
+	 * @return The direct parent node or <code>null</code>.
+	 */
+	public Object getParent(Object context);
 }

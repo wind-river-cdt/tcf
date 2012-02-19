@@ -40,4 +40,28 @@ public interface IStepContext extends IModelNodeProvider {
 	 * @return The context information or <code>null</code>.
 	 */
 	public String getInfo(IPropertiesContainer data);
+
+	/**
+	 * Returns if or if not the associated model node really exist.
+	 *
+	 * @return <code>True</code> if the associated model node really exists, <code>false</code> otherwise.
+	 */
+	public boolean exists();
+
+	/**
+	 * Encodes the context to an persistable representation.
+	 * <p>
+	 * <b>Note:</b> The persistable representation is expected to be a single line.
+	 *
+	 * @return The persistable representation of the context.
+	 */
+	public String encode();
+
+	/**
+	 * Decodes the given persistable representation and store the result
+	 * in the context.
+	 *
+	 * @param value The persistable representation of the context. Must not be <code>null</code>.
+	 */
+	public void decode(String value);
 }

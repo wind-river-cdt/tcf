@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
 import org.eclipse.tcf.te.runtime.model.interfaces.factory.IFactory;
 import org.eclipse.tcf.te.runtime.model.interfaces.factory.IFactoryDelegate;
+import org.eclipse.tcf.te.runtime.model.interfaces.factory.IFactoryDelegate2;
 import org.eclipse.tcf.te.runtime.model.internal.factory.FactoryDelegateManager;
 
 /**
@@ -43,13 +44,8 @@ public final class Factory extends PlatformObject implements IFactory {
 		super();
 	}
 
-	/**
-	 * Creates an new instance of the model node object implementing
-	 * the specified node interface.
-	 *
-	 * @param nodeInterface The node interface to be implemented by the model node object to create.
-	 *                      Must not be <code>null</code>.
-	 * @return The model not object implementing the specified node interface or <code>null</code>.
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.model.interfaces.factory.IFactory#newInstance(java.lang.Class)
 	 */
 	@Override
 	public <V extends IModelNode> V newInstance(Class<V> nodeInterface) {
@@ -58,6 +54,19 @@ public final class Factory extends PlatformObject implements IFactory {
 		// Determine the model node factory delegate to use
 		IFactoryDelegate delegate = manager.getFactoryDelegate(nodeInterface);
 		// Return the model node instance
-		return delegate != null ? (V)delegate.newInstance(nodeInterface) : null;
+		return delegate != null ? (V) delegate.newInstance(nodeInterface) : null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.model.interfaces.factory.IFactory#newInstance(java.lang.Class, java.lang.Object[])
+	 */
+	@Override
+	public <V extends IModelNode> V newInstance(Class<V> nodeInterface, Object[] args) {
+		Assert.isNotNull(nodeInterface);
+
+		// Determine the model node factory delegate to use
+		IFactoryDelegate delegate = manager.getFactoryDelegate(nodeInterface);
+		// Return the model node instance
+		return delegate instanceof IFactoryDelegate2 ? (V) ((IFactoryDelegate2)delegate).newInstance(nodeInterface, args) : null;
 	}
 }

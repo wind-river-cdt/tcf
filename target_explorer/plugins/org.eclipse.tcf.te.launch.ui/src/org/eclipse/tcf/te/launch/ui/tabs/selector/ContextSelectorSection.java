@@ -9,7 +9,11 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.launch.ui.tabs.selector;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.jface.action.Action;
@@ -18,10 +22,13 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tcf.te.launch.core.persistence.ContextSelectorPersistenceDelegate;
 import org.eclipse.tcf.te.launch.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.launch.ui.interfaces.ILaunchConfigurationTabFormPart;
 import org.eclipse.tcf.te.launch.ui.internal.ImageConsts;
 import org.eclipse.tcf.te.launch.ui.nls.Messages;
+import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
 import org.eclipse.tcf.te.ui.forms.parts.AbstractSection;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
@@ -94,7 +101,15 @@ public class ContextSelectorSection extends AbstractSection implements ILaunchCo
 		createSectionToolbar(section, toolkit);
 
 		// Create the section sub controls
-		selector = new StepContextSelectorControl(null);
+		selector = new StepContextSelectorControl(null) {
+			/* (non-Javadoc)
+			 * @see org.eclipse.tcf.te.launch.ui.tabs.selector.StepContextSelectorControl#onModelNodeCheckStateChanged(org.eclipse.tcf.te.runtime.model.interfaces.IModelNode, boolean)
+			 */
+			@Override
+			protected void onModelNodeCheckStateChanged(IModelNode node, boolean checked) {
+				getManagedForm().dirtyStateChanged();
+			}
+		};
 		selector.setFormToolkit(toolkit);
 		selector.setupPanel(client);
 	}
@@ -122,6 +137,24 @@ public class ContextSelectorSection extends AbstractSection implements ILaunchCo
 	 */
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration) {
+		Assert.isNotNull(configuration);
+
+		if (selector != null) {
+			IStepContext[] contexts = ContextSelectorPersistenceDelegate.getLaunchContexts(configuration);
+			if (contexts != null && contexts.length > 0) {
+				// Loop the contexts and create a list of nodes
+				List<IModelNode> nodes = new ArrayList<IModelNode>();
+				for (IStepContext context : contexts) {
+					IModelNode node = context.getModelNode();
+					if (node != null && !nodes.contains(node)) {
+						nodes.add(node);
+					}
+				}
+				if (!nodes.isEmpty()) {
+					selector.setCheckedModelContexts(nodes.toArray(new IModelNode[nodes.size()]));
+				}
+			}
+		}
 	}
 
 	/* (non-Javadoc)
@@ -129,6 +162,28 @@ public class ContextSelectorSection extends AbstractSection implements ILaunchCo
 	 */
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
+		Assert.isNotNull(configuration);
+
+		if (selector != null) {
+			IModelNode[] nodes = selector.getCheckedModelContexts();
+			// Loop the nodes and create a list of step contexts
+			List<IStepContext> contexts = new ArrayList<IStepContext>();
+			for (IModelNode node : nodes) {
+				IStepContext context = (IStepContext)Platform.getAdapterManager().loadAdapter(node, IStepContext.class.getName());
+				if (context != null && !contexts.contains(context)) {
+					contexts.add(context);
+				}
+			}
+
+			// Write the selected contexts to the launch configuration
+			if (!contexts.isEmpty()) {
+				ContextSelectorPersistenceDelegate.setLaunchContexts(configuration, contexts.toArray(new IStepContext[contexts.size()]));
+			} else {
+				ContextSelectorPersistenceDelegate.setLaunchContexts(configuration, null);
+			}
+		} else {
+			ContextSelectorPersistenceDelegate.setLaunchContexts(configuration, null);
+		}
 	}
 
 	/* (non-Javadoc)

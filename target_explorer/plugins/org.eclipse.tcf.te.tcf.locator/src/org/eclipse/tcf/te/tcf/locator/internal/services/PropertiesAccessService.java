@@ -92,4 +92,28 @@ public class PropertiesAccessService extends AbstractService implements IPropert
 	    return value.get();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.services.interfaces.IPropertiesAccessService#getParent(java.lang.Object)
+	 */
+	@Override
+	public Object getParent(final Object context) {
+		Assert.isNotNull(context);
+
+		final AtomicReference<Object> value = new AtomicReference<Object>();
+		if (context instanceof IPeerModel) {
+			final IPeerModel peerModel = (IPeerModel) context;
+
+			Runnable runnable = new Runnable() {
+				@Override
+				public void run() {
+					value.set(peerModel.getParent());
+				}
+			};
+
+			if (Protocol.isDispatchThread()) runnable.run();
+			else Protocol.invokeAndWait(runnable);
+		}
+
+	    return value.get();
+	}
 }

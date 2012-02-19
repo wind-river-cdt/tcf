@@ -13,8 +13,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IAdapterFactory;
+import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.runtime.interfaces.IDisposable;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
+import org.eclipse.tcf.te.tcf.locator.interfaces.IModelListener;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.listener.ModelAdapter;
@@ -35,7 +37,7 @@ public class AdapterFactory implements IAdapterFactory {
      * Constructor.
      */
     public AdapterFactory() {
-    	Model.getModel().addListener(new ModelAdapter() {
+    	final IModelListener listener = new ModelAdapter() {
     		/* (non-Javadoc)
     		 * @see org.eclipse.tcf.te.tcf.locator.listener.ModelAdapter#locatorModelChanged(org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel, org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel, boolean)
     		 */
@@ -47,7 +49,17 @@ public class AdapterFactory implements IAdapterFactory {
     				if (adapter instanceof IDisposable) ((IDisposable)adapter).dispose();
     			}
     		}
-    	});
+    	};
+
+    	Runnable runnable = new Runnable() {
+			@Override
+			public void run() {
+		    	Model.getModel().addListener(listener);
+			}
+		};
+
+		if (Protocol.isDispatchThread()) runnable.run();
+		else Protocol.invokeAndWait(runnable);
     }
 
 	/* (non-Javadoc)

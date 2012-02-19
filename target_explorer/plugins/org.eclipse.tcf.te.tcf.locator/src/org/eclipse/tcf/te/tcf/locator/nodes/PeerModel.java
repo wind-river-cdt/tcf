@@ -35,13 +35,15 @@ public class PeerModel extends ContainerModelNode implements IPeerModel, IWorkin
 	 * Constructor.
 	 *
 	 * @param model The parent locator model. Must not be <code>null</code>.
-	 * @param peer The peer or <code>null</code>.
+	 * @param peer The peer. Must not be <code>null</code>.
 	 */
 	public PeerModel(ILocatorModel model, IPeer peer) {
 		super();
 
 		Assert.isNotNull(model);
 		this.model = model;
+
+		Assert.isNotNull(peer);
 
 		// Set the default properties before enabling the change events.
 		// The properties changed listeners should not be called from the

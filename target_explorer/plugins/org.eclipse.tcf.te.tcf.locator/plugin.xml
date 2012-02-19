@@ -56,4 +56,13 @@
       </service>
    </extension>
 
+<!-- Model node factory delegate contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.model.factoryDelegates">
+      <delegate
+            class="org.eclipse.tcf.te.tcf.locator.internal.ModelNodeFactoryDelegate"
+            id="org.eclipse.tcf.te.tcf.locator.model.factory.delegate">
+         <nodeType class="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+      </delegate>
+   </extension>
+
 </plugin>

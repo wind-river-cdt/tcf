@@ -377,8 +377,12 @@ public class ContextSelectorControl extends BaseDialogPageControl implements ISe
 					// checked, drop the model node and the use the container node only.
 					if (element instanceof IModelNode) {
 						IModelNode node = (IModelNode) element;
-						if (node.getParent() != null && checked.contains(node.getParent())
-								&& !grayed.contains(node.getParent())) {
+
+						// Determine the parent node
+						IPropertiesAccessService service = ServiceManager.getInstance().getService(node, IPropertiesAccessService.class);
+						IModelNode parent = service != null ? (IModelNode)service.getParent(node) : node.getParent();
+
+						if (parent != null && checked.contains(parent) && !grayed.contains(parent)) {
 							continue;
 						}
 					}

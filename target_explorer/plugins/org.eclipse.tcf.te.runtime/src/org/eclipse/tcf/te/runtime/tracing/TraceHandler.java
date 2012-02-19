@@ -194,7 +194,7 @@ public class TraceHandler {
 
 	/**
 	 * Returns the tracer instance. Create a new tracer instance
-	 * on first invokation.
+	 * on first invocation.
 	 *
 	 * @return The tracer instance.
 	 */
@@ -203,6 +203,13 @@ public class TraceHandler {
 			tracer = new Tracer(identifier);
 		}
 		return tracer;
+	}
+
+	/**
+	 * Return the current debug mode.
+	 */
+	public final int getDebugMode() {
+		return getTracer().getDebugMode();
 	}
 
 	/**
