@@ -144,6 +144,14 @@ public class StepContextAdapter extends PlatformObject implements IStepContext {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext#getEncodedClassName()
+	 */
+	@Override
+	public String getEncodedClassName() {
+	    return IPeerModel.class.getName();
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext#decode(java.lang.String)
 	 */
 	@Override

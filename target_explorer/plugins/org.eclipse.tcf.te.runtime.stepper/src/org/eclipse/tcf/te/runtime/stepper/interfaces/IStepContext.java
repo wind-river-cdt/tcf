@@ -58,6 +58,15 @@ public interface IStepContext extends IModelNodeProvider {
 	public String encode();
 
 	/**
+	 * Returns the class name of the encoded context.
+	 * <p>
+	 * The class name is used to load the correct class to decode the persistable representation.
+	 *
+	 * @return The class name of the encoded context.
+	 */
+	public String getEncodedClassName();
+
+	/**
 	 * Decodes the given persistable representation and store the result
 	 * in the context.
 	 *

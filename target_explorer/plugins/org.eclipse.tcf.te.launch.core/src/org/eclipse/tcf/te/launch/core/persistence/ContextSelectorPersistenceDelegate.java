@@ -33,6 +33,7 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.tcf.te.launch.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.IContextSelectorLaunchAttributes;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification;
+import org.eclipse.tcf.te.runtime.model.factory.Factory;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
 import org.osgi.framework.Bundle;
@@ -229,7 +230,7 @@ public class ContextSelectorPersistenceDelegate {
 		Assert.isNotNull(indentation);
 		Assert.isNotNull(context);
 
-		writer.write(indentation + "<context type=\"" + context.getModelNode().getClass().getName() + "\">\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		writer.write(indentation + "<context type=\"" + context.getEncodedClassName() + "\">\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		writer.write(indentation + "\t" + context.encode() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		writer.write(indentation + "</context>\n"); //$NON-NLS-1$
 	}
@@ -437,10 +438,17 @@ public class ContextSelectorPersistenceDelegate {
 					}
 
 					if (clazz != null) {
-						// Try to load the step context
-						IStepContext context = (IStepContext)Platform.getAdapterManager().loadAdapter(clazz, IStepContext.class.getName());
-						if (context != null && !contexts.contains(context)) {
-							contexts.add(context);
+						// Create an instance of this class and try to load the step context
+						Object object = Factory.getInstance().newInstance(clazz);
+						if (object != null) {
+							IStepContext context = (IStepContext)Platform.getAdapterManager().loadAdapter(object, IStepContext.class.getName());
+							if (context != null) {
+								// Decodes the context object
+								context.decode(lastData);
+								if (!contexts.contains(context)) {
+									contexts.add(context);
+								}
+							}
 						}
 					}
 				}
