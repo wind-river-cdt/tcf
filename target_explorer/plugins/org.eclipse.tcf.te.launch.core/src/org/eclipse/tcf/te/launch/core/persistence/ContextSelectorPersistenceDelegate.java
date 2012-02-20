@@ -151,7 +151,7 @@ public class ContextSelectorPersistenceDelegate {
 			}
 			catch (IOException e) {
 				// Export to the string writer failed --> remove attribute from launch configuration
-				if (CoreBundleActivator.getTraceHandler().getDebugMode() > 0) {
+				if (Platform.inDebugMode()) {
 					IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
 												"Launch framework internal error: " + e.getLocalizedMessage(), e); //$NON-NLS-1$
 					Platform.getLog(CoreBundleActivator.getContext().getBundle()).log(status);
@@ -292,7 +292,7 @@ public class ContextSelectorPersistenceDelegate {
 				}
 				catch (Exception e) {
 					// Import failed --> remove attribute from launch configuration
-					if (CoreBundleActivator.getTraceHandler().getDebugMode() > 0) {
+					if (Platform.inDebugMode()) {
 						IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
 													"Launch framework internal error: " + e.getLocalizedMessage(), e); //$NON-NLS-1$
 						Platform.getLog(CoreBundleActivator.getContext().getBundle()).log(status);
@@ -400,7 +400,7 @@ public class ContextSelectorPersistenceDelegate {
 					try {
 						clazz = (Class<IModelNode>)CoreBundleActivator.getContext().getBundle().loadClass(lastType);
 					} catch (ClassNotFoundException e) {
-						if (CoreBundleActivator.getTraceHandler().getDebugMode() > 0) {
+						if (Platform.inDebugMode()) {
 							IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
 														"Launch framework internal error: " + e.getLocalizedMessage(), e); //$NON-NLS-1$
 							Platform.getLog(CoreBundleActivator.getContext().getBundle()).log(status);
@@ -428,7 +428,7 @@ public class ContextSelectorPersistenceDelegate {
 							try {
 								clazz = (Class<IModelNode>)bundle.loadClass(lastType);
 							} catch (ClassNotFoundException e) {
-								if (CoreBundleActivator.getTraceHandler().getDebugMode() > 0) {
+								if (Platform.inDebugMode()) {
 									IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
 																"Launch framework internal error: " + e.getLocalizedMessage(), e); //$NON-NLS-1$
 									Platform.getLog(CoreBundleActivator.getContext().getBundle()).log(status);
@@ -443,10 +443,18 @@ public class ContextSelectorPersistenceDelegate {
 						if (object != null) {
 							IStepContext context = (IStepContext)Platform.getAdapterManager().loadAdapter(object, IStepContext.class.getName());
 							if (context != null) {
-								// Decodes the context object
-								context.decode(lastData);
-								if (!contexts.contains(context)) {
-									contexts.add(context);
+								try {
+									// Decodes the context object
+									context.decode(lastData);
+									if (!contexts.contains(context)) {
+										contexts.add(context);
+									}
+								} catch (IOException e) {
+									if (Platform.inDebugMode()) {
+										IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
+																	"Launch framework internal error: " + e.getLocalizedMessage(), e); //$NON-NLS-1$
+										Platform.getLog(CoreBundleActivator.getContext().getBundle()).log(status);
+									}
 								}
 							}
 						}

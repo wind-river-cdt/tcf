@@ -23,13 +23,13 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.internal.ModelNodeFactoryDelegate;
 
 /**
- * Illegal peer model node implementation. All methods does throw an {@link IllegalStateException}.
+ * Invalid peer model node implementation. All methods does throw an {@link IllegalStateException}.
  * <p>
  * Objects of this class are returned by the {@link ModelNodeFactoryDelegate} if calling
  * {@link IFactoryDelegate#newInstance(Class)}. All what objects of this class can be used for is
  * loading adapters.
  */
-public final class IllegalPeerModel implements IPeerModel {
+public final class InvalidPeerModel implements IPeerModel {
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.runtime.model.interfaces.IContainerModelNode#add(org.eclipse.tcf.te.runtime.model.interfaces.IModelNode)

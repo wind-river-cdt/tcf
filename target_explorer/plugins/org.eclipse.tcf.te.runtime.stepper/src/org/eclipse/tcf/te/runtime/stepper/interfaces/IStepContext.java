@@ -9,6 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.runtime.stepper.interfaces;
 
+import java.io.IOException;
+
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNodeProvider;
 
@@ -71,6 +73,7 @@ public interface IStepContext extends IModelNodeProvider {
 	 * in the context.
 	 *
 	 * @param value The persistable representation of the context. Must not be <code>null</code>.
+	 * @throws IOException - if the decode operation fails
 	 */
-	public void decode(String value);
+	public void decode(String value) throws IOException;
 }

@@ -14,7 +14,7 @@ import org.eclipse.tcf.te.runtime.model.factory.AbstractFactoryDelegate2;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
-import org.eclipse.tcf.te.tcf.locator.internal.nodes.IllegalPeerModel;
+import org.eclipse.tcf.te.tcf.locator.internal.nodes.InvalidPeerModel;
 import org.eclipse.tcf.te.tcf.locator.nodes.PeerModel;
 
 /**
@@ -29,7 +29,7 @@ public class ModelNodeFactoryDelegate extends AbstractFactoryDelegate2 {
     @Override
 	public <V extends IModelNode> V newInstance(Class<V> nodeInterface) {
 		if (IPeerModel.class.equals(nodeInterface)) {
-			return (V) new IllegalPeerModel();
+			return (V) new InvalidPeerModel();
 		}
 		return null;
 	}

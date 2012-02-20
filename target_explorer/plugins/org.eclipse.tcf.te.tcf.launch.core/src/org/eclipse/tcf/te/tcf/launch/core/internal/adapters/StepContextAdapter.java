@@ -16,17 +16,28 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.PlatformObject;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.tcf.core.TransientPeer;
+import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.JSON;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
+import org.eclipse.tcf.te.tcf.launch.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelLookupService;
+import org.eclipse.tcf.te.tcf.locator.internal.nodes.InvalidPeerModel;
+import org.eclipse.tcf.te.tcf.locator.model.Model;
+import org.eclipse.tcf.te.tcf.locator.nodes.PeerModel;
 
 /**
  * Peer model step context adapter implementation.
  */
+@SuppressWarnings("restriction")
 public class StepContextAdapter extends PlatformObject implements IStepContext {
 	// Reference to the wrapped peer model
 	/* default */ IPeerModel peerModel;
@@ -133,7 +144,13 @@ public class StepContextAdapter extends PlatformObject implements IStepContext {
 
 	                encoded.set(JSON.toJSON(attrs));
                 }
-                catch (IOException e) { /* ignored on purpose */ }
+                catch (IOException e) {
+					if (Platform.inDebugMode()) {
+						IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
+													"StepContextAdapter encode failure: " + e.getLocalizedMessage(), e); //$NON-NLS-1$
+						Platform.getLog(CoreBundleActivator.getContext().getBundle()).log(status);
+					}
+                }
 			}
 		};
 
@@ -155,7 +172,53 @@ public class StepContextAdapter extends PlatformObject implements IStepContext {
 	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext#decode(java.lang.String)
 	 */
 	@Override
-	public void decode(String value) {
+	public void decode(final String value) throws IOException {
 		Assert.isNotNull(value);
+
+		final AtomicReference<IOException> error = new AtomicReference<IOException>();
+
+		Runnable runnable = new Runnable() {
+            @Override
+			public void run() {
+				try {
+					Object o = JSON.parseOne(value.getBytes("UTF-8")); //$NON-NLS-1$
+					// The decoded object should be a map
+					if (o instanceof Map) {
+						@SuppressWarnings("unchecked")
+                        Map<String, String> attrs = (Map<String, String>)o;
+
+						// Get the id of the decoded attributes
+						String id = attrs.get("ID"); //$NON-NLS-1$
+						if (id == null) throw new IOException("StepContextAdapter#decode: Mandatory attribure 'ID' is missing."); //$NON-NLS-1$
+
+						// If the ID is matching the associated peer model, than we are done here
+						if (peerModel != null && !(peerModel instanceof InvalidPeerModel) && peerModel.getPeerId().equals(id)) {
+							return;
+						}
+
+						// Lookup the id within the model
+						IPeerModel candidate = Model.getModel().getService(ILocatorModelLookupService.class).lkupPeerModelById(id);
+						if (candidate != null) {
+							peerModel = candidate;
+							return;
+						}
+
+						// Not found in the model -> create a ghost object
+						IPeer peer = new TransientPeer(attrs);
+						peerModel = new PeerModel(Model.getModel(), peer);
+						peerModel.setProperty(IModelNode.PROPERTY_IS_GHOST, true);
+					} else {
+						throw new IOException("StepContextAdapter#decode: Object not of map type."); //$NON-NLS-1$
+					}
+				} catch (IOException e) {
+					error.set(e);
+				}
+			}
+		};
+
+		if (Protocol.isDispatchThread()) runnable.run();
+		else Protocol.invokeAndWait(runnable);
+
+		if (error.get() != null) throw error.get();
 	}
 }
