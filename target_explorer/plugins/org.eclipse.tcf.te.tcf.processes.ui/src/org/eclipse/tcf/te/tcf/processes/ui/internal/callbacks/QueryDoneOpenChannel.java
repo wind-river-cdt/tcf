@@ -22,15 +22,27 @@ import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 public class QueryDoneOpenChannel implements IChannelManager.DoneOpenChannel {
 	// The parent node to be queried.
 	ProcessTreeNode parentNode;
+	// The callback object.
+	Runnable callback;
+	
+	/**
+	 * Create an instance with a process model and a parent node.
+	 * 
+	 * @param parentNode The parent node to be queried.
+	 */
+	public QueryDoneOpenChannel(ProcessTreeNode parentNode) {
+		this(parentNode, null);
+	}
 
 	/**
 	 * Create an instance with a process model and a parent node.
 	 * 
-	 * @param model The process model.
 	 * @param parentNode The parent node to be queried.
+	 * @param callback The callback object.
 	 */
-	public QueryDoneOpenChannel(ProcessTreeNode parentNode) {
+	public QueryDoneOpenChannel(ProcessTreeNode parentNode, Runnable callback) {
 		this.parentNode = parentNode;
+		this.callback = callback;
 	}
 	
 	/*
@@ -41,6 +53,21 @@ public class QueryDoneOpenChannel implements IChannelManager.DoneOpenChannel {
     public void doneOpenChannel(Throwable error, final IChannel channel) {
 		Assert.isTrue(Protocol.isDispatchThread());
 		if (error == null && channel != null) {
+			IChannel.IChannelListener listener = new IChannel.IChannelListener(){
+				@Override
+                public void onChannelOpened() {
+                }
+				@Override
+                public void onChannelClosed(Throwable error) {
+					channel.removeChannelListener(this);
+					if(callback != null) {
+						callback.run();
+					}
+                }
+				@Override
+                public void congestionLevel(int level) {
+                }};
+            channel.addChannelListener(listener);
 			ISysMonitor service = channel.getRemoteService(ISysMonitor.class);
 			if (service != null) {
 				service.getChildren(parentNode.id, new QueryDoneGetChildren(channel, service, parentNode));

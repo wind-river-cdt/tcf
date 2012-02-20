@@ -22,6 +22,8 @@ import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 public class QueryDoneOpenChannel implements DoneOpenChannel {
 	// The parent node to be queried.
 	FSTreeNode parentNode;
+	// Callback object.
+	Runnable callback;
 
 	/**
 	 * Create an instance with a parent node.
@@ -29,7 +31,18 @@ public class QueryDoneOpenChannel implements DoneOpenChannel {
 	 * @param parentNode The parent node.
 	 */
 	public QueryDoneOpenChannel(FSTreeNode parentNode) {
+		this(parentNode, null);
+	}
+
+	/**
+	 * Create an instance with a parent node.
+	 * 
+	 * @param parentNode The parent node.
+	 * @param callback Callback object.
+	 */
+	public QueryDoneOpenChannel(FSTreeNode parentNode, Runnable callback) {
 		this.parentNode = parentNode;
+		this.callback = callback;
     }
 
 	/*
@@ -37,9 +50,25 @@ public class QueryDoneOpenChannel implements DoneOpenChannel {
 	 * @see org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel#doneOpenChannel(java.lang.Throwable, org.eclipse.tcf.protocol.IChannel)
 	 */
 	@Override
-	public void doneOpenChannel(Throwable error, IChannel channel) {
+	public void doneOpenChannel(Throwable error, final IChannel channel) {
 		Assert.isTrue(Protocol.isDispatchThread());
 		if(error == null && channel != null) {
+			IChannel.IChannelListener listener = new IChannel.IChannelListener() {
+				@Override
+				public void onChannelOpened() {
+				}
+				@Override
+				public void onChannelClosed(Throwable error) {
+					channel.removeChannelListener(this);
+					if(callback != null) {
+						callback.run();
+					}
+				}
+				@Override
+				public void congestionLevel(int level) {
+				}
+			};
+			channel.addChannelListener(listener);
 			IFileSystem service = channel.getRemoteService(IFileSystem.class);
 			if(service != null) {
 				if(parentNode.isSystemRoot()) {
