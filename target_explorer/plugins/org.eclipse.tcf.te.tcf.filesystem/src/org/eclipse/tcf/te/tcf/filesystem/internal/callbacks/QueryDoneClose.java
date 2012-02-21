@@ -13,54 +13,42 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
-import org.eclipse.tcf.services.IFileSystem.DirEntry;
-import org.eclipse.tcf.services.IFileSystem.DoneRoots;
+import org.eclipse.tcf.services.IFileSystem.DoneClose;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 
 /**
- * The callback handler that handles the event when the roots are listed.
+ * The callback handler that handles the event when a directory is closed.
  */
-public class QueryDoneRoots implements DoneRoots {
-	// The channel being used.
+public class QueryDoneClose implements DoneClose {
+	// The tcf channel.
 	IChannel channel;
-	// The parent directory node.
+	// The parent node being queried.
 	FSTreeNode parentNode;
-	// The callback object
+	// The callback object.
 	ICallback callback;
 
 	/**
-	 * Create an instance with parameters to initialize the fields.
+	 * Constructor
 	 * 
-	 * @param callback the callback.
-	 * @param channel The tcf channel.
-	 * @param parentNode The parent directory node.
+	 * @param callback The callback object.
+	 * @param channel The channel to close.
+	 * @param parentNode The parent node
 	 */
-	public QueryDoneRoots(ICallback callback, IChannel channel, FSTreeNode parentNode) {
+	public QueryDoneClose(ICallback callback, IChannel channel, FSTreeNode parentNode) {
 		this.callback = callback;
 		this.channel = channel;
 		this.parentNode = parentNode;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.services.IFileSystem.DoneRoots#doneRoots(org.eclipse.tcf.protocol.IToken, org.eclipse.tcf.services.IFileSystem.FileSystemException, org.eclipse.tcf.services.IFileSystem.DirEntry[])
+	 * @see org.eclipse.tcf.services.IFileSystem.DoneClose#doneClose(org.eclipse.tcf.protocol.IToken, org.eclipse.tcf.services.IFileSystem.FileSystemException)
 	 */
 	@Override
-	public void doneRoots(IToken token, FileSystemException error, DirEntry[] entries) {
-		if (error == null) {
-			if (entries.length > 0) {
-				for (DirEntry entry : entries) {
-					FSTreeNode node = new FSTreeNode(parentNode, entry, true);
-					parentNode.addChild(node);
-				}
-			}
-			else {
-				parentNode.clearChildren();
-			}
-		}
+	public void doneClose(IToken token, FileSystemException error) {
 		if(callback != null) {
 			IStatus status = error == null ? Status.OK_STATUS : new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), error.getLocalizedMessage(), error);
 			callback.done(this, status);

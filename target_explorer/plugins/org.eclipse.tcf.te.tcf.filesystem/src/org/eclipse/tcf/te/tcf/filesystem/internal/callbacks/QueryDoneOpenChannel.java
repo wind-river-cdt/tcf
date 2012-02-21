@@ -10,11 +10,18 @@
 package org.eclipse.tcf.te.tcf.filesystem.internal.callbacks;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IFileSystem;
+import org.eclipse.tcf.te.runtime.callback.Callback;
+import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
+import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel;
+import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
+import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 
 /**
  * The callback handler that handles the event when the channel opens.
@@ -23,7 +30,7 @@ public class QueryDoneOpenChannel implements DoneOpenChannel {
 	// The parent node to be queried.
 	FSTreeNode parentNode;
 	// Callback object.
-	Runnable callback;
+	ICallback callback;
 
 	/**
 	 * Create an instance with a parent node.
@@ -40,7 +47,7 @@ public class QueryDoneOpenChannel implements DoneOpenChannel {
 	 * @param parentNode The parent node.
 	 * @param callback Callback object.
 	 */
-	public QueryDoneOpenChannel(FSTreeNode parentNode, Runnable callback) {
+	public QueryDoneOpenChannel(FSTreeNode parentNode, ICallback callback) {
 		this.parentNode = parentNode;
 		this.callback = callback;
     }
@@ -52,32 +59,34 @@ public class QueryDoneOpenChannel implements DoneOpenChannel {
 	@Override
 	public void doneOpenChannel(Throwable error, final IChannel channel) {
 		Assert.isTrue(Protocol.isDispatchThread());
+		ICallback proxy = new Callback(){
+			@Override
+            protected void internalDone(Object caller, IStatus status) {
+				// Reset the children query markers
+				parentNode.childrenQueryRunning = false;
+				parentNode.childrenQueried = true;
+				Tcf.getChannelManager().closeChannel(channel);
+				if(callback != null) {
+					callback.done(this, status);
+				}
+            }
+		};
 		if(error == null && channel != null) {
-			IChannel.IChannelListener listener = new IChannel.IChannelListener() {
-				@Override
-				public void onChannelOpened() {
-				}
-				@Override
-				public void onChannelClosed(Throwable error) {
-					channel.removeChannelListener(this);
-					if(callback != null) {
-						callback.run();
-					}
-				}
-				@Override
-				public void congestionLevel(int level) {
-				}
-			};
-			channel.addChannelListener(listener);
 			IFileSystem service = channel.getRemoteService(IFileSystem.class);
 			if(service != null) {
 				if(parentNode.isSystemRoot()) {
-					service.roots(new QueryDoneRoots(channel, parentNode));
+					service.roots(new QueryDoneRoots(proxy, channel, parentNode));
 				} else {
 					String absPath = parentNode.getLocation();
-					service.opendir(absPath, new QueryDoneOpen(channel, service, parentNode));
+					service.opendir(absPath, new QueryDoneOpen(proxy, channel, service, parentNode));
 				}
+			} else {
+				Status status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), Messages.QueryDoneOpenChannel_NoFService, null);
+				proxy.done(this, status);
 			}
+		} else {
+			IStatus status = error == null ? Status.OK_STATUS : new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), error.getLocalizedMessage(), error);
+			proxy.done(this, status);
 		}
 	}
 }

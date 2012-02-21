@@ -9,12 +9,16 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.callbacks;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.DoneOpen;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.services.IFileSystem.IFileHandle;
+import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
+import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 
 /**
@@ -27,15 +31,19 @@ public class QueryDoneOpen implements DoneOpen {
 	IFileSystem service;
 	// The parent node being queried.
 	FSTreeNode parentNode;
+	// The callback
+	ICallback callback;
 
 	/**
 	 * Create an instance with parameters to initialize the fields.
 	 * 
+	 * @param callback the callback
 	 * @param channel The tcf channel.
 	 * @param service The file system service.
 	 * @param node The parent node.
 	 */
-	public QueryDoneOpen(IChannel channel, IFileSystem service, FSTreeNode node) {
+	public QueryDoneOpen(ICallback callback, IChannel channel, IFileSystem service, FSTreeNode node) {
+		this.callback = callback;
 		this.channel = channel;
 		this.service = service;
 		this.parentNode = node;
@@ -49,12 +57,11 @@ public class QueryDoneOpen implements DoneOpen {
 	public void doneOpen(IToken token, FileSystemException error, IFileHandle handle) {
 		if (error == null) {
 			// Read the directory content until finished
-			service.readdir(handle, new QueryDoneReadDir(channel, service, handle, parentNode));
+			service.readdir(handle, new QueryDoneReadDir(callback, channel, service, handle, parentNode));
 		}
-		else {
-			// In case of an error, we are done here
-			parentNode.childrenQueryRunning = false;
-			parentNode.childrenQueried = true;
+		else if (callback != null) {
+			IStatus status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), error.getLocalizedMessage(), error);
+			callback.done(this, status);
 		}
 	}
 }

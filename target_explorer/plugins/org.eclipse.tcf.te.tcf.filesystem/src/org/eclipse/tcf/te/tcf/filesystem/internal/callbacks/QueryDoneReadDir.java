@@ -9,13 +9,16 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.callbacks;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.DirEntry;
 import org.eclipse.tcf.services.IFileSystem.DoneReadDir;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
-import org.eclipse.tcf.te.tcf.core.Tcf;
+import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
+import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 
 /**
@@ -30,7 +33,8 @@ public class QueryDoneReadDir implements DoneReadDir {
 	IFileSystem.IFileHandle handle;
 	// The parent node being queried.
 	FSTreeNode parentNode;
-	
+	// The callback object.
+	ICallback callback;
 	/**
 	 * Create an instance with parameters to initialize the fields.
 	 * 
@@ -39,7 +43,8 @@ public class QueryDoneReadDir implements DoneReadDir {
 	 * @param handle The directory's file handle.
 	 * @param parentNode The parent directory.
 	 */
-	public QueryDoneReadDir(IChannel channel, IFileSystem service, IFileSystem.IFileHandle handle, FSTreeNode parentNode) {
+	public QueryDoneReadDir(ICallback callback, IChannel channel, IFileSystem service, IFileSystem.IFileHandle handle, FSTreeNode parentNode) {
+		this.callback = callback;
 		this.channel = channel;
 		this.service = service;
 		this.handle = handle;
@@ -63,23 +68,18 @@ public class QueryDoneReadDir implements DoneReadDir {
 			else {
 				parentNode.clearChildren();
 			}
-		}
 
-		if (eof) {
-			// Close the handle and channel if EOF is signaled or an error occurred.
-			service.close(handle, new IFileSystem.DoneClose() {
-				@Override
-				public void doneClose(IToken token, FileSystemException error) {
-					Tcf.getChannelManager().closeChannel(channel);
-				}
-			});
-			// Reset the children query markers
-			parentNode.childrenQueryRunning = false;
-			parentNode.childrenQueried = true;
-		}
-		else {
-			// And invoke ourself again
-			service.readdir(handle, new QueryDoneReadDir(channel, service, handle, parentNode));
+			if (eof) {
+				// Close the handle and channel if EOF is signaled or an error occurred.
+				service.close(handle, new QueryDoneClose(callback, channel, parentNode));
+			}
+			else {
+				// And invoke ourself again
+				service.readdir(handle, new QueryDoneReadDir(callback, channel, service, handle, parentNode));
+			}
+		} else if(callback != null) {
+			Status status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), error.getLocalizedMessage(), error);
+			callback.done(this, status);
 		}
 	}
 }
