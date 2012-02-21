@@ -9,11 +9,18 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.processes.ui.internal.callbacks;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
+import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
+import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
 
 /**
  * A helper class used to synchronize multiple threads. It is used
@@ -89,19 +96,19 @@ import org.eclipse.core.runtime.Assert;
  */
 public class CallbackMonitor {
 	// The callback which is invoked after all the locks are unlocked.
-	private Runnable callback;
-	// The lock map containing the keys and the corresponding values.
-	private Map<Object, Boolean> locks;
+	private ICallback callback;
+	// The lock map containing the keys and the corresponding running results.
+	private Map<Object, IStatus> locks;
 	
 	/**
 	 * Create a callback monitor with the specified callback.
 	 * 
 	 * @param callback The callback to be invoked after all the locks being unlocked.
 	 */
-	public CallbackMonitor(Runnable callback) {
+	public CallbackMonitor(ICallback callback) {
 		Assert.isNotNull(callback);
 		this.callback = callback;
-		this.locks = Collections.synchronizedMap(new HashMap<Object, Boolean>());
+		this.locks = Collections.synchronizedMap(new HashMap<Object, IStatus>());
 	}
 	
 	/**
@@ -110,12 +117,12 @@ public class CallbackMonitor {
 	 * @param callback The callback to be invoked after all the locks being unlocked.
 	 * @param keys The keys to lock and unlock the locks.
 	 */
-	public CallbackMonitor(Runnable callback, Object... keys) {
+	public CallbackMonitor(ICallback callback, Object... keys) {
 		Assert.isNotNull(callback);
 		this.callback = callback;
-		this.locks = Collections.synchronizedMap(new HashMap<Object, Boolean>());
+		this.locks = Collections.synchronizedMap(new HashMap<Object, IStatus>());
 		for (Object key : keys) {
-			this.locks.put(key, Boolean.FALSE);
+			this.locks.put(key, null);
 		}
 	}
 	
@@ -126,7 +133,7 @@ public class CallbackMonitor {
 	 */
 	public synchronized void lock(Object... keys) {
 		for(Object key : keys) {
-			this.locks.put(key, Boolean.FALSE);
+			this.locks.put(key, null);
 		}
 	}
 	
@@ -136,35 +143,40 @@ public class CallbackMonitor {
 	 * @param key The key whose lock is added.
 	 */
 	public synchronized void lock(Object key) {
-		this.locks.put(key, Boolean.FALSE);
+		Assert.isNotNull(key);
+		this.locks.put(key, null);
 	}
 
 	/**
-	 * Unlock the lock with the specified key and check
-	 * if all the locks have been unlocked. If all the locks
-	 * have been unlocked, then invoke the callback.
+	 * Unlock the lock with the specified key and status 
+	 * check if all the locks have been unlocked. If all the 
+	 * locks have been unlocked, then invoke the callback.
 	 * 
 	 * @param key The key to unlock its lock.
 	 */
-	public synchronized void unlock(Object key) {
+	public synchronized void unlock(Object key, IStatus status) {
 		Assert.isNotNull(key);
-		locks.put(key, Boolean.TRUE);
-		if (isComplete()) {
-			callback.run();
+		Assert.isNotNull(status);
+		locks.put(key, status);
+		IStatus current = getCurrentStatus();
+		if (current != null) {
+			callback.done(this, current);
 		}
 	}
 
 	/**
-	 * Check if all the locks are unlocked.
+	 * Check if all the locks are unlocked and return a running status.
 	 * 
-	 * @return true if all the locks are unlocked or else false.
+	 * @return a MultiStatus object describing running result or null if not completed yet.
 	 */
-	private synchronized boolean isComplete() {
+	private synchronized IStatus getCurrentStatus() {
+		List<IStatus> list = new ArrayList<IStatus>();
 		for (Object key : locks.keySet()) {
-			Boolean value = locks.get(key);
-			Assert.isNotNull(value);
-			if (!value.booleanValue()) return false;
+			IStatus status = locks.get(key);
+			if (status == null) return null;
+			list.add(status);
 		}
-		return true;
+		IStatus[] children = list.toArray(new IStatus[list.size()]); 
+		return new MultiStatus(UIPlugin.getUniqueIdentifier(), 0, children, Messages.CallbackMonitor_AllTasksFinished, null);
 	}
 }

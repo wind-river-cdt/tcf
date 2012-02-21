@@ -14,17 +14,20 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.IProcesses.ProcessContext;
 import org.eclipse.tcf.services.ISysMonitor;
+import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 
 /**
  * The callback handler that handles the result of service.getContext when refreshing.
  */
-public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext, IProcesses.DoneGetContext, Runnable {
+public class RefreshDoneGetContext extends Callback implements ISysMonitor.DoneGetContext, IProcesses.DoneGetContext {
 	// The current context id.
 	String contextId;
 	// The parent node to be refreshed.
@@ -139,7 +142,7 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext, IProce
 					}
 					childNode = node;
 					newNodes.add(childNode);
-					monitor.unlock(contextId);
+					monitor.unlock(contextId, Status.OK_STATUS);
 				}
 				else {
 					ISysMonitor service = channel.getRemoteService(ISysMonitor.class);
@@ -149,7 +152,7 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext, IProce
 				}
 			}
 			else {
-				monitor.unlock(contextId);
+				monitor.unlock(contextId, Status.OK_STATUS);
 			}
 		}
 	}
@@ -159,9 +162,9 @@ public class RefreshDoneGetContext implements ISysMonitor.DoneGetContext, IProce
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run() {
+	protected void internalDone(Object caller, IStatus status) {
 		parentNode.addChild(childNode);
 		newNodes.add(childNode);
-		monitor.unlock(contextId);
+		monitor.unlock(contextId, status);
     }
 }

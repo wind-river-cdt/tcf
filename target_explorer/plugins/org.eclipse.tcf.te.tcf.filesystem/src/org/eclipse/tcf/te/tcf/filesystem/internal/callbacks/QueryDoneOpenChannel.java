@@ -67,7 +67,7 @@ public class QueryDoneOpenChannel implements DoneOpenChannel {
 				parentNode.childrenQueried = true;
 				Tcf.getChannelManager().closeChannel(channel);
 				if(callback != null) {
-					callback.done(this, status);
+					callback.done(caller, status);
 				}
             }
 		};

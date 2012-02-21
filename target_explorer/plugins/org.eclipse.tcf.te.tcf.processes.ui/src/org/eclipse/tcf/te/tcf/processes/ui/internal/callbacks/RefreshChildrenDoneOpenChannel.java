@@ -15,9 +15,12 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.ISysMonitor;
+import org.eclipse.tcf.te.runtime.callback.Callback;
+import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
@@ -46,14 +49,14 @@ public class RefreshChildrenDoneOpenChannel implements IChannelManager.DoneOpenC
 		if (error == null && channel != null) {
 			ISysMonitor service = channel.getRemoteService(ISysMonitor.class);
 			if (service != null) {
-				CallbackMonitor monitor = new CallbackMonitor(new Runnable(){
+				CallbackMonitor monitor = new CallbackMonitor(new Callback(){
 					@Override
-                    public void run() {
+					protected void internalDone(Object caller, IStatus status) {
 						Tcf.getChannelManager().closeChannel(channel);
                     }}, getChildrenIds());
 				for (ProcessTreeNode child : parentNode.getChildren()) {
 					if (!child.childrenQueried && !child.childrenQueryRunning) {
-						Runnable callback = new RefreshChildrenDoneCallback(child.id, monitor);
+						ICallback callback = new RefreshChildrenDoneCallback(child.id, monitor);
 						Queue<ProcessTreeNode> queue = new ConcurrentLinkedQueue<ProcessTreeNode>();
 						ISysMonitor.DoneGetChildren done = new RefreshDoneGetChildren(callback, queue, channel, service, child);
 						service.getChildren(child.id, done);

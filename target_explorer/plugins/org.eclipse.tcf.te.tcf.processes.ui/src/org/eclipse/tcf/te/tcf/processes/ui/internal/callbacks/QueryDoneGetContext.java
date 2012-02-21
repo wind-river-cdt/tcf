@@ -12,17 +12,20 @@ package org.eclipse.tcf.te.tcf.processes.ui.internal.callbacks;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.IProcesses.ProcessContext;
 import org.eclipse.tcf.services.ISysMonitor;
+import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 
 /**
  * The callback handler that handles the result of service.getContext when querying.
  */
-public class QueryDoneGetContext implements ISysMonitor.DoneGetContext, IProcesses.DoneGetContext, Runnable {
+public class QueryDoneGetContext extends Callback implements ISysMonitor.DoneGetContext, IProcesses.DoneGetContext {
 	// The current context id.
 	String contextId;
 	// The channel used for query.
@@ -86,7 +89,7 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext, IProcess
 					service.getChildren(childNode.id, new RefreshDoneGetChildren(this, queue, channel, service, childNode));
 				}
 			} else {
-				run();
+				done(this, Status.OK_STATUS);
 			}
 		}
     }
@@ -109,10 +112,10 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext, IProcess
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run() {
+	protected void internalDone(Object caller, IStatus status) {
 		if(childNode != null) {
 			parentNode.addChild(childNode);
 		}
-		monitor.unlock(contextId);
+		monitor.unlock(contextId, status);
     }
 }

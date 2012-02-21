@@ -10,10 +10,16 @@
 package org.eclipse.tcf.te.tcf.processes.ui.internal.callbacks;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.ISysMonitor;
+import org.eclipse.tcf.te.runtime.callback.Callback;
+import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
+import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
+import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 
 /**
@@ -23,7 +29,7 @@ public class QueryDoneOpenChannel implements IChannelManager.DoneOpenChannel {
 	// The parent node to be queried.
 	ProcessTreeNode parentNode;
 	// The callback object.
-	Runnable callback;
+	ICallback callback;
 	
 	/**
 	 * Create an instance with a process model and a parent node.
@@ -40,7 +46,7 @@ public class QueryDoneOpenChannel implements IChannelManager.DoneOpenChannel {
 	 * @param parentNode The parent node to be queried.
 	 * @param callback The callback object.
 	 */
-	public QueryDoneOpenChannel(ProcessTreeNode parentNode, Runnable callback) {
+	public QueryDoneOpenChannel(ProcessTreeNode parentNode, ICallback callback) {
 		this.parentNode = parentNode;
 		this.callback = callback;
 	}
@@ -53,25 +59,27 @@ public class QueryDoneOpenChannel implements IChannelManager.DoneOpenChannel {
     public void doneOpenChannel(Throwable error, final IChannel channel) {
 		Assert.isTrue(Protocol.isDispatchThread());
 		if (error == null && channel != null) {
-			IChannel.IChannelListener listener = new IChannel.IChannelListener(){
-				@Override
-                public void onChannelOpened() {
-                }
-				@Override
-                public void onChannelClosed(Throwable error) {
-					channel.removeChannelListener(this);
-					if(callback != null) {
-						callback.run();
-					}
-                }
-				@Override
-                public void congestionLevel(int level) {
-                }};
-            channel.addChannelListener(listener);
 			ISysMonitor service = channel.getRemoteService(ISysMonitor.class);
 			if (service != null) {
-				service.getChildren(parentNode.id, new QueryDoneGetChildren(channel, service, parentNode));
+				service.getChildren(parentNode.id, new QueryDoneGetChildren(new Callback(){
+					@Override
+                    protected void internalDone(Object caller, IStatus status) {
+						parentNode.childrenQueryRunning = false;
+						parentNode.childrenQueried = true;
+						Tcf.getChannelManager().closeChannel(channel);
+						if(callback != null) {
+							callback.done(caller, status);
+						}
+                    }
+				}, channel, service, parentNode));
 			}
+			else if (callback != null) {
+				callback.done(this, Status.OK_STATUS);
+			}
+		}
+		else if (callback != null) {
+			IStatus status = error == null ? Status.OK_STATUS : new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), error.getLocalizedMessage(), error);
+			callback.done(this, status);
 		}
     }
 }

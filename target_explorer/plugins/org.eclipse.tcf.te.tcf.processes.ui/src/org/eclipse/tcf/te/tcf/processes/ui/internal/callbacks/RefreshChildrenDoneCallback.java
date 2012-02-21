@@ -9,11 +9,14 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.processes.ui.internal.callbacks;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.tcf.te.runtime.callback.Callback;
+
 
 /**
  * The callback invoked after refreshing the children of a process node. 
  */
-public class RefreshChildrenDoneCallback implements Runnable {
+public class RefreshChildrenDoneCallback extends Callback {
 	// The monitor to unlock the current node.
 	private CallbackMonitor monitor;
 	// This process' context id.
@@ -32,7 +35,7 @@ public class RefreshChildrenDoneCallback implements Runnable {
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-	public void run() {
-		monitor.unlock(contextId);
+	protected void internalDone(Object caller, IStatus status) {
+		monitor.unlock(contextId, status);
 	}
 }

@@ -15,9 +15,13 @@ import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.te.runtime.callback.Callback;
+import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
@@ -139,9 +143,9 @@ public class ProcessModel implements IPreferenceConsts{
 	    TimerTask pollingTask = new TimerTask(){
 			@Override
 	        public void run() {
-				refresh(new Runnable() {
+				refresh(new Callback() {
 					@Override
-					public void run() {
+					protected void internalDone(Object caller, IStatus status) {
 						if (!stopped) {
 							schedulePolling();
 						}
@@ -202,16 +206,10 @@ public class ProcessModel implements IPreferenceConsts{
 	 * @param parentNode The process context node. Must not be <code>null</code>.
 	 * @param callback The callback object, or <code>null</code> when callback is not needed.
 	 */
-	public void refresh(final ProcessTreeNode parentNode, final Runnable callback) {
+	public void refresh(final ProcessTreeNode parentNode, final ICallback callback) {
 		Assert.isNotNull(parentNode);
 		parentNode.childrenQueryRunning = true;
-		Tcf.getChannelManager().openChannel(parentNode.peerNode.getPeer(), false, new RefreshDoneOpenChannel(new Runnable(){
-			@Override
-            public void run() {
-	            if(callback != null) {
-	            	callback.run();
-	            }
-            }}, parentNode));
+		Tcf.getChannelManager().openChannel(parentNode.peerNode.getPeer(), false, new RefreshDoneOpenChannel(callback, parentNode));
 	}
 
 	/**
@@ -227,15 +225,15 @@ public class ProcessModel implements IPreferenceConsts{
 	 * Recursively refresh the tree from the root node with a callback, which
 	 * is called when the whole process is finished.
 	 * 
-	 * @param runnable The callback object or <code>null</code> when callback is not needed.
+	 * @param callback The callback object or <code>null</code> when callback is not needed.
 	 */
-	public void refresh(Runnable runnable) {
+	public void refresh(ICallback callback) {
 		if (this.root.childrenQueried && !this.root.childrenQueryRunning) {
-			refresh(this.root, runnable);
+			refresh(this.root, callback);
 		}
 		else {
-			if (runnable != null) {
-				runnable.run();
+			if (callback != null) {
+				callback.done(this, Status.OK_STATUS);
 			}
 		}
 	}

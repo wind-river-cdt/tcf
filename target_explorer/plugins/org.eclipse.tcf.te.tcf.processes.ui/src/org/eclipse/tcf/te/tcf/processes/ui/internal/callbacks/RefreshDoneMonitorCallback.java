@@ -13,15 +13,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.services.ISysMonitor;
+import org.eclipse.tcf.te.runtime.callback.Callback;
+import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 
 /**
  * The monitor's callback invoked after all the contexts of the processes have been 
  * fetched and updated.
  */
-public class RefreshDoneMonitorCallback implements Runnable {
+public class RefreshDoneMonitorCallback extends Callback {
 	// The new nodes during this querying.
 	List<ProcessTreeNode> newNodes;
 	// The parent node whose children are refreshing.
@@ -29,7 +32,7 @@ public class RefreshDoneMonitorCallback implements Runnable {
 	// The queue to cache the legitimate nodes for refreshing.
 	Queue<ProcessTreeNode> queue;
 	// The callback after the querying is done.
-	Runnable callback;
+	ICallback callback;
 	// The service used to fetch process context.
 	ISysMonitor service;
 	// The TCF channel.
@@ -39,7 +42,7 @@ public class RefreshDoneMonitorCallback implements Runnable {
 	 * Create an instance with parameters to initialize the fields.
 	 */
 	public RefreshDoneMonitorCallback(List<ProcessTreeNode> newNodes, ProcessTreeNode parentNode, 
-					Queue<ProcessTreeNode> queue, Runnable callback, ISysMonitor service, IChannel channel) {
+					Queue<ProcessTreeNode> queue, ICallback callback, ISysMonitor service, IChannel channel) {
 		this.newNodes = newNodes;
 		this.parentNode = parentNode;
 		this.queue = queue;
@@ -50,10 +53,10 @@ public class RefreshDoneMonitorCallback implements Runnable {
 
 	/*
 	 * (non-Javadoc)
-	 * @see java.lang.Runnable#run()
+	 * @see org.eclipse.tcf.te.runtime.callback.Callback#internalDone(java.lang.Object, org.eclipse.core.runtime.IStatus)
 	 */
 	@Override
-	public void run() {
+	protected void internalDone(Object caller, IStatus status) {
 		parentNode.childrenQueryRunning = false;
 		parentNode.childrenQueried = true;
 		removeDead();
@@ -64,7 +67,7 @@ public class RefreshDoneMonitorCallback implements Runnable {
 		}
 		if (queue.isEmpty()) {
 			if (callback != null) {
-				callback.run();
+				callback.done(caller, status);
 			}
 		}
 		else {
