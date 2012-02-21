@@ -64,9 +64,8 @@
          <includes>
             <contentExtension
                   isRoot="true"
-                  pattern="org.eclipse.tcf.te.ui.views.navigator.content.*">
+                  pattern="org.eclipse.tcf.te.ui.views.navigator.*">
             </contentExtension>
-            <contentExtension pattern="org.eclipse.tcf.te.ui.views.navigator.filters.*"/>
             
          </includes>
       </viewerContentBinding>

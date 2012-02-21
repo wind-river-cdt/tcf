@@ -25,6 +25,7 @@
                   isRoot="true"
                   pattern="org.eclipse.tcf.te.ui.views.navigator.content.workingSets">
             </contentExtension>
+            <contentExtension pattern="org.eclipse.tcf.te.ui.views.navigator.filters.workingSet"/>
          </includes>
       </viewerContentBinding>
    </extension>   
