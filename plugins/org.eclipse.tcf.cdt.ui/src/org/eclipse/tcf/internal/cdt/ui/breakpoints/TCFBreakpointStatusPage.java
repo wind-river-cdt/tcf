@@ -135,35 +135,34 @@ public class TCFBreakpointStatusPage extends PropertyPage {
                         if (y != null) {
                             StatusItem z = new StatusItem();
                             z.marker = getBreakpoint().getMarker();
-                            z.text = (String)m.get(IBreakpoints.INSTANCE_ERROR);
-                            if (z.text == null) {
-                                z.text = "Not planted";
-                                Number addr = (Number)m.get(IBreakpoints.INSTANCE_ADDRESS);
-                                if (addr != null) {
-                                    z.planted_ok = true;
-                                    BigInteger i = JSON.toBigInteger(addr);
-                                    z.text = "0x" +  i.toString(16) + ": " + z.marker.getAttribute(TCFBreakpointsModel.ATTR_MESSAGE, "");;
-                                    Number size = (Number)m.get(IBreakpoints.INSTANCE_SIZE);
-                                    if (size != null) z.add("Size: " + size);
-                                    String type = (String)m.get(IBreakpoints.INSTANCE_TYPE);
-                                    if (type != null) z.add("Type: " + type);
-                                    if (y.object instanceof TCFNode) {
-                                        TCFDataCache<TCFNodeExecContext> mem = model.searchMemoryContext((TCFNode)y.object);
-                                        if (mem != null) {
-                                            if (!mem.validate(this)) {
-                                                pending = mem;
-                                            }
-                                            else {
-                                                TCFNodeExecContext ctx = mem.getData();
-                                                if (ctx != null) {
-                                                    TCFDataCache<TCFSourceRef> ln_cache = ctx.getLineInfo(i);
-                                                    if (ln_cache != null) {
-                                                        if (!ln_cache.validate()) {
-                                                            pending = ln_cache;
-                                                        }
-                                                        else {
-                                                            addLocationInfo(z, ln_cache.getData());
-                                                        }
+                            z.text = z.marker.getAttribute(TCFBreakpointsModel.ATTR_MESSAGE, "");
+                            String error = (String)m.get(IBreakpoints.INSTANCE_ERROR);
+                            if (error != null) z.add("Error: " + error);
+                            Number addr = (Number)m.get(IBreakpoints.INSTANCE_ADDRESS);
+                            if (addr != null) {
+                                z.planted_ok = error == null;
+                                BigInteger i = JSON.toBigInteger(addr);
+                                z.add("Address: 0x" +  i.toString(16));
+                                Number size = (Number)m.get(IBreakpoints.INSTANCE_SIZE);
+                                if (size != null) z.add("Size: " + size);
+                                String type = (String)m.get(IBreakpoints.INSTANCE_TYPE);
+                                if (type != null) z.add("Type: " + type);
+                                if (y.object instanceof TCFNode) {
+                                    TCFDataCache<TCFNodeExecContext> mem = model.searchMemoryContext((TCFNode)y.object);
+                                    if (mem != null) {
+                                        if (!mem.validate(this)) {
+                                            pending = mem;
+                                        }
+                                        else {
+                                            TCFNodeExecContext ctx = mem.getData();
+                                            if (ctx != null) {
+                                                TCFDataCache<TCFSourceRef> ln_cache = ctx.getLineInfo(i);
+                                                if (ln_cache != null) {
+                                                    if (!ln_cache.validate()) {
+                                                        pending = ln_cache;
+                                                    }
+                                                    else {
+                                                        addLocationInfo(z, ln_cache.getData());
                                                     }
                                                 }
                                             }
