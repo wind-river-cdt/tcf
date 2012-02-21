@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.views.interfaces;
 
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.tcf.te.runtime.interfaces.extensions.IExecutableExtension;
 
 /**
@@ -16,4 +17,10 @@ import org.eclipse.tcf.te.runtime.interfaces.extensions.IExecutableExtension;
  */
 public interface ICategory extends IExecutableExtension {
 
+	/**
+	 * Returns the category image.
+	 *
+	 * @return The category image or <code>null</code>.
+	 */
+	public Image getImage();
 }

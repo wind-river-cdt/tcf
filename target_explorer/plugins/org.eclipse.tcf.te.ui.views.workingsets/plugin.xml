@@ -16,6 +16,18 @@
          <adapter type="org.eclipse.tcf.te.runtime.interfaces.workingsets.IWorkingSetElement"/>
       </factory>
    </extension>
+   
+<!-- Common Navigator contributions -->
+   <extension point="org.eclipse.ui.navigator.viewer">
+      <viewerContentBinding viewerId="org.eclipse.tcf.te.ui.views.View">
+         <includes>
+            <contentExtension
+                  isRoot="true"
+                  pattern="org.eclipse.tcf.te.ui.views.navigator.content.workingSets">
+            </contentExtension>
+         </includes>
+      </viewerContentBinding>
+   </extension>   
 
 <!-- Working Sets navigator action contributions -->
    <extension point="org.eclipse.ui.navigator.navigatorContent">
