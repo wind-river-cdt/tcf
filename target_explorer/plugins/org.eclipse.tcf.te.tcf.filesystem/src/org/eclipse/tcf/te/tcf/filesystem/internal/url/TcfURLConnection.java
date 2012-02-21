@@ -16,6 +16,8 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.IToken;
@@ -29,6 +31,8 @@ import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.internal.exceptions.TCFChannelException;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation;
 import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.tcf.locator.model.Model;
 
 /**
  * The URL connection returned by TCF stream service used to handler "tcf"
@@ -81,13 +85,36 @@ public class TcfURLConnection extends URLConnection {
 		super(url);
 		// The peerId is stored as the host name in URL. See TcfURLStreamHandlerService#parseURL for details.
 		String peerId = url.getHost();
-		peer = Protocol.getLocator().getPeers().get(peerId);
+		Assert.isNotNull(peerId);
+		peer = findPeer(peerId);
+		if(peer == null) {
+			throw new IllegalArgumentException(NLS.bind(Messages.TcfURLConnection_NoPeerFound, peerId));
+		}
 		path = url.getPath();
 		// Set default timeout.
 		setConnectTimeout(DEFAULT_CONNECT_TIMEOUT);
 		setOpenTimeout(DEFAULT_OPEN_TIMEOUT);
 		setReadTimeout(DEFAULT_READ_TIMEOUT);
 		setCloseTimeout(DEFAULT_CLOSE_TIMEOUT);
+	}
+	
+	/**
+	 * Find the TCF peer with the specified ID.
+	 * 
+	 * @param peerId The target peer's ID.
+	 * @return The peer with this ID or null if not found.
+	 */
+	private IPeer findPeer(String peerId) {
+		IPeer peer = Protocol.getLocator().getPeers().get(peerId);
+		if(peer == null) {
+			IPeerModel[] peerModels = Model.getModel().getPeers();
+			for(IPeerModel peerModel : peerModels) {
+				if(peerId.equals(peerModel.getPeerId())) {
+					return peerModel.getPeer();
+				}
+			}
+		}
+		return peer;
 	}
 
 	/**

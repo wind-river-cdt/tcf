@@ -296,6 +296,7 @@ public class Messages extends NLS {
 	public static String TcfURLConnection_CloseFileTimeout;
 	public static String TcfURLConnection_NoFileHandleReturned;
 	public static String TcfURLConnection_NoFSServiceAvailable;
+	public static String TcfURLConnection_NoPeerFound;
 	public static String TcfURLConnection_NoSuchTcfAgent;
 	public static String TcfURLConnection_OpenFileTimeout;
 	public static String TcfURLConnection_OpenTCFChannelTimeout;
