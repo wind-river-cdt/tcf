@@ -68,9 +68,9 @@ import org.eclipse.ui.forms.widgets.Section;
  */
 public class SerialLinePanel extends AbstractWizardConfigurationPanel implements IDataExchangeNode3 {
 	public static final String fcDefaultTTYSpeed = "9600"; //$NON-NLS-1$
-	public static final String fcDefaultTTYDeviceWin32 = "COM2"; //$NON-NLS-1$
-	public static final String fcDefaultTTYDeviceSolaris = "/dev/cua/b"; //$NON-NLS-1$
-	public static final String fcDefaultTTYDeviceLinux = "/dev/ttyS1"; //$NON-NLS-1$
+	public static final String fcDefaultTTYDeviceWin32 = "COM1"; //$NON-NLS-1$
+	public static final String fcDefaultTTYDeviceSolaris = "/dev/cua/a"; //$NON-NLS-1$
+	public static final String fcDefaultTTYDeviceLinux = "/dev/ttyS0"; //$NON-NLS-1$
 	public static final String fcDefaultTTYDatabits = "8"; //$NON-NLS-1$
 	public static final String fcDefaultTTYParity = "None"; //$NON-NLS-1$
 	public static final String fcDefaultTTYStopbits = "1"; //$NON-NLS-1$
