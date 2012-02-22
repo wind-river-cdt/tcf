@@ -80,7 +80,10 @@
       </viewerActionBinding>
    </extension>
    
+<!-- Common navigator contributions -->
    <extension point="org.eclipse.ui.navigator.navigatorContent">
+
+<!-- Default navigator content contibutions -->
 
 <!-- Default navigator action contributions -->
       <actionProvider

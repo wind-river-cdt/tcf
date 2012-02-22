@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others. All rights reserved.
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -129,7 +129,7 @@ public interface ITerminalsConnectorConstants {
 	 */
 	public static final String PROP_STREAMS_STDERR = "streams.stderr"; //$NON-NLS-1$
 
-	// ****** Ssh specific properties ****
+	// ***** Ssh specific properties *****
 
 	/**
 	 * Property: ssh keep alive value.
@@ -145,4 +145,36 @@ public interface ITerminalsConnectorConstants {
 	 * Property: Ssh user.
 	 */
 	public static final String PROP_SSH_USER = "ssh.user"; //$NON-NLS-1$
+
+	// ***** Serial specific properties *****
+
+	/**
+	 * The serial device name.
+	 */
+	public static final String PROP_SERIAL_DEVICE = "serial.device"; //$NON-NLS-1$
+
+	/**
+	 * The baud rate.
+	 */
+	public static final String PROP_SERIAL_BAUD_RATE = "serial.baudrate"; //$NON-NLS-1$
+
+	/**
+	 * The data bits
+	 */
+	public static final String PROP_SERIAL_DATA_BITS = "serial.databits"; //$NON-NLS-1$
+
+	/**
+	 * The parity
+	 */
+	public static final String PROP_SERIAL_PARITY = "serial.parity"; //$NON-NLS-1$
+
+	/**
+	 * The stop bits
+	 */
+	public static final String PROP_SERIAL_STOP_BITS = "serial.stopbits"; //$NON-NLS-1$
+
+	/**
+	 * The flow control
+	 */
+	public static final String PROP_SERIAL_FLOW_CONTROL = "serial.flowcontrol"; //$NON-NLS-1$
 }

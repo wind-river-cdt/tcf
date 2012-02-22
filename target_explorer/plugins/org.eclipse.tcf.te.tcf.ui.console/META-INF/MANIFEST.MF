@@ -17,6 +17,7 @@ Bundle-Localization: plugin
 Export-Package: org.eclipse.tcf.te.tcf.ui.console,
  org.eclipse.tcf.te.tcf.ui.console.activator;x-internal:=true,
  org.eclipse.tcf.te.tcf.ui.console.handler,
+ org.eclipse.tcf.te.tcf.ui.console.help,
  org.eclipse.tcf.te.tcf.ui.console.interfaces,
  org.eclipse.tcf.te.tcf.ui.console.internal.preferences;x-internal:=true,
  org.eclipse.tcf.te.tcf.ui.console.nls;x-internal:=true

@@ -21,3 +21,8 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.7.0",
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
+Export-Package: org.eclipse.tcf.te.ui.terminals.telnet.activator;x-internal:=true,
+ org.eclipse.tcf.te.ui.terminals.telnet.controls,
+ org.eclipse.tcf.te.ui.terminals.telnet.launcher,
+ org.eclipse.tcf.te.ui.terminals.telnet.nls;x-internal:=true,
+ org.eclipse.tcf.te.ui.terminals.telnet.types

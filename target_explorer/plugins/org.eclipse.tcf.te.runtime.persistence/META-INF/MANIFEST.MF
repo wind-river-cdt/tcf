@@ -14,4 +14,5 @@ Bundle-Localization: plugin
 Export-Package: org.eclipse.tcf.te.runtime.persistence,
  org.eclipse.tcf.te.runtime.persistence.activator;x-internal:=true,
  org.eclipse.tcf.te.runtime.persistence.interfaces,
- org.eclipse.tcf.te.runtime.persistence.properties
+ org.eclipse.tcf.te.runtime.persistence.properties,
+ org.eclipse.tcf.te.runtime.persistence.services

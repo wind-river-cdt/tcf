@@ -23,6 +23,7 @@ Bundle-Localization: plugin
 Export-Package: org.eclipse.tcf.te.ui.views,
  org.eclipse.tcf.te.ui.views.actions,
  org.eclipse.tcf.te.ui.views.activator;x-internal:=true,
+ org.eclipse.tcf.te.ui.views.categories,
  org.eclipse.tcf.te.ui.views.editor,
  org.eclipse.tcf.te.ui.views.editor.pages,
  org.eclipse.tcf.te.ui.views.events,

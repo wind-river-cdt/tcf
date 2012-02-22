@@ -21,3 +21,8 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.7.0",
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
+Export-Package: org.eclipse.tcf.te.ui.terminals.ssh.activator;x-internal:=true,
+ org.eclipse.tcf.te.ui.terminals.ssh.controls,
+ org.eclipse.tcf.te.ui.terminals.ssh.launcher,
+ org.eclipse.tcf.te.ui.terminals.ssh.nls;x-internal:=true,
+ org.eclipse.tcf.te.ui.terminals.ssh.types
