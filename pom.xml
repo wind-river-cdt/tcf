@@ -209,6 +209,7 @@
 					<threshold>Low</threshold>
 					<xmlOutput>true</xmlOutput>
 					<failOnError>false</failOnError>
+					<excludeFilterFile>findbugs-exclude.xml</excludeFilterFile>
 				</configuration>
 				<executions>
 					<execution>
@@ -275,6 +276,7 @@
 						<threshold>Low</threshold>
 						<xmlOutput>true</xmlOutput>
 						<failOnError>false</failOnError>
+						<excludeFilterFile>findbugs-exclude.xml</excludeFilterFile>
 					</configuration>
 					<executions>
 						<execution>

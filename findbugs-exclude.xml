@@ -1,0 +1,7 @@
+<FindBugsFilter>
+	<!-- Ignore all ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD violations in "start(BundleContext)" methods -->
+	<Match>
+		<Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+		<Method name="start" params="org.osgi.framework.BundleContext" returns="void"/>
+	</Match>
+</FindBugsFilter>
