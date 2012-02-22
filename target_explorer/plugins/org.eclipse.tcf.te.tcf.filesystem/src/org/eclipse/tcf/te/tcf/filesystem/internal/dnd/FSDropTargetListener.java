@@ -13,6 +13,8 @@ import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerDropAdapter;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
@@ -34,6 +36,24 @@ public class FSDropTargetListener extends ViewerDropAdapter {
 		super(viewer);
 		this.viewer = viewer;
 		dnd = new CommonDnD();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ViewerDropAdapter#dragEnter(org.eclipse.swt.dnd.DropTargetEvent)
+	 */
+	@Override
+    public void dragEnter(DropTargetEvent event) {
+	    super.dragEnter(event);
+	    // Force the operation of file transfer from external application to DROP_COPY
+		for (int i = 0; i < event.dataTypes.length; i++) {
+			if (FileTransfer.getInstance().isSupportedType(event.dataTypes[i])) {
+				event.currentDataType = event.dataTypes[i];
+				event.detail = DND.DROP_COPY; 
+				super.dragEnter(event);
+				break;
+			}
+		}
 	}
 
 	/*
