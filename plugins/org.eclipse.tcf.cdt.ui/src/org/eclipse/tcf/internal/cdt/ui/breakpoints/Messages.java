@@ -12,7 +12,7 @@ public class Messages extends NLS {
     public static String TCFBreakpointStatusPage_4;
     public static String TCFBreakpointStatusPage_5;
     public static String TCFBreakpointStatusPage_6;
-    
+    public static String TCFBreakpointAdvancedPage_0;
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

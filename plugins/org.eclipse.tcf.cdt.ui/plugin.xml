@@ -96,6 +96,15 @@
             </and>
          </enabledWhen>
       </page>
+      <page
+            class="org.eclipse.tcf.internal.cdt.ui.breakpoints.TCFBreakpointAdvancedPage"
+            id="org.eclipse.tcf.breakpoint.advanced"
+            name="%breakpoints.advancedPage.name">
+         <filter
+               name="debugModelId"
+               value="org.eclipse.tcf.debug">
+         </filter>
+      </page>
    </extension>
 
     <!-- Remote Application Launch config type -->
