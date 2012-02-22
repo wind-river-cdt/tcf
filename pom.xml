@@ -16,9 +16,10 @@
 
 	<properties>
 		<tycho-version>0.14.0</tycho-version>
-		<platform-version>4.2milestones</platform-version>
+		<platform-version>3.8milestones</platform-version>
 		<platform-site>http://download.eclipse.org/eclipse/updates/${platform-version}</platform-site>
-		<cdt-site>http://download.eclipse.org/tools/cdt/builds/hudson/cdt-nightly</cdt-site>
+		<cdt-version>juno</cdt-version>
+		<cdt-site>http://download.eclipse.org/tools/cdt/builds/${cdt-version}/nightly</cdt-site>
 		<tm-version>3.3</tm-version>
 		<tm-site>http://download.eclipse.org/tm/updates/${tm-version}</tm-site>
 		<rxtx-site>http://rxtx.qbang.org/eclipse</rxtx-site>
@@ -266,7 +267,7 @@
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>findbugs-maven-plugin</artifactId>
-					<version>2.4.1-SNAPSHOT</version>
+					<version>2.4.1</version>
 					<configuration>
 						<effort>Max</effort>
 						<threshold>Low</threshold>

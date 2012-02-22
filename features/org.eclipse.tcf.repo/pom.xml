@@ -15,14 +15,69 @@
 	<artifactId>org.eclipse.tcf.repo</artifactId>
 	<packaging>eclipse-repository</packaging>
 
+	<properties>
+		<tcf-stream>juno</tcf-stream>
+		<tcf-zipfile>org.eclipse.tcf.repo.zip</tcf-zipfile>
+		<tcf-install>/home/data/httpd/download.eclipse.org/tools/tcf/builds/${tcf-stream}/nightly</tcf-install>
+	</properties>
+	
+	<pluginRepositories>
+   		<pluginRepository>
+			<id>maven.eclipse.org</id>
+     		<url>http://maven.eclipse.org/nexus/content/repositories/public</url>
+    	</pluginRepository>
+  	</pluginRepositories>
+
 	<profiles>
 		<profile>
 			<id>production</id>
-			<properties>
-				<tcf-install>/home/data/httpd/download.eclipse.org/tools/cdt/builds/hudson/tcf-nightly</tcf-install>
-			</properties>
 			<build>
 				<plugins>
+					<plugin>
+						<groupId>org.eclipse.dash.maven</groupId>
+						<artifactId>eclipse-signing-maven-plugin</artifactId>
+						<version>1.0.3</version>
+						<executions>
+							<execution>
+								<id>pack</id>
+								<configuration>
+									<inputFile>${project.build.directory}/${tcf-zipfile}</inputFile>
+								</configuration>
+								<phase>package</phase>
+								<goals>
+									<goal>pack</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>sign</id>
+								<configuration>
+									<inputFile>${project.build.directory}/${tcf-zipfile}</inputFile>
+									<signerInputDirectory>/home/data/httpd/download-staging.priv/tools/tcf/hudson</signerInputDirectory>
+								</configuration>
+								<phase>package</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>repack</id>
+								<configuration>
+									<inputFile>${project.build.directory}/signed/site_assembly.zip</inputFile>
+								</configuration>
+								<phase>package</phase>
+								<goals>
+									<goal>pack</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>fixCheckSums</id>
+								<phase>package</phase>
+								<goals>
+									<goal>fixCheckSums</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
 					<plugin>
 						<artifactId>maven-antrun-plugin</artifactId>
 						<executions>
@@ -34,15 +89,26 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<mkdir dir="${tcf-install}" />
-										<delete>
+										<delete includeemptydirs="false">
 											<fileset dir="${tcf-install}">
 												<include name="**" />
 											</fileset>
 										</delete>
-										<copy file="target/org.eclipse.tcf.repo.zip"
-											tofile="${tcf-install}/org.eclipse.tcf.repo.${unqualifiedVersion}.${buildQualifier}.zip" />
-										<unzip src="target/org.eclipse.tcf.repo.zip" dest="${tcf-install}" />
+										<zip destfile="${tcf-install}/${tcf-zipfile}">
+											<fileset dir="target/checksumFix">
+												<include name="**" />
+											</fileset>
+										</zip>
+										<copy includeemptydirs="false" todir="${tcf-install}">
+											<fileset dir="target/checksumFix">
+												<include name="**" />
+											</fileset>
+										</copy>
+										<chmod perm="g+w">
+											<fileset dir="${tcf-install}">
+												<include name="**"/>
+											</fileset>
+										</chmod>
 									</tasks>
 								</configuration>
 							</execution>
