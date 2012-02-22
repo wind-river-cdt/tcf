@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others. All rights reserved.
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -145,11 +145,14 @@ public class Messages extends NLS {
 
 	public static String SerialLinePanel_section;
 	public static String SerialLinePanel_hostTTYDevice_label;
+	public static String SerialLinePanel_hostTTYDevice_label_terminalMode;
 	public static String SerialLinePanel_hostTTYSpeed_label;
+	public static String SerialLinePanel_hostTTYSpeed_label_terminalMode;
 	public static String SerialLinePanel_hostTTYDatabits_label;
 	public static String SerialLinePanel_hostTTYParity_label;
 	public static String SerialLinePanel_hostTTYStopbits_label;
 	public static String SerialLinePanel_hostTTYFlowControl_label;
+	public static String SerialLinePanel_hostTTYTimeout_label;
 	public static String SerialLinePanel_customSerialDevice_title;
 	public static String SerialLinePanel_customSerialDevice_message;
 	public static String SerialLinePanel_customSerialBaudRate_title;
@@ -162,6 +165,7 @@ public class Messages extends NLS {
 	public static String SerialLinePanel_error_emptyHostTTYParity;
 	public static String SerialLinePanel_error_emptyHostTTYStopbits;
 	public static String SerialLinePanel_error_emptyHostTTYFlowControl;
+	public static String SerialLinePanel_error_emptyHostTTYTimeout;
 	public static String SerialLinePanel_info_editableTTYDeviceSelected;
 	public static String SerialLinePanel_info_editableTTYBaudRateSelected;
 	public static String SerialLinePanel_warning_FailedToLoadSerialPorts;

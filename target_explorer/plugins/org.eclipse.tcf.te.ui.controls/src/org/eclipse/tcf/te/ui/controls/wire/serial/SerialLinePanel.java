@@ -33,6 +33,8 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.TypedEvent;
@@ -41,8 +43,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.tcf.te.core.nodes.interfaces.wire.IWireTypeSerial;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
+import org.eclipse.tcf.te.runtime.services.interfaces.constants.ITerminalsConnectorConstants;
 import org.eclipse.tcf.te.ui.controls.BaseDialogPageControl;
 import org.eclipse.tcf.te.ui.controls.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.controls.interfaces.tracing.ITraceIds;
@@ -71,6 +75,7 @@ public class SerialLinePanel extends AbstractWizardConfigurationPanel implements
 	public static final String fcDefaultTTYParity = "None"; //$NON-NLS-1$
 	public static final String fcDefaultTTYStopbits = "1"; //$NON-NLS-1$
 	public static final String fcDefaultTTYFlowControl = "None"; //$NON-NLS-1$
+	public static final String fcDefaultTTYTimeout = "5"; //$NON-NLS-1$
 	public static final String fcEditableTTYOther = "Other..."; //$NON-NLS-1$
 
 	public static final String[] fcTTYSpeedRates = { "600", //$NON-NLS-1$
@@ -102,7 +107,7 @@ public class SerialLinePanel extends AbstractWizardConfigurationPanel implements
 	};
 
 	private final boolean editable;
-	private final boolean layoutInRows;
+	private final boolean terminalMode;
 	private final boolean showAdvancedSerialOptions;
 
 	Label hostTTYDeviceLabel;
@@ -117,6 +122,8 @@ public class SerialLinePanel extends AbstractWizardConfigurationPanel implements
 	Combo hostTTYStopbitsCombo;
 	Label hostTTYFlowControlLabel;
 	Combo hostTTYFlowControlCombo;
+	Label hostTTYTimeoutLabel;
+	Text  hostTTYTimeoutText;
 
 	// Keep the fInputValidator protected!
 	protected IInputValidator inputValidatorBaud;
@@ -128,38 +135,38 @@ public class SerialLinePanel extends AbstractWizardConfigurationPanel implements
 	 * Constructor.
 	 *
 	 * @param parentPageControl The parent control this backend configuration panel is embedded in. Must not be <code>null</code>!
-	 * @param layoutInRows Specify <code>true</code> if the configuration panel controls should be layout one per row, <code>false</code> otherwise.
+	 * @param terminalMode Specify <code>true</code> if the configuration panel controls are layout one per row.
 	 * @param editable Specify <code>true</code> if the user should be allowed to edit the serial device name, <code>false</code> otherwise.
 	 */
-	public SerialLinePanel(BaseDialogPageControl parentPageControl, boolean layoutInRows, boolean editable) {
-		this(parentPageControl, layoutInRows, editable, false);
+	public SerialLinePanel(BaseDialogPageControl parentPageControl, boolean terminalMode, boolean editable) {
+		this(parentPageControl, terminalMode, editable, false);
 	}
 
 	/**
 	 * Constructor.
 	 *
 	 * @param parentPageControl The parent control this backend configuration panel is embedded in. Must not be <code>null</code>!
-	 * @param layoutInRows Specify <code>true</code> if the configuration panel controls should be layout one per row, <code>false</code> otherwise.
+	 * @param terminalMode Specify <code>true</code> if the configuration panel controls are layout one per row.
 	 * @param editable Specify <code>true</code> if the user should be allowed to edit the serial device name and serial baud rate, <code>false</code> otherwise.
 	 * @param showAdvancedOptions If <code>true</code>, advanced serial options are available to the user.
 	 */
-	public SerialLinePanel(BaseDialogPageControl parentPageControl, boolean layoutInRows, boolean editable, boolean showAdvancedOptions) {
+	public SerialLinePanel(BaseDialogPageControl parentPageControl, boolean terminalMode, boolean editable, boolean showAdvancedOptions) {
 		super(parentPageControl);
-		this.layoutInRows = layoutInRows;
+		this.terminalMode = terminalMode;
 		this.editable = editable;
 		this.showAdvancedSerialOptions = showAdvancedOptions;
 	}
 
 	protected class CustomSerialBaudRateInputValidator implements IInputValidator {
-		private final Validator fValidator;
+		private final Validator validator;
 
 		/**
 		 * Constructor.
 		 *
 		 */
 		public CustomSerialBaudRateInputValidator() {
-			fValidator = new NumberValidator();
-			fValidator.setMessageText(RegexValidator.ERROR_INVALID_VALUE, Messages.SerialLinePanel_error_invalidCharactesBaudRate);
+			validator = new NumberValidator();
+			validator.setMessageText(RegexValidator.ERROR_INVALID_VALUE, Messages.SerialLinePanel_error_invalidCharactesBaudRate);
 		}
 
 		/* (non-Javadoc)
@@ -168,8 +175,8 @@ public class SerialLinePanel extends AbstractWizardConfigurationPanel implements
 		@Override
         public String isValid(String newText) {
 			if (newText != null && newText.trim().length() > 0) {
-				if (!fValidator.isValid(newText)) {
-					return fValidator.getMessage();
+				if (!validator.isValid(newText)) {
+					return validator.getMessage();
 				}
 			} else if (newText != null) {
 				// Empty string is an error without message (see interface)!
@@ -190,6 +197,15 @@ public class SerialLinePanel extends AbstractWizardConfigurationPanel implements
 		return inputValidatorBaud;
 	}
 
+	/**
+	 * Returns if or if not to adjust the background color of the panels.
+	 *
+	 * @return <code>True</code> to adjust the background color.
+	 */
+	protected boolean isAdjustBackgroundColor() {
+		return getParentControl().getParentPage() != null || terminalMode;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.ui.controls.interfaces.IWizardConfigurationPanel#setupPanel(org.eclipse.swt.widgets.Composite, org.eclipse.ui.forms.widgets.FormToolkit)
 	 */
@@ -198,7 +214,7 @@ public class SerialLinePanel extends AbstractWizardConfigurationPanel implements
 		Assert.isNotNull(parent);
 		Assert.isNotNull(toolkit);
 
-		boolean adjustBackgroundColor = getParentControl().getParentPage() != null;
+		boolean adjustBackgroundColor = isAdjustBackgroundColor();
 
 		Composite panel = toolkit.createComposite(parent);
 		GridLayout layout = new GridLayout();
@@ -210,24 +226,29 @@ public class SerialLinePanel extends AbstractWizardConfigurationPanel implements
 		setControl(panel);
 
 		// Create the wire type section
-		// Create the wire type section
-		Section section = toolkit.createSection(panel, ExpandableComposite.TITLE_BAR);
-		Assert.isNotNull(section);
-		section.setText(Messages.SerialLinePanel_section);
-		section.setLayout(new GridLayout());
-		section.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+		Composite section;
+		if (!terminalMode) {
+			section = toolkit.createSection(panel, ExpandableComposite.TITLE_BAR);
+			Assert.isNotNull(section);
+			((Section)section).setText(Messages.SerialLinePanel_section);
+			section.setLayout(new GridLayout());
+			section.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+		} else {
+			// No section -> Use the panel directly
+			section = panel;
+		}
 		if (adjustBackgroundColor) section.setBackground(panel.getBackground());
 
 		final Composite client = toolkit.createComposite(section);
 		Assert.isNotNull(client);
-		client.setLayout(new GridLayout(layoutInRows ? 2 : 4, false));
+		client.setLayout(new GridLayout(terminalMode ? 2 : 4, false));
 		client.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		if (adjustBackgroundColor) client.setBackground(section.getBackground());
-		section.setClient(client);
+		if (section instanceof Section) ((Section)section).setClient(client);
 
 		// Host TTY settings
 		hostTTYDeviceLabel = new Label(client, SWT.NONE);
-		hostTTYDeviceLabel.setText(Messages.SerialLinePanel_hostTTYDevice_label);
+		hostTTYDeviceLabel.setText(terminalMode ? Messages.SerialLinePanel_hostTTYDevice_label_terminalMode : Messages.SerialLinePanel_hostTTYDevice_label);
 
 		hostTTYDeviceCombo = new Combo(client, SWT.SINGLE | SWT.BORDER | SWT.READ_ONLY);
 		hostTTYDeviceCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -271,7 +292,7 @@ public class SerialLinePanel extends AbstractWizardConfigurationPanel implements
 		});
 
 		hostTTYSpeedLabel = new Label(client, SWT.NONE);
-		hostTTYSpeedLabel.setText(Messages.SerialLinePanel_hostTTYSpeed_label);
+		hostTTYSpeedLabel.setText(terminalMode ? Messages.SerialLinePanel_hostTTYSpeed_label_terminalMode : Messages.SerialLinePanel_hostTTYSpeed_label);
 
 		hostTTYSpeedCombo = new Combo(client, SWT.SINGLE | SWT.BORDER | SWT.READ_ONLY);
 		hostTTYSpeedCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -380,8 +401,8 @@ public class SerialLinePanel extends AbstractWizardConfigurationPanel implements
 
 		// add the advanced serial options if configured
 		if (showAdvancedSerialOptions) {
-			Composite bitsPanel = layoutInRows ? getControl() : new Composite(getControl(), SWT.NONE);
-			if (!layoutInRows) {
+			Composite bitsPanel = terminalMode ? client : new Composite(client, SWT.NONE);
+			if (!terminalMode) {
 				layout = new GridLayout();
 				layout.marginHeight = 0; layout.marginWidth = 0;
 				layout.numColumns = 3;
@@ -391,8 +412,8 @@ public class SerialLinePanel extends AbstractWizardConfigurationPanel implements
 				bitsPanel.setLayoutData(layoutData);
 			}
 
-			Composite panel2 = layoutInRows ? getControl() : new Composite(bitsPanel, SWT.NONE);
-			if (!layoutInRows) {
+			Composite panel2 = terminalMode ? client : new Composite(bitsPanel, SWT.NONE);
+			if (!terminalMode) {
 				layout = new GridLayout(2, false);
 				layout.marginHeight = 0;
 				layout.marginWidth = 0;
@@ -417,15 +438,6 @@ public class SerialLinePanel extends AbstractWizardConfigurationPanel implements
 			}
 			SWTControlUtil.setText(hostTTYBitsCombo, fcDefaultTTYDatabits);
 
-			panel = layoutInRows ? getControl() : new Composite(bitsPanel, SWT.NONE);
-			if (!layoutInRows) {
-				layout = new GridLayout(2, false);
-				layout.marginHeight = 0;
-				layout.marginWidth = 0;
-				panel.setLayout(layout);
-				panel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-			}
-
 			hostTTYParityLabel = new Label(panel2, SWT.NONE);
 			hostTTYParityLabel.setText(Messages.SerialLinePanel_hostTTYParity_label);
 			hostTTYParityCombo = new Combo(panel2, SWT.SINGLE | SWT.BORDER | SWT.READ_ONLY);
@@ -442,15 +454,6 @@ public class SerialLinePanel extends AbstractWizardConfigurationPanel implements
 				SWTControlUtil.add(hostTTYParityCombo, element);
 			}
 			SWTControlUtil.setText(hostTTYParityCombo, fcDefaultTTYParity);
-
-			panel = layoutInRows ? getControl() : new Composite(bitsPanel, SWT.NONE);
-			if (!layoutInRows) {
-				layout = new GridLayout(2, false);
-				layout.marginHeight = 0;
-				layout.marginWidth = 0;
-				panel.setLayout(layout);
-				panel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-			}
 
 			hostTTYStopbitsLabel = new Label(panel2, SWT.NONE);
 			hostTTYStopbitsLabel.setText(Messages.SerialLinePanel_hostTTYStopbits_label);
@@ -469,17 +472,6 @@ public class SerialLinePanel extends AbstractWizardConfigurationPanel implements
 			}
 			SWTControlUtil.setText(hostTTYStopbitsCombo, fcDefaultTTYStopbits);
 
-			panel = layoutInRows ? getControl() : new Composite(bitsPanel, SWT.NONE);
-			if (!layoutInRows) {
-				layout = new GridLayout(2, false);
-				layout.marginHeight = 0;
-				layout.marginWidth = 0;
-				panel.setLayout(layout);
-				GridData layoutData = new GridData(GridData.FILL_HORIZONTAL);
-				layoutData.horizontalSpan = 3;
-				panel.setLayoutData(layoutData);
-			}
-
 			hostTTYFlowControlLabel = new Label(panel2, SWT.NONE);
 			hostTTYFlowControlLabel.setText(Messages.SerialLinePanel_hostTTYFlowControl_label);
 			hostTTYFlowControlCombo = new Combo(panel2, SWT.SINGLE | SWT.BORDER | SWT.READ_ONLY);
@@ -496,6 +488,21 @@ public class SerialLinePanel extends AbstractWizardConfigurationPanel implements
 				SWTControlUtil.add(hostTTYFlowControlCombo, element);
 			}
 			SWTControlUtil.setText(hostTTYFlowControlCombo, fcDefaultTTYFlowControl);
+
+			if (terminalMode) {
+				hostTTYTimeoutLabel = new Label(panel2, SWT.NONE);
+				hostTTYTimeoutLabel.setText(Messages.SerialLinePanel_hostTTYTimeout_label);
+				hostTTYTimeoutText = new Text(panel2, SWT.SINGLE | SWT.BORDER);
+				hostTTYTimeoutText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+				hostTTYTimeoutText.addModifyListener(new ModifyListener() {
+					@Override
+					public void modifyText(ModifyEvent e) {
+						IValidatingContainer validatingContainer = SerialLinePanel.this.getParentControl().getValidatingContainer();
+						if (validatingContainer != null) validatingContainer.validate();
+					}
+				});
+				SWTControlUtil.setText(hostTTYTimeoutText, fcDefaultTTYTimeout);
+			}
 		}
 	}
 
@@ -596,38 +603,45 @@ public class SerialLinePanel extends AbstractWizardConfigurationPanel implements
 	}
 
 	/**
-	 * Returns the default value for the serial port default speed setting in bit/s
+	 * Returns the default value for the serial port speed setting in bit/s
 	 */
 	public String getDefaultHostTTYSpeed() {
 		return fcDefaultTTYSpeed;
 	}
 
 	/**
-	 * Returns the default value for the serial port default data bits setting
+	 * Returns the default value for the serial port data bits setting
 	 */
 	public String getDefaultHostTTYDatabits() {
 		return fcDefaultTTYDatabits;
 	}
 
 	/**
-	 * Returns the default value for the serial port default parity setting
+	 * Returns the default value for the serial port parity setting
 	 */
 	public String getDefaultHostTTYParity() {
 		return fcDefaultTTYParity;
 	}
 
 	/**
-	 * Returns the default value for the serial port default stop bits setting
+	 * Returns the default value for the serial port stop bits setting
 	 */
 	public String getDefaultHostTTYStopbits() {
 		return fcDefaultTTYStopbits;
 	}
 
 	/**
-	 * Returns the default value for the serial port default flow control setting
+	 * Returns the default value for the serial port flow control setting
 	 */
 	public String getDefaultHostTTYFlowControl() {
 		return fcDefaultTTYFlowControl;
+	}
+
+	/**
+	 * Returns the default value for the serial port timeout setting.
+	 */
+	public String getDefaultHostTTYTimeout() {
+		return fcDefaultTTYTimeout;
 	}
 
 	/**
@@ -761,6 +775,14 @@ public class SerialLinePanel extends AbstractWizardConfigurationPanel implements
 				setMessage(Messages.SerialLinePanel_error_emptyHostTTYFlowControl, IMessageProvider.ERROR);
 				return false;
 			}
+
+			if (terminalMode) {
+				option = SWTControlUtil.getText(hostTTYTimeoutText);
+				if (option == null || option.trim().length() == 0) {
+					setMessage(Messages.SerialLinePanel_error_emptyHostTTYFlowControl, IMessageProvider.ERROR);
+					return false;
+				}
+			}
 		}
 
 		return true;
@@ -775,27 +797,52 @@ public class SerialLinePanel extends AbstractWizardConfigurationPanel implements
 
 		boolean isDirty = false;
 
-        Map<String, Object> container = (Map<String, Object>)data.getProperty(IWireTypeSerial.PROPERTY_CONTAINER_NAME);
-		if (container == null) container = new HashMap<String, Object>();
+		if (!terminalMode) {
+			Map<String, Object> container = (Map<String, Object>)data.getProperty(IWireTypeSerial.PROPERTY_CONTAINER_NAME);
+			if (container == null) container = new HashMap<String, Object>();
 
-		String value = SWTControlUtil.getText(hostTTYDeviceCombo);
-		if (value != null) isDirty |= !value.equals(container.get(IWireTypeSerial.PROPERTY_SERIAL_DEVICE) != null ? container.get(IWireTypeSerial.PROPERTY_SERIAL_DEVICE) : ""); //$NON-NLS-1$
+			String value = SWTControlUtil.getText(hostTTYDeviceCombo);
+			if (value != null) isDirty |= !value.equals(container.get(IWireTypeSerial.PROPERTY_SERIAL_DEVICE) != null ? container.get(IWireTypeSerial.PROPERTY_SERIAL_DEVICE) : ""); //$NON-NLS-1$
 
-		value = SWTControlUtil.getText(hostTTYSpeedCombo);
-		if (value != null) isDirty |= !value.equals(container.get(IWireTypeSerial.PROPERTY_SERIAL_BAUD_RATE) != null ? container.get(IWireTypeSerial.PROPERTY_SERIAL_BAUD_RATE) : ""); //$NON-NLS-1$
+			value = SWTControlUtil.getText(hostTTYSpeedCombo);
+			if (value != null) isDirty |= !value.equals(container.get(IWireTypeSerial.PROPERTY_SERIAL_BAUD_RATE) != null ? container.get(IWireTypeSerial.PROPERTY_SERIAL_BAUD_RATE) : ""); //$NON-NLS-1$
 
-		if (showAdvancedSerialOptions) {
-			value = SWTControlUtil.getText(hostTTYBitsCombo);
-			if (value != null) isDirty |= !value.equals(container.get(IWireTypeSerial.PROPERTY_SERIAL_DATA_BITS) != null ? container.get(IWireTypeSerial.PROPERTY_SERIAL_DATA_BITS) : ""); //$NON-NLS-1$
+			if (showAdvancedSerialOptions) {
+				value = SWTControlUtil.getText(hostTTYBitsCombo);
+				if (value != null) isDirty |= !value.equals(container.get(IWireTypeSerial.PROPERTY_SERIAL_DATA_BITS) != null ? container.get(IWireTypeSerial.PROPERTY_SERIAL_DATA_BITS) : ""); //$NON-NLS-1$
 
-			value = SWTControlUtil.getText(hostTTYParityCombo);
-			if (value != null) isDirty |= !value.equals(container.get(IWireTypeSerial.PROPERTY_SERIAL_PARITY) != null ? container.get(IWireTypeSerial.PROPERTY_SERIAL_PARITY) : ""); //$NON-NLS-1$
+				value = SWTControlUtil.getText(hostTTYParityCombo);
+				if (value != null) isDirty |= !value.equals(container.get(IWireTypeSerial.PROPERTY_SERIAL_PARITY) != null ? container.get(IWireTypeSerial.PROPERTY_SERIAL_PARITY) : ""); //$NON-NLS-1$
 
-			value = SWTControlUtil.getText(hostTTYStopbitsCombo);
-			if (value != null) isDirty |= !value.equals(container.get(IWireTypeSerial.PROPERTY_SERIAL_STOP_BITS) != null ? container.get(IWireTypeSerial.PROPERTY_SERIAL_STOP_BITS) : ""); //$NON-NLS-1$
+				value = SWTControlUtil.getText(hostTTYStopbitsCombo);
+				if (value != null) isDirty |= !value.equals(container.get(IWireTypeSerial.PROPERTY_SERIAL_STOP_BITS) != null ? container.get(IWireTypeSerial.PROPERTY_SERIAL_STOP_BITS) : ""); //$NON-NLS-1$
 
-			value = SWTControlUtil.getText(hostTTYFlowControlCombo);
-			if (value != null) isDirty |= !value.equals(container.get(IWireTypeSerial.PROPERTY_SERIAL_FLOW_CONTROL) != null ? container.get(IWireTypeSerial.PROPERTY_SERIAL_FLOW_CONTROL) : ""); //$NON-NLS-1$
+				value = SWTControlUtil.getText(hostTTYFlowControlCombo);
+				if (value != null) isDirty |= !value.equals(container.get(IWireTypeSerial.PROPERTY_SERIAL_FLOW_CONTROL) != null ? container.get(IWireTypeSerial.PROPERTY_SERIAL_FLOW_CONTROL) : ""); //$NON-NLS-1$
+			}
+		} else {
+			String value = SWTControlUtil.getText(hostTTYDeviceCombo);
+			if (value != null) isDirty |= !value.equals(data.getStringProperty(ITerminalsConnectorConstants.PROP_SERIAL_DEVICE) != null ? data.getStringProperty(ITerminalsConnectorConstants.PROP_SERIAL_DEVICE) : ""); //$NON-NLS-1$
+
+			value = SWTControlUtil.getText(hostTTYSpeedCombo);
+			if (value != null) isDirty |= !value.equals(data.getStringProperty(ITerminalsConnectorConstants.PROP_SERIAL_BAUD_RATE) != null ? data.getStringProperty(ITerminalsConnectorConstants.PROP_SERIAL_BAUD_RATE) : ""); //$NON-NLS-1$
+
+			if (showAdvancedSerialOptions) {
+				value = SWTControlUtil.getText(hostTTYBitsCombo);
+				if (value != null) isDirty |= !value.equals(data.getStringProperty(ITerminalsConnectorConstants.PROP_SERIAL_DATA_BITS) != null ? data.getStringProperty(ITerminalsConnectorConstants.PROP_SERIAL_DATA_BITS) : ""); //$NON-NLS-1$
+
+				value = SWTControlUtil.getText(hostTTYParityCombo);
+				if (value != null) isDirty |= !value.equals(data.getStringProperty(ITerminalsConnectorConstants.PROP_SERIAL_PARITY) != null ? data.getStringProperty(ITerminalsConnectorConstants.PROP_SERIAL_PARITY) : ""); //$NON-NLS-1$
+
+				value = SWTControlUtil.getText(hostTTYStopbitsCombo);
+				if (value != null) isDirty |= !value.equals(data.getStringProperty(ITerminalsConnectorConstants.PROP_SERIAL_STOP_BITS) != null ? data.getStringProperty(ITerminalsConnectorConstants.PROP_SERIAL_STOP_BITS) : ""); //$NON-NLS-1$
+
+				value = SWTControlUtil.getText(hostTTYFlowControlCombo);
+				if (value != null) isDirty |= !value.equals(data.getStringProperty(ITerminalsConnectorConstants.PROP_SERIAL_FLOW_CONTROL) != null ? data.getStringProperty(ITerminalsConnectorConstants.PROP_SERIAL_FLOW_CONTROL) : ""); //$NON-NLS-1$
+
+				value = SWTControlUtil.getText(hostTTYTimeoutText);
+				if (value != null) isDirty |= !value.equals(data.getStringProperty(ITerminalsConnectorConstants.PROP_TIMEOUT) != null ? data.getStringProperty(ITerminalsConnectorConstants.PROP_TIMEOUT) : ""); //$NON-NLS-1$
+			}
 		}
 
 		return isDirty;
@@ -807,6 +854,7 @@ public class SerialLinePanel extends AbstractWizardConfigurationPanel implements
 	private final String fcSelectedTTYParitySlotId = "SerialLinePanel.selectedTTYParity." + System.getProperty("os.name"); //$NON-NLS-1$ //$NON-NLS-2$
 	private final String fcSelectedTTYStopbitsSlotId = "SerialLinePanel.selectedTTYStopbits." + System.getProperty("os.name"); //$NON-NLS-1$ //$NON-NLS-2$
 	private final String fcSelectedTTYFlowControlSlotId = "SerialLinePanel.selectedTTYFlowControl." + System.getProperty("os.name"); //$NON-NLS-1$ //$NON-NLS-2$
+	private final String fcSelectedTTYTimeoutSlotId = "SerialLinePanel.selectedTTYTimeout." + System.getProperty("os.name"); //$NON-NLS-1$ //$NON-NLS-2$
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.ui.controls.panels.AbstractWizardConfigurationPanel#doRestoreWidgetValues(org.eclipse.jface.dialogs.IDialogSettings, java.lang.String)
@@ -849,6 +897,13 @@ public class SerialLinePanel extends AbstractWizardConfigurationPanel implements
 			if (option != null && option.trim().length() > 0 && SWTControlUtil.indexOf(hostTTYFlowControlCombo, option) != -1) {
 				SWTControlUtil.setText(hostTTYFlowControlCombo, option);
 			}
+
+			if (terminalMode) {
+				option = settings.get(getParentControl().prefixDialogSettingsSlotId(fcSelectedTTYTimeoutSlotId, idPrefix));
+				if (option != null && option.trim().length() > 0 && SWTControlUtil.indexOf(hostTTYTimeoutText, option) != -1) {
+					SWTControlUtil.setText(hostTTYTimeoutText, option);
+				}
+			}
 		}
 	}
 
@@ -867,6 +922,10 @@ public class SerialLinePanel extends AbstractWizardConfigurationPanel implements
 			settings.put(getParentControl().prefixDialogSettingsSlotId(fcSelectedTTYParitySlotId, idPrefix), SWTControlUtil.getText(hostTTYParityCombo));
 			settings.put(getParentControl().prefixDialogSettingsSlotId(fcSelectedTTYStopbitsSlotId, idPrefix), SWTControlUtil.getText(hostTTYStopbitsCombo));
 			settings.put(getParentControl().prefixDialogSettingsSlotId(fcSelectedTTYFlowControlSlotId, idPrefix), SWTControlUtil.getText(hostTTYFlowControlCombo));
+
+			if (terminalMode) {
+				settings.put(getParentControl().prefixDialogSettingsSlotId(fcSelectedTTYTimeoutSlotId, idPrefix), SWTControlUtil.getText(hostTTYTimeoutText));
+			}
 		}
 	}
 
@@ -877,17 +936,32 @@ public class SerialLinePanel extends AbstractWizardConfigurationPanel implements
     public void setupData(IPropertiesContainer data) {
 		if (data == null) return;
 
-        Map<String, Object> container = (Map<String, Object>)data.getProperty(IWireTypeSerial.PROPERTY_CONTAINER_NAME);
-		if (container == null) container = new HashMap<String, Object>();
+		if (!terminalMode) {
+			Map<String, Object> container = (Map<String, Object>)data.getProperty(IWireTypeSerial.PROPERTY_CONTAINER_NAME);
+			if (container == null) container = new HashMap<String, Object>();
 
-		SWTControlUtil.setText(hostTTYDeviceCombo, (String)container.get(IWireTypeSerial.PROPERTY_SERIAL_DEVICE));
-		SWTControlUtil.setText(hostTTYSpeedCombo, (String)container.get(IWireTypeSerial.PROPERTY_SERIAL_BAUD_RATE));
+			SWTControlUtil.setText(hostTTYDeviceCombo, (String)container.get(IWireTypeSerial.PROPERTY_SERIAL_DEVICE));
+			SWTControlUtil.setText(hostTTYSpeedCombo, (String)container.get(IWireTypeSerial.PROPERTY_SERIAL_BAUD_RATE));
 
-		if (showAdvancedSerialOptions) {
-			SWTControlUtil.setText(hostTTYBitsCombo, (String)container.get(IWireTypeSerial.PROPERTY_SERIAL_DATA_BITS));
-			SWTControlUtil.setText(hostTTYParityCombo, (String)container.get(IWireTypeSerial.PROPERTY_SERIAL_PARITY));
-			SWTControlUtil.setText(hostTTYStopbitsCombo, (String)container.get(IWireTypeSerial.PROPERTY_SERIAL_STOP_BITS));
-			SWTControlUtil.setText(hostTTYFlowControlCombo, (String)container.get(IWireTypeSerial.PROPERTY_SERIAL_FLOW_CONTROL));
+			if (showAdvancedSerialOptions) {
+				SWTControlUtil.setText(hostTTYBitsCombo, (String)container.get(IWireTypeSerial.PROPERTY_SERIAL_DATA_BITS));
+				SWTControlUtil.setText(hostTTYParityCombo, (String)container.get(IWireTypeSerial.PROPERTY_SERIAL_PARITY));
+				SWTControlUtil.setText(hostTTYStopbitsCombo, (String)container.get(IWireTypeSerial.PROPERTY_SERIAL_STOP_BITS));
+				SWTControlUtil.setText(hostTTYFlowControlCombo, (String)container.get(IWireTypeSerial.PROPERTY_SERIAL_FLOW_CONTROL));
+			}
+		} else {
+			// In terminal mode, read the properties directly from the given properties container
+			// and use the constants from ITerminalConnectorConstants!
+			SWTControlUtil.setText(hostTTYDeviceCombo, data.getStringProperty(ITerminalsConnectorConstants.PROP_SERIAL_DEVICE));
+			SWTControlUtil.setText(hostTTYSpeedCombo, data.getStringProperty(ITerminalsConnectorConstants.PROP_SERIAL_BAUD_RATE));
+
+			if (showAdvancedSerialOptions) {
+				SWTControlUtil.setText(hostTTYBitsCombo, data.getStringProperty(ITerminalsConnectorConstants.PROP_SERIAL_DATA_BITS));
+				SWTControlUtil.setText(hostTTYParityCombo, data.getStringProperty(ITerminalsConnectorConstants.PROP_SERIAL_PARITY));
+				SWTControlUtil.setText(hostTTYStopbitsCombo, data.getStringProperty(ITerminalsConnectorConstants.PROP_SERIAL_STOP_BITS));
+				SWTControlUtil.setText(hostTTYFlowControlCombo, data.getStringProperty(ITerminalsConnectorConstants.PROP_SERIAL_FLOW_CONTROL));
+				SWTControlUtil.setText(hostTTYTimeoutText, data.getStringProperty(ITerminalsConnectorConstants.PROP_TIMEOUT));
+			}
 		}
 	}
 
@@ -898,18 +972,32 @@ public class SerialLinePanel extends AbstractWizardConfigurationPanel implements
     public void extractData(IPropertiesContainer data) {
 		if (data == null) return;
 
-        Map<String, Object> container = (Map<String, Object>)data.getProperty(IWireTypeSerial.PROPERTY_CONTAINER_NAME);
-		if (container == null) container = new HashMap<String, Object>();
+		if (!terminalMode) {
+			Map<String, Object> container = (Map<String, Object>)data.getProperty(IWireTypeSerial.PROPERTY_CONTAINER_NAME);
+			if (container == null) container = new HashMap<String, Object>();
 
-		container.put(IWireTypeSerial.PROPERTY_SERIAL_DEVICE, SWTControlUtil.getText(hostTTYDeviceCombo));
-		container.put(IWireTypeSerial.PROPERTY_SERIAL_BAUD_RATE, SWTControlUtil.getText(hostTTYSpeedCombo));
+			container.put(IWireTypeSerial.PROPERTY_SERIAL_DEVICE, SWTControlUtil.getText(hostTTYDeviceCombo));
+			container.put(IWireTypeSerial.PROPERTY_SERIAL_BAUD_RATE, SWTControlUtil.getText(hostTTYSpeedCombo));
 
-		container.put(IWireTypeSerial.PROPERTY_SERIAL_DATA_BITS, showAdvancedSerialOptions ? SWTControlUtil.getText(hostTTYBitsCombo) : null);
-		container.put(IWireTypeSerial.PROPERTY_SERIAL_PARITY, showAdvancedSerialOptions ? SWTControlUtil.getText(hostTTYParityCombo) : null);
-		container.put(IWireTypeSerial.PROPERTY_SERIAL_STOP_BITS, showAdvancedSerialOptions ? SWTControlUtil.getText(hostTTYStopbitsCombo) : null);
-		container.put(IWireTypeSerial.PROPERTY_SERIAL_FLOW_CONTROL, showAdvancedSerialOptions ? SWTControlUtil.getText(hostTTYFlowControlCombo) : null);
+			container.put(IWireTypeSerial.PROPERTY_SERIAL_DATA_BITS, showAdvancedSerialOptions ? SWTControlUtil.getText(hostTTYBitsCombo) : null);
+			container.put(IWireTypeSerial.PROPERTY_SERIAL_PARITY, showAdvancedSerialOptions ? SWTControlUtil.getText(hostTTYParityCombo) : null);
+			container.put(IWireTypeSerial.PROPERTY_SERIAL_STOP_BITS, showAdvancedSerialOptions ? SWTControlUtil.getText(hostTTYStopbitsCombo) : null);
+			container.put(IWireTypeSerial.PROPERTY_SERIAL_FLOW_CONTROL, showAdvancedSerialOptions ? SWTControlUtil.getText(hostTTYFlowControlCombo) : null);
 
-		data.setProperty(IWireTypeSerial.PROPERTY_CONTAINER_NAME, !container.isEmpty() ? container : null);
+			data.setProperty(IWireTypeSerial.PROPERTY_CONTAINER_NAME, !container.isEmpty() ? container : null);
+		} else {
+			// In terminal mode, write the properties directly to the given properties container
+			// and use the constants from ITerminalConnectorConstants!
+			data.setProperty(ITerminalsConnectorConstants.PROP_SERIAL_DEVICE, SWTControlUtil.getText(hostTTYDeviceCombo));
+			data.setProperty(ITerminalsConnectorConstants.PROP_SERIAL_BAUD_RATE, SWTControlUtil.getText(hostTTYSpeedCombo));
+
+			data.setProperty(ITerminalsConnectorConstants.PROP_SERIAL_DATA_BITS, showAdvancedSerialOptions ? SWTControlUtil.getText(hostTTYBitsCombo) : null);
+			data.setProperty(ITerminalsConnectorConstants.PROP_SERIAL_PARITY, showAdvancedSerialOptions ? SWTControlUtil.getText(hostTTYParityCombo) : null);
+			data.setProperty(ITerminalsConnectorConstants.PROP_SERIAL_STOP_BITS, showAdvancedSerialOptions ? SWTControlUtil.getText(hostTTYStopbitsCombo) : null);
+			data.setProperty(ITerminalsConnectorConstants.PROP_SERIAL_FLOW_CONTROL, showAdvancedSerialOptions ? SWTControlUtil.getText(hostTTYFlowControlCombo) : null);
+
+			data.setProperty(ITerminalsConnectorConstants.PROP_TIMEOUT, showAdvancedSerialOptions ? SWTControlUtil.getText(hostTTYTimeoutText) : null);
+		}
 	}
 
 	/* (non-Javadoc)

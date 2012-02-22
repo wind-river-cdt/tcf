@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others. All rights reserved.
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -254,8 +254,12 @@ public abstract class AbstractConfigurationPanel extends AbstractWizardConfigura
     	return false;
     }
 
+	public boolean isWithHostList() {
+    	return true;
+    }
+
 	protected void createHostsUI(Composite parent){
-		if(isWithoutSelection()){
+		if(isWithoutSelection() && isWithHostList()){
 			Composite comboComposite=new Composite(parent, SWT.NONE);
 	        GridLayout layout = new GridLayout(3, false);
 	        layout.marginHeight = 0; layout.marginWidth = 0;
