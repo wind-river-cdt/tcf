@@ -200,7 +200,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>findbugs-maven-plugin</artifactId>
-				<version>2.4.1-SNAPSHOT</version>
+				<version>2.4.1</version>
 				<configuration>
 					<encoding>UTF-8</encoding>
 					<effort>Max</effort>
