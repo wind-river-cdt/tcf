@@ -9,30 +9,37 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.dnd;
 
-import java.util.List;
-
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.swt.dnd.DND;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.dnd.TransferData;
-import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSCopy;
-import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSMove;
-import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
+import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
+import org.eclipse.ui.IViewReference;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.navigator.CommonDropAdapter;
 import org.eclipse.ui.navigator.CommonDropAdapterAssistant;
+import org.eclipse.ui.navigator.CommonNavigator;
 
 /**
  * The drop assistant used by Target Explorer to extend its DnD support to FSTreeNode elements.
  */
 public class FSDropAdapterAssistant extends CommonDropAdapterAssistant {
+	// The common dnd operation
+	CommonDnD dnd;
+
 	/**
 	 * Create an instance.
 	 */
 	public FSDropAdapterAssistant() {
+		dnd = new CommonDnD();
 	}
 
 	/*
@@ -41,33 +48,28 @@ public class FSDropAdapterAssistant extends CommonDropAdapterAssistant {
 	 */
 	@Override
 	public IStatus validateDrop(Object target, int operation, TransferData transferType) {
-		LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
-		if (transfer.isSupportedType(transferType) && target instanceof FSTreeNode) {
-			FSTreeNode hovered = (FSTreeNode) target;
-			IStructuredSelection selection = (IStructuredSelection) transfer.getSelection();
-			List<FSTreeNode> nodes = selection.toList();
-			boolean moving = (operation & DND.DROP_MOVE) != 0;
-			boolean copying = (operation & DND.DROP_COPY) != 0;
-			if (hovered.isDirectory() && hovered.isWritable() && (moving || copying)) {
-				FSTreeNode head = nodes.get(0);
-				String hid = head.peerNode.getPeerId();
-				String tid = hovered.peerNode.getPeerId();
-				if (hid.equals(tid)) {
-					for (FSTreeNode node : nodes) {
-						if (moving && node == hovered || node.isAncestorOf(hovered)) {
-							return Status.CANCEL_STATUS;
-						}
-					}
-					return Status.OK_STATUS;
-				}
+		boolean valid = false;
+		if (target instanceof FSTreeNode) {
+			if (LocalSelectionTransfer.getTransfer().isSupportedType(transferType)) {
+				valid = dnd.validateLocalSelectionDrop(target, operation, transferType);
 			}
-			else if (hovered.isFile() && copying) {
-				hovered = hovered.parent;
-				return validateDrop(hovered, operation, transferType);
+			else if(FileTransfer.getInstance().isSupportedType(transferType)) {
+				valid = dnd.validateFilesDrop(target, operation, transferType);
 			}
 		}
-		return Status.CANCEL_STATUS;
-	}
+		return valid ? Status.OK_STATUS : Status.CANCEL_STATUS;
+	}	
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.navigator.CommonDropAdapterAssistant#isSupportedType(org.eclipse.swt.dnd.TransferData)
+	 */
+	@Override
+    public boolean isSupportedType(TransferData aTransferType) {
+		if(FileTransfer.getInstance().isSupportedType(aTransferType))
+			return true;
+	    return super.isSupportedType(aTransferType);
+    }
 
 	/*
 	 * (non-Javadoc)
@@ -75,44 +77,39 @@ public class FSDropAdapterAssistant extends CommonDropAdapterAssistant {
 	 */
 	@Override
 	public IStatus handleDrop(CommonDropAdapter aDropAdapter, DropTargetEvent aDropTargetEvent, Object aTarget) {
-		Object data = aDropTargetEvent.data;
-		int operations = aDropAdapter.getCurrentOperation();
-		IStructuredSelection selection = (IStructuredSelection) data;
-		List<FSTreeNode> nodes = selection.toList();
-		FSOperation operation = null;
-		if ((operations & DND.DROP_MOVE) != 0) {
-			FSTreeNode dest = (FSTreeNode) aTarget;
-			operation = new FSMove(nodes, dest);
+		boolean sucess = false;
+		TransferData transferType = aDropTargetEvent.currentDataType;
+		if (LocalSelectionTransfer.getTransfer().isSupportedType(transferType)) {
+			IStructuredSelection selection = (IStructuredSelection) aDropTargetEvent.data;
+			int operations = aDropAdapter.getCurrentOperation();
+			FSTreeNode target = (FSTreeNode) aTarget;
+			sucess = dnd.dropLocalSelection(target, operations, selection);
 		}
-		else if ((operations & DND.DROP_COPY) != 0) {
-			FSTreeNode hovered = (FSTreeNode) aTarget;
-			FSTreeNode dest = getCopyDestination(hovered, nodes);
-			operation = new FSCopy(nodes, dest);
+		else if(FileTransfer.getInstance().isSupportedType(transferType)) {
+			String[] files = (String[]) aDropTargetEvent.data;
+		    int operations = aDropAdapter.getCurrentOperation();
+			FSTreeNode target = (FSTreeNode) aTarget;
+		    sucess = dnd.dropFiles(getCommonViewer(), files, operations, target);
 		}
-		return operation != null ? operation.doit() : Status.CANCEL_STATUS;
+		return sucess ? Status.OK_STATUS : Status.CANCEL_STATUS;
 	}
-
+	
 	/**
-	 * Return an appropriate destination directory for copying according to
-	 * the specified hovered node.  If the hovered node is a file, then return 
-	 * its parent directory. If the hovered node is a directory, then return its
-	 * self if it is not a node being copied. Return its parent directory if it is
-	 * a node being copied.
-	 * @param hovered
-	 * @param nodes
-	 * @return
+	 * Get the tree viewer of Target Explorer view.
+	 * 
+	 * @return The tree viewer of Target Explorer view or null if the view is not found.
 	 */
-	private FSTreeNode getCopyDestination(FSTreeNode hovered, List<FSTreeNode> nodes) {
-		if (hovered.isFile()) {
-			return hovered.parent;
-		}
-		else if (hovered.isDirectory()) {
-			for (FSTreeNode node : nodes) {
-				if (node == hovered) {
-					return hovered.parent;
-				}
+	private TreeViewer getCommonViewer() {
+		Assert.isNotNull(Display.getCurrent());
+		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		Assert.isNotNull(window);
+		IViewReference[] references = window.getActivePage().getViewReferences();
+		for(IViewReference reference : references) {
+			if(reference.getId().equals(IUIConstants.ID_EXPLORER)) {
+				CommonNavigator navigator =  (CommonNavigator) reference.getPart(true);
+				return navigator.getCommonViewer();
 			}
 		}
-		return hovered;
-	}
+	    return null;
+    }
 }

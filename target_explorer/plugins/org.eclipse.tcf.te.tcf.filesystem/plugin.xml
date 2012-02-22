@@ -1782,6 +1782,9 @@
              </operations>
              <transferTypes>
              	<transferType name ="LocalSelectionTransfer" />
+              <transferType
+                    name="FileTransfer">
+              </transferType>
 			 </transferTypes>
           </dropSupport>
       </viewer>

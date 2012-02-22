@@ -286,8 +286,8 @@ public class CacheManager {
 						else
 							message = NLS.bind(Messages.CacheManager_UploadNFiles, Long.valueOf(nodes.length));
 						monitor.beginTask(message, 100);
-						boolean canceled = uploadFiles(monitor, sync, nodes);
-						if (canceled)
+						uploadFiles(monitor, sync, nodes);
+						if (monitor.isCanceled())
 							throw new InterruptedException();
 					} catch (Exception e) {
 						throw new InvocationTargetException(e);
@@ -301,8 +301,7 @@ public class CacheManager {
 			dialog.run(true, true, runnable);
 			return true;
 		} catch (InvocationTargetException e) {
-			// Something's gone wrong. Roll back the downloading and display the
-			// error.
+			// Something's gone wrong. Roll back the downloading and display the error.
 			displayError(parent, e);
 		} catch (InterruptedException e) {
 			// It is canceled. Just roll back the downloading result.
@@ -334,19 +333,60 @@ public class CacheManager {
 	 *            The local files to be uploaded.
 	 * @param monitor
 	 *            The monitor used to report the progress.
-	 * @return true if it is canceled or else false.
 	 * @throws Exception
 	 *             an Exception thrown during downloading and storing data.
 	 */
-	public boolean uploadFiles(IProgressMonitor monitor, final boolean sync,  final FSTreeNode[] nodes) throws IOException {
+	void uploadFiles(IProgressMonitor monitor, final boolean sync,  final FSTreeNode[] nodes) throws IOException {
+		File[] files = new File[nodes.length];
+		URL[] urls = new URL[nodes.length];
+		for (int i = 0; i < nodes.length; i++) {
+			files[i] = getCacheFile(nodes[i]);
+			urls[i] = nodes[i].getLocationURL();
+		}
+		try {
+			// Upload the files to the remote location by the specified URLs.
+			uploadFiles(monitor, files, urls);
+		}
+		finally {
+			// Once upload is successful, synchronize the modified time.
+			for (int i = 0; i < nodes.length; i++) {
+				final FSTreeNode node = nodes[i];
+				SafeRunner.run(new SafeRunnable() {
+					@Override
+					public void handleException(Throwable e) {
+						// Ignore exception
+					}
+
+					@Override
+					public void run() throws Exception {
+						PersistenceManager.getInstance().setBaseTimestamp(node.getLocationURL(), node.attr.mtime);
+						if (sync) {
+							File file = getCacheFile(node);
+							file.setLastModified(node.attr.mtime);
+						}
+						StateManager.getInstance().refreshState(node);
+					}
+				});
+			}
+		}
+	}
+	
+	/**
+	 * Upload the specified files using the monitor to report the progress.
+	 *
+	 * @param files  The local file objects.
+	 * @param urls The remote file's URL location.
+	 * @param monitor The monitor used to report the progress.
+	 * @throws Exception an Exception thrown during downloading and storing data.
+	 */
+	public void uploadFiles(IProgressMonitor monitor, File[] files, URL[] urls) throws IOException {
 		BufferedInputStream input = null;
 		BufferedOutputStream output = null;
 		// The buffer used to download the file.
 		byte[] data = new byte[DEFAULT_CHUNK_SIZE];
 		// Calculate the total size.
 		long totalSize = 0;
-		for (FSTreeNode node : nodes) {
-			File file = getCachePath(node).toFile();
+		for (File file:files) {
 			totalSize += file.length();
 		}
 		// Calculate the chunk size of one percent.
@@ -355,10 +395,10 @@ public class CacheManager {
 		int percentRead = 0;
 		// The current length of read bytes.
 		long bytesRead = 0;
-		for (int i = 0; i < nodes.length && !monitor.isCanceled(); i++) {
-			File file = getCachePath(nodes[i]).toFile();
+		for (int i = 0; i < files.length && !monitor.isCanceled(); i++) {
+			File file = files[i];
 			try {
-				URL url = nodes[i].getLocationURL();
+				URL url = urls[i];
 				TcfURLConnection connection = (TcfURLConnection) url.openConnection();
 				connection.setDoInput(false);
 				connection.setDoOutput(true);
@@ -395,28 +435,8 @@ public class CacheManager {
 					} catch (Exception e) {
 					}
 				}
-				if(!monitor.isCanceled()){
-					// Once upload is successful, synchronize the modified time.
-					final FSTreeNode node = nodes[i];
-					SafeRunner.run(new SafeRunnable() {
-						@Override
-	                    public void handleException(Throwable e) {
-							// Ignore exception
-	                    }
-						@Override
-						public void run() throws Exception {
-							PersistenceManager.getInstance().setBaseTimestamp(node.getLocationURL(), node.attr.mtime);
-							if(sync) {
-								File file = getCacheFile(node);
-								file.setLastModified(node.attr.mtime);
-							}
-							StateManager.getInstance().refreshState(node);
-						}
-					});
-				}
 			}
 		}
-		return monitor.isCanceled();
 	}
 
 	/**
@@ -483,7 +503,7 @@ public class CacheManager {
 	 *            The file size to be displayed.
 	 * @return The string representation of the size.
 	 */
-	private String formatSize(long size) {
+	private static String formatSize(long size) {
 		double kbSize = size / 1024.0;
 		if (kbSize < 1.0) {
 			return SIZE_FORMAT.format(size) + Messages.CacheManager_Bytes;

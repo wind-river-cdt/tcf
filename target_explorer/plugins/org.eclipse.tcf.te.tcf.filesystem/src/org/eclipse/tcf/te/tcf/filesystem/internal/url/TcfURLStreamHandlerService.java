@@ -39,32 +39,41 @@ public class TcfURLStreamHandlerService extends AbstractURLStreamHandlerService 
 	 */
 	@Override
 	protected void parseURL(URL u, String spec, int start, int limit) {
-		IllegalArgumentException errorFormat = new IllegalArgumentException(Messages.TcfURLStreamHandlerService_ErrorURLFormat); 
-		int end = spec.indexOf("/", start); //$NON-NLS-1$
-		if (end == -1) throw errorFormat;
-		start = end + 1;
-		end = spec.indexOf("/", start); //$NON-NLS-1$
-		if (end == -1) throw errorFormat;
-		String peerId = spec.substring(start, end);
-		if (peerId.trim().length() == 0) throw errorFormat;
-		start = end + 1;
-		String path = spec.substring(start);
-		if (path.length() > 0) {
-			if (path.matches(WINPATH_PATTERN)) {
-				String pathext = path.substring(2); // Cut the path after ':'.
-			    if(pathext.length() == 0)
-			    	throw new IllegalArgumentException(Messages.TcfURLStreamHandlerService_OnlyDiskPartError);
-			    pathext = pathext.substring(1); // Cut the path after the disk part.
-				checkWinPath(pathext);
+		if (u.getPath() != null) {
+			String path = u.getPath();
+			if (!path.endsWith("/")) { //$NON-NLS-1$
+				path += "/"; //$NON-NLS-1$
 			}
-			else {
-				path = "/" + path; //$NON-NLS-1$
-			}
+			path += spec;
+			setURL(u, u.getProtocol(), u.getHost(), u.getPort(), u.getAuthority(), u.getUserInfo(), path, u.getQuery(), u.getRef());
 		}
 		else {
-			path = "/"; //$NON-NLS-1$
+			IllegalArgumentException errorFormat = new IllegalArgumentException(Messages.TcfURLStreamHandlerService_ErrorURLFormat);
+			int end = spec.indexOf("/", start); //$NON-NLS-1$
+			if (end == -1) throw errorFormat;
+			start = end + 1;
+			end = spec.indexOf("/", start); //$NON-NLS-1$
+			if (end == -1) throw errorFormat;
+			String peerId = spec.substring(start, end);
+			if (peerId.trim().length() == 0) throw errorFormat;
+			start = end + 1;
+			String path = spec.substring(start);
+			if (path.length() > 0) {
+				if (path.matches(WINPATH_PATTERN)) {
+					String pathext = path.substring(2); // Cut the path after ':'.
+					if (pathext.length() == 0) throw new IllegalArgumentException(Messages.TcfURLStreamHandlerService_OnlyDiskPartError);
+					pathext = pathext.substring(1); // Cut the path after the disk part.
+					checkWinPath(pathext);
+				}
+				else {
+					path = "/" + path; //$NON-NLS-1$
+				}
+			}
+			else {
+				path = "/"; //$NON-NLS-1$
+			}
+			setURL(u, TcfURLConnection.PROTOCOL_SCHEMA, peerId, -1, null, null, path, null, null);
 		}
-		setURL(u, TcfURLConnection.PROTOCOL_SCHEMA, peerId, -1, null, null, path, null, null);
 	}
 
 	/**

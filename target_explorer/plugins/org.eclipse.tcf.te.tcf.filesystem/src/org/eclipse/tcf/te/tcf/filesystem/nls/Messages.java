@@ -210,6 +210,9 @@ public class Messages extends NLS {
 
 	public static String FSDelete_DeleteFileFolderTitle;
 
+	public static String FSDropTargetListener_ConfirmMoveTitle;
+	public static String FSDropTargetListener_MovingWarningMultiple;
+	public static String FSDropTargetListener_MovingWarningSingle;
 	public static String FSRename_CannotRename;
 	public static String FSRename_JobTitle;
 	public static String FSRename_RenameFileFolderTitle;
@@ -249,6 +252,7 @@ public class Messages extends NLS {
 	public static String FSRenamingAssistant_SpecifyNonEmptyName;
 	public static String FSRenamingAssistant_UnixIllegalCharacters;
 	public static String FSRenamingAssistant_WinIllegalCharacters;
+	public static String FSUpload_UploadTitle;
 
 	public static String SaveAllListener_Cancel;
 	public static String SaveAllListener_Merge;

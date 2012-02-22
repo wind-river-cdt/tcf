@@ -14,7 +14,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.dnd.DragSourceEvent;
 import org.eclipse.swt.dnd.DragSourceListener;
-import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 
 /**
  * The drag source listener for the file tree of Target Explorer.
@@ -22,6 +21,8 @@ import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 public class FSDragSourceListener implements DragSourceListener {
 	// The tree viewer in which the DnD gesture happens.
 	private TreeViewer viewer;
+	// The common dnd operation
+	CommonDnD dnd;
 
 	/**
 	 * Create an FSDragSourceListener using the specified tree viewer.
@@ -30,6 +31,7 @@ public class FSDragSourceListener implements DragSourceListener {
 	 */
 	public FSDragSourceListener(TreeViewer viewer) {
 		this.viewer = viewer;
+		dnd = new CommonDnD();
 	}
 
 	/*
@@ -39,7 +41,7 @@ public class FSDragSourceListener implements DragSourceListener {
 	@Override
 	public void dragStart(DragSourceEvent event) {
 		IStructuredSelection aSelection = (IStructuredSelection) viewer.getSelection();
-		event.doit = isDraggable(aSelection);
+		event.doit = dnd.isDraggable(aSelection);
 		LocalSelectionTransfer.getTransfer().setSelection(aSelection);
 	}
 
@@ -61,37 +63,4 @@ public class FSDragSourceListener implements DragSourceListener {
 	@Override
 	public void dragFinished(DragSourceEvent event) {
 	}
-	
-	/**
-	 * If the current selection is draggable.
-	 * 
-	 * @param selection The currently selected nodes.
-	 * @return true if it is draggable.
-	 */
-	private boolean isDraggable(IStructuredSelection selection) {
-		if (selection.isEmpty()) {
-			return false;
-		}
-		Object[] objects = selection.toArray();
-		for (Object object : objects) {
-			if (!isDraggableObject(object)) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/**
-	 * If the specified object is a draggable element.
-	 * 
-	 * @param object The object to be dragged.
-	 * @return true if it is draggable.
-	 */
-	private boolean isDraggableObject(Object object) {
-		if (object instanceof FSTreeNode) {
-			FSTreeNode node = (FSTreeNode) object;
-			return !node.isRoot() && (node.isWindowsNode() && !node.isReadOnly() || !node.isWindowsNode() && node.isWritable());
-		}
-		return false;
-	}	
 }
