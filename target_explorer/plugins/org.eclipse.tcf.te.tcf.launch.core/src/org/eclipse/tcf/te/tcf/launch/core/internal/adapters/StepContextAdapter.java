@@ -221,4 +221,47 @@ public class StepContextAdapter extends PlatformObject implements IStepContext {
 
 		if (error.get() != null) throw error.get();
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
+	 */
+	@Override
+	public Object getAdapter(final Class adapter) {
+		// NOTE: The getAdapter(...) method can be invoked from many place and
+		//       many threads where we cannot control the calls. Therefore, this
+		//       method is allowed be called from any thread.
+		final AtomicReference<Object> object = new AtomicReference<Object>();
+		Runnable runnable = new Runnable() {
+			@Override
+			public void run() {
+				object.set(doGetAdapter(adapter));
+			}
+		};
+
+		if (Protocol.isDispatchThread()) runnable.run();
+		else Protocol.invokeAndWait(runnable);
+
+		return object.get() != null ? object.get() : super.getAdapter(adapter);
+	}
+
+	/**
+	 * Returns an object which is an instance of the given class associated with this object.
+	 * Returns <code>null</code> if no such object can be found.
+	 * <p>
+	 * This method must be called within the TCF dispatch thread!
+	 *
+	 * @param adapter The adapter class to look up.
+	 * @return The adapter or <code>null</code>.
+	 */
+	protected Object doGetAdapter(Class<?> adapter) {
+		if (IModelNode.class.isAssignableFrom(adapter)) {
+			return peerModel;
+		}
+
+		if (IPeer.class.equals(adapter)) {
+			return peerModel.getPeer();
+		}
+
+		return null;
+	}
 }

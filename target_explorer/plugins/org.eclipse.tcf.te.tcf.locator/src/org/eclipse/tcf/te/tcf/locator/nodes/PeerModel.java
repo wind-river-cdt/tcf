@@ -162,11 +162,13 @@ public class PeerModel extends ContainerModelNode implements IPeerModel, IWorkin
 	protected Object doGetAdapter(Class<?> adapter) {
 		Assert.isTrue(checkThreadAccess(), "Illegal Thread Access"); //$NON-NLS-1$
 
-		if (adapter.isAssignableFrom(ILocatorModel.class)) {
+		if (ILocatorModel.class.equals(adapter)) {
 			return model;
 		}
 
 		Object peer = getProperty(IPeerModelProperties.PROP_INSTANCE);
+		// Check with adapter.isAssignableFrom(...) to return the peer instance
+		// correctly if adapter is IPeer.class.
 		if (peer != null && adapter.isAssignableFrom(peer.getClass())) {
 			return peer;
 		}
