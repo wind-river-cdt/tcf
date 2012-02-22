@@ -23,6 +23,7 @@
 		<tm-version>3.3</tm-version>
 		<tm-site>http://download.eclipse.org/tm/updates/${tm-version}</tm-site>
 		<rxtx-site>http://rxtx.qbang.org/eclipse</rxtx-site>
+		<findbugs-maven-version>2.4.1-SNAPSHOT</findbugs-maven-version>
 	</properties>
 
 	<licenses>
@@ -201,7 +202,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>findbugs-maven-plugin</artifactId>
-				<version>2.4.0</version>
+				<version>${findbugs-maven-version}</version>
 				<configuration>
 					<encoding>UTF-8</encoding>
 					<effort>Max</effort>
@@ -268,7 +269,7 @@
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>findbugs-maven-plugin</artifactId>
-					<version>2.4.0</version>
+					<version>${findbugs-maven-version}</version>
 					<configuration>
 						<effort>Max</effort>
 						<threshold>Low</threshold>
