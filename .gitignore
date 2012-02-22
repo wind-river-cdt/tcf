@@ -138,6 +138,8 @@ tests/plugins/org.eclipse.tcf.debug.test/bin
 /target_explorer/plugins/org.eclipse.tcf.te.ui.terminals/bin
 /target_explorer/plugins/org.eclipse.tcf.te.ui.terminals.process/target
 /target_explorer/plugins/org.eclipse.tcf.te.ui.terminals.process/bin
+/target_explorer/plugins/org.eclipse.tcf.te.ui.terminals.serial/target
+/target_explorer/plugins/org.eclipse.tcf.te.ui.terminals.serial/bin
 /target_explorer/plugins/org.eclipse.tcf.te.ui.terminals.ssh/target
 /target_explorer/plugins/org.eclipse.tcf.te.ui.terminals.ssh/bin
 /target_explorer/plugins/org.eclipse.tcf.te.ui.terminals.telnet/target

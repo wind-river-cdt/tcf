@@ -71,6 +71,7 @@
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.ui.swt</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.ui.terminals</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.ui.terminals.process</module>
+	  <module>target_explorer/plugins/org.eclipse.tcf.te.ui.terminals.serial</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.ui.terminals.ssh</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.ui.terminals.telnet</module>
 	  <module>target_explorer/plugins/org.eclipse.tcf.te.ui.views</module>
