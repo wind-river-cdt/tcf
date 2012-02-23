@@ -99,6 +99,10 @@ public class FSUpload extends FSUIOperation implements IConfirmCallback {
 	    return status;
     }
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.interfaces.IConfirmCallback#requires(java.lang.Object)
+	 */
 	@Override
     public boolean requires(Object object) {
 		File file = (File) object;
@@ -110,6 +114,10 @@ public class FSUpload extends FSUIOperation implements IConfirmCallback {
 	    return false;
     }
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.interfaces.IConfirmCallback#confirms(java.lang.Object)
+	 */
 	@Override
     public int confirms(Object object) {
 		final int[] results = new int[1];

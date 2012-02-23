@@ -127,6 +127,7 @@ public class UIPlugin extends AbstractUIPlugin {
 			Command saveAllCmd = commandService.getCommand(IWorkbenchCommandConstants.FILE_SAVE_ALL);
 			saveAllCmd.removeExecutionListener(saveAllListener);
 		}
+		clipboard.dispose();
 		clipboard = null;
 		plugin = null;
 		super.stop(context);

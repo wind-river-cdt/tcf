@@ -15,7 +15,11 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
+import org.eclipse.tcf.te.tcf.filesystem.internal.dnd.CommonDnD;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSClipboard;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSCopy;
 import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSMove;
@@ -36,7 +40,17 @@ public class PasteFilesHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		FSClipboard cb = UIPlugin.getDefault().getClipboard();
-		if (!cb.isEmpty()) {
+		Clipboard clipboard = cb.getSystemClipboard();
+		Object contents = clipboard.getContents(FileTransfer.getInstance());
+		if(contents != null) {
+			String[] files = (String[]) contents;
+			// Get the files/folders from the clip board.
+			IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getCurrentSelectionChecked(event);
+			FSTreeNode hovered = (FSTreeNode) selection.getFirstElement();
+			CommonDnD dnd = new CommonDnD();
+			dnd.dropFiles(null, files, DND.DROP_COPY, hovered);
+		} 
+		else if (!cb.isEmpty()) {
 			// Get the files/folders from the clip board.
 			int operations = cb.getOperation();
 			IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getCurrentSelectionChecked(event);

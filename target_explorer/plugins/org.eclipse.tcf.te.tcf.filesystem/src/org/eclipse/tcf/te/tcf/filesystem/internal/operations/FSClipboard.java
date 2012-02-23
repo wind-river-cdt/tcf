@@ -12,8 +12,10 @@ package org.eclipse.tcf.te.tcf.filesystem.internal.operations;
 import java.util.List;
 
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.ui.utils.PropertyChangeProvider;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * The clip board to which copy or cut files/folders.
@@ -27,12 +29,15 @@ public class FSClipboard extends PropertyChangeProvider {
 	private int operation;
 	// The currently selected files/folders.
 	private List<FSTreeNode> files;
+	// The system clipboard.
+	private Clipboard clipboard;
 
 	/**
 	 * Create a clip board instance.
 	 */
 	public FSClipboard() {
 		operation = NONE;
+		clipboard = new Clipboard(PlatformUI.getWorkbench().getDisplay());
 	}
 
 	/**
@@ -70,6 +75,7 @@ public class FSClipboard extends PropertyChangeProvider {
 	public void cutFiles(List<FSTreeNode> files) {
 		operation = CUT;
 		this.files = files;
+		clipboard.clearContents();
 		PropertyChangeEvent event = new PropertyChangeEvent(this, "cut", null, null); //$NON-NLS-1$
 		firePropertyChange(event);
 	}
@@ -82,6 +88,7 @@ public class FSClipboard extends PropertyChangeProvider {
 	public void copyFiles(List<FSTreeNode> files) {
 		operation = COPY;
 		this.files = files;
+		clipboard.clearContents();
 		PropertyChangeEvent event = new PropertyChangeEvent(this, "copy", null, null); //$NON-NLS-1$
 		firePropertyChange(event);
 	}
@@ -92,7 +99,24 @@ public class FSClipboard extends PropertyChangeProvider {
 	public void clear() {
 		operation = NONE;
 		this.files = null;
+		clipboard.clearContents();
 		PropertyChangeEvent event = new PropertyChangeEvent(this, "clear", null, null); //$NON-NLS-1$
 		firePropertyChange(event);
+	}
+	
+	/**
+	 * Dispose the clipboard.
+	 */
+	public void dispose() {
+		if (!clipboard.isDisposed()) clipboard.dispose();
+	}
+
+	/**
+	 * Get the system clipboard.
+	 * 
+	 * @return The system clipboard.
+	 */
+	public Clipboard getSystemClipboard() {
+		return clipboard;
 	}
 }
