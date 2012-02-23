@@ -240,7 +240,7 @@
                         </instanceof>
                         <not>
                            <test
-                                 property="org.eclipse.tcf.te.tcf.processes.ui.propertytester.process.isSystemRoot">
+                                 property="org.eclipse.tcf.te.tcf.processes.ui.model.isSystemRoot">
                            </test>
                         </not>
                      </and>
@@ -270,7 +270,7 @@
                         </instanceof>
                         <not>
                            <test
-                                 property="org.eclipse.tcf.te.tcf.processes.ui.propertytester.process.isSystemRoot">
+                                 property="org.eclipse.tcf.te.tcf.processes.ui.model.isSystemRoot">
                            </test>
                         </not>
                      </and>
@@ -349,7 +349,7 @@
                   <count value="+"/>
                   <iterate operator="and" ifEmpty="false">
                      <adapt type="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
-                        <test property="org.eclipse.tcf.te.tcf.processes.model.isAttached" value="false"/>
+                        <test property="org.eclipse.tcf.te.tcf.processes.ui.model.isAttached" value="false"/>
                      </adapt>
                   </iterate>
                </with>
@@ -379,7 +379,7 @@
                   <count value="+"/>
                   <iterate operator="and" ifEmpty="false">
                      <adapt type="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
-                        <test property="org.eclipse.tcf.te.tcf.processes.model.isAttached" value="true"/>
+                        <test property="org.eclipse.tcf.te.tcf.processes.ui.model.isAttached" value="true"/>
                      </adapt>
                   </iterate>
                </with>
@@ -450,15 +450,6 @@
    </extension>
 
 <!-- Eclipse core expressions property tester -->
-   <extension point="org.eclipse.core.expressions.propertyTesters">
-      <propertyTester
-            class="org.eclipse.tcf.te.tcf.processes.ui.model.PropertyTester"
-            id="org.eclipse.tcf.te.tcf.processes.ui.model.PropertyTester"
-            namespace="org.eclipse.tcf.te.tcf.processes.model"
-            properties="isAttached"
-            type="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
-      </propertyTester>
-   </extension>
    
    <extension point="org.eclipse.tcf.te.ui.viewers">
       <viewer
@@ -684,7 +675,7 @@
                </instanceof>
                <not>
                   <test
-                        property="org.eclipse.tcf.te.tcf.processes.ui.propertytester.process.isSystemRoot">
+                        property="org.eclipse.tcf.te.tcf.processes.ui.model.isSystemRoot">
                   </test>
                </not>
             </and>
@@ -701,7 +692,7 @@
                </instanceof>
                <not>
                   <test
-                        property="org.eclipse.tcf.te.tcf.processes.ui.propertytester.process.isSystemRoot">
+                        property="org.eclipse.tcf.te.tcf.processes.ui.model.isSystemRoot">
                   </test>
                </not>
             </and>
@@ -718,7 +709,7 @@
                </instanceof>
                <not>
                   <test
-                        property="org.eclipse.tcf.te.tcf.processes.ui.propertytester.process.isSystemRoot">
+                        property="org.eclipse.tcf.te.tcf.processes.ui.model.isSystemRoot">
                   </test>
                </not>
             </and>
@@ -730,8 +721,8 @@
       <propertyTester
             class="org.eclipse.tcf.te.tcf.processes.ui.internal.testers.ProcessPropertyTester"
             id="org.eclipse.tcf.te.tcf.processes.ui.propertytester.process"
-            namespace="org.eclipse.tcf.te.tcf.processes.ui.propertytester.process"
-            properties="isSystemRoot"
+            namespace="org.eclipse.tcf.te.tcf.processes.ui.model"
+            properties="isSystemRoot, isAttached"
             type="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
       </propertyTester>
    </extension>
