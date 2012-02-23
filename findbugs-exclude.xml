@@ -8,13 +8,9 @@
 		</Or>
 	</Match>
 	
-	<!-- Ignore all NM_SAME_SIMPLE_NAME_AS_SUPERCLASS for PreferencePage/PropertyTester -->
+	<!-- Ignore all NM_SAME_SIMPLE_NAME_AS_SUPERCLASS violations -->
 	<Match>
 		<Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"/>
-		<Or>
-			<Class name="~.*\.PreferencePage"/>
-			<Class name="~.*\.PropertyTester"/>
-		</Or>
 	</Match>
 	
 </FindBugsFilter>
