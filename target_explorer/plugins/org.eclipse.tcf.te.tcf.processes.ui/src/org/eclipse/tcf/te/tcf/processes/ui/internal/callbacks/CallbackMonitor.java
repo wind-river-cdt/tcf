@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
@@ -171,8 +172,8 @@ public class CallbackMonitor {
 	 */
 	private synchronized IStatus getCurrentStatus() {
 		List<IStatus> list = new ArrayList<IStatus>();
-		for (Object key : locks.keySet()) {
-			IStatus status = locks.get(key);
+		for (Entry<Object, IStatus>entry : locks.entrySet()) {
+			IStatus status = entry.getValue();
 			if (status == null) return null;
 			list.add(status);
 		}

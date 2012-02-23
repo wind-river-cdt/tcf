@@ -268,10 +268,10 @@ public class LocalFileSaveable extends Saveable implements
 		if (document != null) {
 			Object otherDocument = ((Saveable) obj).getAdapter(IDocument.class);
 
-			if (document == null && otherDocument == null)
+			if (otherDocument == null)
 				return false;
 
-			return document != null && document.equals(otherDocument);
+			return document.equals(otherDocument);
 		}
 
 		if (obj instanceof LocalFileSaveable) {

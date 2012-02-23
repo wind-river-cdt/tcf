@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.eclipse.core.runtime.Platform;
@@ -287,16 +288,17 @@ public class PersistenceManager {
 	private void saveContentTypes() {
 		XMLMemento memento = XMLMemento.createWriteRoot(CONTENT_TYPE_ROOT);
 		IMemento mResolved = memento.createChild(ELEMENT_RESOLVED);
-		for (URI key : resolved.keySet()) {
-			IContentType iContentType = resolved.get(key);
+		for (Entry<URI, IContentType> entry : resolved.entrySet()) {
 			IMemento mResolvable = mResolved.createChild(ELEMENT_RESOLVABLE);
+			URI key = entry.getKey();
 			mResolvable.putString(ATTR_URI, key.toString());
+			IContentType iContentType = entry.getValue();
 			mResolvable.putString(ATTR_CONTENT_TYPE, iContentType.getId());
 		}
 		IMemento mUnresolved = memento.createChild(ELEMENT_UNRESOLVED);
-		for (URI key : unresolved.keySet()) {
+		for (Entry<URI, URI> entry : unresolved.entrySet()) {
 			IMemento mUnresolvable = mUnresolved.createChild(ELEMENT_UNRESOLVABLE);
-			mUnresolvable.putString(ATTR_URI, key.toString());
+			mUnresolvable.putString(ATTR_URI, entry.getKey().toString());
 		}
 		writeMemento(memento, CONTENT_TYPE_FILE);
 	}
@@ -363,11 +365,11 @@ public class PersistenceManager {
 	 */
 	private void savePersistentProperties() {
 		XMLMemento memento = XMLMemento.createWriteRoot(PERSISTENT_ROOT);
-		for (URI key : properties.keySet()) {
-			Map<QualifiedName, String> nodeProperties = properties.get(key);
-			if (!nodeProperties.keySet().isEmpty()) {
+		for (Entry<URI, Map<QualifiedName, String>> entry : properties.entrySet()) {
+			Map<QualifiedName, String> nodeProperties = entry.getValue();
+			if (!nodeProperties.isEmpty()) {
 				IMemento mFile = memento.createChild(ELEMENT_FILE);
-				mFile.putString(ATTR_URI, key.toString());
+				mFile.putString(ATTR_URI, entry.getKey().toString());
 				saveFileProperties(mFile, nodeProperties);
 			}
 		}
@@ -381,11 +383,12 @@ public class PersistenceManager {
 	 * @param properties The file properties.
 	 */
 	private void saveFileProperties(IMemento memento, Map<QualifiedName, String> properties) {
-		for (QualifiedName name : properties.keySet()) {
+		for (Entry<QualifiedName, String> entry : properties.entrySet()) {
+			QualifiedName name = entry.getKey();
 			IMemento mProperty = memento.createChild(ELEMENT_PROPERTY);
 			mProperty.putString(ATTR_QUALIFIER, name.getQualifier());
 			mProperty.putString(ATTR_LOCAL_NAME, name.getLocalName());
-			mProperty.putString(ATTR_VALUE, properties.get(name));
+			mProperty.putString(ATTR_VALUE, entry.getValue());
 		}
 	}
 
@@ -479,9 +482,8 @@ public class PersistenceManager {
 	 */
 	private void saveTimestamps() {
 		Properties properties = new Properties();
-		for (URI key : timestamps.keySet()) {
-			Long timestamp = timestamps.get(key);
-			properties.setProperty(key.toString(), timestamp.toString());
+		for (Entry<URI, Long> entry : timestamps.entrySet()) {
+			properties.setProperty(entry.getKey().toString(), entry.getValue().toString());
 		}
 		File location = CacheManager.getInstance().getCacheRoot();
 		File fTimestamp = new File(location, TIMESTAMP_FILE);

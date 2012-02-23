@@ -332,7 +332,7 @@ public class OpenWithMenu extends ContributionItem {
 			return defaultDescriptor;
 		}
 
-		IEditorDescriptor editorDesc = defaultDescriptor;
+		IEditorDescriptor editorDesc = null;
 
 		// next check the OS for in-place editor (OLE on Win32)
 		if (registry.isSystemInPlaceEditorAvailable(node.name)) {

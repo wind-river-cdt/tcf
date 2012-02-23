@@ -15,6 +15,7 @@ import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
  * The comparator for the tree column "size".
  */
 public class SizeComparator extends FSTreeNodeComparator {
+    private static final long serialVersionUID = 1L;
 
 	/*
 	 * (non-Javadoc)

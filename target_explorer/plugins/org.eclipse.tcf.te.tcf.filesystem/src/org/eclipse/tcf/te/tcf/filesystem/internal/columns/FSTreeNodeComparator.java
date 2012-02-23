@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.columns;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
@@ -16,7 +17,8 @@ import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 /**
  * The base comparator for all the file system tree column.
  */
-public abstract class FSTreeNodeComparator implements Comparator<FSTreeNode> {
+public abstract class FSTreeNodeComparator implements Comparator<FSTreeNode>, Serializable {
+    private static final long serialVersionUID = 1L;
 
 	/*
 	 * (non-Javadoc)

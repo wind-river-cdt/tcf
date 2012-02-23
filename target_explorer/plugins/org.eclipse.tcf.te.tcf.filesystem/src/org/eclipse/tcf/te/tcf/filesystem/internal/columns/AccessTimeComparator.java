@@ -15,6 +15,7 @@ import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
  * The comparator for the tree column "Date Accessed".
  */
 public class AccessTimeComparator extends FSTreeNodeComparator {
+    private static final long serialVersionUID = 1L;
 
 	/*
 	 * (non-Javadoc)

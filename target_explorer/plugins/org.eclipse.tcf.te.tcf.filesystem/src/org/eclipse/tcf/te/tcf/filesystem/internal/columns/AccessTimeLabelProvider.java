@@ -19,8 +19,6 @@ import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
  * The label provider for the tree column "Date Accessed".
  */
 public class AccessTimeLabelProvider extends LabelProvider {
-	// The date formatter.
-	private static final SimpleDateFormat DATE_ACCESSED_FORMAT = new SimpleDateFormat("M/d/yyyy h:mm aa"); //$NON-NLS-1$
 
 	/*
 	 * (non-Javadoc)
@@ -33,7 +31,8 @@ public class AccessTimeLabelProvider extends LabelProvider {
 			// Pending nodes does not have column texts at all
 			if(node.isPendingNode()) return ""; //$NON-NLS-1$
 			if (node.attr != null) {
-				return DATE_ACCESSED_FORMAT.format(new Date(node.attr.atime));
+				SimpleDateFormat dateFormat = new SimpleDateFormat("M/d/yyyy h:mm aa"); //$NON-NLS-1$
+				return dateFormat.format(new Date(node.attr.atime));
 			}
 		}
 		return ""; //$NON-NLS-1$

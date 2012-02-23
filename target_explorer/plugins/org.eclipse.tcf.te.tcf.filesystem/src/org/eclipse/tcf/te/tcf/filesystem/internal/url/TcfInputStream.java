@@ -42,9 +42,6 @@ public class TcfInputStream extends InputStream {
 	// The chunk size of the reading buffer.
 	int chunk_size = 0;
 
-	// File reading timeout.
-	int timeout;
-
 	// The URL Connection
 	TcfURLConnection connection;
 
@@ -75,15 +72,6 @@ public class TcfInputStream extends InputStream {
 	public TcfInputStream(TcfURLConnection connection, int chunk_size) {
 		this.connection = connection;
 		this.chunk_size = chunk_size;
-	}
-
-	/**
-	 * Set the timeout for reading a file.
-	 *
-	 * @param timeout the timeout in milliseconds.
-	 */
-	void setTimeout(int readTimeout) {
-		this.timeout = readTimeout;
 	}
 
 	/*

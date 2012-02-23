@@ -37,14 +37,8 @@ public class TcfOutputStream extends OutputStream {
 	// The current error during writing.
 	Exception ERROR;
 
-	// The chunk size of the writing buffer.
-	int chunk_size = 0;
-
 	// The URL Connection
 	TcfURLConnection connection;
-
-	// The timeout for writing data.
-	int timeout;
 	/**
 	 * Create a TCF output stream connected the specified peer with specified
 	 * path to the remote resource.
@@ -71,18 +65,8 @@ public class TcfOutputStream extends OutputStream {
 	 */
 	public TcfOutputStream(TcfURLConnection connection, int chunk_size) {
 		this.connection = connection;
-		this.chunk_size = chunk_size;
 		buffer = new byte[chunk_size];
 		offset = 0;
-	}
-
-	/**
-	 * Set the timeout for writing a file.
-	 *
-	 * @param timeout The timeout for writing a file.
-	 */
-	void setTimeout(int timeout){
-		this.timeout = timeout;
 	}
 
 	/* (non-Javadoc)

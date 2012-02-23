@@ -56,15 +56,14 @@ public abstract class MergeTypedElement extends BufferedContent implements IType
 	 */
 	@Override
 	public String getType() {
-		if (node.isDirectory())
-			return ITypedElement.FOLDER_TYPE;
 		if (node != null) {
+			if (node.isDirectory()) {
+				return ITypedElement.FOLDER_TYPE;
+			}
 			String s = node.name;
 			int dot = s.lastIndexOf('.');
-			if (dot != -1)
-				s = s.substring(dot + 1);
-			if (s != null)
-				return s;
+			if (dot != -1) s = s.substring(dot + 1);
+			if (s != null) return s;
 		}
 		return ITypedElement.UNKNOWN_TYPE;
 	}

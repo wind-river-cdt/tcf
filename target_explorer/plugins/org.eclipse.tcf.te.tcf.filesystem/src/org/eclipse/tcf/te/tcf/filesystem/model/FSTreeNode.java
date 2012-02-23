@@ -609,12 +609,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 	public void setName(String name) {
 		String oldName = this.name;
 		this.name = name;
-		if(oldName == null) {
-			if(name != null) {
-				firePropertyChange(new PropertyChangeEvent(this, "name", oldName, name)); //$NON-NLS-1$
-			}
-		} 
-		else	if(!oldName.equals(name)) {
+		if(name == null && oldName != null || name != null && !name.equals(oldName)) {
 			firePropertyChange(new PropertyChangeEvent(this, "name", oldName, name)); //$NON-NLS-1$
 		}
 	}

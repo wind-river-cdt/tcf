@@ -211,11 +211,9 @@ public class TcfURLConnection extends URLConnection {
 			openFile();
 			if (doInput) {
 				inputStream = new TcfInputStream(this);
-				inputStream.setTimeout(getReadTimeout());
 			}
 			if (doOutput) {
 				outputStream = new TcfOutputStream(this);
-				outputStream.setTimeout(getReadTimeout());
 			}
 			connected = true;
 		}
