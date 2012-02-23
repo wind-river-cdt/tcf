@@ -252,7 +252,13 @@ public class Messages extends NLS {
 	public static String FSRenamingAssistant_SpecifyNonEmptyName;
 	public static String FSRenamingAssistant_UnixIllegalCharacters;
 	public static String FSRenamingAssistant_WinIllegalCharacters;
+	public static String FSUpload_Cancel;
+	public static String FSUpload_No;
+	public static String FSUpload_OverwriteConfirmation;
+	public static String FSUpload_OverwriteTitle;
 	public static String FSUpload_UploadTitle;
+	public static String FSUpload_Yes;
+	public static String FSUpload_YesToAll;
 
 	public static String SaveAllListener_Cancel;
 	public static String SaveAllListener_Merge;

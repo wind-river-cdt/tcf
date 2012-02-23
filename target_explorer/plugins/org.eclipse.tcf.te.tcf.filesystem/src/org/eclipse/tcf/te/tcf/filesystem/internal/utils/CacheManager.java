@@ -36,6 +36,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.dialogs.TimeTriggeredProgressMonitorDialog;
+import org.eclipse.tcf.te.tcf.filesystem.interfaces.IConfirmCallback;
 import org.eclipse.tcf.te.tcf.filesystem.internal.url.TcfURLConnection;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
@@ -345,7 +346,7 @@ public class CacheManager {
 		}
 		try {
 			// Upload the files to the remote location by the specified URLs.
-			uploadFiles(monitor, files, urls);
+			uploadFiles(monitor, files, urls, null);
 		}
 		finally {
 			// Once upload is successful, synchronize the modified time.
@@ -377,9 +378,10 @@ public class CacheManager {
 	 * @param files  The local file objects.
 	 * @param urls The remote file's URL location.
 	 * @param monitor The monitor used to report the progress.
+	 * @param callback confirmation callback.
 	 * @throws Exception an Exception thrown during downloading and storing data.
 	 */
-	public void uploadFiles(IProgressMonitor monitor, File[] files, URL[] urls) throws IOException {
+	public void uploadFiles(IProgressMonitor monitor, File[] files, URL[] urls, IConfirmCallback callback) throws IOException {
 		BufferedInputStream input = null;
 		BufferedOutputStream output = null;
 		// The buffer used to download the file.
@@ -395,8 +397,36 @@ public class CacheManager {
 		int percentRead = 0;
 		// The current length of read bytes.
 		long bytesRead = 0;
+		boolean yes2all = false;
 		for (int i = 0; i < files.length && !monitor.isCanceled(); i++) {
 			File file = files[i];
+			if(callback != null && !yes2all) {
+				if(callback.requires(file)) {
+					int result = callback.confirms(file);
+					switch(result) {
+					case IConfirmCallback.YES:
+						break;
+					case IConfirmCallback.YES_TO_ALL:
+						yes2all = true;
+						break;
+					case IConfirmCallback.NO:
+						bytesRead += file.length();
+						if (chunk_size != 0) {
+							int percent = (int) bytesRead / chunk_size;
+							if (percent != percentRead) { // Update the progress.
+								monitor.worked(percent - percentRead);
+								percentRead = percent; // Remember the percentage.
+								// Report the progress.
+								monitor.subTask(NLS.bind(Messages.CacheManager_UploadingProgress, new Object[]{file.getName(), formatSize(bytesRead), formatSize(file.length())}));
+							}
+						}
+						continue;
+					case IConfirmCallback.CANCEL:
+						monitor.setCanceled(true);
+						continue;
+					}
+				}
+			}
 			try {
 				URL url = urls[i];
 				TcfURLConnection connection = (TcfURLConnection) url.openConnection();
