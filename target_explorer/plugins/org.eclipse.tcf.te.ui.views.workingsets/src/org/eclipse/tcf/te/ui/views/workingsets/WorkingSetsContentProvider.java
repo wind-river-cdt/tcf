@@ -95,7 +95,7 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			if (SHOW_TOP_LEVEL_WORKING_SETS.equals(event.getProperty())) {
-				updateRootMode();
+				updateRootMode(true);
 			}
 		}
 	};
@@ -137,7 +137,7 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 		extensionStateModel = config.getExtensionStateModel();
 		extensionStateModel.addPropertyChangeListener(rootModeListener);
 
-		updateRootMode();
+		updateRootMode(false);
 	}
 
 	/* (non-Javadoc)
@@ -302,7 +302,7 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 	/**
 	 * Update the common navigator root mode.
 	 */
-	private void updateRootMode() {
+	private void updateRootMode(boolean updateInput) {
 		CommonNavigator navigator = viewer.getCommonNavigator();
 		if (navigator == null) return;
 
@@ -319,7 +319,7 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 			filterActive = false;
 		}
 
-		if (!newInput.equals(viewer.getInput())) {
+		if (updateInput && !newInput.equals(viewer.getInput())) {
 			viewer.setInput(newInput);
 		}
 		setFilterActive(filterActive);
