@@ -9,7 +9,6 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.preferences;
 
-import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -21,9 +20,9 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 /**
- * Target Explorer top preference page implementation.
+ * Top preference page implementation.
  */
-public class TargetExplorerPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+public class PreferencePage extends org.eclipse.jface.preference.PreferencePage implements IWorkbenchPreferencePage {
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
