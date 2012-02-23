@@ -19,12 +19,14 @@ import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
 import org.eclipse.tcf.te.tcf.locator.interfaces.IModelListener;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.tcf.locator.internal.nodes.InvalidPeerModel;
 import org.eclipse.tcf.te.tcf.locator.listener.ModelAdapter;
 import org.eclipse.tcf.te.tcf.locator.model.Model;
 
 /**
  * Adapter factory implementation.
  */
+@SuppressWarnings("restriction")
 public class AdapterFactory implements IAdapterFactory {
 	// Maintain a map of step context adapters per peer model
 	/* default */ Map<IPeerModel, IStepContext> adapters = new HashMap<IPeerModel, IStepContext>();
@@ -65,7 +67,7 @@ public class AdapterFactory implements IAdapterFactory {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 	 */
-	@Override
+    @Override
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if (adaptableObject instanceof IPeerModel) {
 			if (IStepContext.class.equals(adapterType)) {
@@ -74,7 +76,9 @@ public class AdapterFactory implements IAdapterFactory {
 				// No adapter yet -> create a new one for this peer
 				if (adapter == null) {
 					adapter = new StepContextAdapter((IPeerModel)adaptableObject);
-					adapters.put((IPeerModel)adaptableObject, adapter);
+					if (!(adaptableObject instanceof InvalidPeerModel)) {
+						adapters.put((IPeerModel)adaptableObject, adapter);
+					}
 				}
 				return adapter;
 			}
