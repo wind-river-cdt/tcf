@@ -124,7 +124,7 @@
 <!-- Preference page contributions -->
    <extension point="org.eclipse.ui.preferencePages">
       <page
-            class="org.eclipse.tcf.te.ui.preferences.PreferencePage"
+            class="org.eclipse.tcf.te.ui.preferences.TargetExplorerPreferencePage"
             id="org.eclipse.tcf.te.ui.preferences.general"
             name="%preference.page.name">
       </page>

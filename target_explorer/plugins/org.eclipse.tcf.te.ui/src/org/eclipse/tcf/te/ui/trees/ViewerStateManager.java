@@ -12,9 +12,13 @@ package org.eclipse.tcf.te.ui.trees;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -142,9 +146,9 @@ public class ViewerStateManager {
                 }
 				@Override
 				public void run() throws Exception {
-					BufferedReader reader = null;
+					Reader reader = null;
 					try {
-						reader = new BufferedReader(new FileReader(stateFile));
+						reader = new BufferedReader(new InputStreamReader(new FileInputStream(stateFile), "UTF-8")); //$NON-NLS-1$
 						XMLMemento root = XMLMemento.createReadRoot(reader);
 						loadViewerState(root);
 					}
@@ -226,9 +230,9 @@ public class ViewerStateManager {
             }
 			@Override
 			public void run() throws Exception {
-				BufferedWriter writer = null;
+				Writer writer = null;
 				try {
-					writer = new BufferedWriter(new FileWriter(stateFile));
+					writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(stateFile), "UTF-8")); //$NON-NLS-1$
 					root.save(writer);
 				}
 				finally {
