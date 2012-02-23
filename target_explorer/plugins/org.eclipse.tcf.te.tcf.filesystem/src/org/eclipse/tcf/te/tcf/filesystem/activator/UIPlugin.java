@@ -18,6 +18,7 @@ import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.IExecutionListener;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.swt.SWTException;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tcf.te.tcf.filesystem.internal.ImageConsts;
 import org.eclipse.tcf.te.tcf.filesystem.internal.autosave.SaveAllListener;
@@ -127,7 +128,8 @@ public class UIPlugin extends AbstractUIPlugin {
 			Command saveAllCmd = commandService.getCommand(IWorkbenchCommandConstants.FILE_SAVE_ALL);
 			saveAllCmd.removeExecutionListener(saveAllListener);
 		}
-		clipboard.dispose();
+		// Ignore SWTException here, the display might be disposed already.
+		try { clipboard.dispose(); } catch (SWTException e) { /* ignored on purpose */ }
 		clipboard = null;
 		plugin = null;
 		super.stop(context);
