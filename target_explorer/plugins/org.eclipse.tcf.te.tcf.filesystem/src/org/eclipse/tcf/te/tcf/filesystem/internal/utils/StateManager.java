@@ -143,7 +143,7 @@ public class StateManager {
 	 */
 	void commitNodeAttr(FSTreeNode node, FileAttrs attr){
 		node.setAttributes(attr);
-		PersistenceManager.getInstance().setBaseTimestamp(node.getLocationURL(), attr.mtime);
+		PersistenceManager.getInstance().setBaseTimestamp(node.getLocationURI(), attr.mtime);
 	}
 
 	/**
@@ -158,7 +158,7 @@ public class StateManager {
 		if(!file.exists())
 			return CacheState.consistent;
 		long ltime = file.lastModified();
-		long btime = PersistenceManager.getInstance().getBaseTimestamp(node.getLocationURL());
+		long btime = PersistenceManager.getInstance().getBaseTimestamp(node.getLocationURI());
 		long mtime = 0;
 		if(node.attr!=null)
 			mtime = node.attr.mtime;

@@ -21,8 +21,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -75,8 +75,8 @@ public class PersistenceManager {
 	// The attribute "qualifier" of a qualified name.
 	private static final String ATTR_QUALIFIER = "qualifier"; //$NON-NLS-1$
 
-	// The attribute of a node's URL
-	private static final String ATTR_URL = "URL"; //$NON-NLS-1$
+	// The attribute of a node's URI
+	private static final String ATTR_URI = "URI"; //$NON-NLS-1$
 
 	// The element "property" to record a file's property
 	private static final String ELEMENT_PROPERTY = "property"; //$NON-NLS-1$
@@ -97,16 +97,16 @@ public class PersistenceManager {
 	private static PersistenceManager instance;
 
 	// The time stamp for each file.
-	private Map<URL, Long> timestamps;
+	private Map<URI, Long> timestamps;
 
 	// The persistent properties of the files.
-	private Map<URL, Map<QualifiedName, String>> properties;
+	private Map<URI, Map<QualifiedName, String>> properties;
 
-	// Already known resolved content type of file nodes specified by their URLs.
-	private Map<URL, IContentType> resolved;
+	// Already known resolved content type of file nodes specified by their URIs.
+	private Map<URI, IContentType> resolved;
 
-	// Already known unresolvable file nodes specified by their URLs.
-	private Map<URL, URL> unresolved;
+	// Already known unresolvable file nodes specified by their URIs.
+	private Map<URI, URI> unresolved;
 
 	/**
 	 * Get the singleton cache manager.
@@ -136,7 +136,7 @@ public class PersistenceManager {
 	 * @return true if it is not resolvable or else false.
 	 */
 	public boolean isUnresovled(FSTreeNode node) {
-		return unresolved.get(node.getLocationURL()) != null;
+		return unresolved.get(node.getLocationURI()) != null;
 	}
 
 	/**
@@ -146,7 +146,7 @@ public class PersistenceManager {
 	 * @return the content type of the node if it is resolvable or null.
 	 */
 	public IContentType getResolved(FSTreeNode node) {
-		return resolved.get(node.getLocationURL());
+		return resolved.get(node.getLocationURI());
 	}
 
 	/**
@@ -156,7 +156,7 @@ public class PersistenceManager {
 	 * @param contentType Its content type.
 	 */
 	public void addResovled(FSTreeNode node, IContentType contentType) {
-		resolved.put(node.getLocationURL(), contentType);
+		resolved.put(node.getLocationURI(), contentType);
 	}
 
 	/**
@@ -165,7 +165,7 @@ public class PersistenceManager {
 	 * @param node The file node.
 	 */
 	public void addUnresolved(FSTreeNode node) {
-		unresolved.put(node.getLocationURL(), node.getLocationURL());
+		unresolved.put(node.getLocationURI(), node.getLocationURI());
 	}
 
 	/**
@@ -221,17 +221,17 @@ public class PersistenceManager {
 	 */
 	private void loadPersistentProperties() {
 		IMemento memento = readMemento(PERSISTENT_FILE, PERSISTENT_ROOT);
-		properties = Collections.synchronizedMap(new HashMap<URL, Map<QualifiedName, String>>());
+		properties = Collections.synchronizedMap(new HashMap<URI, Map<QualifiedName, String>>());
 		IMemento[] children = memento.getChildren(ELEMENT_FILE);
 		if (children != null && children.length > 0) {
 			for (IMemento child : children) {
 				try {
-					String str = child.getString(ATTR_URL);
-					URL url = new URL(str);
+					String str = child.getString(ATTR_URI);
+					URI uri = new URI(str);
 					Map<QualifiedName, String> nodeProperties = loadFileProperties(child);
-					properties.put(url, nodeProperties);
+					properties.put(uri, nodeProperties);
 				}
-				catch (MalformedURLException e) {
+				catch (URISyntaxException e) {
 				}
 			}
 		}
@@ -242,24 +242,24 @@ public class PersistenceManager {
 	 */
 	private void loadContentTypes() {
 		IMemento memento = readMemento(CONTENT_TYPE_FILE, CONTENT_TYPE_ROOT);
-		resolved = Collections.synchronizedMap(new HashMap<URL, IContentType>());
-		unresolved = Collections.synchronizedMap(new HashMap<URL, URL>());
+		resolved = Collections.synchronizedMap(new HashMap<URI, IContentType>());
+		unresolved = Collections.synchronizedMap(new HashMap<URI, URI>());
 		IMemento mResolved = memento.getChild(ELEMENT_RESOLVED);
 		if (mResolved != null) {
 			IMemento[] children = mResolved.getChildren(ELEMENT_RESOLVABLE);
 			if (children != null && children.length > 0) {
 				for (IMemento child : children) {
 					try {
-						String str = child.getString(ATTR_URL);
-						URL url = new URL(str);
+						String str = child.getString(ATTR_URI);
+						URI uri = new URI(str);
 						String id = child.getString(ATTR_CONTENT_TYPE);
 						IContentType contentType = Platform.getContentTypeManager()
 						                .getContentType(id);
 						if (contentType != null) {
-							resolved.put(url, contentType);
+							resolved.put(uri, contentType);
 						}
 					}
-					catch (MalformedURLException e) {
+					catch (URISyntaxException e) {
 					}
 				}
 			}
@@ -270,11 +270,11 @@ public class PersistenceManager {
 			if (children != null && children.length > 0) {
 				for (IMemento child : children) {
 					try {
-						String str = child.getString(ATTR_URL);
-						URL url = new URL(str);
-						unresolved.put(url, url);
+						String str = child.getString(ATTR_URI);
+						URI uri = new URI(str);
+						unresolved.put(uri, uri);
 					}
-					catch (MalformedURLException e) {
+					catch (URISyntaxException e) {
 					}
 				}
 			}
@@ -287,16 +287,16 @@ public class PersistenceManager {
 	private void saveContentTypes() {
 		XMLMemento memento = XMLMemento.createWriteRoot(CONTENT_TYPE_ROOT);
 		IMemento mResolved = memento.createChild(ELEMENT_RESOLVED);
-		for (URL key : resolved.keySet()) {
+		for (URI key : resolved.keySet()) {
 			IContentType iContentType = resolved.get(key);
 			IMemento mResolvable = mResolved.createChild(ELEMENT_RESOLVABLE);
-			mResolvable.putString(ATTR_URL, key.toString());
+			mResolvable.putString(ATTR_URI, key.toString());
 			mResolvable.putString(ATTR_CONTENT_TYPE, iContentType.getId());
 		}
 		IMemento mUnresolved = memento.createChild(ELEMENT_UNRESOLVED);
-		for (URL key : unresolved.keySet()) {
+		for (URI key : unresolved.keySet()) {
 			IMemento mUnresolvable = mUnresolved.createChild(ELEMENT_UNRESOLVABLE);
-			mUnresolvable.putString(ATTR_URL, key.toString());
+			mUnresolvable.putString(ATTR_URI, key.toString());
 		}
 		writeMemento(memento, CONTENT_TYPE_FILE);
 	}
@@ -363,11 +363,11 @@ public class PersistenceManager {
 	 */
 	private void savePersistentProperties() {
 		XMLMemento memento = XMLMemento.createWriteRoot(PERSISTENT_ROOT);
-		for (URL key : properties.keySet()) {
+		for (URI key : properties.keySet()) {
 			Map<QualifiedName, String> nodeProperties = properties.get(key);
 			if (!nodeProperties.keySet().isEmpty()) {
 				IMemento mFile = memento.createChild(ELEMENT_FILE);
-				mFile.putString(ATTR_URL, key.toString());
+				mFile.putString(ATTR_URI, key.toString());
 				saveFileProperties(mFile, nodeProperties);
 			}
 		}
@@ -425,10 +425,10 @@ public class PersistenceManager {
 	 * @return The file properties object or empty properties object if it does not exist.
 	 */
 	public Map<QualifiedName, String> getPersistentProperties(FSTreeNode node) {
-		Map<QualifiedName, String> nodeProperties = properties.get(node.getLocationURL());
+		Map<QualifiedName, String> nodeProperties = properties.get(node.getLocationURI());
 		if (nodeProperties == null) {
 			nodeProperties = Collections.synchronizedMap(new HashMap<QualifiedName, String>());
-			properties.put(node.getLocationURL(), nodeProperties);
+			properties.put(node.getLocationURI(), nodeProperties);
 		}
 		return nodeProperties;
 	}
@@ -437,7 +437,7 @@ public class PersistenceManager {
 	 * Load the time stamps from the time stamps file in the cache's root directory.
 	 */
 	private void loadTimestamps() {
-		timestamps = Collections.synchronizedMap(new HashMap<URL, Long>());
+		timestamps = Collections.synchronizedMap(new HashMap<URI, Long>());
 		File location = CacheManager.getInstance().getCacheRoot();
 		File tsFile = new File(location, TIMESTAMP_FILE);
 		if (tsFile.exists()) {
@@ -466,7 +466,7 @@ public class PersistenceManager {
 				long timestamp = 0L;
 				try {
 					timestamp = Long.parseLong(value);
-					timestamps.put(new URL(key), Long.valueOf(timestamp));
+					timestamps.put(new URI(key), Long.valueOf(timestamp));
 				}
 				catch (Exception nfe) {
 				}
@@ -479,7 +479,7 @@ public class PersistenceManager {
 	 */
 	private void saveTimestamps() {
 		Properties properties = new Properties();
-		for (URL key : timestamps.keySet()) {
+		for (URI key : timestamps.keySet()) {
 			Long timestamp = timestamps.get(key);
 			properties.setProperty(key.toString(), timestamp.toString());
 		}
@@ -507,30 +507,30 @@ public class PersistenceManager {
 	/**
 	 * Set the time stamp of the FSTreeNode with the specified location.
 	 * 
-	 * @param url The FSTreeNode's location URL.
+	 * @param uri The FSTreeNode's location URI.
 	 * @param timestamp The new base time stamp to be set.
 	 */
-	public void setBaseTimestamp(URL url, long timestamp) {
-		timestamps.put(url, Long.valueOf(timestamp));
+	public void setBaseTimestamp(URI uri, long timestamp) {
+		timestamps.put(uri, Long.valueOf(timestamp));
 	}
 
 	/**
-	 * Remove the time stamp entry with the specified URL.
+	 * Remove the time stamp entry with the specified URI.
 	 * 
-	 * @param url The URL key.
+	 * @param uri The URI key.
 	 */
-	public void removeBaseTimestamp(URL url) {
-		timestamps.remove(url);
+	public void removeBaseTimestamp(URI uri) {
+		timestamps.remove(uri);
 	}
 
 	/**
 	 * Get the time stamp of the FSTreeNode with the specified location.
 	 * 
-	 * @param url The FSTreeNode's location URL.
+	 * @param uri The FSTreeNode's location URI.
 	 * @return The FSTreeNode's base time stamp.
 	 */
-	public long getBaseTimestamp(URL url) {
-		Long timestamp = timestamps.get(url);
+	public long getBaseTimestamp(URI uri) {
+		Long timestamp = timestamps.get(uri);
 		return timestamp == null ? 0L : timestamp.longValue();
 	}
 

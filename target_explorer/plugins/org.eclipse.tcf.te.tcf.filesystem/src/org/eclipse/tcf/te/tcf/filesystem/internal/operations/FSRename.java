@@ -130,7 +130,7 @@ public class FSRename extends FSJobOperation {
 									closeEditor(file);
 								}
 							});
-							PersistenceManager.getInstance().removeBaseTimestamp(node.getLocationURL());
+							PersistenceManager.getInstance().removeBaseTimestamp(node.getLocationURI());
 						}
 						file.delete();
 					}

@@ -230,7 +230,7 @@ public class CacheManager {
 								if (file.exists()) {
 									// If downloading is successful, update the attributes of the file and
 									// set the last modified time to that of its corresponding file.
-									PersistenceManager.getInstance().setBaseTimestamp(node.getLocationURL(), node.attr.mtime);
+									PersistenceManager.getInstance().setBaseTimestamp(node.getLocationURI(), node.attr.mtime);
 									file.setLastModified(node.attr.mtime);
 									if (!node.isWritable()) file.setReadOnly();
 									StateManager.getInstance().refreshState(node);
@@ -254,12 +254,12 @@ public class CacheManager {
 			// Something's gone wrong. Roll back the downloading and display the
 			// error.
 			file.delete();
-			PersistenceManager.getInstance().removeBaseTimestamp(node.getLocationURL());
+			PersistenceManager.getInstance().removeBaseTimestamp(node.getLocationURI());
 			displayError(parent, e);
 		} catch (InterruptedException e) {
 			// It is canceled. Just roll back the downloading result.
 			file.delete();
-			PersistenceManager.getInstance().removeBaseTimestamp(node.getLocationURL());
+			PersistenceManager.getInstance().removeBaseTimestamp(node.getLocationURI());
 		}
 		return false;
 	}
@@ -360,7 +360,7 @@ public class CacheManager {
 
 					@Override
 					public void run() throws Exception {
-						PersistenceManager.getInstance().setBaseTimestamp(node.getLocationURL(), node.attr.mtime);
+						PersistenceManager.getInstance().setBaseTimestamp(node.getLocationURI(), node.attr.mtime);
 						if (sync) {
 							File file = getCacheFile(node);
 							file.setLastModified(node.attr.mtime);

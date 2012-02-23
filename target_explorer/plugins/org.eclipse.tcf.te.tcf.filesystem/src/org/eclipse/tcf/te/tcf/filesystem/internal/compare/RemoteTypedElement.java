@@ -99,6 +99,6 @@ public class RemoteTypedElement extends MergeTypedElement {
 	 */
 	@Override
 	public String toString() {
-		return node.getLocationURL().toString();
+		return node.getLocationURI().toString();
 	}
 }

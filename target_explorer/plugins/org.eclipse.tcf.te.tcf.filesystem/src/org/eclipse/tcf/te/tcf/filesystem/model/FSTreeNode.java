@@ -13,6 +13,8 @@
 package org.eclipse.tcf.te.tcf.filesystem.model;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -405,16 +407,32 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 	 * {@link TcfURLConnection#TcfURLConnection(URL)}
 	 *
 	 * @see TcfURLStreamHandlerService#parseURL(URL, String, int, int)
+	 * @see #getLocationURI()
 	 * @return The URL of the file/folder.
-	 * @throws MalformedURLException
 	 */
 	public URL getLocationURL() {
+		try {
+			return 	getLocationURI().toURL();
+		} catch (MalformedURLException e) {
+			assert false;
+			return null;
+		}
+	}
+	
+	/**
+	 * Get the URI of the file or folder. The URI's format is created in the
+	 * following way: tcf:/<TCF_AGENT_ID>/remote/path/to/the/resource...
+	 *
+	 * @return The URI of the file/folder.
+	 */
+	public URI getLocationURI() {
 		try {
 			String id = peerNode.getPeerId();
 			String path = getLocation(true);
 			String location = TcfURLConnection.PROTOCOL_SCHEMA + ":/" + id + (path.startsWith("/") ? path : "/" + path); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			return new URL(location);
-		} catch (MalformedURLException e) {
+			return new URI(location);
+		}
+		catch (URISyntaxException e) {
 			assert false;
 			return null;
 		}

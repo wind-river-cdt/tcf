@@ -176,7 +176,7 @@ public class FSOperation implements IRunnableWithProgress{
 			});
 			file.delete();
 		}
-		PersistenceManager.getInstance().removeBaseTimestamp(node.getLocationURL());
+		PersistenceManager.getInstance().removeBaseTimestamp(node.getLocationURI());
 		FSTreeNode parent = node.parent;
 		if (parent != null) {
 			parent.removeChild(node);
