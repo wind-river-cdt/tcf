@@ -5,7 +5,7 @@
  * available at http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- * William Chen (Wind River)	[360494]Provide an "Open With" action in the pop 
+ * William Chen (Wind River)	[360494]Provide an "Open With" action in the pop
  * 								up menu of file system nodes of Target Explorer.
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.utils;
@@ -110,7 +110,7 @@ public class PersistenceManager {
 
 	/**
 	 * Get the singleton cache manager.
-	 * 
+	 *
 	 * @return The singleton cache manager.
 	 */
 	public static PersistenceManager getInstance() {
@@ -131,7 +131,7 @@ public class PersistenceManager {
 
 	/**
 	 * If the node is already considered unresolvable.
-	 * 
+	 *
 	 * @param node The file node.
 	 * @return true if it is not resolvable or else false.
 	 */
@@ -141,7 +141,7 @@ public class PersistenceManager {
 
 	/**
 	 * Get the resolved content type of the node.
-	 * 
+	 *
 	 * @param node The file node.
 	 * @return the content type of the node if it is resolvable or null.
 	 */
@@ -151,7 +151,7 @@ public class PersistenceManager {
 
 	/**
 	 * Add the node and its content type to the resolved list.
-	 * 
+	 *
 	 * @param node The file node.
 	 * @param contentType Its content type.
 	 */
@@ -161,7 +161,7 @@ public class PersistenceManager {
 
 	/**
 	 * Add the node as an unresolvable node.
-	 * 
+	 *
 	 * @param node The file node.
 	 */
 	public void addUnresolved(FSTreeNode node) {
@@ -170,7 +170,7 @@ public class PersistenceManager {
 
 	/**
 	 * If the option of "autosaving" is set to on.
-	 * 
+	 *
 	 * @return true if it is auto saving or else false.
 	 */
 	public boolean isAutoSaving() {
@@ -182,7 +182,7 @@ public class PersistenceManager {
 
 	/**
 	 * If the option of "in-place editor" is set to on.
-	 * 
+	 *
 	 * @return true if it uses in-place editor when renaming files/folders.
 	 */
 	public boolean isInPlaceEditor() {
@@ -194,7 +194,7 @@ public class PersistenceManager {
 
 	/**
 	 * If the option of "copy permissions" is set to on.
-	 * 
+	 *
 	 * @return true if it should copy source file permissions.
 	 */
 	public boolean isCopyPermission() {
@@ -206,7 +206,7 @@ public class PersistenceManager {
 
 	/**
 	 * If the option of "copy ownership" is set to on.
-	 * 
+	 *
 	 * @return true if it should copy source file ownership.
 	 */
 	public boolean isCopyOwnership() {
@@ -303,7 +303,7 @@ public class PersistenceManager {
 
 	/**
 	 * Load a file's properties from the memento node.
-	 * 
+	 *
 	 * @param memento The memento node.
 	 * @return The properties as a map.
 	 */
@@ -325,7 +325,7 @@ public class PersistenceManager {
 
 	/**
 	 * Read the memento from a memento file using the specified root element name.
-	 * 
+	 *
 	 * @param mementoFile The memento file.
 	 * @param mementoRoot The memento's root element name.
 	 * @return A memento of this file or an empty memento if the file does not exist.
@@ -376,7 +376,7 @@ public class PersistenceManager {
 
 	/**
 	 * Save the file's properties to a memento.
-	 * 
+	 *
 	 * @param memento The memento object.
 	 * @param properties The file properties.
 	 */
@@ -391,7 +391,7 @@ public class PersistenceManager {
 
 	/**
 	 * Write the memento to a memento file.
-	 * 
+	 *
 	 * @param memento The memento object.
 	 * @param mementoFile The file to write to.
 	 */
@@ -420,7 +420,7 @@ public class PersistenceManager {
 
 	/**
 	 * Get the file properties of the specified node from the properties map.
-	 * 
+	 *
 	 * @param node The file node.
 	 * @return The file properties object or empty properties object if it does not exist.
 	 */
@@ -506,7 +506,7 @@ public class PersistenceManager {
 
 	/**
 	 * Set the time stamp of the FSTreeNode with the specified location.
-	 * 
+	 *
 	 * @param uri The FSTreeNode's location URI.
 	 * @param timestamp The new base time stamp to be set.
 	 */
@@ -516,7 +516,7 @@ public class PersistenceManager {
 
 	/**
 	 * Remove the time stamp entry with the specified URI.
-	 * 
+	 *
 	 * @param uri The URI key.
 	 */
 	public void removeBaseTimestamp(URI uri) {
@@ -525,7 +525,7 @@ public class PersistenceManager {
 
 	/**
 	 * Get the time stamp of the FSTreeNode with the specified location.
-	 * 
+	 *
 	 * @param uri The FSTreeNode's location URI.
 	 * @return The FSTreeNode's base time stamp.
 	 */
@@ -542,5 +542,14 @@ public class PersistenceManager {
 		saveTimestamps();
 		savePersistentProperties();
 		saveContentTypes();
+	}
+
+	/**
+	 * Returns if or if not the persistence manager needs to be disposed.
+	 *
+	 * @return <code>True</code> if the persistence manager needs disposal, <code>false</code> otherwise.
+	 */
+	public final static boolean needsDisposal() {
+		return instance != null;
 	}
 }

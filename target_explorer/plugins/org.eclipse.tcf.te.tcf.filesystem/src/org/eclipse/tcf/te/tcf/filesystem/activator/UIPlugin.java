@@ -114,7 +114,7 @@ public class UIPlugin extends AbstractUIPlugin {
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		PersistenceManager.getInstance().dispose();
+		if (PersistenceManager.needsDisposal()) PersistenceManager.getInstance().dispose();
 		if (regURLStreamHandlerService != null) {
 			// When URL stream handler service is unregistered, any URL related operation will be invalid.
 			regURLStreamHandlerService.unregister();

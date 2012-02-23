@@ -88,37 +88,41 @@ public class Scanner extends Job implements IScanner {
 		IPeerModel[] peers = getParentModel().getPeers();
 		// Do we have something to scan at all
 		if (peers.length > 0) {
-			// The first runnable is setting the thread which will finish
-			// the job at the end
-			Protocol.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					Scanner.this.setThread(Thread.currentThread());
-				}
-			});
-			// Loop the nodes and try to get an channel
-			for (IPeerModel peer : peers) {
-				// Check for the progress monitor getting canceled
-				if (monitor.isCanceled() || isTerminated()) break;
-				// Create the scanner runnable
-				Runnable runnable = new ScannerRunnable(this, peer);
-				// Submit for execution
-				Protocol.invokeLater(runnable);
-			}
-			// The last runnable will terminate the job as soon all
-			// scanner runnable's are processed and will reschedule the job
-			final IStatus result = monitor.isCanceled() ? Status.CANCEL_STATUS : Status.OK_STATUS;
-			Protocol.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					Scanner.this.done(result);
-
-					Long delay = (Long)getConfiguration().get(IScanner.PROP_SCHEDULE);
-					if (delay != null) {
-						Scanner.this.schedule(delay.longValue());
+			try {
+				// The first runnable is setting the thread which will finish
+				// the job at the end
+				Protocol.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						Scanner.this.setThread(Thread.currentThread());
 					}
+				});
+				// Loop the nodes and try to get an channel
+				for (IPeerModel peer : peers) {
+					// Check for the progress monitor getting canceled
+					if (monitor.isCanceled() || isTerminated()) break;
+					// Create the scanner runnable
+					Runnable runnable = new ScannerRunnable(this, peer);
+					// Submit for execution
+					Protocol.invokeLater(runnable);
 				}
-			});
+				// The last runnable will terminate the job as soon all
+				// scanner runnable's are processed and will reschedule the job
+				final IStatus result = monitor.isCanceled() ? Status.CANCEL_STATUS : Status.OK_STATUS;
+				Protocol.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						Scanner.this.done(result);
+
+						Long delay = (Long)getConfiguration().get(IScanner.PROP_SCHEDULE);
+						if (delay != null) {
+							Scanner.this.schedule(delay.longValue());
+						}
+					}
+				});
+			} catch (IllegalStateException e) {
+				/* ignored on purpose */
+			}
 		}
 
 		return peers.length > 0 ? ASYNC_FINISH : Status.OK_STATUS;
