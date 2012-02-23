@@ -115,6 +115,15 @@ public class MergeEditorInput extends CompareEditorInput implements
 	}
 
 	/**
+	 * Override hashCode to provide identical value when
+	 * two MergeEditorInputs are equal to each other.
+	 */
+	@Override
+    public int hashCode() {
+	    return left.hashCode() + right.hashCode();
+    }
+
+	/**
 	 * Prepare the compare input of this editor input. This method is not
 	 * intended to be overridden of extended by subclasses (but is not final for
 	 * backwards compatibility reasons). The implementation of this method in
