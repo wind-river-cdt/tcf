@@ -200,4 +200,6 @@ public class Messages extends NLS {
 	public static String GeneralInformationPage_User;
 	
 	public static String PendingOperation_label;
+
+	public static String TerminateHandler_TerminationError;
 }
