@@ -101,6 +101,7 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
     private ILineNumbers.CodeArea data_bp_area;
     private String data_bp_id;
     private String temp_bp_id;
+    private String inv_bp_id;
     private boolean temp_bp_removed;
     private int temp_bp_cnt;
     private int data_bp_cnt;
@@ -154,6 +155,7 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
                 }
                 if (err != null) {
                     if (bp_cnt == 0 && id.equals(data_bp_id)) return;
+                    if (id.equals(inv_bp_id)) return;
                     exit(new Exception("Invalid BP status: " + err));
                 }
             }
@@ -613,6 +615,7 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
             case 9:
                 // Invalid breakpoint that should not be planted
                 m[i].put("Unknown property", "Unknown value");
+                inv_bp_id = (String)m[i].get(IBreakpoints.PROP_ID);
                 break;
             }
             bp_list.put((String)m[i].get(IBreakpoints.PROP_ID), m[i]);
