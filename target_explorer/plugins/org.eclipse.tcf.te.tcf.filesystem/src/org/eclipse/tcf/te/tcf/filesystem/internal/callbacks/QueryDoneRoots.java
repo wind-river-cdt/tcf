@@ -11,7 +11,6 @@ package org.eclipse.tcf.te.tcf.filesystem.internal.callbacks;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IFileSystem.DirEntry;
 import org.eclipse.tcf.services.IFileSystem.DoneRoots;
@@ -24,8 +23,6 @@ import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
  * The callback handler that handles the event when the roots are listed.
  */
 public class QueryDoneRoots implements DoneRoots {
-	// The channel being used.
-	IChannel channel;
 	// The parent directory node.
 	FSTreeNode parentNode;
 	// The callback object
@@ -35,12 +32,10 @@ public class QueryDoneRoots implements DoneRoots {
 	 * Create an instance with parameters to initialize the fields.
 	 * 
 	 * @param callback the callback.
-	 * @param channel The tcf channel.
 	 * @param parentNode The parent directory node.
 	 */
-	public QueryDoneRoots(ICallback callback, IChannel channel, FSTreeNode parentNode) {
+	public QueryDoneRoots(ICallback callback, FSTreeNode parentNode) {
 		this.callback = callback;
-		this.channel = channel;
 		this.parentNode = parentNode;
 	}
 

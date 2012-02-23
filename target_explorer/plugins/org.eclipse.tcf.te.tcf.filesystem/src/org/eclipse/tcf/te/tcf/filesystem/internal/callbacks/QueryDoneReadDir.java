@@ -15,6 +15,7 @@ import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.DirEntry;
+import org.eclipse.tcf.services.IFileSystem.DoneClose;
 import org.eclipse.tcf.services.IFileSystem.DoneReadDir;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
@@ -71,7 +72,14 @@ public class QueryDoneReadDir implements DoneReadDir {
 
 			if (eof) {
 				// Close the handle and channel if EOF is signaled or an error occurred.
-				service.close(handle, new QueryDoneClose(callback, channel, parentNode));
+				service.close(handle, new DoneClose() {
+					@Override
+                    public void doneClose(IToken token, FileSystemException error) {
+						if(callback != null) {
+							IStatus status = error == null ? Status.OK_STATUS : new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), error.getLocalizedMessage(), error);
+							callback.done(this, status);
+						}
+                    }});
 			}
 			else {
 				// And invoke ourself again

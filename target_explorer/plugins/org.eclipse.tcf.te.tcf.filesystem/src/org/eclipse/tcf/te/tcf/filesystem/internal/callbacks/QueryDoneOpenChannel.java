@@ -75,7 +75,7 @@ public class QueryDoneOpenChannel implements DoneOpenChannel {
 			IFileSystem service = channel.getRemoteService(IFileSystem.class);
 			if(service != null) {
 				if(parentNode.isSystemRoot()) {
-					service.roots(new QueryDoneRoots(proxy, channel, parentNode));
+					service.roots(new QueryDoneRoots(proxy, parentNode));
 				} else {
 					String absPath = parentNode.getLocation();
 					service.opendir(absPath, new QueryDoneOpen(proxy, channel, service, parentNode));
