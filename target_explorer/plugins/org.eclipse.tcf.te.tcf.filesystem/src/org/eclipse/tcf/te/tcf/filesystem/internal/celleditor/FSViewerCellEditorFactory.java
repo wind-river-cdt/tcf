@@ -25,12 +25,10 @@ import org.eclipse.tcf.te.ui.interfaces.IViewerCellEditorFactory;
  * cell editors to Target Explorer for renaming files or folders in the file system tree viewer.
  */
 public class FSViewerCellEditorFactory implements IViewerCellEditorFactory, FocusListener {
-	// The column properties used for cell editing.
-	private static String[] COLUMN_PROPERTIES = { FSCellModifier.PROPERTY_NAME };
 	// The tree viewer to add cell editing.
 	private TreeViewer viewer;
 	// The cell editors used to rename a file/folder.
-	private CellEditor[] cellEditors;
+	private TextCellEditor cellEditor;
 	// The cell modifier used to modify a file/folder's name.
 	private ICellModifier cellModifer;
 
@@ -47,10 +45,9 @@ public class FSViewerCellEditorFactory implements IViewerCellEditorFactory, Focu
 	@Override
 	public void init(TreeViewer aViewer) {
 		viewer = aViewer;
-		TextCellEditor cellEditor = new TextCellEditor(aViewer.getTree(), SWT.BORDER);
+		cellEditor = new TextCellEditor(aViewer.getTree(), SWT.BORDER);
 		cellEditor.setValidator(new FSCellValidator(aViewer));
 		cellEditor.addListener(new FSCellListener(cellEditor));
-		cellEditors = new CellEditor[] { cellEditor };
 		cellModifer = new FSCellModifier();
 		Tree tree = aViewer.getTree();
 		tree.addFocusListener(this);
@@ -62,7 +59,7 @@ public class FSViewerCellEditorFactory implements IViewerCellEditorFactory, Focu
 	 */
 	@Override
 	public CellEditor[] getCellEditors() {
-		return cellEditors;
+		return new CellEditor[] { cellEditor };
 	}
 
 	/*
@@ -80,7 +77,7 @@ public class FSViewerCellEditorFactory implements IViewerCellEditorFactory, Focu
 	 */
 	@Override
 	public String[] getColumnProperties() {
-		return COLUMN_PROPERTIES;
+		return new String[] { FSCellModifier.PROPERTY_NAME };
 	}
 
 	/*

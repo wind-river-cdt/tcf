@@ -30,8 +30,6 @@ public class WindowsFolderAISection extends BaseTitledSection {
 
 	// The original node.
 	protected FSTreeNode node;
-	// The copy node.
-	protected FSTreeNode clone;
 
 	// The check box for archive attribute.
 	protected Button archiveButton;
@@ -89,7 +87,6 @@ public class WindowsFolderAISection extends BaseTitledSection {
     protected void updateInput(IPeerModelProvider input) {
 		Assert.isTrue(input instanceof FSTreeNode);
 		this.node = (FSTreeNode) input;
-		this.clone = (FSTreeNode) node.clone();
 	}
 
 	/*

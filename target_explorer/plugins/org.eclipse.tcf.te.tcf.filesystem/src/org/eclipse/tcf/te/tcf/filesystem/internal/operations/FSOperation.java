@@ -116,12 +116,29 @@ public class FSOperation implements IRunnableWithProgress{
 	 */
 	protected void cleanUpFolder(FSTreeNode node) {
 		File file = CacheManager.getInstance().getCacheFile(node);
-		if (file.exists()) {
-			file.delete();
-		}
+		deleteFileChecked(file);
 		FSTreeNode parent = node.parent;
 		if (parent != null) {
 			parent.removeChild(node);
+		}
+	}
+	
+	/**
+	 * Check if the file exists and delete if it does. Record
+	 * the failure message if deleting fails.
+	 * 
+	 * @param file The file to be deleted.
+	 */
+	protected void deleteFileChecked(final File file) {
+		if (file.exists()) {
+			SafeRunner.run(new SafeRunnable(){
+				@Override
+                public void run() throws Exception {
+					boolean successful = file.delete();
+					if (!successful) {
+						throw new Exception(NLS.bind(Messages.FSOperation_DeletingFileFailed, file.getAbsolutePath()));
+					}
+                }});
 		}
 	}
 
@@ -174,8 +191,8 @@ public class FSOperation implements IRunnableWithProgress{
 					closeEditor(file);
 				}
 			});
-			file.delete();
 		}
+		deleteFileChecked(file);
 		PersistenceManager.getInstance().removeBaseTimestamp(node.getLocationURI());
 		FSTreeNode parent = node.parent;
 		if (parent != null) {

@@ -141,15 +141,18 @@ public class CommonDnD {
 		return new Callback() {
 			@Override
 			protected void internalDone(Object caller, IStatus status) {
+				boolean successful = true;
 				if (status != null && status.isOK()) {
 					for (String path : files) {
 						File file = new File(path);
-						file.delete();
+						successful &= file.delete();
 					}
 				}
-				FSTreeNode root = FSModel.getFSModel(target.peerNode).getRoot();
-				FSRefresh refresh = new FSRefresh(root, getSelectionCallback(viewer, files, target));
-				refresh.doit();
+				if (successful) {
+					FSTreeNode root = FSModel.getFSModel(target.peerNode).getRoot();
+					FSRefresh refresh = new FSRefresh(root, getSelectionCallback(viewer, files, target));
+					refresh.doit();
+				}
 			}
 		};
 	}

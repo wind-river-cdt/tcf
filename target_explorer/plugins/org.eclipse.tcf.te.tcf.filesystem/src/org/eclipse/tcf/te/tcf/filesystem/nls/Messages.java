@@ -104,6 +104,9 @@ public class Messages extends NLS {
 	public static String CacheManager_DownloadingProgress;
 	public static String CacheManager_KBs;
 	public static String CacheManager_MBs;
+	public static String CacheManager_MkdirFailed;
+	public static String CacheManager_SetLastModifiedFailed;
+	public static String CacheManager_SetReadOnlyFailed;
 	public static String CacheManager_UploadingProgress;
 	public static String CacheManager_UploadNFiles;
 	public static String CacheManager_UploadSingleFile;
@@ -230,6 +233,7 @@ public class Messages extends NLS {
 	public static String FSOperation_NotResponding;
 	public static String FSOperation_CannotOpenDir;
 	public static String FSOperation_CannotReadDir;
+	public static String FSOperation_DeletingFileFailed;
 	public static String FSOperation_TimedOutWhenOpening;
 
 	public static String PermissionsGroup_Executable;

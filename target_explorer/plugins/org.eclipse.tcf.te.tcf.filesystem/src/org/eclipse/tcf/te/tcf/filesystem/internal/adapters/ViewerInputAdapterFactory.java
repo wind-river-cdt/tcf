@@ -23,8 +23,6 @@ import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 public class ViewerInputAdapterFactory implements IAdapterFactory {
 	// The key to store and access the the viewer input object.
 	private static final String VIEWER_INPUT_KEY = UIPlugin.getUniqueIdentifier()+".peer.viewerInput"; //$NON-NLS-1$
-	// The adapters
-	private Class<?>[] adapters = {IViewerInput.class};
 	
 	/*
 	 * (non-Javadoc)
@@ -73,7 +71,7 @@ public class ViewerInputAdapterFactory implements IAdapterFactory {
 	 */
 	@Override
 	public Class[] getAdapterList() {
-		return adapters;
+		return new Class[] { IViewerInput.class };
 	}
 
 }

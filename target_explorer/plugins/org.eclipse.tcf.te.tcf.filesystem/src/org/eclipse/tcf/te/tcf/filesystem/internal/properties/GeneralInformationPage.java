@@ -40,8 +40,6 @@ import org.eclipse.ui.dialogs.PropertyPage;
  * The general information page of a file's properties dialog.
  */
 public class GeneralInformationPage extends PropertyPage {
-	// The formatter for the modified time and the accessed time.
-	private static final DateFormat DATE_FORMAT = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
 	// The formatter for the size of a file.
 	private static final DecimalFormat SIZE_FORMAT = new DecimalFormat();
 	// The original node.
@@ -115,7 +113,8 @@ public class GeneralInformationPage extends PropertyPage {
 	 * @return The string in the format of DATE_FORMAT.
 	 */
 	protected String getDateText(long time) {
-		return DATE_FORMAT.format(new Date(time));
+		DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
+		return dateFormat.format(new Date(time));
 	}
 
 	/**

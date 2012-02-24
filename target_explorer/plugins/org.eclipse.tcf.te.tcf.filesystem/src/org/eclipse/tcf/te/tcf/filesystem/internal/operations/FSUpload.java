@@ -52,7 +52,8 @@ public class FSUpload extends FSUIOperation implements IConfirmCallback {
 	 */
 	public FSUpload(String[] sourceFiles, FSTreeNode targetFolder, ICallback callback) {
 	    super(Messages.FSUpload_UploadTitle);
-	    this.sourceFiles = sourceFiles;
+	    this.sourceFiles = new String[sourceFiles.length];
+    	System.arraycopy(sourceFiles, 0, this.sourceFiles, 0, sourceFiles.length);
 	    this.targetFolder = targetFolder;
 	    this.callback = callback;
     }

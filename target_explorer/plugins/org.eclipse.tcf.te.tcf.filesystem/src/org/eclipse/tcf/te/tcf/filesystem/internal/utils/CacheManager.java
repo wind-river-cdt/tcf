@@ -96,12 +96,87 @@ public class CacheManager {
 		String agent = agentId.replace(':', PATH_ESCAPE_CHAR);
 		IPath agentDir = new Path(location.getAbsolutePath()).append(agent);
 		File agentDirFile = agentDir.toFile();
-		if (!agentDirFile.exists()) {
-			agentDirFile.mkdir();
-		}
+		mkdirChecked(agentDirFile);
 		return appendNodePath(agentDir, node);
 	}
 
+	/**
+	 * Check and make a directory if it does not exist. Record
+	 * the failure message if making fails.
+	 *  
+	 * @param file The file to be deleted.
+	 */
+	void mkdirChecked(final File dir) {
+		if(!dir.exists()) {
+			SafeRunner.run(new SafeRunnable(){
+				@Override
+                public void run() throws Exception {
+					boolean successful = dir.mkdir();
+					if (!successful) {
+						throw new Exception(NLS.bind(Messages.CacheManager_MkdirFailed, dir.getAbsolutePath()));
+					}
+                }});
+		}
+	}
+	
+	/**
+	 * Check if the file exists and delete if it does. Record
+	 * the failure message if deleting fails.
+	 * 
+	 * @param file The file to be deleted.
+	 */
+	void deleteFileChecked(final File file) {
+		if (file.exists()) {
+			SafeRunner.run(new SafeRunnable(){
+				@Override
+                public void run() throws Exception {
+					boolean successful = file.delete();
+					if (!successful) {
+						throw new Exception(NLS.bind(Messages.FSOperation_DeletingFileFailed, file.getAbsolutePath()));
+					}
+                }});
+		}
+	}
+	
+	/**
+	 * Check if the file exists and set its last modified time if it does. Record
+	 * the failure message if it fails.
+	 * 
+	 * @param file The file to be set.
+	 * @param lastModified the last modified time.
+	 */
+	void setLastModifiedChecked(final File file, final long lastModified) {
+		if (file.exists()) {
+			SafeRunner.run(new SafeRunnable(){
+				@Override
+                public void run() throws Exception {
+					boolean successful = file.setLastModified(lastModified);
+					if (!successful) {
+						throw new Exception(NLS.bind(Messages.CacheManager_SetLastModifiedFailed, file.getAbsolutePath()));
+					}
+                }});
+		}
+	}
+	
+	/**
+	 * Check if the file exists and set its read-only attribute if it does. Record
+	 * the failure message if it fails.
+	 * 
+	 * @param file The file to be set.
+	 */
+	void setReadOnlyChecked(final File file) {
+		if (file.exists()) {
+			SafeRunner.run(new SafeRunnable(){
+				@Override
+                public void run() throws Exception {
+					boolean successful = file.setReadOnly();
+					if (!successful) {
+						throw new Exception(NLS.bind(Messages.CacheManager_SetReadOnlyFailed, file.getAbsolutePath()));
+					}
+                }});
+		}
+	}
+	
 	/**
 	 * Get the local file of the specified node.
 	 *
@@ -137,7 +212,7 @@ public class CacheManager {
         }
 
         // Create the location if it not exist
-		if (!location.exists()) location.mkdir();
+		mkdirChecked(location);
 		return location;
 	}
 
@@ -176,8 +251,8 @@ public class CacheManager {
 	private IPath appendPathSegment(FSTreeNode node, IPath path, String name) {
 		IPath newPath = path.append(name);
 		File newFile = newPath.toFile();
-		if (node.isDirectory() && !newFile.exists()) {
-			newFile.mkdir();
+		if (node.isDirectory()) {
+			mkdirChecked(newFile);
 		}
 		return newPath;
 	}
@@ -203,7 +278,7 @@ public class CacheManager {
 					File file = getCachePath(node).toFile();
 					if(file.exists() && !file.canWrite()){
 						// If the file exists and is read-only, delete it.
-						file.delete();
+						deleteFileChecked(file);
 					}
 					output = new BufferedOutputStream(new FileOutputStream(file));
 					download2OutputStream(node, output, monitor);
@@ -231,8 +306,8 @@ public class CacheManager {
 									// If downloading is successful, update the attributes of the file and
 									// set the last modified time to that of its corresponding file.
 									PersistenceManager.getInstance().setBaseTimestamp(node.getLocationURI(), node.attr.mtime);
-									file.setLastModified(node.attr.mtime);
-									if (!node.isWritable()) file.setReadOnly();
+									setLastModifiedChecked(file, node.attr.mtime);
+									if (!node.isWritable()) setReadOnlyChecked(file);
 									StateManager.getInstance().refreshState(node);
 								}
 							}
@@ -253,12 +328,12 @@ public class CacheManager {
 		} catch (InvocationTargetException e) {
 			// Something's gone wrong. Roll back the downloading and display the
 			// error.
-			file.delete();
+			deleteFileChecked(file);
 			PersistenceManager.getInstance().removeBaseTimestamp(node.getLocationURI());
 			displayError(parent, e);
 		} catch (InterruptedException e) {
 			// It is canceled. Just roll back the downloading result.
-			file.delete();
+			deleteFileChecked(file);
 			PersistenceManager.getInstance().removeBaseTimestamp(node.getLocationURI());
 		}
 		return false;
@@ -363,7 +438,7 @@ public class CacheManager {
 						PersistenceManager.getInstance().setBaseTimestamp(node.getLocationURI(), node.attr.mtime);
 						if (sync) {
 							File file = getCacheFile(node);
-							file.setLastModified(node.attr.mtime);
+							setLastModifiedChecked(file, node.attr.mtime);
 						}
 						StateManager.getInstance().refreshState(node);
 					}

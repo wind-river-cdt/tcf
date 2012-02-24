@@ -12,7 +12,7 @@ package org.eclipse.tcf.te.tcf.filesystem.interfaces;
 /**
  * UIConstants for file system.
  */
-public interface IUIConstants extends org.eclipse.tcf.te.ui.interfaces.IUIConstants {
+public interface IFSConstants extends org.eclipse.tcf.te.ui.interfaces.IUIConstants {
 	
 	/**
 	 * The viewer id of the file tree of Target Explorer.

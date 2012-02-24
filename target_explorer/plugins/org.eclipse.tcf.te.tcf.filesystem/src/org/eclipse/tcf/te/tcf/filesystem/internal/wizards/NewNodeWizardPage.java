@@ -29,7 +29,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeContentProvider;
 import org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeViewerSorter;
 import org.eclipse.tcf.te.tcf.filesystem.help.IContextHelpIds;
-import org.eclipse.tcf.te.tcf.filesystem.interfaces.IUIConstants;
+import org.eclipse.tcf.te.tcf.filesystem.interfaces.IFSConstants;
 import org.eclipse.tcf.te.tcf.filesystem.internal.columns.FSTreeElementLabelProvider;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
@@ -219,7 +219,7 @@ public abstract class NewNodeWizardPage extends AbstractValidatingWizardPage {
 	 */
     private void setInput(Object input) {
 		treeViewer.setInput(input);
-		FilterDescriptor[] filterDescriptors = ViewerStateManager.getInstance().getFilterDescriptors(IUIConstants.ID_TREE_VIEWER_FS, input);
+		FilterDescriptor[] filterDescriptors = ViewerStateManager.getInstance().getFilterDescriptors(IFSConstants.ID_TREE_VIEWER_FS, input);
 		if (filterDescriptors != null) {
 			for (FilterDescriptor descriptor : filterDescriptors) {
 				if (descriptor.isEnabled()) treeViewer.addFilter(descriptor.getFilter());

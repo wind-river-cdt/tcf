@@ -29,8 +29,6 @@ public class FSTreeNodeAdapterFactory implements IAdapterFactory {
 	private static ILabelProvider nodeLabelProvider = new FSTreeElementLabelProvider();
 	private static IDeleteHandlerDelegate deleteDelegate = new DeleteHandlerDelegate();
 	private static IRefreshHandlerDelegate refreshDelegate = new RefreshHandlerDelegate();
-	// The ADAPTERS adapted by this factory.
-	private static Class<?>[] ADAPTERS = {IActionFilter.class, ILabelProvider.class, IRefreshHandlerDelegate.class, IDeleteHandlerDelegate.class};
 	// The fFilters map caching fFilters for FS nodes.
 	private Map<FSTreeNode, NodeStateFilter> filters;
 
@@ -74,6 +72,6 @@ public class FSTreeNodeAdapterFactory implements IAdapterFactory {
 	 */
 	@Override
 	public Class[] getAdapterList() {
-		return ADAPTERS;
+		return new Class[] { IActionFilter.class, ILabelProvider.class, IRefreshHandlerDelegate.class, IDeleteHandlerDelegate.class };
 	}
 }

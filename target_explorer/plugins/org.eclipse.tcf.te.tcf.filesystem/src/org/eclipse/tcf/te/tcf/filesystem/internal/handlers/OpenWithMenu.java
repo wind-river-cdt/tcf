@@ -161,6 +161,8 @@ public class OpenWithMenu extends ContributionItem {
 						syncOpen(descriptor, false);
 					}
 					break;
+				default:
+					break;
 				}
 			}
 		};
@@ -191,6 +193,8 @@ public class OpenWithMenu extends ContributionItem {
 							syncOpen(editor, editor.isOpenExternal());
 						}
 					}
+					break;
+				default:
 					break;
 				}
 			}
@@ -311,6 +315,8 @@ public class OpenWithMenu extends ContributionItem {
 							e.printStackTrace();
 						}
 					}
+					break;
+				default:
 					break;
 				}
 			}
