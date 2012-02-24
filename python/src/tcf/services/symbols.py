@@ -1,5 +1,5 @@
 #******************************************************************************
-# * Copyright (c) 2011 Wind River Systems, Inc. and others.
+# * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others.
 # * All rights reserved. This program and the accompanying materials
 # * are made available under the terms of the Eclipse Public License v1.0
 # * which accompanies this distribution, and is available at
@@ -20,6 +20,9 @@ class SymbolClass:
     reference = 2              # variable data object
     function = 3               # function body
     type = 4                   # a type
+    comp_unit = 5              # a compilation unit
+    block = 6                  # a block of code
+    namespace = 7              # a namespace
 
 class TypeClass:
     unknown = 0                # unknown type class
@@ -31,6 +34,32 @@ class TypeClass:
     composite = 6              # struct, union, or class.
     enumeration = 7            # enumeration type.
     function = 8               # function type.
+    member_ptr = 9             # a pointer on member type
+
+SYM_FLAG_PARAMETER = 0x000001
+SYM_FLAG_TYPEDEF = 0x000002
+SYM_FLAG_CONST_TYPE = 0x000004
+SYM_FLAG_PACKET_TYPE = 0x000008
+SYM_FLAG_SUBRANGE_TYPE = 0x000010
+SYM_FLAG_VOLATILE_TYPE = 0x000020
+SYM_FLAG_RESTRICT_TYPE = 0x000040
+SYM_FLAG_UNION_TYPE = 0x000080
+SYM_FLAG_CLASS_TYPE = 0x000100
+SYM_FLAG_INTERFACE_TYPE = 0x000200
+SYM_FLAG_SHARED_TYPE = 0x000400
+SYM_FLAG_REFERENCE = 0x000800
+SYM_FLAG_BIG_ENDIAN = 0x001000
+SYM_FLAG_LITTLE_ENDIAN = 0x002000
+SYM_FLAG_OPTIONAL = 0x004000
+SYM_FLAG_EXTERNAL = 0x008000
+SYM_FLAG_VARARG = 0x010000
+SYM_FLAG_ARTIFICIAL = 0x020000
+SYM_FLAG_TYPE_PARAMETER = 0x040000
+SYM_FLAG_PRIVATE = 0x080000
+SYM_FLAG_PROTECTED = 0x100000
+SYM_FLAG_PUBLIC = 0x200000
+SYM_FLAG_ENUM_TYPE = 0x400000
+SYM_FLAG_STRUCT_TYPE = 0x800000
 
 #
 # Symbol context property names.
@@ -53,6 +82,7 @@ PROP_ADDRESS = "Address"
 PROP_VALUE = "Value"
 PROP_BIG_ENDIAN = "BigEndian"
 PROP_REGISTER = "Register"
+PROP_FLAGS = "Flags"
 
 #
 # Symbol context properties update policies.
@@ -119,14 +149,14 @@ class Symbol(object):
         Get symbol class.
         @return symbol class.
         """
-        return self._props.get(PROP_SYMBOL_CLASS)
+        return self._props.get(PROP_SYMBOL_CLASS, SymbolClass.unknown)
 
     def getTypeClass(self):
         """
         Get symbol type class.
         @return type class.
         """
-        return self._props.get(PROP_TYPE_CLASS)
+        return self._props.get(PROP_TYPE_CLASS, TypeClass.unknown)
 
     def getTypeID(self):
         """
@@ -222,6 +252,13 @@ class Symbol(object):
         """
         return self._props.get(PROP_REGISTER)
 
+    def getFlags(self):
+        """
+        Get symbol flags.
+        @return Symbol flags (see SYM_FLAG_ values).
+        """
+        return self._props.get(PROP_FLAGS, 0)
+
     def getProperties(self):
         """
         Get complete map of context properties.
@@ -259,7 +296,20 @@ class SymbolsService(services.Service):
 
     def find(self, context_id, ip, name, done):
         """
-        Search symbol with given name in given context.
+        Search first symbol with given name in given context.
+        The context can be memory space, process, thread or stack frame.
+
+        @param context_id - a search scope.
+        @param ip - instruction pointer - ignored if context_id is a stack frame ID
+        @param name - symbol name.
+        @param done - call back interface called when operation is completed.
+        @return - pending command handle.
+        """
+        raise NotImplementedError("Abstract method")
+
+    def findByName(self, context_id, ip, name, done):
+        """
+        Search symbols with given name in given context.
         The context can be memory space, process, thread or stack frame.
 
         @param context_id - a search scope.
@@ -282,12 +332,43 @@ class SymbolsService(services.Service):
         """
         raise NotImplementedError("Abstract method")
 
+    def findInScope(self, context_id, ip, scope_id, name, done):
+        """
+        Search symbols with given name in given context or in given symbol scope.
+        The context can be memory space, process, thread or stack frame.
+        The symbol scope can be any symbol.
+        If ip is not null, the search of the symbol name is done first in the
+        scope defined by @e context_id and @e ip.
+        If the symbol is not found, the supplied scope is then used.
+
+        @param context_id - a search scope.
+        @param ip - instruction pointer. Can be null if only @e scope_id
+                    should be used.
+        @param scope_id - symbol context ID.
+        @param name - symbol name.
+        @param done - call back interface called when operation is completed.
+        @return - pending command handle.
+        """
+        raise NotImplementedError("Abstract method")
+
     def list(self, context_id, done):
         """
         List all symbols in given context.
         The context can be a stack frame.
 
         @param context_id - a scope.
+        @param done - call back interface called when operation is completed.
+        @return - pending command handle.
+        """
+        raise NotImplementedError("Abstract method")
+
+    def getArrayType(self, type_id, length, done):
+        """
+        Create an array type.
+
+        @param type_id - symbol ID of the array cell type
+        @param length - length of the array. A length of 0 creates a pointer
+                        type.
         @param done - call back interface called when operation is completed.
         @return - pending command handle.
         """
@@ -331,14 +412,14 @@ class DoneGetChildren(object):
 
 class DoneFind(object):
     """
-    Client call back interface for find().
+    Client call back interface for find(), findByName() and findInScope().
     """
-    def doneFind(self, token, error, symbol_id):
+    def doneFind(self, token, error, symbol_ids):
         """
         Called when symbol search is done.
         @param token - command handle.
         @param error - error description if operation failed, None if succeeded.
-        @param symbol_id - symbol ID.
+        @param symbol_ids - list of symbol ID.
         """
         pass
 
@@ -352,6 +433,18 @@ class DoneList(object):
         @param token - command handle.
         @param error - error description if operation failed, None if succeeded.
         @param symbol_ids - array of symbol IDs.
+        """
+
+class DoneGetArrayType(object):
+    """
+    Client call back interface for getArrayType().
+    """
+    def doneGetArrayType(self, token, error, type_id):
+        """
+        Called when array type creation is done.
+        @param token - command handle.
+        @param error - error description if operation failed, None if succeeded.
+        @param type_id - array type symbol ID 
         """
 
 

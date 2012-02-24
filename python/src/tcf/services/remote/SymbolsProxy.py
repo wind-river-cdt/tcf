@@ -1,5 +1,5 @@
 # *******************************************************************************
-# * Copyright (c) 2011 Wind River Systems, Inc. and others.
+# * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others.
 # * All rights reserved. This program and the accompanying materials
 # * are made available under the terms of the Eclipse Public License v1.0
 # * which accompanies this distribution, and is available at
@@ -72,6 +72,38 @@ class SymbolsProxy(symbols.SymbolsService):
                 done.doneFind(self.token, error, id)
         return FindCommand().token
 
+    def findByName(self, context_id, ip, name, done):
+        done = self._makeCallback(done)
+        service = self
+        class FindByNameCommand(Command):
+            def __init__(self):
+                super(FindByNameCommand, self).__init__(service.channel, service, "findByName", (context_id, ip, name))
+            def done(self, error, args):
+                ids = []
+                if not error:
+                    assert len(args) >= 2
+                    error = self.toError(args[0])
+                    if not error:
+                        ids = args[1:]
+                done.doneFind(self.token, error, ids)
+        return FindByNameCommand().token
+
+    def findInScope(self, context_id, ip, scope_id, name, done):
+        done = self._makeCallback(done)
+        service = self
+        class FindInScopeCommand(Command):
+            def __init__(self):
+                super(FindInScopeCommand, self).__init__(service.channel, service, "findInScope", (context_id, ip, scope_id, name))
+            def done(self, error, args):
+                ids = []
+                if not error:
+                    assert len(args) >= 2
+                    error = self.toError(args[0])
+                    if not error:
+                        ids = args[1:]
+                done.doneFind(self.token, error, ids)
+        return FindInScopeCommand().token
+
     def findByAddr(self, context_id, addr, done):
         done = self._makeCallback(done)
         service = self
@@ -101,6 +133,21 @@ class SymbolsProxy(symbols.SymbolsService):
                     lst = args[1]
                 done.doneList(self.token, error, lst)
         return ListCommand().token
+
+    def getArrayType(self, type_id, length, done):
+        done = self._makeCallback(done)
+        service = self
+        class GetArrayTypeCommand(Command):
+            def __init__(self):
+                super(GetArrayTypeCommand, self).__init__(service.channel, service, "getArrayType", (type_id, length))
+            def done(self, error, args):
+                id = None
+                if not error:
+                    assert len(args) == 2
+                    error = self.toError(args[0])
+                    id = args[1]
+                done.doneGetArrayType(self.token, error, id)
+        return GetArrayTypeCommand().token
 
     def findFrameInfo(self, context_id, address, done):
         done = self._makeCallback(done)

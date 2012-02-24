@@ -96,7 +96,7 @@ class MemContext(memory.MemoryContext):
                     e = memory.MemoryError(error.message)
                 else:
                     assert len(args) == 2
-                    e = self.toMemoryError(args[0], args[1])
+                    e = self.toMemoryError(addr, args[0], args[1])
                 done.doneMemory(self.token, e)
         return FillCommand().token
 
@@ -117,7 +117,7 @@ class MemContext(memory.MemoryContext):
                     byts = channel.toByteArray(args[0])
                     assert len(byts) <= size
                     buf[offs:offs+len(byts)] = byts
-                    e = self.toMemoryError(args[1], args[2])
+                    e = self.toMemoryError(addr, args[1], args[2])
                 done.doneMemory(self.token, e)
         return GetCommand().token
 
@@ -135,7 +135,7 @@ class MemContext(memory.MemoryContext):
                     e = memory.MemoryError(error.message)
                 else:
                     assert len(args) == 2
-                    e = self.toMemoryError(args[1], args[2])
+                    e = self.toMemoryError(addr, args[1], args[2])
                 done.doneMemory(self.token, e)
         return SetCommand().token
 

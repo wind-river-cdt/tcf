@@ -1,5 +1,5 @@
 # *******************************************************************************
-# * Copyright (c) 2011 Wind River Systems, Inc. and others.
+# * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others.
 # * All rights reserved. This program and the accompanying materials
 # * are made available under the terms of the Eclipse Public License v1.0
 # * which accompanies this distribution, and is available at
@@ -153,6 +153,13 @@ class Value(object):
         """
         return self._props.get(VAL_BIG_ENDIAN)
 
+    def getAddress(self):
+        """
+        Get the value address if one exists.
+        @return The value address or None if none address exists for the value
+        """
+        return self._props.get(VAL_ADDRESS)
+
     def getValue(self):
         """
         Get value as array of bytes.
@@ -170,6 +177,9 @@ class Value(object):
 # Expression value property names.
 VAL_CLASS = "Class"
 VAL_TYPE = "Type"
+VAL_SYMBOL = "Symbol"
+VAL_REGISTER = "Register"
+VAL_ADDRESS = "Address"
 VAL_BIG_ENDIAN = "BigEndian"
 
 class ExpressionsService(services.Service):
