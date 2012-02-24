@@ -48,7 +48,7 @@ public class ConfigIntervalDynamicContribution extends CompoundContributionItem 
 	/**
 	 * The action to allow a most recently used interval to be selected.
 	 */
-	class MRUAction extends Action {
+	static class MRUAction extends Action {
 		// The process model.
 		private ProcessModel model;
 		// The interval of this most recently used item.
@@ -83,7 +83,7 @@ public class ConfigIntervalDynamicContribution extends CompoundContributionItem 
 	/**
 	 * The action to allow a speed grade to be selected.
 	 */
-	class GradeAction extends Action {
+	static class GradeAction extends Action {
 		// The process model.
 		private ProcessModel model;
 		// The interval time represented by this grade.
@@ -119,7 +119,7 @@ public class ConfigIntervalDynamicContribution extends CompoundContributionItem 
 	/**
 	 * The action to allow defining a custom interval.
 	 */
-	class CustomAction extends Action {
+	static class CustomAction extends Action {
 		/**
 		 * Constructor
 		 *

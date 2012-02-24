@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.processes.ui.internal.columns;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
@@ -16,8 +17,8 @@ import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 /**
  * The comparator for the tree column "user".
  */
-public class UserComparator implements Comparator<ProcessTreeNode> {
-
+public class UserComparator implements Comparator<ProcessTreeNode> , Serializable {
+    private static final long serialVersionUID = 1L;
 	/*
 	 * (non-Javadoc)
 	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)

@@ -64,7 +64,7 @@ public class TerminateHandler extends AbstractHandler {
 	 * The callback to be invoked after the selected processes are successfully terminated
 	 * to update the tree viewer or display errors.
 	 */
-	class TerminateCallback extends Callback {
+	static class TerminateCallback extends Callback {
 		private ProcessTreeNode node;
 		public TerminateCallback(ProcessTreeNode node) {
 			this.node = node;

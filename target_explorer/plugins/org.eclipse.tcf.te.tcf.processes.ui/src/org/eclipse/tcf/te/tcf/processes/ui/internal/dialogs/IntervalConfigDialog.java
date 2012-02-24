@@ -148,7 +148,7 @@ public class IntervalConfigDialog extends StatusDialog implements ModifyListener
 	/**
 	 * The label provider used to display the speed grades in the combo viewer.
 	 */
-	class GradeLabelProvider extends LabelProvider {
+	static class GradeLabelProvider extends LabelProvider {
 		@Override
         public String getText(Object element) {
 			if(element instanceof IntervalGrade) {

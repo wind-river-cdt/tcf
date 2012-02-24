@@ -25,13 +25,6 @@ public class AdapterFactory implements IAdapterFactory {
 	// The refresh handler delegate adapter
 	private IRefreshHandlerDelegate refreshDelegate = new RefreshHandlerDelegate();
 
-	// The adapter class.
-	private Class<?>[] adapters = {
-					ILabelProvider.class,
-					IPeerModel.class,
-					IRefreshHandlerDelegate.class
-				};
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 	 */
@@ -56,7 +49,11 @@ public class AdapterFactory implements IAdapterFactory {
 	 */
 	@Override
 	public Class[] getAdapterList() {
-		return adapters;
+		return new Class<?>[] {
+						ILabelProvider.class,
+						IPeerModel.class,
+						IRefreshHandlerDelegate.class
+					};
 	}
 
 }

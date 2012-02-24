@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.processes.ui.internal.columns;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,8 +19,8 @@ import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 /**
  * The comparator for the tree column "name".
  */
-public class ProcessComparator implements Comparator<ProcessTreeNode> {
-
+public class ProcessComparator implements Comparator<ProcessTreeNode> , Serializable {
+    private static final long serialVersionUID = 1L;
 	/*
 	 * (non-Javadoc)
 	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
@@ -31,8 +32,8 @@ public class ProcessComparator implements Comparator<ProcessTreeNode> {
 		if (node1 == null && node2 != null) return -1;
 
 		// Get the labels
-		String text1 = node1.name;
-		String text2 = node2.name;
+		String text1 = node1 == null ? null : node1.name;
+		String text2 = node2 == null ? null : node2.name;
 
 		// Normalize labels
 		if (text1 == null) text1 = ""; //$NON-NLS-1$

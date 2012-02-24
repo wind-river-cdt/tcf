@@ -29,8 +29,6 @@ public class PIDLabelProvider extends LabelProvider {
 		// Pending nodes does not have column texts at all
 		if (node.type.endsWith("PendingNode")) return ""; //$NON-NLS-1$ //$NON-NLS-2$
 		String id = Long.toString(node.pid);
-		if (id == null) id = node.id;
-		if (id != null) return id.startsWith("P") ? id.substring(1) : id; //$NON-NLS-1$
-		return ""; //$NON-NLS-1$
+		return id.startsWith("P") ? id.substring(1) : id; //$NON-NLS-1$
 	}
 }
