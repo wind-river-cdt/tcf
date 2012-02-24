@@ -128,7 +128,7 @@ class MemContext(memory.MemoryContext):
         class SetCommand(MemoryCommand):
             def __init__(self):
                 super(SetCommand, self).__init__(service,
-                        "set", (id, addr, word_size, size, mode, bytearray(buf[offs:offs:size])))
+                        "set", (id, addr, word_size, size, mode, bytearray(buf[offs:offs+size])))
             def done(self, error, args):
                 e = None
                 if error:
@@ -194,9 +194,9 @@ class MemoryCommand(Command):
         cmd = self.getCommandString()
         if len(cmd) > 72: cmd = cmd[0:72] + "..."
         e = MemoryErrorReport(
-                "TCF command exception:\nCommand: %s\nException: %s\nError code: " % (
+                "TCF command exception:\nCommand: %s\nException: %s\nError code: %d" % (
                     cmd, self.toErrorString(data), code),
-                map, addr, ranges)
+                data, addr, ranges)
         caused_by = data.get(errors.ERROR_CAUSED_BY)
         if caused_by is not None: e.caused_by = self.toError(caused_by, False)
         return e
