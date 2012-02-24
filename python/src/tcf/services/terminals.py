@@ -46,7 +46,9 @@ PROP_STDOUT_ID = "StdOutID"
 # Process standard error stream ID
 PROP_STDERR_ID = "StdErrID"
 
+
 class TerminalContext(object):
+
     def __init__(self, props):
         self._props = props or {}
 
@@ -95,6 +97,27 @@ class TerminalContext(object):
         """
         return self._props.get(PROP_HEIGHT)
 
+    def getStdErrID(self):
+        """
+        Get standard error stream ID of the terminal.
+        Same as getProperties().get("StdErrID")
+        """
+        return self._props.get(PROP_STDERR_ID)
+
+    def getStdInID(self):
+        """
+        Get standard input stream ID of the terminal.
+        Same as getProperties().get("StdInID")
+        """
+        return self._props.get(PROP_STDIN_ID)
+
+    def getStdOutID(self):
+        """
+        Get standard output stream ID of the terminal.
+        Same as getProperties().get("StdOutID")
+        """
+        return self._props.get(PROP_STDOUT_ID)
+
     def getProperties(self):
         """
         Get all available context properties.
@@ -102,7 +125,7 @@ class TerminalContext(object):
         """
         return self._props
 
-    def exit(self, done):
+    def exit(self, done):  # @ReservedAssignment
         """
         Exit the terminal.
         @param done - call back interface called when operation is completed.
@@ -110,27 +133,28 @@ class TerminalContext(object):
         """
         raise NotImplementedError("Abstract method")
 
+
 class TerminalsService(services.Service):
     def getName(self):
         return NAME
 
-    def getContext(self, id, done):
+    def getContext(self, id, done):  # @ReservedAssignment
         """
         Retrieve context info for given context ID.
         A context corresponds to an terminal.
         Context IDs are valid across TCF services, so it is allowed to issue
         'ITerminals.getContext' command with a context that was obtained,
         for example, from Memory service.
-        However, 'ITerminals.getContext' is supposed to return only terminal specific data,
-        If the ID is not a terminal ID, 'ITerminals.getContext' may not return any
-        useful information
+        However, 'ITerminals.getContext' is supposed to return only terminal
+        specific data, if the ID is not a terminal ID, 'ITerminals.getContext'
+        may not return any useful information
 
         @param id - context ID.
         @param done - call back interface called when operation is completed.
         """
         raise NotImplementedError("Abstract method")
 
-    def launch(self, type, encoding, environment, done):
+    def launch(self, type, encoding, environment, done):  # @ReservedAssignment
         """
         Launch a new terminal to remote machine.
         @param type - requested terminal type for the new terminal.
@@ -152,7 +176,7 @@ class TerminalsService(services.Service):
         """
         raise NotImplementedError("Abstract method")
 
-    def exit(self, context_id, done):
+    def exit(self, context_id, done):  # @ReservedAssignment
         """
         Exit a terminal.
         @param context_id - context ID.
@@ -183,14 +207,17 @@ class DoneGetContext(object):
     def doneGetContext(self, token, error, context):
         """
         Called when contexts data retrieval is done.
-        @param error - error description if operation failed, None if succeeded.
+        @param error - error description if operation failed, None if
+                       succeeded.
         @param context - context data.
         """
         pass
 
+
 class DoneCommand(object):
     def doneCommand(self, token, error):
         pass
+
 
 class DoneLaunch(object):
     """
@@ -199,10 +226,12 @@ class DoneLaunch(object):
     def doneLaunch(self, token, error, terminal):
         pass
 
+
 class TerminalsListener(object):
     """
     Process event listener is notified when a terminal exits.
-    Event are reported only for terminals that were started by 'launch' command.
+    Event are reported only for terminals that were started by 'launch'
+    command.
     """
     def exited(self, terminal_id, exit_code):
         """
