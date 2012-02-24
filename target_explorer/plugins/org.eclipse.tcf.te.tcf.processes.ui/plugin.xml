@@ -176,7 +176,7 @@
          </command>
          <command
                commandId="org.eclipse.tcf.te.launch.command.terminate"
-               icon="icons/obj16/process.gif"
+               icon="platform:/plugin/org.eclipse.debug.ui/icons/full/elcl16/terminate_co.gif"
                id="org.eclipse.tcf.te.launch.menu.terminate"
                label="%command.terminate.label"
                style="push"
