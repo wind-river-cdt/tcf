@@ -36,7 +36,7 @@ public class UserManager {
 	/* default */ static final String USER_ACCOUNT_KEY = UIPlugin.getUniqueIdentifier()+".user.account"; //$NON-NLS-1$
 
 	// The singleton fInstance.
-	private static UserManager instance;
+	private static volatile UserManager instance;
 
 	/**
 	 * Get the singleton user manager.

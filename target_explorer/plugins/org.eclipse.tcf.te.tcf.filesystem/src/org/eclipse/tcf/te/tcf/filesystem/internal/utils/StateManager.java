@@ -36,7 +36,7 @@ import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 public class StateManager {
 
 	// The singleton instance.
-	private static StateManager instance;
+	private static volatile StateManager instance;
 
 	/**
 	 * Get the singleton user manager.

@@ -91,16 +91,7 @@ public class FSFolderSelectionDialog extends ElementTreeSelectionDialog {
 		setMessage(Messages.FSFolderSelectionDialog_MoveDialogMessage);
 		this.setAllowMultiple(false);
 		this.setComparator(new FSTreeViewerSorter());
-		this.addFilter(new ViewerFilter() {
-			@Override
-			public boolean select(Viewer viewer, Object parentElement, Object element) {
-				if (element instanceof FSTreeNode) {
-					FSTreeNode node = (FSTreeNode) element;
-					return node.isDirectory() || node.isPendingNode();
-				}
-				return false;
-			}
-		});
+		this.addFilter(new DirectoryFilter());
 		this.setStatusLineAboveButtons(false);
 		this.setValidator(new ISelectionStatusValidator() {
 
@@ -109,6 +100,20 @@ public class FSFolderSelectionDialog extends ElementTreeSelectionDialog {
 				return isValidFolder(selection);
 			}
 		});
+	}
+	
+	/**
+	 * The viewer filter used to filter out files.
+	 */
+	static class DirectoryFilter extends ViewerFilter {
+		@Override
+		public boolean select(Viewer viewer, Object parentElement, Object element) {
+			if (element instanceof FSTreeNode) {
+				FSTreeNode node = (FSTreeNode) element;
+				return node.isDirectory() || node.isPendingNode();
+			}
+			return false;
+		}
 	}
 	
 	/*

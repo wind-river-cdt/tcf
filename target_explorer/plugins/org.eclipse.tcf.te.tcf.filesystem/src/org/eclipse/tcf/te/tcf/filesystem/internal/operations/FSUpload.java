@@ -10,13 +10,17 @@
 package org.eclipse.tcf.te.tcf.filesystem.internal.operations;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
@@ -50,12 +54,17 @@ public class FSUpload extends FSUIOperation implements IConfirmCallback {
 	 * @param targetFolder the target folder to upload the files to.
 	 * @param callback the callback that is invoked after uploading.
 	 */
-	public FSUpload(String[] sourceFiles, FSTreeNode targetFolder, ICallback callback) {
+	public FSUpload(String[] sourceFiles, final FSTreeNode targetFolder, ICallback callback) {
 	    super(Messages.FSUpload_UploadTitle);
 	    this.sourceFiles = new String[sourceFiles.length];
     	System.arraycopy(sourceFiles, 0, this.sourceFiles, 0, sourceFiles.length);
 	    this.targetFolder = targetFolder;
 	    this.callback = callback;
+	    SafeRunner.run(new SafeRunnable(){
+			@Override
+            public void run() throws Exception {
+		        targetChildren = getChildren(targetFolder);
+            }});
     }
 
 	/*
@@ -78,9 +87,10 @@ public class FSUpload extends FSUIOperation implements IConfirmCallback {
 				files[i] = new File(sourceFiles[i]);
 				urls[i] = new URL(folderURL, files[i].getName());
 			}
-		    this.targetChildren = getChildren(targetFolder);
 			CacheManager.getInstance().uploadFiles(monitor, files, urls, this);
-		} catch (Exception e) {
+		} catch (MalformedURLException e) {
+			throw new InvocationTargetException(e);
+		} catch (IOException e) {
 			throw new InvocationTargetException(e);
 		} finally {
 			monitor.done();

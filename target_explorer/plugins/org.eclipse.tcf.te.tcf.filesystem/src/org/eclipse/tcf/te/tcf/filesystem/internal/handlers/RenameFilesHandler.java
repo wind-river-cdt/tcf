@@ -33,7 +33,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
  */
 public class RenameFilesHandler extends AbstractHandler {
 	// The currently focused viewer.
-	private static TreeViewer CurrentViewer;
+	private static TreeViewer currentViewer;
 
 	/*
 	 * (non-Javadoc)
@@ -47,10 +47,10 @@ public class RenameFilesHandler extends AbstractHandler {
 			boolean inPlaceEditor = PersistenceManager.getInstance().isInPlaceEditor();
 			if (inPlaceEditor) {
 				// If it is configured to use in-place editor, then invoke the editor.
-				if (CurrentViewer != null) {
-					Control control = CurrentViewer.getControl();
+				if (currentViewer != null) {
+					Control control = currentViewer.getControl();
 					if (!control.isDisposed()) {
-						CurrentViewer.editElement(node, 0);
+						currentViewer.editElement(node, 0);
 					}
 				}
 			}
@@ -130,6 +130,6 @@ public class RenameFilesHandler extends AbstractHandler {
 	 * @param viewer The currently focused tree viewer.
 	 */
 	public static void setCurrentViewer(TreeViewer viewer) {
-		CurrentViewer = viewer;
+		currentViewer = viewer;
 	}
 }

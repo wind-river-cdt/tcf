@@ -32,7 +32,7 @@ public class ContentTypeHelper {
 	// The binary content type's id.
 	private static final String CONTENT_TYPE_BINARY_ID = "org.eclipse.cdt.core.binaryFile"; //$NON-NLS-1$
 	// The singleton of the content type helper.
-	private static ContentTypeHelper instance;
+	private static volatile ContentTypeHelper instance;
 
 	/**
 	 * Get the singleton instance of the content type helper.

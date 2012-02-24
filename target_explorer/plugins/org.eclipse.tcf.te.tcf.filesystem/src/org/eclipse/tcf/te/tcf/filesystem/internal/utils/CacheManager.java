@@ -56,7 +56,7 @@ public class CacheManager {
 	private static final DecimalFormat SIZE_FORMAT = new DecimalFormat("#,##0.##"); //$NON-NLS-1$
 
 	// The singleton instance.
-	private static CacheManager instance;
+	private static volatile CacheManager instance;
 
 	/**
 	 * Get the singleton cache manager.
@@ -361,7 +361,7 @@ public class CacheManager {
 						uploadFiles(monitor, sync, nodes);
 						if (monitor.isCanceled())
 							throw new InterruptedException();
-					} catch (Exception e) {
+					} catch(IOException e) {
 						throw new InvocationTargetException(e);
 					} finally {
 						monitor.done();

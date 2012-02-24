@@ -95,7 +95,7 @@ public class PersistenceManager {
 	private static final String PERSISTENT_FILE = "persistent.xml"; //$NON-NLS-1$
 
 	// The singleton instance.
-	private static PersistenceManager instance;
+	private static volatile PersistenceManager instance;
 
 	// The time stamp for each file.
 	private Map<URI, Long> timestamps;
@@ -469,9 +469,11 @@ public class PersistenceManager {
 				long timestamp = 0L;
 				try {
 					timestamp = Long.parseLong(value);
-					timestamps.put(new URI(key), Long.valueOf(timestamp));
+                    timestamps.put(new URI(key), Long.valueOf(timestamp));
 				}
-				catch (Exception nfe) {
+				catch (NumberFormatException nfe) {
+				}
+				catch (URISyntaxException e) {
 				}
 			}
 		}

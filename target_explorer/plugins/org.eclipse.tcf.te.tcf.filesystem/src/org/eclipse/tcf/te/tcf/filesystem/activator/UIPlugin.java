@@ -129,7 +129,13 @@ public class UIPlugin extends AbstractUIPlugin {
 			saveAllCmd.removeExecutionListener(saveAllListener);
 		}
 		// Ignore SWTException here, the display might be disposed already.
-		try { clipboard.dispose(); } catch (SWTException e) { /* ignored on purpose */ }
+		if (clipboard != null) {
+			try {
+				clipboard.dispose();
+			}
+			catch (SWTException e) { /* ignored on purpose */
+			}
+		}
 		clipboard = null;
 		plugin = null;
 		super.stop(context);

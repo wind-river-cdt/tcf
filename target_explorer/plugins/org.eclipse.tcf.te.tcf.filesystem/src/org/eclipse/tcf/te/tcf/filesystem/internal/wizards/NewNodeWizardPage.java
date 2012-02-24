@@ -171,17 +171,7 @@ public abstract class NewNodeWizardPage extends AbstractValidatingWizardPage {
 		treeViewer.setContentProvider(new FSTreeContentProvider());
 		treeViewer.setLabelProvider(createDecoratingLabelProvider(new FSTreeElementLabelProvider()));
 		treeViewer.setComparator(new FSTreeViewerSorter());
-		ViewerFilter folderFilter = new ViewerFilter() {
-			@Override
-			public boolean select(Viewer viewer, Object parentElement, Object element) {
-				if (element instanceof FSTreeNode) {
-					FSTreeNode node = (FSTreeNode) element;
-					return node.isDirectory() || node.isPendingNode();
-				}
-				return false;
-			}
-		};
-		treeViewer.addFilter(folderFilter);
+		treeViewer.addFilter(new DirectoryFilter());
 		IPeerModel peer = wizard.getPeer();
 		if (peer != null) {
 			setInput(peer);
@@ -210,6 +200,20 @@ public abstract class NewNodeWizardPage extends AbstractValidatingWizardPage {
 
 		// restore the widget values from the history
 		restoreWidgetValues();
+	}
+	
+	/**
+	 * The viewer filter to filter out files.
+	 */
+	static class DirectoryFilter extends ViewerFilter {
+		@Override
+		public boolean select(Viewer viewer, Object parentElement, Object element) {
+			if (element instanceof FSTreeNode) {
+				FSTreeNode node = (FSTreeNode) element;
+				return node.isDirectory() || node.isPendingNode();
+			}
+			return false;
+		}
 	}
 
 	/**

@@ -55,7 +55,7 @@ public class NameValidator extends Validator {
 			setMessage(Messages.FSRenamingAssistant_SpecifyNonEmptyName, IMessageProvider.ERROR);
 			return false;
 		}
-		String text = newText.toString().trim();
+		String text = newText.trim();
 		if (hasChild(text)) {
 			setMessage(Messages.FSRenamingAssistant_NameAlreadyExists, IMessageProvider.ERROR);
 			return false;
