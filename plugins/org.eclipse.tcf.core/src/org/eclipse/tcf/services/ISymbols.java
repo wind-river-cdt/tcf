@@ -32,7 +32,8 @@ public interface ISymbols extends IService {
         function,               // function body
         type,                   // a type
         comp_unit,              // compilation unit
-        block                   // lexical block
+        block,                  // lexical block
+        namespace               // C++ namespace
     }
 
     enum TypeClass {
