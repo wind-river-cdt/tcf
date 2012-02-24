@@ -647,6 +647,11 @@
             <instanceof value="org.eclipse.tcf.internal.debug.ui.model.TCFNode"/>
          </enabledWhen>
       </page>
+      <page class="org.eclipse.tcf.internal.debug.ui.properties.TCFBreakpointStatusPage"
+            id="org.eclipse.tcf.breakpoint.status"
+            name="%breakpoints.statusPage.name">
+         <filter name="debugModelId" value="org.eclipse.tcf.debug"/>
+      </page>
    </extension>
 
    <extension

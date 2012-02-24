@@ -83,19 +83,6 @@
             </and>
          </enabledWhen>
       </page>
-      <page class="org.eclipse.tcf.internal.cdt.ui.breakpoints.TCFBreakpointStatusPage"
-            id="org.eclipse.tcf.breakpoint.status"
-            name="%breakpoints.statusPage.name">
-         <filter name="debugModelId" value="org.eclipse.tcf.debug"/>
-         <enabledWhen>
-            <and>
-               <adapt type="org.eclipse.cdt.debug.core.model.ICBreakpoint"/>
-               <not>
-                  <adapt type="org.eclipse.cdt.debug.core.model.ICTracepoint"/>
-               </not>
-            </and>
-         </enabledWhen>
-      </page>
    </extension>
 
     <!-- Remote Application Launch config type -->
