@@ -165,7 +165,7 @@ public class BlockingCallProxy implements InvocationHandler {
 	 * The invocation handler of the callback proxy. Used to delegate the callback invocation
 	 * and unblock the rendezvous object.
 	 */
-	private class DoneHandler implements InvocationHandler {
+	static private class DoneHandler implements InvocationHandler {
 		// The callback handler that delegates the invocation.
 		private Object done;
 		// The rendezvous that unblocks the invocation.

@@ -71,8 +71,7 @@ public class OpenFileHandler extends AbstractHandler {
 		File file = CacheManager.getInstance().getCacheFile(node);
 		if (!file.exists()) {
 			// If the file node's local cache does not exist yet, download it.
-			boolean successful = CacheManager.getInstance().download(node);
-			if (!successful) {
+			if (!CacheManager.getInstance().download(node)) {
 				return;
 			}
 		}

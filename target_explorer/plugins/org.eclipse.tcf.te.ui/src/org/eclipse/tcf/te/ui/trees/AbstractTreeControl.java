@@ -704,11 +704,9 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 
 		// If the parent composite is a forms section, set the toolbar
 		// as text client to the section header
-		if (parent instanceof Section) {
-			Section section = (Section)parent;
-			// Set the toolbar as text client
-			section.setTextClient(toolbar);
-		}
+		Section section = (Section)parent;
+		// Set the toolbar as text client
+		section.setTextClient(toolbar);
 	}
 
 	/**
@@ -741,7 +739,9 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * @return The filter descriptors of this viewer.
 	 */
 	public FilterDescriptor[] getFilterDescriptors() {
-		return filterDescriptors;
+		FilterDescriptor[] descriptors = new FilterDescriptor[filterDescriptors.length];
+		System.arraycopy(filterDescriptors, 0, descriptors, 0, filterDescriptors.length);
+		return descriptors;
 	}
 
 	/**
@@ -750,7 +750,9 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * @return The current viewer columns.
 	 */
 	public ColumnDescriptor[] getViewerColumns() {
-		return columns;
+		ColumnDescriptor[] columnDescriptors = new ColumnDescriptor[columns.length];
+		System.arraycopy(columns, 0, columnDescriptors, 0, columns.length);
+		return columnDescriptors;
 	}
 
 	/**

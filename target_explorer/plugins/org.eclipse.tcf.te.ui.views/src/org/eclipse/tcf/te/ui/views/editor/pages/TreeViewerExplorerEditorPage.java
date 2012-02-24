@@ -84,11 +84,13 @@ public class TreeViewerExplorerEditorPage extends AbstractCustomFormToolkitEdito
 		String title = titleText == null ? getTitle() :titleText;
 		// Stretch to a length of 40 characters to make sure the title can be changed
 		// to hold and show text up to this length
-		while (title.length() < 40) {
-			title += " "; //$NON-NLS-1$
+		StringBuilder builder = new StringBuilder();
+		builder.append(title);
+		while (builder.length() < 40) {
+			builder.append(" "); //$NON-NLS-1$
 		}
 		// Set the title to the section
-		section.setText(title);
+		section.setText(builder.toString());
 		GridData data = new GridData(GridData.FILL_BOTH);
 		data.widthHint = 0;
 		data.heightHint = 0;

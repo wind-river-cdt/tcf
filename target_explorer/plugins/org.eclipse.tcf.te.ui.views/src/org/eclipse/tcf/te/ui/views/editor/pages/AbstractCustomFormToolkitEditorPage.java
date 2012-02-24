@@ -36,7 +36,7 @@ public abstract class AbstractCustomFormToolkitEditorPage extends AbstractEditor
 	private CustomFormToolkit toolkit = null;
 
 	// The default help action class definition
-	protected class HelpAction extends Action {
+	static protected class HelpAction extends Action {
 		/* default */ final String helpID;
 
 		/**

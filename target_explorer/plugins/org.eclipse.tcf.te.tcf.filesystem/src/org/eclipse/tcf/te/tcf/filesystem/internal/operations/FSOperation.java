@@ -134,8 +134,7 @@ public class FSOperation implements IRunnableWithProgress{
 			SafeRunner.run(new SafeRunnable(){
 				@Override
                 public void run() throws Exception {
-					boolean successful = file.delete();
-					if (!successful) {
+					if (!file.delete()) {
 						throw new Exception(NLS.bind(Messages.FSOperation_DeletingFileFailed, file.getAbsolutePath()));
 					}
                 }});

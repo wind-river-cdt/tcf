@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.tcf.te.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
+import org.eclipse.tcf.te.ui.nls.Messages;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 
@@ -210,7 +211,16 @@ public class ViewerStateManager {
 			location = new File(System.getProperty("user.home"), ".tcf"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		// Create the location if it not exist
-		if (!location.exists()) location.mkdir();
+		if (!location.exists()) {
+			final File dir = location;
+			SafeRunner.run(new SafeRunnable(){
+				@Override
+                public void run() throws Exception {
+					if (!dir.mkdir()) {
+						throw new Exception(Messages.ViewerStateManager_MkdirFailed);
+					}
+                }});
+		}
 		location = new File(location, "viewerstates.xml"); //$NON-NLS-1$
 		return location;
 	}

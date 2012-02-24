@@ -111,8 +111,7 @@ public class CacheManager {
 			SafeRunner.run(new SafeRunnable(){
 				@Override
                 public void run() throws Exception {
-					boolean successful = dir.mkdir();
-					if (!successful) {
+					if (!dir.mkdir()) {
 						throw new Exception(NLS.bind(Messages.CacheManager_MkdirFailed, dir.getAbsolutePath()));
 					}
                 }});
@@ -130,8 +129,7 @@ public class CacheManager {
 			SafeRunner.run(new SafeRunnable(){
 				@Override
                 public void run() throws Exception {
-					boolean successful = file.delete();
-					if (!successful) {
+					if (!file.delete()) {
 						throw new Exception(NLS.bind(Messages.FSOperation_DeletingFileFailed, file.getAbsolutePath()));
 					}
                 }});
@@ -150,8 +148,7 @@ public class CacheManager {
 			SafeRunner.run(new SafeRunnable(){
 				@Override
                 public void run() throws Exception {
-					boolean successful = file.setLastModified(lastModified);
-					if (!successful) {
+					if (!file.setLastModified(lastModified)) {
 						throw new Exception(NLS.bind(Messages.CacheManager_SetLastModifiedFailed, file.getAbsolutePath()));
 					}
                 }});
@@ -169,8 +166,7 @@ public class CacheManager {
 			SafeRunner.run(new SafeRunnable(){
 				@Override
                 public void run() throws Exception {
-					boolean successful = file.setReadOnly();
-					if (!successful) {
+					if (!file.setReadOnly()) {
 						throw new Exception(NLS.bind(Messages.CacheManager_SetReadOnlyFailed, file.getAbsolutePath()));
 					}
                 }});
