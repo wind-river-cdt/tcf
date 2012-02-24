@@ -19,11 +19,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.cdt.debug.core.model.ICBreakpoint;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -139,31 +139,32 @@ public class TCFBreakpointStatusPage extends PropertyPage {
                             String error = (String)m.get(IBreakpoints.INSTANCE_ERROR);
                             if (error != null) z.add("Error: " + error);
                             Number addr = (Number)m.get(IBreakpoints.INSTANCE_ADDRESS);
+                            z.planted_ok = error == null;
                             if (addr != null) {
-                                z.planted_ok = error == null;
                                 BigInteger i = JSON.toBigInteger(addr);
                                 z.add("Address: 0x" +  i.toString(16));
-                                Number size = (Number)m.get(IBreakpoints.INSTANCE_SIZE);
-                                if (size != null) z.add("Size: " + size);
-                                String type = (String)m.get(IBreakpoints.INSTANCE_TYPE);
-                                if (type != null) z.add("Type: " + type);
-                                if (y.object instanceof TCFNode) {
-                                    TCFDataCache<TCFNodeExecContext> mem = model.searchMemoryContext((TCFNode)y.object);
-                                    if (mem != null) {
-                                        if (!mem.validate(this)) {
-                                            pending = mem;
-                                        }
-                                        else {
-                                            TCFNodeExecContext ctx = mem.getData();
-                                            if (ctx != null) {
-                                                TCFDataCache<TCFSourceRef> ln_cache = ctx.getLineInfo(i);
-                                                if (ln_cache != null) {
-                                                    if (!ln_cache.validate()) {
-                                                        pending = ln_cache;
-                                                    }
-                                                    else {
-                                                        addLocationInfo(z, ln_cache.getData());
-                                                    }
+                            }
+                            Number size = (Number)m.get(IBreakpoints.INSTANCE_SIZE);
+                            if (size != null) z.add("Size: " + size);
+                            String type = (String)m.get(IBreakpoints.INSTANCE_TYPE);
+                            if (type != null) z.add("Type: " + type);
+                            if (addr != null && y.object instanceof TCFNode) {
+                                TCFDataCache<TCFNodeExecContext> mem = model.searchMemoryContext((TCFNode)y.object);
+                                if (mem != null) {
+                                    if (!mem.validate(this)) {
+                                        pending = mem;
+                                    }
+                                    else {
+                                        TCFNodeExecContext ctx = mem.getData();
+                                        if (ctx != null) {
+                                            BigInteger i = JSON.toBigInteger(addr);
+                                            TCFDataCache<TCFSourceRef> ln_cache = ctx.getLineInfo(i);
+                                            if (ln_cache != null) {
+                                                if (!ln_cache.validate()) {
+                                                    pending = ln_cache;
+                                                }
+                                                else {
+                                                    addLocationInfo(z, ln_cache.getData());
                                                 }
                                             }
                                         }
@@ -346,8 +347,8 @@ public class TCFBreakpointStatusPage extends PropertyPage {
         viewer.expandAll();
     }
 
-    private ICBreakpoint getBreakpoint() {
-        return (ICBreakpoint)getElement().getAdapter(ICBreakpoint.class);
+    private IBreakpoint getBreakpoint() {
+        return (IBreakpoint)getElement().getAdapter(IBreakpoint.class);
     }
 
     private List<StatusItem> getCurrentStatus() {
