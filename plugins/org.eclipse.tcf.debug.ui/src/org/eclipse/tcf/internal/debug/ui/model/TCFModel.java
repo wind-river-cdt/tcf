@@ -580,19 +580,21 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
         boolean done;
         public void run() {
             if (done) return;
-            ArrayList<TCFNodeExecContext> nodes = new ArrayList<TCFNodeExecContext>();
-            if (!searchSuspendedThreads(launch_node.getFilteredChildren(), nodes)) return;
-            if (nodes.size() == 0) {
-                setDebugViewSelection(launch_node, "Launch");
-            }
-            else if (nodes.size() == 1) {
-                TCFNodeExecContext n = nodes.get(0);
-                setDebugViewSelection(n, "Launch");
-            }
-            else {
-                for (TCFNodeExecContext n : nodes) {
-                    String reason = n.getState().getData().suspend_reason;
-                    setDebugViewSelection(n, reason);
+            if (launch_node != null) {
+                ArrayList<TCFNodeExecContext> nodes = new ArrayList<TCFNodeExecContext>();
+                if (!searchSuspendedThreads(launch_node.getFilteredChildren(), nodes)) return;
+                if (nodes.size() == 0) {
+                    setDebugViewSelection(launch_node, "Launch");
+                }
+                else if (nodes.size() == 1) {
+                    TCFNodeExecContext n = nodes.get(0);
+                    setDebugViewSelection(n, "Launch");
+                }
+                else {
+                    for (TCFNodeExecContext n : nodes) {
+                        String reason = n.getState().getData().suspend_reason;
+                        setDebugViewSelection(n, reason);
+                    }
                 }
             }
             done = true;
