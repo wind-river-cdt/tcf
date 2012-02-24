@@ -1,5 +1,5 @@
 # *******************************************************************************
-# * Copyright (c) 2011 Wind River Systems, Inc. and others.
+# * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others.
 # * All rights reserved. self program and the accompanying materials
 # * are made available under the terms of the Eclipse Public License v1.0
 # * which accompanies self distribution, and is available at
@@ -73,5 +73,5 @@ class SysMonitorProxy(sysmonitor.SysMonitorService):
                     assert len(args) == 2
                     error = self.toError(args[0])
                     arr = args[1]
-                done.doneGetCommandLine(self.token, error, arr)
+                done.doneGetEnvironment(self.token, error, arr)
         return GetEnvironmentCommand().token
