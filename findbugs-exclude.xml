@@ -13,4 +13,9 @@
 		<Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"/>
 	</Match>
 	
+	<!-- Ignore all EI_EXPOSE_REP violations for IAdapterFactory#getAdapterList() -->
+	<Match>
+		<Bug pattern="EI_EXPOSE_REP"/>
+		<Method name="getAdapterList"/>
+	</Match>
 </FindBugsFilter>
