@@ -26,6 +26,7 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.tcf.te.runtime.events.EventManager;
 import org.eclipse.tcf.te.runtime.interfaces.workingsets.IWorkingSetElement;
 import org.eclipse.tcf.te.ui.views.events.ViewerContentChangeEvent;
+import org.eclipse.tcf.te.ui.views.interfaces.ICategory;
 import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
 import org.eclipse.tcf.te.ui.views.interfaces.workingsets.IWorkingSetIDs;
 import org.eclipse.tcf.te.ui.views.internal.ViewRoot;
@@ -202,8 +203,19 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 				IWorkingSetElement element = holder.getElement();
 				// If the element is null, try to look up the element through the content provider
 				if (element == null) {
-					ITreeContentProvider contentProvider = (ITreeContentProvider)viewer.getContentProvider();
-					for (Object elementCandidate : contentProvider.getElements(ViewRoot.getInstance())) {
+		    		List<Object> elementCandidates = new ArrayList<Object>();
+					ITreeContentProvider provider = (ITreeContentProvider)viewer.getContentProvider();
+		    		Object[] viewElements = provider.getElements(ViewRoot.getInstance());
+		    		for (Object viewElement : viewElements) {
+		    			if (viewElement instanceof ICategory) {
+		    				elementCandidates.addAll(Arrays.asList(provider.getChildren(viewElement)));
+		    			} else {
+		    				elementCandidates.add(viewElement);
+		    			}
+		    		}
+		    		provider.dispose();
+
+					for (Object elementCandidate : elementCandidates) {
 						if (elementCandidate instanceof IWorkingSetElement && ((IWorkingSetElement)elementCandidate).getElementId().equals(holder.getElementId())) {
 							holder.setElement((IWorkingSetElement)elementCandidate);
 							element = holder.getElement();

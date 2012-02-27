@@ -10,6 +10,7 @@
 package org.eclipse.tcf.te.ui.views.workingsets.pages;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -23,6 +24,7 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.tcf.te.runtime.interfaces.workingsets.IWorkingSetElement;
 import org.eclipse.tcf.te.ui.trees.TreeArrayContentProvider;
 import org.eclipse.tcf.te.ui.views.ViewsUtil;
+import org.eclipse.tcf.te.ui.views.interfaces.ICategory;
 import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
 import org.eclipse.tcf.te.ui.views.internal.ViewRoot;
 import org.eclipse.tcf.te.ui.views.workingsets.WorkingSetElementHolder;
@@ -90,8 +92,22 @@ public class TargetWorkingSetPage extends AbstractWorkingSetWizardPage {
     			}
     		});
 
+    		// Determine the tree input. For working sets, we drop the category nodes and
+    		// present a plain list.
+    		List<Object> objects = new ArrayList<Object>();
+    		ITreeContentProvider provider = contentService.createCommonContentProvider();
+    		Object[] candidates = provider.getElements(ViewRoot.getInstance());
+    		for (Object candidate : candidates) {
+    			if (candidate instanceof ICategory) {
+    				objects.addAll(Arrays.asList(provider.getChildren(candidate)));
+    			} else {
+    				objects.add(candidate);
+    			}
+    		}
+    		provider.dispose();
+
     		// Initialize the tree input
-    		tree.setInput(contentService.createCommonContentProvider().getElements(ViewRoot.getInstance()));
+    		tree.setInput(objects.toArray());
     	}
 	}
 

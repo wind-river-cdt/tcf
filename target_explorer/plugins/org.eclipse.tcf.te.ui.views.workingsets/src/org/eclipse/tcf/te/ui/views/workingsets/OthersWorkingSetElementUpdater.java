@@ -10,12 +10,15 @@
 package org.eclipse.tcf.te.ui.views.workingsets;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.tcf.te.runtime.interfaces.workingsets.IWorkingSetElement;
+import org.eclipse.tcf.te.ui.views.interfaces.ICategory;
 import org.eclipse.tcf.te.ui.views.internal.ViewRoot;
 import org.eclipse.tcf.te.ui.views.internal.ViewViewer;
 import org.eclipse.ui.IWorkingSet;
@@ -67,7 +70,19 @@ public class OthersWorkingSetElementUpdater extends WorkingSetElementUpdater {
 		List<WorkingSetElementHolder> otherElements = new ArrayList<WorkingSetElementHolder>();
 
 		// Get all (root) elements from the common viewer
-		Object[] elements = viewer.getNavigatorContentService().createCommonContentProvider().getElements(ViewRoot.getInstance());
+		List<Object> objects = new ArrayList<Object>();
+		ITreeContentProvider provider = viewer.getNavigatorContentService().createCommonContentProvider();
+		Object[] candidates = provider.getElements(ViewRoot.getInstance());
+		for (Object candidate : candidates) {
+			if (candidate instanceof ICategory) {
+				objects.addAll(Arrays.asList(provider.getChildren(candidate)));
+			} else {
+				objects.add(candidate);
+			}
+		}
+		provider.dispose();
+
+		Object[] elements = objects.toArray();
 
 		// Get all working sets
 		WorkingSetViewStateManager manager = (WorkingSetViewStateManager)Platform.getAdapterManager().getAdapter(viewer.getCommonNavigator(), WorkingSetViewStateManager.class);
