@@ -739,9 +739,12 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * @return The filter descriptors of this viewer.
 	 */
 	public FilterDescriptor[] getFilterDescriptors() {
-		FilterDescriptor[] descriptors = new FilterDescriptor[filterDescriptors.length];
-		System.arraycopy(filterDescriptors, 0, descriptors, 0, filterDescriptors.length);
-		return descriptors;
+		if (filterDescriptors != null) {
+			FilterDescriptor[] descriptors = new FilterDescriptor[filterDescriptors.length];
+			System.arraycopy(filterDescriptors, 0, descriptors, 0, filterDescriptors.length);
+			return descriptors;
+		}
+		return null;
 	}
 
 	/**
@@ -750,9 +753,12 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * @return The current viewer columns.
 	 */
 	public ColumnDescriptor[] getViewerColumns() {
-		ColumnDescriptor[] columnDescriptors = new ColumnDescriptor[columns.length];
-		System.arraycopy(columns, 0, columnDescriptors, 0, columns.length);
-		return columnDescriptors;
+		if (columns != null) {
+			ColumnDescriptor[] columnDescriptors = new ColumnDescriptor[columns.length];
+			System.arraycopy(columns, 0, columnDescriptors, 0, columns.length);
+			return columnDescriptors;
+		}
+		return null;
 	}
 
 	/**
