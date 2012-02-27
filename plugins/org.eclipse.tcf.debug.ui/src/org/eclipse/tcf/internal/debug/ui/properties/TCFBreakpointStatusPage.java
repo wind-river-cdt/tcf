@@ -38,6 +38,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.tcf.internal.debug.launch.TCFSourceLookupParticipant;
 import org.eclipse.tcf.internal.debug.model.TCFBreakpointsModel;
 import org.eclipse.tcf.internal.debug.model.TCFBreakpointsStatus;
 import org.eclipse.tcf.internal.debug.model.TCFLaunch;
@@ -204,16 +205,17 @@ public class TCFBreakpointStatusPage extends PropertyPage {
             int req_char = z.marker.getAttribute(TCFBreakpointsModel.ATTR_REQESTED_CHAR, -1);
             if (req_char < 0) req_char = z.marker.getAttribute(TCFBreakpointsModel.ATTR_CHAR, -1);
 
+            String area_file = TCFSourceLookupParticipant.toFileName(ref.area);
             if (req_file != null && req_line >= 0) {
                 String req_file_name = new File(req_file).getName();
                 String file_name = new File(ref.area.file).getName();
                 if (!req_file_name.equals(file_name) || req_line != ref.area.start_line) {
                     addLocationInfo(z, "Requested location", req_file, req_line, req_char);
-                    addLocationInfo(z, "Adjusted location", ref.area.file, ref.area.start_line, ref.area.start_column);
+                    addLocationInfo(z, "Adjusted location", area_file, ref.area.start_line, ref.area.start_column);
                     return;
                 }
             }
-            addLocationInfo(z, "Source location", ref.area.file, ref.area.start_line, ref.area.start_column);
+            addLocationInfo(z, "Location", area_file, ref.area.start_line, ref.area.start_column);
         }
 
         private void addLocationInfo(StatusItem z, String name, String file, int line, int column) {
