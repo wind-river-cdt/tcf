@@ -54,6 +54,10 @@
                      value="true">
                </property>
                <property
+                     name="org.eclipse.ui.navigator.hideAvailableCustomizationsDialog"
+                     value="false">
+               </property>
+               <property
                      name="org.eclipse.ui.navigator.enforceHasChildren"
                      value="true">
                </property>
