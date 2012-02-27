@@ -56,4 +56,9 @@ public interface ImageConsts {
      * The key to access the help action image.
      */
     public static final String  HELP = "HelpAction"; //$NON-NLS-1$
+
+    /**
+     * The key to access the favorites category image.
+     */
+    public static final String FAVORITES = "Favorites"; //$NON-NLS-1$
 }

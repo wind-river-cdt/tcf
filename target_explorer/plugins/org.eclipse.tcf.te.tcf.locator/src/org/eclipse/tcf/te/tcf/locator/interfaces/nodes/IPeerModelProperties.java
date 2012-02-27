@@ -68,11 +68,6 @@ public interface IPeerModelProperties {
 	public static int STATE_ERROR = 3;
 
 	/**
-	 * Property: The peer connect timeout (for socket based transports)
-	 */
-	public static String PROP_CONNECT_TIMEOUT = "connectTimeout"; //$NON-NLS-1$
-
-	/**
 	 * Property: Reference counter tracking the active channels for this peer.
 	 */
 	public static String PROP_CHANNEL_REF_COUNTER = "channelRefCounter.silent"; //$NON-NLS-1$
@@ -81,4 +76,9 @@ public interface IPeerModelProperties {
 	 * Property: The last error the scanner encounter trying to open a channel to this peer.
 	 */
 	public static String PROP_LAST_SCANNER_ERROR = "lastScannerError"; //$NON-NLS-1$
+
+	/**
+	 * Property: The parent category id.
+	 */
+	public static String PROP_PARENT_CATEGORY_ID = "parentCategoryId.silent"; //$NON-NLS-1$
 }

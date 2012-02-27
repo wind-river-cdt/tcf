@@ -15,14 +15,16 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tcf.te.runtime.extensions.ExecutableExtension;
+import org.eclipse.tcf.te.runtime.interfaces.IDisposable;
 import org.eclipse.tcf.te.ui.views.interfaces.ICategory;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 /**
  * Abstract main view category node implementation.
  */
-public abstract class AbstractCategory extends ExecutableExtension implements ICategory {
-	// The category image
+public abstract class AbstractCategory extends ExecutableExtension implements ICategory, IDisposable {
+	// The category image / image descriptor
+	private ImageDescriptor descriptor = null;
 	private Image image = null;
 
 	/* (non-Javadoc)
@@ -35,11 +37,23 @@ public abstract class AbstractCategory extends ExecutableExtension implements IC
         // Read the icon attribute and create the image
         String attrIcon = config.getAttribute("icon");//$NON-NLS-1$
         if (attrIcon != null) {
-        	ImageDescriptor descriptor = AbstractUIPlugin.imageDescriptorFromPlugin(config.getNamespaceIdentifier(), attrIcon);
+        	descriptor = AbstractUIPlugin.imageDescriptorFromPlugin(config.getNamespaceIdentifier(), attrIcon);
         	if (descriptor != null) {
         		image = JFaceResources.getResources().createImageWithDefault(descriptor);
         	}
         }
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.interfaces.IDisposable#dispose()
+	 */
+	@Override
+	public void dispose() {
+		if (descriptor != null) {
+			JFaceResources.getResources().destroyImage(descriptor);
+			descriptor = null;
+		}
+		image = null;
 	}
 
 	/* (non-Javadoc)

@@ -84,6 +84,25 @@
    <extension point="org.eclipse.ui.navigator.navigatorContent">
 
 <!-- Default navigator content contibutions -->
+      <navigatorContent
+            activeByDefault="true"
+            appearsBefore="org.eclipse.tcf.te.tcf.ui.navigator.content"
+            contentProvider="org.eclipse.tcf.te.ui.views.navigator.ContentProviderDelegate"
+            icon="icons/eview16/targets_view.gif"
+            id="org.eclipse.tcf.te.ui.views.navigator.content"
+            labelProvider="org.eclipse.tcf.te.ui.views.navigator.LabelProviderDelegate"
+            name="%navigatorContent.name"
+            priority="higher">
+            <triggerPoints>
+               <instanceof value="org.eclipse.tcf.te.ui.views.interfaces.IRoot"/>
+            </triggerPoints>
+            <possibleChildren>
+               <instanceof value="org.eclipse.tcf.te.ui.views.interfaces.ICategory"/>
+            </possibleChildren>
+            <commonSorter
+                  class="org.eclipse.tcf.te.ui.trees.TreeViewerSorter"
+                  id="org.eclipse.tcf.te.ui.views.navigator.sorter"/>
+      </navigatorContent>
 
 <!-- Default navigator action contributions -->
       <actionProvider
@@ -117,7 +136,31 @@
       </view>
    </extension>
 
-<!-- Target Explorer Perspective -->
+<!-- View categories contributions -->
+   <extension point="org.eclipse.tcf.te.ui.views.categories">
+      <category
+            class="org.eclipse.tcf.te.ui.views.categories.Favorites"
+            icon="icons/obj16/favorites.gif"
+            id="org.eclipse.tcf.te.ui.views.category.favorites"
+            label="%category.favorites.name">
+      </category>
+      
+      <category
+            class="org.eclipse.tcf.te.ui.views.categories.Home"
+            icon="icons/obj16/home_nav.gif"
+            id="org.eclipse.tcf.te.ui.views.category.home"
+            label="%category.home.name">
+      </category>
+
+      <category
+            class="org.eclipse.tcf.te.ui.views.categories.Neighborhood"
+            icon="icons/obj16/neighborhood.gif"
+            id="org.eclipse.tcf.te.ui.views.category.neighborhood"
+            label="%category.neighborhood.name">
+      </category>
+   </extension>
+
+<!-- Perspective -->
    <extension point="org.eclipse.ui.perspectives">
       <perspective
             class="org.eclipse.tcf.te.ui.views.perspective.PerspectiveFactory"
@@ -147,8 +190,17 @@
             name="%Editor.name">
       </editor>
    </extension>
-   
-<!-- Target Explorer menu contributions -->
+
+<!-- Tabbed properties view contributions -->   
+   <extension point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
+      <propertyContributor
+            contributorId="org.eclipse.tcf.te.ui"
+            labelProvider="org.eclipse.tcf.te.ui.views.internal.PropertyContributorLabelProvider">
+         <propertyCategory category="org.eclipse.tcf.te"/>
+      </propertyContributor>
+   </extension>
+
+<!-- Menu contributions -->
    <extension point="org.eclipse.ui.menus">
       <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.refresh">
          <command
@@ -371,15 +423,14 @@
             properties="hasApplicableEditorBindings,isRefreshableElement,canRefresh,isDeletableElement,canDelete"
             type="java.lang.Object">
       </propertyTester>
-   </extension>
-   
-<!-- Tabbed properties view contributions -->   
-   <extension point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
-      <propertyContributor
-            contributorId="org.eclipse.tcf.te.ui"
-            labelProvider="org.eclipse.tcf.te.ui.views.internal.PropertyContributorLabelProvider">
-         <propertyCategory category="org.eclipse.tcf.te"/>
-      </propertyContributor>
+
+      <propertyTester
+            class="org.eclipse.tcf.te.ui.views.expressions.PropertyTester"
+            id="org.eclipse.tcf.te.ui.views.CategortyPropertyTester"
+            namespace="org.eclipse.tcf.te.ui.views"
+            properties="isCategoryID,isFavorites,isHome,isNeighborhood"
+            type="org.eclipse.tcf.te.ui.views.interfaces.ICategory">
+      </propertyTester>
    </extension>
 
 </plugin>

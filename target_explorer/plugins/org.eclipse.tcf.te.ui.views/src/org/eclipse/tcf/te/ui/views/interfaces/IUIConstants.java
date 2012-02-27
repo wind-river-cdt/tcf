@@ -24,6 +24,11 @@ public interface IUIConstants {
 	 */
 	public static final String ID_EDITOR = "org.eclipse.tcf.te.ui.views.Editor"; //$NON-NLS-1$
 
+	/**
+	 * The tabbed properties contributor id.
+	 */
+	public static final String TABBED_PROPERTIES_CONTRIBUTOR_ID = "org.eclipse.tcf.te.ui";  //$NON-NLS-1$
+
 	// ***** Define the constants for the main view root mode *****
 
 	/**
@@ -36,8 +41,20 @@ public interface IUIConstants {
 	 */
 	public static final int MODE_NORMAL = 1;
 
+	// ***** Define the constants for the default main view categories *****
+
 	/**
-	 * The tabbed properties contributor id for Target Explorer
+	 * Category: Favorites
 	 */
-	public static final String TABBED_PROPERTIES_CONTRIBUTOR_ID = "org.eclipse.tcf.te.ui";  //$NON-NLS-1$
+	public static final String ID_CAT_FAVORITES = "org.eclipse.tcf.te.ui.views.category.favorites"; //$NON-NLS-1$
+
+	/**
+	 * Category: Home
+	 */
+	public static final String ID_CAT_HOME = "org.eclipse.tcf.te.ui.views.category.home"; //$NON-NLS-1$
+
+	/**
+	 * Category: Neighborhood
+	 */
+	public static final String ID_CAT_NEIGHBORHOOD = "org.eclipse.tcf.te.ui.views.category.neighborhood"; //$NON-NLS-1$
 }

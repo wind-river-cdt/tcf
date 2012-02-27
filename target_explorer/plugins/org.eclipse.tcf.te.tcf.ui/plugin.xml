@@ -29,7 +29,7 @@
       <viewerContentBinding viewerId="org.eclipse.tcf.te.ui.views.View">
          <includes>
             <contentExtension
-                  isRoot="true"
+                  isRoot="false"
                   pattern="org.eclipse.tcf.te.tcf.ui.navigator.*"/>
          </includes>
       </viewerContentBinding>
@@ -46,6 +46,7 @@
             priority="normal">
             <enablement>
                <or>
+                  <instanceof value="org.eclipse.tcf.te.ui.views.interfaces.ICategory"/>
                   <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
                   <instanceof value="org.eclipse.tcf.te.tcf.ui.navigator.nodes.PeerRedirectorGroupNode"/>
                </or>
@@ -60,11 +61,6 @@
                   <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
                </enablement>
             </commonWizard>
-            <possibleChildren>
-               <instanceof
-                     value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel">
-               </instanceof>
-            </possibleChildren>
       </navigatorContent>
       <commonFilter
             activeByDefault="false"

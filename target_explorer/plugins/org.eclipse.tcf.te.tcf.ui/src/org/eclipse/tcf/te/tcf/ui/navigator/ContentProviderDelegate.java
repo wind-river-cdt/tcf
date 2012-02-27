@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.ui.navigator;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,12 +22,17 @@ import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.tcf.locator.interfaces.IModelListener;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerRedirector;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelLookupService;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelRefreshService;
 import org.eclipse.tcf.te.tcf.locator.model.Model;
 import org.eclipse.tcf.te.tcf.ui.navigator.nodes.PeerRedirectorGroupNode;
+import org.eclipse.tcf.te.ui.swt.DisplayUtil;
+import org.eclipse.tcf.te.ui.views.extensions.CategoriesExtensionPointManager;
+import org.eclipse.tcf.te.ui.views.interfaces.ICategory;
 import org.eclipse.tcf.te.ui.views.interfaces.IRoot;
+import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.internal.navigator.NavigatorFilterService;
 import org.eclipse.ui.navigator.CommonViewer;
@@ -59,14 +65,67 @@ public class ContentProviderDelegate implements ICommonContentProvider {
 	public Object[] getChildren(Object parentElement) {
 		Object[] children = NO_ELEMENTS;
 
-		// If the parent element is null or IRoot, than we assume
+		// The category id if the parent element is a category node
+		final String catID = parentElement instanceof ICategory ? ((ICategory)parentElement).getId() : null;
+
+		// If the parent element is a category, than we assume
 		// the locator model as parent element.
-		if (parentElement == null || parentElement instanceof IRoot) {
+		if (parentElement instanceof ICategory) {
 			parentElement = Model.getModel();
 		}
 		// If it is the locator model, get the peers
 		if (parentElement instanceof ILocatorModel) {
-			children = ((ILocatorModel)parentElement).getPeers();
+			final IPeerModel[] peers = ((ILocatorModel)parentElement).getPeers();
+			final List<IPeerModel> candidates = new ArrayList<IPeerModel>();
+
+			Runnable runnable = new Runnable() {
+				@Override
+				public void run() {
+					if (IUIConstants.ID_CAT_FAVORITES.equals(catID)) {
+						for (IPeerModel peer : peers) {
+							String value = peer.getPeer().getAttributes().get("favorite"); //$NON-NLS-1$
+							boolean isFavorite = value != null && Boolean.parseBoolean(value.trim());
+							if (isFavorite && !candidates.contains(peer)) {
+								peer.setProperty(IPeerModelProperties.PROP_PARENT_CATEGORY_ID, catID);
+								candidates.add(peer);
+							}
+						}
+					}
+					else if (IUIConstants.ID_CAT_HOME.equals(catID)) {
+						for (IPeerModel peer : peers) {
+							String value = peer.getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
+							boolean isStatic = value != null && Boolean.parseBoolean(value.trim());
+
+							value = peer.getPeer().getAttributes().get("favorite"); //$NON-NLS-1$
+							boolean isFavorite = value != null && Boolean.parseBoolean(value.trim());
+
+							if (isStatic && !isFavorite && !candidates.contains(peer)) {
+								peer.setProperty(IPeerModelProperties.PROP_PARENT_CATEGORY_ID, catID);
+								candidates.add(peer);
+							}
+						}
+					}
+					else if (IUIConstants.ID_CAT_NEIGHBORHOOD.equals(catID)) {
+						for (IPeerModel peer : peers) {
+							String value = peer.getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
+							boolean isStatic = value != null && Boolean.parseBoolean(value.trim());
+
+							value = peer.getPeer().getAttributes().get("favorite"); //$NON-NLS-1$
+							boolean isFavorite = value != null && Boolean.parseBoolean(value.trim());
+
+							if (!isStatic && !isFavorite && !candidates.contains(peer)) {
+								peer.setProperty(IPeerModelProperties.PROP_PARENT_CATEGORY_ID, catID);
+								candidates.add(peer);
+							}
+						}
+					}
+				}
+			};
+
+			if (Protocol.isDispatchThread()) runnable.run();
+			else Protocol.invokeAndWait(runnable);
+
+			children = candidates.toArray(new IPeerModel[candidates.size()]);
 		}
 		// If it is a peer model itself, get the child peers
 		else if (parentElement instanceof IPeerModel) {
@@ -109,7 +168,20 @@ public class ContentProviderDelegate implements ICommonContentProvider {
 				if (!roots.containsKey(parentPeerId)) roots.put(parentPeer.getID(), new PeerRedirectorGroupNode(parentPeerId));
 				return roots.get(parentPeerId);
 			}
-			return ((IPeerModel)element).getModel();
+
+			// Determine the parent category node
+			final AtomicReference<String> parentCatID = new AtomicReference<String>();
+			Runnable runnable = new Runnable() {
+				@Override
+				public void run() {
+					parentCatID.set(((IPeerModel)element).getStringProperty(IPeerModelProperties.PROP_PARENT_CATEGORY_ID));
+				}
+			};
+			if (Protocol.isDispatchThread()) runnable.run();
+			else Protocol.invokeAndWait(runnable);
+
+			ICategory category = parentCatID.get() != null ? CategoriesExtensionPointManager.getInstance().getCategory(parentCatID.get(), false) : null;
+			return category != null ? category : ((IPeerModel)element).getModel();
 		} else if (element instanceof PeerRedirectorGroupNode) {
 			// Return the parent peer model node
 			final AtomicReference<IPeerModel> parent = new AtomicReference<IPeerModel>();
@@ -144,6 +216,10 @@ public class ContentProviderDelegate implements ICommonContentProvider {
 		else if (element instanceof PeerRedirectorGroupNode) {
 			List<IPeerModel> children = Model.getModel().getChildren(((PeerRedirectorGroupNode)element).peerId);
 			hasChildren = children != null && children.size() > 0;
+		}
+		else if (element instanceof ICategory) {
+			Object[] children = getChildren(element);
+			hasChildren = children != null && children.length > 0;
 		}
 
 		return hasChildren;
@@ -206,9 +282,15 @@ public class ContentProviderDelegate implements ICommonContentProvider {
     	INavigatorFilterService fs = cs != null ? cs.getFilterService() : null;
 		if (fs != null && !fs.isActive(REDIRECT_PEERS_FILTER_ID)) {
 			if (fs instanceof NavigatorFilterService) {
-				NavigatorFilterService navFilterService = (NavigatorFilterService)fs;
+				final NavigatorFilterService navFilterService = (NavigatorFilterService)fs;
 				navFilterService.addActiveFilterIds(new String[] { REDIRECT_PEERS_FILTER_ID });
-				navFilterService.updateViewer();
+				// Do the update view asynchronous to avoid reentrant viewer calls
+				DisplayUtil.safeAsyncExec(new Runnable() {
+					@Override
+					public void run() {
+						navFilterService.updateViewer();
+					}
+				});
 			}
 		}
     }

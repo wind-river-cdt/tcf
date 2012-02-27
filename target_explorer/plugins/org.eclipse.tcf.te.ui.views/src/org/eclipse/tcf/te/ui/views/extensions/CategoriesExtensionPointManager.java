@@ -47,7 +47,7 @@ public class CategoriesExtensionPointManager extends AbstractExtensionPointManag
 	 */
 	@Override
 	protected String getExtensionPointId() {
-		return "org.eclipse.tcf.te.views.categories"; //$NON-NLS-1$
+		return "org.eclipse.tcf.te.ui.views.categories"; //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
