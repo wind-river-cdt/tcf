@@ -12,7 +12,9 @@ package org.eclipse.tcf.te.tcf.filesystem.internal.operations;
 import java.util.List;
 
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.swt.SWTException;
 import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.ui.utils.PropertyChangeProvider;
 import org.eclipse.ui.PlatformUI;
@@ -75,7 +77,7 @@ public class FSClipboard extends PropertyChangeProvider {
 	public void cutFiles(List<FSTreeNode> files) {
 		operation = CUT;
 		this.files = files;
-		clipboard.clearContents();
+		clearSystemClipboard();
 		PropertyChangeEvent event = new PropertyChangeEvent(this, "cut", null, null); //$NON-NLS-1$
 		firePropertyChange(event);
 	}
@@ -88,7 +90,7 @@ public class FSClipboard extends PropertyChangeProvider {
 	public void copyFiles(List<FSTreeNode> files) {
 		operation = COPY;
 		this.files = files;
-		clipboard.clearContents();
+		clearSystemClipboard();
 		PropertyChangeEvent event = new PropertyChangeEvent(this, "copy", null, null); //$NON-NLS-1$
 		firePropertyChange(event);
 	}
@@ -99,16 +101,47 @@ public class FSClipboard extends PropertyChangeProvider {
 	public void clear() {
 		operation = NONE;
 		this.files = null;
-		clipboard.clearContents();
+		clearSystemClipboard();
 		PropertyChangeEvent event = new PropertyChangeEvent(this, "clear", null, null); //$NON-NLS-1$
 		firePropertyChange(event);
+	}
+	
+	/**
+	 * Make sure the system clip board is cleared in a UI thread.
+	 */
+	void clearSystemClipboard() {
+		if (Display.getCurrent() != null) {
+			clipboard.clearContents();
+		}
+		else {
+			PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable(){
+				@Override
+                public void run() {
+					clearSystemClipboard();
+                }});
+		}
 	}
 	
 	/**
 	 * Dispose the clipboard.
 	 */
 	public void dispose() {
-		if (!clipboard.isDisposed()) clipboard.dispose();
+		if(Display.getCurrent() != null) {
+			if (!clipboard.isDisposed()) {
+				try {
+					clipboard.dispose();
+				}
+				catch (SWTException e) {
+				}
+			}
+		}
+		else {
+			PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable(){
+				@Override
+                public void run() {
+					dispose();
+                }});
+		}
 	}
 
 	/**
