@@ -135,7 +135,7 @@ class MemContext(memory.MemoryContext):
                     e = memory.MemoryError(error.message)
                 else:
                     assert len(args) == 2
-                    e = self.toMemoryError(addr, args[1], args[2])
+                    e = self.toMemoryError(addr, args[0], args[1])
                 done.doneMemory(self.token, e)
         return SetCommand().token
 
