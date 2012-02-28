@@ -42,8 +42,11 @@ import org.eclipse.debug.internal.ui.viewers.model.provisional.IChildrenCountUpd
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IChildrenUpdate;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IColumnPresentation;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IColumnPresentationFactory;
+import org.eclipse.debug.internal.ui.viewers.model.provisional.IElementCompareRequest;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IElementContentProvider;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IElementLabelProvider;
+import org.eclipse.debug.internal.ui.viewers.model.provisional.IElementMementoProvider;
+import org.eclipse.debug.internal.ui.viewers.model.provisional.IElementMementoRequest;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IHasChildrenUpdate;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.ILabelUpdate;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IModelDelta;
@@ -137,7 +140,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
  */
 @SuppressWarnings("restriction")
 public class TCFModel implements IElementContentProvider, IElementLabelProvider, IViewerInputProvider,
-        IModelProxyFactory, IColumnPresentationFactory, ISourceDisplay, ISuspendTrigger {
+        IModelProxyFactory, IColumnPresentationFactory, ISourceDisplay, ISuspendTrigger, IElementMementoProvider {
 
     /** The id of the expression hover presentation context */
     public static final String ID_EXPRESSION_HOVER = Activator.PLUGIN_ID + ".expression_hover";
@@ -1325,6 +1328,30 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
                         ((TCFNode)o).update(update);
                     }
                 }
+            }
+        });
+    }
+
+    public void encodeElements(final IElementMementoRequest[] requests) {
+        for (IElementMementoRequest request : requests) {
+            Object element = request.getElement();
+            if (element instanceof TCFNode) ((TCFNode)element).encodeElement(request);
+        }
+        display.asyncExec(new Runnable() {
+            public void run() {
+                for (IElementMementoRequest request : requests) request.done();
+            }
+        });
+    }
+
+    public void compareElements(final IElementCompareRequest[] requests) {
+        for (IElementCompareRequest request : requests) {
+            Object element = request.getElement();
+            if (element instanceof TCFNode) ((TCFNode)element).compareElements(request);
+        }
+        display.asyncExec(new Runnable() {
+            public void run() {
+                for (IElementMementoRequest request : requests) request.done();
             }
         });
     }

@@ -18,6 +18,8 @@ import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IChildrenCountUpdate;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IChildrenUpdate;
+import org.eclipse.debug.internal.ui.viewers.model.provisional.IElementCompareRequest;
+import org.eclipse.debug.internal.ui.viewers.model.provisional.IElementMementoRequest;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IHasChildrenUpdate;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.ILabelUpdate;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IModelDelta;
@@ -446,6 +448,25 @@ public abstract class TCFNode extends PlatformObject implements ITCFObject, Comp
     protected boolean getData(IViewerInputUpdate update, Runnable done) {
         update.setInputElement(this);
         return true;
+    }
+
+    /**
+     * Creates and stores a IMemento for the node.
+     * A request should be cancelled if a IMemento is not supported.
+     *
+     * @param request Specifies IMemento.
+     */
+    public void encodeElement(IElementMementoRequest request) {
+        request.getMemento().putString("TCF.ID", id);
+    }
+
+    /**
+     * Determines whether a IMemento represents this node.
+     *
+     * @param request Specifies previously created IMemento.
+     */
+    public void compareElements(IElementCompareRequest request) {
+        request.setEqual(id.equals(request.getMemento().getString("TCF.ID")));
     }
 
     /*--------------------------------------------------------------------------------------*/
