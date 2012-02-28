@@ -1,5 +1,5 @@
-# *******************************************************************************
-# * Copyright (c) 2011 Wind River Systems, Inc. and others.
+# *****************************************************************************
+# * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others.
 # * All rights reserved. This program and the accompanying materials
 # * are made available under the terms of the Eclipse Public License v1.0
 # * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
 # *
 # * Contributors:
 # *     Wind River Systems - initial API and implementation
-# *******************************************************************************
+# *****************************************************************************
 
 """
 Locator service uses transport layer to search
@@ -15,7 +15,10 @@ for peers and to collect and maintain up-to-date
 data about peer's attributes.
 """
 
-import threading, time, socket, cStringIO
+import threading
+import time
+import socket
+import cStringIO
 from tcf.services import locator
 from tcf.util import logging
 from tcf.channel import fromJSONSequence, toJSONSequence
@@ -25,12 +28,14 @@ from tcf import protocol, services, channel, peer, errors
 # Flag indicating whether tracing of the the discovery activity is enabled.
 __TRACE_DISCOVERY__ = False
 
+
 class SubNet(object):
     def __init__(self, prefix_length, address, broadcast):
         self.prefix_length = prefix_length
         self.address = address
         self.broadcast = broadcast
         self.last_slaves_req_time = 0
+
     def contains(self, addr):
         if addr is None or self.address is None: return False
         a1 = addr.getAddress()
@@ -448,14 +453,14 @@ class LocatorService(locator.LocatorService):
             self.socket.sendto(str(self.out_buf[:size]), (addr.getHostAddress(), port))
 
             if __TRACE_DISCOVERY__:
-                map = None
+                attrs = None
                 if self.out_buf[4] == locator.CONF_PEER_INFO:
-                    map = self.__parsePeerAttributes(self.out_buf, 8)
+                    attrs = self.__parsePeerAttributes(self.out_buf, 8)
                 elif self.out_buf[4] == locator.CONF_SLAVES_INFO:
-                    map = self.__parseIDs(self.out_buf, size)
+                    attrs = self.__parseIDs(self.out_buf, size)
                 elif self.out_buf[4] == locator.CONF_PEERS_REMOVED:
-                    map = self.__parseIDs(self.out_buf, size)
-                self.__traceDiscoveryPacket(False, self.packetTypes[self.out_buf[4]], map, addr, port)
+                    attrs = self.__parseIDs(self.out_buf, size)
+                self.__traceDiscoveryPacket(False, self.packetTypes[self.out_buf[4]], attrs, addr, port)
         except Exception as x:
             self._log("Cannot send datagram packet to %s" % addr, x)
             return False
@@ -469,8 +474,8 @@ class LocatorService(locator.LocatorService):
         @param size - the packet size
         @return a map containing the attributes
         """
-        map = {}
-        s = data[8:size - 8].decode("UTF-8")
+        attrs = {}
+        s = data[8:size].decode("UTF-8")
         l = len(s)
         i = 0
         while i < l:
@@ -484,8 +489,8 @@ class LocatorService(locator.LocatorService):
             if i < l and s[i] == '\0': i += 1
             key = s[i0:i1]
             val = s[i2:i3]
-            map[key] = val
-        return map
+            attrs[key] = val
+        return attrs
 
     def __parseIDs(self, data, size):
         """
@@ -496,7 +501,7 @@ class LocatorService(locator.LocatorService):
         @return a map containing the IDs
         """
         cnt = 0
-        map = {}
+        attrs = {}
         s = data[8:size - 8].decode("UTF-8")
         l = len(s)
         i = 0
@@ -504,11 +509,11 @@ class LocatorService(locator.LocatorService):
             i0 = i
             while i < l and s[i] != '\0': i += 1
             if i > i0:
-                id = s[i0:i]
-                map[str(cnt)] = id
+                _id = s[i0:i]
+                attrs[str(cnt)] = _id
                 cnt += 1
             while i < l and s[i] == '\0': i += 1
-        return map
+        return attrs
 
     def __sendPeersRequest(self, addr, port):
         self.out_buf[4] = locator.CONF_REQ_INFO
@@ -649,12 +654,12 @@ class LocatorService(locator.LocatorService):
 
     def __handlePeerInfoPacket(self, p):
         try:
-            map = self.__parsePeerAttributes(p.getData(), p.getLength())
-            if __TRACE_DISCOVERY__: self.__traceDiscoveryPacket(True, "CONF_PEER_INFO", map, p)
-            id = map.get(peer.ATTR_ID)
-            if id is None: raise RuntimeError("Invalid peer info: no ID")
+            attrs = self.__parsePeerAttributes(p.getData(), p.getLength())
+            if __TRACE_DISCOVERY__: self.__traceDiscoveryPacket(True, "CONF_PEER_INFO", attrs, p)
+            _id = attrs.get(peer.ATTR_ID)
+            if _id is None: raise RuntimeError("Invalid peer info: no ID")
             ok = True
-            host = map.get(peer.ATTR_IP_HOST)
+            host = attrs.get(peer.ATTR_IP_HOST)
             if host is not None:
                 ok = False
                 peer_addr = self.__getInetAddress(host)
@@ -666,9 +671,9 @@ class LocatorService(locator.LocatorService):
             if ok:
                 _peer = self.peers.get(id)
                 if isinstance(_peer, peer.RemotePeer):
-                    _peer.updateAttributes(map)
+                    _peer.updateAttributes(attrs)
                 elif _peer is None:
-                    peer.RemotePeer(map)
+                    peer.RemotePeer(attrs)
         except Exception as x:
             self._log("Invalid datagram packet received from %s/%s" % (p.getAddress(), p.getPort()), x)
 
@@ -679,9 +684,9 @@ class LocatorService(locator.LocatorService):
 
     def __handleSlavesInfoPacket(self, p, time_now):
         try:
-            map = self.__parseIDs(p.getData(), p.getLength())
-            if __TRACE_DISCOVERY__: self.__traceDiscoveryPacket(True, "CONF_SLAVES_INFO", map, p)
-            for s in map.values():
+            attrs = self.__parseIDs(p.getData(), p.getLength())
+            if __TRACE_DISCOVERY__: self.__traceDiscoveryPacket(True, "CONF_SLAVES_INFO", attrs, p)
+            for s in attrs.values():
                 i = 0
                 l = len(s)
                 time0 = i
@@ -731,10 +736,10 @@ class LocatorService(locator.LocatorService):
 
     def __handlePeerRemovedPacket(self, p):
         try:
-            map = self.__parseIDs(p.getData(), p.getLength())
-            if __TRACE_DISCOVERY__: self.__traceDiscoveryPacket(True, "CONF_PEERS_REMOVED", map, p)
-            for id in map.values():
-                _peer = self.peers.get(id)
+            attrs = self.__parseIDs(p.getData(), p.getLength())
+            if __TRACE_DISCOVERY__: self.__traceDiscoveryPacket(True, "CONF_PEERS_REMOVED", attrs, p)
+            for _id in attrs.values():
+                _peer = self.peers.get(_id)
                 if isinstance(_peer, peer.RemotePeer): _peer.dispose()
         except Exception as x:
             self._log("Invalid datagram packet received from %s/%s" % (p.getAddress(), p.getPort()), x)
@@ -764,7 +769,7 @@ class LocatorService(locator.LocatorService):
         self.listeners.remove(listener)
 
     @classmethod
-    def __traceDiscoveryPacket(cls, received, type, attrs, addr, port=None):
+    def __traceDiscoveryPacket(cls, received, packet_type, attrs, addr, port=None):
         """
         Log that a TCF Discovery packet has be sent or received. The trace is
         sent to stdout. This should be called only if the tracing has been turned
@@ -772,7 +777,7 @@ class LocatorService(locator.LocatorService):
 
         @param received
                    True if the packet was sent, otherwise it was received
-        @param type
+        @param packet_type
                    a string specifying the type of packet, e.g., "CONF_PEER_INFO"
         @param attrs
                    a set of attributes relevant to the type of packet (typically
@@ -788,7 +793,7 @@ class LocatorService(locator.LocatorService):
             port = addr.getPort()
             addr = addr.getAddress()
         buf = cStringIO.StringIO()
-        buf.write(type)
+        buf.write(packet_type)
         buf.write((" sent to ", " received from ")[received])
         buf.write("%s/%s" % (addr, port))
         if attrs is not None:
