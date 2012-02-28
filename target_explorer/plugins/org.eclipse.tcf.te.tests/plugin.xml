@@ -130,6 +130,18 @@
                   removable="true"
                   singleton="true">
             </reference>
+            <reference
+                  disable="false"
+                  hidden="false"
+                  id="org.eclipse.tcf.te.tests.stepper.step5"
+                  removable="true"
+                  singleton="true">
+                  <enablement>
+                     <with variable="context">
+                        <instanceof value="org.eclipse.tcf.te.runtime.model.interfaces.IModelNode"/>
+                     </with>
+                  </enablement>
+            </reference>
          </references>
       </stepGroup>
 

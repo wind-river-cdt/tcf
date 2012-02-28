@@ -80,23 +80,18 @@ public class StepperTestCase extends CoreTestCase {
 		assertNotNull("Unexpected return value 'null'.", StepperManager.getInstance()); //$NON-NLS-1$
 		assertNotNull("Unexpected return value 'null'.", StepperManager.getInstance().getStepperExtManager()); //$NON-NLS-1$
 
-		// Lookup the default multi-context and single-context stepper contributions
-		boolean multiContext = false;
+		// Lookup the default single-context stepper contributions
 		boolean singleContext = false;
 
 		IStepper[] steppers = StepperManager.getInstance().getStepperExtManager().getStepper(false);
 		for (IStepper stepper : steppers) {
-			if (stepper.getId().equals("org.eclipse.tcf.te.runtime.stepper.multiContext")) { //$NON-NLS-1$
-				multiContext = true;
-			}
-			if (stepper.getId().equals("org.eclipse.tcf.te.runtime.stepper.singleContext")) { //$NON-NLS-1$
+			if (stepper.getId().equals("org.eclipse.tcf.te.runtime.stepper")) { //$NON-NLS-1$
 				singleContext = true;
 			}
-			if (multiContext && singleContext) {
+			if (singleContext) {
 				break;
 			}
 		}
-		assertTrue("Default multi context stepper contribution not found.", multiContext); //$NON-NLS-1$
 		assertTrue("Default single context stepper contribution not found.", singleContext); //$NON-NLS-1$
 	}
 
@@ -258,7 +253,7 @@ public class StepperTestCase extends CoreTestCase {
 				}
 				assertNull("Failed to determine steps from step group. Possible cause: " + message, error); //$NON-NLS-1$
 				assertNotNull("Unexpected return value 'null'.", steps); //$NON-NLS-1$
-				assertEquals("Unexpected number of steps returned.", 4, steps.length); //$NON-NLS-1$
+				assertEquals("Unexpected number of steps returned.", 5, steps.length); //$NON-NLS-1$
 
 				assertEquals("Unexpected step order.", "org.eclipse.tcf.te.tests.stepper.step1", steps[0].getExtension().getId()); //$NON-NLS-1$ //$NON-NLS-2$
 				assertEquals("Unexpected step order.", "org.eclipse.tcf.te.tests.stepper.step2", steps[1].getExtension().getId()); //$NON-NLS-1$ //$NON-NLS-2$
