@@ -61,6 +61,8 @@ public class TCFModelPresentation implements IDebugModelPresentation {
         TCFBreakpointsModel.ATTR_FUNCTION, "location",
         TCFBreakpointsModel.ATTR_EXPRESSION, "expression",
         TCFBreakpointsModel.ATTR_CONDITION, "condition",
+        TCFBreakpointsModel.ATTR_EVENT_TYPE, "event type",
+        TCFBreakpointsModel.ATTR_EVENT_ARGS, "event args",
         TCFBreakpointsModel.ATTR_CONTEXTNAMES, "scope (names)",
         TCFBreakpointsModel.ATTR_CONTEXTIDS, "scope (IDs)",
         TCFBreakpointsModel.ATTR_EXE_PATHS, "scope (modules)",
