@@ -173,11 +173,11 @@ The categroy implementation class must be specified either by the class attribut
 &lt;pre&gt;
 &lt;extension point=&quot;org.eclipse.tcf.te.ui.views.categories&quot;&gt;
    &lt;category
-      id=&quot;org.eclipse.tcf.te.ui.views.category.home&quot;
-      class=&quot;org.eclipse.tcf.te.ui.views.categories.Home&quot;
-      label=&quot;Home&quot;&gt;
+      id=&quot;org.eclipse.tcf.te.ui.views.category.mytargets&quot;
+      class=&quot;org.eclipse.tcf.te.ui.views.categories.MyTargets&quot;
+      label=&quot;My Targets&quot;&gt;
       &lt;description&gt;
-         The home category.
+         The &quot;My Targets&quot; category.
       &lt;/description&gt;
    &lt;/category&gt;
 &lt;/extension&gt;

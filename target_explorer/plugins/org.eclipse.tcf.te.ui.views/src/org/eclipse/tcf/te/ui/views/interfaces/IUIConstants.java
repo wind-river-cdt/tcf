@@ -49,9 +49,9 @@ public interface IUIConstants {
 	public static final String ID_CAT_FAVORITES = "org.eclipse.tcf.te.ui.views.category.favorites"; //$NON-NLS-1$
 
 	/**
-	 * Category: Home
+	 * Category: My Targets
 	 */
-	public static final String ID_CAT_HOME = "org.eclipse.tcf.te.ui.views.category.home"; //$NON-NLS-1$
+	public static final String ID_CAT_MY_TARGETS = "org.eclipse.tcf.te.ui.views.category.mytargets"; //$NON-NLS-1$
 
 	/**
 	 * Category: Neighborhood

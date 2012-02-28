@@ -10,8 +10,8 @@
 package org.eclipse.tcf.te.ui.views.categories;
 
 /**
- * Favorites category implementation.
+ * "My Targets" category implementation.
  */
-public class Home extends AbstractCategory {
+public class MyTargets extends AbstractCategory {
 
 }

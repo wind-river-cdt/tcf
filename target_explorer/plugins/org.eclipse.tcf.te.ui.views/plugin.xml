@@ -150,10 +150,10 @@
       </category>
       
       <category
-            class="org.eclipse.tcf.te.ui.views.categories.Home"
+            class="org.eclipse.tcf.te.ui.views.categories.MyTargets"
             icon="icons/obj16/home_nav.gif"
-            id="org.eclipse.tcf.te.ui.views.category.home"
-            label="%category.home.name">
+            id="org.eclipse.tcf.te.ui.views.category.mytargets"
+            label="%category.mytargets.name">
       </category>
 
       <category
