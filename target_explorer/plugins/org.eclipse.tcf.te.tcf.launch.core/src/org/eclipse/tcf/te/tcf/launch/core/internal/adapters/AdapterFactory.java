@@ -13,72 +13,76 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IAdapterFactory;
+import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.ILaunch;
+import org.eclipse.debug.core.ILaunchListener;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.runtime.interfaces.IDisposable;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
-import org.eclipse.tcf.te.tcf.locator.interfaces.IModelListener;
-import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
-import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
-import org.eclipse.tcf.te.tcf.locator.internal.nodes.InvalidPeerModel;
-import org.eclipse.tcf.te.tcf.locator.listener.ModelAdapter;
-import org.eclipse.tcf.te.tcf.locator.model.Model;
 
 /**
  * Adapter factory implementation.
  */
-@SuppressWarnings("restriction")
 public class AdapterFactory implements IAdapterFactory {
 	// Maintain a map of step context adapters per peer model
-	/* default */ Map<IPeerModel, IStepContext> adapters = new HashMap<IPeerModel, IStepContext>();
+	/* default */ Map<ILaunch, IStepContext> adapters = new HashMap<ILaunch, IStepContext>();
 
 	private static final Class<?>[] CLASSES = new Class[] {
 		IStepContext.class
 	};
 
 	/**
-     * Constructor.
-     */
-    public AdapterFactory() {
-    	final IModelListener listener = new ModelAdapter() {
-    		/* (non-Javadoc)
-    		 * @see org.eclipse.tcf.te.tcf.locator.listener.ModelAdapter#locatorModelChanged(org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel, org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel, boolean)
-    		 */
-    		@Override
-    		public void locatorModelChanged(ILocatorModel model, IPeerModel peer, boolean added) {
-    			// If a peer gets removed, remove the step context adapter too
-    			if (peer != null && !added) {
-    				IStepContext adapter = adapters.remove(peer);
-    				if (adapter instanceof IDisposable) ((IDisposable)adapter).dispose();
-    			}
-    		}
-    	};
-
-    	Runnable runnable = new Runnable() {
+	 * Constructor.
+	 */
+	public AdapterFactory() {
+		final ILaunchListener  listener = new ILaunchListener() {
 			@Override
-			public void run() {
-		    	Model.getModel().addListener(listener);
+			public void launchRemoved(ILaunch launch) {
+				IStepContext adapter = adapters.remove(launch);
+				if (adapter instanceof IDisposable) {
+					((IDisposable)adapter).dispose();
+				}
+			}
+			@Override
+			public void launchChanged(ILaunch launch) {
+				IStepContext adapter = adapters.remove(launch);
+				if (adapter instanceof IDisposable) {
+					((IDisposable)adapter).dispose();
+				}
+			}
+			@Override
+			public void launchAdded(ILaunch launch) {
 			}
 		};
 
-		if (Protocol.isDispatchThread()) runnable.run();
-		else Protocol.invokeAndWait(runnable);
-    }
+		Runnable runnable = new Runnable() {
+			@Override
+			public void run() {
+				DebugPlugin.getDefault().getLaunchManager().addLaunchListener(listener);
+			}
+		};
+
+		if (Protocol.isDispatchThread()) {
+			runnable.run();
+		}
+		else {
+			Protocol.invokeAndWait(runnable);
+		}
+	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 	 */
-    @Override
+	@Override
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
-		if (adaptableObject instanceof IPeerModel) {
+		if (adaptableObject instanceof ILaunch) {
 			if (IStepContext.class.equals(adapterType)) {
 				// Lookup the adapter
 				IStepContext adapter = adapters.get(adaptableObject);
 				// No adapter yet -> create a new one for this peer
 				if (adapter == null) {
-					adapter = new StepContextAdapter((IPeerModel)adaptableObject);
-					if (!(adaptableObject instanceof InvalidPeerModel)) {
-						adapters.put((IPeerModel)adaptableObject, adapter);
-					}
+					adapter = new StepContextAdapter((ILaunch)adaptableObject);
+					adapters.put((ILaunch)adaptableObject, adapter);
 				}
 				return adapter;
 			}

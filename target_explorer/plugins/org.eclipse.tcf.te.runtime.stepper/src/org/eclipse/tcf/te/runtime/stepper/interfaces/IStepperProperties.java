@@ -31,11 +31,4 @@ public interface IStepperProperties {
 	 * Type: String
 	 */
 	public static final String PROP_NAME = "name"; //$NON-NLS-1$
-
-	/**
-	 * The context objects the stepper is working on.
-	 * <p>
-	 * Type: Array of {@link IStepContext}
-	 */
-	public static final String PROP_CONTEXTS = "contexts"; //$NON-NLS-1$
 }

@@ -9,56 +9,42 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.launch.core.internal.adapters;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.PlatformObject;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.tcf.core.TransientPeer;
-import org.eclipse.tcf.protocol.IPeer;
-import org.eclipse.tcf.protocol.JSON;
+import org.eclipse.debug.core.ILaunch;
+import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
-import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
-import org.eclipse.tcf.te.tcf.launch.core.activator.CoreBundleActivator;
-import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
-import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelLookupService;
-import org.eclipse.tcf.te.tcf.locator.internal.nodes.InvalidPeerModel;
-import org.eclipse.tcf.te.tcf.locator.model.Model;
-import org.eclipse.tcf.te.tcf.locator.nodes.PeerModel;
 
 /**
  * Peer model step context adapter implementation.
  */
-@SuppressWarnings("restriction")
 public class StepContextAdapter extends PlatformObject implements IStepContext {
-	// Reference to the wrapped peer model
-	/* default */ IPeerModel peerModel;
+	// Reference to the launch
+	private final ILaunch launch;
 
 	/**
-     * Constructor.
-     *
-     * @param peerModel The peer model. Must not be <code>null</code>.
-     */
-    public StepContextAdapter(IPeerModel peerModel) {
-    	super();
-    	Assert.isNotNull(peerModel);
-    	this.peerModel = peerModel;
-    }
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.model.interfaces.IModelNodeProvider#getModelNode()
+	 * Constructor.
+	 *
+	 * @param launch The launch. Must not be <code>null</code>.
 	 */
-	@Override
-	public IModelNode getModelNode() {
-		return peerModel;
+	public StepContextAdapter(ILaunch launch) {
+		super();
+		Assert.isNotNull(launch);
+		this.launch = launch;
+	}
+
+	/**
+	 * Returns the launch.
+	 * @return The launch.
+	 */
+	public ILaunch getLaunch() {
+		return launch;
 	}
 
 	/* (non-Javadoc)
@@ -66,7 +52,7 @@ public class StepContextAdapter extends PlatformObject implements IStepContext {
 	 */
 	@Override
 	public String getId() {
-		return peerModel != null ? peerModel.getPeerId() : null;
+		return launch != null ? launch.getLaunchConfiguration().getName() : null;
 	}
 
 	/* (non-Javadoc)
@@ -76,19 +62,31 @@ public class StepContextAdapter extends PlatformObject implements IStepContext {
 	public String getName() {
 		final AtomicReference<String> name = new AtomicReference<String>();
 
-		if (peerModel != null) {
+		if (launch != null) {
 			Runnable runnable = new Runnable() {
 				@Override
 				public void run() {
-					name.set(peerModel.getName());
+					name.set(getId());
 				}
 			};
 
-			if (Protocol.isDispatchThread()) runnable.run();
-			else Protocol.invokeAndWait(runnable);
+			if (Protocol.isDispatchThread()) {
+				runnable.run();
+			}
+			else {
+				Protocol.invokeAndWait(runnable);
+			}
 		}
 
 		return name.get();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext#getContextObject()
+	 */
+	@Override
+	public Object getContextObject() {
+		return launch;
 	}
 
 	/* (non-Javadoc)
@@ -96,130 +94,12 @@ public class StepContextAdapter extends PlatformObject implements IStepContext {
 	 */
 	@Override
 	public String getInfo(IPropertiesContainer data) {
-		return ""; //$NON-NLS-1$
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext#exists()
-	 */
-	@Override
-	public boolean exists() {
-		final AtomicBoolean isGhost = new AtomicBoolean();
-
-		if (peerModel != null) {
-			Runnable runnable = new Runnable() {
-				@Override
-				public void run() {
-					isGhost.set(peerModel.getBooleanProperty(IModelNode.PROPERTY_IS_GHOST));
-				}
-			};
-
-			if (Protocol.isDispatchThread()) runnable.run();
-			else Protocol.invokeAndWait(runnable);
+		try {
+			return getName() + "(" + launch.getLaunchMode() + ") - " + launch.getLaunchConfiguration().getType().getName(); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-
-	    return peerModel != null && !isGhost.get();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext#encode()
-	 */
-	@Override
-	public String encode() {
-		final AtomicReference<String> encoded = new AtomicReference<String>();
-
-		Runnable runnable = new Runnable() {
-			@Override
-			public void run() {
-				try {
-					Map<String, String> attrs = new HashMap<String, String>(peerModel.getPeer().getAttributes());
-
-					// Remove all transient attributes
-					String[] keys = attrs.keySet().toArray(new String[attrs.keySet().size()]);
-					for (String key : keys) {
-						if (key.endsWith(".transient")) { //$NON-NLS-1$
-							attrs.remove(key);
-						}
-					}
-
-	                encoded.set(JSON.toJSON(attrs));
-                }
-                catch (IOException e) {
-					if (Platform.inDebugMode()) {
-						IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
-													"StepContextAdapter encode failure: " + e.getLocalizedMessage(), e); //$NON-NLS-1$
-						Platform.getLog(CoreBundleActivator.getContext().getBundle()).log(status);
-					}
-                }
-			}
-		};
-
-		if (Protocol.isDispatchThread()) runnable.run();
-		else Protocol.invokeAndWait(runnable);
-
-	    return encoded.get() != null ? encoded.get() : ""; //$NON-NLS-1$
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext#getEncodedClassName()
-	 */
-	@Override
-	public String getEncodedClassName() {
-	    return IPeerModel.class.getName();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext#decode(java.lang.String)
-	 */
-	@Override
-	public void decode(final String value) throws IOException {
-		Assert.isNotNull(value);
-
-		final AtomicReference<IOException> error = new AtomicReference<IOException>();
-
-		Runnable runnable = new Runnable() {
-            @Override
-			public void run() {
-				try {
-					Object o = JSON.parseOne(value.getBytes("UTF-8")); //$NON-NLS-1$
-					// The decoded object should be a map
-					if (o instanceof Map) {
-						@SuppressWarnings("unchecked")
-                        Map<String, String> attrs = (Map<String, String>)o;
-
-						// Get the id of the decoded attributes
-						String id = attrs.get("ID"); //$NON-NLS-1$
-						if (id == null) throw new IOException("StepContextAdapter#decode: Mandatory attribure 'ID' is missing."); //$NON-NLS-1$
-
-						// If the ID is matching the associated peer model, than we are done here
-						if (peerModel != null && !(peerModel instanceof InvalidPeerModel) && peerModel.getPeerId().equals(id)) {
-							return;
-						}
-
-						// Lookup the id within the model
-						IPeerModel candidate = Model.getModel().getService(ILocatorModelLookupService.class).lkupPeerModelById(id);
-						if (candidate != null) {
-							peerModel = candidate;
-							return;
-						}
-
-						// Not found in the model -> create a ghost object
-						IPeer peer = new TransientPeer(attrs);
-						peerModel = new PeerModel(Model.getModel(), peer);
-						peerModel.setProperty(IModelNode.PROPERTY_IS_GHOST, true);
-					} else {
-						throw new IOException("StepContextAdapter#decode: Object not of map type."); //$NON-NLS-1$
-					}
-				} catch (IOException e) {
-					error.set(e);
-				}
-			}
-		};
-
-		if (Protocol.isDispatchThread()) runnable.run();
-		else Protocol.invokeAndWait(runnable);
-
-		if (error.get() != null) throw error.get();
+		catch (CoreException e) {
+		}
+		return getName() + "(" + launch.getLaunchMode() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/* (non-Javadoc)
@@ -238,8 +118,12 @@ public class StepContextAdapter extends PlatformObject implements IStepContext {
 			}
 		};
 
-		if (Protocol.isDispatchThread()) runnable.run();
-		else Protocol.invokeAndWait(runnable);
+		if (Protocol.isDispatchThread()) {
+			runnable.run();
+		}
+		else {
+			Protocol.invokeAndWait(runnable);
+		}
 
 		return object.get() != null ? object.get() : super.getAdapter(adapter);
 	}
@@ -254,12 +138,20 @@ public class StepContextAdapter extends PlatformObject implements IStepContext {
 	 * @return The adapter or <code>null</code>.
 	 */
 	protected Object doGetAdapter(Class<?> adapter) {
-		if (IModelNode.class.isAssignableFrom(adapter)) {
-			return peerModel;
+		if (ILaunch.class.equals(adapter)) {
+			return launch;
 		}
 
-		if (IPeer.class.equals(adapter)) {
-			return peerModel.getPeer();
+		if (ILaunchConfiguration.class.equals(adapter)) {
+			return launch.getLaunchConfiguration();
+		}
+
+		if (ILaunchConfigurationType.class.equals(adapter)) {
+			try {
+				return launch.getLaunchConfiguration().getType();
+			}
+			catch (CoreException e) {
+			}
 		}
 
 		return null;

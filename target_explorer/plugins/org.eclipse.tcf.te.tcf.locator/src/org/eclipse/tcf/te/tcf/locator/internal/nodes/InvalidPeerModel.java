@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.te.runtime.model.interfaces.IContainerModelNode;
@@ -444,7 +445,7 @@ public final class InvalidPeerModel implements IPeerModel {
 	 */
 	@Override
 	public Object getAdapter(Class adapter) {
-		throw new IllegalStateException();
+		return Platform.getAdapterManager().getAdapter(this, adapter);
 	}
 
 	/* (non-Javadoc)

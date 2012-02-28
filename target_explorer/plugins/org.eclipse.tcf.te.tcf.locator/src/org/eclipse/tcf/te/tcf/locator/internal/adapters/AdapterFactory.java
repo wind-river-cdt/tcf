@@ -12,8 +12,9 @@ package org.eclipse.tcf.te.tcf.locator.internal.adapters;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IAdapterFactory;
-import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistable;
+import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistable2;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 
 /**
  * Static peers adapter factory implementation.
@@ -24,7 +25,8 @@ public class AdapterFactory implements IAdapterFactory {
 	private final IPersistable peerModelPersistableAdapter = new PeerModelPersistableAdapter();
 
 	private static final Class<?>[] CLASSES = new Class[] {
-		IPersistable.class
+		IPersistable.class,
+		IPersistable2.class
 	};
 
 	/* (non-Javadoc)
@@ -40,6 +42,9 @@ public class AdapterFactory implements IAdapterFactory {
 
 		if (adaptableObject instanceof IPeerModel) {
 			if (IPersistable.class.equals(adapterType)) {
+				return peerModelPersistableAdapter;
+			}
+			if (IPersistable2.class.equals(adapterType)) {
 				return peerModelPersistableAdapter;
 			}
 		}

@@ -15,6 +15,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.stepper.StepperManager;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStep;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
@@ -28,6 +29,35 @@ import org.eclipse.tcf.te.tests.CoreTestCase;
  */
 public class StepperTestCase extends CoreTestCase {
 
+	protected static class TestStepContext implements IStepContext {
+
+		@Override
+		public Object getAdapter(Class adapter) {
+			return null;
+		}
+
+		@Override
+		public String getId() {
+			return "org.eclipse.tcf.te.tests.stepper.TestStepContext"; //$NON-NLS-1$
+		}
+
+		@Override
+		public String getName() {
+			return "TestStepContext"; //$NON-NLS-1$
+		}
+
+		@Override
+		public Object getContextObject() {
+			return this;
+		}
+
+		@Override
+		public String getInfo(IPropertiesContainer data) {
+			return getName();
+		}
+
+	}
+
 	/**
 	 * Provides a test suite to the caller which combines all single
 	 * test bundled within this category.
@@ -37,8 +67,8 @@ public class StepperTestCase extends CoreTestCase {
 	public static Test getTestSuite() {
 		TestSuite testSuite = new TestSuite("Test stepper engine"); //$NON-NLS-1$
 
-			// add ourself to the test suite
-			testSuite.addTestSuite(StepperTestCase.class);
+		// add ourself to the test suite
+		testSuite.addTestSuite(StepperTestCase.class);
 
 		return testSuite;
 	}
@@ -62,7 +92,9 @@ public class StepperTestCase extends CoreTestCase {
 			if (stepper.getId().equals("org.eclipse.tcf.te.runtime.stepper.singleContext")) { //$NON-NLS-1$
 				singleContext = true;
 			}
-			if (multiContext && singleContext) break;
+			if (multiContext && singleContext) {
+				break;
+			}
 		}
 		assertTrue("Default multi context stepper contribution not found.", multiContext); //$NON-NLS-1$
 		assertTrue("Default single context stepper contribution not found.", singleContext); //$NON-NLS-1$
@@ -90,10 +122,6 @@ public class StepperTestCase extends CoreTestCase {
 				assertEquals("Unexpected step description found.", "", step.getDescription()); //$NON-NLS-1$ //$NON-NLS-2$
 				assertTrue("Unexpected step class type found.", step instanceof TestStep); //$NON-NLS-1$
 				assertEquals("Unexpected number of dependencies found.", 0, step.getDependencies().length); //$NON-NLS-1$
-
-				assertTrue("Step is not enabled but should.", StepperManager.getInstance().getStepBindingsExtManager().isStepEnabled(step.getId(), null)); //$NON-NLS-1$
-				assertTrue("Step is not enabled but should.", StepperManager.getInstance().getStepBindingsExtManager().isStepEnabled(step.getId(), new IStepContext[0])); //$NON-NLS-1$
-				assertTrue("Step is not enabled but should.", StepperManager.getInstance().getStepBindingsExtManager().isStepEnabled(step.getId(), new IStepContext[1])); //$NON-NLS-1$
 			}
 
 			if (step.getId().endsWith(".step2")) { //$NON-NLS-1$
@@ -129,10 +157,6 @@ public class StepperTestCase extends CoreTestCase {
 				assertEquals("Unexpected step description found.", "", step.getDescription()); //$NON-NLS-1$ //$NON-NLS-2$
 				assertTrue("Unexpected step class type found.", step instanceof TestStep); //$NON-NLS-1$
 				assertEquals("Unexpected number of dependencies found.", 0, step.getDependencies().length); //$NON-NLS-1$
-
-				assertFalse("Step is enabled but should not.", StepperManager.getInstance().getStepBindingsExtManager().isStepEnabled(step.getId(), null)); //$NON-NLS-1$
-				assertFalse("Step is enabled but should not.", StepperManager.getInstance().getStepBindingsExtManager().isStepEnabled(step.getId(), new IStepContext[0])); //$NON-NLS-1$
-				assertTrue("Step is not enabled but should.", StepperManager.getInstance().getStepBindingsExtManager().isStepEnabled(step.getId(), new IStepContext[1])); //$NON-NLS-1$
 			}
 		}
 
@@ -167,7 +191,7 @@ public class StepperTestCase extends CoreTestCase {
 				assertNull("Unexpected non-null value.", stepGroup.getStepGroupIterator()); //$NON-NLS-1$
 
 				try {
-					steps = stepGroup.getSteps(new IStepContext[0]);
+					steps = stepGroup.getSteps(new TestStepContext());
 				} catch (CoreException e) {
 					error = e;
 					message = e.getLocalizedMessage();
@@ -185,7 +209,7 @@ public class StepperTestCase extends CoreTestCase {
 
 				error = null; message = null; steps = null;
 				try {
-					steps = stepGroup.getSteps(new IStepContext[0]);
+					steps = stepGroup.getSteps(new TestStepContext());
 				} catch (CoreException e) {
 					error = e;
 					message = e.getLocalizedMessage();
@@ -203,7 +227,7 @@ public class StepperTestCase extends CoreTestCase {
 
 				error = null; message = null; steps = null;
 				try {
-					steps = stepGroup.getSteps(new IStepContext[0]);
+					steps = stepGroup.getSteps(new TestStepContext());
 				} catch (CoreException e) {
 					error = e;
 					message = e.getLocalizedMessage();
@@ -227,7 +251,7 @@ public class StepperTestCase extends CoreTestCase {
 
 				error = null; message = null; steps = null;
 				try {
-					steps = stepGroup.getSteps(new IStepContext[0]);
+					steps = stepGroup.getSteps(new TestStepContext());
 				} catch (CoreException e) {
 					error = e;
 					message = e.getLocalizedMessage();
@@ -243,7 +267,7 @@ public class StepperTestCase extends CoreTestCase {
 
 				error = null; message = null; steps = null;
 				try {
-					steps = stepGroup.getSteps(new IStepContext[1]);
+					steps = stepGroup.getSteps(new TestStepContext());
 				} catch (CoreException e) {
 					error = e;
 					message = e.getLocalizedMessage();

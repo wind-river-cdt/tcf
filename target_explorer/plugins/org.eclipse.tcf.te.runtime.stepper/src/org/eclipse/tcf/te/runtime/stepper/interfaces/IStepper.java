@@ -55,14 +55,14 @@ public interface IStepper extends IExecutableExtension {
 		 * @see org.eclipse.tcf.te.runtime.interfaces.IConditionTester#cleanup()
 		 */
 		@Override
-        public void cleanup() {
+		public void cleanup() {
 		}
 
 		/* (non-Javadoc)
 		 * @see org.eclipse.tcf.te.runtime.interfaces.IConditionTester#isConditionFulfilled()
 		 */
 		@Override
-        public boolean isConditionFulfilled() {
+		public boolean isConditionFulfilled() {
 			return stepper.isFinished();
 		}
 	}
@@ -72,13 +72,14 @@ public interface IStepper extends IExecutableExtension {
 	 * </i>. Once the stepper finished the execution, the initialization is reseted and must be
 	 * renewed before <i><code>execute()</code></i> can be called again.
 	 *
+	 * @param context The step context. Must not be <code>null</code>.
 	 * @param data The data. Must not be <code>null</code>.
 	 * @param fullQualifiedId The full qualified id of this stepper.
 	 * @param monitor The progress monitor. Must not be <code>null</code>.
 	 *
 	 * @throws IllegalStateException If called if the stepper is in initialized state already.
 	 */
-	public void initialize(IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor) throws IllegalStateException;
+	public void initialize(IStepContext context, IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor) throws IllegalStateException;
 
 	/**
 	 * Returns if or if not the stepper got initialized for a new run.

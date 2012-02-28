@@ -25,6 +25,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -35,7 +36,9 @@ import org.eclipse.tcf.te.launch.core.lm.interfaces.IContextSelectorLaunchAttrib
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification;
 import org.eclipse.tcf.te.runtime.model.factory.Factory;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
+import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistable2;
+import org.eclipse.tcf.te.runtime.services.ServiceManager;
+import org.eclipse.tcf.te.runtime.services.interfaces.IPropertiesAccessService;
 import org.osgi.framework.Bundle;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -47,7 +50,7 @@ import org.xml.sax.helpers.DefaultHandler;
 public class ContextSelectorPersistenceDelegate {
 	// The read cache for step contexts. Avoid running time consuming
 	// re-parsing of an already parsed step context description again and again.
-	private final static Map<String, List<IStepContext>> readCache = new LinkedHashMap<String, List<IStepContext>>();
+	private final static Map<String, List<IModelNode>> readCache = new LinkedHashMap<String, List<IModelNode>>();
 	// The write cache for target contexts. Avoids re-generating the XML again and again.
 	private final static Map<String, String> writeCache = new LinkedHashMap<String, String>();
 
@@ -64,7 +67,7 @@ public class ContextSelectorPersistenceDelegate {
 	 * @param wc The launch configuration working copy. Must not be <code>null</code>.
 	 * @param contexts The launch contexts to save or <code>null</code>.
 	 */
-	public final static void setLaunchContexts(ILaunchConfigurationWorkingCopy wc, IStepContext[] contexts) {
+	public final static void setLaunchContexts(ILaunchConfigurationWorkingCopy wc, IModelNode[] contexts) {
 		Assert.isNotNull(wc);
 
 		if (contexts == null || contexts.length == 0) {
@@ -87,7 +90,7 @@ public class ContextSelectorPersistenceDelegate {
 	 * @param launchSpec The launch specification. Must not be <code>null</code>.
 	 * @param contexts The launch contexts to save or <code>null</code>.
 	 */
-	public final static void setLaunchContexts(ILaunchSpecification launchSpec, IStepContext[] contexts) {
+	public final static void setLaunchContexts(ILaunchSpecification launchSpec, IModelNode[] contexts) {
 		Assert.isNotNull(launchSpec);
 
 		if (contexts == null || contexts.length == 0) {
@@ -108,7 +111,7 @@ public class ContextSelectorPersistenceDelegate {
 	 * @param contexts The launch contexts to encode. Must not be <code>null</code>.
 	 * @return The full XML representation of the given contexts or <code>null</code>.
 	 */
-	public final static String encodeLaunchContexts(IStepContext[] contexts) {
+	public final static String encodeLaunchContexts(IModelNode[] contexts) {
 		Assert.isNotNull(contexts);
 
 		// The final result
@@ -133,7 +136,7 @@ public class ContextSelectorPersistenceDelegate {
 				// Write the header and get the initial indentation
 				String indentation = writeHeader(writer);
 				// Iterate over the given selected step contexts and write them out.
-				for (IStepContext node : contexts) {
+				for (IModelNode node : contexts) {
 					writeStepContext(writer, indentation, node);
 				}
 				// Write the footer
@@ -153,7 +156,7 @@ public class ContextSelectorPersistenceDelegate {
 				// Export to the string writer failed --> remove attribute from launch configuration
 				if (Platform.inDebugMode()) {
 					IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
-												"Launch framework internal error: " + e.getLocalizedMessage(), e); //$NON-NLS-1$
+									"Launch framework internal error: " + e.getLocalizedMessage(), e); //$NON-NLS-1$
 					Platform.getLog(CoreBundleActivator.getContext().getBundle()).log(status);
 				}
 				result = null;
@@ -176,11 +179,11 @@ public class ContextSelectorPersistenceDelegate {
 	 * @param contexts The contexts
 	 * @return The corresponding write key cache.
 	 */
-	private static String makeWriteCacheKey(IStepContext[] contexts) {
+	private static String makeWriteCacheKey(IModelNode[] contexts) {
 		Assert.isNotNull(contexts);
 
 		StringBuffer key = new StringBuffer();
-		for (IStepContext context : contexts) {
+		for (IModelNode context : contexts) {
 			key.append(Integer.toHexString(context.hashCode()));
 			key.append(':');
 		}
@@ -225,13 +228,15 @@ public class ContextSelectorPersistenceDelegate {
 	 *
 	 * @throws IOException in case the write failed.
 	 */
-	private static void writeStepContext(Writer writer, String indentation, IStepContext context) throws IOException {
+	private static void writeStepContext(Writer writer, String indentation, IModelNode context) throws IOException {
 		Assert.isNotNull(writer);
 		Assert.isNotNull(indentation);
 		Assert.isNotNull(context);
 
-		writer.write(indentation + "<context type=\"" + context.getEncodedClassName() + "\">\n"); //$NON-NLS-1$ //$NON-NLS-2$
-		writer.write(indentation + "\t" + context.encode() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		IPersistable2 adapter = (IPersistable2)context.getAdapter(IPersistable2.class);
+
+		writer.write(indentation + "<context type=\"" + adapter.getEncodedClassName(context) + "\">\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		writer.write(indentation + "\t" + adapter.exportStringFrom(context) + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		writer.write(indentation + "</context>\n"); //$NON-NLS-1$
 	}
 
@@ -241,10 +246,10 @@ public class ContextSelectorPersistenceDelegate {
 	 * @param encodedContexts The selected launch contexts encoded as XML string. Must not be <code>null</code>.
 	 * @return The selected launch contexts or an empty array.
 	 */
-	public final static IStepContext[] decodeLaunchContexts(String encodedContexts) {
+	public final static IModelNode[] decodeLaunchContexts(String encodedContexts) {
 		Assert.isNotNull(encodedContexts);
 
-		List<IStepContext> contexts = null;
+		List<IModelNode> contexts = null;
 
 		if (!"".equals(encodedContexts.trim())) { //$NON-NLS-1$
 			synchronized (readCache) {
@@ -254,10 +259,18 @@ public class ContextSelectorPersistenceDelegate {
 					contexts = readCache.get(encodedContexts);
 					// check sanity. If empty or we cannot find the step context,
 					// drop the cache value and decode again.
-					ListIterator<IStepContext> iterator = contexts.listIterator();
+					ListIterator<IModelNode> iterator = contexts.listIterator();
 					while (iterator.hasNext()) {
-						IStepContext node = iterator.next();
-						if (!node.exists()) {
+						IModelNode node = iterator.next();
+						IPropertiesAccessService service = ServiceManager.getInstance().getService(node, IPropertiesAccessService.class);
+						boolean isGhost = false;
+						if (service != null) {
+							Object value = service.getProperty(node, IModelNode.PROPERTY_IS_GHOST);
+							if (value instanceof Boolean) {
+								isGhost = ((Boolean)value).booleanValue();
+							}
+						}
+						if (isGhost) {
 							contexts = null;
 							readCache.remove(encodedContexts);
 							break;
@@ -272,7 +285,7 @@ public class ContextSelectorPersistenceDelegate {
 			}
 
 			if (contexts == null || contexts.isEmpty()) {
-				contexts = new ArrayList<IStepContext>();
+				contexts = new ArrayList<IModelNode>();
 				// We have to parse the contexts from the string
 				InputStream input = new ByteArrayInputStream(encodedContexts.getBytes());
 				// Instantiate the XML parser
@@ -294,7 +307,7 @@ public class ContextSelectorPersistenceDelegate {
 					// Import failed --> remove attribute from launch configuration
 					if (Platform.inDebugMode()) {
 						IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
-													"Launch framework internal error: " + e.getLocalizedMessage(), e); //$NON-NLS-1$
+										"Launch framework internal error: " + e.getLocalizedMessage(), e); //$NON-NLS-1$
 						Platform.getLog(CoreBundleActivator.getContext().getBundle()).log(status);
 					}
 					contexts = null;
@@ -302,7 +315,7 @@ public class ContextSelectorPersistenceDelegate {
 			}
 		}
 
-		return contexts != null ? contexts.toArray(new IStepContext[contexts.size()]) : new IStepContext[0];
+		return contexts != null ? contexts.toArray(new IModelNode[contexts.size()]) : new IModelNode[0];
 	}
 
 	/**
@@ -333,7 +346,7 @@ public class ContextSelectorPersistenceDelegate {
 		private int parseState;
 		private String lastData;
 		private String lastType;
-		private List<IStepContext> contexts;
+		private List<IModelNode> contexts;
 
 		/**
 		 * Constructor
@@ -377,7 +390,7 @@ public class ContextSelectorPersistenceDelegate {
 		/**
 		 * Associate the list instance to store the identified contexts.
 		 */
-		protected void setContexts(List<IStepContext> contexts) {
+		protected void setContexts(List<IModelNode> contexts) {
 			this.contexts = contexts;
 		}
 
@@ -401,8 +414,8 @@ public class ContextSelectorPersistenceDelegate {
 						clazz = (Class<IModelNode>)CoreBundleActivator.getContext().getBundle().loadClass(lastType);
 					} catch (ClassNotFoundException e) {
 						if (Platform.inDebugMode()) {
-							IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
-														"Launch framework internal error: " + e.getLocalizedMessage(), e); //$NON-NLS-1$
+							IStatus status = new Status(IStatus.WARNING, CoreBundleActivator.getUniqueIdentifier(),
+											"Launch framework internal error: " + e.getLocalizedMessage(), e); //$NON-NLS-1$
 							Platform.getLog(CoreBundleActivator.getContext().getBundle()).log(status);
 						}
 					}
@@ -430,7 +443,7 @@ public class ContextSelectorPersistenceDelegate {
 							} catch (ClassNotFoundException e) {
 								if (Platform.inDebugMode()) {
 									IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
-																"Launch framework internal error: " + e.getLocalizedMessage(), e); //$NON-NLS-1$
+													"Launch framework internal error: " + e.getLocalizedMessage(), e); //$NON-NLS-1$
 									Platform.getLog(CoreBundleActivator.getContext().getBundle()).log(status);
 								}
 							}
@@ -440,21 +453,19 @@ public class ContextSelectorPersistenceDelegate {
 					if (clazz != null) {
 						// Create an instance of this class and try to load the step context
 						Object object = Factory.getInstance().newInstance(clazz);
-						if (object != null) {
-							IStepContext context = (IStepContext)Platform.getAdapterManager().loadAdapter(object, IStepContext.class.getName());
-							if (context != null) {
-								try {
-									// Decodes the context object
-									context.decode(lastData);
-									if (!contexts.contains(context)) {
-										contexts.add(context);
-									}
-								} catch (IOException e) {
-									if (Platform.inDebugMode()) {
-										IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
-																	"Launch framework internal error: " + e.getLocalizedMessage(), e); //$NON-NLS-1$
-										Platform.getLog(CoreBundleActivator.getContext().getBundle()).log(status);
-									}
+						if (object instanceof IAdaptable) {
+							try {
+								IPersistable2 adapter = (IPersistable2)((IAdaptable)object).getAdapter(IPersistable2.class);
+								// Decodes the context object
+								IModelNode context = (IModelNode)adapter.importFrom(lastData);
+								if (!contexts.contains(context)) {
+									contexts.add(context);
+								}
+							} catch (IOException e) {
+								if (Platform.inDebugMode()) {
+									IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
+													"Launch framework internal error: " + e.getLocalizedMessage(), e); //$NON-NLS-1$
+									Platform.getLog(CoreBundleActivator.getContext().getBundle()).log(status);
 								}
 							}
 						}
@@ -503,8 +514,8 @@ public class ContextSelectorPersistenceDelegate {
 	 * @param configuration The launch configuration or <code>null</code>.
 	 * @return The list of configured launch contexts or an empty array.
 	 */
-	public static final IStepContext[] getLaunchContexts(ILaunchConfiguration configuration) {
-		IStepContext[] contexts = new IStepContext[0];
+	public static final IModelNode[] getLaunchContexts(ILaunchConfiguration configuration) {
+		IModelNode[] contexts = new IModelNode[0];
 
 		// First read the contexts written by the launch context selector control.
 		if (configuration != null) {
@@ -527,8 +538,8 @@ public class ContextSelectorPersistenceDelegate {
 	 * @param launchSpec The launch specification or <code>null</code>.
 	 * @return The list of configured launch contexts or an empty array.
 	 */
-	public static final IStepContext[] getLaunchContexts(ILaunchSpecification launchSpec) {
-		IStepContext[] contexts = new IStepContext[0];
+	public static final IModelNode[] getLaunchContexts(ILaunchSpecification launchSpec) {
+		IModelNode[] contexts = new IModelNode[0];
 
 		// First read the contexts written by the launch context selector control.
 		if (launchSpec != null) {

@@ -39,6 +39,7 @@
             adaptableType="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"
             class="org.eclipse.tcf.te.tcf.locator.internal.adapters.AdapterFactory">
          <adapter type="org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistable"/>
+         <adapter type="org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistable2"/>
       </factory>
    </extension>
    

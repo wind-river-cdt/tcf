@@ -16,12 +16,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.expressions.EvaluationContext;
+import org.eclipse.core.expressions.EvaluationResult;
+import org.eclipse.core.expressions.Expression;
+import org.eclipse.core.expressions.ExpressionConverter;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.tcf.te.runtime.extensions.ExecutableExtension;
+import org.eclipse.tcf.te.runtime.extensions.ExecutableExtensionProxy;
 import org.eclipse.tcf.te.runtime.interfaces.extensions.IExecutableExtension;
 import org.eclipse.tcf.te.runtime.stepper.StepperManager;
 import org.eclipse.tcf.te.runtime.stepper.activator.CoreBundleActivator;
@@ -29,6 +36,7 @@ import org.eclipse.tcf.te.runtime.stepper.interfaces.IExtendedStep;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStep;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroup;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroupIterator;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroupable;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.tracing.ITraceIds;
 import org.eclipse.tcf.te.runtime.stepper.nls.Messages;
@@ -36,12 +44,19 @@ import org.eclipse.tcf.te.runtime.stepper.nls.Messages;
 /**
  * A default step group implementation.
  */
-public class StepGroup extends AbstractStepGroup {
+public class StepGroup extends ExecutableExtension implements IStepGroup {
 
 	private boolean locked;
 	private String baseOn;
 
 	private final List<ReferenceSubElement> references = new ArrayList<ReferenceSubElement>();
+
+	private ExecutableExtensionProxy<IStepGroupIterator> iteratorProxy = null;
+
+	/**
+	 * Constant to be returned in case the step group contains no steps.
+	 */
+	protected final static IStepGroupable[] NO_STEPS = new IStepGroupable[0];
 
 	/**
 	 * Step group reference sub element.
@@ -57,7 +72,7 @@ public class StepGroup extends AbstractStepGroup {
 		private boolean disable;
 		private boolean singleton;
 		private final List<String> dependencies = new ArrayList<String>();
-
+		private Expression expression;
 
 		/**
 		 * Returns the id of the referenced step or step group.
@@ -166,11 +181,20 @@ public class StepGroup extends AbstractStepGroup {
 			return dependencies.toArray(new String[dependencies.size()]);
 		}
 
+		/**
+		 * Returns the enablement expression which is associated with this reference.
+		 *
+		 * @return The enablement expression or <code>null</code>.
+		 */
+		public Expression getEnablement() {
+			return expression;
+		}
+
 		/* (non-Javadoc)
 		 * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
 		 */
 		@Override
-        public void setInitializationData(IConfigurationElement config, String propertyName, Object data) throws CoreException {
+		public void setInitializationData(IConfigurationElement config, String propertyName, Object data) throws CoreException {
 			if (config == null) {
 				return;
 			}
@@ -225,17 +249,25 @@ public class StepGroup extends AbstractStepGroup {
 				value = require.getAttribute("id"); //$NON-NLS-1$
 				if (value == null || value.trim().length() == 0) {
 					throw new CoreException(new Status(IStatus.ERROR,
-						CoreBundleActivator.getUniqueIdentifier(),
-						0,
-						NLS.bind(Messages.AbstractStep_error_missingRequiredAttribute,
-							"dependency id (requires)", //$NON-NLS-1$
-							config.getName()),
-							null));
+									CoreBundleActivator.getUniqueIdentifier(),
+									0,
+									NLS.bind(Messages.AbstractStep_error_missingRequiredAttribute,
+													"dependency id (requires)", //$NON-NLS-1$
+													config.getName()),
+													null));
 				}
 				if (!dependencies.contains(value.trim())) {
 					dependencies.add(value.trim());
 				}
 			}
+
+			// Read the sub elements of the extension
+			IConfigurationElement[] enablements = config.getChildren("enablement"); //$NON-NLS-1$
+			// The "enablement" element is the only expected one
+			if (enablements != null && enablements.length > 0) {
+				expression = ExpressionConverter.getDefault().perform(enablements[0]);
+			}
+
 		}
 
 		/* (non-Javadoc)
@@ -347,8 +379,8 @@ public class StepGroup extends AbstractStepGroup {
 				// If either the groupable, the reference or the extension is
 				// marked singleton, than this is an failure.
 				checkFailed = step.isSingleton() || reference.isSingleton()
-					|| (step.getExtension() instanceof IExtendedStep
-						&& ((IExtendedStep)step.getExtension()).isSingleton());
+								|| (step.getExtension() instanceof IExtendedStep
+												&& ((IExtendedStep)step.getExtension()).isSingleton());
 				if (checkFailed) {
 					break;
 				}
@@ -357,11 +389,11 @@ public class StepGroup extends AbstractStepGroup {
 
 		if (checkFailed) {
 			throw new CoreException(new Status(IStatus.ERROR,
-				CoreBundleActivator.getUniqueIdentifier(),
-				MessageFormat.format(Messages.StepGroup_error_multipleSingletonOccurrences,
-					NLS.bind(Messages.StepGroup_error_stepGroup, getLabel()),
-					NLS.bind(Messages.StepGroup_error_referencedStepOrGroup, reference.getId()))
-				));
+							CoreBundleActivator.getUniqueIdentifier(),
+							MessageFormat.format(Messages.StepGroup_error_multipleSingletonOccurrences,
+											NLS.bind(Messages.StepGroup_error_stepGroup, getLabel()),
+											NLS.bind(Messages.StepGroup_error_referencedStepOrGroup, reference.getId()))
+							));
 		}
 	}
 
@@ -397,7 +429,7 @@ public class StepGroup extends AbstractStepGroup {
 			// A step is clearly affected if the primary id and the secondary
 			// id (if any) matches the overwritten id
 			if (step.getExtension().getId().equals(primaryId)
-				&& (secondaryId == null || secondaryId.equals(step.getSecondaryId()))) {
+							&& (secondaryId == null || secondaryId.equals(step.getSecondaryId()))) {
 				if (step instanceof StepGroupable) {
 					StepGroupable groupable = ((StepGroupable)step);
 					// Update the grouped extension
@@ -545,11 +577,11 @@ public class StepGroup extends AbstractStepGroup {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroup#getSteps(org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext[])
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroup#getSteps(org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext)
 	 */
-    @Override
-	public IStepGroupable[] getSteps(IStepContext[] contexts) throws CoreException {
-		Assert.isNotNull(contexts);
+	@Override
+	public IStepGroupable[] getSteps(IStepContext context) throws CoreException {
+		Assert.isNotNull(context);
 
 		// The list of resolved steps for the specified type and mode
 		List<IStepGroupable> steps = new ArrayList<IStepGroupable>();
@@ -562,15 +594,15 @@ public class StepGroup extends AbstractStepGroup {
 			// without the base group.
 			if (baseStepGroup == null) {
 				throw new CoreException(new Status(IStatus.ERROR,
-					CoreBundleActivator.getUniqueIdentifier(),
-					MessageFormat.format(Messages.StepGroup_error_missingBaseStepGroup,
-						NLS.bind(Messages.StepGroup_error_stepGroup, getLabel()),
-						NLS.bind(Messages.StepGroup_error_referencedBaseGroup, getBaseOn()))
-					));
+								CoreBundleActivator.getUniqueIdentifier(),
+								MessageFormat.format(Messages.StepGroup_error_missingBaseStepGroup,
+												NLS.bind(Messages.StepGroup_error_stepGroup, getLabel()),
+												NLS.bind(Messages.StepGroup_error_referencedBaseGroup, getBaseOn()))
+								));
 			}
 
 			// Add all the steps from the base step group now to the list
-			steps.addAll(Arrays.asList(baseStepGroup.getSteps(contexts)));
+			steps.addAll(Arrays.asList(baseStepGroup.getSteps(context)));
 		}
 
 		// Now process the references and modify the steps list accordingly
@@ -584,24 +616,22 @@ public class StepGroup extends AbstractStepGroup {
 			// If the candidate is null here, that's an error as a referenced step is missing.
 			if (candidate == null) {
 				throw new CoreException(new Status(IStatus.ERROR,
-					CoreBundleActivator.getUniqueIdentifier(),
-					MessageFormat.format(Messages.StepGroup_error_missingReferencedStep,
-						NLS.bind(Messages.StepGroup_error_stepGroup, getLabel()),
-						NLS.bind(Messages.StepGroup_error_referencedStepOrGroup, reference.getId()))
-					));
+								CoreBundleActivator.getUniqueIdentifier(),
+								MessageFormat.format(Messages.StepGroup_error_missingReferencedStep,
+												NLS.bind(Messages.StepGroup_error_stepGroup, getLabel()),
+												NLS.bind(Messages.StepGroup_error_referencedStepOrGroup, reference.getId()))
+								));
 			}
 
 			// Check if the step is valid for the current contexts.
-			if (candidate instanceof IStep) {
-				boolean valid = isValidStep(candidate.getId(), contexts);
+			boolean valid = isValidReference(reference, context);
 
-				if (!valid) {
-					CoreBundleActivator.getTraceHandler().trace(
-						"StepGroup#getSteps: SKIPPED step = '" + candidate.getLabel() + "'." //$NON-NLS-1$ //$NON-NLS-2$
-						+ " Not valid for contexts '" + Arrays.deepToString(contexts),  //$NON-NLS-1$
-						0, ITraceIds.TRACE_STEPPING, IStatus.WARNING, this);
-					continue;
-				}
+			if (!valid) {
+				CoreBundleActivator.getTraceHandler().trace(
+								"StepGroup#getSteps: SKIPPED reference = '" + candidate.getLabel() + "'." //$NON-NLS-1$ //$NON-NLS-2$
+								+ " Not valid for contexts '" + context,  //$NON-NLS-1$
+								0, ITraceIds.TRACE_STEPPING, IStatus.WARNING, this);
+				continue;
 			}
 
 			// Check for duplicates of singleton references.
@@ -609,7 +639,7 @@ public class StepGroup extends AbstractStepGroup {
 
 			// Check for the steps own dependencies to be valid for the current type id and mode
 			if (candidate instanceof IStep) {
-				checkForDependenciesValid((IStep)candidate, contexts);
+				checkForDependenciesValid((IStep)candidate, context);
 			}
 
 			// Will contain the list of affected groupables from the whole list
@@ -626,7 +656,7 @@ public class StepGroup extends AbstractStepGroup {
 
 				// If neither one is specified, the step or step group will be to the end of the list
 				if ((insertBefore == null || insertBefore.length() == 0)
-					&& (insertAfter == null || insertAfter.length() == 0)) {
+								&& (insertAfter == null || insertAfter.length() == 0)) {
 					IStepGroupable groupable = new StepGroupable(candidate, reference.getSecondaryId());
 					steps.add(groupable);
 					affectedGroupables.add(groupable);
@@ -673,7 +703,7 @@ public class StepGroup extends AbstractStepGroup {
 	@Override
 	public void setInitializationData(IConfigurationElement config, String propertyName, Object data) throws CoreException {
 		references.clear();
-	    super.setInitializationData(config, propertyName, data);
+		super.setInitializationData(config, propertyName, data);
 	}
 
 	/* (non-Javadoc)
@@ -681,7 +711,16 @@ public class StepGroup extends AbstractStepGroup {
 	 */
 	@Override
 	public void doSetInitializationData(IConfigurationElement config, String propertyName, Object data) throws CoreException {
-	    super.doSetInitializationData(config, propertyName, data);
+		super.doSetInitializationData(config, propertyName, data);
+
+		if (iteratorProxy == null) {
+			iteratorProxy = new ExecutableExtensionProxy<IStepGroupIterator>(config) {
+				@Override
+				protected String getExecutableExtensionAttributeName() {
+					return "iterator"; //$NON-NLS-1$
+				}
+			};
+		}
 
 		if (!locked) {
 			String lockedAttribute = config.getAttribute("locked"); //$NON-NLS-1$
@@ -728,17 +767,17 @@ public class StepGroup extends AbstractStepGroup {
 
 
 	/**
-	 * Checks is all dependencies of the given step are available
+	 * Checks if all dependencies of the given step are available
 	 * and valid for the given type id and mode.
 	 *
 	 * @param step The step. Must not be <code>null</code>.
-	 * @param contexts The array of context objects. Must not be <code>null</code>.
+	 * @param context The context. Must not be <code>null</code>.
 	 *
 	 * @throws CoreException If a required step or step group is not available or not valid.
 	 */
-    protected void checkForDependenciesValid(IStep step, IStepContext[] contexts) throws CoreException {
+	protected void checkForDependenciesValid(IStep step, IStepContext context) throws CoreException {
 		Assert.isNotNull(step);
-		Assert.isNotNull(contexts);
+		Assert.isNotNull(context);
 
 		String[] dependencies = step.getDependencies();
 		for (String dependency : dependencies) {
@@ -751,28 +790,11 @@ public class StepGroup extends AbstractStepGroup {
 			// If the candidate is null here, that's an error as a required step or step group is missing.
 			if (candidate == null) {
 				throw new CoreException(new Status(IStatus.ERROR,
-					CoreBundleActivator.getUniqueIdentifier(),
-					MessageFormat.format(Messages.StepGroup_error_missingRequiredStep,
-						NLS.bind(Messages.StepGroup_error_step, step.getLabel()),
-						NLS.bind(Messages.StepGroup_error_requiredStepOrGroup, dependency))
-					));
-			}
-
-			// If the candidate a step, validate the step
-			if (candidate instanceof IStep) {
-				IStep candidateStep = (IStep)candidate;
-				boolean valid = isValidStep(candidateStep.getId(), contexts);
-				if (!valid) {
-					throw new CoreException(new Status(IStatus.ERROR,
-						CoreBundleActivator.getUniqueIdentifier(),
-						MessageFormat.format(Messages.StepGroup_error_invalidRequiredStep,
-							NLS.bind(Messages.StepGroup_error_step, step.getLabel()),
-							NLS.bind(Messages.StepGroup_error_requiredStep, dependency))
-						));
-				}
-
-				// Step is valid -> recursively check required steps.
-				checkForDependenciesValid(candidateStep, contexts);
+								CoreBundleActivator.getUniqueIdentifier(),
+								MessageFormat.format(Messages.StepGroup_error_missingRequiredStep,
+												NLS.bind(Messages.StepGroup_error_step, step.getLabel()),
+												NLS.bind(Messages.StepGroup_error_requiredStepOrGroup, dependency))
+								));
 			}
 		}
 	}
@@ -802,16 +824,46 @@ public class StepGroup extends AbstractStepGroup {
 	}
 
 	/**
-	 * Returns if or if not the step identified by the given id is valid for
-	 * the given contexts.
+	 * Returns if or if not the reference is valid for the given contexts.
 	 *
-	 * @param id The step id. Must not be <code>null</code>.
-	 * @param contexts The array of context objects or <code>null</code>.
+	 * @param reference The reference. Must not be <code>null</code>.
+	 * @param context The context or <code>null</code>.
 	 *
 	 * @return <code>True</code> if the step is valid, <code>false</code> otherwise.
 	 */
-	protected boolean isValidStep(String id, IStepContext[] contexts) {
-		Assert.isNotNull(id);
-		return StepperManager.getInstance().getStepBindingsExtManager().isStepEnabled(id, contexts);
+	protected boolean isValidReference(ReferenceSubElement reference, IStepContext context) {
+		Assert.isNotNull(reference);
+		// Get the enablement.
+		Expression enablement = reference.getEnablement();
+
+		if (enablement != null) {
+			if (context != null) {
+				// Set the default variable to the context.
+				EvaluationContext evalContext = new EvaluationContext(null, context);
+				// Initialize the evaluation context named variables
+				evalContext.addVariable("context", context.getContextObject()); //$NON-NLS-1$
+				evalContext.addVariable("id", context.getId()); //$NON-NLS-1$
+				// Allow plugin activation
+				evalContext.setAllowPluginActivation(true);
+				// Evaluate the expression
+				try {
+					return enablement.evaluate(evalContext).equals(EvaluationResult.TRUE);
+				} catch (CoreException e) {
+					IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
+									e.getLocalizedMessage(), e);
+					Platform.getLog(CoreBundleActivator.getContext().getBundle()).log(status);
+				}
+			}
+			return false;
+		}
+		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroup#getStepGroupIterator()
+	 */
+	@Override
+	public IStepGroupIterator getStepGroupIterator() {
+		return iteratorProxy != null ? iteratorProxy.newInstance() : null;
 	}
 }

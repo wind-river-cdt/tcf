@@ -64,20 +64,20 @@ public class StepExecutor implements IStepExecutor {
 	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepExecutor#execute(org.eclipse.tcf.te.runtime.stepper.interfaces.IStep, org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId, org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext, org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-    public final void execute(IStep step, IFullQualifiedId id, final IStepContext context, final IPropertiesContainer data, IProgressMonitor progress) throws CoreException {
+	public final void execute(IStep step, IFullQualifiedId id, final IStepContext context, final IPropertiesContainer data, IProgressMonitor progress) throws CoreException {
 		Assert.isNotNull(step);
 		Assert.isNotNull(id);
-		Assert.isNotNull(context);
+		//		Assert.isNotNull(context);
 		Assert.isNotNull(data);
 		Assert.isNotNull(progress);
 
 		long startTime = System.currentTimeMillis();
 
 		CoreBundleActivator.getTraceHandler().trace("StepExecutor#execute: *** START (" + step.getLabel() + ")", //$NON-NLS-1$ //$NON-NLS-2$
-													0, ITraceIds.TRACE_STEPPING, IStatus.WARNING, this);
+						0, ITraceIds.TRACE_STEPPING, IStatus.WARNING, this);
 		CoreBundleActivator.getTraceHandler().trace(" [" + ISharedConstants.TIME_FORMAT.format(new Date(startTime)) + "]" //$NON-NLS-1$ //$NON-NLS-2$
-													+ " ***", //$NON-NLS-1$
-													0, ITraceIds.PROFILE_STEPPING, IStatus.WARNING, this);
+						+ " ***", //$NON-NLS-1$
+						0, ITraceIds.PROFILE_STEPPING, IStatus.WARNING, this);
 
 		int ticksToUse = (step instanceof IExtendedStep) ? ((IExtendedStep)step).getTotalWork(context, data) : IProgressMonitor.UNKNOWN;
 		progress = ProgressHelper.getProgressMonitor(progress, ticksToUse);
@@ -112,10 +112,10 @@ public class StepExecutor implements IStepExecutor {
 		}
 		catch (Exception e) {
 			CoreBundleActivator.getTraceHandler().trace("StepExecutor#execute: Exception catched: class ='" + e.getClass().getName() + "'" //$NON-NLS-1$ //$NON-NLS-2$
-														+ ", message = '" + e.getLocalizedMessage() + "'"  //$NON-NLS-1$ //$NON-NLS-2$
-														+ ", cause = "  //$NON-NLS-1$
-														+ (e instanceof CoreException ? ((CoreException)e).getStatus().getException() : e.getCause()),
-														0, ITraceIds.TRACE_STEPPING, IStatus.WARNING, this);
+							+ ", message = '" + e.getLocalizedMessage() + "'"  //$NON-NLS-1$ //$NON-NLS-2$
+							+ ", cause = "  //$NON-NLS-1$
+							+ (e instanceof CoreException ? ((CoreException)e).getStatus().getException() : e.getCause()),
+							0, ITraceIds.TRACE_STEPPING, IStatus.WARNING, this);
 
 			// If the exception is a CoreException by itself, just re-throw
 			if (e instanceof CoreException) {
@@ -142,11 +142,11 @@ public class StepExecutor implements IStepExecutor {
 
 			long endTime = System.currentTimeMillis();
 			CoreBundleActivator.getTraceHandler().trace("StepExecutor#execute: *** DONE (" + step.getLabel() + ")", //$NON-NLS-1$ //$NON-NLS-2$
-														0, ITraceIds.TRACE_STEPPING, IStatus.WARNING, this);
+							0, ITraceIds.TRACE_STEPPING, IStatus.WARNING, this);
 			CoreBundleActivator.getTraceHandler().trace(" [" + ISharedConstants.TIME_FORMAT.format(new Date(endTime)) //$NON-NLS-1$
-														+ " , delay = " + (endTime - startTime) + " ms]" //$NON-NLS-1$ //$NON-NLS-2$
-														+ " ***", //$NON-NLS-1$
-														0, ITraceIds.PROFILE_STEPPING, IStatus.WARNING, this);
+							+ " , delay = " + (endTime - startTime) + " ms]" //$NON-NLS-1$ //$NON-NLS-2$
+							+ " ***", //$NON-NLS-1$
+							0, ITraceIds.PROFILE_STEPPING, IStatus.WARNING, this);
 		}
 	}
 
@@ -172,12 +172,12 @@ public class StepExecutor implements IStepExecutor {
 		}
 
 		switch (status.getSeverity()) {
-			case IStatus.CANCEL:
-				throw new OperationCanceledException(status.getMessage());
-			default:
-				String message = formatMessage(status.getMessage(), status.getSeverity(), step, id, context, data);
-				status = new Status(status.getSeverity(), status.getPlugin(), status.getCode(), message != null ? message : status.getMessage(), status.getException());
-				throw new CoreException(status);
+		case IStatus.CANCEL:
+			throw new OperationCanceledException(status.getMessage());
+		default:
+			String message = formatMessage(status.getMessage(), status.getSeverity(), step, id, context, data);
+			status = new Status(status.getSeverity(), status.getPlugin(), status.getCode(), message != null ? message : status.getMessage(), status.getException());
+			throw new CoreException(status);
 		}
 	}
 
@@ -204,19 +204,19 @@ public class StepExecutor implements IStepExecutor {
 	 *
 	 * @return Formatted message.
 	 */
-    protected String formatMessage(String message, int severity, IStep step, IFullQualifiedId id, IStepContext context, IPropertiesContainer data) {
+	protected String formatMessage(String message, int severity, IStep step, IFullQualifiedId id, IStepContext context, IPropertiesContainer data) {
 		String template = null;
 
 		switch (severity) {
-			case IStatus.INFO:
-				template = Messages.StepExecutor_info_stepFailed;
-				break;
-			case IStatus.WARNING:
-				template = Messages.StepExecutor_warning_stepFailed;
-				break;
-			case IStatus.ERROR:
-				template = Messages.StepExecutor_error_stepFailed;
-				break;
+		case IStatus.INFO:
+			template = Messages.StepExecutor_info_stepFailed;
+			break;
+		case IStatus.WARNING:
+			template = Messages.StepExecutor_warning_stepFailed;
+			break;
+		case IStatus.ERROR:
+			template = Messages.StepExecutor_error_stepFailed;
+			break;
 		}
 
 		// If we cannot determine the formatted message template, just return the message as is
@@ -233,11 +233,11 @@ public class StepExecutor implements IStepExecutor {
 
 		// Format the core message
 		String formattedMessage = NLS.bind(template,
-										   new String[] { splittedMsg[0],
-										   				  context.getName(),
-										   				  context.getInfo(data),
-										   				  (step.getLabel() != null && step.getLabel().trim().length() > 0 ? step.getLabel() : step.getId())
-												});
+						new String[] { splittedMsg[0],
+						context.getName(),
+						context.getInfo(data),
+						(step.getLabel() != null && step.getLabel().trim().length() > 0 ? step.getLabel() : step.getId())
+		});
 
 		// If we have more information available, append them
 		if (splittedMsg.length > 1 && splittedMsg[1] != null && !"".equals(splittedMsg[1])) { //$NON-NLS-1$

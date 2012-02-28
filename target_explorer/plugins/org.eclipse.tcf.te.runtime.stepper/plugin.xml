@@ -3,20 +3,15 @@
 <plugin>
 
 <!-- Extension Points -->
-   <extension-point id="steppers" name="Steppers" schema="schema/steppers.exsd"/>
-   <extension-point id="steps" name="Steps" schema="schema/steps.exsd"/>
-   <extension-point id="stepGroups" name="Step Groups" schema="schema/stepGroups.exsd"/>
-   <extension-point id="stepBindings" name="Step Bindings" schema="schema/stepBindings.exsd"/>
+   <extension-point id="steppers" name="%Extension.Steppers.name" schema="schema/steppers.exsd"/>
+   <extension-point id="steps" name="%Extension.Steps.name" schema="schema/steps.exsd"/>
+   <extension-point id="stepGroups" name="%Extension.StepGroups.name" schema="schema/stepGroups.exsd"/>
 
 <!-- Stepper contributions -->
    <extension point="org.eclipse.tcf.te.runtime.stepper.steppers">
       <stepper
-            id="org.eclipse.tcf.te.runtime.stepper.multiContext" 
-            class="org.eclipse.tcf.te.runtime.stepper.stepper.MultiContextStepper"
-            label="%MultiContextStepper.name"/>
-      <stepper
-            id="org.eclipse.tcf.te.runtime.stepper.singleContext" 
-            class="org.eclipse.tcf.te.runtime.stepper.stepper.SingleContextStepper"
+            id="org.eclipse.tcf.te.runtime.stepper" 
+            class="org.eclipse.tcf.te.runtime.stepper.stepper.Stepper"
             label="%SingleContextStepper.name"/>
    </extension>
 

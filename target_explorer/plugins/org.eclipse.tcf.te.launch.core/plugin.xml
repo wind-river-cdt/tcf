@@ -3,9 +3,9 @@
 <plugin>
 
 <!-- Extension points -->
-   <extension-point id="launchConfigTypeBindings" name="Launch Configuration Type Bindings" schema="schema/launchConfigTypeBindings.exsd"/>
-   <extension-point id="launchManagerDelegates" name="Launch Manager Delegates" schema="schema/launchManagerDelegates.exsd"/>
-   <extension-point id="launchModeVariantDelegates" name="Launch Mode Variant Delegates" schema="schema/launchModeVariantDelegates.exsd"/>
+   <extension-point id="launchConfigTypeBindings" name="%Extension.LaunchConfigTypeBindings.name" schema="schema/launchConfigTypeBindings.exsd"/>
+   <extension-point id="launchManagerDelegates" name="%Extension.LaunchManagerDelegates.name" schema="schema/launchManagerDelegates.exsd"/>
+   <extension-point id="launchModeVariantDelegates" name="%Extension.LaunchModeVariantDelegates.name" schema="schema/launchModeVariantDelegates.exsd"/>
 
 <!-- Adapter factory contributions -->
    <extension point="org.eclipse.core.runtime.adapters">
@@ -22,6 +22,26 @@
       <initializer
             class="org.eclipse.tcf.te.launch.core.preferences.PreferencesInitializer">
       </initializer>
+   </extension>
+
+<!-- Property tester contributions -->
+   <extension point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.eclipse.tcf.te.launch.core.bindings.internal.PropertyTester"
+            id="org.eclipse.tcf.te.launch.core.PropertyTester"
+            namespace="org.eclipse.tcf.te.launch.core"
+            properties="launchMode,launchConfigTypeId"
+            type="org.eclipse.debug.core.ILaunch">
+      </propertyTester>
+   </extension>
+
+<!-- Launch Step contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.stepper.steps">
+      <step
+            class="org.eclipse.tcf.te.launch.core.steps.RemoveLaunchStep"
+            id="org.eclipse.tcf.te.launch.core.removeLaunchStep"
+            label="%LaunchStep.RemoveLaunch.name">
+      </step>
    </extension>
 
 </plugin>

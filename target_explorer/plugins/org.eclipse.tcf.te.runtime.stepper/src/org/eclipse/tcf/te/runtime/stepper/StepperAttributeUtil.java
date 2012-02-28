@@ -50,7 +50,7 @@ public class StepperAttributeUtil {
 		if (fullQualifiedId == null || data.getProperty(getFullQualifiedKey(key, fullQualifiedId, data)) != null) {
 			return data.getProperty(getFullQualifiedKey(key, fullQualifiedId, data));
 		}
-		return data.getProperty(getFullQualifiedKey(key, fullQualifiedId.getParentId(), data));
+		return getProperty(key, fullQualifiedId.getParentId(), data);
 	}
 
 	/**
@@ -70,7 +70,7 @@ public class StepperAttributeUtil {
 		if (fullQualifiedId == null || data.getProperty(getFullQualifiedKey(key, fullQualifiedId, data)) != null) {
 			return data.getStringProperty(getFullQualifiedKey(key, fullQualifiedId, data));
 		}
-		return data.getStringProperty(getFullQualifiedKey(key, fullQualifiedId.getParentId(), data));
+		return getStringProperty(key, fullQualifiedId.getParentId(), data);
 	}
 
 	/**
@@ -90,7 +90,7 @@ public class StepperAttributeUtil {
 		if (fullQualifiedId == null || data.getProperty(getFullQualifiedKey(key, fullQualifiedId, data)) != null) {
 			return data.getBooleanProperty(getFullQualifiedKey(key, fullQualifiedId, data));
 		}
-		return data.getBooleanProperty(getFullQualifiedKey(key, fullQualifiedId.getParentId(), data));
+		return getBooleanProperty(key, fullQualifiedId.getParentId(), data);
 	}
 
 	/**
@@ -109,7 +109,7 @@ public class StepperAttributeUtil {
 		if (fullQualifiedId == null || data.getProperty(getFullQualifiedKey(key, fullQualifiedId, data)) != null) {
 			return data.getIntProperty(getFullQualifiedKey(key, fullQualifiedId, data));
 		}
-		return data.getIntProperty(getFullQualifiedKey(key, fullQualifiedId.getParentId(), data));
+		return getIntProperty(key, fullQualifiedId.getParentId(), data);
 	}
 
 	/**

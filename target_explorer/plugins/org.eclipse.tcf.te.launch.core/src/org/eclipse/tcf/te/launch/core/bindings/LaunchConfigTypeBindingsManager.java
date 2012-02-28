@@ -27,7 +27,6 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfigurationType;
-import org.eclipse.tcf.te.launch.core.bindings.internal.LaunchBinding;
 import org.eclipse.tcf.te.launch.core.bindings.internal.LaunchConfigTypeBinding;
 import org.eclipse.tcf.te.launch.core.bindings.internal.OverwritableLaunchBinding;
 import org.eclipse.tcf.te.launch.core.extensions.internal.LaunchModeVariantDelegateExtensionPointManager;
@@ -121,8 +120,8 @@ public class LaunchConfigTypeBindingsManager {
 		LaunchConfigTypeBinding binding = bindings.get(typeId);
 		ILaunchConfigurationType launchConfigType = DebugPlugin.getDefault().getLaunchManager().getLaunchConfigurationType(typeId);
 		return (launchConfigType != null && launchConfigType.isPublic() &&
-			(mode == null || launchConfigType.supportsMode(mode)) &&
-			binding != null && binding.validate(mode, context) != EvaluationResult.FALSE);
+						(mode == null || launchConfigType.supportsMode(mode)) &&
+						binding != null && binding.validate(mode, context) != EvaluationResult.FALSE);
 	}
 
 	/**
@@ -198,25 +197,22 @@ public class LaunchConfigTypeBindingsManager {
 	}
 
 	/**
-	 * Get the registered step group for the given launch configuration type and launch mode.
+	 * Get the registered step group id for the given launch configuration type, launch mode and variant.
 	 *
 	 * @param typeId The launch configuration type id. Must not be <code>null</code>.
 	 * @param mode The launch mode. Must not be <code>null</code>.
 	 * @param variant The launch mode variant or <code>null</code>.
 	 *
-	 * @return The launch step group or <code>null</code> if no step group is registered for the
-	 *         given launch configuration type id and launch mode.
+	 * @return The launch step group id or <code>null</code> if no step group is registered for the
+	 *         given launch configuration type id, launch mode and variant.
 	 */
-	public IStepGroup getStepGroup(String typeId, String mode, String variant) {
+	public String getStepGroupId(String typeId, String mode, String variant) {
 		Assert.isNotNull(typeId);
 		Assert.isNotNull(mode);
 
 		LaunchConfigTypeBinding binding = bindings.get(typeId);
 		if (binding != null) {
-			String id = binding.getStepGroup(mode, variant);
-			if (id != null) {
-				return getStepGroup(id);
-			}
+			return binding.getStepGroupId(mode, variant);
 		}
 		return null;
 	}
@@ -241,35 +237,6 @@ public class LaunchConfigTypeBindingsManager {
 	public IStep getStep(String id) {
 		Assert.isNotNull(id);
 		return StepperManager.getInstance().getStepExtManager().getStep(id, true);
-	}
-
-	/**
-	 * Returns if or if not the given step id is valid for the given combination
-	 * of launch configuration type id and launch mode. A launch step is invalid if not
-	 * bound to the launch configuration type for the given launch mode.
-	 *
-	 * @param id The launch step id. Must not be <code>null</code>.
-	 * @param typeId The launch configuration type id. Must not be <code>null</code>.
-	 * @param mode The launch mode. Must not be <code>null</code>.
-	 *
-	 * @return <code>True</code> if the launch step id is valid, <code>false</code> otherwise.
-	 */
-	public boolean isValidStep(String id, String typeId, String mode) {
-		Assert.isNotNull(id);
-		Assert.isNotNull(typeId);
-		Assert.isNotNull(mode);
-
-		LaunchConfigTypeBinding binding = bindings.get(typeId);
-		if (binding != null) {
-			String[] steps = binding.getSteps(mode);
-			for (String stepId : steps) {
-				if (id.equals(stepId)) {
-					return true;
-				}
-			}
-		}
-
-		return false;
 	}
 
 	/*
@@ -335,14 +302,6 @@ public class LaunchConfigTypeBindingsManager {
 			binding.addStepper(new OverwritableLaunchBinding(id, overwrites, modes));
 		}
 
-		IConfigurationElement[] stepBindings = element.getChildren("step"); //$NON-NLS-1$
-		for (IConfigurationElement stepBinding : stepBindings) {
-			String id = stepBinding.getAttribute("id"); //$NON-NLS-1$
-			String modes = stepBinding.getAttribute("modes"); //$NON-NLS-1$
-
-			binding.addStep(new LaunchBinding(id, modes));
-		}
-
 		IConfigurationElement[] stepGroupBindings = element.getChildren("stepGroup"); //$NON-NLS-1$
 		for (IConfigurationElement stepGroupBinding : stepGroupBindings) {
 			String id = stepGroupBinding.getAttribute("id"); //$NON-NLS-1$
@@ -359,10 +318,14 @@ public class LaunchConfigTypeBindingsManager {
 			try {
 				expression = ExpressionConverter.getDefault().perform(enablement);
 			} catch (CoreException e) {
-				if (Platform.inDebugMode()) e.printStackTrace();
+				if (Platform.inDebugMode()) {
+					e.printStackTrace();
+				}
 			}
 
-			if (expression != null) binding.addEnablement(expression);
+			if (expression != null) {
+				binding.addEnablement(expression);
+			}
 		}
 	}
 

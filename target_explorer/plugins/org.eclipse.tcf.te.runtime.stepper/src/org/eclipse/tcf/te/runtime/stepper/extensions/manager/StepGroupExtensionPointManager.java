@@ -112,7 +112,5 @@ public final class StepGroupExtensionPointManager extends AbstractExtensionPoint
 		else {
 			super.doStoreExtensionTo(extensions, candidate, element);
 		}
-
-	    super.doStoreExtensionTo(extensions, candidate, element);
 	}
 }

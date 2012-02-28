@@ -23,6 +23,7 @@ public interface ICommonLaunchAttributes {
 	 * Launch configuration attribute: List of projects which must be build before executing the launch.
 	 */
 	public static final String ATTR_PROJECTS_FOR_BUILD = ATTR_PREFIX + ".projectsForBuild";     //$NON-NLS-1$
+
 	/**
 	 * Launch configuration attribute: List of referenced projects.
 	 */

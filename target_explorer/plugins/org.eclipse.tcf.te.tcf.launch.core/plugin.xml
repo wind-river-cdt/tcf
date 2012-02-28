@@ -5,7 +5,7 @@
 <!-- Adapter factory contributions -->
    <extension point="org.eclipse.core.runtime.adapters">
       <factory
-            adaptableType="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"
+            adaptableType="org.eclipse.debug.core.ILaunch"
             class="org.eclipse.tcf.te.tcf.launch.core.internal.adapters.AdapterFactory">
          <adapter type="org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext"/>
       </factory>
@@ -37,6 +37,89 @@
             modes="run,debug"
             name="%LaunchType.Linux.App.name">
       </launchConfigurationType>
+   </extension>
+   
+<!-- Launch Configuration Type Binding contributions -->
+   <extension point="org.eclipse.tcf.te.launch.core.launchConfigTypeBindings">
+      <launchConfigTypeBinding
+            launchConfigTypeId="org.eclipse.tcf.te.tcf.launch.type.linux.app">
+         <stepper
+               id="org.eclipse.tcf.te.runtime.stepper"
+               modes="run,debug">
+         </stepper>
+         <launchManagerDelegate
+               id="org.eclipse.tcf.te.tcf.launch.type.linux.app.launchManagerDelegate"
+               modes="run,debug">
+         </launchManagerDelegate>
+         <stepGroup
+               id="org.eclipse.tcf.te.tcf.launch.type.linux.app.stepGroup"
+               modes="run,debug">
+         </stepGroup>
+      </launchConfigTypeBinding>
+   </extension>
+   
+<!-- Launch Manager Delegate contributions -->
+   <extension point="org.eclipse.tcf.te.launch.core.launchManagerDelegates">
+      <delegate
+            class="org.eclipse.tcf.te.launch.core.lm.delegates.DefaultLaunchManagerDelegate"
+            id="org.eclipse.tcf.te.tcf.launch.type.linux.app.launchManagerDelegate">
+      </delegate>
+   </extension>
+   
+<!-- Launch Step Group contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.stepper.stepGroups">
+      <stepGroup
+            id="org.eclipse.tcf.te.tcf.launch.type.linux.app.stepGroup"
+            label="%LaunchStepGroup.Linux.App.name"
+            locked="false">
+         <references>
+            <reference
+                  id="org.eclipse.tcf.te.tcf.launch.core.openChannelStep"
+                  disable="false"
+                  hidden="false"
+                  removable="false"
+                  singleton="true">
+            </reference>
+            <reference
+                  id="org.eclipse.tcf.te.tcf.launch.core.closeChannelStep"
+                  disable="false"
+                  hidden="false"
+                  removable="false"
+                  singleton="true">
+            </reference>
+            <reference
+                  id="org.eclipse.tcf.te.launch.core.removeLaunchStep"
+                  disable="false"
+                  hidden="false"
+                  removable="false"
+                  singleton="true">
+                  <enablement>
+                      <with variable="context">
+                          <not>
+                              <test property="org.eclipse.tcf.te.launch.core.launchMode" value="debug"/>
+                          </not>
+                      </with>
+                  </enablement>
+            </reference>
+         </references>
+      </stepGroup>
+   </extension>
+   
+<!-- Launch Step contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.stepper.steps">
+      <step
+            class="org.eclipse.tcf.te.tcf.launch.core.steps.OpenChannelStep"
+            id="org.eclipse.tcf.te.tcf.launch.core.openChannelStep"
+            label="%LaunchStep.OpenChannel.name">
+      </step>
+      <step
+            class="org.eclipse.tcf.te.tcf.launch.core.steps.CloseChannelStep"
+            id="org.eclipse.tcf.te.tcf.launch.core.closeChannelStep"
+            label="%LaunchStep.CloseChannel.name">
+         <requires
+               id="org.eclipse.tcf.te.tcf.launch.core.openChannelStep">
+         </requires>
+      </step>
    </extension>
 
 </plugin>

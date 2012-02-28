@@ -81,18 +81,6 @@
       </step>
    </extension>
 
-   <extension point="org.eclipse.tcf.te.runtime.stepper.stepBindings">
-      <binding
-            id="org.eclipse.tcf.te.tests.stepper.steps.binding1"
-            stepId="org.eclipse.tcf.te.tests.stepper.step5">
-            <enablement>
-               <with variable="activeContexts">
-                  <count value="1"/>
-               </with>
-            </enablement>
-      </binding>
-   </extension>
-
    <extension point="org.eclipse.tcf.te.runtime.stepper.stepGroups">
       <stepGroup
             id="org.eclipse.tcf.te.tests.stepper.stepGroup1"

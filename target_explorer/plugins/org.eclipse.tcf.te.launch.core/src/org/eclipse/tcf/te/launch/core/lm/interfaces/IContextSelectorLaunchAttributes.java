@@ -15,6 +15,11 @@ package org.eclipse.tcf.te.launch.core.lm.interfaces;
 public interface IContextSelectorLaunchAttributes {
 
 	/**
+	 * Launch configuration attribute: The active launch context the launch is operating with.
+	 */
+	public static final String ATTR_ACTIVE_LAUNCH_CONTEXT = ICommonLaunchAttributes.ATTR_PREFIX + ".active_launch_context"; //$NON-NLS-1$
+
+	/**
 	 * Launch configuration attribute: The launch contexts the launch is operating with. Use
 	 * 								   {@link ContextSelectorPersistanceDelegate} to access
 	 * 								   this attribute within a launch configuration.

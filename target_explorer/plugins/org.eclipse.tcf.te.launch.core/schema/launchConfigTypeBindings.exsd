@@ -60,7 +60,6 @@
             <element ref="launchManagerDelegate" minOccurs="0" maxOccurs="unbounded"/>
             <element ref="launchModeVariantDelegate" minOccurs="0" maxOccurs="unbounded"/>
             <element ref="stepper" minOccurs="0" maxOccurs="unbounded"/>
-            <element ref="step" minOccurs="0" maxOccurs="unbounded"/>
             <element ref="stepGroup" minOccurs="0" maxOccurs="unbounded"/>
             <element ref="enablement" minOccurs="0" maxOccurs="unbounded"/>
          </sequence>
@@ -173,33 +172,6 @@
             <annotation>
                <documentation>
                   The launch mode to use the stepper for. If not specified, the stepper is used for all undefined launch modes, for which the launch configuration type can be used.
-               </documentation>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
-
-   <element name="step">
-      <annotation>
-         <documentation>
-            A step could be bound to a launch configuration type for each available launch mode. If no launch mode is specified, the step is used for all launch modes the launch configuration type supports.
-         </documentation>
-      </annotation>
-      <complexType>
-         <attribute name="id" type="string" use="required">
-            <annotation>
-               <documentation>
-                  The id of the step to use.
-               </documentation>
-               <appinfo>
-                  <meta.attribute kind="identifier" basedOn="org.eclipse.tcf.te.runtime.stepper.steps/step/@id"/>
-               </appinfo>
-            </annotation>
-         </attribute>
-         <attribute name="modes" type="string">
-            <annotation>
-               <documentation>
-                  The comma separated list of launch modes to use the step for. If not specified, the step is used for all undefined launch modes, for which the launch configuration type can be used.
                </documentation>
             </annotation>
          </attribute>

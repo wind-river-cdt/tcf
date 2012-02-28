@@ -32,20 +32,20 @@ public class Messages extends NLS {
 	public static String AbstractStep_error_missingRequiredAttribute;
 	public static String AbstractStep_warning_stepFinishedWithWarnings;
 
-	public static String AbstractStepper_error_stepGroup;
-	public static String AbstractStepper_error_step;
-	public static String AbstractStepper_error_referencedBaseGroup;
-	public static String AbstractStepper_error_referencedStepOrGroup;
-	public static String AbstractStepper_error_requiredStepOrGroup;
-	public static String AbstractStepper_error_requiredStep;
-	public static String AbstractStepper_error_initializeNotCalled;
-	public static String AbstractStepper_error_missingStepGroupId;
-	public static String AbstractStepper_error_missingStepGroup;
-	public static String AbstractStepper_error_missingSteps;
-	public static String AbstractStepper_multiStatus_finishedWithWarnings;
-	public static String AbstractStepper_multiStatus_finishedWithErrors;
-	public static String AbstractStepper_error_missingRequiredStep;
-	public static String AbstractStepper_error_requiredStepNotExecuted;
+	public static String Stepper_error_stepGroup;
+	public static String Stepper_error_step;
+	public static String Stepper_error_referencedBaseGroup;
+	public static String Stepper_error_referencedStepOrGroup;
+	public static String Stepper_error_requiredStepOrGroup;
+	public static String Stepper_error_requiredStep;
+	public static String Stepper_error_initializeNotCalled;
+	public static String Stepper_error_missingStepGroupId;
+	public static String Stepper_error_missingStepGroup;
+	public static String Stepper_error_missingSteps;
+	public static String Stepper_multiStatus_finishedWithWarnings;
+	public static String Stepper_multiStatus_finishedWithErrors;
+	public static String Stepper_error_missingRequiredStep;
+	public static String Stepper_error_requiredStepNotExecuted;
 
 	public static String StepGroup_error_missingBaseStepGroup;
 	public static String StepGroup_error_missingReferencedStep;

@@ -9,7 +9,6 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.runtime.stepper;
 
-import org.eclipse.tcf.te.runtime.stepper.extensions.manager.StepBindingsExtensionPointManager;
 import org.eclipse.tcf.te.runtime.stepper.extensions.manager.StepExtensionPointManager;
 import org.eclipse.tcf.te.runtime.stepper.extensions.manager.StepGroupExtensionPointManager;
 import org.eclipse.tcf.te.runtime.stepper.extensions.manager.StepperExtensionPointManager;
@@ -21,7 +20,6 @@ import org.eclipse.tcf.te.runtime.stepper.extensions.manager.StepperExtensionPoi
 public final class StepperManager {
 	// References to the extension point managers
 	private final StepExtensionPointManager stepExtManager = new StepExtensionPointManager();
-	private final StepBindingsExtensionPointManager stepBindingsExtManager = new StepBindingsExtensionPointManager();
 	private final StepperExtensionPointManager stepperExtManager = new StepperExtensionPointManager();
 	private final StepGroupExtensionPointManager stepGroupExtManager = new StepGroupExtensionPointManager();
 
@@ -71,14 +69,5 @@ public final class StepperManager {
 	 */
 	public StepGroupExtensionPointManager getStepGroupExtManager() {
 		return stepGroupExtManager;
-	}
-
-	/**
-	 * Returns the step bindings extension point manager instance.
-	 *
-	 * @return The step bindings extension point manager instance.
-	 */
-	public StepBindingsExtensionPointManager getStepBindingsExtManager() {
-		return stepBindingsExtManager;
 	}
 }

@@ -29,14 +29,14 @@ public interface IStepGroup extends IExecutableExtension {
 
 	/**
 	 * Returns the list of steps or step groups enlisted and enabled in the group for the
-	 * given contexts.
+	 * given context.
 	 *
-	 * @param contexts The array of context objects. Must not be <code>null</code>.
+	 * @param context The step context object. Must not be <code>null</code>.
 	 * @return The list of steps and step groups or an empty array.
 	 *
 	 * @throws CoreException If the steps cannot be determined.
 	 */
-	public IStepGroupable[] getSteps(IStepContext[] contexts) throws CoreException;
+	public IStepGroupable[] getSteps(IStepContext context) throws CoreException;
 
 	/**
 	 * Return the step group iterator or <code>null</code>. The step group iterator can be used to

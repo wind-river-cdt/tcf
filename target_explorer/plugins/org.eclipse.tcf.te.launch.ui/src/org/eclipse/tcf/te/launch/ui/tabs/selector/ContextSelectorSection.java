@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.jface.action.Action;
@@ -28,7 +27,6 @@ import org.eclipse.tcf.te.launch.ui.interfaces.ILaunchConfigurationTabFormPart;
 import org.eclipse.tcf.te.launch.ui.internal.ImageConsts;
 import org.eclipse.tcf.te.launch.ui.nls.Messages;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
 import org.eclipse.tcf.te.ui.forms.parts.AbstractSection;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
@@ -48,23 +46,23 @@ public class ContextSelectorSection extends AbstractSection implements ILaunchCo
 	protected class RefreshAction extends Action {
 
 		/**
-         * Constructor.
-         */
-        public RefreshAction() {
-        	super(null, IAction.AS_PUSH_BUTTON);
-        	setImageDescriptor(UIPlugin.getImageDescriptor(ImageConsts.ACTION_Refresh_Enabled));
-        	setToolTipText(Messages.ContextSelectorControl_toolbar_refresh_tooltip);
-        }
+		 * Constructor.
+		 */
+		public RefreshAction() {
+			super(null, IAction.AS_PUSH_BUTTON);
+			setImageDescriptor(UIPlugin.getImageDescriptor(ImageConsts.ACTION_Refresh_Enabled));
+			setToolTipText(Messages.ContextSelectorControl_toolbar_refresh_tooltip);
+		}
 
-        /* (non-Javadoc)
-         * @see org.eclipse.jface.action.Action#run()
-         */
-        @Override
-        public void run() {
-        	if (selector != null && selector.getViewer() != null) {
-        		selector.getViewer().refresh();
-        	}
-        }
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.action.Action#run()
+		 */
+		@Override
+		public void run() {
+			if (selector != null && selector.getViewer() != null) {
+				selector.getViewer().refresh();
+			}
+		}
 	}
 
 	/**
@@ -120,7 +118,7 @@ public class ContextSelectorSection extends AbstractSection implements ILaunchCo
 	@Override
 	public void dispose() {
 		if (selector != null) { selector.dispose(); selector = null; }
-	    super.dispose();
+		super.dispose();
 	}
 
 	/* (non-Javadoc)
@@ -128,8 +126,8 @@ public class ContextSelectorSection extends AbstractSection implements ILaunchCo
 	 */
 	@Override
 	protected void createSectionToolbarItems(Section section, FormToolkit toolkit, ToolBarManager tlbMgr) {
-	    super.createSectionToolbarItems(section, toolkit, tlbMgr);
-	    tlbMgr.add(new RefreshAction());
+		super.createSectionToolbarItems(section, toolkit, tlbMgr);
+		tlbMgr.add(new RefreshAction());
 	}
 
 	/* (non-Javadoc)
@@ -140,12 +138,11 @@ public class ContextSelectorSection extends AbstractSection implements ILaunchCo
 		Assert.isNotNull(configuration);
 
 		if (selector != null) {
-			IStepContext[] contexts = ContextSelectorPersistenceDelegate.getLaunchContexts(configuration);
+			IModelNode[] contexts = ContextSelectorPersistenceDelegate.getLaunchContexts(configuration);
 			if (contexts != null && contexts.length > 0) {
 				// Loop the contexts and create a list of nodes
 				List<IModelNode> nodes = new ArrayList<IModelNode>();
-				for (IStepContext context : contexts) {
-					IModelNode node = context.getModelNode();
+				for (IModelNode node : contexts) {
 					if (node != null && !nodes.contains(node)) {
 						nodes.add(node);
 					}
@@ -166,18 +163,10 @@ public class ContextSelectorSection extends AbstractSection implements ILaunchCo
 
 		if (selector != null) {
 			IModelNode[] nodes = selector.getCheckedModelContexts();
-			// Loop the nodes and create a list of step contexts
-			List<IStepContext> contexts = new ArrayList<IStepContext>();
-			for (IModelNode node : nodes) {
-				IStepContext context = (IStepContext)Platform.getAdapterManager().loadAdapter(node, IStepContext.class.getName());
-				if (context != null && !contexts.contains(context)) {
-					contexts.add(context);
-				}
-			}
 
 			// Write the selected contexts to the launch configuration
-			if (!contexts.isEmpty()) {
-				ContextSelectorPersistenceDelegate.setLaunchContexts(configuration, contexts.toArray(new IStepContext[contexts.size()]));
+			if (nodes != null && nodes.length > 0) {
+				ContextSelectorPersistenceDelegate.setLaunchContexts(configuration, nodes);
 			} else {
 				ContextSelectorPersistenceDelegate.setLaunchContexts(configuration, null);
 			}
@@ -191,6 +180,6 @@ public class ContextSelectorSection extends AbstractSection implements ILaunchCo
 	 */
 	@Override
 	public boolean isValid(ILaunchConfiguration configuration) {
-	    return true;
+		return true;
 	}
 }

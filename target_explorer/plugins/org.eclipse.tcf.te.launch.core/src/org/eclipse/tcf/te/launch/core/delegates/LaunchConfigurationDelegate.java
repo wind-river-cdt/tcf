@@ -34,16 +34,21 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.te.launch.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.launch.core.bindings.LaunchConfigTypeBindingsManager;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ICommonLaunchAttributes;
+import org.eclipse.tcf.te.launch.core.lm.interfaces.IContextSelectorLaunchAttributes;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchManagerDelegate;
 import org.eclipse.tcf.te.launch.core.nls.Messages;
+import org.eclipse.tcf.te.launch.core.persistence.ContextSelectorPersistenceDelegate;
 import org.eclipse.tcf.te.launch.core.persistence.DefaultPersistenceDelegate;
 import org.eclipse.tcf.te.runtime.concurrent.util.ExecutorsUtil;
 import org.eclipse.tcf.te.runtime.extensions.ExecutableExtension;
 import org.eclipse.tcf.te.runtime.interfaces.ISharedConstants;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
+import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
 import org.eclipse.tcf.te.runtime.stepper.FullQualifiedId;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepperProperties;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.tracing.ITraceIds;
 
 /**
@@ -69,7 +74,7 @@ public class LaunchConfigurationDelegate extends AbstractLaunchConfigurationDele
 	 * @see org.eclipse.debug.core.model.ILaunchConfigurationDelegate#launch(org.eclipse.debug.core.ILaunchConfiguration, java.lang.String, org.eclipse.debug.core.ILaunch, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-    public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor) throws CoreException {
+	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor) throws CoreException {
 		Assert.isNotNull(configuration);
 		Assert.isNotNull(mode);
 		Assert.isNotNull(launch);
@@ -82,11 +87,11 @@ public class LaunchConfigurationDelegate extends AbstractLaunchConfigurationDele
 		launchConfig.doSave();
 
 		CoreBundleActivator.getTraceHandler().trace("LaunchConfigurationDelegate#launch: *** ENTERED" //$NON-NLS-1$
-													+ " (" + configuration.getName() + ")", //$NON-NLS-1$ //$NON-NLS-2$
-													0, ITraceIds.TRACE_STEPPING, IStatus.WARNING, this);
+						+ " (" + configuration.getName() + ")", //$NON-NLS-1$ //$NON-NLS-2$
+						0, ITraceIds.TRACE_STEPPING, IStatus.WARNING, this);
 		CoreBundleActivator.getTraceHandler().trace(" [" + ISharedConstants.TIME_FORMAT.format(new Date(startTime)) + "]" //$NON-NLS-1$ //$NON-NLS-2$
-													+ " ***", //$NON-NLS-1$
-													0, ITraceIds.PROFILE_STEPPING, IStatus.WARNING, this);
+						+ " ***", //$NON-NLS-1$
+						0, ITraceIds.PROFILE_STEPPING, IStatus.WARNING, this);
 
 		// Reset the attribute to tell if the launch sequence has been completed. Clients cannot
 		// use ILaunch.isTerminated() as this is passing through to a possibly associated IProcess
@@ -109,7 +114,7 @@ public class LaunchConfigurationDelegate extends AbstractLaunchConfigurationDele
 			if (stepper == null) {
 				// Failed to retrieve stepper for this launch -> throw a CoreException
 				throw new CoreException(new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
-												   NLS.bind(Messages.LaunchConfigurationDelegate_error_failedToGetStepper, type.getIdentifier(), mode)));
+								NLS.bind(Messages.LaunchConfigurationDelegate_error_failedToGetStepper, type.getIdentifier(), mode)));
 			}
 
 			// In case the stepper is already busy with another launch, we need a second instance
@@ -126,7 +131,7 @@ public class LaunchConfigurationDelegate extends AbstractLaunchConfigurationDele
 				} catch (Exception e) {
 					// Failed to clone already initialized stepper -> throw a CoreException
 					throw new CoreException(new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
-													   NLS.bind(Messages.LaunchConfigurationDelegate_error_failedToCloneStepper, type.getIdentifier(), mode)));
+									NLS.bind(Messages.LaunchConfigurationDelegate_error_failedToCloneStepper, type.getIdentifier(), mode)));
 				}
 			}
 
@@ -134,8 +139,22 @@ public class LaunchConfigurationDelegate extends AbstractLaunchConfigurationDele
 			// Get the launch properties container
 			IPropertiesContainer properties = (IPropertiesContainer)launch.getAdapter(IPropertiesContainer.class);
 			Assert.isNotNull(properties);
+
+			// Add some information to the stepper data
+			properties.setProperty(IStepperProperties.PROP_NAME, launchConfig.getName());
+			properties.setProperty(IStepperProperties.PROP_STEP_GROUP_ID,
+							LaunchConfigTypeBindingsManager.getInstance().getStepGroupId(
+											launchConfig.getType().getIdentifier(),
+											launch.getLaunchMode(),
+											properties.getStringProperty(ICommonLaunchAttributes.ATTR_DELEGATE_VARIANT)));
+
+			IModelNode[] contexts = ContextSelectorPersistenceDelegate.decodeLaunchContexts(
+							launchConfig.getAttribute(IContextSelectorLaunchAttributes.ATTR_LAUNCH_CONTEXTS, (String)null));
+			properties.setProperty(IContextSelectorLaunchAttributes.ATTR_ACTIVE_LAUNCH_CONTEXT, contexts != null && contexts.length > 0 ? contexts[0] : null);
+
 			// Initialize the stepper
-			stepper.initialize(properties, fullQualifiedId, monitor != null ? monitor : new NullProgressMonitor());
+			IStepContext context = (IStepContext)launch.getAdapter(IStepContext.class);
+			stepper.initialize(context, properties, fullQualifiedId, monitor != null ? monitor : new NullProgressMonitor());
 
 			// Execute
 			stepper.execute();
@@ -190,12 +209,12 @@ public class LaunchConfigurationDelegate extends AbstractLaunchConfigurationDele
 
 			long endTime = System.currentTimeMillis();
 			CoreBundleActivator.getTraceHandler().trace("LaunchConfigurationDelegate#launch: *** DONE" //$NON-NLS-1$
-														+ " (" + configuration.getName() + ")", //$NON-NLS-1$ //$NON-NLS-2$
-														0, ITraceIds.TRACE_STEPPING, IStatus.WARNING, this);
+							+ " (" + configuration.getName() + ")", //$NON-NLS-1$ //$NON-NLS-2$
+							0, ITraceIds.TRACE_STEPPING, IStatus.WARNING, this);
 			CoreBundleActivator.getTraceHandler().trace(" [" + ISharedConstants.TIME_FORMAT.format(new Date(endTime)) //$NON-NLS-1$
-														+ " , delay = " + (endTime - startTime) + " ms]" //$NON-NLS-1$ //$NON-NLS-2$
-														+ " ***", //$NON-NLS-1$
-														0, ITraceIds.PROFILE_STEPPING, IStatus.WARNING, this);
+							+ " , delay = " + (endTime - startTime) + " ms]" //$NON-NLS-1$ //$NON-NLS-2$
+							+ " ***", //$NON-NLS-1$
+							0, ITraceIds.PROFILE_STEPPING, IStatus.WARNING, this);
 
 		}
 	}
@@ -263,8 +282,8 @@ public class LaunchConfigurationDelegate extends AbstractLaunchConfigurationDele
 				// Not accessible -> means the project does either not exist or
 				// is closed.
 				throw new CoreException(new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
-					NLS.bind(Messages.LaunchConfigurationDelegate_error_inaccessibleReferencedProject, projectName)
-					));
+								NLS.bind(Messages.LaunchConfigurationDelegate_error_inaccessibleReferencedProject, projectName)
+								));
 			}
 
 			// add the project resource to the list
