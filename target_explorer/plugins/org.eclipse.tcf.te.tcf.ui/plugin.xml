@@ -29,7 +29,7 @@
       <viewerContentBinding viewerId="org.eclipse.tcf.te.ui.views.View">
          <includes>
             <contentExtension
-                  isRoot="false"
+                  isRoot="true"
                   pattern="org.eclipse.tcf.te.tcf.ui.navigator.*"/>
          </includes>
       </viewerContentBinding>
