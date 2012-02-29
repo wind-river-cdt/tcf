@@ -651,6 +651,9 @@
             id="org.eclipse.tcf.breakpoint.status"
             name="%breakpoints.statusPage.name">
          <filter name="debugModelId" value="org.eclipse.tcf.debug"/>
+         <enabledWhen>
+            <adapt type="org.eclipse.debug.core.model.IBreakpoint"/>
+         </enabledWhen>
       </page>
    </extension>
 
