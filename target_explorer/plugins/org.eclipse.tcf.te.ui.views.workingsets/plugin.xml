@@ -22,7 +22,6 @@
       <viewerContentBinding viewerId="org.eclipse.tcf.te.ui.views.View">
          <includes>
             <contentExtension
-                  isRoot="true"
                   pattern="org.eclipse.tcf.te.ui.views.navigator.content.workingSets">
             </contentExtension>
             <contentExtension pattern="org.eclipse.tcf.te.ui.views.navigator.filters.workingSet"/>
@@ -70,6 +69,7 @@
                <instanceof value="org.eclipse.tcf.te.ui.views.workingsets.WorkingSetViewStateManager"/>
                <instanceof value="org.eclipse.ui.IWorkingSet"/>
                <instanceof value="org.eclipse.tcf.te.ui.views.workingsets.WorkingSetElementHolder"/>
+               <instanceof value="org.eclipse.tcf.te.ui.views.interfaces.IRoot" />
             </or>
          </triggerPoints>
          <possibleChildren>
