@@ -58,8 +58,6 @@
       <complexType>
          <sequence>
             <element ref="launchManagerDelegate" minOccurs="0" maxOccurs="unbounded"/>
-            <element ref="launchModeVariantDelegate" minOccurs="0" maxOccurs="unbounded"/>
-            <element ref="stepper" minOccurs="0" maxOccurs="unbounded"/>
             <element ref="stepGroup" minOccurs="0" maxOccurs="unbounded"/>
             <element ref="enablement" minOccurs="0" maxOccurs="unbounded"/>
          </sequence>
@@ -110,74 +108,6 @@
       </complexType>
    </element>
 
-   <element name="launchModeVariantDelegate">
-      <annotation>
-         <documentation>
-            A launch mode variant delegate could be bound to a launch configuration type for each available launch mode. If no launch mode is specified, the launch mode variant delegate is used for all launch modes.
-         </documentation>
-      </annotation>
-      <complexType>
-         <attribute name="id" type="string" use="required">
-            <annotation>
-               <documentation>
-                  The unique id of the launch mode variant delegate.
-               </documentation>
-               <appinfo>
-                  <meta.attribute kind="identifier" basedOn="org.eclipse.tcf.te.launch.core.launchModeVariantDelegates/delegate/@id"/>
-               </appinfo>
-            </annotation>
-         </attribute>
-         <attribute name="overwrites" type="string">
-            <annotation>
-               <documentation>
-                  The id of a previousely bound launch mode variant delegate to overwrite with the launchModeVariantDelegateId. A comma separated list can be specified to overwrite multiple launch mode variant delegates.
-               </documentation>
-            </annotation>
-         </attribute>
-         <attribute name="modes" type="string">
-            <annotation>
-               <documentation>
-                  The launch mode to use the launch mode varianat delegate for. If not specified, the launch mode variant delegate is used for all undefined launch modes, for which the launch configuration type can be used.
-               </documentation>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
-
-   <element name="stepper">
-      <annotation>
-         <documentation>
-            A stepper could be bound to a launch configuration type for each available launch mode. If no launch mode is specified, the stepper is used for all launch modes the launch configuration type supports.
-         </documentation>
-      </annotation>
-      <complexType>
-         <attribute name="id" type="string" use="required">
-            <annotation>
-               <documentation>
-                  The id of the stepper to use.
-               </documentation>
-               <appinfo>
-                  <meta.attribute kind="identifier" basedOn="org.eclipse.tcf.te.runtime.stepper.steppers/stepper/@id"/>
-               </appinfo>
-            </annotation>
-         </attribute>
-         <attribute name="overwrites" type="string">
-            <annotation>
-               <documentation>
-                  The id of a previousely bound stepper to overwrite with the id. A comma separated list can be specified to overwrite multiple stepper.
-               </documentation>
-            </annotation>
-         </attribute>
-         <attribute name="modes" type="string">
-            <annotation>
-               <documentation>
-                  The launch mode to use the stepper for. If not specified, the stepper is used for all undefined launch modes, for which the launch configuration type can be used.
-               </documentation>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
-
    <element name="stepGroup">
       <annotation>
          <documentation>
@@ -206,13 +136,6 @@
             <annotation>
                <documentation>
                   The launch mode to use the step group for. If not specified, the step group is used for all undefined launch modes, for which the launch configuration type can be used.
-               </documentation>
-            </annotation>
-         </attribute>
-         <attribute name="variants" type="string">
-            <annotation>
-               <documentation>
-                  The comma separated list of launch mode variants to use the step group for. If not specified, the step group is used for all undefined launch mode variants, for which the launch configuration type can be used.
                </documentation>
             </annotation>
          </attribute>

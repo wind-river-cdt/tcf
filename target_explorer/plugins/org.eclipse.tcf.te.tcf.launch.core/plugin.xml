@@ -43,10 +43,6 @@
    <extension point="org.eclipse.tcf.te.launch.core.launchConfigTypeBindings">
       <launchConfigTypeBinding
             launchConfigTypeId="org.eclipse.tcf.te.tcf.launch.type.linux.app">
-         <stepper
-               id="org.eclipse.tcf.te.runtime.stepper"
-               modes="run,debug">
-         </stepper>
          <launchManagerDelegate
                id="org.eclipse.tcf.te.tcf.launch.type.linux.app.launchManagerDelegate"
                modes="run,debug">

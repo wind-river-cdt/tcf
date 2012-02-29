@@ -5,7 +5,6 @@
 <!-- Extension points -->
    <extension-point id="launchConfigTypeBindings" name="%Extension.LaunchConfigTypeBindings.name" schema="schema/launchConfigTypeBindings.exsd"/>
    <extension-point id="launchManagerDelegates" name="%Extension.LaunchManagerDelegates.name" schema="schema/launchManagerDelegates.exsd"/>
-   <extension-point id="launchModeVariantDelegates" name="%Extension.LaunchModeVariantDelegates.name" schema="schema/launchModeVariantDelegates.exsd"/>
 
 <!-- Adapter factory contributions -->
    <extension point="org.eclipse.core.runtime.adapters">

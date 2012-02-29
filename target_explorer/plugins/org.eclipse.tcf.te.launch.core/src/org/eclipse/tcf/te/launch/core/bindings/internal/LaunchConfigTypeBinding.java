@@ -23,7 +23,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.tcf.te.launch.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.launch.core.bindings.interfaces.ILaunchBinding;
 import org.eclipse.tcf.te.launch.core.bindings.interfaces.IOverwritableLaunchBinding;
-import org.eclipse.tcf.te.launch.core.bindings.interfaces.IVaryableLaunchBinding;
 import org.eclipse.tcf.te.launch.core.selection.interfaces.ILaunchSelection;
 import org.eclipse.tcf.te.launch.core.selection.interfaces.ISelectionContext;
 
@@ -38,7 +37,6 @@ public class LaunchConfigTypeBinding {
 	private final List<ILaunchBinding> lmDelegateBindings = new ArrayList<ILaunchBinding>();
 	private final List<ILaunchBinding> stepperBindings = new ArrayList<ILaunchBinding>();
 	private final List<ILaunchBinding> stepGroupBindings = new ArrayList<ILaunchBinding>();
-	private final List<ILaunchBinding> variantDelegateBindings = new ArrayList<ILaunchBinding>();
 
 	// The list of enablement expressions
 	private final List<Expression> expressions = new ArrayList<Expression>();
@@ -89,31 +87,6 @@ public class LaunchConfigTypeBinding {
 	}
 
 	/**
-	 * Returns the launch mode variant delegate id for the given launch mode.
-	 *
-	 * @param mode The launch mode. Must not be <code>null</code>.
-	 * @return The launch mode variant delegate id or <code>null</code>.
-	 */
-	public String getLaunchModeVariantDelegate(String mode) {
-		Assert.isNotNull(mode);
-
-		ILaunchBinding binding = getBinding(variantDelegateBindings, mode);
-		return binding != null ? binding.getId() : null;
-	}
-
-	/**
-	 * Adds the given launch mode variant delegate binding.
-	 *
-	 * @param binding The binding. Must not be <code>null</code>.
-	 */
-	public void addLaunchModeVariantDelegate(IOverwritableLaunchBinding binding) {
-		Assert.isNotNull(binding);
-		if (!variantDelegateBindings.contains(binding)) {
-			variantDelegateBindings.add(binding);
-		}
-	}
-
-	/**
 	 * Returns the stepper id for the given launch mode.
 	 *
 	 * @param mode The launch mode. Must not be <code>null</code>.
@@ -139,15 +112,14 @@ public class LaunchConfigTypeBinding {
 	}
 
 	/**
-	 * Returns the step group id for the given launch mode and variant.
+	 * Returns the step group id for the given launch mode.
 	 *
 	 * @param mode The launch mode. Must not be <code>null</code>.
-	 * @param variant The launch mode variant or <code>null</code>.
 	 *
 	 * @return The step group id or <code>null</code>.
 	 */
-	public String getStepGroupId(String mode, String variant) {
-		ILaunchBinding binding = getBinding(stepGroupBindings, mode, variant);
+	public String getStepGroupId(String mode) {
+		ILaunchBinding binding = getBinding(stepGroupBindings, mode);
 		return binding != null ? binding.getId() : null;
 	}
 
@@ -251,22 +223,16 @@ public class LaunchConfigTypeBinding {
 	 *
 	 * @param bindings The list of available bindings. Must not be <code>null</code>.
 	 * @param mode The launch mode. Must not be <code>null</code>.
-	 * @param variant The launch mode variant or <code>null</code>.
 	 *
 	 * @return The list of valid bindings for the given launch mode or an empty list.
 	 */
-	private List<ILaunchBinding> getBindings(List<ILaunchBinding> bindings, String mode, String variant) {
+	private List<ILaunchBinding> getBindings(List<ILaunchBinding> bindings, String mode) {
 		Assert.isNotNull(bindings);
 		Assert.isNotNull(mode);
 
 		List<ILaunchBinding> candidates = new ArrayList<ILaunchBinding>();
 		for (ILaunchBinding binding : bindings) {
-			if (binding instanceof IVaryableLaunchBinding) {
-				if (((IVaryableLaunchBinding) binding).isValidLaunchMode(mode, variant)) {
-					candidates.add(binding);
-				}
-			}
-			else if (binding.isValidLaunchMode(mode)) {
+			if (binding.isValidLaunchMode(mode)) {
 				candidates.add(binding);
 			}
 		}
@@ -283,25 +249,12 @@ public class LaunchConfigTypeBinding {
 	 * @return The resolved binding or <code>null</code>.
 	 */
 	private ILaunchBinding getBinding(List<ILaunchBinding> bindings, String mode) {
-		return getBinding(bindings, mode, null);
-	}
-
-	/**
-	 * Returns the resolved binding in case of overwritable bindings.
-	 *
-	 * @param bindings The list of available bindings. Must not be <code>null</code>.
-	 * @param mode The launch mode. Must not be <code>null</code>.
-	 * @param variant The launch mode variant or <code>null</code>.
-	 *
-	 * @return The resolved binding or <code>null</code>.
-	 */
-	private ILaunchBinding getBinding(List<ILaunchBinding> bindings, String mode, String variant) {
 		Assert.isNotNull(bindings);
 		Assert.isNotNull(mode);
 
 		ILaunchBinding binding = null;
 
-		List<ILaunchBinding> candidates = getBindings(bindings, mode, variant);
+		List<ILaunchBinding> candidates = getBindings(bindings, mode);
 		for (int i = 0; i < candidates.size(); i++) {
 			if (binding == null) {
 				binding = candidates.get(i);

@@ -116,18 +116,6 @@ public interface ILaunchManagerDelegate extends IExecutableExtension {
 	public ILaunchSpecification getLaunchSpecification(String launchConfigTypeId, ILaunchSelection launchSelection);
 
 	/**
-	 * Get a launch spec with all needed attributes for this delegate and variant taken from the selection to find or create a new
-	 * launch configuration.
-	 *
-	 * @param launchConfigTypeId The launch configuration type id.
-	 * @param launchSelection The selected contexts.
-	 * @param variant The delegate variant.
-	 * @return Launch spec with attributes set from selected contexts.
-	 * @throws LaunchServiceException
-	 */
-	public ILaunchSpecification getLaunchSpecification(String launchConfigTypeId, ILaunchSelection launchSelection, String variant);
-
-	/**
 	 * Validates a launch specification.
 	 *
 	 * @param launchSpec The launch specification to validate.
@@ -170,13 +158,6 @@ public interface ILaunchManagerDelegate extends IExecutableExtension {
 	 * Returns the error message when not valid, otherwise <code>null</code>.
 	 */
 	public String getErrorMessage();
-
-	/**
-	 * Return the list of variants or null.
-	 *
-	 * @param launchSelection The launch selection or <code>null</code>.
-	 */
-	public String[] getVariants(ILaunchSelection launchSelection);
 
 	/**
 	 * Return <code>true</code> if the two selection contexts are equal

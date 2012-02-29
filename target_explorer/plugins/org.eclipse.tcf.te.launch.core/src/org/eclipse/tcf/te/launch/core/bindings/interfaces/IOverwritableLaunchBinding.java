@@ -12,7 +12,7 @@ package org.eclipse.tcf.te.launch.core.bindings.interfaces;
 /**
  * Interface to be implemented by a overwritable launch configuration type binding element.
  */
-public interface IOverwritableLaunchBinding extends IVaryableLaunchBinding {
+public interface IOverwritableLaunchBinding extends ILaunchBinding {
 
 	/**
 	 * Returns if or if not this binding overwrites the given bindings id.

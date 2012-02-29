@@ -26,7 +26,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.IStatusHandler;
 import org.eclipse.debug.core.model.IBreakpoint;
@@ -40,7 +39,6 @@ import org.eclipse.tcf.te.launch.core.nls.Messages;
 import org.eclipse.tcf.te.launch.core.persistence.ContextSelectorPersistenceDelegate;
 import org.eclipse.tcf.te.launch.core.persistence.DefaultPersistenceDelegate;
 import org.eclipse.tcf.te.runtime.concurrent.util.ExecutorsUtil;
-import org.eclipse.tcf.te.runtime.extensions.ExecutableExtension;
 import org.eclipse.tcf.te.runtime.interfaces.ISharedConstants;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
@@ -50,6 +48,7 @@ import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepperProperties;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.tracing.ITraceIds;
+import org.eclipse.tcf.te.runtime.stepper.stepper.Stepper;
 
 /**
  * Default launch configuration delegate implementation.
@@ -100,41 +99,11 @@ public class LaunchConfigurationDelegate extends AbstractLaunchConfigurationDele
 		launch.setAttribute(ICommonLaunchAttributes.ILAUNCH_ATTRIBUTE_LAUNCH_SEQUENCE_COMPLETED, Boolean.FALSE.toString());
 
 		// The stepper instance to be used
-		IStepper stepper = null;
+		IStepper stepper = new Stepper();
 		IStatus status = null;
 
 		try {
-			// Get the launch configuration type from the launch configuration.
-			// This may throw an CoreException if the launch configuration type
-			// cannot be retrieved or instantiated.
-			ILaunchConfigurationType type = configuration.getType();
-
 			// Get the associated stepper for this launch
-			stepper = LaunchConfigTypeBindingsManager.getInstance().getStepper(type.getIdentifier(), mode);
-			if (stepper == null) {
-				// Failed to retrieve stepper for this launch -> throw a CoreException
-				throw new CoreException(new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
-								NLS.bind(Messages.LaunchConfigurationDelegate_error_failedToGetStepper, type.getIdentifier(), mode)));
-			}
-
-			// In case the stepper is already busy with another launch, we need a second instance
-			if (stepper.isInitialized()) {
-				try {
-					// Create a new stepper instance
-					IStepper candidate = stepper.getClass().newInstance();
-					// Note: If the stepper is an instance of ExecutableExtension, the candidate has to be too.
-					if (stepper instanceof ExecutableExtension) {
-						((ExecutableExtension)stepper).cloneInitializationData((ExecutableExtension)candidate);
-					}
-					// Force to use the newly created instance
-					stepper = candidate;
-				} catch (Exception e) {
-					// Failed to clone already initialized stepper -> throw a CoreException
-					throw new CoreException(new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
-									NLS.bind(Messages.LaunchConfigurationDelegate_error_failedToCloneStepper, type.getIdentifier(), mode)));
-				}
-			}
-
 			IFullQualifiedId fullQualifiedId = new FullQualifiedId(IStepper.ID_TYPE_STEPPER_ID, stepper.getId(), null);
 			// Get the launch properties container
 			IPropertiesContainer properties = (IPropertiesContainer)launch.getAdapter(IPropertiesContainer.class);
@@ -145,8 +114,7 @@ public class LaunchConfigurationDelegate extends AbstractLaunchConfigurationDele
 			properties.setProperty(IStepperProperties.PROP_STEP_GROUP_ID,
 							LaunchConfigTypeBindingsManager.getInstance().getStepGroupId(
 											launchConfig.getType().getIdentifier(),
-											launch.getLaunchMode(),
-											properties.getStringProperty(ICommonLaunchAttributes.ATTR_DELEGATE_VARIANT)));
+											launch.getLaunchMode()));
 
 			IModelNode[] contexts = ContextSelectorPersistenceDelegate.decodeLaunchContexts(
 							launchConfig.getAttribute(IContextSelectorLaunchAttributes.ATTR_LAUNCH_CONTEXTS, (String)null));
@@ -200,9 +168,7 @@ public class LaunchConfigurationDelegate extends AbstractLaunchConfigurationDele
 			}
 
 			// Cleanup the stepper
-			if (stepper != null) {
-				stepper.cleanup();
-			}
+			stepper.cleanup();
 
 			// Set the launch completed here. Doesn't matter if the launch might completed with error or not.
 			launch.setAttribute(ICommonLaunchAttributes.ILAUNCH_ATTRIBUTE_LAUNCH_SEQUENCE_COMPLETED, Boolean.TRUE.toString());

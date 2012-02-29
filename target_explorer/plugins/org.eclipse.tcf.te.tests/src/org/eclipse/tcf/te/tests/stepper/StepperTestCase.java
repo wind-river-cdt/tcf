@@ -21,7 +21,6 @@ import org.eclipse.tcf.te.runtime.stepper.interfaces.IStep;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroup;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroupable;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper;
 import org.eclipse.tcf.te.tests.CoreTestCase;
 
 /**
@@ -78,21 +77,6 @@ public class StepperTestCase extends CoreTestCase {
 	 */
 	public void testStepperContributions() {
 		assertNotNull("Unexpected return value 'null'.", StepperManager.getInstance()); //$NON-NLS-1$
-		assertNotNull("Unexpected return value 'null'.", StepperManager.getInstance().getStepperExtManager()); //$NON-NLS-1$
-
-		// Lookup the default single-context stepper contributions
-		boolean singleContext = false;
-
-		IStepper[] steppers = StepperManager.getInstance().getStepperExtManager().getStepper(false);
-		for (IStepper stepper : steppers) {
-			if (stepper.getId().equals("org.eclipse.tcf.te.runtime.stepper")) { //$NON-NLS-1$
-				singleContext = true;
-			}
-			if (singleContext) {
-				break;
-			}
-		}
-		assertTrue("Default single context stepper contribution not found.", singleContext); //$NON-NLS-1$
 	}
 
 	/**

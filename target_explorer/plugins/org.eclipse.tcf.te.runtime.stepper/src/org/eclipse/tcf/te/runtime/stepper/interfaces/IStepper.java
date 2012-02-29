@@ -13,7 +13,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.tcf.te.runtime.interfaces.IConditionTester;
-import org.eclipse.tcf.te.runtime.interfaces.extensions.IExecutableExtension;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 
 
@@ -27,7 +26,7 @@ import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
  * <p>
  * Stepper must run in worker threads.
  */
-public interface IStepper extends IExecutableExtension {
+public interface IStepper {
 
 	public static final String ID_TYPE_STEPPER_ID = "Stepper"; //$NON-NLS-1$
 	public static final String ID_TYPE_CONTEXT_ID = "Context"; //$NON-NLS-1$
@@ -66,6 +65,28 @@ public interface IStepper extends IExecutableExtension {
 			return stepper.isFinished();
 		}
 	}
+
+	/**
+	 * Returns the unique id of the extension. The returned
+	 * id must be never <code>null</code> or an empty string.
+	 *
+	 * @return The unique id.
+	 */
+	public String getId();
+
+	/**
+	 * Returns the label or UI name of the extension.
+	 *
+	 * @return The label or UI name. An empty string if not set.
+	 */
+	public String getLabel();
+
+	/**
+	 * Returns the description of the extension.
+	 *
+	 * @return The description or an empty string.
+	 */
+	public String getDescription();
 
 	/**
 	 * Initialize the stepper for a run. This method must be called before <i><code>execute()</code>

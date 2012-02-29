@@ -29,7 +29,6 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.tcf.te.launch.core.bindings.internal.LaunchConfigTypeBinding;
 import org.eclipse.tcf.te.launch.core.bindings.internal.OverwritableLaunchBinding;
-import org.eclipse.tcf.te.launch.core.extensions.internal.LaunchModeVariantDelegateExtensionPointManager;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchManagerDelegate;
 import org.eclipse.tcf.te.launch.core.lm.internal.ExtensionPointManager;
 import org.eclipse.tcf.te.launch.core.selection.interfaces.ILaunchSelection;
@@ -38,8 +37,6 @@ import org.eclipse.tcf.te.runtime.extensions.ExtensionPointComparator;
 import org.eclipse.tcf.te.runtime.stepper.StepperManager;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStep;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroup;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IVariantDelegate;
 
 
 /**
@@ -148,71 +145,21 @@ public class LaunchConfigTypeBindingsManager {
 	}
 
 	/**
-	 * Get the registered launch mode variant delegate for the given launch configuration type and launch mode.
+	 * Get the registered step group id for the given launch configuration type and launch mode.
 	 *
 	 * @param typeId The launch configuration type id. Must not be <code>null</code>.
 	 * @param mode The launch mode. Must not be <code>null</code>.
-	 *
-	 * @return The launch mode variant delegate, or a <code>null</code> if no delegate is registered for the
-	 *         given launch configuration type id and launch mode.
-	 */
-	public IVariantDelegate getLaunchModeVariantDelegate(String typeId, String mode) {
-		Assert.isNotNull(typeId);
-		Assert.isNotNull(mode);
-
-		LaunchConfigTypeBinding binding = bindings.get(typeId);
-		if (binding != null) {
-			String id = binding.getLaunchModeVariantDelegate(mode);
-			if (id != null) {
-				return LaunchModeVariantDelegateExtensionPointManager.getInstance().getLaunchModeVariantDelegate(id);
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Get the registered stepper for the given launch configuration type id and launch mode.
-	 *
-	 * @param typeId The launch configuration type id. Must not be <code>null</code>.
-	 * @param mode The launch mode. Must not be <code>null</code>.
-
-	 * @return The stepper or <code>null</code> if no stepper is registered for the
-	 *         given launch configuration type id and launch mode.
-	 */
-	public IStepper getStepper(String typeId, String mode) {
-		Assert.isNotNull(typeId);
-		Assert.isNotNull(mode);
-
-		IStepper stepper = null;
-
-		LaunchConfigTypeBinding binding = bindings.get(typeId);
-		if (binding != null) {
-			String id = binding.getStepper(mode);
-			if (id != null) {
-				stepper = StepperManager.getInstance().getStepperExtManager().getStepper(id, false);
-			}
-		}
-
-		return stepper;
-	}
-
-	/**
-	 * Get the registered step group id for the given launch configuration type, launch mode and variant.
-	 *
-	 * @param typeId The launch configuration type id. Must not be <code>null</code>.
-	 * @param mode The launch mode. Must not be <code>null</code>.
-	 * @param variant The launch mode variant or <code>null</code>.
 	 *
 	 * @return The launch step group id or <code>null</code> if no step group is registered for the
-	 *         given launch configuration type id, launch mode and variant.
+	 *         given launch configuration type id and launch mode.
 	 */
-	public String getStepGroupId(String typeId, String mode, String variant) {
+	public String getStepGroupId(String typeId, String mode) {
 		Assert.isNotNull(typeId);
 		Assert.isNotNull(mode);
 
 		LaunchConfigTypeBinding binding = bindings.get(typeId);
 		if (binding != null) {
-			return binding.getStepGroupId(mode, variant);
+			return binding.getStepGroupId(mode);
 		}
 		return null;
 	}
@@ -284,15 +231,6 @@ public class LaunchConfigTypeBindingsManager {
 			binding.addLaunchManagerDelegate(new OverwritableLaunchBinding(id, overwrites, modes));
 		}
 
-		IConfigurationElement[] launchModeVariantDelegateBindings = element.getChildren("launchModeVariantDelegate"); //$NON-NLS-1$
-		for (IConfigurationElement launchModeVariantDelegateBinding : launchModeVariantDelegateBindings) {
-			String id = launchModeVariantDelegateBinding.getAttribute("id"); //$NON-NLS-1$
-			String overwrites = launchModeVariantDelegateBinding.getAttribute("overwrites"); //$NON-NLS-1$
-			String modes = launchModeVariantDelegateBinding.getAttribute("modes"); //$NON-NLS-1$
-
-			binding.addLaunchModeVariantDelegate(new OverwritableLaunchBinding(id, overwrites, modes));
-		}
-
 		IConfigurationElement[] stepperBindings = element.getChildren("stepper"); //$NON-NLS-1$
 		for (IConfigurationElement stepperBinding : stepperBindings) {
 			String id = stepperBinding.getAttribute("id"); //$NON-NLS-1$
@@ -307,9 +245,8 @@ public class LaunchConfigTypeBindingsManager {
 			String id = stepGroupBinding.getAttribute("id"); //$NON-NLS-1$
 			String overwrites = stepGroupBinding.getAttribute("overwrites"); //$NON-NLS-1$
 			String modes = stepGroupBinding.getAttribute("modes"); //$NON-NLS-1$
-			String variants = stepGroupBinding.getAttribute("variants"); //$NON-NLS-1$
 
-			binding.addStepGroup(new OverwritableLaunchBinding(id, overwrites, modes, variants));
+			binding.addStepGroup(new OverwritableLaunchBinding(id, overwrites, modes));
 		}
 
 		IConfigurationElement[] enablements = element.getChildren("enablement"); //$NON-NLS-1$

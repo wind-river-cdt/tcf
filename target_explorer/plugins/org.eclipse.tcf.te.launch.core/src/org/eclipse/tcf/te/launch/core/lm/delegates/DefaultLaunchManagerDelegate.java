@@ -98,7 +98,7 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 			List<LaunchConfigSorter> rankedList = new ArrayList<LaunchConfigSorter>();
 			for (ILaunchConfiguration launchConfig : launchConfigs) {
 				if (CoreBundleActivator.getTraceHandler()
-				                .isSlotEnabled(0, ITraceIds.TRACE_LAUNCHCONFIGURATIONMATCHING)) {
+								.isSlotEnabled(0, ITraceIds.TRACE_LAUNCHCONFIGURATIONMATCHING)) {
 					System.out.println("\n***\n"); //$NON-NLS-1$
 				}
 
@@ -119,7 +119,7 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 				int fullMatchRanking = getFullMatchRanking();
 
 				if (CoreBundleActivator.getTraceHandler()
-				                .isSlotEnabled(0, ITraceIds.TRACE_LAUNCHCONFIGURATIONMATCHING)) {
+								.isSlotEnabled(0, ITraceIds.TRACE_LAUNCHCONFIGURATIONMATCHING)) {
 					StringBuilder message = new StringBuilder("Ranking launch spec ("); //$NON-NLS-1$
 					message.append(launchSpec.getLaunchConfigName());
 					message.append(") vs launch configuration ("); //$NON-NLS-1$
@@ -130,8 +130,8 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 					message.append(fullMatchRanking);
 
 					CoreBundleActivator
-					                .getTraceHandler()
-					                .trace(message.toString(), 0, ITraceIds.TRACE_LAUNCHCONFIGURATIONMATCHING, IStatus.INFO, this);
+					.getTraceHandler()
+					.trace(message.toString(), 0, ITraceIds.TRACE_LAUNCHCONFIGURATIONMATCHING, IStatus.INFO, this);
 				}
 
 				if (ranking >= fullMatchRanking) {
@@ -158,19 +158,10 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 	 */
 	@Override
 	public final ILaunchSpecification getLaunchSpecification(String launchConfigTypeId, ILaunchSelection launchSelection) {
-		return getLaunchSpecification(launchConfigTypeId, launchSelection, null);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchManagerDelegate#getLaunchSpecification(java.lang.String, org.eclipse.tcf.te.launch.core.selection.interfaces.ILaunchSelection, java.lang.String)
-	 */
-	@Override
-	public final ILaunchSpecification getLaunchSpecification(String launchConfigTypeId, ILaunchSelection launchSelection, String variant) {
 		ILaunchSpecification spec = null;
 
 		if (isValidLaunchSelection(launchSelection)) {
 			spec = new LaunchSpecification(launchConfigTypeId, launchSelection.getLaunchMode());
-			spec.addAttribute(ICommonLaunchAttributes.ATTR_DELEGATE_VARIANT, variant, true);
 
 			for (ISelectionContext selectionContext : launchSelection.getSelectedContexts()) {
 				// For launch specifications, all selection contexts needs to be set as preferred
@@ -179,8 +170,8 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 				// launch configuration type id.
 				selectionContext.setIsPreferredContext(true);
 				if (LaunchConfigTypeBindingsManager
-				                .getInstance()
-				                .isValidLaunchConfigType(launchConfigTypeId, launchSelection.getLaunchMode(), selectionContext)) {
+								.getInstance()
+								.isValidLaunchConfigType(launchConfigTypeId, launchSelection.getLaunchMode(), selectionContext)) {
 					spec = addLaunchSpecAttributes(spec, launchConfigTypeId, selectionContext);
 				}
 			}
@@ -258,15 +249,15 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 
 		// Read the launch configuration matching mode from the preferences
 		int mode = CoreBundleActivator.getScopedPreferences()
-		                .getInt(IPreferenceKeys.PREF_LAUNCH_CONFIG_FIND_CREATE_MODE);
+						.getInt(IPreferenceKeys.PREF_LAUNCH_CONFIG_FIND_CREATE_MODE);
 		if (launchSpec.getAttribute(IPreferenceKeys.PREF_LAUNCH_CONFIG_FIND_CREATE_MODE, null) instanceof Integer) {
 			mode = ((Integer) launchSpec
-			                .getAttribute(IPreferenceKeys.PREF_LAUNCH_CONFIG_FIND_CREATE_MODE, null))
-			                .intValue();
+							.getAttribute(IPreferenceKeys.PREF_LAUNCH_CONFIG_FIND_CREATE_MODE, null))
+							.intValue();
 		}
 
 		if (CoreBundleActivator.getTraceHandler()
-		                .isSlotEnabled(0, ITraceIds.TRACE_LAUNCHCONFIGURATIONMATCHING)) {
+						.isSlotEnabled(0, ITraceIds.TRACE_LAUNCHCONFIGURATIONMATCHING)) {
 			StringBuilder message = new StringBuilder("Ranking launch spec ("); //$NON-NLS-1$
 			message.append(launchSpec.getLaunchConfigName());
 			message.append(") vs launch configuration ("); //$NON-NLS-1$
@@ -286,8 +277,8 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 			}
 
 			CoreBundleActivator
-			                .getTraceHandler()
-			                .trace(message.toString(), 0, ITraceIds.TRACE_LAUNCHCONFIGURATIONMATCHING, IStatus.INFO, this);
+			.getTraceHandler()
+			.trace(message.toString(), 0, ITraceIds.TRACE_LAUNCHCONFIGURATIONMATCHING, IStatus.INFO, this);
 		}
 
 		for (ILaunchAttribute specAttribute : launchSpec.getAllAttributes()) {
@@ -298,7 +289,7 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 				int match = compareAttributeValues(key, specValue, configValue, launchSpec, launchConfig);
 
 				if (CoreBundleActivator.getTraceHandler()
-				                .isSlotEnabled(0, ITraceIds.TRACE_LAUNCHCONFIGURATIONMATCHING)) {
+								.isSlotEnabled(0, ITraceIds.TRACE_LAUNCHCONFIGURATIONMATCHING)) {
 					StringBuilder message = new StringBuilder("Launch spec attribute '"); //$NON-NLS-1$
 					message.append(specAttribute.getKey());
 					message.append("': mandatory = "); //$NON-NLS-1$
@@ -321,8 +312,8 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 					}
 
 					CoreBundleActivator
-					                .getTraceHandler()
-					                .trace(message.toString(), 0, ITraceIds.TRACE_LAUNCHCONFIGURATIONMATCHING, IStatus.INFO, this);
+					.getTraceHandler()
+					.trace(message.toString(), 0, ITraceIds.TRACE_LAUNCHCONFIGURATIONMATCHING, IStatus.INFO, this);
 				}
 
 				if (match == PARTIAL_MATCH && mode == IPreferenceKeys.MODE_FULL_MATCH_LAUNCH_CONFIG) {
@@ -345,20 +336,20 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 			}
 			else {
 				if (CoreBundleActivator.getTraceHandler()
-				                .isSlotEnabled(0, ITraceIds.TRACE_LAUNCHCONFIGURATIONMATCHING)) {
+								.isSlotEnabled(0, ITraceIds.TRACE_LAUNCHCONFIGURATIONMATCHING)) {
 					StringBuilder message = new StringBuilder("Skipped launch spec attribute '"); //$NON-NLS-1$
 					message.append(specAttribute.getKey());
 					message.append("': is create only attribute"); //$NON-NLS-1$
 
 					CoreBundleActivator
-					                .getTraceHandler()
-					                .trace(message.toString(), 0, ITraceIds.TRACE_LAUNCHCONFIGURATIONMATCHING, IStatus.INFO, this);
+					.getTraceHandler()
+					.trace(message.toString(), 0, ITraceIds.TRACE_LAUNCHCONFIGURATIONMATCHING, IStatus.INFO, this);
 				}
 			}
 		}
 		if (mandatorys < getNumMandatoryAttributes()) {
 			throw new LaunchServiceException("missing mandatory attribute in ILaunchSpecification", //$NON-NLS-1$
-			LaunchServiceException.TYPE_MISSING_LAUNCH_SPEC_ATTR);
+							LaunchServiceException.TYPE_MISSING_LAUNCH_SPEC_ATTR);
 		}
 
 		Iterator<?> configIt = configKeys.iterator();
@@ -706,14 +697,6 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 	@Override
 	public String getErrorMessage() {
 		return errorMessage;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchManagerDelegate#getVariants(org.eclipse.tcf.te.launch.core.selection.interfaces.ILaunchSelection)
-	 */
-	@Override
-	public String[] getVariants(ILaunchSelection launchSelection) {
-		return null;
 	}
 
 	/* (non-Javadoc)

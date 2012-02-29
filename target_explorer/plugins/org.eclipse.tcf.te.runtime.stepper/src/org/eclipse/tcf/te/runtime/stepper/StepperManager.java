@@ -11,7 +11,6 @@ package org.eclipse.tcf.te.runtime.stepper;
 
 import org.eclipse.tcf.te.runtime.stepper.extensions.manager.StepExtensionPointManager;
 import org.eclipse.tcf.te.runtime.stepper.extensions.manager.StepGroupExtensionPointManager;
-import org.eclipse.tcf.te.runtime.stepper.extensions.manager.StepperExtensionPointManager;
 
 /**
  * Central manager providing access to the stepper, steps and step groups
@@ -20,7 +19,6 @@ import org.eclipse.tcf.te.runtime.stepper.extensions.manager.StepperExtensionPoi
 public final class StepperManager {
 	// References to the extension point managers
 	private final StepExtensionPointManager stepExtManager = new StepExtensionPointManager();
-	private final StepperExtensionPointManager stepperExtManager = new StepperExtensionPointManager();
 	private final StepGroupExtensionPointManager stepGroupExtManager = new StepGroupExtensionPointManager();
 
 	/*
@@ -51,15 +49,6 @@ public final class StepperManager {
 	 */
 	public StepExtensionPointManager getStepExtManager() {
 		return stepExtManager;
-	}
-
-	/**
-	 * Returns the stepper extension point manager instance.
-	 *
-	 * @return The stepper extension point manager instance.
-	 */
-	public StepperExtensionPointManager getStepperExtManager() {
-		return stepperExtManager;
 	}
 
 	/**

@@ -35,11 +35,6 @@ public interface ICommonLaunchAttributes {
 	public static final String ATTR_LAST_LAUNCHED = ATTR_PREFIX + ".lastLaunched";     //$NON-NLS-1$
 
 	/**
-	 * Launch mode variant id.
-	 */
-	public static final String ATTR_DELEGATE_VARIANT = ATTR_PREFIX + ".delegateVariant"; //$NON-NLS-1$
-
-	/**
 	 * Attribute used exclusively with <code>ILaunch.setAttribute</code> to mark when
 	 * then launch sequence finished. The attribute does not tell if an error occurred
 	 * during the launch!

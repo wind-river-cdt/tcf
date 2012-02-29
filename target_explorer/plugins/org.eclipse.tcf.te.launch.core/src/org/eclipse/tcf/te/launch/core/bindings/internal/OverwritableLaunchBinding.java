@@ -15,7 +15,7 @@ import org.eclipse.tcf.te.launch.core.bindings.interfaces.IOverwritableLaunchBin
 /**
  * Overwritable launch configuration type binding element implementation.
  */
-public class OverwritableLaunchBinding extends VaryableLaunchBinding implements IOverwritableLaunchBinding {
+public class OverwritableLaunchBinding extends LaunchBinding implements IOverwritableLaunchBinding {
 
 	private String[] overwrites;
 
@@ -27,22 +27,14 @@ public class OverwritableLaunchBinding extends VaryableLaunchBinding implements 
 	 * @param modes The launch modes or <code>null</code>
 	 */
 	public OverwritableLaunchBinding(String id, String overwrites, String modes) {
-		this(id, overwrites, modes, null);
-	}
+		super(id, modes);
 
-	/**
-	 * Constructor.
-	 *
-	 * @param id The launch binding id. Must not be <code>null</code>.
-	 * @param overwrites The overwritten launch binding id's or <code>null</code>.
-	 * @param modes The launch modes or <code>null</code>
-	 * @param variants The launch mode variants or <code>null</code>.
-	 */
-	public OverwritableLaunchBinding(String id, String overwrites, String modes, String variants) {
-		super(id, modes, variants);
-
-		if (overwrites != null) this.overwrites = overwrites.trim().split("( )*,( )*"); //$NON-NLS-1$
-		else this.overwrites = new String[0];
+		if (overwrites != null) {
+			this.overwrites = overwrites.trim().split("( )*,( )*"); //$NON-NLS-1$
+		}
+		else {
+			this.overwrites = new String[0];
+		}
 	}
 
 	/* (non-Javadoc)
@@ -51,8 +43,8 @@ public class OverwritableLaunchBinding extends VaryableLaunchBinding implements 
 	@Override
 	public boolean overwrites(String id) {
 		Assert.isNotNull(id);
-		for (int i = 0; i < overwrites.length; i++) {
-			if (id.equals(overwrites[i])) {
+		for (String overwrite : overwrites) {
+			if (id.equals(overwrite)) {
 				return true;
 			}
 		}
@@ -70,10 +62,6 @@ public class OverwritableLaunchBinding extends VaryableLaunchBinding implements 
 		toString.append(getId());
 		toString.append(", launchModes"); //$NON-NLS-1$
 		toString.append(toString(getModes()));
-		if (getVariants().length > 0) {
-			toString.append(", launchModeVariants"); //$NON-NLS-1$
-			toString.append(toString(getVariants()));
-		}
 		toString.append(", overwrites"); //$NON-NLS-1$
 		toString.append(toString(overwrites));
 		toString.append(")"); //$NON-NLS-1$
