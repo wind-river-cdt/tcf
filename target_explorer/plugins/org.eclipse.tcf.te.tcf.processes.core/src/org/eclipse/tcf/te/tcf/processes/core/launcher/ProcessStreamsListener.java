@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IProcesses;
@@ -42,8 +43,10 @@ import org.eclipse.tcf.util.TCFTask;
  * Remote process streams listener implementation.
  */
 public class ProcessStreamsListener implements IStreams.StreamsListener, IProcessContextAwareListener {
-	// The parent process launcher instance
-	private final ProcessLauncher parent;
+	// The channel instance
+	/* default */ IChannel channel;
+	// The streams service instance
+	/* default */ IStreams svcStreams;
 	// The remote process context
 	private IProcesses.ProcessContext context;
 	// The list of registered stream data receivers
@@ -230,8 +233,6 @@ public class ProcessStreamsListener implements IStreams.StreamsListener, IProces
 
 			// Store the callback instance
 			this.callback = callback;
-			// Mark the runnable as stopped
-			stopped = true;
 		}
 
 		/**
@@ -275,8 +276,6 @@ public class ProcessStreamsListener implements IStreams.StreamsListener, IProces
         public void run() {
 			// Create a snapshot of the receivers
 			final StreamsDataReceiver[] receivers = this.receivers.toArray(new StreamsDataReceiver[this.receivers.size()]);
-			// Get the service instance from the parent
-			final IStreams svcStreams = getParent().getSvcStreams();
 
 			// Run until stopped and the streams service is available
 			while (!isStopped() && svcStreams != null) {
@@ -329,6 +328,12 @@ public class ProcessStreamsListener implements IStreams.StreamsListener, IProces
 				// Mark the runnable definitely stopped
 				stopped = true;
 			}
+			// Make sure that data receivers are disposed before leaving the thread.
+			// This will closes the PipedOutputStream wrapped by the writer in the data receivers,
+			// thus the PipedInputStream read an EOS and terminate gracefully.
+			for(StreamsDataReceiver receiver:receivers) {
+				receiver.dispose();
+			}
 		}
 
 		/**
@@ -348,7 +353,7 @@ public class ProcessStreamsListener implements IStreams.StreamsListener, IProces
 			Assert.isTrue(!Protocol.isDispatchThread());
 
 			// Create the task object
-			TCFTask<ReadData> task = new TCFTask<ReadData>(getParent().getChannel()) {
+			TCFTask<ReadData> task = new TCFTask<ReadData>(channel) {
 				@Override
                 public void run() {
 					service.read(streamId, size, new IStreams.DoneRead() {
@@ -516,9 +521,6 @@ public class ProcessStreamsListener implements IStreams.StreamsListener, IProces
 				return;
 			}
 
-			// Get the service instance from the parent
-			final IStreams svcStreams = getParent().getSvcStreams();
-
 			// Create the data buffer instance
 			final char[] buffer = new char[1024];
 
@@ -619,16 +621,8 @@ public class ProcessStreamsListener implements IStreams.StreamsListener, IProces
 	 */
 	public ProcessStreamsListener(ProcessLauncher parent) {
 		Assert.isNotNull(parent);
-		this.parent = parent;
-	}
-
-	/**
-	 * Returns the parent process launcher instance.
-	 *
-	 * @return The parent process launcher instance.
-	 */
-	protected final ProcessLauncher getParent() {
-		return parent;
+		this.channel = parent.getChannel();
+		this.svcStreams = parent.getSvcStreams();
 	}
 
 	/**
@@ -655,8 +649,6 @@ public class ProcessStreamsListener implements IStreams.StreamsListener, IProces
 			@Override
 			protected void internalDone(final Object caller, final IStatus status) {
 				Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
-				// Get the service instance from the parent
-				IStreams svcStreams = getParent().getSvcStreams();
 				// Unsubscribe the streams listener from the service
 				svcStreams.unsubscribe(IProcesses.NAME, finStreamsListener, new IStreams.DoneUnsubscribe() {
 					@Override
