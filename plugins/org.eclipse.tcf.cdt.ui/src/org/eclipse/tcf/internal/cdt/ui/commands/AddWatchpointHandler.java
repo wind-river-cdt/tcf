@@ -14,7 +14,7 @@ package org.eclipse.tcf.internal.cdt.ui.commands;
 import java.math.BigInteger;
 
 import org.eclipse.cdt.debug.core.CDIDebugModel;
-import org.eclipse.cdt.debug.internal.ui.actions.AddWatchpointDialog;
+import org.eclipse.cdt.debug.internal.ui.actions.breakpoints.AddWatchpointDialog;
 import org.eclipse.cdt.debug.ui.CDebugUIPlugin;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -35,6 +35,8 @@ public class AddWatchpointHandler extends AbstractHandler {
         if (selection instanceof ITextSelection) {
                 expr = ((ITextSelection) selection).getText();
         }
+        
+        
         AddWatchpointDialog dlg = new AddWatchpointDialog(HandlerUtil.getActiveShell(event), null);
         dlg.setExpression(expr);
         if (dlg.open() == Window.OK) {
