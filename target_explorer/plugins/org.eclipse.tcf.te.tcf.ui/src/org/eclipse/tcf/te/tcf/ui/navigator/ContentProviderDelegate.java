@@ -27,6 +27,7 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerRedirector;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelLookupService;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelRefreshService;
 import org.eclipse.tcf.te.tcf.locator.model.Model;
+import org.eclipse.tcf.te.tcf.ui.internal.categories.CategoryManager;
 import org.eclipse.tcf.te.tcf.ui.navigator.nodes.PeerRedirectorGroupNode;
 import org.eclipse.tcf.te.ui.swt.DisplayUtil;
 import org.eclipse.tcf.te.ui.views.extensions.CategoriesExtensionPointManager;
@@ -83,8 +84,7 @@ public class ContentProviderDelegate implements ICommonContentProvider {
 				public void run() {
 					if (IUIConstants.ID_CAT_FAVORITES.equals(catID)) {
 						for (IPeerModel peer : peers) {
-							String value = peer.getPeer().getAttributes().get("favorite"); //$NON-NLS-1$
-							boolean isFavorite = value != null && Boolean.parseBoolean(value.trim());
+							boolean isFavorite = CategoryManager.getInstance().isFavorite(peer.getPeerId());
 							if (isFavorite && !candidates.contains(peer)) {
 								peer.setProperty(IPeerModelProperties.PROP_PARENT_CATEGORY_ID, catID);
 								candidates.add(peer);
@@ -96,8 +96,13 @@ public class ContentProviderDelegate implements ICommonContentProvider {
 							String value = peer.getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
 							boolean isStatic = value != null && Boolean.parseBoolean(value.trim());
 
-							value = peer.getPeer().getAttributes().get("favorite"); //$NON-NLS-1$
-							boolean isFavorite = value != null && Boolean.parseBoolean(value.trim());
+							// If it is not a static peer, but launched by the current user,
+							// put it under "My Targets" too.
+							if (System.getProperty("user.name").equals(peer.getPeer().getUserName())) { //$NON-NLS-1$
+								isStatic = true;
+							}
+
+							boolean isFavorite = CategoryManager.getInstance().isFavorite(peer.getPeerId());
 
 							if (isStatic && !isFavorite && !candidates.contains(peer)) {
 								peer.setProperty(IPeerModelProperties.PROP_PARENT_CATEGORY_ID, catID);
@@ -110,8 +115,13 @@ public class ContentProviderDelegate implements ICommonContentProvider {
 							String value = peer.getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
 							boolean isStatic = value != null && Boolean.parseBoolean(value.trim());
 
-							value = peer.getPeer().getAttributes().get("favorite"); //$NON-NLS-1$
-							boolean isFavorite = value != null && Boolean.parseBoolean(value.trim());
+							// If it is not a static peer, but launched by the current user,
+							// put it under "My Targets" too.
+							if (System.getProperty("user.name").equals(peer.getPeer().getUserName())) { //$NON-NLS-1$
+								isStatic = true;
+							}
+
+							boolean isFavorite = CategoryManager.getInstance().isFavorite(peer.getPeerId());
 
 							if (!isStatic && !isFavorite && !candidates.contains(peer)) {
 								peer.setProperty(IPeerModelProperties.PROP_PARENT_CATEGORY_ID, catID);

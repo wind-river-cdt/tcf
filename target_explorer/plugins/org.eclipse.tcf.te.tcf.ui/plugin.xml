@@ -32,6 +32,10 @@
                   pattern="org.eclipse.tcf.te.tcf.ui.navigator.*"/>
          </includes>
       </viewerContentBinding>
+      <dragAssistant
+            class="org.eclipse.tcf.te.tcf.ui.navigator.dnd.DragAssistant"
+            viewerId="org.eclipse.tcf.te.ui.views.View">
+      </dragAssistant>
    </extension>
    
    <extension point="org.eclipse.ui.navigator.navigatorContent">
@@ -60,6 +64,16 @@
                   <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
                </enablement>
             </commonWizard>
+            <dropAssistant
+                  class="org.eclipse.tcf.te.tcf.ui.navigator.dnd.DropAssistant"
+                  id="org.eclipse.tcf.te.tcf.ui.navigator.dnd">
+               <possibleDropTargets>
+                  <or>
+                     <instanceof value="org.eclipse.tcf.te.ui.views.interfaces.ICategory"/>
+                     <instanceof value="org.eclipse.tcf.te.ui.views.interfaces.IRoot"/>
+                  </or>
+               </possibleDropTargets>
+            </dropAssistant>
       </navigatorContent>
       <commonFilter
             activeByDefault="false"
