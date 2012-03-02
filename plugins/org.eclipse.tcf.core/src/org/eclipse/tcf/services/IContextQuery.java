@@ -77,6 +77,12 @@ public interface IContextQuery extends IService {
      */
     static final String NAME = "ContextQuery";
 
+    /**
+     * Execute a context query and return array of matching context IDs.
+     * @param query - context query string.
+     * @param done - command result call back object.
+     * @return - pending command handle.
+     */
     IToken query(String query, DoneQuery done);
 
     /**
@@ -90,5 +96,25 @@ public interface IContextQuery extends IService {
          * @param contexts - array of context IDs.
          */
         void doneQuery(IToken token, Exception error, String[] contexts);
+    }
+
+    /**
+     * Get list of attribute names available for context queries.
+     * @param done - command result call back object.
+     * @return - pending command handle.
+     */
+    IToken getAttrNames(DoneGetAttrNames done);
+
+    /**
+     * Call back interface for 'getAttrNames' command.
+     */
+    interface DoneGetAttrNames {
+        /**
+         * Called when 'query' command is done.
+         * @param token - command handle.
+         * @param error - error object or null.
+         * @param contexts - array of context IDs.
+         */
+        void doneGetAttrNames(IToken token, Exception error, String[] names);
     }
 }

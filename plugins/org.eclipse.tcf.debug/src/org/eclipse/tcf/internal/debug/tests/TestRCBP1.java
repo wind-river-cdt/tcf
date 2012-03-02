@@ -898,23 +898,40 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
                     return;
                 }
                 if (srv_context_query != null) {
-                    String s = null;
-                    switch (rnd.nextInt(4)) {
-                    case 0: s = "ID=" + id; break;
-                    case 1: s = "**/ID=" + id; break;
-                    case 2: s = "/**/ID=" + id; break;
-                    case 3: s = "ID=" + id + ",ID=" + id; break;
-                    }
-                    srv_context_query.query(s, new IContextQuery.DoneQuery() {
-                        public void doneQuery(IToken token, Exception error, String[] contexts) {
+                    srv_context_query.getAttrNames(new IContextQuery.DoneGetAttrNames() {
+                        public void doneGetAttrNames(IToken token, Exception error, String[] names) {
                             if (error != null) {
-                                exit(error);
+                                if (((IErrorReport)error).getErrorCode() != IErrorReport.TCF_ERROR_INV_COMMAND) {
+                                    exit(error);
+                                }
                             }
-                            else if (contexts == null || contexts.length != 1) {
-                                exit(new Exception("Invalid result length of ContextQuery.query command"));
-                            }
-                            else if (!id.equals(contexts[0])) {
-                                exit(new Exception("Invalid ID returned by ContextQuery.query command"));
+                            else {
+                                for (String nm : names) {
+                                    if (nm.equals("ID")) {
+                                        String s = null;
+                                        switch (rnd.nextInt(4)) {
+                                        case 0: s = "ID=" + id; break;
+                                        case 1: s = "**/ID=" + id; break;
+                                        case 2: s = "/**/ID=" + id; break;
+                                        case 3: s = "ID=" + id + ",id=" + id; break;
+                                        }
+                                        srv_context_query.query(s, new IContextQuery.DoneQuery() {
+                                            public void doneQuery(IToken token, Exception error, String[] contexts) {
+                                                if (error != null) {
+                                                    exit(error);
+                                                }
+                                                else if (contexts == null || contexts.length != 1) {
+                                                    exit(new Exception("Invalid result length of ContextQuery.query command"));
+                                                }
+                                                else if (!id.equals(contexts[0])) {
+                                                    exit(new Exception("Invalid ID returned by ContextQuery.query command"));
+                                                }
+                                            }
+                                        });
+                                        return;
+                                    }
+                                }
+                                exit(new Exception("ContextQuery.getAttrNames result must include 'ID'"));
                             }
                         }
                     });

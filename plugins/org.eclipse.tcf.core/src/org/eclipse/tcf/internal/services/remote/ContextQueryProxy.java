@@ -44,6 +44,21 @@ public class ContextQueryProxy implements IContextQuery {
         }.token;
     }
 
+    public IToken getAttrNames(final DoneGetAttrNames done) {
+        return new Command(channel, this, "getAttrNames", null) {
+            @Override
+            public void done(Exception error, Object[] args) {
+                String[] names = null;
+                if (error == null) {
+                    assert args.length == 2;
+                    error = toError(args[0]);
+                    names = toStringArray(args[1]);
+                }
+                done.doneGetAttrNames(token, error, names);
+            }
+        }.token;
+    }
+
     @SuppressWarnings("unchecked")
     private String[] toStringArray(Object o) {
         if (o == null) return null;
