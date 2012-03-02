@@ -15,6 +15,7 @@ for peers and to collect and maintain up-to-date
 data about peer's attributes.
 """
 
+import platform
 import threading
 import time
 import socket
@@ -127,7 +128,7 @@ class LocatorService(locator.LocatorService):
     peers = {} # str->Peer
     listeners = [] # list of LocatorListener
     error_log = set() # set of str
-
+    addr_list = []
     addr_cache = {} # str->AddressCacheItem
     addr_request = False
     local_peer = None
@@ -145,7 +146,7 @@ class LocatorService(locator.LocatorService):
     def startup(cls):
         if cls.locator:
             cls.locator._startup()
-    
+
     @classmethod
     def shutdown(cls):
         if cls.locator:
@@ -156,7 +157,7 @@ class LocatorService(locator.LocatorService):
         self._alive = False
         LocatorService.locator = self
         LocatorService.local_peer = peer.LocalPeer()
-    
+
     def _startup(self):
         if self._alive: return
         self._alive = True
@@ -415,18 +416,70 @@ class LocatorService(locator.LocatorService):
                 buf.write("\n\t* address=%s, broadcast=%s" % (subnet.address, subnet.broadcast))
             logging.trace(buf.getvalue())
 
+    def __getAllIpAddresses (self) :
+        import fcntl  # @UnresolvedImport
+        import struct
+        import array
+
+        nBytes = 8192
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        names = array.array('B', '\0' * nBytes)
+        ifcfg = struct.unpack \
+            (
+            'iL',
+            fcntl.ioctl (s.fileno(), 0x8912, # @UndefinedVariable
+                         struct.pack ('iL', nBytes, names.buffer_info ()[0]))
+            )[0]
+
+        namestr = names.tostring ()
+        res = []
+
+        # the ipconf structure changed at a time, check if there are more than
+        # 40 bytes
+
+        ifconfSz = 32
+        sz = 32
+        altSz = 40
+
+        if len (namestr) > sz :
+            # check for name at 32->32+16
+            secondName = str (namestr [sz:sz + 16].split ('\0', 1)[0])
+            secondAltName = str (namestr [altSz:altSz + 16].split ('\0', 1)[0])
+
+            if (not secondName.isalnum ()) and (secondAltName.isalnum ()) :
+                ifconfSz = 40
+
+        for ix in range (0, ifcfg, ifconfSz):
+            ipStartIx = ix + 20
+            ipEndIx = ix + 24
+            ip = namestr [ipStartIx : ipEndIx]
+            res.append (str (ord (ip [0])) + '.' + str (ord (ip [1])) + '.' + \
+                        str (ord (ip [2])) + '.' + str (ord (ip [3])))
+
+        return (res)
+
     def __getSubNetList(self, _set):
-        # TODO iterate over network interfaces to get proper broadcast addresses
         hostname = socket.gethostname()
-        _, _, addresses = socket.gethostbyname_ex(hostname)
-        if not "127.0.0.1" in addresses:
-            addresses.append("127.0.0.1")
-        for address in addresses:
+        if len (self.addr_list) == 0 :
+            # Create the list of IP address for this host
+            _, _, self.addr_list = socket.gethostbyname_ex (hostname)
+            if not "127.0.0.1" in self.addr_list:
+                self.addr_list.append ("127.0.0.1")
+
+            # On unix hosts, use sockets to get the other interfaces IPs
+
+            if (platform.system() != 'Windows') :
+                for ip_addr in self.__getAllIpAddresses () :
+                    if not ip_addr in self.addr_list :
+                        self.addr_list.append (ip_addr)
+
+        for address in self.addr_list:
             rawaddr = socket.inet_aton(address)
             if len(rawaddr) != 4: continue
             rawaddr = rawaddr[:3] + '\xFF'
             broadcast = socket.inet_ntoa(rawaddr)
-            _set.add(SubNet(24, InetAddress(hostname, address), InetAddress(None, broadcast)))
+            _set.add(SubNet(24, InetAddress(hostname, address),
+                            InetAddress(None, broadcast)))
 
     def __getUTF8Bytes(self, s):
         return s.encode("UTF-8")
@@ -543,7 +596,7 @@ class LocatorService(locator.LocatorService):
                     sb.write('\0')
                 bt = self.__getUTF8Bytes(sb.getvalue())
                 if i + len(bt) > len(self.out_buf): return
-                self.out_buf[i:i+len(bt)] = bt
+                self.out_buf[i:i + len(bt)] = bt
                 i += len(bt)
             if self.__sendDatagramPacket(subnet, i, addr, port): subnet.send_all_ok = True
 
@@ -573,7 +626,7 @@ class LocatorService(locator.LocatorService):
             i = 8
             s = "%d:%s:%s" % (ttl, x.port, x.address.getHostAddress())
             bt = self.__getUTF8Bytes(s)
-            self.out_buf[i:i+len(bt)] = bt
+            self.out_buf[i:i + len(bt)] = bt
             i += len(bt)
             self.out_buf[i] = 0
             i += 1
@@ -708,7 +761,7 @@ class LocatorService(locator.LocatorService):
                     if addr is not None:
                         delta = 10006030 # 30 minutes
                         if len(timestamp) > 0:
-                            time_val =  int(timestamp)
+                            time_val = int(timestamp)
                         else:
                             time_val = time_now
                         if time_val < 3600000:
@@ -716,13 +769,13 @@ class LocatorService(locator.LocatorService):
                             time_val = time_now + time_val / 1000 - locator.DATA_RETENTION_PERIOD
                         elif time_val < time_now / 1000 + 50000000:
                             # Time stamp is in seconds
-                            time_val= 1000
+                            time_val = 1000
                         else:
                             # Time stamp is in milliseconds
                             pass
                         if time_val < time_now - delta or time_val > time_now + delta:
                             msg = "Invalid slave info timestamp: %s -> %s" % (
-                                    timestamp, time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time_val/1000.)))
+                                    timestamp, time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time_val / 1000.)))
                             self._log("Invalid datagram packet received from %s/%s" % (p.getAddress(), p.getPort()), Exception(msg))
                             time_val = time_now - locator.DATA_RETENTION_PERIOD / 2
                         self.__addSlave(addr, port, time_val, time_now)
