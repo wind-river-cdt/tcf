@@ -73,7 +73,7 @@ public class AgentLauncher extends ProcessLauncher implements IDisposable {
 	 */
 	@Override
 	public void launch() throws Throwable {
-		String cmd = path.toString() + " -S"; //$NON-NLS-1$
+		String cmd = "\"" + path.toString() + "\" -S"; //$NON-NLS-1$ //$NON-NLS-2$
 		process = Runtime.getRuntime().exec(cmd);
 
 		// Launch the process output reader
