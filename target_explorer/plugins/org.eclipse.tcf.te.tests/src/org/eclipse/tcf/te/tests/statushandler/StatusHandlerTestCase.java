@@ -15,10 +15,10 @@ import java.util.List;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.eclipse.tcf.te.runtime.interfaces.IConditionTester;
 import org.eclipse.tcf.te.runtime.statushandler.StatusHandlerManager;
 import org.eclipse.tcf.te.runtime.statushandler.interfaces.IStatusHandler;
 import org.eclipse.tcf.te.tests.CoreTestCase;
-import org.eclipse.tcf.te.tests.interfaces.IInterruptCondition;
 
 /**
  * Status handler test cases.
@@ -76,15 +76,19 @@ public class StatusHandlerTestCase extends CoreTestCase {
 
 		handlerIds.clear();
 
-		IInterruptCondition context = new IInterruptCondition() {
-
+		IConditionTester context = new IConditionTester() {
+			/* (non-Javadoc)
+			 * @see org.eclipse.tcf.te.runtime.interfaces.IConditionTester#isConditionFulfilled()
+			 */
 			@Override
-			public boolean isTrue() {
-				return false;
+			public boolean isConditionFulfilled() {
+			    return false;
 			}
-
+			/* (non-Javadoc)
+			 * @see org.eclipse.tcf.te.runtime.interfaces.IConditionTester#cleanup()
+			 */
 			@Override
-			public void dispose() {
+			public void cleanup() {
 			}
 		};
 

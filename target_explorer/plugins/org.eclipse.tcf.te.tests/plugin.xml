@@ -22,7 +22,7 @@
             <enablement>
                <or>
                   <instanceof value="org.eclipse.tcf.te.tests.CoreTestCase"/>
-                  <instanceof value="org.eclipse.tcf.te.tests.interfaces.IInterruptCondition"/>
+                  <instanceof value="org.eclipse.tcf.te.runtime.interfaces.IConditionTester"/>
                </or>
             </enablement>
       </binding>
@@ -31,7 +31,7 @@
             handlerId="org.eclipse.tcf.te.tests.handler2"
             id="org.eclipse.tcf.te.tests.binding2">
             <enablement>
-               <instanceof value="org.eclipse.tcf.te.tests.interfaces.IInterruptCondition"/>
+               <instanceof value="org.eclipse.tcf.te.runtime.interfaces.IConditionTester"/>
             </enablement>
       </binding>
    </extension>

@@ -30,9 +30,9 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.tcf.te.runtime.interfaces.IConditionTester;
 import org.eclipse.tcf.te.tests.activator.UIPlugin;
 import org.eclipse.tcf.te.tests.interfaces.IConfigurationProperties;
-import org.eclipse.tcf.te.tests.interfaces.IInterruptCondition;
 import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
@@ -514,12 +514,12 @@ public class CoreTestCase extends TestCase {
 	 * given interrupt condition is fulfilled.
 	 *
 	 * @param timeout The timeout in milliseconds. Must be larger or equals than 0.
-	 * @param condition The interrupt condition to test. Must not be <code>null</code> if the timeout is 0.
+	 * @param condition The condition to test. Must not be <code>null</code> if the timeout is 0.
 	 *
 	 * @return <code>True</code> if the method returned because of the timeout, <code>false</code> if the
 	 *         method returned because of the condition became true.
 	 */
-	public boolean waitAndDispatch(long timeout, IInterruptCondition condition) {
+	public boolean waitAndDispatch(long timeout, IConditionTester condition) {
 		Assert.isTrue(timeout >= 0);
 		if (timeout == 0) Assert.isNotNull(condition);
 
@@ -530,7 +530,7 @@ public class CoreTestCase extends TestCase {
 			if (display != null) {
 				long current = System.currentTimeMillis();
 				while (timeout == 0 || (current - start) < timeout && !display.isDisposed()) {
-					if (condition != null && condition.isTrue()) break;
+					if (condition != null && condition.isConditionFulfilled()) break;
 					if (!display.readAndDispatch()) display.sleep();
 					current = System.currentTimeMillis();
 				}
@@ -538,27 +538,28 @@ public class CoreTestCase extends TestCase {
 			} else {
 				long current = System.currentTimeMillis();
 				while (timeout == 0 || (current - start) < timeout) {
-					if (condition != null && condition.isTrue()) break;
+					if (condition != null && condition.isConditionFulfilled()) break;
 					try { Thread.sleep(50); } catch (InterruptedException e) { /* ignored on purpose */ }
 					current = System.currentTimeMillis();
 				}
 				isTimedOut = (current - start) >= timeout && timeout > 0;
 			}
 		}
-		if (condition != null) condition.dispose();
+		if (condition != null) condition.cleanup();
 
 		return isTimedOut;
 	}
 
 	/**
-	 * Calculates the absolute path to load test data from.
+	 * Calculates the absolute path to load additional data from.
 	 * <p>
 	 * The returned path is calculated as follow:<br>
 	 * <ul>
 	 *     <li>Add org.eclipse.tcf.te.tests bundle location</li>
-	 *     <li>Add &quot;test.data&quot;</li>
-	 *     <li>If &quot;hostSpecific&quot; is true, add &quot;Platform.getOS()&quot;</li>
+	 *     <li>Add &quot;data&quot;</li>
 	 *     <li>Add the given relative path</li>
+	 *     <li>If &quot;hostSpecific&quot; is true, add &quot;Platform.getOS()&quot;</li>
+	 *     <li>If &quot;archSpecific&quot; is true, add &quot;Platform.getOSArch()&quot;</li>
 	 * </ul>
 	 * <p>
 	 * The calculated path must be a readable directory, otherwise the method will
@@ -566,18 +567,20 @@ public class CoreTestCase extends TestCase {
 	 *
 	 * @param path The relative path segment to append. Must not be <code>null</code>.
 	 * @param hostSpecific Specify <code>true</code> to include {@link Platform#getOS()}, <code>false</code> if not.
+	 * @param archSpecific Specify <code>true</code> to include {@link Platform#getOSArch()}, <code>false</code> if not.
 	 *
-	 * @return The absolute path to the test data or <code>null</code>.
+	 * @return The absolute path to the data location or <code>null</code>.
 	 */
-	protected final IPath getTestDataLocation(String path, boolean hostSpecific) {
+	protected final IPath getDataLocation(String path, boolean hostSpecific, boolean archSpecific) {
 		Assert.isNotNull(path);
 		IPath root = null;
 
 		if (path != null) {
 			Bundle bundle = UIPlugin.getDefault().getBundle();
 			if (bundle != null) {
-				IPath relative = new Path ("test.data").append(path); //$NON-NLS-1$
+				IPath relative = new Path ("data").append(path); //$NON-NLS-1$
 				if (hostSpecific) relative = relative.append(Platform.getOS());
+				if (archSpecific) relative = relative.append(Platform.getOSArch());
 
 				URL url = FileLocator.find(bundle, relative, null);
 				if (url != null) {
