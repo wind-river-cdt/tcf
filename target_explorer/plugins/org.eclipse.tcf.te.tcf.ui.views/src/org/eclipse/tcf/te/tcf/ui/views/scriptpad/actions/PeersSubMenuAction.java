@@ -28,6 +28,7 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.listener.ModelAdapter;
 import org.eclipse.tcf.te.tcf.locator.model.Model;
 import org.eclipse.tcf.te.tcf.ui.views.scriptpad.ScriptPad;
+import org.eclipse.tcf.te.ui.swt.DisplayUtil;
 import org.eclipse.ui.IActionDelegate2;
 import org.eclipse.ui.IViewActionDelegate;
 import org.eclipse.ui.IViewPart;
@@ -59,13 +60,18 @@ public class PeersSubMenuAction extends Action implements IMenuCreator, IViewAct
             public void locatorModelChanged(ILocatorModel model, IPeerModel peer, boolean added) {
     			// Re-evaluate the enablement
     			if (actionProxy != null) {
-    				IPeerModel[] peers = Model.getModel().getPeers();
+    				final IPeerModel[] peers = Model.getModel().getPeers();
     				actionProxy.setEnabled(peers != null && peers.length > 0);
 
     				// If the peer is not set to the view yet, but the action get's
     				// enabled, than force the first peer in the list to be the selected one.
     				if (actionProxy.isEnabled() && view instanceof ScriptPad && ((ScriptPad)view).getPeerModel() == null) {
-    					((ScriptPad)view).setPeerModel(peers[0]);
+    					DisplayUtil.safeAsyncExec(new Runnable() {
+	                        @Override
+                            public void run() {
+	        					((ScriptPad)view).setPeerModel(peers[0]);
+	                        }
+                        });
     				}
     			}
     		}
