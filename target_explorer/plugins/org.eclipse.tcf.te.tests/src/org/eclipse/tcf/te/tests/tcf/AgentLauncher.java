@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.tcf.te.runtime.interfaces.IDisposable;
 import org.eclipse.tcf.te.runtime.processes.ProcessLauncher;
 import org.eclipse.tcf.te.runtime.processes.ProcessOutputReaderThread;
+import org.eclipse.tcf.te.runtime.utils.Host;
 
 /**
  * TCF tests agent launcher implementation.
@@ -73,8 +74,9 @@ public class AgentLauncher extends ProcessLauncher implements IDisposable {
 	 */
 	@Override
 	public void launch() throws Throwable {
-		String cmd = "\"" + path.toString() + "\" -S"; //$NON-NLS-1$ //$NON-NLS-2$
-		process = Runtime.getRuntime().exec(cmd);
+		IPath dir = path.removeLastSegments(1);
+		String cmd = Host.isWindowsHost() ? path.lastSegment() : "./" + path.lastSegment(); //$NON-NLS-1$
+		process = Runtime.getRuntime().exec(new String[] { cmd, "-S" }, null, dir.toFile()); //$NON-NLS-1$
 
 		// Launch the process output reader
 		outputReader = new ProcessOutputReaderThread(null, new InputStream[] { process.getInputStream() });
