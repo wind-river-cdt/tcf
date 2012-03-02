@@ -9,13 +9,13 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.processes.ui.internal.handler;
 
-import java.util.Collections;
 import java.util.Iterator;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
@@ -34,6 +34,7 @@ import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.ui.handlers.IHandlerService;
 
 /**
  * Attach to process command handler implementation.
@@ -106,8 +107,12 @@ public class AttachHandler extends AbstractHandler {
 									ctx.addVariable(ISources.ACTIVE_SHELL_NAME, site.getShell());
 								}
 								ctx.setAllowPluginActivation(true);
-								ExecutionEvent executionEvent = new ExecutionEvent(command, Collections.EMPTY_MAP, part, ctx);
-								command.executeWithChecks(executionEvent);
+
+								ParameterizedCommand pCmd = ParameterizedCommand.generateCommand(command, null);
+								Assert.isNotNull(pCmd);
+								IHandlerService handlerSvc = (IHandlerService)PlatformUI.getWorkbench().getService(IHandlerService.class);
+								Assert.isNotNull(handlerSvc);
+								handlerSvc.executeCommandInContext(pCmd, null, ctx);
 							} catch (Exception e) {
 								// If the platform is in debug mode, we print the exception to the log view
 								if (Platform.inDebugMode()) {

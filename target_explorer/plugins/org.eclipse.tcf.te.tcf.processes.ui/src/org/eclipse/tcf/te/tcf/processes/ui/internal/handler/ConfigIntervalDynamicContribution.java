@@ -10,12 +10,11 @@
 package org.eclipse.tcf.te.tcf.processes.ui.internal.handler;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.commands.Command;
-import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.SafeRunner;
@@ -39,6 +38,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.CompoundContributionItem;
 import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.handlers.IHandlerService;
 
 /**
  * The dynamic contribution class to create a drop down menu of interval configuration.
@@ -157,8 +157,12 @@ public class ConfigIntervalDynamicContribution extends CompoundContributionItem 
 							IEditorInput editorInput = window.getActivePage().getActiveEditor().getEditorInput();
 							ctx.addVariable(ISources.ACTIVE_EDITOR_INPUT_NAME, editorInput);
 							ctx.setAllowPluginActivation(true);
-							ExecutionEvent executionEvent = new ExecutionEvent(command, Collections.EMPTY_MAP, CustomAction.this, ctx);
-							command.executeWithChecks(executionEvent);
+
+							ParameterizedCommand pCmd = ParameterizedCommand.generateCommand(command, null);
+							Assert.isNotNull(pCmd);
+							IHandlerService handlerSvc = (IHandlerService)PlatformUI.getWorkbench().getService(IHandlerService.class);
+							Assert.isNotNull(handlerSvc);
+							handlerSvc.executeCommandInContext(pCmd, null, ctx);
 						}
 					});
 				}

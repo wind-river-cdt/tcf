@@ -19,7 +19,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.core.commands.Command;
-import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.SafeRunner;
@@ -85,6 +85,7 @@ import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.part.MultiPageSelectionProvider;
 
@@ -858,8 +859,12 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 						ctx.addVariable(ISources.ACTIVE_SHELL_NAME, site.getShell());
 					}
 					ctx.setAllowPluginActivation(true);
-					ExecutionEvent executionEvent = new ExecutionEvent(command, Collections.EMPTY_MAP, part, ctx);
-					command.executeWithChecks(executionEvent);
+
+					ParameterizedCommand pCmd = ParameterizedCommand.generateCommand(command, null);
+					Assert.isNotNull(pCmd);
+					IHandlerService handlerSvc = (IHandlerService)PlatformUI.getWorkbench().getService(IHandlerService.class);
+					Assert.isNotNull(handlerSvc);
+					handlerSvc.executeCommandInContext(pCmd, null, ctx);
                 }});
 		} else {
 			IStructuredSelection selection = (IStructuredSelection) event.getSelection();

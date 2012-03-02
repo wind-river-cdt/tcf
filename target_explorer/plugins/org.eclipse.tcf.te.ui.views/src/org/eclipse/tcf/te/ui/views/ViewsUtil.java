@@ -9,10 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.views;
 
-import java.util.Collections;
-
 import org.eclipse.core.commands.Command;
-import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ISelection;
@@ -23,6 +21,7 @@ import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.navigator.CommonNavigator;
 
 /**
@@ -138,11 +137,13 @@ public class ViewsUtil {
 						context.addVariable(ISources.ACTIVE_WORKBENCH_WINDOW_NAME, PlatformUI.getWorkbench().getActiveWorkbenchWindow());
 						// Allow plugin activation
 						context.setAllowPluginActivation(true);
-						// Construct the execution event
-						ExecutionEvent execEvent = new ExecutionEvent(command, Collections.EMPTY_MAP, this, context);
 						// And execute the event
 						try {
-							command.executeWithChecks(execEvent);
+							ParameterizedCommand pCmd = ParameterizedCommand.generateCommand(command, null);
+							Assert.isNotNull(pCmd);
+							IHandlerService handlerSvc = (IHandlerService)PlatformUI.getWorkbench().getService(IHandlerService.class);
+							Assert.isNotNull(handlerSvc);
+							handlerSvc.executeCommandInContext(pCmd, null, context);
 						} catch (Exception e) { /* ignored on purpose */ }
 					}
 				}

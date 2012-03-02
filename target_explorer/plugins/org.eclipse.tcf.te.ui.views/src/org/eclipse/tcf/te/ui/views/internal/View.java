@@ -9,11 +9,10 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.views.internal;
 
-import java.util.Collections;
-
 import org.eclipse.core.commands.Command;
-import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.expressions.EvaluationContext;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -37,6 +36,7 @@ import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
@@ -190,8 +190,12 @@ public class View extends CommonNavigator implements ITabbedPropertySheetPageCon
 				ctx.addVariable(ISources.ACTIVE_SITE_NAME, getViewSite());
 				ctx.addVariable(ISources.ACTIVE_SHELL_NAME, getViewSite().getShell());
 				ctx.setAllowPluginActivation(true);
-				ExecutionEvent event = new ExecutionEvent(command, Collections.EMPTY_MAP, this, ctx);
-				command.executeWithChecks(event);
+
+				ParameterizedCommand pCmd = ParameterizedCommand.generateCommand(command, null);
+				Assert.isNotNull(pCmd);
+				IHandlerService handlerSvc = (IHandlerService)PlatformUI.getWorkbench().getService(IHandlerService.class);
+				Assert.isNotNull(handlerSvc);
+				handlerSvc.executeCommandInContext(pCmd, null, ctx);
 			} catch (Exception e) {
 				// If the platform is in debug mode, we print the exception to the log view
 				if (Platform.inDebugMode()) {

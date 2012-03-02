@@ -13,6 +13,9 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.core.expressions.IEvaluationContext;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -25,6 +28,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.navigator.CommonNavigator;
 
 /**
@@ -54,7 +58,11 @@ public class OpenCommandHandler extends AbstractHandler {
 				Command command = service != null ? service.getCommand(ActionFactory.PROPERTIES.getCommandId()) : null;
 				if (command != null && command.isDefined() && command.isEnabled()) {
 					try {
-						command.executeWithChecks(event);
+						ParameterizedCommand pCmd = ParameterizedCommand.generateCommand(command, null);
+						Assert.isNotNull(pCmd);
+						IHandlerService handlerSvc = (IHandlerService)PlatformUI.getWorkbench().getService(IHandlerService.class);
+						Assert.isNotNull(handlerSvc);
+						handlerSvc.executeCommandInContext(pCmd, null, (IEvaluationContext)event.getApplicationContext());
 					} catch (Exception e) {
 						// If the platform is in debug mode, we print the exception to the log view
 						if (Platform.inDebugMode()) {

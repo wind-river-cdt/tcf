@@ -9,10 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.terminals.actions;
 
-import java.util.Collections;
-
 import org.eclipse.core.commands.Command;
-import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
@@ -30,6 +28,7 @@ import org.eclipse.tm.internal.terminal.control.actions.AbstractTerminalAction;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.handlers.IHandlerService;
 
 /**
  * Abstract terminal action wrapper implementation.
@@ -113,11 +112,13 @@ public abstract class AbstractAction extends AbstractTerminalAction {
 				context.addVariable(ISources.ACTIVE_MENU_SELECTION_NAME, selection);
 				// Allow plugin activation
 				context.setAllowPluginActivation(true);
-				// Construct the execution event
-				ExecutionEvent execEvent = new ExecutionEvent(command, Collections.EMPTY_MAP, this, context);
 				// And execute the event
 				try {
-					command.executeWithChecks(execEvent);
+					ParameterizedCommand pCmd = ParameterizedCommand.generateCommand(command, null);
+					Assert.isNotNull(pCmd);
+					IHandlerService handlerSvc = (IHandlerService)PlatformUI.getWorkbench().getService(IHandlerService.class);
+					Assert.isNotNull(handlerSvc);
+					handlerSvc.executeCommandInContext(pCmd, null, context);
 				} catch (Exception e) {
 					IStatus status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(),
 												NLS.bind(Messages.AbstractAction_error_commandExecutionFailed, getCommandId(), e.getLocalizedMessage()),
