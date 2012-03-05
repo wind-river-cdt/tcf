@@ -84,5 +84,14 @@ public class TerminateHandler extends AbstractHandler {
                     }});
 			}
         }
+
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.tcf.te.runtime.properties.PropertiesContainer#equals(java.lang.Object)
+		 */
+		@Override
+	    public boolean equals(Object obj) {
+		    return super.equals(obj);
+	    }		
 	}
 }

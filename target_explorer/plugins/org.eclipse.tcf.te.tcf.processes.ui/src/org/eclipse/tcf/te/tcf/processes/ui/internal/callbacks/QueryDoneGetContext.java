@@ -25,7 +25,7 @@ import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 /**
  * The callback handler that handles the result of service.getContext when querying.
  */
-public class QueryDoneGetContext extends Callback implements ISysMonitor.DoneGetContext, IProcesses.DoneGetContext {
+public class QueryDoneGetContext implements ISysMonitor.DoneGetContext, IProcesses.DoneGetContext {
 	// The current context id.
 	String contextId;
 	// The channel used for query.
@@ -86,10 +86,15 @@ public class QueryDoneGetContext extends Callback implements ISysMonitor.DoneGet
 				ISysMonitor service = channel.getRemoteService(ISysMonitor.class);
 				if (service != null) {
 					Queue<ProcessTreeNode> queue = new ConcurrentLinkedQueue<ProcessTreeNode>();
-					service.getChildren(childNode.id, new RefreshDoneGetChildren(this, queue, channel, service, childNode));
+					service.getChildren(childNode.id, new RefreshDoneGetChildren(new Callback() {
+						@Override
+                        protected void internalDone(Object caller, IStatus status) {
+	                        doCallback(caller, status);
+                        }
+					}, queue, channel, service, childNode));
 				}
 			} else {
-				done(this, Status.OK_STATUS);
+				doCallback(this, Status.OK_STATUS);
 			}
 		}
     }
@@ -107,12 +112,13 @@ public class QueryDoneGetContext extends Callback implements ISysMonitor.DoneGet
 		refreshChildren();
     }
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Runnable#run()
+	/**
+	 * Call after everything is done.
+	 * 
+	 * @param caller The caller.
+	 * @param status The returned status.
 	 */
-	@Override
-	protected void internalDone(Object caller, IStatus status) {
+	protected void doCallback(Object caller, IStatus status) {
 		if(childNode != null) {
 			parentNode.addChild(childNode);
 		}

@@ -49,14 +49,20 @@ public class RefreshChildrenDoneOpenChannel implements IChannelManager.DoneOpenC
 		if (error == null && channel != null) {
 			ISysMonitor service = channel.getRemoteService(ISysMonitor.class);
 			if (service != null) {
-				CallbackMonitor monitor = new CallbackMonitor(new Callback(){
+				final CallbackMonitor monitor = new CallbackMonitor(new Callback(){
 					@Override
 					protected void internalDone(Object caller, IStatus status) {
 						Tcf.getChannelManager().closeChannel(channel);
                     }}, getChildrenIds());
 				for (ProcessTreeNode child : parentNode.getChildren()) {
 					if (!child.childrenQueried && !child.childrenQueryRunning) {
-						ICallback callback = new RefreshChildrenDoneCallback(child.id, monitor);
+						final String contextId = child.id;
+						ICallback callback = new Callback() {
+							@Override
+                            protected void internalDone(Object caller, IStatus status) {
+								monitor.unlock(contextId, status);
+                            }
+						};
 						Queue<ProcessTreeNode> queue = new ConcurrentLinkedQueue<ProcessTreeNode>();
 						ISysMonitor.DoneGetChildren done = new RefreshDoneGetChildren(callback, queue, channel, service, child);
 						service.getChildren(child.id, done);

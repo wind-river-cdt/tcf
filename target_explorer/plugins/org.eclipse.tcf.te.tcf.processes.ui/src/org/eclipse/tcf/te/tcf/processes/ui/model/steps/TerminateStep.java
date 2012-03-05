@@ -55,12 +55,9 @@ public class TerminateStep {
 			} else {
 				onError(node, Messages.DetachStep_error_disconnect, null, callback);
 			}
-		} else {
-			if (node.pContext == null) {
-				onError(node, Messages.DetachStep_error_disconnect, null, callback);
-			} else {
-				onDone(callback);
-			}
+		} 
+		else {
+			onError(node, Messages.DetachStep_error_disconnect, null, callback);
 		}
 	}
 
