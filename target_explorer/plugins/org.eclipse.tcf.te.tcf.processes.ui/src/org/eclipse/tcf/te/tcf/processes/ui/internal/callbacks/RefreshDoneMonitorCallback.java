@@ -109,14 +109,5 @@ public class RefreshDoneMonitorCallback extends Callback {
 			}
 			return -1;
 		}
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.properties.PropertiesContainer#equals(java.lang.Object)
-	 */
-	@Override
-    public boolean equals(Object obj) {
-	    return super.equals(obj);
-    }	
+	}	
 }

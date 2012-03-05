@@ -51,7 +51,6 @@ public class TerminateHandler extends AbstractHandler {
 							step.executeTerminate(process, new TerminateCallback(process));
 						}
 					};
-
 					Protocol.invokeLater(runnable);
 				}
 			}
@@ -84,14 +83,5 @@ public class TerminateHandler extends AbstractHandler {
                     }});
 			}
         }
-
-		/*
-		 * (non-Javadoc)
-		 * @see org.eclipse.tcf.te.runtime.properties.PropertiesContainer#equals(java.lang.Object)
-		 */
-		@Override
-	    public boolean equals(Object obj) {
-		    return super.equals(obj);
-	    }		
 	}
 }
