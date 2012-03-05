@@ -46,7 +46,7 @@
          <attribute name="name" type="string">
             <annotation>
                <documentation>
-               Class should implement ILaunchContext interface   
+               Class should implement org.eclipse.tcf.debug.ui.ITCFLaunchContext interface   
                </documentation>
             </annotation>
          </attribute>

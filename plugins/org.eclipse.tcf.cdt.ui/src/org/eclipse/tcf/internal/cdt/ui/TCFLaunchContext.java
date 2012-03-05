@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2011 Wind River Systems, Inc. and others.
+ * Copyright (c) 2008, 2012 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,8 +37,8 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.tcf.debug.ui.ITCFLaunchContext;
 import org.eclipse.tcf.internal.debug.launch.TCFLaunchDelegate;
-import org.eclipse.tcf.internal.debug.ui.launch.ITCFLaunchContext;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
@@ -46,11 +46,10 @@ import org.eclipse.ui.dialogs.TwoPaneElementSelector;
 
 public class TCFLaunchContext implements ITCFLaunchContext {
 
-    public boolean isActive() {
-        return getContext(null) != null;
-    }
-
     public boolean isSupportedSelection(Object selection) {
+        if (selection == null) {
+            return getContext(null) != null;
+        }
         if (selection instanceof IProject) {
             return CoreModel.getDefault().getCModel().getCProject(((IProject)selection).getName()) != null;
         }

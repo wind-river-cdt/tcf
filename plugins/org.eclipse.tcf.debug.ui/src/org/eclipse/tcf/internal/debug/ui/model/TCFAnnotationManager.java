@@ -42,6 +42,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.tcf.debug.ui.ITCFAnnotationProvider;
 import org.eclipse.tcf.internal.debug.launch.TCFSourceLookupDirector;
 import org.eclipse.tcf.internal.debug.model.ITCFBreakpointListener;
 import org.eclipse.tcf.internal.debug.model.TCFBreakpointsModel;
@@ -154,6 +155,7 @@ public class TCFAnnotationManager {
         final HashSet<TCFAnnotation> annotations = new HashSet<TCFAnnotation>();
         final Map<IEditorInput,ITextEditor> editors = new HashMap<IEditorInput,ITextEditor>();
 
+        ITCFAnnotationProvider provider;
         Runnable update_task;
         TCFNode update_node;
 
@@ -488,6 +490,19 @@ public class TCFAnnotationManager {
         final WorkbenchWindowInfo win_info = windows.get(window);
         if (win_info == null) return;
         if (win_info.update_task != null && win_info.update_node == node) return;
+        if (win_info.update_node != node && node != null) {
+            win_info.provider = TCFAnnotationProvider.getAnnotationProvider(node);
+        }
+        if (win_info.provider != null) {
+            if (win_info.annotations.size() > 0) {
+                for (TCFAnnotation a : win_info.annotations) a.dispose();
+                win_info.annotations.clear();
+            }
+            win_info.update_node = node;
+            win_info.update_task = null;
+            win_info.provider.updateAnnotations(window, node);
+            return;
+        }
         win_info.update_node = node;
         win_info.update_task = new Runnable() {
             public void run() {

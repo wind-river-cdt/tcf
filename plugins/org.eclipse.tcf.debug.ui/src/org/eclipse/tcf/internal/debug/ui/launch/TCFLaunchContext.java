@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 Wind River Systems, Inc. and others.
+ * Copyright (c) 2008, 2012 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.tcf.debug.ui.ITCFLaunchContext;
 import org.eclipse.tcf.internal.debug.ui.Activator;
 import org.osgi.framework.Bundle;
 
@@ -46,12 +47,7 @@ public class TCFLaunchContext {
                         if (nm.equals("class")) { //$NON-NLS-1$
                             Class<?> c = bundle.loadClass(e[j].getAttribute("name")); //$NON-NLS-1$
                             ITCFLaunchContext launch_context = (ITCFLaunchContext)c.newInstance();
-                            if (selection != null) {
-                                if (launch_context.isSupportedSelection(selection)) return launch_context;
-                            }
-                            else {
-                                if (launch_context.isActive()) return launch_context;
-                            }
+                            if (launch_context.isSupportedSelection(selection)) return launch_context;
                         }
                     }
                 }
@@ -65,5 +61,4 @@ public class TCFLaunchContext {
         }
         return null;
     }
-
 }
