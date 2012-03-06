@@ -79,6 +79,17 @@ public class CommonDnD {
 					// Fire a refresh of the view
 					ViewsUtil.refresh(IUIConstants.ID_EXPLORER);
 				}
+				else if (IUIConstants.ID_CAT_MY_TARGETS.equals(hovered.getId())) {
+					// Create a static copy of the dropped peer node
+					Iterator<?> iterator = selection.iterator();
+					while (iterator.hasNext()) {
+						Object element = iterator.next();
+						if (!(element instanceof IPeerModel)) continue;
+						CategoryManager.getInstance().addToMyTargets((IPeerModel)element);
+					}
+					// Fire a refresh of the view
+					ViewsUtil.refresh(IUIConstants.ID_EXPLORER);
+				}
 			} else if (target instanceof IRoot) {
 				// Remove the peer nodes from the favorites list
 				Iterator<?> iterator = selection.iterator();
