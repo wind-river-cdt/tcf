@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.tcf">
+<annotation>
+   <appInfo>
+      <meta.schema plugin="org.eclipse.tcf.debug.ui" id="annotation_provider" name="TCF Annotation Provider"/>
+   </appInfo>
+   <documentation>
+      This extension point is used to register plugins
+      that want to extends TCF debugger functionality.
+      Implementing the extension allows a plugin to take over
+      the management of debugger annotations in the Eclipse workspace.
+      Debugger annotations include editor markers for current instruction pointer, 
+      stack frame addresses, and breakpoint planting status.  
+   </documentation>
+
+</annotation>
+
+   <element name="extension">
+      <complexType>
+         <sequence>
+            <element ref="class" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  a fully qualified identifier of the target extension point
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  an optional identifier of the extension instance
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  an optional name of the extension instance
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="class">
+      <complexType>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+               Class should implement org.eclipse.tcf.debug.ui.ITCFAnnotationProvider interface   
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="apiInfo"/>
+      </appInfo>
+      <documentation>
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="implementation"/>
+      </appInfo>
+      <documentation>
+      </documentation>
+   </annotation>
+
+</schema>
