@@ -75,7 +75,7 @@ public class AgentLauncher extends ProcessLauncher implements IDisposable {
 	@Override
 	public void launch() throws Throwable {
 		IPath dir = path.removeLastSegments(1);
-		String cmd = Host.isWindowsHost() ? path.lastSegment() : "./" + path.lastSegment(); //$NON-NLS-1$
+		String cmd = Host.isWindowsHost() ? path.toOSString() : "./" + path.lastSegment(); //$NON-NLS-1$
 		process = Runtime.getRuntime().exec(new String[] { cmd, "-S" }, null, dir.toFile()); //$NON-NLS-1$
 
 		// Launch the process output reader
