@@ -1,0 +1,302 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+    <title>Target Communication Framework Services - Disassembly</title>
+</head>
+
+<body lang='EN-US'>
+
+<h1>Target Communication Framework Services - Disassembly</h1>
+
+<ul>
+    <li><a href='#VersionHistory'>Version History</a>
+    <li><a href='#Overview'>Overview</a>
+    <li><a href='#Cmds'>Commands</a>
+    <ul>
+        <li><a href='#CmdGetCapabilities'>Get Capabilities</a>
+        <li><a href='#CmdDisassemble'>Disassemble</a>
+    </ul>
+    <li><a href='#API'>API</a>
+</ul>
+
+<h1>Disassembly Service</h1>
+
+<h2><a name='VersionHistory'>Version History</a></h2>
+
+<table border=1 cellpadding=8>
+    <tr>
+        <th>Version
+        <th>Date
+        <th>Change
+    <tr>
+        <td>0.1
+        <td>2011-02-18
+        <td>Initial contribution
+</table>
+
+<h2><a name='Overview'>Overview</a></h2>
+
+<p>Disassembly is the translation of machine language (or memory bytes), into human readable assembly language.  The readable assembly language is produced from a specified Instruction Set Architecture (or ISA).</p>
+
+<p>While disassembly is dependent upon a specific processor architecture, the memory from which it is derived is not.  So for a given memory context, or buffer, the specified ISA used to disassemble the memory bytes is subjective to the Tool or user.</p>
+
+<p>The service uses standard format for error reports,
+see <a href='TCF Services.html#ErrorFormat'>Error Report Format</a>.</p>
+
+<h2><a name='Cmds'>Commands</a></h2>
+
+<h3><a name='CmdDisassemble'>Disassemble</a></h3>
+
+<pre><b><font face="Courier New" size=2 color=#333399>
+C &bull; <i>&lt;token&gt;</i> &bull; Disassembly &bull; disassemble &bull; <i>&lt;string: context-id&gt;</i> &bull; <i>&lt;int: start location&gt;</i> &bull; <i>&lt;int: size&gt;</i> &bull; <i>&lt;object: disassembly parameters&gt;</i> &bull;</font></b></pre>
+
+<p> The command disassembles instruction code from a specified range of memory, in a specified context.<p>
+
+<p>Where context-id is the memory context in which to process the command.</p>
+
+<p>Predefined properties are:</p>
+<dl>
+<ul>
+    <li><dt><code><b><font face="Courier New" size=2 color=#333399><a name='propISA'>"ISA"</a> : <i>&lt;string&gt;</i></font></b></code>
+    <dd>The name of the instruction set architecture.
+    </li>
+
+    <li><dt><code><b><font face="Courier New" size=2 color=#333399><a name='propSimplified'>"Simplified"</a> : <i>&lt;boolean&gt;</i></font></b></code>
+    <dd>If true, simplified mnemonics are specified.
+    </li>
+
+    <li><dt><code><b><font face="Courier New" size=2 color=#333399><a name='propPseudoInst'>"PseudoInstructions"</a> : <i>&lt;boolean&gt;</i></font></b></code>
+    <dd>If true, pseudo-instructions are requested.
+    </li>
+
+    <li><dt><code><b><font face="Courier New" size=2 color=#333399><a name='propOpcodeValue'>"OpcodeValue"</a> : <i>&lt;boolean&gt;</i></font></b></code>
+    <dd>If true, the instruction code byte values are returned.
+    </li>
+</ul>
+</dl>
+
+<p>Reply:</p>
+
+<pre><b><font face="Courier New" size=2 color=#333399>
+R &bull; <i>&lt;token&gt;</i> &bull; <i>&lt;error report&gt;</i> &bull; <i>&lt;array: disassembly output&gt;</i> &bull;
+
+<i>&lt;array: disassembly output&gt;</i>
+    &rArr; <i>&lt;null&gt;</i>
+    &rArr; [ ]
+    &rArr; [ <i>&lt;disassembly line list&gt;</i> ]
+
+<i>&lt;disassembly line list&gt;</i>
+    &rArr; <i>&lt;object: disassembly line&gt;</i>
+    &rArr; <i>&lt;disassembly line list&gt;</i>, <i>&lt;object: disassembly line&gt;</i>
+</font></b></pre>
+
+<pre><b><font face="Courier New" size=2 color=#333399>
+<i>&lt;object: disassembly line&gt;</i>
+</font></b></pre>
+
+<p>Disassembly line is an object containing properties. Predefined properties are:</p>
+
+<ul>
+    <li><code><b><font face="Courier New" size=2 color=#333399>"ISA" : <i>&lt;string&gt;</i></font></b></code>
+    - Instruction Set Architecture of the disassembly line
+    <li><code><b><font face="Courier New" size=2 color=#333399>"Address" : <i>&lt;int&gt;</i></font></b></code>
+        - Address of the instruction
+    <li><code><b><font face="Courier New" size=2 color=#333399>"Size" : <i>&lt;int&gt;</i></font></b></code>
+        - Size of the instruction in bytes
+    <li><code><b><font face="Courier New" size=2 color=#333399>"Instruction" : <i>&lt;array&gt;</i></font></b></code>
+        - Array of the intruction fields
+    <li><code><b><font face="Courier New" size=2 color=#333399>"OpcodeValue" : <i>&lt;string&gt;</i></font></b></code>
+        - Encoded byte array of the instruction binary representation
+</ul>
+
+<pre><b><font face="Courier New" size=2 color=#333399>
+<i>&lt;object: Instruction field&gt;</i>
+</font></b></pre>
+
+<p>Instruction field is an object containing properties.  Predefined properties are:</p>
+
+<ul>
+    <li><code><b><font face="Courier New" size=2 color=#333399>"Type" : <i>&lt;string&gt;</i></font></b></code>
+    - The predefined type of the instruction field.  Predefined types are:
+    <ul>
+        <li>"String"
+        <li>"Register"
+        <li>"Address"
+        <li>"Displacement"
+        <li>"Immediate"
+    </ul>
+    <li><code><b><font face="Courier New" size=2 color=#333399>"Text" : <i>&lt;string&gt;</i></font></b></code>
+    - Value of the field for "String" and "Register" types.
+    <li><code><b><font face="Courier New" size=2 color=#333399>"Value" : <i>&lt;number&gt;</i></font></b></code>
+    - Value of the field for "Address," "Displacement," or "Immediate" types.
+    <li><code><b><font face="Courier New" size=2 color=#333399>"AddressSpace" : <i>&lt;context-id&gt;</i></font></b></code>
+    - Context-ID of the address space used with the "Address" type.
+</ul>
+
+
+<p><b>Examples:</b></p>
+
+<p>The following command requests disassembly at address <code>0x1000</code>, for 8 bytes, in memory context "mc1", using a generic PowerPC ISA, and requesting instruction code bytes:</p>
+
+<pre><b><font face="Courier New" size=2 color=#333399>
+C <i>&lt;token&gt;</i> Disassembly <i>disassemble "mc1" 0x1000 8 {ISA:PPC,OpcodeValue:true}</i>
+</font></b></pre>
+
+<h3><a name='CmdGetCapabilities'>Get Capabilities</a></h3>
+
+<pre><b><font face="Courier New" size=2 color=#333399>
+C &bull; <i>&lt;token&gt;</i> &bull; Disassembly &bull; getCapabilities &bull; <i>&lt;string: context ID&gt;</i> &bull;
+</font></b></pre>
+
+<p>The command reports disassembly service capabilities to clients so they
+can adjust to different implementations of the service.
+The exact definition of context depends on the target agent and provided topology.</p>
+
+<p>Reply:</p>
+
+<pre><b><font face="Courier New" size=2 color=#333399>
+R &bull; <i>&lt;token&gt;</i> &bull; <i>&lt;error report&gt;</i> &bull; <i>&lt;service capabilities&gt;</i> &bull;
+
+<i>&lt;service capabilities&gt;</i>
+    &rArr; <i>&lt;null&gt;</i>
+    &rArr; <i>&lt;array: capabilities list&gt;</i>
+</font></b></pre>
+
+<p>Service capabilities consist of an array of lists of properties. All properties are optional.
+Tools and targets can define additional properties. Predefined properties are:</p>
+
+<ul>
+    <li><code><b><font face="Courier New" size=2 color=#333399>"ISA" : <i>&lt;string&gt;</i></font></b></code>
+    - The name of the supported instruction set architecture
+    <li><code><b><font face="Courier New" size=2 color=#333399>"Simplified" : <i>&lt;boolean&gt;</i></font></b></code>
+    - If true, simplified mnemonics are supported.  These are typical 1:1 correlation of architecture instruction to simplified mnemonic.
+    <li><code><b><font face="Courier New" size=2 color=#333399>"PseudoInstruction" : <i>&lt;boolean&gt;</i></font></b></code>
+    - If true, pseudo-instructions are supported.  These are typically macros, which correlate multiple architecture instructions to one pseudo-instruction.
+    <li><code><b><font face="Courier New" size=2 color=#333399>"OpcodeValue" : <i>&lt;boolean&gt;</i></font></b></code>
+    - If true, the decoded instruction code bytes are retrievable with the OpcodeValue parameter.
+</ul>
+
+<h2><a name='API'>API</a></h2>
+
+<pre>
+<font color=#3F5FBF>/**
+ * TCF Disassembly service interface.
+ */</font>
+<font color=#7F0055>public interface</font> IDisassembly <font color=#7F0055>extends</font> IService {
+
+    <font color=#3F5FBF>/**
+     * Service name.
+     */</font>
+    <font color=#7F0055>static final</font> String NAME = "Disassembly";
+
+    <font color=#7F0055>static final</font> String
+        <font color=#3F5FBF>/** The name of the instruction set architecture, String */</font>
+        CAPABILITY_ISA = "ISA",
+
+        <font color=#3F5FBF>/** If true, simplified mnemonics are supported or requested, Boolean */</font>
+        CAPABILITY_SIMPLIFIED = "Simplified",
+
+        <font color=#3F5FBF>/** If true, pseudo-instructions are supported or requested, Boolean */</font>
+        CAPABILITY_PSEUDO = "Pseudo",
+
+        <font color=#3F5FBF>/** If true, instruction code bytes are supported or requested, Boolean */</font>
+        CAPABILITY_OPCODE = "OpcodeValue";
+
+    <font color=#3F5FBF>/**
+     * Retrieve disassembly service capabilities a given context-id.
+     * @param context_id - a context ID, usually one returned by Run Control or Memory services.
+     * @param done - command result call back object.
+     * @return - pending command handle.
+     */</font>
+    IToken getCapabilities(String context_id, DoneGetCapabilities done);
+
+    <font color=#3F5FBF>/**
+     * Call back interface for 'getCapabilities' command.
+     */</font>
+    <font color=#7F0055>Interface</font> DoneGetCapabilities {
+        <font color=#3F5FBF>/**
+         * Called when capabilities retrieval is done.
+         * @param token - command handle.
+         * @param error - error object or null.
+         * @param capabilities - array of capabilities, see CAPABILITY_* for contents of each array element.
+         */</font>
+        <font color=#7F0055>void</font> doneGetCapabilities(IToken token, Throwable error, Map<String,Object>[] capabilities);
+    }
+
+    <font color=#3F5FBF>/**
+     * Disassemble instruction code from a specified range of memory addresses, in a specified context.
+     * @param context_id - a context ID, usually one returned by Run Control or Memory services.
+     * @param addr - address of first instruction to disassemble.
+     * @param size - size in bytes of the address range.
+     * @param params - properties to control the disassembly output, an element of capabilities array, see getCapabilities.
+     * @param done - command result call back object.
+     * @return - pending command handle.
+     */</font>
+
+    IToken disassemble(String context_id, Number addr, int size, Map<String,Object> params, DoneDisassemble done);
+
+    <font color=#3F5FBF>/**
+     * Call back interface for 'disassemble' command.
+     */</font>
+    <font color=#7F0055>interface</font> DoneDisassemble {
+        <font color=#3F5FBF>/**
+         * Called when disassembling is done.
+         * @param token - command handle.
+         * @param error - error object or null.
+         * @param disassembly - array of disassembly lines.
+         */</font>
+        <font color=#7F0055>void</font> doneDisassemble(IToken token, Throwable error, IDisassemblyLine[] disassembly);
+    }
+
+    <font color=#3F5FBF>/**
+     * Interface to represent a single disassembly line.
+     */</font>
+    <font color=#7F0055>interface</font> IDisassemblyLine {
+
+        <font color=#3F5FBF>/**
+         * @return instruction address.
+         */</font>
+        Number getAddress();
+
+        <font color=#3F5FBF>/**
+         * @return instruction size in bytes.
+         */</font>
+        <font color=#7F0055>int</font> getSize();
+
+        <font color=#3F5FBF>/**
+         * @return instruction binary representation.
+         */</font>
+        <font color=#7F0055>byte</font>[] getOpcodeValue();
+
+        <font color=#3F5FBF>/**
+         * @return array of instruction fields, each field is a collection of field properties, see FIELD_*.
+         */</font>
+        Map&lt;String,Object&gt;[] getInstruction();
+    }
+
+    <font color=#3F5FBF>/** Instruction field properties */</font>
+    <font color=#7F0055>static final</font> String
+        <font color=#3F5FBF>/** The type of the instruction field. See FTYPE_*, String. */</font>
+        FIELD_TYPE = "Type",
+
+        <font color=#3F5FBF>/** Value of the field for “String” and “Register” types, String. */</font>
+        FIELD_TEXT = "Text",
+
+        <font color=#3F5FBF>/** Value of the field for “Address,” “Displacement,” or “Immediate” types, Number. */</font>
+        FIELD_VALUE = "Value",
+
+        <font color=#3F5FBF>/** Context ID of the address space used with “Address” types, String. */</font>
+        FIELD_ADDRESS_SPACE = "AddressSpace";
+
+    <font color=#3F5FBF>/** Instruction field types */</font>
+    <font color=#7F0055>static final</font> String
+        FTYPE_STRING = "String",
+        FTYPE_REGISTER = "Register",
+        FTYPE_ADDRESS = "Address",
+        FTYPE_DISPLACEMENT = "Displacement",
+        FTYPE_IMMEDIATE = "Immediate";
+}
+</pre>
+
+</body>
+</html>
