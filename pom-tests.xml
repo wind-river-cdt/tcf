@@ -134,18 +134,9 @@
 					</configuration>
 				</plugin>
 				<plugin>      
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>emma-maven-plugin</artifactId>
-					<version>1.0-alpha-3</version>
-					<inherited>true</inherited>          
-					<executions>
-						<execution>
-							<phase>process-classes</phase>               
-							<goals>
-								<goal>instrument</goal>
-							</goals>
-						</execution>
-					</executions>
+					<groupId>org.jacoco</groupId>
+					<artifactId>jacoco-maven-plugin</artifactId>
+					<version>0.5.7-SNAPSHOT</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
