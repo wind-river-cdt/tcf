@@ -16,6 +16,7 @@ import java.util.Map;
 import org.eclipse.tcf.core.Command;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.JSON;
 import org.eclipse.tcf.services.IDisassembly;
 
 public class DisassemblyProxy implements IDisassembly {
@@ -26,13 +27,17 @@ public class DisassemblyProxy implements IDisassembly {
 
         final Number addr;
         final int size;
+        final byte[] data;
         final Map<String,Object>[] instruction;
 
         @SuppressWarnings("unchecked")
         DisassemblyLine(Map<String,Object> m) {
             addr = (Number)m.get("Address");
+            data = JSON.toByteArray(m.get("OpcodeValue"));
             Number size = (Number)m.get("Size");
-            this.size = size != null ? size.intValue() : 0;
+            if (size != null) this.size = size.intValue();
+            else if (data != null) this.size = data.length;
+            else this.size = 0;
             Collection<Map<String,Object>> c = (Collection<Map<String,Object>>)m.get("Instruction");
             instruction = c.toArray(new Map[c.size()]);
         }
@@ -45,6 +50,10 @@ public class DisassemblyProxy implements IDisassembly {
             return size;
         }
 
+        public byte[] getOpcodeValue() {
+            return data;
+        }
+
         public Map<String,Object>[] getInstruction() {
             return instruction;
         }
@@ -55,6 +64,8 @@ public class DisassemblyProxy implements IDisassembly {
             bf.append(addr.toString());
             bf.append(' ');
             bf.append(size);
+            bf.append(' ');
+            bf.append(data);
             bf.append(' ');
             for (Map<String,Object> m : instruction) bf.append(m.toString());
             bf.append(']');

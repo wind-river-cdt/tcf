@@ -22,7 +22,7 @@ public class TCFDisassemblyBackendFactory implements IAdapterFactory {
     public Object getAdapter(Object adaptableObject, Class adapterType) {
         if (adaptableObject instanceof TCFNode) {
             TCFDisassemblyBackend backend = new TCFDisassemblyBackend();
-            if (backend.supportsDebugContext((TCFNode) adaptableObject)) {
+            if (backend.supportsDebugContext((TCFNode)adaptableObject)) {
                 return backend;
             }
         }
@@ -32,5 +32,4 @@ public class TCFDisassemblyBackendFactory implements IAdapterFactory {
     public Class[] getAdapterList() {
         return CLASSES;
     }
-
 }

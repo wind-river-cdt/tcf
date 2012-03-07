@@ -31,7 +31,10 @@ public interface IDisassembly extends IService {
         CAPABILITY_SIMPLIFIED = "Simplified",
 
         /** If true, pseudo-instructions are supported or requested, Boolean */
-        CAPABILITY_PSEUDO = "Pseudo";
+        CAPABILITY_PSEUDO = "Pseudo",
+
+        /** If true, instruction code bytes are supported or requested, Boolean */
+        CAPABILITY_OPCODE = "OpcodeValue";
 
     /**
      * Retrieve disassembly service capabilities a given context-id.
@@ -92,6 +95,11 @@ public interface IDisassembly extends IService {
          * @return instruction size in bytes.
          */
         int getSize();
+
+        /**
+         * @return instruction binary representation.
+         */
+        byte[] getOpcodeValue();
 
         /**
          * @return array of instruction fields, each field is a collection of field properties, see FIELD_*.
