@@ -31,7 +31,7 @@
 					<useUIHarness>true</useUIHarness>
 					<useUIThread>true</useUIThread>
 					<product>org.eclipse.sdk.ide</product>
-					<argLine>${ui.test.vmargs}</argLine>
+					<argLine>${tycho.testArgLine} ${ui.test.vmargs}</argLine>
 					<application>org.eclipse.ui.ide.workbench</application>
 					<dependencies>
 						<dependency>
