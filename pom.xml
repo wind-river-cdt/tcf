@@ -127,6 +127,19 @@
 		</repository>
 	</repositories>
 
+	<pluginRepositories>
+		<pluginRepository>
+			<id>sonatype</id>
+			<url>https://repository.sonatype.org/content/repositories/public</url>
+  			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</pluginRepository>
+	</pluginRepositories>
+
 	<build>
 		<plugins>
 			<plugin>
