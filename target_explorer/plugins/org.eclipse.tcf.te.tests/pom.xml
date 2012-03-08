@@ -30,13 +30,13 @@
 					<testClass>org.eclipse.tcf.te.tests.suites.AllCoreTests</testClass>
 					<useUIHarness>true</useUIHarness>
 					<useUIThread>true</useUIThread>
-					<product>org.eclipse.sdk.ide</product>
+					<product>org.eclipse.platform.ide</product>
 					<argLine>${tycho.testArgLine} ${ui.test.vmargs}</argLine>
 					<application>org.eclipse.ui.ide.workbench</application>
 					<dependencies>
 						<dependency>
 							<type>p2-installable-unit</type>
-							<artifactId>org.eclipse.pde.feature.group</artifactId>
+							<artifactId>org.eclipse.sdk.feature.group</artifactId>
 							<version>${platform-version}</version>
 						</dependency>
 						<dependency>
