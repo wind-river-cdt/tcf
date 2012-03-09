@@ -49,7 +49,7 @@
 		</profile>
 
 		<profile>
-			<id>codeCoverage</id>
+			<id>coverage</id>
  
 			<build>
 				<plugins>

@@ -16,6 +16,9 @@
 	<packaging>eclipse-test-plugin</packaging>
 
 	<properties>
+		<sdk-version>3.8.0</sdk-version>
+		<te-version>1.0.0</te-version>
+				
 		<ui.test.vmargs>-Xmx512m -XX:MaxPermSize=256m</ui.test.vmargs>
 	</properties>
 
@@ -37,12 +40,12 @@
 						<dependency>
 							<type>p2-installable-unit</type>
 							<artifactId>org.eclipse.sdk.feature.group</artifactId>
-							<version>${platform-version}</version>
+							<version>${sdk-version}</version>
 						</dependency>
 						<dependency>
 							<type>p2-installable-unit</type>
 							<artifactId>org.eclipse.tcf.te.feature.feature.group</artifactId>
-							<version>1.0.0</version>
+							<version>${te-version}</version>
 						</dependency>
 					</dependencies>
 				</configuration>
