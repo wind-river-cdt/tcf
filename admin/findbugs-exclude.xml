@@ -18,4 +18,5 @@
 		<Bug pattern="EI_EXPOSE_REP"/>
 		<Method name="getAdapterList"/>
 	</Match>
+	
 </FindBugsFilter>
