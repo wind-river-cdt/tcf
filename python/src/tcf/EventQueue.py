@@ -1,5 +1,5 @@
-# *******************************************************************************
-# * Copyright (c) 2011 Wind River Systems, Inc. and others.
+# *****************************************************************************
+# * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others.
 # * All rights reserved. This program and the accompanying materials
 # * are made available under the terms of the Eclipse Public License v1.0
 # * which accompanies this distribution, and is available at
@@ -7,15 +7,17 @@
 # *
 # * Contributors:
 # *     Wind River Systems - initial API and implementation
-# *******************************************************************************
+# *****************************************************************************
 
 import threading
 import protocol
 
+
 class EventQueue(object):
 
     def __init__(self, on_shutdown=None):
-        self.__thread = threading.Thread(target=self, name="TCF Event Dispatcher")
+        self.__thread = threading.Thread(target=self,
+                                         name="TCF Event Dispatcher")
         self.__thread.daemon = True
         self.__is_waiting = False
         self.__is_shutdown = False
@@ -40,7 +42,7 @@ class EventQueue(object):
             protocol.log("Failed to shutdown TCF event dispatch thread", e)
 
     def isShutdown(self):
-        with self._lock:
+        with self.__lock:
             return self.__is_shutdown
 
     def __error(self, x):
@@ -51,7 +53,8 @@ class EventQueue(object):
             try:
                 with self.__lock:
                     while not self.__queue:
-                        if self.__is_shutdown: return
+                        if self.__is_shutdown:
+                            return
                         self.__is_waiting = True
                         self.__lock.wait()
                     r, args, kwargs = self.__queue.pop(0)
@@ -62,7 +65,8 @@ class EventQueue(object):
     def invokeLater(self, r, *args, **kwargs):
         assert r
         with self.__lock:
-            if self.__is_shutdown: raise RuntimeError("TCF event dispatcher has shut down")
+            if self.__is_shutdown:
+                raise RuntimeError("TCF event dispatcher has shut down")
             self.__queue.append((r, args, kwargs))
             if self.__is_waiting:
                 self.__is_waiting = False
@@ -76,6 +80,8 @@ class EventQueue(object):
             job_cnt = 0
             l0 = job_cnt / 10 - 100
             l1 = len(self.__queue) / 10 - 100
-            if l1 > l0: l0 = l1
-            if l0 > 100: l0 = 100
+            if l1 > l0:
+                l0 = l1
+            if l0 > 100:
+                l0 = 100
             return l0
