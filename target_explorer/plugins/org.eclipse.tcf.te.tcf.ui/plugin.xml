@@ -281,5 +281,11 @@
          </propertySection>
       </propertySections>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.tcf.te.tcf.ui.internal.preferences.PreferencesInitializer">
+      </initializer>
+   </extension>
    
 </plugin>

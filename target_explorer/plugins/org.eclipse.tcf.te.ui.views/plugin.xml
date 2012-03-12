@@ -55,7 +55,7 @@
                </property>
                <property
                      name="org.eclipse.ui.navigator.hideAvailableCustomizationsDialog"
-                     value="false">
+                     value="true">
                </property>
                <property
                      name="org.eclipse.ui.navigator.enforceHasChildren"
@@ -283,6 +283,39 @@
             <visibleWhen checkEnabled="true"/>
          </menu>
       </menuContribution>
+      <menuContribution
+            locationURI="menu:org.eclipse.tcf.te.ui.views.View?after=additions">
+         <separator
+               name="group.filters"
+               visible="true">
+         </separator>
+         <dynamic
+               class="org.eclipse.tcf.te.ui.views.handler.FilterMRUContribution"
+               id="org.eclipse.tcf.te.ui.views.dynamic.filterMRU">
+         </dynamic>
+         <command
+               commandId="org.eclipse.tcf.te.ui.views.command.filters"
+               icon="platform:/plugin/org.eclipse.ui.navigator/icons/full/elcl16/filter_ps.gif"
+               id="org.eclipse.tcf.te.ui.views.command.filters"
+               label="%command.filters.label"
+               style="push">
+         </command>
+         <separator
+               name="group.content"
+               visible="true">
+         </separator>
+         <dynamic
+               class="org.eclipse.tcf.te.ui.views.handler.ContentMRUContribution"
+               id="org.eclipse.tcf.te.ui.views.dynamic.contentMRU">
+         </dynamic>
+         <command
+               commandId="org.eclipse.tcf.te.ui.views.command.content"
+               icon="platform:/plugin/org.eclipse.ui.navigator/icons/full/elcl16/content.gif"
+               id="org.eclipse.tcf.te.ui.views.command.content"
+               label="%command.content.label"
+               style="push">
+         </command>
+      </menuContribution>
    </extension>
 
 <!-- Command contributions -->
@@ -302,6 +335,18 @@
             helpContextId="org.eclipse.tcf.te.ui.views.command_ShowInProperties"
             id="org.eclipse.tcf.te.ui.views.command.ShowInProperties"
             name="%command.showInProperties.label">
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.ui.views.command_Filters"
+            id="org.eclipse.tcf.te.ui.views.command.filters"
+            name="%command.filters.name">
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.ui.views.command_Content"
+            id="org.eclipse.tcf.te.ui.views.command.content"
+            name="%command.content.name">
       </command>
    </extension>
 
@@ -415,6 +460,30 @@
                </with>
             </enabledWhen>
       </handler>
+      <handler
+            class="org.eclipse.tcf.te.ui.views.handler.ConfigFiltersHandler"
+            commandId="org.eclipse.tcf.te.ui.views.command.filters">
+         <activeWhen>
+            <with
+                  variable="activePartId">
+               <equals
+                     value="org.eclipse.tcf.te.ui.views.View">
+               </equals>
+            </with>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tcf.te.ui.views.handler.ConfigContentHandler"
+            commandId="org.eclipse.tcf.te.ui.views.command.content">
+         <activeWhen>
+            <with
+                  variable="activePartId">
+               <equals
+                     value="org.eclipse.tcf.te.ui.views.View">
+               </equals>
+            </with>
+         </activeWhen>
+      </handler>
    </extension>
 
 <!-- Eclipse core expressions property tester -->
@@ -434,6 +503,12 @@
             properties="isCategoryID,isFavorites,isHome,isNeighborhood"
             type="org.eclipse.tcf.te.ui.views.interfaces.ICategory">
       </propertyTester>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.tcf.te.ui.views.internal.preferences.PreferencesInitializer">
+      </initializer>
    </extension>
 
 </plugin>

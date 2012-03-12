@@ -122,5 +122,11 @@
             id="org.eclipse.tcf.te.ui.views.workingsets.CustomizedOrderComparatorFactory">
       </factory>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.tcf.te.ui.views.workingsets.internal.preferences.PreferencesInitializer">
+      </initializer>
+   </extension>
 
 </plugin>

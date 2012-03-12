@@ -37,4 +37,13 @@ public class Messages extends NLS {
 
 	public static String AbstractCustomFormToolkitEditorPage_HelpAction_label;
 	public static String AbstractCustomFormToolkitEditorPage_HelpAction_tooltip;
+	public static String CommonFilterDescriptorLabelProvider_ContentExtensionDescription;
+	public static String ConfigContentHandler_DialogTitle;
+	public static String ConfigContentHandler_InitialFilter;
+	public static String ConfigContentHandler_PromptMessage;
+	public static String ConfigFiltersHandler_DialogTitle;
+	public static String ConfigFiltersHandler_InitialFilter;
+	public static String ConfigFiltersHandler_PromptMessage;
+	public static String UpdateActiveExtensionsOperation_OperationName;
+	public static String UpdateActiveFiltersOperation_OperationName;
 }
