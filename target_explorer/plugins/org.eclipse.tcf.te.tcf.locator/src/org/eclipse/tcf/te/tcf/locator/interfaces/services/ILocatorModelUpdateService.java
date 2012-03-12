@@ -11,6 +11,7 @@ package org.eclipse.tcf.te.tcf.locator.interfaces.services;
 
 import java.util.Collection;
 
+import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 
 
@@ -68,4 +69,12 @@ public interface ILocatorModelUpdateService extends ILocatorModelService {
 	 * @param child The child peer model object. Must not be <code>null</code>.
 	 */
 	public void removeChild(IPeerModel child);
+
+	/**
+	 * Merge user defined peer attributes from the given peer into the given peer node.
+	 *
+	 * @param node The peer node. Must not be <code>null</code>.
+	 * @param peer The peer. Must not be <code>null</code>.
+	 */
+	public void mergeUserDefinedAttributes(IPeerModel node, IPeer peer);
 }

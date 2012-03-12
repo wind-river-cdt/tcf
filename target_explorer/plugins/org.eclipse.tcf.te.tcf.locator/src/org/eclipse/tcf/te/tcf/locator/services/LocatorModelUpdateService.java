@@ -11,15 +11,19 @@ package org.eclipse.tcf.te.tcf.locator.services;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.tcf.core.AbstractPeer;
+import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.tcf.locator.interfaces.IModelListener;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerRedirector;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelUpdateService;
 
 
@@ -168,5 +172,48 @@ public class LocatorModelUpdateService extends AbstractLocatorModelService imple
 
 		// Notify listeners
 		parent.fireChangeEvent("changed", null, children); //$NON-NLS-1$
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelUpdateService#mergeUserDefinedAttributes(org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel, org.eclipse.tcf.protocol.IPeer)
+	 */
+	@Override
+	public void mergeUserDefinedAttributes(IPeerModel node, IPeer peer) {
+		Assert.isNotNull(node);
+		Assert.isNotNull(peer);
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+
+		// We can merge the peer attributes only if the destination peer is a AbstractPeer
+		IPeer dst = node.getPeer();
+		if (dst instanceof IPeerRedirector) dst = ((IPeerRedirector)dst).getParent();
+		if (!(dst instanceof AbstractPeer)) return;
+		// If destination and source peer are the same objects(!) nothing to do here
+		if (dst == peer) return;
+
+		// For now, the peer id's of both attribute maps must be the same
+		Assert.isTrue(dst.getID().equals(peer.getID()));
+
+		// Get a modifiable copy of the destination peer attributes
+		Map<String, String> dstAttrs = new HashMap<String, String>(dst.getAttributes());
+
+		// Get a modifiable copy of the source peer attributes
+		Map<String, String> srcAttrs = new HashMap<String, String>(peer.getAttributes());
+
+		// A user defined name overwrites a discovered name
+		String name = srcAttrs.get(IPeer.ATTR_NAME);
+		if (name != null && !"".equals(name)) { //$NON-NLS-1$
+			dstAttrs.put(IPeer.ATTR_NAME, name);
+		}
+
+		// Eliminate all attributes already set in the destination attributes map
+		for (String key : dstAttrs.keySet()) {
+			srcAttrs.remove(key);
+		}
+
+		// Copy all remaining attributes from source to destination
+		if (!srcAttrs.isEmpty()) dstAttrs.putAll(srcAttrs);
+
+		// And update the destination peer attributes
+		((AbstractPeer)dst).updateAttributes(dstAttrs);
 	}
 }

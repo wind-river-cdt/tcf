@@ -116,6 +116,8 @@ public class LocatorModelRefreshService extends AbstractLocatorModelService impl
 			// And create a new one if we cannot find it
 			if (peerNode == null) peerNode = new PeerModel(model, peer);
 			else oldChildren.remove(peerNode);
+			// Merge user configured properties between the peers
+			model.getService(ILocatorModelUpdateService.class).mergeUserDefinedAttributes(peerNode, peer);
 			// Validate the peer node before adding
 			peerNode = model.validatePeerNodeForAdd(peerNode);
 			if (peerNode != null) {
