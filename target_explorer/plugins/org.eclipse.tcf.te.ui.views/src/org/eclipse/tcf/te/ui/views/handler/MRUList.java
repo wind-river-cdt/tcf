@@ -11,7 +11,6 @@ package org.eclipse.tcf.te.ui.views.handler;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -54,10 +53,10 @@ public class MRUList extends ArrayList<String> {
 	/**
 	 * Update the MRU list preference with the specified delta set.
 	 * 
-	 * @param deltaSet The delta set to update the MRU preference with.
+	 * @param deltaList The delta list to update the MRU preference with.
 	 */
-	public void updateMRUList(Set<String> deltaSet) {
-		for (String id : deltaSet) {
+	public void updateMRUList(List<String> deltaList) {
+		for (String id : deltaList) {
 			if (!contains(id)) add(id);
 		}
 		IPreferenceStore prefStore = UIPlugin.getDefault().getPreferenceStore();

@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.tcf.te.ui.views.handler;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import org.eclipse.core.commands.operations.AbstractOperation;
 import org.eclipse.core.runtime.IAdaptable;
@@ -95,7 +95,7 @@ public class UpdateActiveExtensionsOperation extends AbstractOperation {
 					.getVisibleExtensions();
 
 			int indexofContentExtensionIdToBeActivated;
-			Set<String> deltaSet = new HashSet<String>();
+			List<String> deltaList = new ArrayList<String>();
 			/* is there a delta? */
 			for (int i = 0; i < visibleContentDescriptors.length; i++) {
 				indexofContentExtensionIdToBeActivated = Arrays.binarySearch(
@@ -108,12 +108,12 @@ public class UpdateActiveExtensionsOperation extends AbstractOperation {
 				if (indexofContentExtensionIdToBeActivated >= 0
 						^ contentService.isActive(visibleContentDescriptors[i]
 								.getId())) {
-					deltaSet.add(visibleContentDescriptors[i].getId());
+					deltaList.add(visibleContentDescriptors[i].getId());
 				}
 			}
 
 			/* If so, update */
-			if (!deltaSet.isEmpty()) {
+			if (!deltaList.isEmpty()) {
 				 
 				contentService.getActivationService().activateExtensions(
 						contentExtensionsToActivate, true);
@@ -134,7 +134,7 @@ public class UpdateActiveExtensionsOperation extends AbstractOperation {
 				IStructuredSelection newSelection = new StructuredSelection(originalObjects);
 				commonViewer.setSelection(newSelection, true);
 				MRUList mru = new MRUList(IPreferenceConsts.PREF_CONTENT_MRU_LIST);
-				mru.updateMRUList(deltaSet);
+				mru.updateMRUList(deltaList);
 			}
 
 		} finally {

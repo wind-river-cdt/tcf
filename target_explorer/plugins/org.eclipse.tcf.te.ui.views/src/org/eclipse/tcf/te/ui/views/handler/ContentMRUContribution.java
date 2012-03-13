@@ -44,8 +44,8 @@ public class ContentMRUContribution extends CompoundContributionItem {
 		/**
 		 * Constructor
 		 */
-		public ContentMRUAction(INavigatorContentDescriptor contentDescriptor, INavigatorContentService contentService, CommonViewer commonViewer) {
-			super(contentDescriptor.getName(), AS_CHECK_BOX);
+		public ContentMRUAction(int order, INavigatorContentDescriptor contentDescriptor, INavigatorContentService contentService, CommonViewer commonViewer) {
+			super("" + order + " " + contentDescriptor.getName(), AS_CHECK_BOX);  //$NON-NLS-1$//$NON-NLS-2$
 			this.contentDescriptor = contentDescriptor;
 			this.contentService = contentService;
 			this.commonViewer = commonViewer;
@@ -84,9 +84,10 @@ public class ContentMRUContribution extends CompoundContributionItem {
 		List<IContributionItem> items = new ArrayList<IContributionItem>();
 		List<String> extensionSet = new MRUList(IPreferenceConsts.PREF_CONTENT_MRU_LIST);
 		CommonViewer commonViewer = navigator.getCommonViewer();
-		for (String extensionId : extensionSet) {
+		for (int i = 0; i < extensionSet.size(); i++) {
+			String extensionId = extensionSet.get(i);
 			INavigatorContentDescriptor contentDescriptor = contentService.getContentDescriptorById(extensionId);
-			items.add(new ActionContributionItem(new ContentMRUAction(contentDescriptor, contentService, commonViewer)));
+			items.add(new ActionContributionItem(new ContentMRUAction((i + 1), contentDescriptor, contentService, commonViewer)));
 		}
 		return items.toArray(new IContributionItem[items.size()]);
 	}

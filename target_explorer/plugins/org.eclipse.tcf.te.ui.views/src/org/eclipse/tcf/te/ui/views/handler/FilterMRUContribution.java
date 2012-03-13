@@ -48,8 +48,8 @@ public class FilterMRUContribution extends CompoundContributionItem {
 		/**
 		 * Constructor
 		 */
-		public FilterMRUAction(ICommonFilterDescriptor filterDescriptor, NavigatorFilterService filterService, CommonViewer commonViewer) {
-			super(filterDescriptor.getName(), AS_CHECK_BOX);
+		public FilterMRUAction(int order, ICommonFilterDescriptor filterDescriptor, NavigatorFilterService filterService, CommonViewer commonViewer) {
+			super("" + order + " " + filterDescriptor.getName(), AS_CHECK_BOX);  //$NON-NLS-1$//$NON-NLS-2$
 			this.filterDescriptor = filterDescriptor;
 			this.filterService = filterService;
 			this.commonViewer = commonViewer;
@@ -93,9 +93,10 @@ public class FilterMRUContribution extends CompoundContributionItem {
 		List<IContributionItem> items = new ArrayList<IContributionItem>();
 		List<String> filterSet = new MRUList(IPreferenceConsts.PREF_FILTER_MRU_LIST);
 		CommonViewer commonViewer = navigator.getCommonViewer();
-	    for(String filterId : filterSet) {
+		for (int i = 0; i < filterSet.size(); i++) {
+	    	String filterId = filterSet.get(i);
 	    	ICommonFilterDescriptor filterDescriptor = fdMap.get(filterId);
-	    	items.add(new ActionContributionItem(new FilterMRUAction(filterDescriptor, filterService, commonViewer)));
+	    	items.add(new ActionContributionItem(new FilterMRUAction((i+1), filterDescriptor, filterService, commonViewer)));
 	    }
 	    return items.toArray(new IContributionItem[items.size()]);
     }

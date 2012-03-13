@@ -10,8 +10,9 @@
  ******************************************************************************/
 package org.eclipse.tcf.te.ui.views.handler;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.commands.operations.AbstractOperation;
@@ -80,22 +81,26 @@ public class UpdateActiveFiltersOperation extends AbstractOperation {
     public IStatus execute(IProgressMonitor monitor, IAdaptable info) {
         NavigatorFilterService filterService = (NavigatorFilterService) contentService.getFilterService();
 		ICommonFilterDescriptor[] filterDescriptors = filterService.getVisibleFilterDescriptorsForUI();
-		Set<String> currentActiveIds = new HashSet<String>();
+		
+		// Compute delta list.
+		List<String> deltaList = new ArrayList<String>();
+		Set<String> current = new HashSet<String>();
 		for(ICommonFilterDescriptor filterDescriptor : filterDescriptors) {
 			String filterId = filterDescriptor.getId();
 			if(filterService.isActive(filterId)) {
-				currentActiveIds.add(filterId);
+				current.add(filterId);
+				deltaList.add(filterId);
 			}
 		}
-		Set<String> newActiveIds = new HashSet<String>(Arrays.asList(filterIdsToActivate));
-		Set<String> intersections = new HashSet<String>(currentActiveIds);
-		intersections.retainAll(newActiveIds);
-		Set<String> unions = new HashSet<String>(currentActiveIds);
-		unions.addAll(newActiveIds);
-		unions.removeAll(intersections);
+		
+		for(String filterId : filterIdsToActivate) {
+			if (current.contains(filterId)) deltaList.remove(filterId);
+			else deltaList.add(filterId);
+		}
+		
 		filterService.activateFilterIdsAndUpdateViewer(filterIdsToActivate);
 		MRUList mru = new MRUList(IPreferenceConsts.PREF_FILTER_MRU_LIST);
-		mru.updateMRUList(unions);
+		mru.updateMRUList(deltaList);
 		return Status.OK_STATUS;
 	}
 
