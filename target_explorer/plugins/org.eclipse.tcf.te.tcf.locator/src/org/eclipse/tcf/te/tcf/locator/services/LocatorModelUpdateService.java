@@ -210,6 +210,12 @@ public class LocatorModelUpdateService extends AbstractLocatorModelService imple
 			srcAttrs.remove(key);
 		}
 
+		// Mark the peer as a remote peer, but only if there are
+		// attributes to merge left
+		if (!srcAttrs.isEmpty() && "RemotePeer".equals(dst.getClass().getSimpleName())) { //$NON-NLS-1$
+			srcAttrs.put("remote.transient", Boolean.TRUE.toString()); //$NON-NLS-1$
+		}
+
 		// Copy all remaining attributes from source to destination
 		if (!srcAttrs.isEmpty()) dstAttrs.putAll(srcAttrs);
 

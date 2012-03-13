@@ -419,19 +419,23 @@ public class GeneralInformationSection extends AbstractSection {
 		// The name control is enabled for static peers
 		if (nameControl != null) {
 			final AtomicBoolean isStatic = new AtomicBoolean();
+			final AtomicBoolean isRemote = new AtomicBoolean();
 			Runnable runnable = new Runnable() {
 				@Override
 				public void run() {
 					if (input instanceof IPeerModel) {
 						String value = ((IPeerModel)input).getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
 						isStatic.set(value != null && Boolean.parseBoolean(value.trim()));
+
+						value = ((IPeerModel)input).getPeer().getAttributes().get("remote.transient"); //$NON-NLS-1$
+						isRemote.set(value != null && Boolean.parseBoolean(value.trim()));
 					}
 				}
 			};
 			if (Protocol.isDispatchThread()) runnable.run();
 			else Protocol.invokeAndWait(runnable);
 
-			SWTControlUtil.setEnabled(nameControl.getEditFieldControl(), isStatic.get());
+			SWTControlUtil.setEnabled(nameControl.getEditFieldControl(), isStatic.get() && !isRemote.get());
 		}
 	}
 }

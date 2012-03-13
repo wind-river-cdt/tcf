@@ -430,12 +430,16 @@ public class TransportSection extends AbstractSection {
 
 		// Determine if the peer is a static peer
 		final AtomicBoolean isStatic = new AtomicBoolean();
+		final AtomicBoolean isRemote = new AtomicBoolean();
 		Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
 				if (input instanceof IPeerModel) {
 					String value = ((IPeerModel)input).getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
 					isStatic.set(value != null && Boolean.parseBoolean(value.trim()));
+
+					value = ((IPeerModel)input).getPeer().getAttributes().get("remote.transient"); //$NON-NLS-1$
+					isRemote.set(value != null && Boolean.parseBoolean(value.trim()));
 				}
 			}
 		};
@@ -444,10 +448,10 @@ public class TransportSection extends AbstractSection {
 
 		// The transport type control is enabled for static peers
 		if (transportTypeControl != null) {
-			SWTControlUtil.setEnabled(transportTypeControl.getEditFieldControl(), isStatic.get());
+			SWTControlUtil.setEnabled(transportTypeControl.getEditFieldControl(), isStatic.get() && !isRemote.get());
 			if (transportTypePanelControl != null) {
 				IWizardConfigurationPanel panel = transportTypePanelControl.getConfigurationPanel(transportTypeControl.getSelectedTransportType());
-				if (panel != null) panel.setEnabled(isStatic.get());
+				if (panel != null) panel.setEnabled(isStatic.get() && !isRemote.get());
 			}
 		}
 	}

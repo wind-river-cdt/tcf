@@ -109,6 +109,14 @@ public class PeerAttributesTablePart extends TablePart implements IDisposable {
 			}
 			return text != null ? text : ""; //$NON-NLS-1$
 		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
+		 */
+		@Override
+		public String getText(Object element) {
+		    return getColumnText(element, 0);
+		}
 	}
 
 	/**

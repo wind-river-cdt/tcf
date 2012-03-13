@@ -59,7 +59,7 @@ public class AttributesSection extends AbstractSection {
 	 * to add to the table.
 	 */
 	private static final String[] BANNED_NAMES = new String[] {
-																IPeer.ATTR_ID, IPeer.ATTR_AGENT_ID, IPeer.ATTR_SERVICE_MANGER_ID,
+																IPeer.ATTR_ID, IPeer.ATTR_AGENT_ID, IPeer.ATTR_SERVICE_MANGER_ID, "ServerManagerID", //$NON-NLS-1$
 																IPeer.ATTR_NAME, IPeer.ATTR_TRANSPORT_NAME, IPeer.ATTR_IP_HOST,
 																IPeer.ATTR_IP_PORT, "PipeName" //$NON-NLS-1$
 															  };
@@ -364,18 +364,22 @@ public class AttributesSection extends AbstractSection {
 
 		// Determine if the peer is a static peer
 		final AtomicBoolean isStatic = new AtomicBoolean();
+		final AtomicBoolean isRemote = new AtomicBoolean();
 		Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
 				if (input instanceof IPeerModel) {
 					String value = ((IPeerModel)input).getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
 					isStatic.set(value != null && Boolean.parseBoolean(value.trim()));
+
+					value = ((IPeerModel)input).getPeer().getAttributes().get("remote.transient"); //$NON-NLS-1$
+					isRemote.set(value != null && Boolean.parseBoolean(value.trim()));
 				}
 			}
 		};
 		if (Protocol.isDispatchThread()) runnable.run();
 		else Protocol.invokeAndWait(runnable);
 
-		if (tablePart != null) tablePart.setReadOnly(!isStatic.get());
+		if (tablePart != null) tablePart.setReadOnly(!isStatic.get() || isRemote.get());
 	}
 }
