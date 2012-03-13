@@ -42,6 +42,12 @@ public class ExpressionsProxy implements IExpressions {
             return n.booleanValue();
         }
 
+        public boolean hasFuncCall() {
+            Boolean n = (Boolean)props.get(PROP_HAS_FUNC_CALL);
+            if (n == null) return false;
+            return n.booleanValue();
+        }
+
         public int getBits() {
             Number n = (Number)props.get(PROP_BITS);
             if (n == null) return 0;

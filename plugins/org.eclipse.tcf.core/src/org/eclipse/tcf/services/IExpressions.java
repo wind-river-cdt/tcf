@@ -93,6 +93,13 @@ public interface IExpressions extends IService {
         boolean canAssign();
 
         /**
+         * Check if the expression contains target function call.
+         * Such expression can resume the target when evaluated.
+         * @return true if has a function call.
+         */
+        boolean hasFuncCall();
+
+        /**
          * Get complete map of context properties.
          * @return map of context properties.
          */
@@ -111,7 +118,8 @@ public interface IExpressions extends IService {
         PROP_BITS = "Bits",
         PROP_SIZE = "Size",
         PROP_TYPE = "Type",
-        PROP_CAN_ASSIGN = "CanAssign";
+        PROP_CAN_ASSIGN = "CanAssign",
+        PROP_HAS_FUNC_CALL = "HasFuncCall";
 
     /**
      * Value represents result of expression evaluation.
