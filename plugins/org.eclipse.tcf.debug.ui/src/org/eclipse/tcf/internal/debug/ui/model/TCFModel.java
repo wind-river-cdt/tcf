@@ -1604,7 +1604,7 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
                         if (editor instanceof ITextEditor) {
                             text_editor = (ITextEditor)editor;
                         }
-                        else {
+                        else if (editor != null) {
                             text_editor = (ITextEditor)editor.getAdapter(ITextEditor.class);
                         }
                     }
