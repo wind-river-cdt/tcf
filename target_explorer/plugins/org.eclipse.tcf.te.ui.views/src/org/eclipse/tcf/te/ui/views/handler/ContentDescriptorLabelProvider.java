@@ -9,7 +9,6 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.views.handler;
 
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
@@ -39,16 +38,6 @@ class ContentDescriptorLabelProvider extends LabelProvider implements IDescripti
 			INavigatorContentDescriptor ncd = (INavigatorContentDescriptor) element;
 			String desc = NLS.bind(Messages.CommonFilterDescriptorLabelProvider_ContentExtensionDescription, new Object[] { ncd.getName() });
 			return desc;
-		}
-		return null;
-	}
-
-	/**
-	 * Get the image descriptor for the specified navigator content descriptor.
-	 */
-	public ImageDescriptor getImageDescriptor(Object element) {
-		if (element instanceof INavigatorContentDescriptor) {
-			return ImageDescriptor.createFromImage(getImage(element));
 		}
 		return null;
 	}

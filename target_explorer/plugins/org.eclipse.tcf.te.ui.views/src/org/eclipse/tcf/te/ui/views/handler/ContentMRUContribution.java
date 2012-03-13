@@ -46,7 +46,6 @@ public class ContentMRUContribution extends CompoundContributionItem {
 		 */
 		public ContentMRUAction(INavigatorContentDescriptor contentDescriptor, INavigatorContentService contentService, CommonViewer commonViewer) {
 			super(contentDescriptor.getName(), AS_CHECK_BOX);
-			this.setImageDescriptor(ContentDescriptorLabelProvider.instance.getImageDescriptor(contentDescriptor));
 			this.contentDescriptor = contentDescriptor;
 			this.contentService = contentService;
 			this.commonViewer = commonViewer;
