@@ -216,8 +216,10 @@
 								<goal>prepare-agent</goal>
 							</goals>
 							<configuration>
-								<dumpOnExit>true</dumpOnExit>
+								<append>true</append>
 								<output>file</output>
+								<dumpOnExit>true</dumpOnExit>
+								<skip>false</skip>
 							</configuration>
 						</execution>
 					</executions>
