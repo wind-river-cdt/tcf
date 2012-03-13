@@ -12,7 +12,10 @@
 package org.eclipse.tcf.internal.cdt.ui.breakpoints;
 
 import org.eclipse.cdt.debug.core.model.ICBreakpoint;
+import org.eclipse.cdt.debug.ui.breakpoints.ICBreakpointContext;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -26,6 +29,7 @@ import org.eclipse.ui.dialogs.PropertyPage;
  */
 public class TCFBreakpointThreadFilterPage extends PropertyPage {
 
+    private TCFBreakpointScopeExtension fFilterExtension;
     private TCFThreadFilterEditor fThreadFilterEditor;
 
     @Override
@@ -41,21 +45,37 @@ public class TCFBreakpointThreadFilterPage extends PropertyPage {
     }
 
     protected ICBreakpoint getBreakpoint() {
+        if (getElement() instanceof ICBreakpointContext) {
+            return ((ICBreakpointContext)getElement()).getBreakpoint();
+        }
         return (ICBreakpoint) getElement().getAdapter(ICBreakpoint.class);
     }
 
+    public IPreferenceStore getPreferenceStore() {
+        IAdaptable element = getElement();
+        if (element instanceof ICBreakpointContext) {
+            return ((ICBreakpointContext)element).getPreferenceStore();
+        }
+        return getContainer().getPreferenceStore();
+    }
+
+    
     protected TCFBreakpointScopeExtension getFilterExtension() {
+        if (fFilterExtension != null) return fFilterExtension;
+        
         ICBreakpoint bp = getBreakpoint();
         if (bp != null) {
             try {
-                TCFBreakpointScopeExtension filter =
-                    (TCFBreakpointScopeExtension) bp.getExtension(
-                            ITCFConstants.ID_TCF_DEBUG_MODEL, TCFBreakpointScopeExtension.class);
-                filter.initialize(bp);
-                return filter;
+                fFilterExtension = bp.getExtension(
+                        ITCFConstants.ID_TCF_DEBUG_MODEL, TCFBreakpointScopeExtension.class);
             } catch (CoreException e) {
                 // potential race condition: ignore
             }
+            if (fFilterExtension == null) {
+                fFilterExtension = new TCFBreakpointScopeExtension();
+                fFilterExtension.initialize(getPreferenceStore());
+            }
+            return fFilterExtension;
         }
         return null;
     }
