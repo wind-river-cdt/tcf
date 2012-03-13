@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
@@ -30,6 +31,7 @@ import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.ILocator;
 import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistableNodeProperties;
+import org.eclipse.tcf.te.runtime.utils.net.IPAddressUtil;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.locator.ScannerRunnable;
 import org.eclipse.tcf.te.tcf.locator.activator.CoreBundleActivator;
@@ -117,17 +119,95 @@ public class LocatorModelRefreshService extends AbstractLocatorModelService impl
 			if (peerNode == null) peerNode = new PeerModel(model, peer);
 			else oldChildren.remove(peerNode);
 			// Merge user configured properties between the peers
-			model.getService(ILocatorModelUpdateService.class).mergeUserDefinedAttributes(peerNode, peer);
+			model.getService(ILocatorModelUpdateService.class).mergeUserDefinedAttributes(peerNode, peer, false);
 			// Validate the peer node before adding
 			peerNode = model.validatePeerNodeForAdd(peerNode);
 			if (peerNode != null) {
-				// Add the peer node to model
-				model.getService(ILocatorModelUpdateService.class).add(peerNode);
-				// And schedule for immediate status update
-				Runnable runnable = new ScannerRunnable(model.getScanner(), peerNode);
-				Protocol.invokeLater(runnable);
+				// There is still the chance that the node we add is a static node and
+				// there exist an dynamically discovered node with a different id but
+				// for the same peer. Do this check only if the peer to add is a static one.
+				String value = peerNode.getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
+				boolean isStatic = value != null && Boolean.parseBoolean(value.trim());
+				if (isStatic) {
+					for (IPeerModel candidate : oldChildren) {
+						if (peerNode.getPeer().getTransportName().equals(candidate.getPeer().getTransportName())) {
+							// Same transport name
+							if ("PIPE".equals(candidate.getPeer().getTransportName())) { //$NON-NLS-1$
+								// Compare the pipe name
+								String name1 = peerNode.getPeer().getAttributes().get("PipeName"); //$NON-NLS-1$
+								String name2 = candidate.getPeer().getAttributes().get("PipeName"); //$NON-NLS-1$
+								// Same pipe -> same node
+								if (name1 != null && name1.equals(name2)) {
+									// Merge user configured properties between the peers
+									model.getService(ILocatorModelUpdateService.class).mergeUserDefinedAttributes(candidate, peerNode.getPeer(), true);
+									peerNode = null;
+									break;
+								}
+							} else if ("Loop".equals(candidate.getPeer().getTransportName())) { //$NON-NLS-1$
+								// Merge user configured properties between the peers
+								model.getService(ILocatorModelUpdateService.class).mergeUserDefinedAttributes(candidate, peerNode.getPeer(), true);
+								peerNode = null;
+								break;
+							} else {
+								// Compare IP_HOST and IP_Port;
+								String ip1 = peerNode.getPeer().getAttributes().get(IPeer.ATTR_IP_HOST);
+								String ip2 = candidate.getPeer().getAttributes().get(IPeer.ATTR_IP_HOST);
+								if (IPAddressUtil.getInstance().isSameHost(ip1, ip2)) {
+									// Compare the ports
+									String port1 = peerNode.getPeer().getAttributes().get(IPeer.ATTR_IP_PORT);
+									if (port1 == null || "".equals(port1)) port1 = "1534"; //$NON-NLS-1$ //$NON-NLS-2$
+									String port2 = candidate.getPeer().getAttributes().get(IPeer.ATTR_IP_PORT);
+									if (port2 == null || "".equals(port2)) port2 = "1534"; //$NON-NLS-1$ //$NON-NLS-2$
+
+									if (port1.equals(port2)) {
+										// Merge user configured properties between the peers
+										model.getService(ILocatorModelUpdateService.class).mergeUserDefinedAttributes(candidate, peerNode.getPeer(), true);
+										peerNode = null;
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+				if (peerNode != null) {
+					// Add the peer node to model
+					model.getService(ILocatorModelUpdateService.class).add(peerNode);
+					// And schedule for immediate status update
+					Runnable runnable = new ScannerRunnable(model.getScanner(), peerNode);
+					Protocol.invokeLater(runnable);
+				}
 			}
 		}
+	}
+
+	private final AtomicBoolean REFRESH_STATIC_PEERS_GUARD = new AtomicBoolean(false);
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelRefreshService#refreshStaticPeers()
+	 */
+	@Override
+	public void refreshStaticPeers() {
+		Assert.isTrue(Protocol.isDispatchThread());
+
+		// This method might be called reentrant while processing. Return immediately
+		// in this case.
+		if (REFRESH_STATIC_PEERS_GUARD.get()) return;
+		REFRESH_STATIC_PEERS_GUARD.set(true);
+
+		// Get the parent locator model
+		ILocatorModel model = getLocatorModel();
+
+		// If the parent model is already disposed, the service will drop out immediately
+		if (model.isDisposed()) return;
+
+		// Get the list of old children (update node instances where possible)
+		final List<IPeerModel> oldChildren = new ArrayList<IPeerModel>(Arrays.asList(model.getPeers()));
+
+		// Refresh the static peer definitions
+		refreshStaticPeers(oldChildren, model);
+
+		REFRESH_STATIC_PEERS_GUARD.set(false);
 	}
 
 	/**

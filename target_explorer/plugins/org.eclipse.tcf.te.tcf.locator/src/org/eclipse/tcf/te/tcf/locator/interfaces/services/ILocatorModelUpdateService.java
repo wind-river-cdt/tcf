@@ -75,6 +75,7 @@ public interface ILocatorModelUpdateService extends ILocatorModelService {
 	 *
 	 * @param node The peer node. Must not be <code>null</code>.
 	 * @param peer The peer. Must not be <code>null</code>.
+	 * @param force If <code>true</code>, the peer attributes are merged even if the peer id's don't match.
 	 */
-	public void mergeUserDefinedAttributes(IPeerModel node, IPeer peer);
+	public void mergeUserDefinedAttributes(IPeerModel node, IPeer peer, boolean force);
 }

@@ -9,6 +9,10 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.locator.listener;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
@@ -20,6 +24,7 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelLookupService;
+import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelRefreshService;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelUpdateService;
 import org.eclipse.tcf.te.tcf.locator.nodes.PeerModel;
 
@@ -74,11 +79,22 @@ public class LocatorListener implements ILocator.LocatorListener {
 		}
 	}
 
+	// Map of guardian objects per peer
+	private final Map<IPeer, AtomicBoolean> PEER_CHANGED_GUARDIANS = new HashMap<IPeer, AtomicBoolean>();
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.services.ILocator.LocatorListener#peerChanged(org.eclipse.tcf.protocol.IPeer)
 	 */
 	@Override
 	public void peerChanged(IPeer peer) {
+		// Protect ourself from reentrant calls while processing a changed peer.
+		if (peer != null) {
+			AtomicBoolean guard = PEER_CHANGED_GUARDIANS.get(peer);
+			if (guard != null && guard.get()) return;
+			if (guard != null) guard.set(true);
+			else PEER_CHANGED_GUARDIANS.put(peer, new AtomicBoolean(true));
+		}
+
 		if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITracing.ID_TRACE_LOCATOR_LISTENER)) {
 			CoreBundleActivator.getTraceHandler().trace("LocatorListener.peerChanged( " + (peer != null ? peer.getID() : null) + " )", ITracing.ID_TRACE_LOCATOR_LISTENER, this); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -88,7 +104,12 @@ public class LocatorListener implements ILocator.LocatorListener {
 			IPeerModel peerNode = model.getService(ILocatorModelLookupService.class).lkupPeerModelById(peer.getID());
 			// Update the peer instance
 			if (peerNode != null) peerNode.setProperty(IPeerModelProperties.PROP_INSTANCE, peer);
+			// Refresh static peers and merge attributes if required
+			model.getService(ILocatorModelRefreshService.class).refreshStaticPeers();
 		}
+
+		// Clean up the guardians
+		if (peer != null) PEER_CHANGED_GUARDIANS.remove(peer);
 	}
 
 	/* (non-Javadoc)

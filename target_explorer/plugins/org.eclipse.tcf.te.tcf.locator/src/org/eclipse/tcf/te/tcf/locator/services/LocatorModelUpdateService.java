@@ -175,10 +175,10 @@ public class LocatorModelUpdateService extends AbstractLocatorModelService imple
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelUpdateService#mergeUserDefinedAttributes(org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel, org.eclipse.tcf.protocol.IPeer)
+	 * @see org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelUpdateService#mergeUserDefinedAttributes(org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel, org.eclipse.tcf.protocol.IPeer, boolean)
 	 */
 	@Override
-	public void mergeUserDefinedAttributes(IPeerModel node, IPeer peer) {
+	public void mergeUserDefinedAttributes(IPeerModel node, IPeer peer, boolean force) {
 		Assert.isNotNull(node);
 		Assert.isNotNull(peer);
 		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
@@ -190,8 +190,8 @@ public class LocatorModelUpdateService extends AbstractLocatorModelService imple
 		// If destination and source peer are the same objects(!) nothing to do here
 		if (dst == peer) return;
 
-		// For now, the peer id's of both attribute maps must be the same
-		Assert.isTrue(dst.getID().equals(peer.getID()));
+		// If not forced, the peer id's of both attribute maps must be the same
+		if (!force) Assert.isTrue(dst.getID().equals(peer.getID()));
 
 		// Get a modifiable copy of the destination peer attributes
 		Map<String, String> dstAttrs = new HashMap<String, String>(dst.getAttributes());
