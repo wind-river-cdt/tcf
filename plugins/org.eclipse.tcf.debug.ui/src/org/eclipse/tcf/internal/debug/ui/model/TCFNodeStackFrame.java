@@ -99,7 +99,18 @@ public class TCFNodeStackFrame extends TCFNode {
                     set(null, address.getError(), null);
                     return true;
                 }
-                if (frame_no > 0) n = n.subtract(BigInteger.valueOf(1));
+                if (frame_no > 0) {
+                    boolean func_start = false;
+                    if (!func_info.validate(this)) return false;
+                    TCFFunctionRef ref = func_info.getData();
+                    if (ref != null && ref.symbol_id != null) {
+                        TCFDataCache<ISymbols.Symbol> sym_cache = model.getSymbolInfoCache(ref.symbol_id);
+                        if (!sym_cache.validate(this)) return false;
+                        ISymbols.Symbol sym_data = sym_cache.getData();
+                        if (sym_data != null) func_start = n.equals(JSON.toBigInteger(sym_data.getAddress()));
+                    }
+                    if (!func_start) n = n.subtract(BigInteger.valueOf(1));
+                }
                 TCFDataCache<TCFNodeExecContext> mem_cache = ((TCFNodeExecContext)parent).getMemoryNode();
                 if (!mem_cache.validate(this)) return false;
                 if (mem_cache.getError() != null || mem_cache.getData() == null) {
