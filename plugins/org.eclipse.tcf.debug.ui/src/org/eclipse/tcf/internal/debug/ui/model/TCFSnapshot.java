@@ -50,6 +50,7 @@ class TCFSnapshot {
         IStatus status;
 
         String[] label;
+        String[] label_next;
         FontData[] font_data;
         ImageDescriptor[] image_desc;
         RGB[] fg_color;
@@ -59,9 +60,13 @@ class TCFSnapshot {
         TCFNode[] children;
         boolean children_done;
 
-        boolean stalled;
-
         private final ArrayList<Runnable> waiting_list = new ArrayList<Runnable>();
+
+        boolean isStalled() {
+            if (label == null) return false;
+            if (label_next == null) return false;
+            return !Arrays.equals(label, label_next);
+        }
 
         public IPresentationContext getPresentationContext() {
             return ctx;
@@ -112,12 +117,11 @@ class TCFSnapshot {
                 label[col] = text;
             }
             else {
-                if (col >= label.length) stalled = true;
-                else if (label[col] != text) {
-                    if (label[col] == null || text == null || !text.equals(label[col])) {
-                        stalled = true;
-                    }
+                if (label_next == null) {
+                    int cnt = columns == null ? 1 : columns.length;
+                    label_next = new String[cnt];
                 }
+                label_next[col] = text;
             }
         }
 
@@ -291,7 +295,7 @@ class TCFSnapshot {
                     if (data.image_desc[i] != null) update.setImageDescriptor(data.image_desc[i], i);
                 }
             }
-            if (data.stalled) {
+            if (data.isStalled()) {
                 int n = ids_update == null ? 1 : ids_update.length;
                 for (int i = 0; i < n; i++) update.setForeground(rgb_stalled, i);
             }
@@ -337,7 +341,6 @@ class TCFSnapshot {
         data = cache.get(node);
         if (data == null) cache.put(node, data = new PresentationData());
         assert data.update != update;
-        if (data.label_done && data.stalled) return true;
         if (data.update != null) {
             data.waiting_list.add(done);
             return false;
