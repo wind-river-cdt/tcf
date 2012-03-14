@@ -77,8 +77,8 @@ public class TCFNodeArrayPartition extends TCFNode {
         return true;
     }
 
-    void onSuspended() {
-        children.onSuspended();
+    void onSuspended(boolean func_call) {
+        children.onSuspended(func_call);
     }
 
     void onValueChanged() {

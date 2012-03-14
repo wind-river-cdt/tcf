@@ -478,13 +478,18 @@ public class TCFNodeRegister extends TCFNode implements IElementEditor, IWatchIn
         postStateChangedDelta();
     }
 
-    void onSuspended() {
-        prev_value = next_value;
-        value.reset();
-        children.onSuspended();
-        // Unlike thread registers, stack frame register list must be retrieved on every suspend
-        if (is_stack_frame_register) children.reset();
-        // No need to post delta: parent posted CONTENT
+    void onSuspended(boolean func_call) {
+        if (!func_call) {
+            prev_value = next_value;
+            value.reset();
+            // Unlike thread registers, stack frame register list must be retrieved on every suspend
+            if (is_stack_frame_register) children.reset();
+            // No need to post delta: parent posted CONTENT
+        }
+        else if (value.isValid() && value.getError() != null) {
+            value.reset();
+        }
+        children.onSuspended(func_call);
     }
 
     void onRegistersChanged() {

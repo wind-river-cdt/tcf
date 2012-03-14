@@ -39,9 +39,9 @@ public class TCFChildrenStackTrace extends TCFChildren {
         for (TCFNode n : getNodes()) ((TCFNodeStackFrame)n).onExpressionAddedOrRemoved();
     }
 
-    void onSuspended() {
+    void onSuspended(boolean func_call) {
         limit_factor = 1;
-        for (TCFNode n : getNodes()) ((TCFNodeStackFrame)n).onSuspended();
+        for (TCFNode n : getNodes()) ((TCFNodeStackFrame)n).onSuspended(func_call);
         reset();
     }
 

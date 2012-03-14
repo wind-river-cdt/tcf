@@ -493,17 +493,19 @@ public class TCFNodeStackFrame extends TCFNode {
         postStateChangedDelta();
     }
 
-    void onSuspended() {
+    void onSuspended(boolean func_call) {
         stack_trace_context.cancel();
         line_info.cancel();
         func_info.cancel();
         address.cancel();
-        children_regs.onSuspended();
-        // Unlike thread registers, stack frame register list must be retrieved on every suspend
-        children_regs.reset();
-        children_vars.onSuspended();
-        children_exps.onSuspended();
-        children_hover_exps.onSuspended();
+        if (!func_call) {
+            // Unlike thread registers, stack frame register list must be retrieved on every suspend
+            children_regs.reset();
+        }
+        children_regs.onSuspended(func_call);
+        children_vars.onSuspended(func_call);
+        children_exps.onSuspended(func_call);
+        children_hover_exps.onSuspended(func_call);
         // delta is posted by the parent node
     }
 

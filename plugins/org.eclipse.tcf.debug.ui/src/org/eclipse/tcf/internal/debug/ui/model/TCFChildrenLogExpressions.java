@@ -22,7 +22,7 @@ public class TCFChildrenLogExpressions extends TCFChildren {
     }
 
     void onSuspended() {
-        for (TCFNode n : getNodes()) ((TCFNodeExpression)n).onSuspended();
+        for (TCFNode n : getNodes()) ((TCFNodeExpression)n).onSuspended(false);
         scripts.clear();
         reset();
     }

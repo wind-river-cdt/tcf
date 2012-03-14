@@ -23,8 +23,8 @@ public class TCFChildrenRegisters extends TCFChildren {
         super(node, 128);
     }
 
-    void onSuspended() {
-        for (TCFNode n : getNodes()) ((TCFNodeRegister)n).onSuspended();
+    void onSuspended(boolean func_call) {
+        for (TCFNode n : getNodes()) ((TCFNodeRegister)n).onSuspended(func_call);
     }
 
     void onParentValueChanged() {

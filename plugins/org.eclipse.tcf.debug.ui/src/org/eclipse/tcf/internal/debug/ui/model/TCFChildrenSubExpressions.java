@@ -30,11 +30,11 @@ public class TCFChildrenSubExpressions extends TCFChildren {
         this.par_size = par_size;
     }
 
-    void onSuspended() {
+    void onSuspended(boolean func_call) {
         reset();
         for (TCFNode n : getNodes()) {
-            if (n instanceof TCFNodeExpression) ((TCFNodeExpression)n).onSuspended();
-            if (n instanceof TCFNodeArrayPartition) ((TCFNodeArrayPartition)n).onSuspended();
+            if (n instanceof TCFNodeExpression) ((TCFNodeExpression)n).onSuspended(func_call);
+            if (n instanceof TCFNodeArrayPartition) ((TCFNodeArrayPartition)n).onSuspended(func_call);
         }
     }
 

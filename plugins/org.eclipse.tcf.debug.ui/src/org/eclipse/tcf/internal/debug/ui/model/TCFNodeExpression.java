@@ -563,14 +563,16 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
         }
     }
 
-    void onSuspended() {
-        prev_value = next_value;
-        if (expression.isValid() && expression.getError() != null) expression.reset();
-        value.reset();
-        type.reset();
-        type_name.reset();
-        string.reset();
-        children.onSuspended();
+    void onSuspended(boolean func_call) {
+        if (!func_call) {
+            prev_value = next_value;
+            if (expression.isValid() && expression.getError() != null) expression.reset();
+            value.reset();
+            type.reset();
+            type_name.reset();
+            string.reset();
+        }
+        children.onSuspended(func_call);
         // No need to post delta: parent posted CONTENT
     }
 

@@ -370,22 +370,27 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
 
         public void containerSuspended(String context, String pc, String reason,
                 Map<String,Object> params, String[] suspended_ids) {
+            boolean func_call = false;
+            if (params != null) {
+                Boolean b = (Boolean)params.get("FuncCall");
+                func_call = b != null && b.booleanValue();
+            }
             int action_cnt = 0;
             for (String id : suspended_ids) {
                 TCFNode node = getNode(id);
                 action_results.remove(id);
                 if (active_actions.get(id) != null) action_cnt++;
                 if (!id.equals(context) && node instanceof TCFNodeExecContext) {
-                    ((TCFNodeExecContext)node).onContainerSuspended();
+                    ((TCFNodeExecContext)node).onContainerSuspended(func_call);
                 }
                 onMemoryChanged(id, false, true);
             }
             TCFNode node = getNode(context);
             if (node instanceof TCFNodeExecContext) {
-                ((TCFNodeExecContext)node).onContextSuspended(pc, reason, params);
+                ((TCFNodeExecContext)node).onContextSuspended(pc, reason, params, func_call);
             }
             launch_node.onAnyContextSuspendedOrChanged();
-            if (action_cnt == 0) {
+            if (!func_call && action_cnt == 0) {
                 setDebugViewSelection(node, reason);
                 annotation_manager.updateAnnotations(null, launch);
                 TCFNodePropertySource.refresh(node);
@@ -446,13 +451,18 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
         }
 
         public void contextSuspended(String id, String pc, String reason, Map<String,Object> params) {
+            boolean func_call = false;
+            if (params != null) {
+                Boolean b = (Boolean)params.get("FuncCall");
+                func_call = b != null && b.booleanValue();
+            }
             TCFNode node = getNode(id);
             action_results.remove(id);
             if (node instanceof TCFNodeExecContext) {
-                ((TCFNodeExecContext)node).onContextSuspended(pc, reason, params);
+                ((TCFNodeExecContext)node).onContextSuspended(pc, reason, params, func_call);
             }
             launch_node.onAnyContextSuspendedOrChanged();
-            if (active_actions.get(id) == null) {
+            if (!func_call && active_actions.get(id) == null) {
                 setDebugViewSelection(node, reason);
                 annotation_manager.updateAnnotations(null, launch);
                 TCFNodePropertySource.refresh(node);

@@ -1054,6 +1054,8 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
                     }
                 }
                 label.append(nm != null ? nm : id);
+                Object info = ctx.getProperties().get("AdditionalInfo");
+                if (info != null) label.append(info.toString());
                 if (ctx.hasState() && !TCFModel.ID_PINNED_VIEW.equals(result.getPresentationContext().getId())) {
                     // Thread
                     if (resume_pending && resumed_by_action || model.getActiveAction(id) != null) {
@@ -1354,13 +1356,13 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
         children_stack.onExpressionAddedOrRemoved();
     }
 
-    void onContainerSuspended() {
+    void onContainerSuspended(boolean func_call) {
         assert !isDisposed();
         if (run_context.isValid()) {
             IRunControl.RunControlContext ctx = run_context.getData();
             if (ctx != null && !ctx.hasState()) return;
         }
-        onContextSuspended(null, null, null);
+        onContextSuspended(null, null, null, func_call);
     }
 
     void onContainerResumed() {
@@ -1372,7 +1374,7 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
         onContextResumed();
     }
 
-    void onContextSuspended(String pc, String reason, Map<String,Object> params) {
+    void onContextSuspended(String pc, String reason, Map<String,Object> params, boolean func_call) {
         assert !isDisposed();
         if (pc != null) {
             TCFContextState s = new TCFContextState();
@@ -1387,11 +1389,13 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
         }
         address.reset();
         signal_mask.reset();
-        children_stack.onSuspended();
-        children_regs.onSuspended();
-        children_exps.onSuspended();
-        children_hover_exps.onSuspended();
-        children_log_exps.onSuspended();
+        children_stack.onSuspended(func_call);
+        children_exps.onSuspended(func_call);
+        children_hover_exps.onSuspended(func_call);
+        children_regs.onSuspended(func_call);
+        if (!func_call) {
+            children_log_exps.onSuspended();
+        }
         for (TCFNodeSymbol s : symbols.values()) s.onExeStateChange();
         if (model.getActiveAction(id) == null) {
             boolean update_now = pc != null || resumed_by_action;

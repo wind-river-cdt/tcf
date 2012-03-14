@@ -30,8 +30,8 @@ class TCFChildrenHoverExpressions extends TCFChildren {
         cancel();
     }
 
-    void onSuspended() {
-        for (TCFNode n : getNodes()) ((TCFNodeExpression)n).onSuspended();
+    void onSuspended(boolean func_call) {
+        for (TCFNode n : getNodes()) ((TCFNodeExpression)n).onSuspended(func_call);
     }
 
     void onRegisterValueChanged() {

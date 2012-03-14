@@ -25,9 +25,9 @@ public class TCFChildrenLocalVariables extends TCFChildren {
         this.node = node;
     }
 
-    void onSuspended() {
-        reset();
-        for (TCFNode n : getNodes()) ((TCFNodeExpression)n).onSuspended();
+    void onSuspended(boolean func_call) {
+        if (!func_call) reset();
+        for (TCFNode n : getNodes()) ((TCFNodeExpression)n).onSuspended(func_call);
     }
 
     void onRegisterValueChanged() {
