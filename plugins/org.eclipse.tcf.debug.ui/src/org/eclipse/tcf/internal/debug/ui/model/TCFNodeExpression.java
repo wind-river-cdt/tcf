@@ -324,17 +324,21 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
                     set(null, expression.getError(), null);
                     return true;
                 }
+                final TCFDataCache<?> cache = this;
                 IExpressions exps = launch.getService(IExpressions.class);
                 command = exps.evaluate(exp.expression.getID(), new IExpressions.DoneEvaluate() {
                     public void doneEvaluate(IToken token, Exception error, IExpressions.Value value) {
+                        if (command != token) return;
+                        command = null;
                         if (error != null) {
-                            Boolean b = usePrevValue(null);
-                            if (b != null && b) {
-                                set(token, null, prev_value);
+                            Boolean b = usePrevValue(cache);
+                            if (b == null) return;
+                            if (b) {
+                                set(null, null, prev_value);
                                 return;
                             }
                         }
-                        set(token, error, value);
+                        set(null, error, value);
                     }
                 });
                 return false;
@@ -566,12 +570,12 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
     void onSuspended(boolean func_call) {
         if (!func_call) {
             prev_value = next_value;
-            if (expression.isValid() && expression.getError() != null) expression.reset();
-            value.reset();
             type.reset();
             type_name.reset();
-            string.reset();
         }
+        if (expression.isValid() && expression.getError() != null) expression.reset();
+        if (!func_call || value.isValid() && value.getError() != null) value.reset();
+        if (!func_call || string.isValid() && string.getError() != null) string.reset();
         children.onSuspended(func_call);
         // No need to post delta: parent posted CONTENT
     }

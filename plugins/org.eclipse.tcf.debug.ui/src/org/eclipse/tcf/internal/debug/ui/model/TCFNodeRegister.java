@@ -136,16 +136,20 @@ public class TCFNodeRegister extends TCFNode implements IElementEditor, IWatchIn
                     set(null, null, null);
                     return true;
                 }
+                final TCFDataCache<?> cache = this;
                 command = ctx.get(new IRegisters.DoneGet() {
                     public void doneGet(IToken token, Exception error, byte[] value) {
+                        if (command != token) return;
+                        command = null;
                         if (error != null) {
-                            Boolean b = usePrevValue(null);
-                            if (b != null && b) {
-                                set(token, null, prev_value);
+                            Boolean b = usePrevValue(cache);
+                            if (b == null) return;
+                            if (b) {
+                                set(null, null, prev_value);
                                 return;
                             }
                         }
-                        set(token, error, value);
+                        set(null, error, value);
                     }
                 });
                 return false;
