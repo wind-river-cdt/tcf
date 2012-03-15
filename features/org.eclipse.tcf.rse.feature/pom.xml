@@ -14,4 +14,8 @@
 	<artifactId>org.eclipse.tcf.rse.feature</artifactId>
 	<packaging>eclipse-feature</packaging>
 	<version>1.0.0.qualifier</version>
+	
+	<properties>
+		<jacoco.skip>true</jacoco.skip>
+	</properties>
 </project>

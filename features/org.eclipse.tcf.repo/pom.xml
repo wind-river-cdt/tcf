@@ -19,6 +19,7 @@
 		<tcf-stream>juno</tcf-stream>
 		<tcf-zipfile>org.eclipse.tcf.repo.zip</tcf-zipfile>
 		<tcf-install>/home/data/httpd/download.eclipse.org/tools/tcf/builds/${tcf-stream}/nightly</tcf-install>
+		<jacoco.skip>true</jacoco.skip>
 	</properties>
 	
 	<pluginRepositories>

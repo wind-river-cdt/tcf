@@ -25,6 +25,13 @@
 		<!-- Common global properties -->
 		<adminDir>${env.WORKSPACE}/admin</adminDir>
 
+		<!-- JaCoCo global properties -->
+		<jacoco.basedir>${env.WORKSPACE}/target_explorer/coverage</jacoco.basedir>
+		<jacoco.destFile>${jacoco.basedir}/jacoco.exec</jacoco.destFile>
+		<jacoco.dataFile>${jacoco.basedir}/jacoco.exec</jacoco.dataFile>
+		<jacoco.outputDirectory>${jacoco.basedir}/jacoco</jacoco.outputDirectory>
+		<jacoco.skip>false</jacoco.skip>
+		
 		<!-- P2 repository URL's -->
 		<platform-site>http://download.eclipse.org/eclipse/updates/3.8milestones</platform-site>
 		<cdt-site>http://download.eclipse.org/tools/cdt/builds/juno/nightly</cdt-site>
@@ -216,10 +223,8 @@
 								<goal>prepare-agent</goal>
 							</goals>
 							<configuration>
-								<append>true</append>
 								<output>file</output>
 								<dumpOnExit>true</dumpOnExit>
-								<skip>false</skip>
 							</configuration>
 						</execution>
 					</executions>

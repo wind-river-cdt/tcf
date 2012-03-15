@@ -65,7 +65,8 @@ plugins/org.eclipse.tcf.rse/bin
 # Tests
 tests/plugins/org.eclipse.tcf.debug.test/bin
 
-# target explorer
+# Target Explorer
+/target_explorer/coverage/
 /target_explorer/plugins/org.eclipse.tcf.te.core/target
 /target_explorer/plugins/org.eclipse.tcf.te.core/bin
 /target_explorer/plugins/org.eclipse.tcf.te.core.cdt/target
