@@ -26,11 +26,9 @@
 		<adminDir>${env.WORKSPACE}/admin</adminDir>
 
 		<!-- JaCoCo global properties -->
-		<jacoco.basedir>${env.WORKSPACE}/target_explorer/coverage</jacoco.basedir>
-		<jacoco.destFile>${jacoco.basedir}/jacoco.exec</jacoco.destFile>
-		<jacoco.dataFile>${jacoco.basedir}/jacoco.exec</jacoco.dataFile>
-		<jacoco.outputDirectory>${jacoco.basedir}/jacoco</jacoco.outputDirectory>
 		<jacoco.skip>false</jacoco.skip>
+		<jacoco.output>file</jacoco.output>
+		<jacoco.dumpOnExit>true</jacoco.dumpOnExit>
 		
 		<!-- P2 repository URL's -->
 		<platform-site>http://download.eclipse.org/eclipse/updates/3.8milestones</platform-site>
@@ -222,10 +220,6 @@
 							<goals>
 								<goal>prepare-agent</goal>
 							</goals>
-							<configuration>
-								<output>file</output>
-								<dumpOnExit>true</dumpOnExit>
-							</configuration>
 						</execution>
 					</executions>
 				</plugin>
