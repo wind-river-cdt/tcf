@@ -25,3 +25,11 @@ Bundle-ActivationPolicy: lazy
 Eclipse-LazyStart: true
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-Vendor: %providerName
+Export-Package: org.eclipse.tcf.internal.cdt.launch;x-internal:=true,
+ org.eclipse.tcf.internal.cdt.ui;x-internal:=true,
+ org.eclipse.tcf.internal.cdt.ui.breakpoints;x-internal:=true,
+ org.eclipse.tcf.internal.cdt.ui.commands;x-internal:=true,
+ org.eclipse.tcf.internal.cdt.ui.disassembly;x-internal:=true,
+ org.eclipse.tcf.internal.cdt.ui.hover;x-internal:=true,
+ org.eclipse.tcf.internal.cdt.ui.launch;x-internal:=true,
+ org.eclipse.tcf.internal.cdt.ui.sourcelookup;x-internal:=true

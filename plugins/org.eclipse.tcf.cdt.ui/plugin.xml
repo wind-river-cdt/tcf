@@ -345,4 +345,9 @@
             name="%editor.sourceNotFound.name">
       </editor>
    </extension>
+   
+   <!-- Needed to hide the "TCF Remote Application" launch without disabling it alltogether. -->   
+   <extension point="org.eclipse.ui.startup">
+      <startup class="org.eclipse.tcf.internal.cdt.ui.StartupPreferencesInitializer"/>
+   </extension>
 </plugin>

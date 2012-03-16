@@ -30,6 +30,7 @@ public class Activator extends AbstractUIPlugin {
     private static TCFBreakpointStatusListener bp_status_listener;
     private static TCFBreakpointActions bp_actions;
 
+    @Override
     public void start(BundleContext context) throws Exception {
         super.start(context);
         plugin = this;
@@ -42,6 +43,7 @@ public class Activator extends AbstractUIPlugin {
         });
     }
 
+    @Override
     public void stop(BundleContext context) throws Exception {
         Protocol.invokeAndWait(new Runnable() {
             public void run() {
