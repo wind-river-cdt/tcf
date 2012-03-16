@@ -5,17 +5,17 @@
 <!-- Launch configuration type contributions -->
    <extension point="org.eclipse.debug.ui.launchConfigurationTypeImages">
       <launchConfigurationTypeImage
-            configTypeID="org.eclipse.tcf.te.tcf.launch.type.linux.app"
-            icon="icons/obj16/penguin_obj.gif"
-            id="org.eclipse.tcf.te.tcf.launch.type.linux.app.image">
+            configTypeID="org.eclipse.tcf.te.tcf.launch.type.remote.app"
+            icon="icons/obj16/remote_app.gif"
+            id="org.eclipse.tcf.te.tcf.launch.type.remote.app.image">
       </launchConfigurationTypeImage>
    </extension>
 
    <extension point="org.eclipse.debug.ui.launchConfigurationTabGroups">
       <launchConfigurationTabGroup
-            class="org.eclipse.tcf.te.tcf.launch.ui.linux.app.LaunchConfigurationTabGroup"
-            id="org.eclipse.tcf.te.tcf.launch.type.linux.app.tabgroup"
-            type="org.eclipse.tcf.te.tcf.launch.type.linux.app">
+            class="org.eclipse.tcf.te.tcf.launch.ui.remote.app.LaunchConfigurationTabGroup"
+            id="org.eclipse.tcf.te.tcf.launch.type.remote.app.tabgroup"
+            type="org.eclipse.tcf.te.tcf.launch.type.remote.app">
       </launchConfigurationTabGroup>
    </extension>
 </plugin>

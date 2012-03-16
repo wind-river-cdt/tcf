@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.launch.ui.linux.app;
+package org.eclipse.tcf.te.tcf.launch.ui.remote.app;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.ILaunchConfiguration;

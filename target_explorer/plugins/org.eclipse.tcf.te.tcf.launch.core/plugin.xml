@@ -33,22 +33,22 @@
    <extension point="org.eclipse.debug.core.launchConfigurationTypes">
       <launchConfigurationType
             delegate="org.eclipse.tcf.te.launch.core.delegates.LaunchConfigurationDelegate"
-            id="org.eclipse.tcf.te.tcf.launch.type.linux.app"
+            id="org.eclipse.tcf.te.tcf.launch.type.remote.app"
             modes="run,debug"
-            name="%LaunchType.Linux.App.name">
+            name="%LaunchType.Remote.App.name">
       </launchConfigurationType>
    </extension>
    
 <!-- Launch Configuration Type Binding contributions -->
    <extension point="org.eclipse.tcf.te.launch.core.launchConfigTypeBindings">
       <launchConfigTypeBinding
-            launchConfigTypeId="org.eclipse.tcf.te.tcf.launch.type.linux.app">
+            launchConfigTypeId="org.eclipse.tcf.te.tcf.launch.type.remote.app">
          <launchManagerDelegate
-               id="org.eclipse.tcf.te.tcf.launch.type.linux.app.launchManagerDelegate"
+               id="org.eclipse.tcf.te.tcf.launch.type.remote.app.launchManagerDelegate"
                modes="run,debug">
          </launchManagerDelegate>
          <stepGroup
-               id="org.eclipse.tcf.te.tcf.launch.type.linux.app.stepGroup"
+               id="org.eclipse.tcf.te.tcf.launch.type.remote.app.stepGroup"
                modes="run,debug">
          </stepGroup>
       </launchConfigTypeBinding>
@@ -58,15 +58,15 @@
    <extension point="org.eclipse.tcf.te.launch.core.launchManagerDelegates">
       <delegate
             class="org.eclipse.tcf.te.launch.core.lm.delegates.DefaultLaunchManagerDelegate"
-            id="org.eclipse.tcf.te.tcf.launch.type.linux.app.launchManagerDelegate">
+            id="org.eclipse.tcf.te.tcf.launch.type.remote.app.launchManagerDelegate">
       </delegate>
    </extension>
    
 <!-- Launch Step Group contributions -->
    <extension point="org.eclipse.tcf.te.runtime.stepper.stepGroups">
       <stepGroup
-            id="org.eclipse.tcf.te.tcf.launch.type.linux.app.stepGroup"
-            label="%LaunchStepGroup.Linux.App.name"
+            id="org.eclipse.tcf.te.tcf.launch.type.remote.app.stepGroup"
+            label="%LaunchStepGroup.Remote.App.name"
             locked="false">
          <references>
             <reference id="org.eclipse.tcf.te.tcf.launch.core.openChannelStep"/>

@@ -26,5 +26,5 @@ public interface IContextHelpIds {
 	/**
 	 * Remote Linux Application launch tab group context help id.
 	 */
-	public final static String REMOTE_LINUX_APPLICATION = ILaunchTypes.REMOTE_LINUX_APPLICATION + ".tabGroup"; //$NON-NLS-1$
+	public final static String REMOTE_LINUX_APPLICATION = ILaunchTypes.REMOTE_APPLICATION + ".tabGroup"; //$NON-NLS-1$
 }

@@ -17,7 +17,7 @@ package org.eclipse.tcf.te.tcf.launch.core.interfaces;
 public interface ILaunchTypes {
 
 	/**
-	 * Launch configuration type id: Remote Linux Application
+	 * Launch configuration type id: Remote Application
 	 */
-	public final String REMOTE_LINUX_APPLICATION = "org.eclipse.tcf.te.tcf.launch.type.linux.app"; //$NON-NLS-1$
+	public final String REMOTE_APPLICATION = "org.eclipse.tcf.te.tcf.launch.type.remote.app"; //$NON-NLS-1$
 }
