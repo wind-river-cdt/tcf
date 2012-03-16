@@ -143,15 +143,16 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
                         }
                     }
                 }
-                String s = (String)status.get(IBreakpoints.STATUS_ERROR);
-                if (s != null) exit(new Exception("Invalid BP status: " + s));
-                Collection<Map<String,Object>> list = (Collection<Map<String,Object>>)status.get(IBreakpoints.STATUS_INSTANCES);
-                if (list == null) return;
-                String err = null;
-                for (Map<String,Object> map : list) {
-                    String ctx = (String)map.get(IBreakpoints.INSTANCE_CONTEXT);
-                    if (test_context.getProcessID().equals(ctx) && map.get(IBreakpoints.INSTANCE_ERROR) != null)
-                        err = (String)map.get(IBreakpoints.INSTANCE_ERROR);
+                String err = (String)status.get(IBreakpoints.STATUS_ERROR);
+                if (err == null) {
+                    Collection<Map<String,Object>> list = (Collection<Map<String,Object>>)status.get(IBreakpoints.STATUS_INSTANCES);
+                    if (list != null) {
+                        for (Map<String,Object> map : list) {
+                            String ctx = (String)map.get(IBreakpoints.INSTANCE_CONTEXT);
+                            if (test_context.getProcessID().equals(ctx) && map.get(IBreakpoints.INSTANCE_ERROR) != null)
+                                err = (String)map.get(IBreakpoints.INSTANCE_ERROR);
+                        }
+                    }
                 }
                 if (err != null) {
                     if (bp_cnt == 0 && id.equals(data_bp_id)) return;

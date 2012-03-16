@@ -361,9 +361,11 @@ class TestTerminals implements ITCFTest {
             }
         }
         if (!delay_done) {
+            final int n = stdout_buf.length();
             Protocol.invokeLater(rnd.nextInt(250), new Runnable() {
                 public void run() {
-                    delay_done = true;
+                    if (n > 1 && stdout_buf.length() == n &&
+                            stdout_buf.charAt(n - 1) != '\n') delay_done = true;
                     TestTerminals.this.run();
                 }
             });
