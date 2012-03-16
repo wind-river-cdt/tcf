@@ -21,4 +21,28 @@
 		<module>target_explorer/plugins/org.eclipse.tcf.te.tests</module>
 	</modules>
 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+						<configuration>
+							<includes>
+								<include>org.eclipse.tcf.te.*</include>
+							</includes>
+							<excludes>
+								<exclude>org.eclipse.tcf.te.tests.*</exclude>
+							</excludes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
 </project>

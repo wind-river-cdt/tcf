@@ -50,6 +50,416 @@
 					</dependencies>
 				</configuration>
 			</plugin>
+			
+			<plugin>
+				<groupId>org.codehaus.gmaven</groupId>
+				<artifactId>gmaven-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>execute</goal>
+						</goals>
+						<configuration>
+							<source>
+							project.properties['qualified.bundle.version'] = project.properties['unqualifiedVersion'].replace('qualifier', project.properties['buildQualifier'])
+							</source>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>generate-report</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<typedef resource="org/jacoco/ant/antlib.xml"/>
+								<echo message="Coverage report"/>
+								<report>
+									<executiondata>
+										<fileset dir="${project.build.directory}" includes="jacoco.exec"/>
+									</executiondata>
+									<structure name="JaCoCo">
+										<group name="org.eclipse.tcf.te.core">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.core/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.core/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.core.cdt">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.core.cdt/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.core.cdt/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.launch.core">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.launch.core/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.launch.core/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.launch.ui">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.launch.ui/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.launch.ui/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.runtime">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.runtime/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.runtime/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.runtime.concurrent">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.runtime.concurrent/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.runtime.concurrent/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.runtime.model">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.runtime.model/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.runtime.model/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.runtime.persistence">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.runtime.persistence/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.runtime.persistence/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.runtime.services">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.runtime.services/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.runtime.services/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.runtime.statushandler">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.runtime.statushandler/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.runtime.statushandler/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.runtime">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.runtime.stepper/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.runtime.stepper/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.tcf.core">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.core/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.core/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.tcf.core.model">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.core.model/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.core.model/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.tcf.core.scripting">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.core.scripting/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.core.scripting/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.tcf.filesystem">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.filesystem/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.filesystem/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.tcf.launch.core">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.launch.core/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.launch.core/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.tcf.">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.launch.ui/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.launch.ui/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.tcf.locator">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.locator/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.locator/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.tcf.log.core">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.log.core/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.log.core/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.tcf.processes.core">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.processes.core/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.processes.core/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.tcf.">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.processes.core/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.processes.core/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.tcf.services.contexts">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.services.contexts/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.services.contexts/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.tcf.terminals.core">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.terminals.core/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.terminals.core/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.tcf.terminals.ui">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.terminals.ui/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.terminals.ui/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.tcf.ui">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.ui/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.ui/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.tcf.ui.console">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.ui.console/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.ui.console/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.tcf.ui.views">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.ui.views/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.ui.views/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.ui">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.ui/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.ui/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.ui.controls">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.ui.controls/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.ui.controls/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.ui.forms">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.ui.forms/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.ui.forms/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.ui.startup">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.ui.startup/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.ui.startup/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.ui.swt">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.ui.swt/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.ui.swt/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.ui.terminals">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.ui.terminals/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.ui.terminals/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.ui.terminals.process">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.ui.terminals.process/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.ui.terminals.process/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.ui.terminals.serial">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.ui.terminals.serial/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.ui.terminals.serial/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.ui.terminals.ssh">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.ui.terminals.ssh/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.ui.terminals.ssh/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.ui.terminals.telnet">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.ui.terminals.telnet/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.ui.terminals.telnet/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.ui.views">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.ui.views/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.ui.views/src"/>
+											</sourcefiles>
+										</group>
+										
+										<group name="org.eclipse.tcf.te.ui.views.workingsets">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.ui.views.workingsets/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.ui.views.workingsets/src"/>
+											</sourcefiles>
+										</group>
+										
+									</structure>
+								
+									<html destdir="${project.build.directory}/coverage"
+										  footer="Code Coverage Report for Target Explorer ${qualified.bundle.version}"
+										  locale="de"/>
+									<csv destfile="${project.build.directory}/coverage/coverage.csv"/>
+									<xml destfile="${project.build.directory}/coverage/coverage.xml"/>
+								</report>
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>org.jacoco</groupId>
+						<artifactId>org.jacoco.ant</artifactId>
+						<version>${jacoco-version}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+			
 		</plugins>
 	</build>
 </project>
