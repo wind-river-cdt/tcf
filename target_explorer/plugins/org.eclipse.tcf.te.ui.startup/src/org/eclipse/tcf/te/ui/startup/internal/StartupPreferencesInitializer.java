@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.internal.cdt.ui;
+package org.eclipse.tcf.te.ui.startup.internal;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.debug.internal.ui.DebugUIPlugin;
@@ -25,9 +25,11 @@ public class StartupPreferencesInitializer extends AbstractPreferenceInitializer
     /* (non-Javadoc)
      * @see org.eclipse.ui.IStartup#earlyStartup()
      */
+    @Override
     public void earlyStartup() {
         PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
 
+            @Override
             public void run() {
                 initializeDefaultPreferences();
             }
@@ -50,7 +52,7 @@ public class StartupPreferencesInitializer extends AbstractPreferenceInitializer
             String typeId = "org.eclipse.tcf.cdt.launch.remoteApplicationLaunchType"; //$NON-NLS-1$
 
             String typeList = store.getDefaultString(IInternalDebugUIConstants.PREF_FILTER_TYPE_LIST);
-            if ("".equals(typeList)) {
+            if ("".equals(typeList)) { //$NON-NLS-1$
                 typeList = typeId;
                 added = true;
             } else if (!typeList.contains(typeId)) {

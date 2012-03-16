@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   
+   <!-- Needed to hide the "TCF Remote Application" launch without disabling it alltogether. -->   
+   <extension point="org.eclipse.ui.startup">
+      <startup class="org.eclipse.tcf.te.ui.startup.internal.StartupPreferencesInitializer"/>
+   </extension>
+
+</plugin>
