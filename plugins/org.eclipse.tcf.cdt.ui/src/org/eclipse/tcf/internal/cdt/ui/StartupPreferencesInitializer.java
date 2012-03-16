@@ -44,13 +44,12 @@ public class StartupPreferencesInitializer extends AbstractPreferenceInitializer
         // No longer supported or maintained.
         IPreferenceStore store = DebugUIPlugin.getDefault().getPreferenceStore();
         if (store != null) {
-            store.setValue(IInternalDebugUIConstants.PREF_FILTER_LAUNCH_TYPES, true);
+            store.setDefault(IInternalDebugUIConstants.PREF_FILTER_LAUNCH_TYPES, true);
 
             boolean added = false;
             String typeId = "org.eclipse.tcf.cdt.launch.remoteApplicationLaunchType"; //$NON-NLS-1$
 
-            String typeList = store.getString(IInternalDebugUIConstants.PREF_FILTER_TYPE_LIST);
-            if ("".equals(typeList)) typeList = store.getDefaultString(IInternalDebugUIConstants.PREF_FILTER_TYPE_LIST);
+            String typeList = store.getDefaultString(IInternalDebugUIConstants.PREF_FILTER_TYPE_LIST);
             if ("".equals(typeList)) {
                 typeList = typeId;
                 added = true;
@@ -59,7 +58,7 @@ public class StartupPreferencesInitializer extends AbstractPreferenceInitializer
                 added = true;
             }
             if (added) {
-                store.putValue(IInternalDebugUIConstants.PREF_FILTER_TYPE_LIST, typeList);
+                store.setDefault(IInternalDebugUIConstants.PREF_FILTER_TYPE_LIST, typeList);
             }
         }
     }
