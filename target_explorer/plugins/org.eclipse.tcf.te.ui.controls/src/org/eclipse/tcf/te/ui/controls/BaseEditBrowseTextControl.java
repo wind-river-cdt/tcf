@@ -19,7 +19,6 @@ import org.eclipse.jface.dialogs.IDialogPage;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.fieldassist.ControlDecoration;
-import org.eclipse.jface.fieldassist.FieldDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -54,7 +53,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
  * editable field or combo box to the user with the additional capability
  * of browsing for the field value.
  */
-public class BaseEditBrowseTextControl extends BaseDialogPageControl implements SelectionListener, ModifyListener {
+public class BaseEditBrowseTextControl extends AbstractDecoratedDialogPageControl implements SelectionListener, ModifyListener {
 	private boolean isGroup = true;
 	private boolean hasHistroy = true;
 	private boolean isReadOnly = false;
@@ -77,7 +76,6 @@ public class BaseEditBrowseTextControl extends BaseDialogPageControl implements 
 	private Control labelControl;
 	private Control editFieldControl;
 	private Button buttonControl;
-	private ControlDecoration controlDecoration;
 
 	private String dialogSettingsSlotId;
 
@@ -259,11 +257,11 @@ public class BaseEditBrowseTextControl extends BaseDialogPageControl implements 
 		SWTControlUtil.setEnabled(getButtonControl(), enabled && (isLabelIsButton() ? isLabelControlSelected() : true));
 
 		// Hide or show the control decoration if one is available
-		if (getEditFieldControlDecoration() != null) {
-			if (enabled && getEditFieldControlDecoration().getDescriptionText() != null) {
-				getEditFieldControlDecoration().show();
+		if (getControlDecoration() != null) {
+			if (enabled && getControlDecoration().getDescriptionText() != null) {
+				getControlDecoration().show();
 			} else {
-				getEditFieldControlDecoration().hide();
+				getControlDecoration().hide();
 			}
 		}
 	}
@@ -463,7 +461,9 @@ public class BaseEditBrowseTextControl extends BaseDialogPageControl implements 
 
 		if (isGroup()) {
 			innerPanel = new Group(parent, SWT.NONE);
-			if (toolkit != null) toolkit.adapt(innerPanel);
+			if (toolkit != null) {
+				toolkit.adapt(innerPanel);
+			}
 			((Group)innerPanel).setText(getGroupLabel());
 		} else {
 			innerPanel = toolkit != null ? toolkit.createComposite(parent) : new Composite(parent, SWT.NONE);
@@ -620,7 +620,9 @@ public class BaseEditBrowseTextControl extends BaseDialogPageControl implements 
 
 			// validate the page
 			IValidatingContainer validatingContainer = getValidatingContainer();
-			if (validatingContainer != null) validatingContainer.validate();
+			if (validatingContainer != null) {
+				validatingContainer.validate();
+			}
 		}
 	}
 
@@ -661,7 +663,10 @@ public class BaseEditBrowseTextControl extends BaseDialogPageControl implements 
 	 */
 	public String getLabelControlText() {
 		String value = SWTControlUtil.getText(labelControl);
-		if (value == null) value = ""; //$NON-NLS-1$
+		if (value == null)
+		{
+			value = ""; //$NON-NLS-1$
+		}
 		return value;
 	}
 
@@ -720,7 +725,7 @@ public class BaseEditBrowseTextControl extends BaseDialogPageControl implements 
 		Assert.isNotNull(layoutData);
 
 		// adjust the control indentation
-		if (getEditFieldControlDecoration() != null) {
+		if (getControlDecoration() != null) {
 			layoutData.horizontalIndent = FieldDecorationRegistry.getDefault().getMaximumDecorationWidth();
 		}
 
@@ -781,7 +786,9 @@ public class BaseEditBrowseTextControl extends BaseDialogPageControl implements 
 				style |= SWT.READ_ONLY;
 			}
 			editField = new Combo(parent, doAdjustEditFieldControlStyles(style));
-			if (toolkit != null) toolkit.adapt((Combo)editField);
+			if (toolkit != null) {
+				toolkit.adapt((Combo)editField);
+			}
 			((Combo)editField).addModifyListener(new ModifyListener() {
 				@Override
 				public void modifyText(ModifyEvent e) {
@@ -919,81 +926,6 @@ public class BaseEditBrowseTextControl extends BaseDialogPageControl implements 
 	}
 
 	/**
-	 * Creates a new instance of a {@link ControlDecoration} object associated with
-	 * the given edit field control. The method is called after the edit field control
-	 * has been created.
-	 *
-	 * @param control The edit field control. Must not be <code>null</code>.
-	 * @return The control decoration object instance.
-	 */
-	protected ControlDecoration doCreateEditFieldControlDecoration(Control control) {
-		Assert.isNotNull(control);
-		return new ControlDecoration(control, doGetEditFieldControlDecorationPosition());
-	}
-
-	/**
-	 * Returns the edit field control decoration position. The default is
-	 * {@link SWT#TOP} | {@link SWT#LEFT}.
-	 *
-	 * @return The edit field control position.
-	 */
-	protected int doGetEditFieldControlDecorationPosition() {
-		return SWT.TOP | SWT.LEFT;
-	}
-
-	/**
-	 * Configure the given edit field control decoration.
-	 *
-	 * @param decoration The edit field control decoration. Must not be <code>null</code>.
-	 */
-	protected void configureEditFieldControlDecoration(ControlDecoration decoration) {
-		Assert.isNotNull(decoration);
-		decoration.setShowOnlyOnFocus(false);
-	}
-
-	/**
-	 * Updates the given edit field control decoration to represent the given
-	 * message and message type.
-	 *
-	 * @param decoration The control decoration. Must not be <code>null</code>.
-	 * @param message The message. Must not be <code>null</code>.
-	 * @param messageType The message type.
-	 */
-	protected void updateEditFieldControlDecorationForMessage(ControlDecoration decoration, String message, int messageType) {
-		Assert.isNotNull(decoration);
-		Assert.isNotNull(message);
-
-		// The description is the same as the message
-		decoration.setDescriptionText(message);
-
-		// The icon depends on the message type
-		FieldDecorationRegistry registry = FieldDecorationRegistry.getDefault();
-
-		// Determine the id of the decoration to show
-		String decorationId = FieldDecorationRegistry.DEC_INFORMATION;
-		if (messageType == IMessageProvider.ERROR) {
-			decorationId = FieldDecorationRegistry.DEC_ERROR;
-		} else if (messageType == IMessageProvider.WARNING) {
-			decorationId = FieldDecorationRegistry.DEC_WARNING;
-		}
-
-		// Get the field decoration
-		FieldDecoration fieldDeco = registry.getFieldDecoration(decorationId);
-		if (fieldDeco != null) {
-			decoration.setImage(fieldDeco.getImage());
-		}
-	}
-
-	/**
-	 * Returns the edit field control decoration.
-	 *
-	 * @return The edit field control decoration instance or <code>null</code> if not yet created.
-	 */
-	public final ControlDecoration getEditFieldControlDecoration() {
-		return controlDecoration;
-	}
-
-	/**
 	 * Returns the modification listener instance to be registered for the edit field
 	 * control if not <code>null</code>. The default implementation returns always <code>
 	 * null</code>. Subclasses may override this method to provide a suitable modification
@@ -1012,7 +944,9 @@ public class BaseEditBrowseTextControl extends BaseDialogPageControl implements 
 	public void modifyText(ModifyEvent e) {
 		// validate the page
 		IValidatingContainer validatingContainer = getValidatingContainer();
-		if (validatingContainer != null) validatingContainer.validate();
+		if (validatingContainer != null) {
+			validatingContainer.validate();
+		}
 	}
 
 	/**
@@ -1056,7 +990,9 @@ public class BaseEditBrowseTextControl extends BaseDialogPageControl implements 
 	public void widgetSelected(SelectionEvent e) {
 		// validate the page
 		IValidatingContainer validatingContainer = getValidatingContainer();
-		if (validatingContainer != null) validatingContainer.validate();
+		if (validatingContainer != null) {
+			validatingContainer.validate();
+		}
 	}
 
 	/**
@@ -1066,7 +1002,10 @@ public class BaseEditBrowseTextControl extends BaseDialogPageControl implements 
 	 */
 	public String getEditFieldControlText() {
 		String value = SWTControlUtil.getText(editFieldControl);
-		if (value == null) value = ""; //$NON-NLS-1$
+		if (value == null)
+		{
+			value = ""; //$NON-NLS-1$
+		}
 		return value;
 	}
 
@@ -1137,10 +1076,14 @@ public class BaseEditBrowseTextControl extends BaseDialogPageControl implements 
 			Collections.sort(oldItems);
 			Collections.sort(newItems);
 
-			if (!newItems.equals(oldItems)) SWTControlUtil.setItems(combo, newItemsArray);
+			if (!newItems.equals(oldItems)) {
+				SWTControlUtil.setItems(combo, newItemsArray);
+			}
 
 			// Restore the previously selected item if still available
-			if (newItems.contains(oldSelectedItem)) setEditFieldControlText(oldSelectedItem);
+			if (newItems.contains(oldSelectedItem)) {
+				setEditFieldControlText(oldSelectedItem);
+			}
 		}
 	}
 
@@ -1222,6 +1165,9 @@ public class BaseEditBrowseTextControl extends BaseDialogPageControl implements 
 	 */
 	protected void configureButtonControl(Button button) {
 		Assert.isNotNull(button);
+		if (isAdjustBackgroundColor()) {
+			SWTControlUtil.setBackground(button, button.getParent().getBackground());
+		}
 		// add the selection listener to open the file dialog if the user pressed the button
 		button.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -1331,9 +1277,9 @@ public class BaseEditBrowseTextControl extends BaseDialogPageControl implements 
 			// configured. Otherwise, the layout data for the edit field may
 			// not be configured correctly.
 			if (!isHideEditFieldControlDecoration()) {
-				controlDecoration = doCreateEditFieldControlDecoration(editFieldControl);
+				ControlDecoration controlDecoration = doCreateControlDecoration(editFieldControl);
 				Assert.isNotNull(controlDecoration);
-				configureEditFieldControlDecoration(controlDecoration);
+				configureControlDecoration(controlDecoration);
 			}
 
 			// Configure the edit field control (including layout data)
@@ -1404,7 +1350,9 @@ public class BaseEditBrowseTextControl extends BaseDialogPageControl implements 
 		String[] historyEntries = getHistory(settings, idPrefix);
 		if (historyEntries.length > 0) {
 			setEditFieldControlHistory(historyEntries);
-			if ("".equals(getEditFieldControlText())) setEditFieldControlText(historyEntries[0]); //$NON-NLS-1$
+			if ("".equals(getEditFieldControlText())) { //$NON-NLS-1$
+				setEditFieldControlText(historyEntries[0]);
+			}
 		}
 	}
 
@@ -1467,30 +1415,23 @@ public class BaseEditBrowseTextControl extends BaseDialogPageControl implements 
 		boolean valid = super.isValid();
 
 		if (getEditFieldValidator() != null &&
-			getEditFieldControl() != null &&
-			!getEditFieldControl().isDisposed() &&
-			SWTControlUtil.isEnabled(getEditFieldControl()) &&
-			!isReadOnly() &&
-			isLabelControlSelected()) {
+						getEditFieldControl() != null &&
+						!getEditFieldControl().isDisposed() &&
+						SWTControlUtil.isEnabled(getEditFieldControl()) &&
+						!isReadOnly() &&
+						isLabelControlSelected()) {
 
 			valid = getEditFieldValidator().isValid(getEditFieldControlTextForValidation());
 			setMessage(getEditFieldValidator().getMessage(), getEditFieldValidator().getMessageType());
 		}
 
-		if (getEditFieldControlDecoration() != null) {
+		if (getControlDecoration() != null) {
 			// Setup and show the control decoration if necessary
 			if (isEnabled() && (!valid || (getMessage() != null && getMessageType() != IMessageProvider.NONE))) {
 				// Update the control decorator
-				ControlDecoration decoration = getEditFieldControlDecoration();
-				updateEditFieldControlDecorationForMessage(decoration, getMessage(), getMessageType());
-
-				// And show the decoration
-				decoration.show();
+				updateControlDecoration(getMessage(), getMessageType());
 			} else {
-				ControlDecoration decoration = getEditFieldControlDecoration();
-				// Control is valid and no message is set -> hide the decoration
-				decoration.hide();
-				decoration.setDescriptionText(null);
+				updateControlDecoration(null, IMessageProvider.NONE);
 			}
 		}
 

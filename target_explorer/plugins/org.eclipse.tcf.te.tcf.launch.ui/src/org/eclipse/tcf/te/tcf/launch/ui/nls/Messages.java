@@ -29,4 +29,10 @@ public class Messages extends NLS {
 
 	// **** Declare externalized string id's down here *****
 
+	public static String LaunchConfigurationMainTabSection_title;
+	public static String LaunchConfigurationMainTabSection_processArguments_label;
+
+	public static String ProcessImageSelectorControl_label;
+	public static String ProcessImageSelectorControl_error_missingProcessImage;
+
 }

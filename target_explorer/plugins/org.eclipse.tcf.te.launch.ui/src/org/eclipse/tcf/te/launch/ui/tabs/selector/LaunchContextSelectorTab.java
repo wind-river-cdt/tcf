@@ -22,9 +22,9 @@ import org.eclipse.ui.forms.widgets.TableWrapLayout;
 /**
  * Context selector launch configuration tab implementation.
  */
-public class ContextSelectorTab extends AbstractFormsLaunchConfigurationTab {
+public class LaunchContextSelectorTab extends AbstractFormsLaunchConfigurationTab {
 	// References to the tab sub sections
-	private ContextSelectorSection selectorSection;
+	private LaunchContextSelectorSection selectorSection;
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.launch.ui.tabs.AbstractFormsLaunchConfigurationTab#dispose()
@@ -52,7 +52,7 @@ public class ContextSelectorTab extends AbstractFormsLaunchConfigurationTab {
 		panel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		panel.setBackground(parent.getBackground());
 
-		selectorSection = new ContextSelectorSection(getManagedForm(), panel);
+		selectorSection = new LaunchContextSelectorSection(getManagedForm(), panel);
 		selectorSection.getSection().setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB, TableWrapData.TOP));
 		getManagedForm().addPart(selectorSection);
 	}

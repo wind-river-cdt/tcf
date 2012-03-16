@@ -42,7 +42,7 @@ import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
 import org.eclipse.tcf.te.runtime.services.ServiceManager;
 import org.eclipse.tcf.te.runtime.services.interfaces.IPropertiesAccessService;
-import org.eclipse.tcf.te.ui.controls.BaseDialogPageControl;
+import org.eclipse.tcf.te.ui.controls.AbstractDecoratedDialogPageControl;
 import org.eclipse.tcf.te.ui.jface.interfaces.IValidatingContainer;
 import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
 import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
@@ -63,7 +63,7 @@ import org.eclipse.ui.navigator.CommonViewerSorter;
  * </ul>
  */
 @SuppressWarnings("restriction")
-public class ContextSelectorControl extends BaseDialogPageControl implements ISelectionProvider {
+public class ContextSelectorControl extends AbstractDecoratedDialogPageControl implements ISelectionProvider {
 
 	/**
 	 * Property: If set to <code>true</code>, ghost model nodes will be shown within the tree.
@@ -87,7 +87,7 @@ public class ContextSelectorControl extends BaseDialogPageControl implements ISe
 	/* default */ ISelection selection;
 
 	// Reference to the navigator content service used
-    private NavigatorContentService contentService;
+	private NavigatorContentService contentService;
 
 	/**
 	 * Constant to return an empty viewer filter array.
@@ -147,7 +147,9 @@ public class ContextSelectorControl extends BaseDialogPageControl implements ISe
 			boolean expandable = super.isExpandable(element);
 			// adjust the expandable state if the element does not have
 			// children after the filtering.
-			if (expandable) expandable = getFilteredChildren(element).length > 0;
+			if (expandable) {
+				expandable = getFilteredChildren(element).length > 0;
+			}
 			return expandable;
 		}
 
@@ -204,12 +206,16 @@ public class ContextSelectorControl extends BaseDialogPageControl implements ISe
 						// If a child item is checked, otherwise we wouldn't come here, and this
 						// parent item isn't expanded, we must(!) expand the item now here by force,
 						// otherwise we will loose the checked states of the children elements!
-						if (!treeItem.getExpanded()) treeItem.setExpanded(true);
+						if (!treeItem.getExpanded()) {
+							treeItem.setExpanded(true);
+						}
 
 						// Decide if we shall gray the checked state.
 						// --> The checked state is grayed if the item is a ghost.
 						boolean isGhost = data instanceof IModelNode && isGhost((IModelNode) data);
-						if (!treeItem.getGrayed() && isGhost) treeItem.setGrayed(true);
+						if (!treeItem.getGrayed() && isGhost) {
+							treeItem.setGrayed(true);
+						}
 
 						// go one level up in the hierarchy
 						treeItem = treeItem.getParentItem();
@@ -533,7 +539,9 @@ public class ContextSelectorControl extends BaseDialogPageControl implements ISe
 			viewer.addCheckStateListener(getViewerCheckStateListener(viewer));
 		}
 
-		if (hasViewerFilters()) viewer.setFilters(getViewerFilters());
+		if (hasViewerFilters()) {
+			viewer.setFilters(getViewerFilters());
+		}
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
@@ -541,6 +549,7 @@ public class ContextSelectorControl extends BaseDialogPageControl implements ISe
 				fireSelectionChanged();
 			}
 		});
+		doCreateControlDecoration(viewer.getTree());
 	}
 
 	/**
@@ -611,7 +620,9 @@ public class ContextSelectorControl extends BaseDialogPageControl implements ISe
 	 *         {@link #NO_FILTERS}.
 	 */
 	protected ViewerFilter[] getViewerFilters() {
-		if (filters == null && hasViewerFilters()) filters = doCreateViewerFilters();
+		if (filters == null && hasViewerFilters()) {
+			filters = doCreateViewerFilters();
+		}
 		return filters != null ? filters : NO_FILTERS;
 	}
 
@@ -637,7 +648,9 @@ public class ContextSelectorControl extends BaseDialogPageControl implements ISe
 	 */
 	protected ICheckStateListener getViewerCheckStateListener(CheckboxTreeViewer viewer) {
 		Assert.isNotNull(viewer);
-		if (listener == null) listener = doCreateViewerCheckStateListener(viewer);
+		if (listener == null) {
+			listener = doCreateViewerCheckStateListener(viewer);
+		}
 		return listener;
 	}
 

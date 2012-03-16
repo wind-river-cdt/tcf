@@ -36,9 +36,9 @@ import org.eclipse.ui.forms.widgets.Section;
 /**
  * Context selector section implementation.
  */
-public class ContextSelectorSection extends AbstractSection implements ILaunchConfigurationTabFormPart {
+public class LaunchContextSelectorSection extends AbstractSection implements ILaunchConfigurationTabFormPart {
 	// Reference to the section sub controls
-	/* default */ StepContextSelectorControl selector;
+	/* default */ LaunchContextSelectorControl selector;
 
 	/**
 	 * Context selector control refresh action implementation.
@@ -71,7 +71,7 @@ public class ContextSelectorSection extends AbstractSection implements ILaunchCo
 	 * @param form The parent managed form. Must not be <code>null</code>.
 	 * @param parent The parent composite. Must not be <code>null</code>.
 	 */
-	public ContextSelectorSection(IManagedForm form, Composite parent) {
+	public LaunchContextSelectorSection(IManagedForm form, Composite parent) {
 		super(form, parent, ExpandableComposite.TWISTIE | ExpandableComposite.EXPANDED);
 		getSection().setBackground(parent.getBackground());
 		createClient(getSection(), form.getToolkit());
@@ -99,9 +99,9 @@ public class ContextSelectorSection extends AbstractSection implements ILaunchCo
 		createSectionToolbar(section, toolkit);
 
 		// Create the section sub controls
-		selector = new StepContextSelectorControl(null) {
+		selector = new LaunchContextSelectorControl(null) {
 			/* (non-Javadoc)
-			 * @see org.eclipse.tcf.te.launch.ui.tabs.selector.StepContextSelectorControl#onModelNodeCheckStateChanged(org.eclipse.tcf.te.runtime.model.interfaces.IModelNode, boolean)
+			 * @see org.eclipse.tcf.te.launch.ui.tabs.selector.LaunchContextSelectorControl#onModelNodeCheckStateChanged(org.eclipse.tcf.te.runtime.model.interfaces.IModelNode, boolean)
 			 */
 			@Override
 			protected void onModelNodeCheckStateChanged(IModelNode node, boolean checked) {
@@ -180,6 +180,15 @@ public class ContextSelectorSection extends AbstractSection implements ILaunchCo
 	 */
 	@Override
 	public boolean isValid(ILaunchConfiguration configuration) {
-		return true;
+		boolean valid = super.isValid();
+
+		if (valid) {
+			valid = selector.isValid();
+			if (!valid) {
+				setMessage(selector.getMessage(), selector.getMessageType());
+			}
+		}
+
+		return valid;
 	}
 }

@@ -30,7 +30,7 @@ import org.eclipse.tcf.te.ui.jface.interfaces.IValidatingContainer;
  * 	<li>PROPERTY_MULTI_CONTEXT_SELECTOR = true</li>
  * </ul>
  */
-public class StepContextSelectorControl extends ContextSelectorControl {
+public class LaunchContextSelectorControl extends ContextSelectorControl {
 	/**
 	 * Property: If set to <code>true</code>, the control will be created as multi
 	 *           context control. That means that more than one tree item will be
@@ -45,18 +45,18 @@ public class StepContextSelectorControl extends ContextSelectorControl {
 	private boolean requireSelection = true;
 
 	/**
-     * Constructor.
+	 * Constructor.
 	 *
 	 * @param parentPage The parent target connection page this control is embedded in. Might be
 	 *            		 <code>null</code> if the control is not associated with a page.
-     */
-    public StepContextSelectorControl(IDialogPage parentPage) {
-	    super(parentPage);
-    }
+	 */
+	public LaunchContextSelectorControl(IDialogPage parentPage) {
+		super(parentPage);
+	}
 
-    /* (non-Javadoc)
-     * @see org.eclipse.tcf.te.launch.ui.tabs.selector.ContextSelectorControl#initializeProperties(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
-     */
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.launch.ui.tabs.selector.ContextSelectorControl#initializeProperties(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
+	 */
 	@Override
 	protected void initializeProperties(IPropertiesContainer properties) {
 		super.initializeProperties(properties);
@@ -168,6 +168,17 @@ public class StepContextSelectorControl extends ContextSelectorControl {
 				setMessage(getMessageForId(messageId), getMessageTypeForId(messageId, IMessageProvider.ERROR));
 			}
 		}
+
+		if (getControlDecoration() != null) {
+			// Setup and show the control decoration if necessary
+			if (isEnabled() && (!valid || (getMessage() != null && getMessageType() != IMessageProvider.NONE))) {
+				// Update the control decorator
+				updateControlDecoration(getMessage(), getMessageType());
+			} else {
+				updateControlDecoration(null, IMessageProvider.NONE);
+			}
+		}
+
 
 		return valid;
 	}

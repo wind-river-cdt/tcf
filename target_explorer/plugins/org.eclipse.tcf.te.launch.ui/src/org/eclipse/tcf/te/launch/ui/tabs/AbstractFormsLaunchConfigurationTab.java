@@ -12,6 +12,7 @@ package org.eclipse.tcf.te.launch.ui.tabs;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -41,21 +42,21 @@ public abstract class AbstractFormsLaunchConfigurationTab extends AbstractLaunch
 	private static class TabForm extends ManagedForm {
 
 		/**
-         * Constructor.
-         *
-         * @param parentTab The parent launch configuration tab. Must not be <code>null</code>.
-         * @param form The scrolled form. Must not be <code>null</code>.
-         */
-        public TabForm(AbstractFormsLaunchConfigurationTab parentTab, ScrolledForm form) {
-        	super(parentTab.getFormToolkit().getFormToolkit(), form);
-        	setContainer(parentTab);
-        }
+		 * Constructor.
+		 *
+		 * @param parentTab The parent launch configuration tab. Must not be <code>null</code>.
+		 * @param form The scrolled form. Must not be <code>null</code>.
+		 */
+		public TabForm(AbstractFormsLaunchConfigurationTab parentTab, ScrolledForm form) {
+			super(parentTab.getFormToolkit().getFormToolkit(), form);
+			setContainer(parentTab);
+		}
 
-        /**
-         * Returns the parent launch configuration tab.
-         *
-         * @return The parent launch configuration tab.
-         */
+		/**
+		 * Returns the parent launch configuration tab.
+		 *
+		 * @return The parent launch configuration tab.
+		 */
 		public AbstractFormsLaunchConfigurationTab getParentTab() {
 			return (AbstractFormsLaunchConfigurationTab)getContainer();
 		}
@@ -64,7 +65,7 @@ public abstract class AbstractFormsLaunchConfigurationTab extends AbstractLaunch
 		 * @see org.eclipse.ui.forms.ManagedForm#dirtyStateChanged()
 		 */
 		@SuppressWarnings("synthetic-access")
-        @Override
+		@Override
 		public void dirtyStateChanged() {
 			getParentTab().updateLaunchConfigurationDialog();
 		}
@@ -73,7 +74,7 @@ public abstract class AbstractFormsLaunchConfigurationTab extends AbstractLaunch
 		 * @see org.eclipse.ui.forms.ManagedForm#staleStateChanged()
 		 */
 		@SuppressWarnings("synthetic-access")
-        @Override
+		@Override
 		public void staleStateChanged() {
 			getParentTab().updateLaunchConfigurationDialog();
 		}
@@ -146,7 +147,7 @@ public abstract class AbstractFormsLaunchConfigurationTab extends AbstractLaunch
 		// Create the form content
 		BusyIndicator.showWhile(parent.getDisplay(), new Runnable() {
 			@Override
-            public void run() {
+			public void run() {
 				createFormContent(mform);
 			}
 		});
@@ -247,7 +248,9 @@ public abstract class AbstractFormsLaunchConfigurationTab extends AbstractLaunch
 	 */
 	@Override
 	public boolean isValid(ILaunchConfiguration configuration) {
-	    boolean valid = super.isValid(configuration);
+		boolean valid = super.isValid(configuration);
+
+		String errorMessage = null;
 
 		if (mform != null) {
 			// Get all registered form parts
@@ -255,11 +258,17 @@ public abstract class AbstractFormsLaunchConfigurationTab extends AbstractLaunch
 			for (IFormPart part : parts) {
 				if (part instanceof ILaunchConfigurationTabFormPart) {
 					valid &= ((ILaunchConfigurationTabFormPart)part).isValid(configuration);
-					if (!valid) break;
+					if (!valid) {
+						if (part instanceof IMessageProvider && errorMessage == null) {
+							errorMessage = ((IMessageProvider)part).getMessage();
+						}
+					}
 				}
 			}
 		}
 
-	    return valid;
+		setErrorMessage(errorMessage);
+
+		return valid;
 	}
 }

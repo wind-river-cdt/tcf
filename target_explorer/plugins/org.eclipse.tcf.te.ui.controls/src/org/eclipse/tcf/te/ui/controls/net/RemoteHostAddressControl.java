@@ -62,8 +62,8 @@ public class RemoteHostAddressControl extends BaseEditBrowseTextControl {
 		// Reset the validation message.
 		if (getMessage() != null && getMessage().equals(getUserInformationTextCheckNameAddress())) {
 			setMessage(null, IMessageProvider.NONE);
-			if (getEditFieldControlDecoration() != null) {
-				getEditFieldControlDecoration().hide();
+			if (getControlDecoration() != null) {
+				getControlDecoration().hide();
 			}
 		}
 	}
@@ -74,10 +74,10 @@ public class RemoteHostAddressControl extends BaseEditBrowseTextControl {
 	@Override
 	protected Validator doCreateEditFieldValidator() {
 		return new NameOrIPValidator(
-			Validator.ATTR_MANDATORY |
-			NameOrIPValidator.ATTR_IP |
-			NameOrIPValidator.ATTR_NAME |
-			NameOrIPValidator.ATTR_CHECK_AVAILABLE);
+						Validator.ATTR_MANDATORY |
+						NameOrIPValidator.ATTR_IP |
+						NameOrIPValidator.ATTR_NAME |
+						NameOrIPValidator.ATTR_CHECK_AVAILABLE);
 	}
 
 	/* (non-Javadoc)
@@ -103,9 +103,9 @@ public class RemoteHostAddressControl extends BaseEditBrowseTextControl {
 	protected VerifyListener doGetEditFieldControlVerifyListener() {
 		if (verifyListener == null) {
 			verifyListener =
-				new NameOrIPVerifyListener(
-					NameOrIPVerifyListener.ATTR_IP |
-					NameOrIPVerifyListener.ATTR_NAME);
+							new NameOrIPVerifyListener(
+											NameOrIPVerifyListener.ATTR_IP |
+											NameOrIPVerifyListener.ATTR_NAME);
 		}
 		return verifyListener;
 	}

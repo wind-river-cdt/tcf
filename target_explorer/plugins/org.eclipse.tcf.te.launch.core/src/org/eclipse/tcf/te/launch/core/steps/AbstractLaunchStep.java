@@ -8,6 +8,7 @@ package org.eclipse.tcf.te.launch.core.steps;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.ILaunch;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.IContextSelectorLaunchAttributes;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
@@ -42,5 +43,17 @@ public abstract class AbstractLaunchStep extends AbstractStep {
 		Object context = data.getProperty(IContextSelectorLaunchAttributes.ATTR_ACTIVE_LAUNCH_CONTEXT);
 		Assert.isTrue(context instanceof IModelNode);
 		return (IModelNode)context;
+	}
+
+	/**
+	 * Returns the uses launch configuration.
+	 * 
+	 * @param context The step context.
+	 * @return
+	 */
+	protected ILaunchConfiguration getLaunchConfiguration(IStepContext context) {
+		ILaunch launch = getLaunch(context);
+		Assert.isNotNull(launch);
+		return launch.getLaunchConfiguration();
 	}
 }

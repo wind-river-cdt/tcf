@@ -97,7 +97,7 @@ public class GeneralInformationSection extends AbstractSection {
 		if (InfoSectionPeerNameControl.class.equals(adapter)) {
 			return nameControl;
 		}
-	    return super.getAdapter(adapter);
+		return super.getAdapter(adapter);
 	}
 
 	/* (non-Javadoc)
@@ -143,7 +143,7 @@ public class GeneralInformationSection extends AbstractSection {
 		layout.marginHeight = 0; layout.marginWidth = 0; layout.horizontalSpacing = 0;
 		panel.setLayout(new GridLayout(2, false));
 		layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		if (nameControl.getEditFieldControlDecoration() != null) {
+		if (nameControl.getControlDecoration() != null) {
 			layoutData.horizontalIndent = FieldDecorationRegistry.getDefault().getMaximumDecorationWidth() / 2;
 		}
 		panel.setLayoutData(layoutData);
@@ -173,7 +173,7 @@ public class GeneralInformationSection extends AbstractSection {
 		if (active) {
 			// Leave everything unchanged if the page is in dirty state
 			if (getManagedForm().getContainer() instanceof AbstractEditorPage
-					&& !((AbstractEditorPage)getManagedForm().getContainer()).isDirty()) {
+							&& !((AbstractEditorPage)getManagedForm().getContainer()).isDirty()) {
 				Object node = ((AbstractEditorPage)getManagedForm().getContainer()).getEditorInputNode();
 				if (node instanceof IPeerModel) {
 					setupData((IPeerModel)node);
@@ -199,7 +199,9 @@ public class GeneralInformationSection extends AbstractSection {
 		wc.clearProperties();
 
 		// If no data is available, we are done
-		if (node == null) return;
+		if (node == null) {
+			return;
+		}
 
 		// Thread access to the model is limited to the executors thread.
 		// Copy the data over to the working copy to ease the access.
@@ -262,7 +264,9 @@ public class GeneralInformationSection extends AbstractSection {
 	 */
 	public void extractData(final IPeerModel node) {
 		// If no data is available, we are done
-		if (node == null) return;
+		if (node == null) {
+			return;
+		}
 
 		// Extract the widget data into the working copy
 		if (idControl != null) {
@@ -293,8 +297,12 @@ public class GeneralInformationSection extends AbstractSection {
 							try {
 								uri = persistenceService.getURI(attributes);
 							} catch (IOException e) { /* ignored on purpose */ }
-							if (uri != null) attributes.put(IPersistableNodeProperties.PROPERTY_URI, uri.toString());
-							else attributes.remove(IPersistableNodeProperties.PROPERTY_URI);
+							if (uri != null) {
+								attributes.put(IPersistableNodeProperties.PROPERTY_URI, uri.toString());
+							}
+							else {
+								attributes.remove(IPersistableNodeProperties.PROPERTY_URI);
+							}
 						}
 					}
 					// Create the new peer
@@ -302,7 +310,9 @@ public class GeneralInformationSection extends AbstractSection {
 					// Update the peer node instance (silently)
 					boolean changed = node.setChangeEventsEnabled(false);
 					node.setProperty(IPeerModelProperties.PROP_INSTANCE, newPeer);
-					if (changed) node.setChangeEventsEnabled(true);
+					if (changed) {
+						node.setChangeEventsEnabled(true);
+					}
 				}
 			});
 		}
@@ -313,7 +323,7 @@ public class GeneralInformationSection extends AbstractSection {
 	 */
 	@Override
 	public boolean isValid() {
-	    boolean valid =  super.isValid();
+		boolean valid =  super.isValid();
 
 		if (idControl != null) {
 			valid &= idControl.isValid();
@@ -338,10 +348,12 @@ public class GeneralInformationSection extends AbstractSection {
 		// Remember the current dirty state
 		boolean needsSaving = isDirty();
 		// Call the super implementation (resets the dirty state)
-	    super.commit(onSave);
+		super.commit(onSave);
 
 		// Nothing to do if not on save or saving is not needed
-		if (!onSave || !needsSaving) return;
+		if (!onSave || !needsSaving) {
+			return;
+		}
 
 		// Remember the old name
 		String oldName = odc.getStringProperty(IPeer.ATTR_NAME);
@@ -353,7 +365,10 @@ public class GeneralInformationSection extends AbstractSection {
 			try {
 				// Get the persistence service
 				IPersistenceService persistenceService = ServiceManager.getInstance().getService(IPersistenceService.class);
-				if (persistenceService == null) throw new IOException("Persistence service instance unavailable."); //$NON-NLS-1$
+				if (persistenceService == null)
+				{
+					throw new IOException("Persistence service instance unavailable."); //$NON-NLS-1$
+				}
 				// Remove the old persistence storage using the original data copy
 				persistenceService.delete(odc.getProperties());
 				// Save the peer node to the new persistence storage
@@ -414,7 +429,9 @@ public class GeneralInformationSection extends AbstractSection {
 		final Object input = getManagedForm().getInput();
 
 		// The id control is always read-only
-		if (idControl != null) SWTControlUtil.setEnabled(idControl.getEditFieldControl(), false);
+		if (idControl != null) {
+			SWTControlUtil.setEnabled(idControl.getEditFieldControl(), false);
+		}
 
 		// The name control is enabled for static peers
 		if (nameControl != null) {
@@ -432,8 +449,12 @@ public class GeneralInformationSection extends AbstractSection {
 					}
 				}
 			};
-			if (Protocol.isDispatchThread()) runnable.run();
-			else Protocol.invokeAndWait(runnable);
+			if (Protocol.isDispatchThread()) {
+				runnable.run();
+			}
+			else {
+				Protocol.invokeAndWait(runnable);
+			}
 
 			SWTControlUtil.setEnabled(nameControl.getEditFieldControl(), isStatic.get() && !isRemote.get());
 		}

@@ -15,7 +15,7 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
-import org.eclipse.tcf.te.launch.ui.tabs.selector.ContextSelectorTab;
+import org.eclipse.tcf.te.launch.ui.tabs.selector.LaunchContextSelectorTab;
 
 /**
  * Default launch configuration tab group implementation.
@@ -53,7 +53,7 @@ public class LaunchConfigurationTabGroup extends AbstractLaunchConfigurationTabG
 	public void createContextSelectorTab(ILaunchConfigurationDialog dialog, List<ILaunchConfigurationTab> tabs, String mode) {
 		Assert.isNotNull(tabs);
 
-		ILaunchConfigurationTab tab = new ContextSelectorTab();
+		ILaunchConfigurationTab tab = new LaunchContextSelectorTab();
 		tabs.add(tab);
 	}
 

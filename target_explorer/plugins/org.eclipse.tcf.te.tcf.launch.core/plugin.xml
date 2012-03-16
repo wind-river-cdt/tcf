@@ -69,33 +69,17 @@
             label="%LaunchStepGroup.Linux.App.name"
             locked="false">
          <references>
-            <reference
-                  id="org.eclipse.tcf.te.tcf.launch.core.openChannelStep"
-                  disable="false"
-                  hidden="false"
-                  removable="false"
-                  singleton="true">
-            </reference>
-            <reference
-                  id="org.eclipse.tcf.te.tcf.launch.core.closeChannelStep"
-                  disable="false"
-                  hidden="false"
-                  removable="false"
-                  singleton="true">
-            </reference>
-            <reference
-                  id="org.eclipse.tcf.te.launch.core.removeLaunchStep"
-                  disable="false"
-                  hidden="false"
-                  removable="false"
-                  singleton="true">
-                  <enablement>
-                      <with variable="context">
-                          <not>
-                              <test property="org.eclipse.tcf.te.launch.core.launchMode" value="debug"/>
-                          </not>
-                      </with>
-                  </enablement>
+            <reference id="org.eclipse.tcf.te.tcf.launch.core.openChannelStep"/>
+            <reference id="org.eclipse.tcf.te.tcf.launch.core.launchProcessStep"/>
+            <reference id="org.eclipse.tcf.te.tcf.launch.core.closeChannelStep"/>
+            <reference id="org.eclipse.tcf.te.launch.core.removeLaunchStep">
+               <enablement>
+                  <with variable="context">
+                     <not>
+                        <test property="org.eclipse.tcf.te.launch.core.launchMode" value="debug"/>
+                     </not>
+                  </with>
+               </enablement>
             </reference>
          </references>
       </stepGroup>
@@ -107,6 +91,14 @@
             class="org.eclipse.tcf.te.tcf.launch.core.steps.OpenChannelStep"
             id="org.eclipse.tcf.te.tcf.launch.core.openChannelStep"
             label="%LaunchStep.OpenChannel.name">
+      </step>
+      <step
+            class="org.eclipse.tcf.te.tcf.launch.core.steps.LaunchProcessStep"
+            id="org.eclipse.tcf.te.tcf.launch.core.launchProcessStep"
+            label="%LaunchStep.LaunchProcess.name">
+         <requires
+               id="org.eclipse.tcf.te.tcf.launch.core.openChannelStep">
+         </requires>
       </step>
       <step
             class="org.eclipse.tcf.te.tcf.launch.core.steps.CloseChannelStep"
