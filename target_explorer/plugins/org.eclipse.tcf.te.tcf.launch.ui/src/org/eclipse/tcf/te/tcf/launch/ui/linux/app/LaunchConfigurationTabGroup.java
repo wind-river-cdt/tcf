@@ -16,7 +16,7 @@ import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
 
 /**
- * Remote linux application launch configuration tab group implementation.
+ * Remote application launch configuration tab group implementation.
  */
 public class LaunchConfigurationTabGroup extends org.eclipse.tcf.te.launch.ui.tabs.LaunchConfigurationTabGroup {
 

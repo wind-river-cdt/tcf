@@ -1,9 +1,12 @@
-/*
- * AbstractLaunchStep.java
- * Created on 22.02.2012
+/*******************************************************************************
+ * Copyright (c) 2012 Wind River Systems, Inc. and others. All rights reserved.
+ * This program and the accompanying materials are made available under the terms
+ * of the Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
  *
- * Copyright 2012 Wind River Systems Inc. All rights reserved.
- */
+ * Contributors:
+ * Wind River Systems - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.tcf.te.launch.core.steps;
 
 import org.eclipse.core.runtime.Assert;
@@ -16,14 +19,13 @@ import org.eclipse.tcf.te.runtime.stepper.extensions.AbstractStep;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
 
 /**
- * AbstractLaunchStep
- * @author tobias.schwarz@windriver.com
+ * Abstract launch step implementation.
  */
 public abstract class AbstractLaunchStep extends AbstractStep {
 
 	/**
-	 * Rteurns the launch object for the given step context.
-	 * 
+	 * Returns the launch object for the given step context.
+	 *
 	 * @param context The step context.
 	 * @return The launch or <code>null</code>.
 	 */
@@ -34,7 +36,7 @@ public abstract class AbstractLaunchStep extends AbstractStep {
 
 	/**
 	 * Returns the active launch context model node that is currently used.
-	 * 
+	 *
 	 * @param data The data giving object. Must not be <code>null</code>.
 	 * @return The active launch context model node.
 	 */
@@ -47,7 +49,7 @@ public abstract class AbstractLaunchStep extends AbstractStep {
 
 	/**
 	 * Returns the uses launch configuration.
-	 * 
+	 *
 	 * @param context The step context.
 	 * @return
 	 */

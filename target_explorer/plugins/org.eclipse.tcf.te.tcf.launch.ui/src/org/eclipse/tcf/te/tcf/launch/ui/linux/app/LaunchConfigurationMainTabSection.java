@@ -1,9 +1,12 @@
-/*
- * LaunchConfigurationMainTabSection.java
- * Created on 02.03.2012
+/*******************************************************************************
+ * Copyright (c) 2012 Wind River Systems, Inc. and others. All rights reserved.
+ * This program and the accompanying materials are made available under the terms
+ * of the Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
  *
- * Copyright 2012 Wind River Systems Inc. All rights reserved.
- */
+ * Contributors:
+ * Wind River Systems - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.tcf.te.tcf.launch.ui.linux.app;
 
 import org.eclipse.core.runtime.Assert;
@@ -31,8 +34,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
 /**
- * LaunchConfigurationMainTabSection
- * @author tobias.schwarz@windriver.com
+ * Remote application launch configuration main tab section implementation.
  */
 public class LaunchConfigurationMainTabSection extends AbstractSection implements ILaunchConfigurationTabFormPart {
 
@@ -41,8 +43,8 @@ public class LaunchConfigurationMainTabSection extends AbstractSection implement
 	IModelNode firstSelection = null;
 
 	/**
-	 * Contructor.
-	 * 
+	 * Constructor.
+	 *
 	 * @param form The parent managed form. Must not be <code>null</code>.
 	 * @param parent The parent composite. Must not be <code>null</code>.
 	 */

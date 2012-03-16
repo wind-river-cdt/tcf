@@ -1,9 +1,12 @@
-/*
- * CloseChannelStep.java
- * Created on 23.02.2012
+/*******************************************************************************
+ * Copyright (c) 2012 Wind River Systems, Inc. and others. All rights reserved.
+ * This program and the accompanying materials are made available under the terms
+ * of the Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
  *
- * Copyright 2012 Wind River Systems Inc. All rights reserved.
- */
+ * Contributors:
+ * Wind River Systems - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.tcf.te.tcf.launch.core.steps;
 
 import org.eclipse.core.runtime.CoreException;
@@ -17,8 +20,7 @@ import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 
 /**
- * CloseChannelStep
- * @author tobias.schwarz@windriver.com
+ * Close channel step implementation.
  */
 public class CloseChannelStep extends AbstractTcfLaunchStep {
 
