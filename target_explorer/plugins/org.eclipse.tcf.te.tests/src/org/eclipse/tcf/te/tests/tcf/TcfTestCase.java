@@ -69,17 +69,24 @@ public class TcfTestCase extends CoreTestCase {
 		if (Host.isWindowsHost()) path = path.addFileExtension("exe"); //$NON-NLS-1$
 		assertTrue("Invalid agent location: " + path.toString(), path.toFile().isFile()); //$NON-NLS-1$
 
+		Throwable error = null;
+		String message = null;
+
 		// If the agent is not marked executable on Linux, we have to change that
 		if (Host.isLinuxHost() && !path.toFile().canExecute()) {
 			try {
 				Runtime.getRuntime().exec(new String[] { "chmod", "u+x", path.toString() }); //$NON-NLS-1$ //$NON-NLS-2$
 			} catch (IOException e) {
-				// Ignored
+				error = e;
+				message = e.getLocalizedMessage();
 			}
 		}
+		assertNull("Failed to make the agent executable for the current user.", message); //$NON-NLS-1$
 
-		Throwable error = null;
-		String message = null;
+		error = null;
+		message = null;
+
+		assertTrue("Agent should be executable but is not.", path.toFile().canExecute()); //$NON-NLS-1$
 
 		// Create the agent launcher
 		launcher = new AgentLauncher(path);
