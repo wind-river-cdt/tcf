@@ -87,7 +87,7 @@
 									<executiondata>
 										<fileset dir="${project.build.directory}" includes="jacoco.exec"/>
 									</executiondata>
-									<structure name="JaCoCo">
+									<structure name="Code Coverage - Target Explorer">
 										<group name="org.eclipse.tcf.te.core">
 											<classfiles>
 												<fileset dir="${basedir}/../org.eclipse.tcf.te.core/target/classes"/>
