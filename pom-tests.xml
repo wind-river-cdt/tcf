@@ -18,6 +18,48 @@
 	<name>TCF and Target Explorer, Unit Tests Master</name>
 
 	<modules>
+		<!-- List the modules where we need the class files to create the report -->
+		<module>target_explorer/plugins/org.eclipse.tcf.te.runtime</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.runtime.concurrent</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.runtime.model</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.runtime.persistence</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.runtime.services</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.runtime.statushandler</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.runtime.stepper</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.core</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.core.cdt</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.launch.core</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.launch.ui</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.ui</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.ui.controls</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.ui.forms</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.ui.startup</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.ui.swt</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.ui.terminals</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.ui.terminals.process</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.ui.terminals.serial</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.ui.terminals.ssh</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.ui.terminals.telnet</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.ui.views</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.ui.views.workingsets</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.tcf.core</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.tcf.core.model</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.tcf.core.scripting</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.tcf.launch.core</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.tcf.launch.ui</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.tcf.filesystem</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.tcf.locator</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.tcf.log.core</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.tcf.processes.core</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.tcf.processes.ui</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.tcf.services.contexts</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.tcf.terminals.core</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.tcf.terminals.ui</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.tcf.ui</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.tcf.ui.console</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.tcf.ui.views</module>
+
+		<!-- The test module executing the tests -->
 		<module>target_explorer/plugins/org.eclipse.tcf.te.tests</module>
 	</modules>
 
