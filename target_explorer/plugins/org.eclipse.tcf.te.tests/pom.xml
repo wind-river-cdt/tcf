@@ -178,7 +178,7 @@
 											</sourcefiles>
 										</group>
 										
-										<group name="org.eclipse.tcf.te.runtime">
+										<group name="org.eclipse.tcf.te.runtime.stepper">
 											<classfiles>
 												<fileset dir="${basedir}/../org.eclipse.tcf.te.runtime.stepper/target/classes"/>
 											</classfiles>
