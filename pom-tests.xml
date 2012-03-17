@@ -59,6 +59,13 @@
 		<module>target_explorer/plugins/org.eclipse.tcf.te.tcf.ui.console</module>
 		<module>target_explorer/plugins/org.eclipse.tcf.te.tcf.ui.views</module>
 
+		<module>target_explorer/features/org.eclipse.tcf.te.feature</module>
+		<module>target_explorer/features/org.eclipse.tcf.te.sdk.feature</module>
+		<module>target_explorer/features/org.eclipse.tcf.te.cdt.feature</module>
+		<module>target_explorer/features/org.eclipse.tcf.te.cdt.sdk.feature</module>
+		<module>target_explorer/features/org.eclipse.tcf.te.tcf.feature</module>
+		<module>target_explorer/features/org.eclipse.tcf.te.tcf.sdk.feature</module>
+
 		<!-- The test module executing the tests -->
 		<module>target_explorer/plugins/org.eclipse.tcf.te.tests</module>
 	</modules>
