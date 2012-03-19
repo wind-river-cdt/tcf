@@ -52,6 +52,8 @@ public class TCFMainTab extends AbstractLaunchConfigurationTab {
     private Text working_dir_text;
     private Button default_dir_button;
     private Button attach_children_button;
+    private Button stop_at_entry_button;
+    private Button stop_at_main_button;
     private Button disconnect_on_ctx_exit;
     private Button terminal_button;
     private Exception init_error;
@@ -235,6 +237,24 @@ public class TCFMainTab extends AbstractLaunchConfigurationTab {
         });
         attach_children_button.setEnabled(true);
 
+        stop_at_entry_button = createCheckButton(terminal_comp, "Stop at program entry");
+        stop_at_entry_button.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent evt) {
+                updateLaunchConfigurationDialog();
+            }
+        });
+        stop_at_entry_button.setEnabled(true);
+
+        stop_at_main_button = createCheckButton(terminal_comp, "Stop at 'main'");
+        stop_at_main_button.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent evt) {
+                updateLaunchConfigurationDialog();
+            }
+        });
+        stop_at_main_button.setEnabled(true);
+
         disconnect_on_ctx_exit = createCheckButton(terminal_comp, "Disconnect when last debug context exits");
         disconnect_on_ctx_exit.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -264,6 +284,8 @@ public class TCFMainTab extends AbstractLaunchConfigurationTab {
             working_dir_text.setText(config.getAttribute(TCFLaunchDelegate.ATTR_WORKING_DIRECTORY, ""));
             default_dir_button.setSelection(!config.hasAttribute(TCFLaunchDelegate.ATTR_WORKING_DIRECTORY));
             attach_children_button.setSelection(config.getAttribute(TCFLaunchDelegate.ATTR_ATTACH_CHILDREN, true));
+            stop_at_entry_button.setSelection(config.getAttribute(TCFLaunchDelegate.ATTR_STOP_AT_ENTRY, true));
+            stop_at_main_button.setSelection(config.getAttribute(TCFLaunchDelegate.ATTR_STOP_AT_MAIN, true));
             disconnect_on_ctx_exit.setSelection(config.getAttribute(TCFLaunchDelegate.ATTR_DISCONNECT_ON_CTX_EXIT, true));
             terminal_button.setSelection(config.getAttribute(TCFLaunchDelegate.ATTR_USE_TERMINAL, true));
             working_dir_text.setEnabled(!default_dir_button.getSelection());
@@ -292,6 +314,8 @@ public class TCFMainTab extends AbstractLaunchConfigurationTab {
             config.setAttribute(TCFLaunchDelegate.ATTR_WORKING_DIRECTORY, working_dir_text.getText());
         }
         config.setAttribute(TCFLaunchDelegate.ATTR_ATTACH_CHILDREN, attach_children_button.getSelection());
+        config.setAttribute(TCFLaunchDelegate.ATTR_STOP_AT_ENTRY, stop_at_entry_button.getSelection());
+        config.setAttribute(TCFLaunchDelegate.ATTR_STOP_AT_MAIN, stop_at_main_button.getSelection());
         config.setAttribute(TCFLaunchDelegate.ATTR_DISCONNECT_ON_CTX_EXIT, disconnect_on_ctx_exit.getSelection());
         config.setAttribute(TCFLaunchDelegate.ATTR_USE_TERMINAL, terminal_button.getSelection());
     }
@@ -459,6 +483,8 @@ public class TCFMainTab extends AbstractLaunchConfigurationTab {
     public void setDefaults(ILaunchConfigurationWorkingCopy config) {
         config.setAttribute(TCFLaunchDelegate.ATTR_PROJECT_NAME, "");
         config.setAttribute(TCFLaunchDelegate.ATTR_ATTACH_CHILDREN, true);
+        config.setAttribute(TCFLaunchDelegate.ATTR_STOP_AT_ENTRY, true);
+        config.setAttribute(TCFLaunchDelegate.ATTR_STOP_AT_MAIN, true);
         config.setAttribute(TCFLaunchDelegate.ATTR_DISCONNECT_ON_CTX_EXIT, true);
         config.setAttribute(TCFLaunchDelegate.ATTR_USE_TERMINAL, true);
         config.setAttribute(TCFLaunchDelegate.ATTR_WORKING_DIRECTORY, (String)null);

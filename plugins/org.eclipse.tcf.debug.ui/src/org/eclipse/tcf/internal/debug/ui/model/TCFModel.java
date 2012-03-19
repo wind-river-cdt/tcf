@@ -909,8 +909,8 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
         annotation_manager.updateAnnotations(null, launch);
     }
 
-    void updateContextMap(String id, IRunControl.RunControlContext ctx) {
-        context_map.put(id, ctx);
+    Map<String,Object> getContextMap() {
+        return context_map;
     }
 
     private void onContextOrProcessRemoved() {

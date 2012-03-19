@@ -772,6 +772,8 @@ public class TCFLaunch extends Launch {
             final String args = cfg.getAttribute(TCFLaunchDelegate.ATTR_PROGRAM_ARGUMENTS, "");
             final Map<String,String> env = cfg.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, (Map<String,String>)null);
             final boolean attach_children = cfg.getAttribute(TCFLaunchDelegate.ATTR_ATTACH_CHILDREN, true);
+            final boolean stop_at_entry = cfg.getAttribute(TCFLaunchDelegate.ATTR_STOP_AT_ENTRY, true);
+            final boolean stop_at_main = cfg.getAttribute(TCFLaunchDelegate.ATTR_STOP_AT_MAIN, true);
             final boolean use_terminal = cfg.getAttribute(TCFLaunchDelegate.ATTR_USE_TERMINAL, true);
             // Start the process
             new LaunchStep() {
@@ -811,7 +813,9 @@ public class TCFLaunch extends Launch {
                         Map<String,Object> params = new HashMap<String,Object>();
                         if (mode.equals(ILaunchManager.DEBUG_MODE)) {
                             params.put(IProcessesV1.START_ATTACH, true);
-                            if (attach_children) params.put(IProcessesV1.START_ATTACH_CHILDREN, true);
+                            params.put(IProcessesV1.START_ATTACH_CHILDREN, attach_children);
+                            params.put(IProcessesV1.START_STOP_AT_ENTRY, stop_at_entry);
+                            params.put(IProcessesV1.START_STOP_AT_MAIN, stop_at_main);
                         }
                         if (use_terminal) params.put(IProcessesV1.START_USE_TERMINAL, true);
                         process_start_command = ps_v1.start(dir, file, args_arr, process_env, params, done);

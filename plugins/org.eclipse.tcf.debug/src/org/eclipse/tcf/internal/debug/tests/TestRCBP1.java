@@ -901,10 +901,12 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
                 if (srv_context_query != null) {
                     srv_context_query.getAttrNames(new IContextQuery.DoneGetAttrNames() {
                         public void doneGetAttrNames(IToken token, Exception error, String[] names) {
-                            if (error != null) {
-                                if (((IErrorReport)error).getErrorCode() != IErrorReport.TCF_ERROR_INV_COMMAND) {
-                                    exit(error);
-                                }
+                            if (error instanceof IErrorReport &&
+                                    ((IErrorReport)error).getErrorCode() == IErrorReport.TCF_ERROR_INV_COMMAND) {
+                                // Ignore
+                            }
+                            else if (error != null) {
+                                exit(error);
                             }
                             else {
                                 for (String nm : names) {

@@ -104,6 +104,23 @@ public class TCFNodeLaunch extends TCFNode implements ISymbolOwner {
     }
 
     void onContextAdded(IRunControl.RunControlContext context) {
+        Set<String> filter = launch.getContextFilter();
+        if (filter != null) {
+            String c = context.getCreatorID();
+            while (c != null) {
+                if (filter.contains(c)) {
+                    filter.add(context.getID());
+                    break;
+                }
+                Object o = model.getContextMap().get(c);
+                if (o instanceof IRunControl.RunControlContext) {
+                    c = ((IRunControl.RunControlContext)o).getParentID();
+                }
+                else {
+                    break;
+                }
+            }
+        }
         children.onContextAdded(context);
     }
 

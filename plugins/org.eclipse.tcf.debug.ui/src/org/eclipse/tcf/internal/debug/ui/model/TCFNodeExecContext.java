@@ -264,7 +264,7 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
                 }
                 command = run.getContext(id, new IRunControl.DoneGetContext() {
                     public void doneGetContext(IToken token, Exception error, IRunControl.RunControlContext context) {
-                        if (context != null) model.updateContextMap(id, context);
+                        if (context != null) model.getContextMap().put(id, context);
                         set(token, error, context);
                     }
                 });

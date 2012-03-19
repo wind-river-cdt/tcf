@@ -54,6 +54,8 @@ public class TCFLaunchDelegate extends LaunchConfigurationDelegate {
         ATTR_PROGRAM_ARGUMENTS = ITCFConstants.ID_TCF_DEBUG_MODEL + ".ProgramArguments",
         ATTR_WORKING_DIRECTORY = ITCFConstants.ID_TCF_DEBUG_MODEL + ".WorkingDirectory",
         ATTR_ATTACH_CHILDREN = ITCFConstants.ID_TCF_DEBUG_MODEL + ".AttachChildren",
+        ATTR_STOP_AT_ENTRY = ITCFConstants.ID_TCF_DEBUG_MODEL + ".StopAtEntry",
+        ATTR_STOP_AT_MAIN = ITCFConstants.ID_TCF_DEBUG_MODEL + ".StopAtMain",
         ATTR_DISCONNECT_ON_CTX_EXIT = ITCFConstants.ID_TCF_DEBUG_MODEL + ".DisconnectOnCtxExit",
         ATTR_USE_TERMINAL = ITCFConstants.ID_TCF_DEBUG_MODEL + ".UseTerminal",
         ATTR_RUN_LOCAL_AGENT = ITCFConstants.ID_TCF_DEBUG_MODEL + ".RunLocalAgent",

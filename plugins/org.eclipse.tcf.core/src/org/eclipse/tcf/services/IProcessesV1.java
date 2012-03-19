@@ -28,6 +28,10 @@ public interface IProcessesV1 extends IProcesses {
         START_ATTACH = "Attach",
         /** Boolean, auto-attach process children */
         START_ATTACH_CHILDREN = "AttachChildren",
+        /** Boolean, stop at process entry */
+        START_STOP_AT_ENTRY = "StopAtEntry",
+        /** Boolean, stop at main() */
+        START_STOP_AT_MAIN = "StopAtMain",
         /** Boolean, Use pseudo-terminal for the process standard I/O */
         START_USE_TERMINAL = "UseTerminal";
 
