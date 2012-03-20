@@ -17,9 +17,9 @@ import org.eclipse.tcf.te.tests.stepper.StepperTestCase;
 import org.eclipse.tcf.te.tests.tcf.tests.TcfCoreTests;
 
 /**
- * All core test suites.
+ * Links all tests together into a single suite.
  */
-public class AllCoreTests {
+public class AllTests {
 
 	/**
 	 * Main method called if the tests are running as part of the nightly
@@ -40,7 +40,7 @@ public class AllCoreTests {
 	 * @return Any object of type <code>Test</code> containing the test to run.
 	 */
 	public static Test suite() {
-		TestSuite suite = new TestSuite("All Core Tests"); //$NON-NLS-1$
+		TestSuite suite = new TestSuite("All Target Explorer Tests"); //$NON-NLS-1$
 
 		suite.addTest(StatusHandlerTestCase.getTestSuite());
 		suite.addTest(StepperTestCase.getTestSuite());

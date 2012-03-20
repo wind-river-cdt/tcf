@@ -24,4 +24,7 @@ Export-Package: org.eclipse.tcf.te.tests,
  org.eclipse.tcf.te.tests.activator;x-internal:=true,
  org.eclipse.tcf.te.tests.interfaces,
  org.eclipse.tcf.te.tests.statushandler,
- org.eclipse.tcf.te.tests.suites
+ org.eclipse.tcf.te.tests.stepper,
+ org.eclipse.tcf.te.tests.suites,
+ org.eclipse.tcf.te.tests.tcf,
+ org.eclipse.tcf.te.tests.tcf.tests
