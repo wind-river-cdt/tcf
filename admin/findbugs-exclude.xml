@@ -19,4 +19,8 @@
 		<Method name="getAdapterList"/>
 	</Match>
 	
+	<!-- Ignore all I18N Internationalization bugs -->
+	<Match>
+		<Bug category="I18N"/>
+	</Match>
 </FindBugsFilter>
