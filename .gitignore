@@ -101,6 +101,8 @@ tests/plugins/org.eclipse.tcf.debug.test/bin
 /target_explorer/plugins/org.eclipse.tcf.te.tcf.core.scripting/bin
 /target_explorer/plugins/org.eclipse.tcf.te.tcf.filesystem/target
 /target_explorer/plugins/org.eclipse.tcf.te.tcf.filesystem/bin
+/target_explorer/plugins/org.eclipse.tcf.te.tcf.filesystem.test/target
+/target_explorer/plugins/org.eclipse.tcf.te.tcf.filesystem.test/bin
 /target_explorer/plugins/org.eclipse.tcf.te.tcf.launch.core/target
 /target_explorer/plugins/org.eclipse.tcf.te.tcf.launch.core/bin
 /target_explorer/plugins/org.eclipse.tcf.te.tcf.launch.ui/target
