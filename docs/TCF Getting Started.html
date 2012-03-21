@@ -15,11 +15,13 @@
 <ul>
     <li><a href='#Workspace'>Creating Eclipse Workspace</a>
     <li><a href='#Plugins'>TCF Plugins</a>
+    <li><a href='#TE_Plugins'>Target Explorer Plugins</a>
     <li><a href='#Agent'>Building TCF Agent</a>
     <li><a href='#TcfLua'>TCF Integration with Lua</a>
     <li><a href='#Browsing'>Browsing Agent Source Code in CDT</a>
-    <li><a href='#RSE'>Using TCF With Remote System Explorer</a>
+    <li><a href='#TE'>Using TCF With Target Explorer</a>
     <li><a href='#Debugger'>Using TCF With Eclipse Debugger</a>
+    <li><a href='#RSE'>Using TCF With Remote System Explorer</a>
 </ul>
 
 <h2><a name='Workspace'>Creating Eclipse Workspace</a></h2>
@@ -55,11 +57,11 @@ git clone http://git.eclipse.org/gitroot/tcf/org.eclipse.tcf.git
        <ul>
        <li>If CDT is not installed, don't import the following plugins into your workspace:
            <ul>
-           <li>org.eclipse.tm.tcf.cdt.ui
+           <li>org.eclipse.tcf.cdt.ui
            </ul>
        <li>If RSE is not installed, don't import the following plugins into your workspace:
            <ul>
-           <li>org.eclipse.tm.tcf.rse
+           <li>org.eclipse.tcf.rse
            </ul>
        </ul>
 </ul>
@@ -70,36 +72,40 @@ git clone http://git.eclipse.org/gitroot/tcf/org.eclipse.tcf.git
 Examples source code is stored in <code>&lt;TCF Root&gt;\examples</code> directory.
 
 <dl>
-    <dt><b>org.eclipse.tm.tcf</b>
+    <dt><b>org.eclipse.tcf</b>
     <dd>This is the main TCF plugin. It contains Eclipse integration code for the framework.
     It is the only TCF plugin, which (together with its fragments) should be required by a TCF client. The rest of TCF plugins are
     clients developed as a reference implementation or for demonstration purposes.
     <p>
-    <dt><b>org.eclipse.tm.tcf.core</b>
+    <dt><b>org.eclipse.tcf.core</b>
         <dd>This is a fragment of <b>org.eclipse.tm.tcf</b> plugin. It contains the framework itself and interfaces for standard services.
         The Java code in the fragment does not have any Eclipse dependencies and can be used outside Eclipse.
         <p>
-    <dt><b>org.eclipse.tm.tcf.debug, org.eclipse.tm.tcf.debug.ui</b>
+    <dt><b>org.eclipse.tcf.debug, org.eclipse.tcf.debug.ui</b>
     <dd>This code connects Eclipse Debug Framework and Target Communication Framework.
     It allows to launch Eclipse debug session by connecting to a target running TCF agent,
     and then perform basic debugging tasks, like resuming, suspending, single-stepping, setting/removing breakpoints, etc.
     The code can be used as a reference for developing new TCF clients.
     <p>
-    <dt><b>org.eclipse.tm.tcf.rse</b>
+    <dt><b>org.eclipse.tcf.rse</b>
     <dd>This optional plugin allows Remote System Explorer (RSE) to connect to remote machines using TCF as communication protocol.
     It includes implementation of RSE services as TCF clients.
     <p>
-    <dt><b>org.eclipse.tm.tcf.cdt.ui</b>
+    <dt><b>org.eclipse.tcf.cdt.ui</b>
     <dd>This optional plugin improves integration between CDT and TCF debugger.
     It helps to search for CDT projects and executable files when creating TCF launch configuration.
     <p>
-    <dt><b>org.eclipse.tm.tcf.examples.daytime</b>
+    <dt><b>org.eclipse.tcf.examples.daytime</b>
     <dd>This is an example plugin.
     The Example shows how TCF/Java binding can be extended for a new, user defined service.
     The plugin provides Java binding for DayTime service.
-    Also, see directory <code>&lt;TCF Root&gt;/examples/org.eclipse.tm.tcf.examples.daytime.agent</code>
+    Also, see directory <code>&lt;TCF Root&gt;/examples/org.eclipse.tcf.examples.daytime.agent</code>
     for example code of a customized TCF agent, which implements DayTime service.
 </dl>
+
+<h2><a name='TE_Plugins'>Target Explorer Plugins</a></h2>
+
+<p>Target Explorer plugins source code is stored in the <code>&lt;TCF Root&gt;\target_explorer\plugins</code> directory.
 
 <h2><a name='Agent'>Building TCF Agent</a></h2>
 
@@ -323,37 +329,36 @@ as needed.
 For VxWorks, browsing should be configured automatically through the WR Workbench
 Kernel Module Project.
 
-<h2><a name='RSE'>Using TCF With Remote System Explorer</a></h2>
+<h2><a name='TE'>Using TCF With Target Explorer</a></h2>
 
-<p>Remote System Explorer is an Eclipse based component that allows users to create connections to remote machines and
-explore their file systems, see list of processes and access some other resources, like remote shells.
-Remote System Explorer has been designed as a flexible, extensible framework to which Eclipse plug-in developers can
-contribute their own system definitions, actions, etc.</p>
+<p>The Target Explorer aims to create a lightweight but highly flexible and extensible remote system management
+framework. The focus is on TCF remote system management, but is by no means limited to it. The Target Explorer comes
+with full remote file system and remote process support, and allows to connect a terminal to the remote system using
+TCF, SSH, Telnet and serial line.
 
-<p>Plugin <b>org.eclipse.tm.tcf.rse</b> enables use of Processes and Files subsystems of Remote System Explorer over TCF.
-It also extends Processes subsystem to include CPU utilization data and some other process attributes in RSE views.</p>
+<p>Import all <b>org.eclipse.tcf.te.*</b> plug-in's to enable the Target Explorer.
 
 <p>To connect a remote machine over TCF:</p>
 <ul>
    <li>Make sure TCF agent is running on remote machine.
-   <li>Run Eclipse with RSE and TCF plugins installed.
-   <li>In Eclipse, do "Window/Open Perspective/Remote System Explorer" command.
-   <li>In "Remote Systems" view: do right click and select "New/Connection..."
-   <li>In "New Connection" dialog box: select TCF and press "Next" button.
-   <li>Enter "Host name" - IP host name ot the target machine, and "Connection name" - arbitrary string to name new connection.
-   Press "Finish" button.
-   <li>New connection should appear in "Remote Systems" view and it is ready to be explored.
-</ul>
-
-<p>RSE features supported by TCF connection:
-<ul>
-    <li>File Subsystem: full support, i.e. browse, upload, download, copy, move, delete
-    <li>Processes: browse, including parent/child relationship
+   <li>Run Eclipse with Target Explorer and TCF plugins installed.
+   <li>In Eclipse, do "Window/Open Perspective/Target Explorer" command.
+   <li>If the remote machine is on the same subnet as the host, than expand the "Neighborhood" and/or "My Targets"
+       nodes in the "Target Explorer" view to select the remote machine.
+   <li>If the remote machine is not on the same subnet as the host, In "Target Explorer" view: press "CTRL+N" or click on the "New wizard" button in the views toolbar.
+   <li>In "New" dialog box: select "Peer" and press "Next" button.
+   <li>In the upcoming editor window, enter the "Peer Name" and "Host" - IP host name of the target machine.
+	   Press "CTRL+S" to save the connection properties.
+   <li>New tabs "File System" and "Processes" should appear in editor.
+      <ul>
+	     <li>To add the remote file system tree and/or running processes directly into the "Target Explorer" view,
+		     select "Content..." from the views menu and enable "File System" and/or "Processes".
+	  </ul>
 </ul>
 
 <h2><a name='Debugger'>Using TCF With Eclipse Debugger</a></h2>
 
-<p>Plugins <b>org.eclipse.tm.tcf.debug</b> and <b>org.eclipse.tm.tcf.debug.ui</b> allow to start a debug session
+<p>Plugins <b>org.eclipse.tcf.debug</b> and <b>org.eclipse.tcf.debug.ui</b> allow to start a debug session
 by connecting to a machine runnning TCF agent.
 
 <p>To start a debug session over TCF:</p>
@@ -374,6 +379,34 @@ by connecting to a machine runnning TCF agent.
 <p>In TCF debug session "Debug", "Breakpoints", "Registers", "Variables" and "Expressions" views are populated.
 Source level debugging is fully supported.
 </p>
+
+<h2><a name='RSE'>Using TCF With Remote System Explorer</a></h2>
+
+<p>Remote System Explorer is an Eclipse based component that allows users to create connections to remote machines and
+explore their file systems, see list of processes and access some other resources, like remote shells.
+Remote System Explorer has been designed as a flexible, extensible framework to which Eclipse plug-in developers can
+contribute their own system definitions, actions, etc.</p>
+
+<p>Plugin <b>org.eclipse.tcf.rse</b> enables use of Processes and Files subsystems of Remote System Explorer over TCF.
+It also extends Processes subsystem to include CPU utilization data and some other process attributes in RSE views.</p>
+
+<p>To connect a remote machine over TCF:</p>
+<ul>
+   <li>Make sure TCF agent is running on remote machine.
+   <li>Run Eclipse with RSE and TCF plugins installed.
+   <li>In Eclipse, do "Window/Open Perspective/Remote System Explorer" command.
+   <li>In "Remote Systems" view: do right click and select "New/Connection..."
+   <li>In "New Connection" dialog box: select TCF and press "Next" button.
+   <li>Enter "Host name" - IP host name of the target machine, and "Connection name" - arbitrary string to name new connection.
+   Press "Finish" button.
+   <li>New connection should appear in "Remote Systems" view and it is ready to be explored.
+</ul>
+
+<p>RSE features supported by TCF connection:
+<ul>
+    <li>File Subsystem: full support, i.e. browse, upload, download, copy, move, delete
+    <li>Processes: browse, including parent/child relationship
+</ul>
 
 </body>
 </html>
