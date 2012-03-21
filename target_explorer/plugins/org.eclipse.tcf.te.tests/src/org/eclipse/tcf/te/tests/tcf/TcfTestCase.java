@@ -25,6 +25,7 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelLookupService;
 import org.eclipse.tcf.te.tcf.locator.model.Model;
+import org.eclipse.tcf.te.tcf.locator.nodes.PeerModel;
 import org.eclipse.tcf.te.tests.CoreTestCase;
 
 /**
@@ -37,6 +38,8 @@ public class TcfTestCase extends CoreTestCase {
 	private AgentLauncher launcher;
 	// The peer instance
 	protected IPeer peer;
+	// The peer model instance
+	protected IPeerModel peerModel;
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.tests.CoreTestCase#setUp()
@@ -54,6 +57,7 @@ public class TcfTestCase extends CoreTestCase {
 	protected void tearDown() throws Exception {
 		if (launcher != null) launcher.dispose();
 		peer = null;
+		peerModel = null;
 	    super.tearDown();
 	}
 
@@ -188,8 +192,10 @@ public class TcfTestCase extends CoreTestCase {
 			attrs.put(IPeer.ATTR_ID, id);
 			attrs.put(IPeer.ATTR_IP_HOST, ip);
 			peer = new TransientPeer(attrs);
+			peerModel = new PeerModel(model, peer);
 		} else {
-			peer = node.get().getPeer();
+			peerModel = node.get();
+			peer = peerModel.getPeer();
 		}
 		assertNotNull("Failed to determine the peer to use for the tests.", peer); //$NON-NLS-1$
 	}

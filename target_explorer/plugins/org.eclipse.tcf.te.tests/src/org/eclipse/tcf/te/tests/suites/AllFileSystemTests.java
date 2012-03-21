@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * Copyright (c) 2012 Wind River Systems, Inc. and others. All rights reserved.
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -13,14 +13,15 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.tcf.te.tests.statushandler.StatusHandlerTestCase;
-import org.eclipse.tcf.te.tests.stepper.StepperTestCase;
-import org.eclipse.tcf.te.tests.tcf.tests.TcfCoreTests;
+import org.eclipse.tcf.te.tests.tcf.filesystem.callbacks.CallbackTests;
+import org.eclipse.tcf.te.tests.tcf.filesystem.operations.OperationTests;
+import org.eclipse.tcf.te.tests.tcf.filesystem.url.URLTests;
+import org.eclipse.tcf.te.tests.tcf.filesystem.utils.UtilTests;
 
 /**
- * Links all tests together into a single suite.
+ * Links all file system tests.
  */
-public class AllTests {
+public class AllFileSystemTests {
 
 	/**
 	 * Main method called if the tests are running as part of the nightly
@@ -41,11 +42,8 @@ public class AllTests {
 	 * @return Any object of type <code>Test</code> containing the test to run.
 	 */
 	public static Test suite() {
-		TestSuite suite = new TestSuite("All Target Explorer Tests"); //$NON-NLS-1$
-
+		TestSuite suite = new TestSuite("All File System Tests"); //$NON-NLS-1$
 		addTests(suite);
-		AllFileSystemTests.addTests(suite);
-
 		return suite;
 	}
 
@@ -57,8 +55,9 @@ public class AllTests {
 	public static void addTests(TestSuite suite) {
 		Assert.isNotNull(suite);
 
-		suite.addTest(StatusHandlerTestCase.getTestSuite());
-		suite.addTest(StepperTestCase.getTestSuite());
-		suite.addTest(TcfCoreTests.getTestSuite());
+		suite.addTest(CallbackTests.suite());
+		suite.addTest(OperationTests.suite());
+		suite.addTest(URLTests.suite());
+		suite.addTest(UtilTests.suite());
 	}
 }

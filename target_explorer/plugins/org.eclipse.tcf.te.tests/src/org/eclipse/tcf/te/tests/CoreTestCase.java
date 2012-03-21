@@ -273,6 +273,28 @@ public class CoreTestCase extends TestCase {
 		System.out.println("=== " + name + " finished at: " + DATE_FORMAT.format(new Date(endTime)) + " (duration: " + duration + " ms)"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 
+	/**
+	 * Prints out the given message.
+	 *
+	 * @param message The message. Must not be <code>null</code>.
+	 */
+	protected void printMessage(String message) {
+		Assert.isNotNull(message);
+		System.out.println(message);
+	}
+
+	/**
+	 * Prints out the given debug message.
+	 * <p>
+	 * Debug messages are printed only if the platform is in debug mode.
+	 *
+	 * @param message The message. Must not be <code>null</code>.
+	 */
+	protected void printDebugMessage(String message) {
+		Assert.isNotNull(message);
+		if (Platform.inDebugMode()) System.out.println(message);
+	}
+
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */

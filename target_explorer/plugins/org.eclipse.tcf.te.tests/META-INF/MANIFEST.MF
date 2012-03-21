@@ -15,6 +15,7 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.7.0",
  org.eclipse.tcf.te.runtime.statushandler;bundle-version="1.0.0",
  org.eclipse.tcf.te.runtime.stepper;bundle-version="1.0.0",
  org.eclipse.tcf.te.tcf.locator;bundle-version="1.0.0",
+ org.eclipse.tcf.te.tcf.filesystem;bundle-version="1.0.0",
  org.eclipse.tcf.te.tcf.core;bundle-version="1.0.0",
  org.eclipse.tcf.te.ui.views;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
@@ -27,4 +28,9 @@ Export-Package: org.eclipse.tcf.te.tests,
  org.eclipse.tcf.te.tests.stepper,
  org.eclipse.tcf.te.tests.suites,
  org.eclipse.tcf.te.tests.tcf,
+ org.eclipse.tcf.te.tests.tcf.filesystem,
+ org.eclipse.tcf.te.tests.tcf.filesystem.callbacks,
+ org.eclipse.tcf.te.tests.tcf.filesystem.operations,
+ org.eclipse.tcf.te.tests.tcf.filesystem.url,
+ org.eclipse.tcf.te.tests.tcf.filesystem.utils,
  org.eclipse.tcf.te.tests.tcf.tests
