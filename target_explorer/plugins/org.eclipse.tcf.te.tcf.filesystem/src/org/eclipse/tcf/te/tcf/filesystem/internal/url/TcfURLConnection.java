@@ -131,7 +131,8 @@ public class TcfURLConnection extends URLConnection {
 			String segment = st.nextToken();
 			builder.append(URLDecoder.decode(segment, "UTF-8")); //$NON-NLS-1$
 		}
-		return builder.toString();
+		String relative = builder.toString();
+		return path.startsWith("/") ? "/" + relative : relative;  //$NON-NLS-1$//$NON-NLS-2$
 	}
 	
 	/**
