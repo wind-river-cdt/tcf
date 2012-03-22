@@ -809,12 +809,17 @@ public class TCFTargetTab extends AbstractLaunchConfigurationTab {
                 TreeItem item = findItem(parent);
                 if (item == null) return;
                 expanded = item.getExpanded();
-                item.setItemCount(expanded ? arr.length : 1);
+                item.setItemCount(expanded && arr.length > 0 ? arr.length : 1);
                 items = item.getItems();
             }
-            if (expanded) {
+            if (expanded && arr.length > 0) {
                 assert items.length == arr.length;
                 for (int i = 0; i < items.length; i++) fillItem(items[i], arr[i]);
+            }
+            else if (expanded) {
+                items[0].setText("No peers");
+                int n = peer_tree.getColumnCount();
+                for (int i = 1; i < n; i++) items[0].setText(i, "");
             }
             else {
                 Protocol.invokeAndWait(new Runnable() {
