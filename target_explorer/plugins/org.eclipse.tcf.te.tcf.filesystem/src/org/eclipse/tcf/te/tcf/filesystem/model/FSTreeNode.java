@@ -16,6 +16,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,8 +26,10 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.PlatformObject;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.tcf.protocol.Protocol;
@@ -428,7 +431,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 	public URI getLocationURI() {
 		try {
 			String id = peerNode.getPeerId();
-			String path = getLocation(true);
+			String path = getURLEncodedPath();
 			String location = TcfURLConnection.PROTOCOL_SCHEMA + ":/" + id + (path.startsWith("/") ? path : "/" + path); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			return new URI(location);
 		}
@@ -436,6 +439,37 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 			assert false;
 			return null;
 		}
+	}
+	
+	/**
+	 * Encode each segment of the path to a URL compatible name,
+	 * and get the URL encoded path.
+	 * 
+	 * @return The encoded path which is URL compatible.
+	 */
+	private String getURLEncodedPath() {
+		if(isRoot()) {
+			if(isWindowsNode()) {
+				return name.substring(0, name.length() - 1) + "/"; //$NON-NLS-1$
+			}
+			return name;
+		}
+		final AtomicReference<String> ref = new AtomicReference<String>();
+		SafeRunner.run(new ISafeRunnable(){
+			@Override
+            public void handleException(Throwable exception) {
+				// Ignore on purpose
+            }
+			@Override
+            public void run() throws Exception {
+				ref.set(URLEncoder.encode(name, "UTF-8")); //$NON-NLS-1$
+            }});
+		String segment = ref.get();
+		String pLoc = parent.getURLEncodedPath();
+		if(parent.isRoot()) {
+			return pLoc + segment;
+		}
+		return pLoc + "/" + segment; //$NON-NLS-1$
 	}
 
 	/**

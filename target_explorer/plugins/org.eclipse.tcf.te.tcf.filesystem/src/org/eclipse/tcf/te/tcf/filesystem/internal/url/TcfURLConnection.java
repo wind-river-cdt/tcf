@@ -13,10 +13,15 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLDecoder;
+import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.ISafeRunnable;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
@@ -58,7 +63,7 @@ public class TcfURLConnection extends URLConnection {
 	// The TCF agent peer of the connection.
 	private IPeer peer;
 	// The path to the resource on the remote file system.
-	private String path;
+	String path;
 	// The timeout for opening a file.
 	private int openTimeout;
 	// The timeout for closing a file.
@@ -81,7 +86,7 @@ public class TcfURLConnection extends URLConnection {
 	 * @param url
 	 *            The URL of the resource.
 	 */
-	public TcfURLConnection(URL url) {
+	public TcfURLConnection(final URL url) {
 		super(url);
 		// The peerId is stored as the host name in URL. See TcfURLStreamHandlerService#parseURL for details.
 		String peerId = url.getHost();
@@ -90,12 +95,43 @@ public class TcfURLConnection extends URLConnection {
 		if(peer == null) {
 			throw new IllegalArgumentException(NLS.bind(Messages.TcfURLConnection_NoPeerFound, peerId));
 		}
-		path = url.getPath();
+		SafeRunner.run(new ISafeRunnable(){
+			@Override
+            public void handleException(Throwable exception) {
+				// Ignore on purpose
+            }
+			@Override
+            public void run() throws Exception {
+				path = decodeURLPath(url);
+            }});
 		// Set default timeout.
 		setConnectTimeout(DEFAULT_CONNECT_TIMEOUT);
 		setOpenTimeout(DEFAULT_OPEN_TIMEOUT);
 		setReadTimeout(DEFAULT_READ_TIMEOUT);
 		setCloseTimeout(DEFAULT_CLOSE_TIMEOUT);
+	}
+	
+	/**
+	 * Get the path of the specified URL and decode it from
+	 * URL compatible path to a file system path.
+	 * 
+	 * @see FSTreeNode#getURLEncodedPath
+	 * @param url The URL whose path is to be decoded.
+	 * @return The file system path.
+	 * @throws UnsupportedEncodingException
+	 */
+	String decodeURLPath(URL url) throws UnsupportedEncodingException {
+		String path = url.getPath();
+		StringTokenizer st = new StringTokenizer(path, "/"); //$NON-NLS-1$
+		StringBuilder builder = new StringBuilder();
+		while(st.hasMoreTokens()) {
+			if(builder.length() > 0) {
+				builder.append("/"); //$NON-NLS-1$
+			}
+			String segment = st.nextToken();
+			builder.append(URLDecoder.decode(segment, "UTF-8")); //$NON-NLS-1$
+		}
+		return builder.toString();
 	}
 	
 	/**
