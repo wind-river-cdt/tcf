@@ -19,8 +19,9 @@ import java.util.Set;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.tcf.te.ui.views.ViewsUtil;
+import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
 import org.eclipse.tcf.te.ui.views.internal.preferences.IPreferenceConsts;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.CompoundContributionItem;
 import org.eclipse.ui.internal.navigator.NavigatorFilterService;
 import org.eclipse.ui.navigator.CommonNavigator;
@@ -29,11 +30,11 @@ import org.eclipse.ui.navigator.ICommonFilterDescriptor;
 import org.eclipse.ui.navigator.INavigatorContentService;
 
 /**
- * The dynamic contribution of common filter MRU menu list. 
+ * The dynamic contribution of common filter MRU menu list.
  */
 @SuppressWarnings("restriction")
 public class FilterMRUContribution extends CompoundContributionItem {
-	
+
 	/**
 	 * A MRU item action to enable or disable specified common filter.
 	 */
@@ -44,7 +45,7 @@ public class FilterMRUContribution extends CompoundContributionItem {
 		private ICommonFilterDescriptor filterDescriptor;
 		// The common viewer of the navigator.
 		private CommonViewer commonViewer;
-		
+
 		/**
 		 * Constructor
 		 */
@@ -75,14 +76,16 @@ public class FilterMRUContribution extends CompoundContributionItem {
 			updateFilters.execute(null, null);
         }
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.actions.CompoundContributionItem#getContributionItems()
 	 */
 	@Override
     protected IContributionItem[] getContributionItems() {
-		CommonNavigator navigator = (CommonNavigator) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart();
+		CommonNavigator navigator = (CommonNavigator) ViewsUtil.getPart(IUIConstants.ID_EXPLORER);
+		if (navigator == null) return new IContributionItem[0];
+
 		INavigatorContentService contentService = navigator.getNavigatorContentService();
         NavigatorFilterService filterService = (NavigatorFilterService) contentService.getFilterService();
 		Map<String, ICommonFilterDescriptor> fdMap = new HashMap<String, ICommonFilterDescriptor>();

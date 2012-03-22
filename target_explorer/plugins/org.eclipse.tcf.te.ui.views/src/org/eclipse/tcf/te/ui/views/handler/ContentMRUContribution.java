@@ -17,8 +17,9 @@ import java.util.Set;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.tcf.te.ui.views.ViewsUtil;
+import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
 import org.eclipse.tcf.te.ui.views.internal.preferences.IPreferenceConsts;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.CompoundContributionItem;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
@@ -26,7 +27,7 @@ import org.eclipse.ui.navigator.INavigatorContentDescriptor;
 import org.eclipse.ui.navigator.INavigatorContentService;
 
 /**
- * The dynamic contribution of content extension MRU menu list. 
+ * The dynamic contribution of content extension MRU menu list.
  */
 public class ContentMRUContribution extends CompoundContributionItem {
 
@@ -79,7 +80,9 @@ public class ContentMRUContribution extends CompoundContributionItem {
 	 */
 	@Override
 	protected IContributionItem[] getContributionItems() {
-		CommonNavigator navigator = (CommonNavigator) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart();
+		CommonNavigator navigator = (CommonNavigator) ViewsUtil.getPart(IUIConstants.ID_EXPLORER);
+		if (navigator == null) return new IContributionItem[0];
+
 		INavigatorContentService contentService = navigator.getNavigatorContentService();
 		List<IContributionItem> items = new ArrayList<IContributionItem>();
 		List<String> extensionSet = new MRUList(IPreferenceConsts.PREF_CONTENT_MRU_LIST);
