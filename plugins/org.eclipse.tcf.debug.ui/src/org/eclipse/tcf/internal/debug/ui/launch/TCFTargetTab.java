@@ -13,6 +13,7 @@ package org.eclipse.tcf.internal.debug.ui.launch;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -87,7 +88,6 @@ public class TCFTargetTab extends AbstractLaunchConfigurationTab {
 
     private static class PeerInfo {
         PeerInfo parent;
-        int index;
         String id;
         Map<String,String> attrs;
         PeerInfo[] children;
@@ -120,7 +120,6 @@ public class TCFTargetTab extends AbstractLaunchConfigurationTab {
                     System.arraycopy(arr, 0, buf, 0, arr.length);
                     PeerInfo info = new PeerInfo();
                     info.parent = parent;
-                    info.index = arr.length;
                     info.id = id;
                     info.attrs = attrs;
                     info.peer = peer;
@@ -168,7 +167,6 @@ public class TCFTargetTab extends AbstractLaunchConfigurationTab {
                             });
                         }
                         else {
-                            arr[i].index = j;
                             buf[j++] = arr[i];
                         }
                     }
@@ -531,7 +529,7 @@ public class TCFTargetTab extends AbstractLaunchConfigurationTab {
             peer_tree.setEnabled(true);
             peer_id_text.setEnabled(true);
             String id = peer_id_text.getText();
-            TreeItem item = findItem(findPeerInfo(id));
+            TreeItem item = findItem(id);
             if (item != null) peer_tree.setSelection(item);
             else peer_tree.deselectAll();
         }
@@ -569,7 +567,7 @@ public class TCFTargetTab extends AbstractLaunchConfigurationTab {
         setMessage(null);
         try {
             String id = configuration.getAttribute(TCFLaunchDelegate.ATTR_PEER_ID, "");
-            TreeItem item = findItem(findPeerInfo(id));
+            TreeItem item = findItem(id);
             if (item != null) peer_tree.setSelection(item);
             peer_id_text.setText(id);
             run_local_agent_button.setSelection(configuration.getAttribute(TCFLaunchDelegate.ATTR_RUN_LOCAL_AGENT, false));
@@ -708,7 +706,6 @@ public class TCFTargetTab extends AbstractLaunchConfigurationTab {
         for (IPeer p : map.values()) {
             PeerInfo info = new PeerInfo();
             info.parent = peer;
-            info.index = n;
             info.id = p.getID();
             info.attrs = new HashMap<String,String>(p.getAttributes());
             info.peer = p;
@@ -733,6 +730,39 @@ public class TCFTargetTab extends AbstractLaunchConfigurationTab {
                 updateItems(parent);
             }
         });
+    }
+
+    private ArrayList<PeerInfo> filterPeerList(PeerInfo parent, boolean expanded) {
+        ArrayList<PeerInfo> lst = new ArrayList<PeerInfo>();
+        HashMap<String,PeerInfo> local_agents = new HashMap<String,PeerInfo>();
+        HashSet<String> ids = new HashSet<String>();
+        for (PeerInfo p : parent.children) {
+            String id = p.attrs.get(IPeer.ATTR_AGENT_ID);
+            if (id == null) continue;
+            if (!"TCP".equals(p.attrs.get(IPeer.ATTR_TRANSPORT_NAME))) continue;
+            if (!"127.0.0.1".equals(p.attrs.get(IPeer.ATTR_IP_HOST))) continue;
+            local_agents.put(id, p);
+            ids.add(p.id);
+        }
+        for (PeerInfo p : parent.children) {
+            PeerInfo i = local_agents.get(p.attrs.get(IPeer.ATTR_AGENT_ID));
+            if (i != null && i != p) continue;
+            lst.add(p);
+        }
+        if (parent != peer_info && expanded) {
+            for (PeerInfo p : peer_info.children) {
+                if (p.peer instanceof TCFUserDefPeer && !ids.contains(p.id)) {
+                    PeerInfo x = new PeerInfo();
+                    x.parent = parent;
+                    x.id = p.id;
+                    x.attrs = p.attrs;
+                    x.peer = p.peer;
+                    ids.add(x.id);
+                    lst.add(x);
+                }
+            }
+        }
+        return lst;
     }
 
     private void updateItems(TreeItem parent_item, boolean reload) {
@@ -770,22 +800,21 @@ public class TCFTargetTab extends AbstractLaunchConfigurationTab {
                 items = item.getItems();
             }
             assert items.length == 1;
-            items[0].removeAll();
             if (parent.children_pending) {
                 items[0].setForeground(display.getSystemColor(SWT.COLOR_LIST_FOREGROUND));
-                items[0].setText("Connecting...");
+                fillItem(items[0], "Connecting...");
             }
             else if (parent.children_error != null) {
                 String msg = parent.children_error.getMessage();
                 if (msg == null) msg = parent.children_error.getClass().getName();
                 else msg = msg.replace('\n', ' ');
                 items[0].setForeground(display.getSystemColor(SWT.COLOR_RED));
-                items[0].setText(msg);
+                fillItem(items[0], msg);
             }
             else if (expanded) {
                 loadChildren(parent);
                 items[0].setForeground(display.getSystemColor(SWT.COLOR_LIST_FOREGROUND));
-                items[0].setText("Connecting...");
+                fillItem(items[0], "Connecting...");
             }
             else {
                 Protocol.invokeAndWait(new Runnable() {
@@ -793,33 +822,30 @@ public class TCFTargetTab extends AbstractLaunchConfigurationTab {
                         disconnectPeer(parent);
                     }
                 });
-                items[0].setText("");
+                fillItem(items[0], "");
             }
-            int n = peer_tree.getColumnCount();
-            for (int i = 1; i < n; i++) items[0].setText(i, "");
-            items[0].setImage((Image)null);
         }
         else {
-            PeerInfo[] arr = parent.children;
+            ArrayList<PeerInfo> lst = null;
             if (parent == peer_info) {
-                peer_tree.setItemCount(arr.length);
+                lst = filterPeerList(parent, expanded);
+                peer_tree.setItemCount(lst.size());
                 items = peer_tree.getItems();
             }
             else {
                 TreeItem item = findItem(parent);
                 if (item == null) return;
                 expanded = item.getExpanded();
-                item.setItemCount(expanded && arr.length > 0 ? arr.length : 1);
+                lst = filterPeerList(parent, expanded);
+                item.setItemCount(expanded && lst.size() > 0 ? lst.size() : 1);
                 items = item.getItems();
             }
-            if (expanded && arr.length > 0) {
-                assert items.length == arr.length;
-                for (int i = 0; i < items.length; i++) fillItem(items[i], arr[i]);
+            if (expanded && lst.size() > 0) {
+                assert items.length == lst.size();
+                for (int i = 0; i < items.length; i++) fillItem(items[i], lst.get(i));
             }
             else if (expanded) {
-                items[0].setText("No peers");
-                int n = peer_tree.getColumnCount();
-                for (int i = 1; i < n; i++) items[0].setText(i, "");
+                fillItem(items[0], "No peers");
             }
             else {
                 Protocol.invokeAndWait(new Runnable() {
@@ -827,52 +853,34 @@ public class TCFTargetTab extends AbstractLaunchConfigurationTab {
                         disconnectPeer(parent);
                     }
                 });
-                items[0].setText("");
-                int n = peer_tree.getColumnCount();
-                for (int i = 1; i < n; i++) items[0].setText(i, "");
+                fillItem(items[0], "");
             }
         }
         updateLaunchConfigurationDialog();
     }
 
-    private PeerInfo findPeerInfo(TreeItem item) {
-        assert Thread.currentThread() == display.getThread();
-        if (item == null) return peer_info;
-        TreeItem parent = item.getParentItem();
-        PeerInfo info = findPeerInfo(parent);
-        if (info == null) return null;
-        if (info.children == null) return null;
-        if (info.children_error != null) return null;
-        int i = parent == null ? peer_tree.indexOf(item) : parent.indexOf(item);
-        if (i < 0 || i >= info.children.length) return null;
-        assert info.children[i].index == i;
-        return info.children[i];
-    }
-
-    private PeerInfo findPeerInfo(String path) {
+    private TreeItem findItem(String path) {
         assert Thread.currentThread() == display.getThread();
         if (path == null) return null;
-        int i = path.lastIndexOf('/');
-        String id = null;
-        PeerInfo[] arr = null;
-        if (i < 0) {
-            arr = peer_info.children;
-            if (arr == null) return null;
-            id = path;
+        int z = path.lastIndexOf('/');
+        if (z < 0) {
+            int n = peer_tree.getItemCount();
+            for (int i = 0; i < n; i++) {
+                TreeItem x = peer_tree.getItem(i);
+                PeerInfo p = (PeerInfo)x.getData("TCFPeerInfo");
+                if (p != null && p.id.equals(path)) return x;
+            }
         }
         else {
-            PeerInfo p = findPeerInfo(path.substring(0, i));
-            if (p == null) return null;
-            arr = p.children;
-            if (arr == null) {
-                TreeItem item = findItem(p);
-                item.setExpanded(true);
-                return null;
+            TreeItem y = findItem(path.substring(0, z));
+            if (y == null) return null;
+            String id = path.substring(z + 1);
+            int n = y.getItemCount();
+            for (int i = 0; i < n; i++) {
+                TreeItem x = y.getItem(i);
+                PeerInfo p = (PeerInfo)x.getData("TCFPeerInfo");
+                if (p != null && p.id.equals(id)) return x;
             }
-            id = path.substring(i + 1);
-        }
-        for (int n = 0; n < arr.length; n++) {
-            if (arr[n].id.equals(id)) return arr[n];
         }
         return null;
     }
@@ -882,14 +890,33 @@ public class TCFTargetTab extends AbstractLaunchConfigurationTab {
         assert info.parent != null;
         if (info.parent == peer_info) {
             int n = peer_tree.getItemCount();
-            if (info.index >= n) return null;
-            return peer_tree.getItem(info.index);
+            for (int i = 0; i < n; i++) {
+                TreeItem x = peer_tree.getItem(i);
+                if (x.getData("TCFPeerInfo") == info) return x;
+            }
         }
-        TreeItem i = findItem(info.parent);
+        else {
+            TreeItem y = findItem(info.parent);
+            if (y == null) return null;
+            int n = y.getItemCount();
+            for (int i = 0; i < n; i++) {
+                TreeItem x = y.getItem(i);
+                if (x.getData("TCFPeerInfo") == info) return x;
+            }
+        }
+        return null;
+    }
+
+    private PeerInfo findPeerInfo(String path) {
+        TreeItem i = findItem(path);
         if (i == null) return null;
-        int n = i.getItemCount();
-        if (info.index >= n) return null;
-        return i.getItem(info.index);
+        return (PeerInfo)i.getData("TCFPeerInfo");
+    }
+
+    private PeerInfo findPeerInfo(TreeItem item) {
+        assert Thread.currentThread() == display.getThread();
+        if (item == null) return peer_info;
+        return (PeerInfo)item.getData("TCFPeerInfo");
     }
 
     private void runDiagnostics(boolean loop) {
@@ -1047,6 +1074,14 @@ public class TCFTargetTab extends AbstractLaunchConfigurationTab {
         if (!canHaveChildren(info)) item.setItemCount(0);
         else if (info.children == null || info.children_error != null) item.setItemCount(1);
         else item.setItemCount(info.children.length);
+    }
+
+    private void fillItem(TreeItem item, String text) {
+        item.setText(text);
+        int n = peer_tree.getColumnCount();
+        for (int i = 1; i < n; i++) item.setText(i, "");
+        item.setImage((Image)null);
+        item.removeAll();
     }
 
     private String getPath(PeerInfo info) {

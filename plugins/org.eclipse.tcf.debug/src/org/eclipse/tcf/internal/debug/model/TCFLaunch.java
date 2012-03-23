@@ -269,7 +269,10 @@ public class TCFLaunch extends Launch {
             new LaunchStep() {
                 @Override
                 void start() throws Exception {
-                    channel.redirect(redirection_path.removeFirst());
+                    String id = redirection_path.removeFirst();
+                    IPeer p = Protocol.getLocator().getPeers().get(id);
+                    if (p != null) channel.redirect(p.getAttributes());
+                    else channel.redirect(id);
                 }
             };
         }
@@ -1109,17 +1112,19 @@ public class TCFLaunch extends Launch {
                 }
             }));
         }
-        IStreams streams = getService(IStreams.class);
-        for (String id : stream_ids.keySet()) {
-            cmds.add(streams.disconnect(id, new IStreams.DoneDisconnect() {
-                public void doneDisconnect(IToken token, Exception error) {
-                    cmds.remove(token);
-                    if (error != null) channel.terminate(error);
-                    else if (cmds.isEmpty()) channel.close();
-                }
-            }));
+        if (stream_ids.size() > 0) {
+            IStreams streams = getService(IStreams.class);
+            for (String id : stream_ids.keySet()) {
+                cmds.add(streams.disconnect(id, new IStreams.DoneDisconnect() {
+                    public void doneDisconnect(IToken token, Exception error) {
+                        cmds.remove(token);
+                        if (error != null) channel.terminate(error);
+                        else if (cmds.isEmpty()) channel.close();
+                    }
+                }));
+            }
+            stream_ids.clear();
         }
-        stream_ids.clear();
         process_input_stream_id = null;
         if (cmds.isEmpty()) channel.close();
     }
