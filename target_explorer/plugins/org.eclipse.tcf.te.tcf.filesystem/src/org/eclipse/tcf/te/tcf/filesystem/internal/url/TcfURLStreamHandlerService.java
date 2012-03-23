@@ -1,3 +1,12 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * This program and the accompanying materials are made available under the terms
+ * of the Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ * Wind River Systems - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.url;
 
 import java.io.IOException;
@@ -16,6 +25,9 @@ import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 import org.osgi.service.url.AbstractURLStreamHandlerService;
 
+/**
+ * The stream handler service used to parse tcf stream protocol. 
+ */
 public class TcfURLStreamHandlerService extends AbstractURLStreamHandlerService {
 	// The pattern of a windows path.
 	private static final String WINPATH_PATTERN = "[A-Za-z]:.*"; //$NON-NLS-1$

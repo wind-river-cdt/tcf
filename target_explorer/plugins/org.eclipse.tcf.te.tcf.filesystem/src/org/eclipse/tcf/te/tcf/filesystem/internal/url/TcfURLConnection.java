@@ -35,7 +35,7 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.model.Model;
 
 /**
- * The URL connection returned by TCF stream service used to handler "tcf"
+ * The URL connection returned by TCF stream service used to handle "tcf"
  * stream protocol.
  */
 public class TcfURLConnection extends URLConnection {
@@ -255,9 +255,9 @@ public class TcfURLConnection extends URLConnection {
 			service.close(handle, new DoneClose() {
 				@Override
 				public void doneClose(IToken token, FileSystemException error) {
+					Tcf.getChannelManager().closeChannel(channel);
 				}
 			});
-			Tcf.getChannelManager().closeChannel(channel);
 		}
 	}
 

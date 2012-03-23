@@ -19,7 +19,6 @@ import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 
 /**
  * The TCF input stream returned by {@link TcfURLConnection#getInputStream()}.
- *
  */
 public class TcfInputStream extends InputStream {
 	// Default chunk size while pumping the data.
