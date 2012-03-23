@@ -72,18 +72,21 @@ public class FSTreeElementLabelProvider extends LabelProvider {
 				return UIPlugin.getImage(ImageConsts.FOLDER);
 			}
 			else if (node.isFile()) {
-				String key = node.name;
-				Image image = UIPlugin.getImage(key);
+				Image image = updateDaemon.getImage(node);
 				if (image == null) {
 					updateDaemon.enqueue(node);
-					ImageDescriptor descriptor = getEditorRegistry().getImageDescriptor(key);
-					if (descriptor == null) {
-						descriptor = getEditorRegistry().getSystemExternalEditorImageDescriptor(key);
-					}
-					if (descriptor != null) {
-						UIPlugin.getDefault().getImageRegistry().put(key, descriptor);
-					}
+					String key = node.name;
 					image = UIPlugin.getImage(key);
+					if (image == null) {
+						ImageDescriptor descriptor = getEditorRegistry().getImageDescriptor(key);
+						if (descriptor == null) {
+							descriptor = getEditorRegistry().getSystemExternalEditorImageDescriptor(key);
+						}
+						if (descriptor != null) {
+							UIPlugin.getDefault().getImageRegistry().put(key, descriptor);
+						}
+						image = UIPlugin.getImage(key);
+					}
 				}
 				return image;
 			}
