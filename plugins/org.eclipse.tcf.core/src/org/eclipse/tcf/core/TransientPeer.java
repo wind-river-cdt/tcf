@@ -17,7 +17,6 @@ import java.util.Map;
 import org.eclipse.tcf.internal.core.TransportManager;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
-import org.eclipse.tcf.protocol.Protocol;
 
 /**
  * Transient implementation of IPeer interface.
@@ -43,12 +42,10 @@ public class TransientPeer implements IPeer {
     }
 
     public String getServiceManagerID() {
-        assert Protocol.isDispatchThread();
         return ro_attrs.get(ATTR_SERVICE_MANGER_ID);
     }
 
     public String getAgentID() {
-        assert Protocol.isDispatchThread();
         return ro_attrs.get(ATTR_AGENT_ID);
     }
 
