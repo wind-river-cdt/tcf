@@ -189,6 +189,7 @@ public class LocatorProxy implements ILocator {
                         error = toError(args[0]);
                     }
                     if (error != null) {
+                        if (channel.getState() == IChannel.STATE_CLOSED) return;
                         Protocol.log("Locator error", error);
                         return;
                     }
