@@ -23,6 +23,13 @@ import org.eclipse.ui.PlatformUI;
  * The label provider for the tree column "name".
  */
 public class FSTreeElementLabelProvider extends LabelProvider {
+	// The background daemon that updates the images of the file system nodes.
+	private static LabelProviderUpdateDaemon updateDaemon;
+	static {
+		updateDaemon = new LabelProviderUpdateDaemon();
+		updateDaemon.start();
+	}
+	
 	// The editor registry used to search a file's image.
 	private IEditorRegistry editorRegistry = null;
 
@@ -68,6 +75,7 @@ public class FSTreeElementLabelProvider extends LabelProvider {
 				String key = node.name;
 				Image image = UIPlugin.getImage(key);
 				if (image == null) {
+					updateDaemon.enqueue(node);
 					ImageDescriptor descriptor = getEditorRegistry().getImageDescriptor(key);
 					if (descriptor == null) {
 						descriptor = getEditorRegistry().getSystemExternalEditorImageDescriptor(key);

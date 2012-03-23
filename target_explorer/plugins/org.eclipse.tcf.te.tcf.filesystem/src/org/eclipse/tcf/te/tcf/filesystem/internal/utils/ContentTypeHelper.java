@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
-import org.eclipse.core.runtime.content.IContentTypeManager;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 
 /**
@@ -122,12 +121,7 @@ public class ContentTypeHelper {
 				URL url = node.getLocationURL();
 				is = url.openStream();
 			}
-			IContentTypeManager ctMgr = Platform.getContentTypeManager();
-			IContentType contentType = ctMgr.findContentTypeFor(is, node.name);
-			if(contentType == null) {
-				contentType = ctMgr.findContentTypeFor(is, null);
-			}
-			return contentType;
+			return Platform.getContentTypeManager().findContentTypeFor(is, node.name);
 		} finally {
 			if (is != null) {
 				try {
