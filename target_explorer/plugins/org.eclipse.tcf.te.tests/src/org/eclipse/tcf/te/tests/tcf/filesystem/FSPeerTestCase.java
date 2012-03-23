@@ -53,7 +53,8 @@ public class FSPeerTestCase extends TcfTestCase {
 		assertNotNull(peerModel);
 		assertNotNull(peer);
 
-		testRoot = getFSNode(getTestRoot());
+		printMessage("The work directory of File System tests is located at:" + getTestRoot()); //$NON-NLS-1$
+		testRoot = FSModel.findTreeNode(peerModel, getTestRoot());
 		assertNotNull(testRoot);
 		String path = getTestRoot() + getPathSep() + getTestPath();
 		testFolder = prepareFolder(path, getTestPath(), testRoot);
@@ -90,7 +91,6 @@ public class FSPeerTestCase extends TcfTestCase {
 	}
 
 	protected boolean pathExists(String path) {
-		// Remove its self from the clipped nodes.
 		IChannel channel = null;
 		try {
 			channel = FSOperation.openChannel(peer);

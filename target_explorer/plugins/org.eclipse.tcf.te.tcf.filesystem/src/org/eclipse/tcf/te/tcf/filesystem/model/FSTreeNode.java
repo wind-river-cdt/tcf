@@ -415,7 +415,10 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 	 */
 	public URL getLocationURL() {
 		try {
-			return 	getLocationURI().toURL();
+			String id = peerNode.getPeerId();
+			String path = getLocation(true);
+			String location = TcfURLConnection.PROTOCOL_SCHEMA + ":/" + id + (path.startsWith("/") ? path : "/" + path); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			return new URL(location);
 		} catch (MalformedURLException e) {
 			assert false;
 			return null;
@@ -431,7 +434,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 	public URI getLocationURI() {
 		try {
 			String id = peerNode.getPeerId();
-			String path = getURLEncodedPath();
+			String path = getEncodedURIPath();
 			String location = TcfURLConnection.PROTOCOL_SCHEMA + ":/" + id + (path.startsWith("/") ? path : "/" + path); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			return new URI(location);
 		}
@@ -442,12 +445,12 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 	}
 	
 	/**
-	 * Encode each segment of the path to a URL compatible name,
-	 * and get the URL encoded path.
+	 * Encode each segment of the path to a URI compatible name,
+	 * and get the URI encoded path.
 	 * 
-	 * @return The encoded path which is URL compatible.
+	 * @return The encoded path which is URI compatible.
 	 */
-	private String getURLEncodedPath() {
+	private String getEncodedURIPath() {
 		if(isRoot()) {
 			if(isWindowsNode()) {
 				return name.substring(0, name.length() - 1) + "/"; //$NON-NLS-1$
@@ -465,7 +468,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 				ref.set(URLEncoder.encode(name, "UTF-8")); //$NON-NLS-1$
             }});
 		String segment = ref.get();
-		String pLoc = parent.getURLEncodedPath();
+		String pLoc = parent.getEncodedURIPath();
 		if(parent.isRoot()) {
 			return pLoc + segment;
 		}

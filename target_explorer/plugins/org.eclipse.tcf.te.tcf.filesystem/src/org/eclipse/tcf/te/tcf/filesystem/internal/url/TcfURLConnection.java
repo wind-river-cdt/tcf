@@ -13,15 +13,10 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLDecoder;
-import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.ISafeRunnable;
-import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
@@ -95,44 +90,12 @@ public class TcfURLConnection extends URLConnection {
 		if(peer == null) {
 			throw new IllegalArgumentException(NLS.bind(Messages.TcfURLConnection_NoPeerFound, peerId));
 		}
-		SafeRunner.run(new ISafeRunnable(){
-			@Override
-            public void handleException(Throwable exception) {
-				// Ignore on purpose
-            }
-			@Override
-            public void run() throws Exception {
-				path = decodeURLPath(url);
-            }});
+		path = url.getPath();
 		// Set default timeout.
 		setConnectTimeout(DEFAULT_CONNECT_TIMEOUT);
 		setOpenTimeout(DEFAULT_OPEN_TIMEOUT);
 		setReadTimeout(DEFAULT_READ_TIMEOUT);
 		setCloseTimeout(DEFAULT_CLOSE_TIMEOUT);
-	}
-	
-	/**
-	 * Get the path of the specified URL and decode it from
-	 * URL compatible path to a file system path.
-	 * 
-	 * @see FSTreeNode#getURLEncodedPath
-	 * @param url The URL whose path is to be decoded.
-	 * @return The file system path.
-	 * @throws UnsupportedEncodingException
-	 */
-	String decodeURLPath(URL url) throws UnsupportedEncodingException {
-		String path = url.getPath();
-		StringTokenizer st = new StringTokenizer(path, "/"); //$NON-NLS-1$
-		StringBuilder builder = new StringBuilder();
-		while(st.hasMoreTokens()) {
-			if(builder.length() > 0) {
-				builder.append("/"); //$NON-NLS-1$
-			}
-			String segment = st.nextToken();
-			builder.append(URLDecoder.decode(segment, "UTF-8")); //$NON-NLS-1$
-		}
-		String relative = builder.toString();
-		return path.startsWith("/") ? "/" + relative : relative;  //$NON-NLS-1$//$NON-NLS-2$
 	}
 	
 	/**

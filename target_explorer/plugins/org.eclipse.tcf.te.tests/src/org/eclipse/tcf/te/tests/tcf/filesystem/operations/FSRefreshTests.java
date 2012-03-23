@@ -37,7 +37,6 @@ public class FSRefreshTests extends OperationTestBase {
 
 	@Override
     protected void tearDown() throws Exception {
-	    super.tearDown();
 	    String path = getTestRoot() + getPathSep() + getTestPath();
 	    File dir = new File(path);
 	    File newdir = new File(dir, "newdir"); //$NON-NLS-1$
