@@ -893,6 +893,7 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
             TCFNode node = getNode(id);
             if (node instanceof TCFNodeExecContext) {
                 ((TCFNodeExecContext)node).onContextRemoved();
+                for (TCFModelProxy p : model_proxies.values())p.saveExpandState(node);
             }
             action_results.remove(id);
             context_map.remove(id);

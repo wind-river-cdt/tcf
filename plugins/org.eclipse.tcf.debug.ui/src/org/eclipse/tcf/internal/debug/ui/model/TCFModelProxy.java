@@ -56,12 +56,16 @@ public class TCFModelProxy extends AbstractModelProxy implements IModelProxy, Ru
     private final Map<TCFNode,ModelDelta> node2delta = new HashMap<TCFNode,ModelDelta>();
     private final Set<ModelDelta> content_deltas = new HashSet<ModelDelta>();
     private final LinkedList<TCFNode> selection = new LinkedList<TCFNode>();
+    private final Set<String> auto_expand_set = new HashSet<String>();
 
     private boolean posted;
     private boolean installed;
     private boolean disposed;
     private boolean realized;
     private long last_update_time;
+    private boolean enable_auto_expand;
+    private Set<TCFNode> auto_expand_removed_nodes;
+    private Set<TCFNode> auto_expand_created_nodes;
 
     private final Runnable timer = new Runnable() {
 
@@ -194,6 +198,9 @@ public class TCFModelProxy extends AbstractModelProxy implements IModelProxy, Ru
             public void run() {
                 assert !installed;
                 assert !disposed;
+                enable_auto_expand =
+                        IDebugUIConstants.ID_DEBUG_VIEW.equals(getPresentationContext().getId()) &&
+                        getViewer() instanceof InternalTreeModelViewer;
                 ((ITreeModelViewer)getViewer()).addViewerUpdateListener(update_listener);
                 model.onProxyInstalled(TCFModelProxy.this);
                 installed = true;
@@ -246,6 +253,17 @@ public class TCFModelProxy extends AbstractModelProxy implements IModelProxy, Ru
             node = node.getParent(ctx);
         }
         post();
+    }
+
+    /**
+     * Save expansion state for a node that is about to be deleted.
+     * The data is used to auto-expand the node if it is re-created later.
+     * @param node - a model node that will become expanded.
+     */
+    void saveExpandState(TCFNode node) {
+        if (!enable_auto_expand) return;
+        if (auto_expand_removed_nodes == null) auto_expand_removed_nodes = new HashSet<TCFNode>();
+        auto_expand_removed_nodes.add(node);
     }
 
     /**
@@ -329,6 +347,10 @@ public class TCFModelProxy extends AbstractModelProxy implements IModelProxy, Ru
                     flags |= IModelDelta.SELECT | IModelDelta.STATE;
                     if (this.selection.size() <= 1) flags |= IModelDelta.REVEAL;
                 }
+                if (auto_expand_set.contains(node.id) && getNodeChildren(node).length > 0) {
+                    if (auto_expand_created_nodes == null) auto_expand_created_nodes = new HashSet<TCFNode>();
+                    auto_expand_created_nodes.add(node);
+                }
                 if (node.parent == null) {
                     // The node is TCF launch node
                     if (root.getElement() instanceof TCFNode) return null;
@@ -407,8 +429,27 @@ public class TCFModelProxy extends AbstractModelProxy implements IModelProxy, Ru
         assert pending_node == null;
         if (root.getFlags() != 0 || root.getChildDeltas().length > 0) {
             last_update_time = System.currentTimeMillis();
+            final Set<TCFNode> save_expand_state = auto_expand_removed_nodes;
+            auto_expand_removed_nodes = null;
             asyncExec(new Runnable() {
                 public void run() {
+                    if (save_expand_state != null && save_expand_state.size() > 0) {
+                        Viewer viewer = getViewer();
+                        if (viewer instanceof InternalTreeModelViewer) {
+                            InternalTreeModelViewer tree_viwer = (InternalTreeModelViewer)getViewer();
+                            final Set<String> expanded = new HashSet<String>();
+                            for (TCFNode node : save_expand_state) {
+                                if (tree_viwer.getExpandedState(node)) expanded.add(node.id);
+                            }
+                            if (expanded.size() > 0) {
+                                Protocol.invokeLater(new Runnable() {
+                                    public void run() {
+                                        auto_expand_set.addAll(expanded);
+                                    }
+                                });
+                            }
+                        }
+                    }
                     sortDeltaChildren(root);
                     fireModelChanged(root);
                 }
@@ -429,7 +470,8 @@ public class TCFModelProxy extends AbstractModelProxy implements IModelProxy, Ru
                     public void run() {
                         if (getViewer() instanceof InternalTreeModelViewer) {
                             found = ((InternalTreeModelViewer)getViewer()).findElementIndex(TreePath.EMPTY, launch) >= 0;
-                        } else if (getViewer() instanceof InternalVirtualTreeModelViewer) {
+                        }
+                        else if (getViewer() instanceof InternalVirtualTreeModelViewer) {
                             found = ((InternalVirtualTreeModelViewer)getViewer()).findElementIndex(TreePath.EMPTY, launch) >= 0;
                         }
                         Protocol.invokeLater(new Runnable() {
@@ -506,5 +548,13 @@ public class TCFModelProxy extends AbstractModelProxy implements IModelProxy, Ru
             Protocol.invokeLater(this);
         }
         node2children.clear();
+        if (auto_expand_created_nodes != null) {
+            for (TCFNode node : auto_expand_created_nodes) {
+                auto_expand_set.remove(node.id);
+                addDelta(node, IModelDelta.EXPAND);
+            }
+            auto_expand_created_nodes = null;
+            post();
+        }
     }
 }
