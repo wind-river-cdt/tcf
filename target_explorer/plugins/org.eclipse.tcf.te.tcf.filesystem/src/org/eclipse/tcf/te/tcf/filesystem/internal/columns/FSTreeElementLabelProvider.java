@@ -9,11 +9,14 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.columns;
 
+import java.io.File;
+
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.internal.ImageConsts;
+import org.eclipse.tcf.te.tcf.filesystem.internal.utils.CacheManager;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IWorkbench;
@@ -23,11 +26,14 @@ import org.eclipse.ui.PlatformUI;
  * The label provider for the tree column "name".
  */
 public class FSTreeElementLabelProvider extends LabelProvider {
-	// The background daemon that updates the images of the file system nodes.
-	private static LabelProviderUpdateDaemon updateDaemon;
+	// The background daemons that updates the images of the file system nodes.
+	static LabelProviderUpdateDaemon extDaemon;
+	static LabelProviderUpdateDaemon cacheDaemon;
 	static {
-		updateDaemon = new LabelProviderUpdateDaemon();
-		updateDaemon.start();
+		extDaemon = new FileExtBasedImageUpdater();
+		extDaemon.start();
+		cacheDaemon = new CacheFileImageUpdater();
+		cacheDaemon.start();
 	}
 	
 	// The editor registry used to search a file's image.
@@ -72,28 +78,49 @@ public class FSTreeElementLabelProvider extends LabelProvider {
 				return UIPlugin.getImage(ImageConsts.FOLDER);
 			}
 			else if (node.isFile()) {
-				Image image = updateDaemon.getImage(node);
-				if (image == null) {
-					updateDaemon.enqueue(node);
-					String key = node.name;
-					image = UIPlugin.getImage(key);
-					if (image == null) {
-						ImageDescriptor descriptor = getEditorRegistry().getImageDescriptor(key);
-						if (descriptor == null) {
-							descriptor = getEditorRegistry().getSystemExternalEditorImageDescriptor(key);
-						}
-						if (descriptor != null) {
-							UIPlugin.getDefault().getImageRegistry().put(key, descriptor);
-						}
-						image = UIPlugin.getImage(key);
+				File cacheFile = CacheManager.getInstance().getCacheFile(node);
+				if (cacheFile.exists()) {
+					Image image = cacheDaemon.getImage(node);
+					if(image == null) {
+						cacheDaemon.enqueue(node);
+						image = getPredefinedImage(node);
 					}
+					return image;
 				}
-				return image;
+				Image image = extDaemon.getImage(node);
+                if (image == null) {
+                	extDaemon.enqueue(node);
+                	image = getPredefinedImage(node);
+                }
+                return image;
 			}
 		}
-
 		return super.getImage(element);
 	}
+
+	/**
+	 * Get a predefined image for the tree node. These images are retrieved from
+	 * editor registry.
+	 * 
+	 * @param node The file tree node.
+	 * @return The editor image for this type.
+	 */
+	private Image getPredefinedImage(FSTreeNode node) {
+	    Image image;
+	    String key = node.name;
+	    image = UIPlugin.getImage(key);
+	    if (image == null) {
+	    	ImageDescriptor descriptor = getEditorRegistry().getImageDescriptor(key);
+	    	if (descriptor == null) {
+	    		descriptor = getEditorRegistry().getSystemExternalEditorImageDescriptor(key);
+	    	}
+	    	if (descriptor != null) {
+	    		UIPlugin.getDefault().getImageRegistry().put(key, descriptor);
+	    	}
+	    	image = UIPlugin.getImage(key);
+	    }
+	    return image;
+    }
 
 	/**
 	 * Returns the workbench's editor registry.

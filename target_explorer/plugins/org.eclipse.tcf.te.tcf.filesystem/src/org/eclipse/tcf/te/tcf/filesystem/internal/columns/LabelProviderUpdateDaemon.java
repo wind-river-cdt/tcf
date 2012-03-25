@@ -37,7 +37,7 @@ import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
  * The background daemon that updates the images of the file system using
  * images retrieved by FileSystemView from Swing.
  */
-public class LabelProviderUpdateDaemon extends Thread {
+public abstract class LabelProviderUpdateDaemon extends Thread {
 	// The dummy AWT component used to render the icon.
 	Component dummyComponent = new JComponent(){private static final long serialVersionUID = 5926798769323111209L;};
 	//The queue that caches the current file nodes to be updated.
@@ -94,28 +94,44 @@ public class LabelProviderUpdateDaemon extends Thread {
 	public void run() {
 		while (true) {
 			FSTreeNode node = take();
-			String key = getExtImageKey(node);
+			String key = getImageKey(node);
 			ImageDescriptor image = UIPlugin.getImageDescriptor(key);
 			if (image == null) {
-				String ext = getFileExt(node);
-				File file = getTempFile(ext);
-				File imgFile = getImgFile(file.getName());
+				File mirror = getMirrorFile(node);
+				File imgFile = getImgFile(mirror.getName());
 				if (!imgFile.exists()) {
 					FileSystemView view = FileSystemView.getFileSystemView();
-					Icon icon = view.getSystemIcon(file);
-					createImageFromIcon(icon, file);
+					Icon icon = view.getSystemIcon(mirror);
+					createImageFromIcon(icon, mirror);
 				}
 				try {
 					image = ImageDescriptor.createFromURL(imgFile.toURI().toURL());
 					UIPlugin.getDefault().getImageRegistry().put(key, image);
+					sendNotification(node, node.name, null, image);
 				}
 				catch (MalformedURLException e) {
 					// Ignore
 				}
 			}
-			sendNotification(node, node.name, null, image);
 		}
 	}
+	
+	/**
+	 * Get an extension key as the image registry key for the 
+	 * specified node.
+	 * 
+	 * @param node The node to get the key for.
+	 * @return The key used to cache the image descriptor in the registry.
+	 */
+	abstract protected String getImageKey(FSTreeNode node);
+	
+	/**
+	 * Return a mirror file that will be used to retrieve the image from.
+	 * 
+	 * @param node The file system tree node.
+	 * @return The corresponding mirror file.
+	 */
+	abstract protected File getMirrorFile(FSTreeNode node);
 	
 	/**
 	 * Get the node from the extension registry.
@@ -124,38 +140,9 @@ public class LabelProviderUpdateDaemon extends Thread {
 	 * @return The image for this node.
 	 */
 	public Image getImage(FSTreeNode node) {
-		String key = getExtImageKey(node);
+		String key = getImageKey(node);
 		return UIPlugin.getImage(key);
 	}
-
-	/**
-	 * Get an extension key as the image registry key for the 
-	 * specified node.
-	 * 
-	 * @param node The node to get the key for.
-	 * @return The key used to cache the image descriptor in the registry.
-	 */
-	private String getExtImageKey(FSTreeNode node) {
-	    String ext = getFileExt(node);
-		String key = ext == null ? "" : ext; //$NON-NLS-1$
-		key = "EXT_IMAGE@"+key; //$NON-NLS-1$
-	    return key;
-    }
-
-	/**
-	 * Get the node's file extension or null
-	 * if there is no extension.
-	 * 
-	 * @param node The file tree node.
-	 * @return The file's extension or null.
-	 */
-	private String getFileExt(FSTreeNode node) {
-	    String name = node.name;
-		String ext = null;
-		int index = name.lastIndexOf("."); //$NON-NLS-1$
-		if (index != -1) ext = name.substring(index + 1);
-	    return ext;
-    }
 
 	/**
 	 * Create an image file using "png" format 
@@ -189,38 +176,6 @@ public class LabelProviderUpdateDaemon extends Thread {
 	}
 
 	/**
-	 * Get the temporary file used to obtain icons. If it does
-	 * not exist, then create one.
-	 * 
-	 * @param ext The extension of the temporary file.
-	 * @return The file object.
-	 */
-	private File getTempFile(String ext) {
-		File tmpDir = getTempDir();
-		File file = new File(tmpDir, "temp" + (ext == null ? "" : ("." + ext))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		if (!file.exists()) {
-			try {
-				file.createNewFile();
-			}
-			catch (IOException e) {
-			}
-		}
-		return file;
-	}
-
-	/**
-	 * Get the temporary directory used to store temporary file and images.
-	 * 
-	 * @return The directory file object.
-	 */
-	private File getTempDir() {
-		File file = CacheManager.getInstance().getCacheRoot();
-		file = new File(file, ".tmp"); //$NON-NLS-1$
-		if (!file.exists()) file.mkdirs();
-		return file;
-	}
-
-	/**
 	 * Get the image's directory to hold the temporary images.
 	 * 
 	 * @return The directory
@@ -231,7 +186,6 @@ public class LabelProviderUpdateDaemon extends Thread {
 		if (!file.exists()) file.mkdirs();
 		return file;
 	}
-
 	/**
 	 * Send a notification to inform the file tree for changed images.
 	 * 
