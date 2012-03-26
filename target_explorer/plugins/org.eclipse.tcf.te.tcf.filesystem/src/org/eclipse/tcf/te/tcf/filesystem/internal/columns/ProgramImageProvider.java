@@ -38,11 +38,13 @@ public class ProgramImageProvider extends DefaultImageProvider {
 				String ending = name.substring(dot);
 				String key = "EXT_IMAGE" + ending; //$NON-NLS-1$
 				Image image = UIPlugin.getImage(key);
-				Program program = Program.findProgram(ending);
-				if (image == null && program != null) {
-					ImageData iconData = program.getImageData();
-					image = new Image(Display.getCurrent(), iconData);
-					UIPlugin.getDefault().getImageRegistry().put(key, image);
+				if (image == null) {
+					Program program = Program.findProgram(ending);
+					if (program != null) {
+						ImageData iconData = program.getImageData();
+						image = new Image(Display.getCurrent(), iconData);
+						UIPlugin.getDefault().getImageRegistry().put(key, image);
+					}
 				}
 				return image;
 			}
