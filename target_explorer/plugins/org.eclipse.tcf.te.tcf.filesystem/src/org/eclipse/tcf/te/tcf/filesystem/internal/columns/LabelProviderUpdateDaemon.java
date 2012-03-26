@@ -126,7 +126,7 @@ public abstract class LabelProviderUpdateDaemon extends Thread {
 		String key = "SWING_ROOT_DRIVER_IMAGE"; //$NON-NLS-1$
 		ImageDescriptor imgDesc = UIPlugin.getImageDescriptor(key);
 		if(imgDesc == null) {
-			File mirror = new File("C:\\"); //$NON-NLS-1$
+			File mirror = File.listRoots()[0];
 			File imgFile = getImgFile("_root_driver_"); //$NON-NLS-1$
 			if(!imgFile.exists()) {
 				FileSystemView view = FileSystemView.getFileSystemView();
