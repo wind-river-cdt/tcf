@@ -42,6 +42,7 @@ public abstract class LabelProviderUpdateDaemon extends Thread {
 	Component dummyComponent = new JComponent(){private static final long serialVersionUID = 5926798769323111209L;};
 	//The queue that caches the current file nodes to be updated.
 	BlockingQueue<FSTreeNode> queueNodes;
+	
 
 	/**
 	 * Constructor
@@ -102,7 +103,7 @@ public abstract class LabelProviderUpdateDaemon extends Thread {
 				if (!imgFile.exists()) {
 					FileSystemView view = FileSystemView.getFileSystemView();
 					Icon icon = view.getSystemIcon(mirror);
-					createImageFromIcon(icon, mirror);
+					createImageFromIcon(icon, mirror.getName());
 				}
 				try {
 					image = ImageDescriptor.createFromURL(imgFile.toURI().toURL());
@@ -114,6 +115,60 @@ public abstract class LabelProviderUpdateDaemon extends Thread {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Get the image of disk drivers on Windows platform.
+	 * 
+	 * @return The disk driver image.
+	 */
+	public Image getDiskImage() {
+		String key = "SWING_ROOT_DRIVER_IMAGE"; //$NON-NLS-1$
+		ImageDescriptor imgDesc = UIPlugin.getImageDescriptor(key);
+		if(imgDesc == null) {
+			File mirror = new File("C:\\"); //$NON-NLS-1$
+			File imgFile = getImgFile("_root_driver_"); //$NON-NLS-1$
+			if(!imgFile.exists()) {
+				FileSystemView view = FileSystemView.getFileSystemView();
+				Icon icon = view.getSystemIcon(mirror);
+				createImageFromIcon(icon, "_root_driver_"); //$NON-NLS-1$
+			}
+			try {
+				imgDesc = ImageDescriptor.createFromURL(imgFile.toURI().toURL());
+				UIPlugin.getDefault().getImageRegistry().put(key, imgDesc);
+			}
+			catch (MalformedURLException e) {
+				// Ignore
+			}
+		}
+		return UIPlugin.getImage(key);
+	}
+	
+	/**
+	 * Get the folder image on Windows platform.
+	 * 
+	 * @return The folder image.
+	 */
+	public Image getFolderImage() {
+		String key = "SWING_FOLDER_IMAGE"; //$NON-NLS-1$
+		ImageDescriptor imgDesc = UIPlugin.getImageDescriptor(key);
+		if(imgDesc == null) {
+			File mirror = getImgDir();
+			File imgFile = getImgFile("_directory_"); //$NON-NLS-1$
+			if(!imgFile.exists()) {
+				FileSystemView view = FileSystemView.getFileSystemView();
+				Icon icon = view.getSystemIcon(mirror);
+				createImageFromIcon(icon, "_directory_"); //$NON-NLS-1$
+			}
+			try {
+				imgDesc = ImageDescriptor.createFromURL(imgFile.toURI().toURL());
+				UIPlugin.getDefault().getImageRegistry().put(key, imgDesc);
+			}
+			catch (MalformedURLException e) {
+				// Ignore
+			}
+		}
+		return UIPlugin.getImage(key);
 	}
 	
 	/**
@@ -151,12 +206,12 @@ public abstract class LabelProviderUpdateDaemon extends Thread {
 	 * @param icon The icon that is used for the tmp file.
 	 * @param tmpfile The temp file.
 	 */
-	private void createImageFromIcon(Icon icon, File tmpfile) {
+	private void createImageFromIcon(Icon icon, String imgfile) {
 		BufferedImage bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_4BYTE_ABGR);
 		Graphics g = bi.createGraphics();
 		icon.paintIcon(dummyComponent, g, 0, 0);
 		g.dispose();
-		File imgFile = getImgFile(tmpfile.getName());
+		File imgFile = getImgFile(imgfile);
 		try {
 			ImageIO.write(bi, "png", imgFile); //$NON-NLS-1$
 		}

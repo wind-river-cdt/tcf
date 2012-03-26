@@ -264,7 +264,31 @@ public class CacheManager {
 	 */
 	public boolean download(final FSTreeNode node) {
 		Assert.isNotNull(Display.getCurrent());
-		IRunnableWithProgress runnable = new IRunnableWithProgress() {
+		IRunnableWithProgress runnable = getDownloadRunnable(node);
+		Shell parent = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+		TimeTriggeredProgressMonitorDialog dialog = new TimeTriggeredProgressMonitorDialog(
+				parent, 250);
+		dialog.setCancelable(true);
+		File file = getCachePath(node).toFile();
+		try {
+			dialog.run(true, true, runnable);
+			return true;
+		} catch (InvocationTargetException e) {
+			// Something's gone wrong. Roll back the downloading and display the
+			// error.
+			deleteFileChecked(file);
+			PersistenceManager.getInstance().removeBaseTimestamp(node.getLocationURI());
+			displayError(parent, e);
+		} catch (InterruptedException e) {
+			// It is canceled. Just roll back the downloading result.
+			deleteFileChecked(file);
+			PersistenceManager.getInstance().removeBaseTimestamp(node.getLocationURI());
+		}
+		return false;
+	}
+
+	public IRunnableWithProgress getDownloadRunnable(final FSTreeNode node) {
+	    return new IRunnableWithProgress() {
 			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 				monitor.beginTask(NLS.bind(Messages.CacheManager_DowloadingFile, node.name), 100);
@@ -313,27 +337,7 @@ public class CacheManager {
 				}
 			}
 		};
-		Shell parent = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-		TimeTriggeredProgressMonitorDialog dialog = new TimeTriggeredProgressMonitorDialog(
-				parent, 250);
-		dialog.setCancelable(true);
-		File file = getCachePath(node).toFile();
-		try {
-			dialog.run(true, true, runnable);
-			return true;
-		} catch (InvocationTargetException e) {
-			// Something's gone wrong. Roll back the downloading and display the
-			// error.
-			deleteFileChecked(file);
-			PersistenceManager.getInstance().removeBaseTimestamp(node.getLocationURI());
-			displayError(parent, e);
-		} catch (InterruptedException e) {
-			// It is canceled. Just roll back the downloading result.
-			deleteFileChecked(file);
-			PersistenceManager.getInstance().removeBaseTimestamp(node.getLocationURI());
-		}
-		return false;
-	}
+    }
 
 	/**
 	 * Upload the local files to the remote file system.
