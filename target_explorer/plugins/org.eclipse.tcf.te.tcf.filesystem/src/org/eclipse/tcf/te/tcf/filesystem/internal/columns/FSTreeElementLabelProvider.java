@@ -20,6 +20,8 @@ import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 public class FSTreeElementLabelProvider extends LabelProvider {
 	// The image provider to provide platform specific images.
 	private ImageProvider imgProvider;
+	// The program image provider used to retrieve program images.
+	private ImageProvider prgProvider;
 	
 	/**
 	 * Constructor.
@@ -31,6 +33,7 @@ public class FSTreeElementLabelProvider extends LabelProvider {
 		else {
 			imgProvider = new DefaultImageProvider();
 		}
+		prgProvider = new ProgramImageProvider();
 	}
 
 	/*
@@ -53,6 +56,8 @@ public class FSTreeElementLabelProvider extends LabelProvider {
 	public Image getImage(Object element) {
 		if (element instanceof FSTreeNode) {
 			FSTreeNode node = (FSTreeNode) element;
+			Image image = prgProvider.getImage(node);
+			if(image != null) return image;
 			return imgProvider.getImage(node);
 		}
 		return super.getImage(element);
