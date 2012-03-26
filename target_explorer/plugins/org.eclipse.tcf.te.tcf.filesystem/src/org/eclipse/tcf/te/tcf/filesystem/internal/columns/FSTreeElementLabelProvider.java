@@ -83,7 +83,10 @@ public class FSTreeElementLabelProvider extends LabelProvider {
 					Image image = cacheDaemon.getImage(node);
 					if(image == null) {
 						cacheDaemon.enqueue(node);
-						image = getPredefinedImage(node);
+						image = extDaemon.getImage(node);
+						if(image == null) {
+							image = getPredefinedImage(node);
+						}
 					}
 					return image;
 				}
