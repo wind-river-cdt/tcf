@@ -33,16 +33,19 @@ public class ProgramImageProvider extends DefaultImageProvider {
 	public Image getImage(FSTreeNode node) {
 		if (node.isFile()) {
 			String name = node.name;
-			String ending = name.substring(name.lastIndexOf('.'));
-			String key = "EXT_IMAGE" + ending; //$NON-NLS-1$
-			Image image = UIPlugin.getImage(key);
-			Program program = Program.findProgram(ending);
-			if (image == null && program != null) {
-				ImageData iconData = program.getImageData();
-				image = new Image(Display.getCurrent(), iconData);
-				UIPlugin.getDefault().getImageRegistry().put(key, image);
+			int dot = name.lastIndexOf("."); //$NON-NLS-1$
+			if (dot != -1) {
+				String ending = name.substring(dot);
+				String key = "EXT_IMAGE" + ending; //$NON-NLS-1$
+				Image image = UIPlugin.getImage(key);
+				Program program = Program.findProgram(ending);
+				if (image == null && program != null) {
+					ImageData iconData = program.getImageData();
+					image = new Image(Display.getCurrent(), iconData);
+					UIPlugin.getDefault().getImageRegistry().put(key, image);
+				}
+				return image;
 			}
-			return image;
 		}
 		return null;
 	}
