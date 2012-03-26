@@ -56,6 +56,12 @@ public class DefaultImageProvider implements ImageProvider {
 		return null;
 	}
 
+	/**
+	 * Get the image provided by program class first.
+	 * 
+	 * @param node The file node.
+	 * @return The image provided by program.
+	 */
 	protected Image getProgramImage(FSTreeNode node) {
 		String name = node.name;
 		int dot = name.lastIndexOf("."); //$NON-NLS-1$

@@ -169,6 +169,13 @@ public abstract class LabelProviderUpdateDaemon extends Thread {
 		return tempDir;
 	}
 	
+	/**
+	 * Get the an image file named "imgName" in the temporary image
+	 * directory.
+	 * 
+	 * @param imgName The image's file name.
+	 * @return The file object of this image file.
+	 */
 	protected File getTempImg(String imgName) {
 		File tempDir = getTempDir();
 		File imgDir = new File(tempDir, ".img"); //$NON-NLS-1$
@@ -194,9 +201,9 @@ public abstract class LabelProviderUpdateDaemon extends Thread {
 	abstract protected File getMirrorFile(FSTreeNode node);
 
 	/**
-	 * Get the image file object for the specified temp file name.
+	 * Get the image file object for the specified temporary file name.
 	 * 
-	 * @param tmpName The temp file name.
+	 * @param tmpName The temporary file name.
 	 * @return The file object.
 	 */
 	abstract protected File getImgFile(FSTreeNode node);
@@ -214,10 +221,10 @@ public abstract class LabelProviderUpdateDaemon extends Thread {
 
 	/**
 	 * Create an image file using "png" format 
-	 * for the specified temp file.
+	 * for the specified temporary file.
 	 * 
-	 * @param icon The icon that is used for the tmp file.
-	 * @param tmpfile The temp file.
+	 * @param icon The icon that is used for the temporary file.
+	 * @param tmpfile The temporary file.
 	 */
 	private void createImageFromIcon(Icon icon, File imgFile) {
 		BufferedImage bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_4BYTE_ABGR);
