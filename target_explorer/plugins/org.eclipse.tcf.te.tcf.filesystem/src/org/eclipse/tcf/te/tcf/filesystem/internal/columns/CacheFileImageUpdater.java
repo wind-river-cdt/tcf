@@ -37,4 +37,16 @@ public class CacheFileImageUpdater extends LabelProviderUpdateDaemon {
     protected File getMirrorFile(FSTreeNode node) {
 	    return CacheManager.getInstance().getCacheFile(node);
     }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.columns.LabelProviderUpdateDaemon#getImgFile(org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode)
+	 */
+	@Override
+	protected File getImgFile(FSTreeNode node) {
+		File cacheFile = CacheManager.getInstance().getCacheFile(node);
+		File parentDir = cacheFile.getParentFile();
+		if (!parentDir.exists()) parentDir.mkdirs();
+		return new File(parentDir, node.name + ".png"); //$NON-NLS-1$
+	}
 }

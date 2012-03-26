@@ -11,6 +11,9 @@ package org.eclipse.tcf.te.tcf.filesystem.internal.columns;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.program.Program;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.internal.ImageConsts;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
@@ -45,11 +48,33 @@ public class DefaultImageProvider implements ImageProvider {
 			return UIPlugin.getImage(ImageConsts.FOLDER);
 		}
 		else if (node.isFile()) {
+			Image image = getProgramImage(node);
+			if(image != null)
+				return image;
 			return getPredefinedImage(node);
 		}
 		return null;
 	}
 
+	protected Image getProgramImage(FSTreeNode node) {
+		String name = node.name;
+		int dot = name.lastIndexOf("."); //$NON-NLS-1$
+		if (dot != -1) {
+			String ending = name.substring(dot);
+			String key = "EXT_IMAGE" + ending; //$NON-NLS-1$
+			Image image = UIPlugin.getImage(key);
+			if (image == null) {
+				Program program = Program.findProgram(ending);
+				if (program != null) {
+					ImageData iconData = program.getImageData();
+					image = new Image(Display.getCurrent(), iconData);
+					UIPlugin.getDefault().getImageRegistry().put(key, image);
+				}
+			}
+			return image;
+		}
+		return null;
+	}
 	/**
 	 * Get a predefined image for the tree node. These images are retrieved from
 	 * editor registry.

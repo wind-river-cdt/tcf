@@ -95,27 +95,41 @@ public abstract class LabelProviderUpdateDaemon extends Thread {
 	public void run() {
 		while (true) {
 			FSTreeNode node = take();
-			String key = getImageKey(node);
-			ImageDescriptor image = UIPlugin.getImageDescriptor(key);
-			if (image == null) {
-				File mirror = getMirrorFile(node);
-				File imgFile = getImgFile(mirror.getName());
-				if (!imgFile.exists()) {
-					FileSystemView view = FileSystemView.getFileSystemView();
-					Icon icon = view.getSystemIcon(mirror);
-					createImageFromIcon(icon, mirror.getName());
-				}
-				try {
-					image = ImageDescriptor.createFromURL(imgFile.toURI().toURL());
-					UIPlugin.getDefault().getImageRegistry().put(key, image);
-					sendNotification(node, node.name, null, image);
-				}
-				catch (MalformedURLException e) {
-					// Ignore
-				}
-			}
+			String imgKey = getImageKey(node);
+			File mrrFile = getMirrorFile(node);
+			File imgFile = getImgFile(node);
+			ImageDescriptor image = createImage(imgKey, mrrFile, imgFile);
+			sendNotification(node, node.name, null, image);
 		}
 	}
+
+	/**
+	 * Create an Image Descriptor based on the mirror file and store
+	 * it in the imgFile and store it using the specified image key.
+	 * 
+	 * @param imgKey The image key.
+	 * @param mrrFile The mirror file used to create the image.
+	 * @param imgFile The image file used to store the image data.
+	 * @return The Image Descriptor describing the image.
+	 */
+	private ImageDescriptor createImage(String imgKey, File mrrFile, File imgFile) {
+	    ImageDescriptor image = UIPlugin.getImageDescriptor(imgKey);
+	    if (image == null) {
+	    	if (!imgFile.exists()) {
+	    		FileSystemView view = FileSystemView.getFileSystemView();
+	    		Icon icon = view.getSystemIcon(mrrFile);
+	    		createImageFromIcon(icon, imgFile);
+	    	}
+	    	try {
+	    		image = ImageDescriptor.createFromURL(imgFile.toURI().toURL());
+	    		UIPlugin.getDefault().getImageRegistry().put(imgKey, image);
+	    	}
+	    	catch (MalformedURLException e) {
+	    		// Ignore
+	    	}
+	    }
+	    return image;
+    }
 	
 	/**
 	 * Get the image of disk drivers on Windows platform.
@@ -124,23 +138,9 @@ public abstract class LabelProviderUpdateDaemon extends Thread {
 	 */
 	public Image getDiskImage() {
 		String key = "SWING_ROOT_DRIVER_IMAGE"; //$NON-NLS-1$
-		ImageDescriptor imgDesc = UIPlugin.getImageDescriptor(key);
-		if(imgDesc == null) {
-			File mirror = File.listRoots()[0];
-			File imgFile = getImgFile("_root_driver_"); //$NON-NLS-1$
-			if(!imgFile.exists()) {
-				FileSystemView view = FileSystemView.getFileSystemView();
-				Icon icon = view.getSystemIcon(mirror);
-				createImageFromIcon(icon, "_root_driver_"); //$NON-NLS-1$
-			}
-			try {
-				imgDesc = ImageDescriptor.createFromURL(imgFile.toURI().toURL());
-				UIPlugin.getDefault().getImageRegistry().put(key, imgDesc);
-			}
-			catch (MalformedURLException e) {
-				// Ignore
-			}
-		}
+		File mirror = File.listRoots()[0];
+		File imgFile = getTempImg("_root_driver_"); //$NON-NLS-1$
+		createImage(key, mirror, imgFile);
 		return UIPlugin.getImage(key);
 	}
 	
@@ -151,26 +151,31 @@ public abstract class LabelProviderUpdateDaemon extends Thread {
 	 */
 	public Image getFolderImage() {
 		String key = "SWING_FOLDER_IMAGE"; //$NON-NLS-1$
-		ImageDescriptor imgDesc = UIPlugin.getImageDescriptor(key);
-		if(imgDesc == null) {
-			File mirror = getImgDir();
-			File imgFile = getImgFile("_directory_"); //$NON-NLS-1$
-			if(!imgFile.exists()) {
-				FileSystemView view = FileSystemView.getFileSystemView();
-				Icon icon = view.getSystemIcon(mirror);
-				createImageFromIcon(icon, "_directory_"); //$NON-NLS-1$
-			}
-			try {
-				imgDesc = ImageDescriptor.createFromURL(imgFile.toURI().toURL());
-				UIPlugin.getDefault().getImageRegistry().put(key, imgDesc);
-			}
-			catch (MalformedURLException e) {
-				// Ignore
-			}
-		}
+		String dir = System.getProperty("user.home"); //$NON-NLS-1$
+		File mirror = new File(dir);
+		File imgFile = getTempImg("_directory_"); //$NON-NLS-1$
+		createImage(key, mirror, imgFile);
 		return UIPlugin.getImage(key);
 	}
 	
+	/**
+	 * Get the temporary directory store the images and temporary mirror files.
+	 * @return
+	 */
+	protected File getTempDir() {
+		File cacheRoot = CacheManager.getInstance().getCacheRoot();
+		File tempDir = new File(cacheRoot, ".tmp"); //$NON-NLS-1$
+		if(!tempDir.exists()) tempDir.mkdirs();
+		return tempDir;
+	}
+	
+	protected File getTempImg(String imgName) {
+		File tempDir = getTempDir();
+		File imgDir = new File(tempDir, ".img"); //$NON-NLS-1$
+		if (!imgDir.exists()) imgDir.mkdirs();
+		return new File(imgDir, imgName + ".png"); //$NON-NLS-1$
+	}
+
 	/**
 	 * Get an extension key as the image registry key for the 
 	 * specified node.
@@ -187,6 +192,14 @@ public abstract class LabelProviderUpdateDaemon extends Thread {
 	 * @return The corresponding mirror file.
 	 */
 	abstract protected File getMirrorFile(FSTreeNode node);
+
+	/**
+	 * Get the image file object for the specified temp file name.
+	 * 
+	 * @param tmpName The temp file name.
+	 * @return The file object.
+	 */
+	abstract protected File getImgFile(FSTreeNode node);
 	
 	/**
 	 * Get the node from the extension registry.
@@ -206,12 +219,11 @@ public abstract class LabelProviderUpdateDaemon extends Thread {
 	 * @param icon The icon that is used for the tmp file.
 	 * @param tmpfile The temp file.
 	 */
-	private void createImageFromIcon(Icon icon, String imgfile) {
+	private void createImageFromIcon(Icon icon, File imgFile) {
 		BufferedImage bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_4BYTE_ABGR);
 		Graphics g = bi.createGraphics();
 		icon.paintIcon(dummyComponent, g, 0, 0);
 		g.dispose();
-		File imgFile = getImgFile(imgfile);
 		try {
 			ImageIO.write(bi, "png", imgFile); //$NON-NLS-1$
 		}
@@ -219,28 +231,6 @@ public abstract class LabelProviderUpdateDaemon extends Thread {
 		}
 	}
 
-	/**
-	 * Get the image file object for the specified temp file name.
-	 * 
-	 * @param tmpName The temp file name.
-	 * @return The file object.
-	 */
-	private File getImgFile(String tmpName) {
-		File imgFolder = getImgDir();
-		return new File(imgFolder, tmpName + ".png"); //$NON-NLS-1$
-	}
-
-	/**
-	 * Get the image's directory to hold the temporary images.
-	 * 
-	 * @return The directory
-	 */
-	private File getImgDir() {
-		File file = CacheManager.getInstance().getCacheRoot();
-		file = new File(file, ".img"); //$NON-NLS-1$
-		if (!file.exists()) file.mkdirs();
-		return file;
-	}
 	/**
 	 * Send a notification to inform the file tree for changed images.
 	 * 
