@@ -144,7 +144,10 @@ public abstract class LabelProviderUpdateDaemon extends Thread {
         ImageDescriptor imgDesc = UIPlugin.getImageDescriptor(key);
         if (imgDesc == null) {
         	File[] roots = File.listRoots();
-        	File mirror = roots[roots.length - 1];
+        	File mirror;
+			if (roots.length == 1) mirror = roots[0];
+			else if (roots.length > 1) mirror = roots[1];
+			else mirror = new File("C:\\"); //$NON-NLS-1$
         	File imgFile = getTempImg("_root_driver_"); //$NON-NLS-1$
         	createImage(key, mirror, imgFile);
         }
