@@ -829,7 +829,7 @@ public class TCFTargetTab extends AbstractLaunchConfigurationTab {
             ArrayList<PeerInfo> lst = null;
             if (parent == peer_info) {
                 lst = filterPeerList(parent, expanded);
-                peer_tree.setItemCount(lst.size());
+                peer_tree.setItemCount(lst.size() > 0 ? lst.size() : 1);
                 items = peer_tree.getItems();
             }
             else {
