@@ -96,9 +96,12 @@ public abstract class LabelProviderUpdateDaemon extends Thread {
 		while (true) {
 			FSTreeNode node = take();
 			String imgKey = getImageKey(node);
-			File mrrFile = getMirrorFile(node);
-			File imgFile = getImgFile(node);
-			ImageDescriptor image = createImage(imgKey, mrrFile, imgFile);
+			ImageDescriptor image = UIPlugin.getImageDescriptor(imgKey);
+			if (image == null) {
+				File mrrFile = getMirrorFile(node);
+				File imgFile = getImgFile(node);
+				image = createImage(imgKey, mrrFile, imgFile);
+			}
 			sendNotification(node, node.name, null, image);
 		}
 	}
@@ -138,10 +141,14 @@ public abstract class LabelProviderUpdateDaemon extends Thread {
 	 */
 	public Image getDiskImage() {
 		String key = "SWING_ROOT_DRIVER_IMAGE"; //$NON-NLS-1$
-		File mirror = File.listRoots()[0];
-		File imgFile = getTempImg("_root_driver_"); //$NON-NLS-1$
-		createImage(key, mirror, imgFile);
-		return UIPlugin.getImage(key);
+        ImageDescriptor imgDesc = UIPlugin.getImageDescriptor(key);
+        if (imgDesc == null) {
+        	File[] roots = File.listRoots();
+        	File mirror = roots[roots.length - 1];
+        	File imgFile = getTempImg("_root_driver_"); //$NON-NLS-1$
+        	createImage(key, mirror, imgFile);
+        }
+        return UIPlugin.getImage(key);
 	}
 	
 	/**
@@ -151,10 +158,16 @@ public abstract class LabelProviderUpdateDaemon extends Thread {
 	 */
 	public Image getFolderImage() {
 		String key = "SWING_FOLDER_IMAGE"; //$NON-NLS-1$
-		String dir = System.getProperty("user.home"); //$NON-NLS-1$
-		File mirror = new File(dir);
-		File imgFile = getTempImg("_directory_"); //$NON-NLS-1$
-		createImage(key, mirror, imgFile);
+		ImageDescriptor imgDesc = UIPlugin.getImageDescriptor(key);
+		if (imgDesc == null) {
+			String dir = System.getProperty("work.dir"); //$NON-NLS-1$
+			if (dir == null) dir = System.getProperty("java.home"); //$NON-NLS-1$
+			File mirror = null;
+			if (dir != null) mirror = new File(dir);
+			else mirror = new File("."); //$NON-NLS-1$
+			File imgFile = getTempImg("_directory_"); //$NON-NLS-1$
+			createImage(key, mirror, imgFile);
+		}
 		return UIPlugin.getImage(key);
 	}
 	
