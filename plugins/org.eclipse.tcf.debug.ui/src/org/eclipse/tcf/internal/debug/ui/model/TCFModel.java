@@ -64,7 +64,6 @@ import org.eclipse.debug.ui.ISourcePresentation;
 import org.eclipse.debug.ui.contexts.ISuspendTrigger;
 import org.eclipse.debug.ui.contexts.ISuspendTriggerListener;
 import org.eclipse.debug.ui.sourcelookup.CommonSourceNotFoundEditorInput;
-import org.eclipse.debug.ui.sourcelookup.ISourceDisplay;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
@@ -105,6 +104,8 @@ import org.eclipse.tcf.internal.debug.ui.commands.SuspendCommand;
 import org.eclipse.tcf.internal.debug.ui.commands.TerminateCommand;
 import org.eclipse.tcf.internal.debug.ui.preferences.TCFPreferences;
 import org.eclipse.tcf.core.Command;
+import org.eclipse.tcf.debug.ui.ITCFObject;
+import org.eclipse.tcf.debug.ui.ITCFSourceDisplay;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IErrorReport;
 import org.eclipse.tcf.protocol.IService;
@@ -140,7 +141,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
  */
 @SuppressWarnings("restriction")
 public class TCFModel implements IElementContentProvider, IElementLabelProvider, IViewerInputProvider,
-        IModelProxyFactory, IColumnPresentationFactory, ISourceDisplay, ISuspendTrigger, IElementMementoProvider {
+        IModelProxyFactory, IColumnPresentationFactory, ITCFSourceDisplay, ISuspendTrigger, IElementMementoProvider {
 
     /** The id of the expression hover presentation context */
     public static final String ID_EXPRESSION_HOVER = Activator.PLUGIN_ID + ".expression_hover";
@@ -1565,6 +1566,38 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
         });
     }
 
+    public ITextEditor displaySource(ITCFObject context, String source_file_name, int line) {
+        if (PlatformUI.getWorkbench().isClosing()) return null;
+        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        if (window == null) return null;
+        String editor_id = null;
+        IEditorInput editor_input = null;
+        Object source_element = TCFSourceLookupDirector.lookup(launch, context.getID(), source_file_name);
+        if (source_element != null) {
+            ISourcePresentation presentation = TCFModelPresentation.getDefault();
+            editor_input = presentation.getEditorInput(source_element);
+            if (editor_input != null) editor_id = presentation.getEditorId(editor_input, source_element);
+        }
+        if (editor_input == null || editor_id == null) {
+            ILaunchConfiguration cfg = launch.getLaunchConfiguration();
+            ISourceNotFoundPresentation presentation = (ISourceNotFoundPresentation)DebugPlugin.getAdapter(context, ISourceNotFoundPresentation.class);
+            if (presentation != null) {
+                editor_input = presentation.getEditorInput(context, cfg, source_file_name);
+                editor_id = presentation.getEditorId(editor_input, context);
+            }
+            if (editor_id == null || editor_input == null) {
+                editor_id = IDebugUIConstants.ID_COMMON_SOURCE_NOT_FOUND_EDITOR;
+                editor_input = editor_not_found.get(cfg);
+                if (editor_input == null) {
+                    editor_input = new CommonSourceNotFoundEditorInput(cfg);
+                    editor_not_found.put(cfg, editor_input);
+                }
+            }
+        }
+        IWorkbenchPage page = window.getActivePage();
+        return displaySource(page, editor_id, editor_input, line);
+    }
+
     private void displaySource(final int cnt, final IWorkbenchPage page,
             final Object element, final String exe_id, final String mem_id, final boolean top_frame, final ILineNumbers.CodeArea area) {
         final boolean disassembly_available = channel.getRemoteService(IDisassembly.class) != null;
@@ -1609,21 +1642,7 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
                         editor_input = DisassemblyEditorInput.INSTANCE;
                     }
                     if (cnt != display_source_generation) return;
-                    ITextEditor text_editor = null;
-                    if (page != null && editor_input != null && editor_id != null) {
-                        IEditorPart editor = openEditor(editor_input, editor_id, page);
-                        if (editor instanceof ITextEditor) {
-                            text_editor = (ITextEditor)editor;
-                        }
-                        else if (editor != null) {
-                            text_editor = (ITextEditor)editor.getAdapter(ITextEditor.class);
-                        }
-                    }
-                    IRegion region = null;
-                    if (text_editor != null) {
-                        region = getLineInformation(text_editor, line);
-                        if (region != null) text_editor.selectAndReveal(region.getOffset(), 0);
-                    }
+                    displaySource(page, editor_id, editor_input, line);
                     if (wait_for_pc_update_after_step) launch.addPendingClient(annotation_manager);
                     annotation_manager.updateAnnotations(page.getWorkbenchWindow(), launch);
                 }
@@ -1632,6 +1651,25 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
                 }
             }
         });
+    }
+
+    private ITextEditor displaySource(IWorkbenchPage page, String editor_id, IEditorInput editor_input, int line) {
+        ITextEditor text_editor = null;
+        if (page != null && editor_input != null && editor_id != null) {
+            IEditorPart editor = openEditor(editor_input, editor_id, page);
+            if (editor instanceof ITextEditor) {
+                text_editor = (ITextEditor)editor;
+            }
+            else if (editor != null) {
+                text_editor = (ITextEditor)editor.getAdapter(ITextEditor.class);
+            }
+        }
+        IRegion region = null;
+        if (text_editor != null) {
+            region = getLineInformation(text_editor, line);
+            if (region != null) text_editor.selectAndReveal(region.getOffset(), 0);
+        }
+        return text_editor;
     }
 
     /*
