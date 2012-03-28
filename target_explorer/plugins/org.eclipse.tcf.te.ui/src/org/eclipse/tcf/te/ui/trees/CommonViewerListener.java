@@ -11,6 +11,7 @@ package org.eclipse.tcf.te.ui.trees;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,6 +39,7 @@ class CommonViewerListener implements IPropertyChangeListener {
 		viewerTimer = new Timer("Viewer_Refresher", true); //$NON-NLS-1$
 	}
 	private static final long INTERVAL = 500;
+	private static final long MAX_DELAY = 1000;
 	private static final Object NULL = new Object();
 	// The tree viewer
 	private TreeViewer viewer;
@@ -47,6 +49,8 @@ class CommonViewerListener implements IPropertyChangeListener {
 	private List<Object> queue;
 	// The timer task to process the property events periodically.
 	private TimerTask task;
+	//
+	long lastRun;
 
 	/***
 	 * Create an instance for the specified tree content provider.
@@ -63,7 +67,7 @@ class CommonViewerListener implements IPropertyChangeListener {
 				handleEvent();
             }};
 		viewerTimer.schedule(this.task, INTERVAL, INTERVAL);
-		this.queue = new ArrayList<Object>();
+		this.queue = Collections.synchronizedList(new ArrayList<Object>());
 	}
 
 	/*
@@ -71,10 +75,15 @@ class CommonViewerListener implements IPropertyChangeListener {
 	 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
 	 */
 	@Override
-    public synchronized void propertyChange(PropertyChangeEvent event) {
+    public void propertyChange(PropertyChangeEvent event) {
 		Object object = event.getSource();
 		Assert.isTrue(object != null);
 		queue.add(object);
+		viewerTimer.schedule(new TimerTask(){
+			@Override
+            public void run() {
+				handleEvent();
+            }}, 0);
     }
 	
 	/**
@@ -82,21 +91,39 @@ class CommonViewerListener implements IPropertyChangeListener {
 	 * 
 	 * @return The objects in current queue.
 	 */
-	synchronized Object[] emptyQueue() {
-		Object[] objects = queue.toArray();
-		queue.clear();
-		return objects;
+	Object[] emptyQueue() {
+		synchronized (queue) {
+			Object[] objects = queue.toArray();
+			queue.clear();
+			return objects;
+		}
+	}
+	
+	/**
+	 * Check if it is ready for next run. If the time
+	 * has expired, then mark last run time and return true.
+	 * 
+	 * @return true if it is time.
+	 */
+	synchronized boolean checkReady() {
+		if (System.currentTimeMillis() - lastRun > MAX_DELAY) {
+			lastRun = System.currentTimeMillis();
+			return true;
+		}
+		return false;
 	}
 
 	/**
 	 * Handle the current events in the event queue.
 	 */
 	void handleEvent() {
-		Object[] objects = emptyQueue();
-		if (objects.length > 0) {
-			List<Object> list = mergeObjects(objects);
-			Object object = getRefreshRoot(list);
-			processObject(object);
+		if (checkReady()) {
+			Object[] objects = emptyQueue();
+			if (objects.length > 0) {
+				List<Object> list = mergeObjects(objects);
+				Object object = getRefreshRoot(list);
+				processObject(object);
+			}
 		}
 	}
 
