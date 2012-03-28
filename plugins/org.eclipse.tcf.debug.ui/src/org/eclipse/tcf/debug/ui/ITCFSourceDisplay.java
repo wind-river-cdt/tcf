@@ -27,10 +27,10 @@ public interface ITCFSourceDisplay extends ISourceDisplay {
      * Source file name is translated using source lookup settings of the debugger.
      * "Source not found" window is shown if the file cannot be located.
      * This method should be called on the display thread.
-     * @param context - debug view element that represents a debug context.
+     * @param context_id - debug context ID.
      * @param source_file_name - compile-time source file name.
      * @param line - scroll the editor to reveal this line.
      * @return - text editor interface.
      */
-    ITextEditor displaySource(ITCFObject context, String source_file_name, int line);
+    ITextEditor displaySource(String context_id, String source_file_name, int line);
 }

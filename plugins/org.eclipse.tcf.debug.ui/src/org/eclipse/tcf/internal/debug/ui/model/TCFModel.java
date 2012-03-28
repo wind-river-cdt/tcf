@@ -104,7 +104,6 @@ import org.eclipse.tcf.internal.debug.ui.commands.SuspendCommand;
 import org.eclipse.tcf.internal.debug.ui.commands.TerminateCommand;
 import org.eclipse.tcf.internal.debug.ui.preferences.TCFPreferences;
 import org.eclipse.tcf.core.Command;
-import org.eclipse.tcf.debug.ui.ITCFObject;
 import org.eclipse.tcf.debug.ui.ITCFSourceDisplay;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IErrorReport;
@@ -1566,13 +1565,13 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
         });
     }
 
-    public ITextEditor displaySource(ITCFObject context, String source_file_name, int line) {
+    public ITextEditor displaySource(final String context_id, String source_file_name, int line) {
         if (PlatformUI.getWorkbench().isClosing()) return null;
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         if (window == null) return null;
         String editor_id = null;
         IEditorInput editor_input = null;
-        Object source_element = TCFSourceLookupDirector.lookup(launch, context.getID(), source_file_name);
+        Object source_element = TCFSourceLookupDirector.lookup(launch, context_id, source_file_name);
         if (source_element != null) {
             ISourcePresentation presentation = TCFModelPresentation.getDefault();
             editor_input = presentation.getEditorInput(source_element);
@@ -1580,10 +1579,18 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
         }
         if (editor_input == null || editor_id == null) {
             ILaunchConfiguration cfg = launch.getLaunchConfiguration();
-            ISourceNotFoundPresentation presentation = (ISourceNotFoundPresentation)DebugPlugin.getAdapter(context, ISourceNotFoundPresentation.class);
-            if (presentation != null) {
-                editor_input = presentation.getEditorInput(context, cfg, source_file_name);
-                editor_id = presentation.getEditorId(editor_input, context);
+            TCFNode node = new TCFTask<TCFNode>(channel) {
+                public void run() {
+                    if (!createNode(context_id, this)) return;
+                    done(getNode(context_id));
+                }
+            }.getE();
+            if (node != null) {
+                ISourceNotFoundPresentation presentation = (ISourceNotFoundPresentation)DebugPlugin.getAdapter(node, ISourceNotFoundPresentation.class);
+                if (presentation != null) {
+                    editor_input = presentation.getEditorInput(node, cfg, source_file_name);
+                    editor_id = presentation.getEditorId(editor_input, node);
+                }
             }
             if (editor_id == null || editor_input == null) {
                 editor_id = IDebugUIConstants.ID_COMMON_SOURCE_NOT_FOUND_EDITOR;
