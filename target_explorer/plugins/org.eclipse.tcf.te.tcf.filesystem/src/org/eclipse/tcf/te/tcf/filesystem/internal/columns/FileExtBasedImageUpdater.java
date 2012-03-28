@@ -12,19 +12,25 @@ package org.eclipse.tcf.te.tcf.filesystem.internal.columns;
 import java.io.File;
 import java.io.IOException;
 
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.program.Program;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 
 /**
- * The background daemon that updates the images of the file system using
- * images retrieved by FileSystemView from Swing. 
+ * The image update adapter that updates the images of the file which does
+ * not have a local cache copy. The algorithm is based its extension.
  */
-public class FileExtBasedImageUpdater extends LabelProviderUpdateDaemon {
-
+public class FileExtBasedImageUpdater implements ImageUpdateAdapter {
+	// The label provider update daemon
+	private LabelProviderUpdateDaemon updateDaemon;
+	
+	/**
+	 * Create an instance with the specified daemon.
+	 * 
+	 * @param daemon The label provider update daemon.
+	 */
+	public FileExtBasedImageUpdater(LabelProviderUpdateDaemon daemon) {
+		this.updateDaemon = daemon;
+	}
+	
 	/**
 	 * Get the node's file extension or null if there is no extension.
 	 * 
@@ -45,7 +51,7 @@ public class FileExtBasedImageUpdater extends LabelProviderUpdateDaemon {
 	 * @return The directory to contain the mirror files.
 	 */
 	private File getMirrorDir() {
-		File tmpDir = getTempDir();
+		File tmpDir = updateDaemon.getTempDir();
 		File mrrDir = new File(tmpDir, ".mrr"); //$NON-NLS-1$
 		if(!mrrDir.exists()) mrrDir.mkdirs();
 		return mrrDir;
@@ -53,20 +59,20 @@ public class FileExtBasedImageUpdater extends LabelProviderUpdateDaemon {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.columns.LabelProviderUpdateDaemon#getImageKey(org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.columns.ImageUpdateAdapter#getImageKey(org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode)
 	 */
 	@Override
-	protected String getImageKey(FSTreeNode node) {
+	public String getImageKey(FSTreeNode node) {
 		String ext = getFileExt(node);
 		return "EXT_IMAGE@" + ext; //$NON-NLS-1$
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.columns.LabelProviderUpdateDaemon#getMirrorFile(org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.columns.ImageUpdateAdapter#getMirrorFile(org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode)
 	 */
 	@Override
-	protected File getMirrorFile(FSTreeNode node) {
+	public File getMirrorFile(FSTreeNode node) {
 		String ext = getFileExt(node);
 		File mrrDir = getMirrorDir();
 		File file = new File(mrrDir, "mirror" + "." + ext); //$NON-NLS-1$ //$NON-NLS-2$
@@ -79,38 +85,14 @@ public class FileExtBasedImageUpdater extends LabelProviderUpdateDaemon {
 		}
 		return file;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.columns.LabelProviderUpdateDaemon#getImage(org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.columns.ImageUpdateAdapter#getImgFile(org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode)
 	 */
 	@Override
-	public Image getImage(FSTreeNode node) {
-		String key = getImageKey(node);
-		Image image = UIPlugin.getImage(key);
-		if (image == null) {
-			String name = node.name;
-			int dot = name.lastIndexOf("."); //$NON-NLS-1$
-			if (dot != -1) {
-				String ending = name.substring(dot);
-				Program program = Program.findProgram(ending);
-				if (program != null) {
-					ImageData iconData = program.getImageData();
-					image = new Image(Display.getCurrent(), iconData);
-					UIPlugin.getDefault().getImageRegistry().put(key, image);
-				}
-			}
-		}
-		return UIPlugin.getImage(key);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.columns.LabelProviderUpdateDaemon#getImgFile(org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode)
-	 */
-	@Override
-    protected File getImgFile(FSTreeNode node) {
+	public File getImageFile(FSTreeNode node) {
 		String ext = getFileExt(node);
-	    return getTempImg(ext);
+	    return updateDaemon.getTempImg(ext);
     }
 }

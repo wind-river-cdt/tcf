@@ -9,10 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.columns;
 
-import java.io.File;
-
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.tcf.te.tcf.filesystem.internal.utils.CacheManager;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 
 /**
@@ -21,13 +18,10 @@ import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
  */
 public class WindowsImageProvider extends DefaultImageProvider {
 	// The background daemons that updates the images of the file system nodes.
-	static LabelProviderUpdateDaemon extDaemon;
-	static LabelProviderUpdateDaemon cacheDaemon;
+	static LabelProviderUpdateDaemon updateDaemon;
 	static {
-		extDaemon = new FileExtBasedImageUpdater();
-		extDaemon.start();
-		cacheDaemon = new CacheFileImageUpdater();
-		cacheDaemon.start();
+		updateDaemon = new LabelProviderUpdateDaemon();
+		updateDaemon.start();
 	}
 
 	/*
@@ -37,27 +31,18 @@ public class WindowsImageProvider extends DefaultImageProvider {
 	@Override
     public Image getImage(FSTreeNode node) {
 		if (node.isRoot()) {
-            return extDaemon.getDiskImage();
+            return updateDaemon.getDiskImage();
 		}
 		else if (node.isDirectory()) {
-			return extDaemon.getFolderImage();
+			return updateDaemon.getFolderImage();
 		}
 		else if(node.isFile()) {
-			File cacheFile = CacheManager.getInstance().getCacheFile(node);
-			if (cacheFile.exists()) {
-				Image image = cacheDaemon.getImage(node);
-				if(image == null) {
-					cacheDaemon.enqueue(node);
-					image = extDaemon.getImage(node);
-					if(image == null) {
-						image = getPredefinedImage(node);
-					}
-				}
+			Image image = getProgramImage(node);
+			if(image != null)
 				return image;
-			}
-			Image image = extDaemon.getImage(node);
+			image = updateDaemon.getImage(node);
             if (image == null) {
-            	extDaemon.enqueue(node);
+            	updateDaemon.enqueue(node);
             	image = getPredefinedImage(node);
             }
             return image;

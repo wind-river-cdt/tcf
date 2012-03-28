@@ -37,20 +37,25 @@ import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
  * The background daemon that updates the images of the file system using
  * images retrieved by FileSystemView from Swing.
  */
-public abstract class LabelProviderUpdateDaemon extends Thread {
+public class LabelProviderUpdateDaemon extends Thread {
 	// The dummy AWT component used to render the icon.
 	Component dummyComponent = new JComponent(){private static final long serialVersionUID = 5926798769323111209L;};
 	//The queue that caches the current file nodes to be updated.
 	BlockingQueue<FSTreeNode> queueNodes;
-	
+	// The image update adapter for a file which has a local cache copy.
+	ImageUpdateAdapter cacheAdapter;
+	// The image update adapter for a file which does not has a local cache copy.
+	ImageUpdateAdapter extAdapter;
 
 	/**
 	 * Constructor
 	 */
 	public LabelProviderUpdateDaemon() {
-		super("Label Provider Updater"); //$NON-NLS-1$
+		super("Image Updater Daemon"); //$NON-NLS-1$
 		setDaemon(true);
 		this.queueNodes = new LinkedBlockingQueue<FSTreeNode>();
+		this.cacheAdapter = new CacheFileImageUpdater();
+		this.extAdapter = new FileExtBasedImageUpdater(this);
 	}
 
 	/**
@@ -95,15 +100,43 @@ public abstract class LabelProviderUpdateDaemon extends Thread {
 	public void run() {
 		while (true) {
 			FSTreeNode node = take();
-			String imgKey = getImageKey(node);
+			ImageUpdateAdapter adapter = getUpdateAdapter(node);
+			String imgKey = adapter.getImageKey(node);
 			ImageDescriptor image = UIPlugin.getImageDescriptor(imgKey);
 			if (image == null) {
-				File mrrFile = getMirrorFile(node);
-				File imgFile = getImgFile(node);
+				File mrrFile = adapter.getMirrorFile(node);
+				File imgFile = adapter.getImageFile(node);
 				image = createImage(imgKey, mrrFile, imgFile);
 			}
 			sendNotification(node, node.name, null, image);
 		}
+	}
+	
+	/**
+	 * Select an image update adapter for the specified node.
+	 * 
+	 * @param node The FSTreeNode.
+	 * @return an image update adapter, either cache based or extension based.
+	 */
+	private ImageUpdateAdapter getUpdateAdapter(FSTreeNode node) {
+		File cacheFile = CacheManager.getInstance().getCacheFile(node);
+		if (cacheFile.exists()) {
+			return cacheAdapter;
+		}
+		return extAdapter;
+	}
+
+	/**
+	 * Get the image for the specified node from its
+	 * image update adapter.
+	 * 
+	 * @param node The file system tree node.
+	 * @return The image or null if there's no image yet.
+	 */
+	public Image getImage(FSTreeNode node) {
+		ImageUpdateAdapter adapter = getUpdateAdapter(node);
+		String key = adapter.getImageKey(node);
+		return UIPlugin.getImage(key);
 	}
 
 	/**
@@ -197,42 +230,6 @@ public abstract class LabelProviderUpdateDaemon extends Thread {
 		File imgDir = new File(tempDir, ".img"); //$NON-NLS-1$
 		if (!imgDir.exists()) imgDir.mkdirs();
 		return new File(imgDir, imgName + ".png"); //$NON-NLS-1$
-	}
-
-	/**
-	 * Get an extension key as the image registry key for the 
-	 * specified node.
-	 * 
-	 * @param node The node to get the key for.
-	 * @return The key used to cache the image descriptor in the registry.
-	 */
-	abstract protected String getImageKey(FSTreeNode node);
-	
-	/**
-	 * Return a mirror file that will be used to retrieve the image from.
-	 * 
-	 * @param node The file system tree node.
-	 * @return The corresponding mirror file.
-	 */
-	abstract protected File getMirrorFile(FSTreeNode node);
-
-	/**
-	 * Get the image file object for the specified temporary file name.
-	 * 
-	 * @param tmpName The temporary file name.
-	 * @return The file object.
-	 */
-	abstract protected File getImgFile(FSTreeNode node);
-	
-	/**
-	 * Get the node from the extension registry.
-	 * 
-	 * @param node The node for which the image is retrieved for.
-	 * @return The image for this node.
-	 */
-	public Image getImage(FSTreeNode node) {
-		String key = getImageKey(node);
-		return UIPlugin.getImage(key);
 	}
 
 	/**

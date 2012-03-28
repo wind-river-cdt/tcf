@@ -15,35 +15,34 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.utils.CacheManager;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
 
 /**
- * The background daemon that updates the images of the file system using
- * images retrieved by FileSystemView from Swing. 
+ * The image update adapter that updates the images of the file which
+ * has a local cache copy.
  */
-public class CacheFileImageUpdater extends LabelProviderUpdateDaemon {
-	
+public class CacheFileImageUpdater implements ImageUpdateAdapter {
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.columns.LabelProviderUpdateDaemon#getImageKey(org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.columns.ImageUpdateAdapter#getImageKey(org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode)
 	 */
 	@Override
-    protected String getImageKey(FSTreeNode node) {
+    public String getImageKey(FSTreeNode node) {
 	    return node.getLocationURL().toExternalForm();
     }
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.columns.LabelProviderUpdateDaemon#getMirrorFile(org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.columns.ImageUpdateAdapter#getMirrorFile(org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode)
 	 */
 	@Override
-    protected File getMirrorFile(FSTreeNode node) {
+	public File getMirrorFile(FSTreeNode node) {
 	    return CacheManager.getInstance().getCacheFile(node);
     }
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.columns.LabelProviderUpdateDaemon#getImgFile(org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.columns.ImageUpdateAdapter#getImgFile(org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode)
 	 */
 	@Override
-	protected File getImgFile(FSTreeNode node) {
+	public File getImageFile(FSTreeNode node) {
 		File cacheFile = CacheManager.getInstance().getCacheFile(node);
 		File parentDir = cacheFile.getParentFile();
 		if (!parentDir.exists()) parentDir.mkdirs();
