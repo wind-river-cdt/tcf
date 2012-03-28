@@ -123,11 +123,11 @@ public class FSNavigatorContentProvider extends TreeContentProvider {
 			} else if(node.isSystemRoot()) {
 				hasChildren = true;
 			} else if (node.isDirectory()) {
-				if (!node.childrenQueried || node.childrenQueryRunning) {
-					hasChildren = true;
-				} 
+				if(node.childrenQueryRunning) {
+					hasChildren = !super.hasChildren(element);
+				}
 				else {
-					hasChildren = super.hasChildren(element);
+					hasChildren = !node.childrenQueried || super.hasChildren(element);
 				}
 			}
 		}

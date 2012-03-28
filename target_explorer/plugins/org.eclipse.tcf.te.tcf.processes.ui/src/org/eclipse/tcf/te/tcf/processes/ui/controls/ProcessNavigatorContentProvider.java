@@ -121,11 +121,12 @@ public class ProcessNavigatorContentProvider  extends TreeContentProvider implem
 			ProcessTreeNode node = (ProcessTreeNode) element;
 			if(node.isPendingNode()) {
 				hasChildren = false;
-			}else if (!node.childrenQueried || node.childrenQueryRunning) {
-				hasChildren = true;
+			}
+			else if(node.childrenQueryRunning) {
+				hasChildren = !super.hasChildren(element);
 			}
 			else {
-				hasChildren = super.hasChildren(element);
+				hasChildren = !node.childrenQueried || super.hasChildren(element);
 			}
 		}
 		else if (element instanceof IPeerModel) {
