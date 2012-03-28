@@ -14,13 +14,16 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.content.IContentType;
-import org.eclipse.tcf.te.runtime.utils.Host;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.CacheManager;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.ContentTypeHelper;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
+import org.eclipse.tcf.te.tests.activator.UIPlugin;
+import org.osgi.framework.Bundle;
 
 @SuppressWarnings("restriction")
 public class ContentTypeHelperTest extends UtilsTestBase {
@@ -40,9 +43,8 @@ public class ContentTypeHelperTest extends UtilsTestBase {
     }
 	
     private void uploadAgent() throws MalformedURLException, IOException {
-	    IPath path = getAgentLocation();
-		path = path.append("agent"); //$NON-NLS-1$
-		if (Host.isWindowsHost()) path = path.addFileExtension("exe"); //$NON-NLS-1$
+	    IPath path = getWin32Agent();
+	    assertNotNull("Cannot find Windows agent!", path); //$NON-NLS-1$
 		assertTrue("Invalid agent location: " + path.toString(), path.toFile().isFile()); //$NON-NLS-1$
 	    File agentFile = path.toFile();
 	    String agentPath = getTestRoot() + getPathSep() + agentFile.getName();
@@ -54,6 +56,25 @@ public class ContentTypeHelperTest extends UtilsTestBase {
 			agentNode = getFSNode(agentPath);
 			assertNotNull(agentNode);
 		}
+    }
+    
+    private IPath getWin32Agent() {
+		Bundle bundle = UIPlugin.getDefault().getBundle();
+		if (bundle != null) {
+			IPath relative = new Path ("data").append("agent"); //$NON-NLS-1$ //$NON-NLS-2$
+			relative = relative.append("win32"); //$NON-NLS-1$
+			relative = relative.append("x86"); //$NON-NLS-1$
+			relative = relative.append("agent"); //$NON-NLS-1$
+			relative = relative.addFileExtension("exe"); //$NON-NLS-1$
+
+			URL url = FileLocator.find(bundle, relative, null);
+			if (url != null) {
+				try {
+					return new Path(FileLocator.resolve(url).getFile());
+				} catch (IOException e) { /* ignored on purpose */ }
+			}
+		}
+		return null;
     }
 	
 	public void testBinaryFile() {
