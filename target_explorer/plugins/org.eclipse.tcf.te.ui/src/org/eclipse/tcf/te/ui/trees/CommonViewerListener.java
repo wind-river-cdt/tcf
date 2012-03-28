@@ -38,8 +38,11 @@ class CommonViewerListener implements IPropertyChangeListener {
 	static {
 		viewerTimer = new Timer("Viewer_Refresher", true); //$NON-NLS-1$
 	}
-	private static final long INTERVAL = 500;
+	// The interval of the refreshing timer.
+	private static final long INTERVAL = 200;
+	// Maximum delay before immediate refreshing.
 	private static final long MAX_DELAY = 1000;
+	// The NULL object stands for refreshing the whole tree.
 	private static final Object NULL = new Object();
 	// The tree viewer
 	private TreeViewer viewer;
@@ -49,7 +52,7 @@ class CommonViewerListener implements IPropertyChangeListener {
 	private List<Object> queue;
 	// The timer task to process the property events periodically.
 	private TimerTask task;
-	//
+	// The time of last run.
 	long lastRun;
 
 	/***
