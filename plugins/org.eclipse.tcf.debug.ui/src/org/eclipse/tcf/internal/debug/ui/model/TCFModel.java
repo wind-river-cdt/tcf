@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2011 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2012 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -1442,6 +1442,11 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
         return true;
     }
 
+    /**
+     * Set locking policy (aka update policy) for given workbench part.
+     * @param part - the workbench part.
+     * @param policy - locking policy code.
+     */
     public void setLockPolicy(IWorkbenchPart part, int policy) {
         if (policy == UPDATE_POLICY_AUTOMATIC) {
             clearLock(part);
@@ -1453,6 +1458,11 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
         }
     }
 
+    /**
+     * Return locking policy (aka update policy) for given workbench part.
+     * @param part - the workbench part.
+     * @return - locking policy code.
+     */
     public int getLockPolicy(IWorkbenchPart part) {
         if (locks.get(part) == null) return UPDATE_POLICY_AUTOMATIC;
         Integer i = lock_policy.get(part);
@@ -1460,10 +1470,20 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
         return i.intValue();
     }
 
+    /**
+     * Get a snapshot that is associated with given presentation context.
+     * @param ctx - the presentation context.
+     * @return - debug model snapshot, or null if the context is not locked.
+     */
     TCFSnapshot getSnapshot(IPresentationContext ctx) {
         return locks.get(ctx.getPart());
     }
 
+    /**
+     * Handle debug view selection and suspend triggers when debug context is suspended.
+     * @param node - model node that represents the debug context.
+     * @param reason - suspend reason.
+     */
     public void setDebugViewSelection(TCFNode node, String reason) {
         assert Protocol.isDispatchThread();
         if (node == null) return;
@@ -1565,6 +1585,17 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
         });
     }
 
+    /**
+     * Open source text editor.
+     * The editor is shown in currently active Eclipse window.
+     * Source file name is translated using source lookup settings of the debugger.
+     * "Source not found" window is shown if the file cannot be located.
+     * This method should be called on the display thread.
+     * @param context_id - debug context ID.
+     * @param source_file_name - compile-time source file name.
+     * @param line - scroll the editor to reveal this line.
+     * @return - text editor interface.
+     */
     public ITextEditor displaySource(final String context_id, String source_file_name, int line) {
         if (PlatformUI.getWorkbench().isClosing()) return null;
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
@@ -1660,6 +1691,14 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
         });
     }
 
+    /*
+     * Open an editor for given editor input and scroll it to reveal given line.
+     * @param page - workbench page that will contain the editor
+     * @param editor_id - editor type ID
+     * @param editor_input - IEditorInput representing a source file to be shown in the editor
+     * @param line - scroll the editor to reveal this line.
+     * @return - IEditorPart if the editor was opened successfully, or null otherwise.
+     */
     private ITextEditor displaySource(IWorkbenchPage page, String editor_id, IEditorInput editor_input, int line) {
         ITextEditor text_editor = null;
         if (page != null && editor_input != null && editor_id != null) {
@@ -1738,7 +1777,7 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
      * Create human readable error message from a Throwable object.
      * @param error - a Throwable object.
      * @param multiline - true if multi-line text is allowed.
-     * @return
+     * @return error message text.
      */
     public static String getErrorMessage(Throwable error, boolean multiline) {
         StringBuffer buf = new StringBuffer();

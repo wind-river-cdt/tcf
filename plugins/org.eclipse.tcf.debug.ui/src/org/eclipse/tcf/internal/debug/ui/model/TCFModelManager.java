@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2011 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2012 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,9 @@ import org.eclipse.tcf.internal.debug.model.TCFLaunch;
 import org.eclipse.tcf.internal.debug.ui.Activator;
 import org.eclipse.tcf.protocol.Protocol;
 
-
+/**
+ * TCFModelManager listens debug launch manager and creates TCF debug models when necessary.
+ */
 public class TCFModelManager {
 
     private static final Map<TCFLaunch,TCFModel> sync_model_map =
@@ -173,7 +175,7 @@ public class TCFModelManager {
     }
 
     /**
-     * Synchronized and thread-safe method to map a launch to TCFNode.
+     * Synchronized and thread-safe method to map a launch to TCFNodeLaunch.
      */
     public static TCFNodeLaunch getRootNodeSync(Launch launch) {
         if (launch instanceof TCFLaunch) {

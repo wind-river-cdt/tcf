@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2011 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2012 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -46,7 +46,7 @@ public abstract class TCFNode extends PlatformObject implements ITCFObject, Comp
     private boolean disposed;
 
     /**
-     * An extension of TCFDataCache class that is automatically disposed when the parent node is disposed.
+     * An extension of TCFDataCache class that is automatically disposed when the node is disposed.
      */
     protected abstract class TCFData<V> extends TCFDataCache<V> {
 
@@ -453,7 +453,6 @@ public abstract class TCFNode extends PlatformObject implements ITCFObject, Comp
     /**
      * Creates and stores a IMemento for the node.
      * A request should be cancelled if a IMemento is not supported.
-     *
      * @param request Specifies IMemento.
      */
     public void encodeElement(IElementMementoRequest request) {
@@ -462,7 +461,6 @@ public abstract class TCFNode extends PlatformObject implements ITCFObject, Comp
 
     /**
      * Determines whether a IMemento represents this node.
-     *
      * @param request Specifies previously created IMemento.
      */
     public void compareElements(IElementCompareRequest request) {
@@ -472,6 +470,10 @@ public abstract class TCFNode extends PlatformObject implements ITCFObject, Comp
     /*--------------------------------------------------------------------------------------*/
     /* Misc                                                                                 */
 
+    /**
+     * Flush all caches and repaint the node and its children in presentation context of given part.
+     * @param part - workbench part that needs to be refreshed.
+     */
     public void refresh(IWorkbenchPart part) {
         model.flushAllCaches();
         for (TCFModelProxy p : model.getModelProxies()) {
@@ -480,10 +482,17 @@ public abstract class TCFNode extends PlatformObject implements ITCFObject, Comp
         }
     }
 
+    /**
+     * Compare two nodes.
+     * Extensions of TCFNode are expected to override this method.
+     */
     public int compareTo(TCFNode n) {
         return id.compareTo(n.id);
     }
 
+    /**
+     * Returns a simple human readable string representation of the node.
+     */
     public String toString() {
         String s = "[" + Integer.toHexString(hashCode()) + "] " + id;
         if (disposed) s += ", disposed";
