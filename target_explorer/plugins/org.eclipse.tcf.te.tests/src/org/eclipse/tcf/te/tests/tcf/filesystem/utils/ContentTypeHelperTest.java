@@ -78,6 +78,7 @@ public class ContentTypeHelperTest extends UtilsTestBase {
     }
 	
 	public void testBinaryFile() {
+		super.printMessage("The agent's location is: "+agentNode.getLocation()); //$NON-NLS-1$
 		assertTrue(ContentTypeHelper.getInstance().isBinaryFile(agentNode));
 	}
 	
