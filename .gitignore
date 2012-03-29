@@ -75,10 +75,6 @@ tests/plugins/org.eclipse.tcf.debug.test/bin
 /target_explorer/plugins/org.eclipse.tcf.te.launch.core/bin
 /target_explorer/plugins/org.eclipse.tcf.te.launch.ui/target
 /target_explorer/plugins/org.eclipse.tcf.te.launch.ui/bin
-/target_explorer/plugins/org.eclipse.tcf.te.rcp/target
-/target_explorer/plugins/org.eclipse.tcf.te.rcp/bin
-/target_explorer/plugins/org.eclipse.tcf.te.rcp.application/target
-/target_explorer/plugins/org.eclipse.tcf.te.rcp.application/bin
 /target_explorer/plugins/org.eclipse.tcf.te.runtime/target
 /target_explorer/plugins/org.eclipse.tcf.te.runtime/bin
 /target_explorer/plugins/org.eclipse.tcf.te.runtime.concurrent/target
@@ -155,18 +151,22 @@ tests/plugins/org.eclipse.tcf.debug.test/bin
 /target_explorer/features/org.eclipse.tcf.te.feature/bin
 /target_explorer/features/org.eclipse.tcf.te.cdt.feature/target
 /target_explorer/features/org.eclipse.tcf.te.cdt.feature/bin
-/target_explorer/features/org.eclipse.tcf.te.rcp.feature/target
-/target_explorer/features/org.eclipse.tcf.te.rcp.feature/bin
 /target_explorer/features/org.eclipse.tcf.te.sdk.feature/target
 /target_explorer/features/org.eclipse.tcf.te.sdk.feature/bin
 /target_explorer/features/org.eclipse.tcf.te.cdt.sdk.feature/target
 /target_explorer/features/org.eclipse.tcf.te.cdt.sdk.feature/bin
 /target_explorer/features/org.eclipse.tcf.te.tcf.feature/target
 /target_explorer/features/org.eclipse.tcf.te.tcf.feature/bin
-/target_explorer/features/org.eclipse.tcf.te.tcf.rcp.feature/target
-/target_explorer/features/org.eclipse.tcf.te.tcf.rcp.feature/bin
 /target_explorer/features/org.eclipse.tcf.te.tcf.sdk.feature/target
 /target_explorer/features/org.eclipse.tcf.te.tcf.sdk.feature/bin
 
+/target_explorer/experimental/plugins/org.eclipse.tcf.te.rcp/target
+/target_explorer/experimental/plugins/org.eclipse.tcf.te.rcp/bin
+/target_explorer/experimental/plugins/org.eclipse.tcf.te.rcp.application/target
+/target_explorer/experimental/plugins/org.eclipse.tcf.te.rcp.application/bin
 /target_explorer/experimental/plugins/org.eclipse.tcf.te.ui.sequoyah.vnc/target
 /target_explorer/experimental/plugins/org.eclipse.tcf.te.ui.sequoyah.vnc/bin
+/target_explorer/experimental/features/org.eclipse.tcf.te.rcp.feature/target
+/target_explorer/experimental/features/org.eclipse.tcf.te.rcp.feature/bin
+/target_explorer/experimental/features/org.eclipse.tcf.te.tcf.rcp.feature/target
+/target_explorer/experimental/features/org.eclipse.tcf.te.tcf.rcp.feature/bin
