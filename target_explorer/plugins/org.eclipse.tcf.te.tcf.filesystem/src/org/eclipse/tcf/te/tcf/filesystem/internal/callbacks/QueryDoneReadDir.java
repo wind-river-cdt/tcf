@@ -66,9 +66,6 @@ public class QueryDoneReadDir implements DoneReadDir {
 					parentNode.addChild(node);
 				}
 			}
-			else {
-				parentNode.clearChildren();
-			}
 
 			if (eof) {
 				// Close the handle and channel if EOF is signaled or an error occurred.
