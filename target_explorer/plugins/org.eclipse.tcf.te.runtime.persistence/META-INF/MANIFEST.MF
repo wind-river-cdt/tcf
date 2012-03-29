@@ -16,5 +16,3 @@ Export-Package: org.eclipse.tcf.te.runtime.persistence,
  org.eclipse.tcf.te.runtime.persistence.interfaces,
  org.eclipse.tcf.te.runtime.persistence.properties,
  org.eclipse.tcf.te.runtime.persistence.services
-Bundle-ClassPath: google-gson-2.1/gson-2.1.jar,
- .
