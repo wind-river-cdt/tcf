@@ -53,7 +53,9 @@ public class FileExtBasedImageUpdater implements ImageUpdateAdapter {
 	private File getMirrorDir() {
 		File tmpDir = updateDaemon.getTempDir();
 		File mrrDir = new File(tmpDir, ".mrr"); //$NON-NLS-1$
-		if(!mrrDir.exists()) mrrDir.mkdirs();
+		if(!mrrDir.exists() && !mrrDir.mkdirs()) {
+			mrrDir = tmpDir;
+		}
 		return mrrDir;
 	}
 

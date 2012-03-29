@@ -178,10 +178,9 @@ public class LabelProviderUpdateDaemon extends Thread {
         if (imgDesc == null) {
         	File[] roots = File.listRoots();
         	File mirror;
-			if (roots.length == 1) mirror = roots[0];
-			else if (roots.length > 1) mirror = roots[1];
-			else mirror = new File("C:\\"); //$NON-NLS-1$
-        	File imgFile = getTempImg("_root_driver_"); //$NON-NLS-1$
+			if (roots.length > 1) mirror = roots[1];
+			else mirror = roots[0];
+        	File imgFile = getTempImg("_disk_drive_"); //$NON-NLS-1$
         	createImage(key, mirror, imgFile);
         }
         return UIPlugin.getImage(key);
@@ -214,7 +213,9 @@ public class LabelProviderUpdateDaemon extends Thread {
 	protected File getTempDir() {
 		File cacheRoot = CacheManager.getInstance().getCacheRoot();
 		File tempDir = new File(cacheRoot, ".tmp"); //$NON-NLS-1$
-		if(!tempDir.exists()) tempDir.mkdirs();
+		if (!tempDir.exists() && !tempDir.mkdirs()) {
+			tempDir = cacheRoot;
+		}
 		return tempDir;
 	}
 	
@@ -228,7 +229,9 @@ public class LabelProviderUpdateDaemon extends Thread {
 	protected File getTempImg(String imgName) {
 		File tempDir = getTempDir();
 		File imgDir = new File(tempDir, ".img"); //$NON-NLS-1$
-		if (!imgDir.exists()) imgDir.mkdirs();
+		if (!imgDir.exists() && !imgDir.mkdirs()) {
+			imgDir = tempDir;
+		}
 		return new File(imgDir, imgName + ".png"); //$NON-NLS-1$
 	}
 

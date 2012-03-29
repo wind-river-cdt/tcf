@@ -156,7 +156,7 @@ public class ProcessModel implements IPreferenceConsts{
 					}
 				});
 	        }};
-        pollingTimer.schedule(pollingTask, interval * 1000);
+        pollingTimer.schedule(pollingTask, interval * 1000L);
     }
 	
 	/**
