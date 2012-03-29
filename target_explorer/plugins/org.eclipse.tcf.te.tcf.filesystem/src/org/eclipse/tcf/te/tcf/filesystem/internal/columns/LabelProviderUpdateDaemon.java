@@ -108,7 +108,9 @@ public class LabelProviderUpdateDaemon extends Thread {
 				File imgFile = adapter.getImageFile(node);
 				image = createImage(imgKey, mrrFile, imgFile);
 			}
-			sendNotification(node, node.name, null, image);
+			if (image != null) {
+				sendNotification(node, node.name, null, image);
+			}
 		}
 	}
 	
@@ -146,7 +148,7 @@ public class LabelProviderUpdateDaemon extends Thread {
 	 * @param imgKey The image key.
 	 * @param mrrFile The mirror file used to create the image.
 	 * @param imgFile The image file used to store the image data.
-	 * @return The Image Descriptor describing the image.
+	 * @return The Image Descriptor describing the image or null if it is not successful.
 	 */
 	private ImageDescriptor createImage(String imgKey, File mrrFile, File imgFile) {
 	    ImageDescriptor image = UIPlugin.getImageDescriptor(imgKey);
@@ -154,15 +156,17 @@ public class LabelProviderUpdateDaemon extends Thread {
 	    	if (!imgFile.exists()) {
 	    		FileSystemView view = FileSystemView.getFileSystemView();
 	    		Icon icon = view.getSystemIcon(mrrFile);
-	    		createImageFromIcon(icon, imgFile);
+				if (icon != null) createImageFromIcon(icon, imgFile);
 	    	}
-	    	try {
-	    		image = ImageDescriptor.createFromURL(imgFile.toURI().toURL());
-	    		UIPlugin.getDefault().getImageRegistry().put(imgKey, image);
-	    	}
-	    	catch (MalformedURLException e) {
-	    		// Ignore
-	    	}
+			if (imgFile.exists()) {
+				try {
+					image = ImageDescriptor.createFromURL(imgFile.toURI().toURL());
+					UIPlugin.getDefault().getImageRegistry().put(imgKey, image);
+				}
+				catch (MalformedURLException e) {
+					// Ignore
+				}
+			}
 	    }
 	    return image;
     }
