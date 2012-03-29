@@ -37,6 +37,7 @@
 		<cdt-site>http://download.eclipse.org/tools/cdt/builds/juno/nightly</cdt-site>
 		<tm-site>http://download.eclipse.org/tm/updates/3.3</tm-site>
 		<rxtx-site>http://rxtx.qbang.org/eclipse</rxtx-site>
+		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/S20120308061416/repository/</orbit-site>
   	</properties>
 
 	<licenses>
@@ -57,6 +58,11 @@
 		<repository>
 			<id>platform</id>
 			<url>${platform-site}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>orbit</id>
+			<url>${orbit-site}</url>
 			<layout>p2</layout>
 		</repository>
 		<repository>
