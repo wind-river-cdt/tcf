@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2011 Wind River Systems, Inc. and others.
+ * Copyright (c) 2008, 2012 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -600,17 +600,13 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
                 break;
             case 8:
                 // Temporary breakpoint
+                // It will be enabled when we get main thread ID
                 m[i].put(IBreakpoints.PROP_LOCATION, "tcf_test_func3");
+                m[i].put(IBreakpoints.PROP_ENABLED, false);
                 Boolean ct = (Boolean)bp_capabilities.get(IBreakpoints.CAPABILITY_TEMPORARY);
                 if (ct != null && ct.booleanValue()) {
-                    ArrayList<String> l = new ArrayList<String>();
-                    l.add(test_context.getProcessID());
-                    m[i].put(IBreakpoints.PROP_CONTEXTIDS, l);
                     m[i].put(IBreakpoints.PROP_TEMPORARY, true);
                     temp_bp_id = (String)m[i].get(IBreakpoints.PROP_ID);
-                }
-                else {
-                    m[i].put(IBreakpoints.PROP_ENABLED, false);
                 }
                 break;
             case 9:
@@ -789,7 +785,6 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
             bf.append('"');
         }
         m.put(IBreakpoints.PROP_CONDITION, bf.toString());
-        bp_list.put(bp_id, m);
         srv_breakpoints.change(m, new IBreakpoints.DoneCommand() {
             public void doneCommand(IToken token, Exception error) {
                 bp_change_done = true;
@@ -1070,6 +1065,18 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
                 return;
             }
             main_thread_id = sc.id;
+            if (temp_bp_id != null) {
+                final Map<String,Object> m = bp_list.get(temp_bp_id);
+                ArrayList<String> l = new ArrayList<String>();
+                l.add(main_thread_id);
+                m.put(IBreakpoints.PROP_CONTEXTIDS, l);
+                m.put(IBreakpoints.PROP_ENABLED, true);
+                srv_breakpoints.change(m, new IBreakpoints.DoneCommand() {
+                    public void doneCommand(IToken token, Exception error) {
+                        if (error != null) exit(error);
+                    }
+                });
+            }
         }
         if (main_thread_id == null) {
             if (all_setup_done) resume(sc.id);
