@@ -68,11 +68,13 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 	 */
 	private Object[] getFilteredChildren(Object parent) {
 		Object[] result = getChildren(parent);
-		ViewerFilter[] filters = viewer.getFilters();
-		if (filters != null) {
-			for (ViewerFilter filter : filters) {
-				Object[] filteredResult = filter.filter(viewer, parent, result);
-				result = filteredResult;
+		if (viewer != null) {
+			ViewerFilter[] filters = viewer.getFilters();
+			if (filters != null) {
+				for (ViewerFilter filter : filters) {
+					Object[] filteredResult = filter.filter(viewer, parent, result);
+					result = filteredResult;
+				}
 			}
 		}
 		return result;
