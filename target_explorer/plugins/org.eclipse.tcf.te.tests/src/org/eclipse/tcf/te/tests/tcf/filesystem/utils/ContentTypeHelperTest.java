@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.CacheManager;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.ContentTypeHelper;
@@ -78,8 +79,25 @@ public class ContentTypeHelperTest extends UtilsTestBase {
     }
 	
 	public void testBinaryFile() {
-		super.printMessage("The agent's location is: "+agentNode.getLocation()); //$NON-NLS-1$
-		assertTrue(ContentTypeHelper.getInstance().isBinaryFile(agentNode));
+		printMessage("The agent's location is: "+agentNode.getLocation()); //$NON-NLS-1$
+		IContentType contentType = ContentTypeHelper.getInstance().getContentType(agentNode);
+		if (contentType != null) {
+			IContentType binaryFile = Platform.getContentTypeManager().getContentType("org.eclipse.cdt.core.binaryFile"); //$NON-NLS-1$
+			if (binaryFile != null) {
+				 if(contentType.isKindOf(binaryFile)){
+					 printMessage("Successful of testing binary file"); //$NON-NLS-1$
+				 }
+				 else{
+					 printMessage("Failure of testing binary file"); //$NON-NLS-1$
+				 }
+			}
+			else {
+				printMessage("The content type for binary file cannot be found!"); //$NON-NLS-1$
+			}
+		}
+		else {
+			printMessage("The content type of the agent node is null!"); //$NON-NLS-1$
+		}
 	}
 	
 	public void testContentType() {
