@@ -32,12 +32,13 @@ import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.te.launch.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.launch.core.bindings.LaunchConfigTypeBindingsManager;
+import org.eclipse.tcf.te.launch.core.interfaces.IReferencedProjectItem;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ICommonLaunchAttributes;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.IContextSelectorLaunchAttributes;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchManagerDelegate;
 import org.eclipse.tcf.te.launch.core.nls.Messages;
-import org.eclipse.tcf.te.launch.core.persistence.ContextSelectorPersistenceDelegate;
-import org.eclipse.tcf.te.launch.core.persistence.DefaultPersistenceDelegate;
+import org.eclipse.tcf.te.launch.core.persistence.launchcontext.LaunchContextsPersistenceDelegate;
+import org.eclipse.tcf.te.launch.core.persistence.projects.ReferencedProjectsPersistenceDelegate;
 import org.eclipse.tcf.te.runtime.concurrent.util.ExecutorsUtil;
 import org.eclipse.tcf.te.runtime.interfaces.ISharedConstants;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
@@ -116,7 +117,7 @@ public class LaunchConfigurationDelegate extends AbstractLaunchConfigurationDele
 											launchConfig.getType().getIdentifier(),
 											launch.getLaunchMode()));
 
-			IModelNode[] contexts = ContextSelectorPersistenceDelegate.decodeLaunchContexts(
+			IModelNode[] contexts = LaunchContextsPersistenceDelegate.decodeLaunchContexts(
 							launchConfig.getAttribute(IContextSelectorLaunchAttributes.ATTR_LAUNCH_CONTEXTS, (String)null));
 			properties.setProperty(IContextSelectorLaunchAttributes.ATTR_ACTIVE_LAUNCH_CONTEXT, contexts != null && contexts.length > 0 ? contexts[0] : null);
 
@@ -213,9 +214,12 @@ public class LaunchConfigurationDelegate extends AbstractLaunchConfigurationDele
 
 		// Return the projects to build within the order the user configured within
 		// the corresponding UI launch tab.
-		List<String> projectNames = (List<String>)DefaultPersistenceDelegate.getAttribute(configuration, ICommonLaunchAttributes.ATTR_PROJECTS_FOR_BUILD, (List<?>)null);
-		if (projectNames != null) {
-			projects.addAll(findProjectResources(projectNames));
+		IReferencedProjectItem[] items = ReferencedProjectsPersistenceDelegate.getReferencedProjects(configuration);
+		for (IReferencedProjectItem item : items) {
+			if (item.isProperty(IReferencedProjectItem.PROPERTY_ENABLED, true) && item.getStringProperty(IReferencedProjectItem.PROPERTY_PROJECT_NAME) != null) {
+				IProject project = findProjectResource(item.getStringProperty(IReferencedProjectItem.PROPERTY_PROJECT_NAME));
+				projects.add(project);
+			}
 		}
 
 		// If the list of projects is not empty, we have to check for duplicates
@@ -227,36 +231,27 @@ public class LaunchConfigurationDelegate extends AbstractLaunchConfigurationDele
 	}
 
 	/**
-	 * Lookup the corresponding project resources for the given list of project
-	 * names. If one of the referenced projects cannot be found or is closed,
-	 * a {@link CoreException} will be thrown.
+	 * Lookup the corresponding project resource for the given project name.
+	 * If the referenced project cannot be found or is closed, a {@link CoreException} will be thrown.
 	 *
-	 * @param projectNames The list of project names. Must be not <code>null</code>.
-	 * @return The list of project resources or an empty list.
+	 * @param projectName The project name. Must be not <code>null</code>.
+	 * @return The project resource or <code>null</code>.
 	 */
-	protected List<IProject> findProjectResources(List<String> projectNames) throws CoreException {
-		Assert.isNotNull(projectNames);
-
-		List<IProject> projects = new ArrayList<IProject>();
+	protected IProject findProjectResource(String projectName) throws CoreException {
+		Assert.isNotNull(projectName);
 
 		// Project resources are stored with the workspace root
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		for (String projectName : projectNames) {
-			// Query the project resource from the workspace root.
-			IProject project = root.getProject(projectName);
-			if (!project.isAccessible()) {
-				// Not accessible -> means the project does either not exist or
-				// is closed.
-				throw new CoreException(new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
-								NLS.bind(Messages.LaunchConfigurationDelegate_error_inaccessibleReferencedProject, projectName)
-								));
-			}
-
-			// add the project resource to the list
-			projects.add(project);
+		IProject project = root.getProject(projectName);
+		if (project != null && !project.isAccessible()) {
+			// Not accessible -> means the project does either not exist or
+			// is closed.
+			throw new CoreException(new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
+							NLS.bind(Messages.LaunchConfigurationDelegate_error_inaccessibleReferencedProject, projectName)
+							));
 		}
 
-		return projects;
+		return project;
 	}
 
 	/**

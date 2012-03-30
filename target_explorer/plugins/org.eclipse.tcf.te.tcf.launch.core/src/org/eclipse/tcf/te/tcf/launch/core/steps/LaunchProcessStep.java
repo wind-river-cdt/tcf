@@ -26,7 +26,7 @@ import org.eclipse.tcf.te.runtime.stepper.StepperAttributeUtil;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
 import org.eclipse.tcf.te.tcf.launch.core.activator.CoreBundleActivator;
-import org.eclipse.tcf.te.tcf.launch.core.interfaces.ILinuxAppLaunchAttributes;
+import org.eclipse.tcf.te.tcf.launch.core.interfaces.IRemoteAppLaunchAttributes;
 import org.eclipse.tcf.te.tcf.processes.core.interfaces.launcher.IProcessLauncher;
 import org.eclipse.tcf.te.tcf.processes.core.launcher.ProcessLauncher;
 
@@ -46,16 +46,16 @@ public class LaunchProcessStep extends AbstractTcfLaunchStep {
 	 */
 	@Override
 	public void validateExecute(IStepContext context, IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor) throws CoreException {
-		String processImage = DefaultPersistenceDelegate.getAttribute(getLaunchConfiguration(context), ILinuxAppLaunchAttributes.ATTR_PROCESS_IMAGE, (String)null);
+		String processImage = DefaultPersistenceDelegate.getAttribute(getLaunchConfiguration(context), IRemoteAppLaunchAttributes.ATTR_PROCESS_IMAGE, (String)null);
 		if (processImage != null && processImage.trim().length() > 0) {
-			StepperAttributeUtil.setProperty(ILinuxAppLaunchAttributes.ATTR_PROCESS_IMAGE, fullQualifiedId, data, processImage);
+			StepperAttributeUtil.setProperty(IRemoteAppLaunchAttributes.ATTR_PROCESS_IMAGE, fullQualifiedId, data, processImage);
 		}
 		else {
 			throw new CoreException(new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(), "missing process image name")); //$NON-NLS-1$
 		}
 
-		String processArguments = DefaultPersistenceDelegate.getAttribute(getLaunchConfiguration(context), ILinuxAppLaunchAttributes.ATTR_PROCESS_ARGUMENTS, (String)null);
-		StepperAttributeUtil.setProperty(ILinuxAppLaunchAttributes.ATTR_PROCESS_ARGUMENTS, fullQualifiedId, data, processArguments);
+		String processArguments = DefaultPersistenceDelegate.getAttribute(getLaunchConfiguration(context), IRemoteAppLaunchAttributes.ATTR_PROCESS_ARGUMENTS, (String)null);
+		StepperAttributeUtil.setProperty(IRemoteAppLaunchAttributes.ATTR_PROCESS_ARGUMENTS, fullQualifiedId, data, processArguments);
 	}
 
 	/* (non-Javadoc)
@@ -68,9 +68,9 @@ public class LaunchProcessStep extends AbstractTcfLaunchStep {
 
 		Map<String, Object> launchAttributes = new HashMap<String, Object>();
 
-		launchAttributes.put(IProcessLauncher.PROP_PROCESS_PATH, StepperAttributeUtil.getStringProperty(ILinuxAppLaunchAttributes.ATTR_PROCESS_IMAGE, fullQualifiedId, data));
+		launchAttributes.put(IProcessLauncher.PROP_PROCESS_PATH, StepperAttributeUtil.getStringProperty(IRemoteAppLaunchAttributes.ATTR_PROCESS_IMAGE, fullQualifiedId, data));
 
-		String arguments = StepperAttributeUtil.getStringProperty(ILinuxAppLaunchAttributes.ATTR_PROCESS_ARGUMENTS, fullQualifiedId, data);
+		String arguments = StepperAttributeUtil.getStringProperty(IRemoteAppLaunchAttributes.ATTR_PROCESS_ARGUMENTS, fullQualifiedId, data);
 		String[] args = arguments != null && !"".equals(arguments.trim()) ? StringUtil.tokenize(arguments, 0, true) : null; //$NON-NLS-1$
 		launchAttributes.put(IProcessLauncher.PROP_PROCESS_ARGS, args);
 

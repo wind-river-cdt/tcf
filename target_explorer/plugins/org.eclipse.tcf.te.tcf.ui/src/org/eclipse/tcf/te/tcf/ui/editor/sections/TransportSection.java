@@ -27,7 +27,7 @@ import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
-import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistenceService;
+import org.eclipse.tcf.te.runtime.persistence.interfaces.IURIPersistenceService;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
 import org.eclipse.tcf.te.runtime.services.ServiceManager;
 import org.eclipse.tcf.te.tcf.core.Tcf;
@@ -100,7 +100,7 @@ public class TransportSection extends AbstractSection {
 		if (TransportSectionTypePanelControl.class.equals(adapter)) {
 			return transportTypePanelControl;
 		}
-	    return super.getAdapter(adapter);
+		return super.getAdapter(adapter);
 	}
 
 	/* (non-Javadoc)
@@ -163,7 +163,7 @@ public class TransportSection extends AbstractSection {
 		if (active) {
 			// Leave everything unchanged if the page is in dirty state
 			if (getManagedForm().getContainer() instanceof AbstractEditorPage
-					&& !((AbstractEditorPage)getManagedForm().getContainer()).isDirty()) {
+							&& !((AbstractEditorPage)getManagedForm().getContainer()).isDirty()) {
 				Object node = ((AbstractEditorPage)getManagedForm().getContainer()).getEditorInputNode();
 				if (node instanceof IPeerModel) {
 					setupData((IPeerModel)node);
@@ -189,7 +189,9 @@ public class TransportSection extends AbstractSection {
 		wc.clearProperties();
 
 		// If no data is available, we are done
-		if (node == null) return;
+		if (node == null) {
+			return;
+		}
 
 		// Thread access to the model is limited to the executors thread.
 		// Copy the data over to the working copy to ease the access.
@@ -208,7 +210,9 @@ public class TransportSection extends AbstractSection {
 
 					for (String id : transportTypePanelControl.getConfigurationPanelIds()) {
 						IWizardConfigurationPanel panel = transportTypePanelControl.getConfigurationPanel(id);
-						if (panel instanceof IDataExchangeNode3) ((IDataExchangeNode3)panel).copyData(src, odc);
+						if (panel instanceof IDataExchangeNode3) {
+							((IDataExchangeNode3)panel).copyData(src, odc);
+						}
 					}
 				}
 
@@ -227,7 +231,9 @@ public class TransportSection extends AbstractSection {
 				if (transportTypePanelControl != null) {
 					transportTypePanelControl.showConfigurationPanel(transportType);
 					IWizardConfigurationPanel panel = transportTypePanelControl.getConfigurationPanel(transportType);
-					if (panel instanceof IDataExchangeNode) ((IDataExchangeNode)panel).setupData(wc);
+					if (panel instanceof IDataExchangeNode) {
+						((IDataExchangeNode)panel).setupData(wc);
+					}
 				}
 			}
 		}
@@ -246,7 +252,9 @@ public class TransportSection extends AbstractSection {
 	 */
 	public void extractData(final IPeerModel node) {
 		// If no data is available, we are done
-		if (node == null) return;
+		if (node == null) {
+			return;
+		}
 
 		// The list of removed attributes
 		final List<String> removed = new ArrayList<String>();
@@ -259,7 +267,9 @@ public class TransportSection extends AbstractSection {
 			// Get the current transport type configuration panel
 			IWizardConfigurationPanel panel = transportTypePanelControl.getConfigurationPanel(oldTransportType);
 			// And clean out the current transport type specific attributes from the working copy
-			if (panel instanceof IDataExchangeNode3) ((IDataExchangeNode3)panel).removeData(wc);
+			if (panel instanceof IDataExchangeNode3) {
+				((IDataExchangeNode3)panel).removeData(wc);
+			}
 		}
 
 		// Get the new transport type from the widget
@@ -269,17 +279,23 @@ public class TransportSection extends AbstractSection {
 		// Get the new transport type configuration panel
 		IWizardConfigurationPanel panel = transportTypePanelControl.getConfigurationPanel(transportType);
 		// And extract the new attributes into the working copy
-		if (panel instanceof IDataExchangeNode) ((IDataExchangeNode)panel).extractData(wc);
+		if (panel instanceof IDataExchangeNode) {
+			((IDataExchangeNode)panel).extractData(wc);
+		}
 
 		// If the data has not changed compared to the original data copy,
 		// we are done here and return immediately
-		if (odc.equals(wc)) return;
+		if (odc.equals(wc)) {
+			return;
+		}
 
 		// Get the new key set from the working copy
 		Set<String> newKeySet = wc.getProperties().keySet();
 		// Everything from the old key set not found in the new key set is a removed attribute
 		for (String key : currentKeySet) {
-			if (!newKeySet.contains(key)) removed.add(key);
+			if (!newKeySet.contains(key)) {
+				removed.add(key);
+			}
 		}
 
 		// Copy the working copy data back to the original properties container
@@ -291,7 +307,9 @@ public class TransportSection extends AbstractSection {
 				// Create a write able copy of the peer attributes
 				Map<String, String> attributes = new HashMap<String, String>(oldPeer.getAttributes());
 				// Clean out the removed attributes
-				for (String key : removed) attributes.remove(key);
+				for (String key : removed) {
+					attributes.remove(key);
+				}
 				// Update with the current configured attributes
 				for (String key : wc.getProperties().keySet()) {
 					String value = wc.getStringProperty(key);
@@ -304,7 +322,9 @@ public class TransportSection extends AbstractSection {
 
 				// If there is still a open channel to the old peer, close it by force
 				IChannel channel = Tcf.getChannelManager().getChannel(oldPeer);
-				if (channel != null) channel.close();
+				if (channel != null) {
+					channel.close();
+				}
 
 				// Create the new peer
 				IPeer newPeer = oldPeer instanceof PeerRedirector ? new PeerRedirector(((PeerRedirector)oldPeer).getParent(), attributes) : new TransientPeer(attributes);
@@ -319,7 +339,9 @@ public class TransportSection extends AbstractSection {
 				node.setProperty("dns.name.transient", null); //$NON-NLS-1$
 				node.setProperty("dns.lastIP.transient", null); //$NON-NLS-1$
 				node.setProperty("dns.skip.transient", null); //$NON-NLS-1$
-				if (changed) node.setChangeEventsEnabled(true);
+				if (changed) {
+					node.setChangeEventsEnabled(true);
+				}
 			}
 		});
 	}
@@ -329,7 +351,7 @@ public class TransportSection extends AbstractSection {
 	 */
 	@Override
 	public boolean isValid() {
-	    boolean valid = super.isValid();
+		boolean valid = super.isValid();
 
 		if (transportTypeControl != null) {
 			valid &= transportTypeControl.isValid();
@@ -356,10 +378,12 @@ public class TransportSection extends AbstractSection {
 		// Remember the current dirty state
 		boolean needsSaving = isDirty();
 		// Call the super implementation (resets the dirty state)
-	    super.commit(onSave);
+		super.commit(onSave);
 
 		// Nothing to do if not on save or saving is not needed
-		if (!onSave || !needsSaving) return;
+		if (!onSave || !needsSaving) {
+			return;
+		}
 		// Extract the data into the original data node
 		extractData(od);
 
@@ -369,10 +393,12 @@ public class TransportSection extends AbstractSection {
 		if (!odc.equals(wc)) {
 			try {
 				// Get the persistence service
-				IPersistenceService persistenceService = ServiceManager.getInstance().getService(IPersistenceService.class);
-				if (persistenceService == null) throw new IOException("Persistence service instance unavailable."); //$NON-NLS-1$
+				IURIPersistenceService uRIPersistenceService = ServiceManager.getInstance().getService(IURIPersistenceService.class);
+				if (uRIPersistenceService == null) {
+					throw new IOException("Persistence service instance unavailable."); //$NON-NLS-1$
+				}
 				// Save the peer node to the new persistence storage
-				persistenceService.write(od.getPeer().getAttributes());
+				uRIPersistenceService.write(od.getPeer(), null);
 			} catch (IOException e) {
 				// Pass on to the editor page
 			}
@@ -412,7 +438,9 @@ public class TransportSection extends AbstractSection {
 
 			if (transportTypePanelControl != null) {
 				IWizardConfigurationPanel panel = transportTypePanelControl.getConfigurationPanel(transportType);
-				if (panel != null) isDirty |= panel.dataChanged(odc, e);
+				if (panel != null) {
+					isDirty |= panel.dataChanged(odc, e);
+				}
 			}
 		}
 
@@ -443,15 +471,21 @@ public class TransportSection extends AbstractSection {
 				}
 			}
 		};
-		if (Protocol.isDispatchThread()) runnable.run();
-		else Protocol.invokeAndWait(runnable);
+		if (Protocol.isDispatchThread()) {
+			runnable.run();
+		}
+		else {
+			Protocol.invokeAndWait(runnable);
+		}
 
 		// The transport type control is enabled for static peers
 		if (transportTypeControl != null) {
 			SWTControlUtil.setEnabled(transportTypeControl.getEditFieldControl(), isStatic.get() && !isRemote.get());
 			if (transportTypePanelControl != null) {
 				IWizardConfigurationPanel panel = transportTypePanelControl.getConfigurationPanel(transportTypeControl.getSelectedTransportType());
-				if (panel != null) panel.setEnabled(isStatic.get() && !isRemote.get());
+				if (panel != null) {
+					panel.setEnabled(isStatic.get() && !isRemote.get());
+				}
 			}
 		}
 	}

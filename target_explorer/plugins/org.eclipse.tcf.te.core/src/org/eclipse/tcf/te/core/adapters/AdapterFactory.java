@@ -11,7 +11,7 @@ package org.eclipse.tcf.te.core.adapters;
 
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
-import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistable;
+import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistableURIProvider;
 import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistableNameProvider;
 
 /**
@@ -19,12 +19,12 @@ import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistableNameProvide
  */
 public class AdapterFactory implements IAdapterFactory {
 	// Reference to the persistable adapter to use
-	private final IPersistable persistableAdapter = new ModelNodePersistableAdapter();
+	private final IPersistableURIProvider persistableAdapter = new ModelNodePersistableURIProvider();
 	// Reference to the persistable name provider adapter to use
 	private final IPersistableNameProvider persistableNameProvider = new ModelNodePersistableNameProvider();
 
 	private static final Class<?>[] CLASSES = new Class[] {
-		IPersistable.class,
+		IPersistableURIProvider.class,
 		IPersistableNameProvider.class
 	};
 
@@ -34,7 +34,7 @@ public class AdapterFactory implements IAdapterFactory {
 	@Override
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if (adaptableObject instanceof IModelNode) {
-			if (IPersistable.class.equals(adapterType)) {
+			if (IPersistableURIProvider.class.equals(adapterType)) {
 				return persistableAdapter;
 			}
 			if (IPersistableNameProvider.class.equals(adapterType)) {

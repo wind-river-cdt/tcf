@@ -101,7 +101,7 @@ public class FSFolderSelectionDialog extends ElementTreeSelectionDialog {
 			}
 		});
 	}
-	
+
 	/**
 	 * The viewer filter used to filter out files.
 	 */
@@ -115,22 +115,24 @@ public class FSFolderSelectionDialog extends ElementTreeSelectionDialog {
 			return false;
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.dialogs.ElementTreeSelectionDialog#setInput(java.lang.Object)
 	 */
 	@Override
-    public void setInput(Object input) {
+	public void setInput(Object input) {
 		super.setInput(input);
 		FilterDescriptor[] filterDescriptors = ViewerStateManager.getInstance().getFilterDescriptors(IFSConstants.ID_TREE_VIEWER_FS, input);
 		if (filterDescriptors != null) {
 			for(FilterDescriptor descriptor : filterDescriptors) {
-				if(descriptor.isEnabled()) addFilter(descriptor.getFilter());
+				if(descriptor.isEnabled()) {
+					addFilter(descriptor.getFilter());
+				}
 			}
 		}
 	}
-	
+
 	/**
 	 * Create a decorating label provider using the specified label provider.
 	 * 
@@ -179,13 +181,16 @@ public class FSFolderSelectionDialog extends ElementTreeSelectionDialog {
 			return error;
 		}
 		FSTreeNode target = (FSTreeNode) selection[0];
-		for (FSTreeNode node : movedNodes) {
-			if (node == target || node.isAncestorOf(target)) {
-				return error;
+		if (movedNodes != null) {
+			for (FSTreeNode node : movedNodes) {
+				if (node == target || node.isAncestorOf(target)) {
+					return error;
+				}
 			}
 		}
-		if(!target.isWritable())
+		if(!target.isWritable()) {
 			return error;
+		}
 		return new Status(IStatus.OK, pluginId, null);
 	}
 }

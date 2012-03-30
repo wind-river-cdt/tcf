@@ -25,7 +25,7 @@ import org.eclipse.tcf.core.TransientPeer;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
-import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistenceService;
+import org.eclipse.tcf.te.runtime.persistence.interfaces.IURIPersistenceService;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
 import org.eclipse.tcf.te.runtime.services.ServiceManager;
 import org.eclipse.tcf.te.runtime.statushandler.StatusHandlerManager;
@@ -92,12 +92,14 @@ public class ResetRedirectHandler extends AbstractHandler {
 
 			try {
 				// Save it
-				IPersistenceService persistenceService = ServiceManager.getInstance().getService(IPersistenceService.class);
-				if (persistenceService == null) throw new IOException("Persistence service instance unavailable."); //$NON-NLS-1$
-				persistenceService.write(attributes);
-
+				IURIPersistenceService uRIPersistenceService = ServiceManager.getInstance().getService(IURIPersistenceService.class);
+				if (uRIPersistenceService == null) {
+					throw new IOException("Persistence service instance unavailable."); //$NON-NLS-1$
+				}
 				// Create a peer
 				IPeer peer = new TransientPeer(attributes);
+				uRIPersistenceService.write(peer, null);
+
 				// And update the instance
 				peerModel.setProperty(IPeerModelProperties.PROP_INSTANCE, peer);
 
@@ -108,14 +110,14 @@ public class ResetRedirectHandler extends AbstractHandler {
 				// Trigger a refresh of the locator model in a later dispatch cycle
 				Protocol.invokeLater(new Runnable() {
 					@Override
-	                public void run() {
+					public void run() {
 						Model.getModel().getService(ILocatorModelRefreshService.class).refresh();
 					}
 				});
 			} catch (IOException e) {
 				// Create the status
 				IStatus status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(),
-											Messages.ResetRedirectHandler_error_resetRedirectFailed, e);
+								Messages.ResetRedirectHandler_error_resetRedirectFailed, e);
 
 				// Fill in the status handler custom data
 				IPropertiesContainer data = new PropertiesContainer();
@@ -125,7 +127,9 @@ public class ResetRedirectHandler extends AbstractHandler {
 
 				// Get the status handler
 				IStatusHandler[] handler = StatusHandlerManager.getInstance().getHandler(peerModel);
-				if (handler.length > 0) handler[0].handleStatus(status, data, null);
+				if (handler.length > 0) {
+					handler[0].handleStatus(status, data, null);
+				}
 			}
 		}
 	}

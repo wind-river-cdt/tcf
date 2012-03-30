@@ -11,22 +11,22 @@ package org.eclipse.tcf.te.tcf.locator.internal.adapters;
 
 import java.util.Map;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdapterFactory;
-import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistable;
-import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistable2;
+import org.eclipse.tcf.protocol.IPeer;
+import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistableURIProvider;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
 
 /**
  * Static peers adapter factory implementation.
  */
 public class AdapterFactory implements IAdapterFactory {
 	// The single instance adapter references
-	private final IPersistable mapPersistableAdapter = new MapPersistableAdapter();
-	private final IPersistable peerModelPersistableAdapter = new PeerModelPersistableAdapter();
+	private final IPersistableURIProvider peerModelPersistableURIProvider = new PeerPersistableURIProvider();
 
 	private static final Class<?>[] CLASSES = new Class[] {
-		IPersistable.class,
-		IPersistable2.class
+		IPersistableURIProvider.class
 	};
 
 	/* (non-Javadoc)
@@ -35,17 +35,13 @@ public class AdapterFactory implements IAdapterFactory {
 	@Override
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if (adaptableObject instanceof Map) {
-			if (IPersistable.class.equals(adapterType)) {
-				return mapPersistableAdapter;
+			if (IPersistableURIProvider.class.equals(adapterType)) {
+				Assert.isTrue(false);
 			}
 		}
-
-		if (adaptableObject instanceof IPeerModel) {
-			if (IPersistable.class.equals(adapterType)) {
-				return peerModelPersistableAdapter;
-			}
-			if (IPersistable2.class.equals(adapterType)) {
-				return peerModelPersistableAdapter;
+		if (adaptableObject instanceof IPeerModel || adaptableObject instanceof IPeer || adaptableObject instanceof IPeerModelProvider) {
+			if (IPersistableURIProvider.class.equals(adapterType)) {
+				return peerModelPersistableURIProvider;
 			}
 		}
 		return null;

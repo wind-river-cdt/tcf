@@ -4,11 +4,12 @@
 
 <!-- Extension points -->
    <extension-point id="delegates" name="%ExtensionPoint.delegates.name" schema="schema/delegates.exsd"/>
+   <extension-point id="bindings" name="%ExtensionPoint.bindings.name" schema="schema/bindings.exsd"/>
    
 <!-- Persistence delegate contributions -->
    <extension point="org.eclipse.tcf.te.runtime.persistence.delegates">
       <delegate
-            class="org.eclipse.tcf.te.runtime.persistence.properties.PropertiesFilePersistenceDelegate"
+            class="org.eclipse.tcf.te.runtime.persistence.AbstractPropertiesPersistenceDelegate"
             id="org.eclipse.tcf.te.runtime.persistence.properties"
             label="%PropertiesFilePersistenceDelegate.label">
       </delegate>
@@ -17,9 +18,9 @@
 <!-- Service contributions -->
    <extension point="org.eclipse.tcf.te.runtime.services.services">
       <service
-            class="org.eclipse.tcf.te.runtime.persistence.services.PersistenceService"
+            class="org.eclipse.tcf.te.runtime.persistence.services.URIPersistenceService"
             id="org.eclipse.tcf.te.runtime.services.persistence">
-         <serviceType class="org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistenceService"/>
+         <serviceType class="org.eclipse.tcf.te.runtime.persistence.interfaces.IURIPersistenceService"/>
       </service>
    </extension>
 

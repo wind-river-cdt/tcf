@@ -21,9 +21,10 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.tcf.core.TransientPeer;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
-import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistenceService;
+import org.eclipse.tcf.te.runtime.persistence.interfaces.IURIPersistenceService;
 import org.eclipse.tcf.te.runtime.services.ServiceManager;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
@@ -65,9 +66,11 @@ public class NewTargetWizard extends AbstractWizard implements INewWizard {
 
 		try {
 			// Save the new peer
-			IPersistenceService persistenceService = ServiceManager.getInstance().getService(IPersistenceService.class);
-			if (persistenceService == null) throw new IOException("Persistence service instance unavailable."); //$NON-NLS-1$
-			persistenceService.write(peerAttributes);
+			IURIPersistenceService uRIPersistenceService = ServiceManager.getInstance().getService(IURIPersistenceService.class);
+			if (uRIPersistenceService == null) {
+				throw new IOException("Persistence service instance unavailable."); //$NON-NLS-1$
+			}
+			uRIPersistenceService.write(new TransientPeer(peerAttributes), null);
 
 			// Get the locator model
 			final ILocatorModel model = Model.getModel();

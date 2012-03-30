@@ -21,7 +21,7 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tcf.te.launch.core.persistence.ContextSelectorPersistenceDelegate;
+import org.eclipse.tcf.te.launch.core.persistence.launchcontext.LaunchContextsPersistenceDelegate;
 import org.eclipse.tcf.te.launch.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.launch.ui.interfaces.ILaunchConfigurationTabFormPart;
 import org.eclipse.tcf.te.launch.ui.internal.ImageConsts;
@@ -138,7 +138,7 @@ public class LaunchContextSelectorSection extends AbstractSection implements ILa
 		Assert.isNotNull(configuration);
 
 		if (selector != null) {
-			IModelNode[] contexts = ContextSelectorPersistenceDelegate.getLaunchContexts(configuration);
+			IModelNode[] contexts = LaunchContextsPersistenceDelegate.getLaunchContexts(configuration);
 			if (contexts != null && contexts.length > 0) {
 				// Loop the contexts and create a list of nodes
 				List<IModelNode> nodes = new ArrayList<IModelNode>();
@@ -166,12 +166,12 @@ public class LaunchContextSelectorSection extends AbstractSection implements ILa
 
 			// Write the selected contexts to the launch configuration
 			if (nodes != null && nodes.length > 0) {
-				ContextSelectorPersistenceDelegate.setLaunchContexts(configuration, nodes);
+				LaunchContextsPersistenceDelegate.setLaunchContexts(configuration, nodes);
 			} else {
-				ContextSelectorPersistenceDelegate.setLaunchContexts(configuration, null);
+				LaunchContextsPersistenceDelegate.setLaunchContexts(configuration, null);
 			}
 		} else {
-			ContextSelectorPersistenceDelegate.setLaunchContexts(configuration, null);
+			LaunchContextsPersistenceDelegate.setLaunchContexts(configuration, null);
 		}
 	}
 

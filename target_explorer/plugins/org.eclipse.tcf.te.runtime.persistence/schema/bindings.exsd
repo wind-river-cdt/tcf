@@ -1,0 +1,134 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.tcf.te.runtime.persistence" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="org.eclipse.tcf.te.runtime.persistence" id="bindings" name="Persistence Delegate Bindings Extension Point"/>
+      </appinfo>
+      <documentation>
+         This extension point is used to declare the persistence delegate bindings.
+&lt;p&gt;
+&lt;b&gt;Note:&lt;/b&gt; For the enablement expression evaluation, the default variable and &lt;b&gt;context&lt;/b&gt; is set to the delegate context, 
+the variable &lt;b&gt;contextClass&lt;/b&gt; is set to the name of the class if the context to evaluate is an instance of java.lang.Class.
+&lt;br&gt;
+The variable &lt;b&gt;container&lt;/b&gt; is set with the persistence container object (i.e. ILaunchConfiguration, ...),
+the variable &lt;b&gt;containerClass&lt;/b&gt; is set to the name of the class if the container to evaluate is an instance of java.lang.Class,
+
+      </documentation>
+   </annotation>
+
+   <include schemaLocation="schema://org.eclipse.core.expressions/schema/expressionLanguage.exsd"/>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="binding" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="binding">
+      <annotation>
+         <documentation>
+            Declares a persistence delegate binding.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="enablement" minOccurs="0" maxOccurs="1"/>
+         </sequence>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  persistence delegaete binding contribution.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="delegateId" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The unique id of the referenced persistence delegate.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.tcf.te.runtime.persistence.delegates/delegate/@id"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         Target Explorer 1.0.0
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         &lt;pre&gt;
+   &lt;extension point=&quot;org.eclipse.tcf.te.runtime.persistence.bindings&quot;&gt;
+      &lt;binding
+            id=&quot;org.eclipse.tcf.te.runtime.persistence.binding.LaunchConfigPersistenceDelegate&quot;
+            handlerId=&quot;org.eclipse.tcf.te.launch.core.persistence.LaunchConfigPersistenceDelegate&quot;&gt;
+         &lt;enablement&gt;
+            ...
+         &lt;/enablement&gt;
+      &lt;/binding&gt;
+   &lt;/extension&gt;
+&lt;/pre&gt;
+      </documentation>
+   </annotation>
+
+
+
+   <annotation>
+      <appinfo>
+         <meta.section type="copyright"/>
+      </appinfo>
+      <documentation>
+         Copyright (c) 2012 Wind River Systems, Inc. and others.
+
+All rights reserved.
+
+This program and the accompanying materials are made available under the terms
+of the Eclipse Public License v1.0 which accompanies this distribution, and is
+available at http://www.eclipse.org/legal/epl-v10.html.
+      </documentation>
+   </annotation>
+
+</schema>

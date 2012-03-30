@@ -10,7 +10,6 @@
 package org.eclipse.tcf.te.tcf.ui.editor.sections;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -29,7 +28,7 @@ import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistableNodeProperties;
-import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistenceService;
+import org.eclipse.tcf.te.runtime.persistence.interfaces.IURIPersistenceService;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
 import org.eclipse.tcf.te.runtime.services.ServiceManager;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
@@ -290,21 +289,21 @@ public class GeneralInformationSection extends AbstractSection {
 					// Update the (managed) attributes from the working copy
 					attributes.put(IPeer.ATTR_NAME, wc.getStringProperty(IPeer.ATTR_NAME));
 					// Update the persistence storage URI (if set)
-					if (attributes.containsKey(IPersistableNodeProperties.PROPERTY_URI)) {
-						IPersistenceService persistenceService = ServiceManager.getInstance().getService(IPersistenceService.class);
-						if (persistenceService != null) {
-							URI uri = null;
-							try {
-								uri = persistenceService.getURI(attributes);
-							} catch (IOException e) { /* ignored on purpose */ }
-							if (uri != null) {
-								attributes.put(IPersistableNodeProperties.PROPERTY_URI, uri.toString());
-							}
-							else {
-								attributes.remove(IPersistableNodeProperties.PROPERTY_URI);
-							}
-						}
-					}
+					//					if (attributes.containsKey(IPersistableNodeProperties.PROPERTY_URI)) {
+					//						IURIPersistenceService uRIPersistenceService = ServiceManager.getInstance().getService(IURIPersistenceService.class);
+					//						if (uRIPersistenceService != null) {
+					//							URI uri = null;
+					//							try {
+					//								uri = uRIPersistenceService.getURI(attributes);
+					//							} catch (IOException e) { /* ignored on purpose */ }
+					//							if (uri != null) {
+					//								attributes.put(IPersistableNodeProperties.PROPERTY_URI, uri.toString());
+					//							}
+					//							else {
+					attributes.remove(IPersistableNodeProperties.PROPERTY_URI);
+					//							}
+					//						}
+					//					}
 					// Create the new peer
 					IPeer newPeer = oldPeer instanceof PeerRedirector ? new PeerRedirector(((PeerRedirector)oldPeer).getParent(), attributes) : new TransientPeer(attributes);
 					// Update the peer node instance (silently)
@@ -364,15 +363,18 @@ public class GeneralInformationSection extends AbstractSection {
 		if (!oldName.equals(wc.getStringProperty(IPeer.ATTR_NAME))) {
 			try {
 				// Get the persistence service
-				IPersistenceService persistenceService = ServiceManager.getInstance().getService(IPersistenceService.class);
-				if (persistenceService == null)
-				{
+				IURIPersistenceService uRIPersistenceService = ServiceManager.getInstance().getService(IURIPersistenceService.class);
+				if (uRIPersistenceService == null) {
 					throw new IOException("Persistence service instance unavailable."); //$NON-NLS-1$
 				}
 				// Remove the old persistence storage using the original data copy
-				persistenceService.delete(odc.getProperties());
+				Map<String,String> oldData = new HashMap<String, String>();
+				for (String key : odc.getProperties().keySet()) {
+					oldData.put(key, odc.getStringProperty(key));
+				}
+				uRIPersistenceService.delete(new TransientPeer(oldData), null);
 				// Save the peer node to the new persistence storage
-				persistenceService.write(od.getPeer().getAttributes());
+				uRIPersistenceService.write(od.getPeer(), null);
 			} catch (IOException e) {
 				// Pass on to the editor page
 			}

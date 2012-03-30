@@ -21,9 +21,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.tcf.core.TransientPeer;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
-import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistenceService;
+import org.eclipse.tcf.te.runtime.persistence.interfaces.IURIPersistenceService;
 import org.eclipse.tcf.te.runtime.services.ServiceManager;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelRefreshService;
@@ -150,7 +151,9 @@ public class CategoryManager {
 				// If the peer node is a static node already, there is nothing to do here
 				String value = node.getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
 				boolean isStatic = value != null && Boolean.parseBoolean(value.trim());
-				if (isStatic) return;
+				if (isStatic) {
+					return;
+				}
 
 				// Not a static node yet, copy the peer attributes
 				Map<String, String> attrs = new HashMap<String, String>();
@@ -165,20 +168,26 @@ public class CategoryManager {
 
 				// Persist the attributes
 				try {
-					IPersistenceService persistenceService = ServiceManager.getInstance().getService(IPersistenceService.class);
-					if (persistenceService == null) throw new IOException("Persistence service instance unavailable."); //$NON-NLS-1$
-					persistenceService.write(attrs);
+					IURIPersistenceService uRIPersistenceService = ServiceManager.getInstance().getService(IURIPersistenceService.class);
+					if (uRIPersistenceService == null) {
+						throw new IOException("Persistence service instance unavailable."); //$NON-NLS-1$
+					}
+					uRIPersistenceService.write(new TransientPeer(attrs), null);
 
 					Model.getModel().getService(ILocatorModelRefreshService.class).refresh();
 				} catch (IOException e) {
 					IStatus status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(),
-												NLS.bind(Messages.CategoryManager_dnd_failed, e.getLocalizedMessage()), e);
+									NLS.bind(Messages.CategoryManager_dnd_failed, e.getLocalizedMessage()), e);
 					UIPlugin.getDefault().getLog().log(status);
 				}
 			}
 		};
 
-		if (Protocol.isDispatchThread()) runnable.run();
-		else Protocol.invokeAndWait(runnable);
+		if (Protocol.isDispatchThread()) {
+			runnable.run();
+		}
+		else {
+			Protocol.invokeAndWait(runnable);
+		}
 	}
 }

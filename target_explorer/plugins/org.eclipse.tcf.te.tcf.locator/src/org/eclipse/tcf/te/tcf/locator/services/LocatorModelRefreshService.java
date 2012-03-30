@@ -11,15 +11,12 @@ package org.eclipse.tcf.te.tcf.locator.services;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.core.runtime.Assert;
@@ -31,6 +28,8 @@ import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.ILocator;
 import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistableNodeProperties;
+import org.eclipse.tcf.te.runtime.persistence.interfaces.IURIPersistenceService;
+import org.eclipse.tcf.te.runtime.services.ServiceManager;
 import org.eclipse.tcf.te.runtime.utils.net.IPAddressUtil;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.locator.ScannerRunnable;
@@ -42,6 +41,7 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.preferences.IPreferenceKeys;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelLookupService;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelRefreshService;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelUpdateService;
+import org.eclipse.tcf.te.tcf.locator.model.ModelLocationUtil;
 import org.eclipse.tcf.te.tcf.locator.nodes.LocatorModel;
 import org.eclipse.tcf.te.tcf.locator.nodes.PeerModel;
 import org.eclipse.tcf.te.tcf.locator.nodes.PeerRedirector;
@@ -72,10 +72,14 @@ public class LocatorModelRefreshService extends AbstractLocatorModelService impl
 		ILocatorModel model = getLocatorModel();
 
 		// If the parent model is already disposed, the service will drop out immediately
-		if (model.isDisposed()) return;
+		if (model.isDisposed()) {
+			return;
+		}
 
 		// If the TCF framework isn't initialized yet, the service will drop out immediately
-		if (!Tcf.isRunning()) return;
+		if (!Tcf.isRunning()) {
+			return;
+		}
 
 		// Get the list of old children (update node instances where possible)
 		final List<IPeerModel> oldChildren = new ArrayList<IPeerModel>(Arrays.asList(model.getPeers()));
@@ -84,7 +88,9 @@ public class LocatorModelRefreshService extends AbstractLocatorModelService impl
 		ILocator locatorService = Protocol.getLocator();
 		if (locatorService != null) {
 			// Check for the locator listener to be created and registered
-			if (model instanceof LocatorModel) ((LocatorModel)model).checkLocatorListener();
+			if (model instanceof LocatorModel) {
+				((LocatorModel)model).checkLocatorListener();
+			}
 			// Get the map of peers known to the locator service.
 			Map<String, IPeer> peers = locatorService.getPeers();
 			// Process the peers
@@ -95,7 +101,9 @@ public class LocatorModelRefreshService extends AbstractLocatorModelService impl
 		refreshStaticPeers(oldChildren, model);
 
 		// If there are remaining old children, remove them from the model (non-recursive)
-		for (IPeerModel oldChild : oldChildren) model.getService(ILocatorModelUpdateService.class).remove(oldChild);
+		for (IPeerModel oldChild : oldChildren) {
+			model.getService(ILocatorModelUpdateService.class).remove(oldChild);
+		}
 	}
 
 	/**
@@ -116,8 +124,12 @@ public class LocatorModelRefreshService extends AbstractLocatorModelService impl
 			// Try to find an existing peer node first
 			IPeerModel peerNode = model.getService(ILocatorModelLookupService.class).lkupPeerModelById(peerId);
 			// And create a new one if we cannot find it
-			if (peerNode == null) peerNode = new PeerModel(model, peer);
-			else oldChildren.remove(peerNode);
+			if (peerNode == null) {
+				peerNode = new PeerModel(model, peer);
+			}
+			else {
+				oldChildren.remove(peerNode);
+			}
 			// Merge user configured properties between the peers
 			model.getService(ILocatorModelUpdateService.class).mergeUserDefinedAttributes(peerNode, peer, false);
 			// Validate the peer node before adding
@@ -130,7 +142,7 @@ public class LocatorModelRefreshService extends AbstractLocatorModelService impl
 				boolean isStatic = value != null && Boolean.parseBoolean(value.trim());
 				if (isStatic) {
 					for (IPeerModel candidate : oldChildren) {
-						if (peerNode.getPeer().getTransportName().equals(candidate.getPeer().getTransportName())) {
+						if (peerNode.getPeer().getTransportName() != null && peerNode.getPeer().getTransportName().equals(candidate.getPeer().getTransportName())) {
 							// Same transport name
 							if ("PIPE".equals(candidate.getPeer().getTransportName())) { //$NON-NLS-1$
 								// Compare the pipe name
@@ -155,9 +167,13 @@ public class LocatorModelRefreshService extends AbstractLocatorModelService impl
 								if (IPAddressUtil.getInstance().isSameHost(ip1, ip2)) {
 									// Compare the ports
 									String port1 = peerNode.getPeer().getAttributes().get(IPeer.ATTR_IP_PORT);
-									if (port1 == null || "".equals(port1)) port1 = "1534"; //$NON-NLS-1$ //$NON-NLS-2$
+									if (port1 == null || "".equals(port1)) { //$NON-NLS-1$
+										port1 = "1534"; //$NON-NLS-1$
+									}
 									String port2 = candidate.getPeer().getAttributes().get(IPeer.ATTR_IP_PORT);
-									if (port2 == null || "".equals(port2)) port2 = "1534"; //$NON-NLS-1$ //$NON-NLS-2$
+									if (port2 == null || "".equals(port2)) { //$NON-NLS-1$
+										port2 = "1534"; //$NON-NLS-1$
+									}
 
 									if (port1.equals(port2)) {
 										// Merge user configured properties between the peers
@@ -192,14 +208,18 @@ public class LocatorModelRefreshService extends AbstractLocatorModelService impl
 
 		// This method might be called reentrant while processing. Return immediately
 		// in this case.
-		if (REFRESH_STATIC_PEERS_GUARD.get()) return;
+		if (REFRESH_STATIC_PEERS_GUARD.get()) {
+			return;
+		}
 		REFRESH_STATIC_PEERS_GUARD.set(true);
 
 		// Get the parent locator model
 		ILocatorModel model = getLocatorModel();
 
 		// If the parent model is already disposed, the service will drop out immediately
-		if (model.isDisposed()) return;
+		if (model.isDisposed()) {
+			return;
+		}
 
 		// Get the list of old children (update node instances where possible)
 		final List<IPeerModel> oldChildren = new ArrayList<IPeerModel>(Arrays.asList(model.getPeers()));
@@ -242,41 +262,30 @@ public class LocatorModelRefreshService extends AbstractLocatorModelService impl
 
 					for (File candidate : candidates) {
 						try {
-							Properties properties = new Properties();
+							IURIPersistenceService service = ServiceManager.getInstance().getService(IURIPersistenceService.class);
+							IPeer tempPeer = (IPeer)service.read(candidate.getAbsoluteFile().toURI(), IPeer.class);
 
-							// Load the properties found in the candidate file into
-							// the Properties object. The input stream passed to
-							// the Properties.load(...) method needs to be closed
-							// manually afterwards.
-							InputStream is = null;
-							try {
-								is = new FileInputStream(candidate);
-								properties.load(is);
-							} finally {
-								if (is != null) {
-									try { is.close(); } catch (IOException e) { /* ignored on purpose */ }
-								}
-							}
+							Map<String,String> attrs = new HashMap<String, String>(tempPeer.getAttributes());
 
 							// Remember the file path within the properties
-							properties.setProperty(IPersistableNodeProperties.PROPERTY_URI, candidate.getAbsoluteFile().toURI().toString());
+							attrs.put(IPersistableNodeProperties.PROPERTY_URI, candidate.getAbsoluteFile().toURI().toString());
 							// Mark the node as static peer model node
-							properties.setProperty("static.transient", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+							attrs.put("static.transient", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 
 							// Validate the name attribute. If not set, set
 							// it to the file name without the .ini extension.
-							String name = properties.getProperty(IPeer.ATTR_NAME);
+							String name = attrs.get(IPeer.ATTR_NAME);
 							if (name == null || "".equals(name.trim())) { //$NON-NLS-1$
 								name = new Path(candidate.getAbsolutePath()).removeFileExtension().lastSegment();
-								properties.setProperty(IPeer.ATTR_NAME, name);
+								attrs.put(IPeer.ATTR_NAME, name);
 							}
 
 							// Validate the id attribute. If not set, generate one.
-							String id = properties.getProperty(IPeer.ATTR_ID);
+							String id = attrs.get(IPeer.ATTR_ID);
 							if (id == null || "".equals(id.trim()) || "USR:".equals(id.trim())) { //$NON-NLS-1$ //$NON-NLS-2$
-								String transport = properties.getProperty(IPeer.ATTR_TRANSPORT_NAME);
-								String host = properties.getProperty(IPeer.ATTR_IP_HOST);
-								String port = properties.getProperty(IPeer.ATTR_IP_PORT);
+								String transport = attrs.get(IPeer.ATTR_TRANSPORT_NAME);
+								String host = attrs.get(IPeer.ATTR_IP_HOST);
+								String port = attrs.get(IPeer.ATTR_IP_PORT);
 
 								if (transport != null && host != null && !(id != null && "USR:".equals(id.trim()))) { //$NON-NLS-1$
 									id = transport.trim() + ":" + host.trim(); //$NON-NLS-1$
@@ -289,30 +298,24 @@ public class LocatorModelRefreshService extends AbstractLocatorModelService impl
 										id = "USR:" + System.currentTimeMillis(); //$NON-NLS-1$
 									}
 								}
-								properties.put(IPeer.ATTR_ID, id);
-							}
-
-							// Copy all string attributes
-							Map<String, String> attrs = new HashMap<String, String>();
-							for (Object key : properties.keySet()) {
-								if (key instanceof String && properties.get(key) instanceof String) {
-									attrs.put((String)key, (String)properties.get(key));
-								}
+								attrs.put(IPeer.ATTR_ID, id);
 							}
 
 							// If the redirect property is not set, create the peer right away
-							if (properties.get(IPeerModelProperties.PROP_REDIRECT_PROXY) == null) {
+							if (attrs.get(IPeerModelProperties.PROP_REDIRECT_PROXY) == null) {
 								// Construct the peer from the attributes
 								IPeer peer = new TransientPeer(attrs);
 								// Add the constructed peer to the peers map
 								peers.put(peer.getID(), peer);
 							} else {
 								// Try to get the peer proxy
-								String proxyId = properties.getProperty(IPeerModelProperties.PROP_REDIRECT_PROXY);
+								String proxyId = attrs.get(IPeerModelProperties.PROP_REDIRECT_PROXY);
 								IPeer proxy = peers.get(proxyId);
 								if (proxy == null) {
 									IPeerModel peerModel = model.getService(ILocatorModelLookupService.class).lkupPeerModelById(proxyId);
-									if (peerModel != null) proxy = peerModel.getPeer();
+									if (peerModel != null) {
+										proxy = peerModel.getPeer();
+									}
 								}
 
 								if (proxy != null) {
@@ -339,7 +342,9 @@ public class LocatorModelRefreshService extends AbstractLocatorModelService impl
 					IPeer proxy = proxyId != null ? peers.get(proxyId) : null;
 					if (proxy == null) {
 						IPeerModel peerModel = model.getService(ILocatorModelLookupService.class).lkupPeerModelById(proxyId);
-						if (peerModel != null) proxy = peerModel.getPeer();
+						if (peerModel != null) {
+							proxy = peerModel.getPeer();
+						}
 					}
 
 					if (proxy != null) {
@@ -359,12 +364,16 @@ public class LocatorModelRefreshService extends AbstractLocatorModelService impl
 			}
 
 			// Process the read peers
-			if (!peers.isEmpty()) processPeers(peers, oldChildren, model);
+			if (!peers.isEmpty()) {
+				processPeers(peers, oldChildren, model);
+			}
 
 			// Scan the peers for redirected ones ... and set up the peer model association
 			for (String peerId : peers.keySet()) {
 				IPeer peer = peers.get(peerId);
-				if (!(peer instanceof PeerRedirector)) continue;
+				if (!(peer instanceof PeerRedirector)) {
+					continue;
+				}
 
 				// Get the peers peer model object
 				IPeerModel peerModel = model.getService(ILocatorModelLookupService.class).lkupPeerModelById(peerId);
@@ -392,8 +401,8 @@ public class LocatorModelRefreshService extends AbstractLocatorModelService impl
 
 		// Check on the peers root locations preference setting
 		String roots = Platform.getPreferencesService().getString(CoreBundleActivator.getUniqueIdentifier(),
-																  IPreferenceKeys.PREF_STATIC_PEERS_ROOT_LOCATIONS,
-																  null, null);
+						IPreferenceKeys.PREF_STATIC_PEERS_ROOT_LOCATIONS,
+						null, null);
 		// If set, split it in its single components
 		if (roots != null) {
 			String[] candidates = roots.split(File.pathSeparator);
@@ -404,19 +413,12 @@ public class LocatorModelRefreshService extends AbstractLocatorModelService impl
 					rootLocations.add(file);
 				}
 			}
-		} else {
-			// Try the bundles state location first (not available if launched with -data @none).
-			try {
-				File file = CoreBundleActivator.getDefault().getStateLocation().append(".peers").toFile(); //$NON-NLS-1$
-				if (file.canRead() && file.isDirectory() && !rootLocations.contains(file)) {
-					rootLocations.add(file);
-				}
-			} catch (IllegalStateException e) {
-				/* ignored on purpose */
-			}
+		}
 
-			// The users local peers lookup directory is $HOME/.tcf/.peers.
-			File file = new Path(System.getProperty("user.home")).append(".tcf/.peers").toFile(); //$NON-NLS-1$ //$NON-NLS-2$
+		// always add default root location
+		IPath defaultPath = ModelLocationUtil.getStaticPeersRootLocation();
+		if (defaultPath != null) {
+			File file = defaultPath.toFile();
 			if (file.canRead() && file.isDirectory() && !rootLocations.contains(file)) {
 				rootLocations.add(file);
 			}

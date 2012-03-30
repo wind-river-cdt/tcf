@@ -84,7 +84,7 @@ public class StatusHandlerBindingExtensionPointManager extends AbstractExtension
 					instance.setInitializationData(getConfigurationElement(), null, null);
 				} catch (CoreException e) {
 					IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
-												e.getLocalizedMessage(), e);
+									e.getLocalizedMessage(), e);
 					Platform.getLog(CoreBundleActivator.getContext().getBundle()).log(status);
 				}
 				return instance;
@@ -111,6 +111,7 @@ public class StatusHandlerBindingExtensionPointManager extends AbstractExtension
 				if (context != null) {
 					// Set the default variable to the handler context.
 					EvaluationContext evalContext = new EvaluationContext(null, context);
+					evalContext.addVariable("context", context); //$NON-NLS-1$
 					// Allow plugin activation
 					evalContext.setAllowPluginActivation(true);
 					// Evaluate the expression
@@ -118,7 +119,7 @@ public class StatusHandlerBindingExtensionPointManager extends AbstractExtension
 						isApplicable = enablement.evaluate(evalContext).equals(EvaluationResult.TRUE);
 					} catch (CoreException e) {
 						IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
-								e.getLocalizedMessage(), e);
+										e.getLocalizedMessage(), e);
 						Platform.getLog(CoreBundleActivator.getContext().getBundle()).log(status);
 					}
 				} else {
@@ -128,7 +129,9 @@ public class StatusHandlerBindingExtensionPointManager extends AbstractExtension
 			}
 
 			// Add the binding if applicable
-			if (isApplicable) applicable.add(binding);
+			if (isApplicable) {
+				applicable.add(binding);
+			}
 		}
 
 		return applicable.toArray(new StatusHandlerBinding[applicable.size()]);

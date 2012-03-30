@@ -28,10 +28,10 @@ import org.eclipse.tcf.te.launch.core.exceptions.LaunchServiceException;
 import org.eclipse.tcf.te.launch.core.interfaces.tracing.ITraceIds;
 import org.eclipse.tcf.te.launch.core.lm.LaunchConfigSorter;
 import org.eclipse.tcf.te.launch.core.lm.LaunchSpecification;
-import org.eclipse.tcf.te.launch.core.lm.interfaces.ICommonLaunchAttributes;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchAttribute;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchManagerDelegate;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification;
+import org.eclipse.tcf.te.launch.core.lm.interfaces.IReferencedProjectLaunchAttributes;
 import org.eclipse.tcf.te.launch.core.nls.Messages;
 import org.eclipse.tcf.te.launch.core.preferences.IPreferenceKeys;
 import org.eclipse.tcf.te.launch.core.selection.interfaces.ILaunchSelection;
@@ -615,7 +615,7 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 		Assert.isNotNull(specValue);
 		Assert.isNotNull(confValue);
 
-		if (ICommonLaunchAttributes.ATTR_PROJECTS_FOR_BUILD.equals(attributeKey)) {
+		if (IReferencedProjectLaunchAttributes.ATTR_REFERENCED_PROJECTS.equals(attributeKey)) {
 			// get match of list objects
 			int match = specValue.equals(confValue) ? FULL_MATCH : NO_MATCH;
 			// compare objects in the list when they are not already equal
@@ -623,13 +623,6 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 				List<?> specProject = (List<?>) specValue;
 				List<?> confProject = (List<?>) confValue;
 				match = (specProject.isEmpty() || confProject.isEmpty()) ? PARTIAL_MATCH : NO_MATCH;
-				List<?> refProjects = null;
-				try {
-					refProjects = launchConfig.getAttribute(ICommonLaunchAttributes.ATTR_REFERENCED_PROJECTS, (List<?>) null);
-				}
-				catch (CoreException e) {
-					// ignore
-				}
 				for (int i = 0; i < specProject.size(); i++) {
 					Object specObject = specProject.get(i);
 					if (specObject != null && confProject.contains(specObject)) {
@@ -638,12 +631,6 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 							// full match on first element in the spec list,
 							// otherwise partial match
 							match = (i == 0) ? FULL_MATCH : PARTIAL_MATCH;
-						}
-					}
-					else if (specObject != null && refProjects != null && refProjects.contains(specObject)) {
-						// spec object can be found in the configuration
-						if (match == NO_MATCH) {
-							match = PARTIAL_MATCH;
 						}
 					}
 					else if (match == FULL_MATCH) {

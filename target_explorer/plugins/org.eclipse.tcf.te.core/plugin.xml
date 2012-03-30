@@ -7,7 +7,7 @@
       <factory
             adaptableType="org.eclipse.tcf.te.runtime.model.interfaces.IModelNode"
             class="org.eclipse.tcf.te.core.adapters.AdapterFactory">
-         <adapter type="org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistable"/>
+         <adapter type="org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistableURIProvider"/>
          <adapter type="org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistableNameProvider"/>
       </factory>
    </extension>

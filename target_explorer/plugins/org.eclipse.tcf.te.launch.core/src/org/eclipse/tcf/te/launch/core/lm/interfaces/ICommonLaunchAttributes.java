@@ -20,16 +20,6 @@ public interface ICommonLaunchAttributes {
 	public static final String ATTR_PREFIX = "org.eclipse.tcf.te.launch"; //$NON-NLS-1$
 
 	/**
-	 * Launch configuration attribute: List of projects which must be build before executing the launch.
-	 */
-	public static final String ATTR_PROJECTS_FOR_BUILD = ATTR_PREFIX + ".projectsForBuild";     //$NON-NLS-1$
-
-	/**
-	 * Launch configuration attribute: List of referenced projects.
-	 */
-	public static final String ATTR_REFERENCED_PROJECTS = ATTR_PREFIX + ".referencedProjects";     //$NON-NLS-1$
-
-	/**
 	 * Time stamp when last launched.
 	 */
 	public static final String ATTR_LAST_LAUNCHED = ATTR_PREFIX + ".lastLaunched";     //$NON-NLS-1$

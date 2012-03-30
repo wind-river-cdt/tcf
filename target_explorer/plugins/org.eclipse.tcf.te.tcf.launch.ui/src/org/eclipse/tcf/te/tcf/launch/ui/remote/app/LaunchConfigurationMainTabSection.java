@@ -18,13 +18,13 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tcf.te.launch.core.persistence.ContextSelectorPersistenceDelegate;
 import org.eclipse.tcf.te.launch.core.persistence.DefaultPersistenceDelegate;
+import org.eclipse.tcf.te.launch.core.persistence.launchcontext.LaunchContextsPersistenceDelegate;
 import org.eclipse.tcf.te.launch.ui.interfaces.ILaunchConfigurationTabFormPart;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
 import org.eclipse.tcf.te.tcf.filesystem.dialogs.FSOpenFileDialog;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
-import org.eclipse.tcf.te.tcf.launch.core.interfaces.ILinuxAppLaunchAttributes;
+import org.eclipse.tcf.te.tcf.launch.core.interfaces.IRemoteAppLaunchAttributes;
 import org.eclipse.tcf.te.tcf.launch.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.controls.BaseEditBrowseTextControl;
 import org.eclipse.tcf.te.ui.forms.parts.AbstractSection;
@@ -132,12 +132,12 @@ public class LaunchConfigurationMainTabSection extends AbstractSection implement
 		Assert.isNotNull(configuration);
 
 		if (processImage != null) {
-			String image = DefaultPersistenceDelegate.getAttribute(configuration, ILinuxAppLaunchAttributes.ATTR_PROCESS_IMAGE, ""); //$NON-NLS-1$
+			String image = DefaultPersistenceDelegate.getAttribute(configuration, IRemoteAppLaunchAttributes.ATTR_PROCESS_IMAGE, ""); //$NON-NLS-1$
 			processImage.setEditFieldControlText(image);
 		}
 
 		if (processArguments != null) {
-			String arguments = DefaultPersistenceDelegate.getAttribute(configuration, ILinuxAppLaunchAttributes.ATTR_PROCESS_ARGUMENTS, ""); //$NON-NLS-1$
+			String arguments = DefaultPersistenceDelegate.getAttribute(configuration, IRemoteAppLaunchAttributes.ATTR_PROCESS_ARGUMENTS, ""); //$NON-NLS-1$
 			processArguments.setEditFieldControlText(arguments);
 		}
 	}
@@ -153,31 +153,31 @@ public class LaunchConfigurationMainTabSection extends AbstractSection implement
 			String image = processImage.getEditFieldControlText();
 
 			if (image != null && image.trim().length() > 0) {
-				DefaultPersistenceDelegate.setAttribute(configuration, ILinuxAppLaunchAttributes.ATTR_PROCESS_IMAGE, image);
+				DefaultPersistenceDelegate.setAttribute(configuration, IRemoteAppLaunchAttributes.ATTR_PROCESS_IMAGE, image);
 			} else {
-				DefaultPersistenceDelegate.setAttribute(configuration, ILinuxAppLaunchAttributes.ATTR_PROCESS_IMAGE, (String)null);
+				DefaultPersistenceDelegate.setAttribute(configuration, IRemoteAppLaunchAttributes.ATTR_PROCESS_IMAGE, (String)null);
 			}
 		} else {
-			DefaultPersistenceDelegate.setAttribute(configuration, ILinuxAppLaunchAttributes.ATTR_PROCESS_IMAGE, (String)null);
+			DefaultPersistenceDelegate.setAttribute(configuration, IRemoteAppLaunchAttributes.ATTR_PROCESS_IMAGE, (String)null);
 		}
 
 		if (processArguments != null) {
 			String arguments = processArguments.getEditFieldControlText();
 
 			if (arguments != null && arguments.trim().length() > 0) {
-				DefaultPersistenceDelegate.setAttribute(configuration, ILinuxAppLaunchAttributes.ATTR_PROCESS_ARGUMENTS, arguments);
+				DefaultPersistenceDelegate.setAttribute(configuration, IRemoteAppLaunchAttributes.ATTR_PROCESS_ARGUMENTS, arguments);
 			} else {
-				DefaultPersistenceDelegate.setAttribute(configuration, ILinuxAppLaunchAttributes.ATTR_PROCESS_ARGUMENTS, (String)null);
+				DefaultPersistenceDelegate.setAttribute(configuration, IRemoteAppLaunchAttributes.ATTR_PROCESS_ARGUMENTS, (String)null);
 			}
 		} else {
-			DefaultPersistenceDelegate.setAttribute(configuration, ILinuxAppLaunchAttributes.ATTR_PROCESS_ARGUMENTS, (String)null);
+			DefaultPersistenceDelegate.setAttribute(configuration, IRemoteAppLaunchAttributes.ATTR_PROCESS_ARGUMENTS, (String)null);
 		}
 	}
 
 	@Override
 	public boolean isValid(ILaunchConfiguration configuration) {
 		firstSelection = null;
-		IModelNode[] contexts = ContextSelectorPersistenceDelegate.getLaunchContexts(configuration);
+		IModelNode[] contexts = LaunchContextsPersistenceDelegate.getLaunchContexts(configuration);
 		if (contexts != null && contexts.length > 0) {
 			firstSelection = contexts[0];
 		}

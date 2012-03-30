@@ -14,6 +14,8 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
+import org.eclipse.tcf.te.tcf.launch.ui.remote.app.filetransfer.FileTransferTab;
+import org.eclipse.tcf.te.tcf.launch.ui.remote.app.projects.ReferencedProjetcsTab;
 
 /**
  * Remote application launch configuration tab group implementation.
@@ -32,7 +34,15 @@ public class LaunchConfigurationTabGroup extends org.eclipse.tcf.te.launch.ui.ta
 		Assert.isNotNull(tabs);
 
 		ILaunchConfigurationTab tab = new LaunchConfigurationMainTab();
+		tabs.add(tab);
+	}
 
+	@Override
+	public void createAdditionalTabs(ILaunchConfigurationDialog dialog, List<ILaunchConfigurationTab> tabs, String mode) {
+
+		ILaunchConfigurationTab tab = new FileTransferTab();
+		tabs.add(tab);
+		tab = new ReferencedProjetcsTab();
 		tabs.add(tab);
 	}
 }

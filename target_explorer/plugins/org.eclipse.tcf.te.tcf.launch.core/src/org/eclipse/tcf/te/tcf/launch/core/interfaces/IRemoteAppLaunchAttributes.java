@@ -14,7 +14,7 @@ import org.eclipse.tcf.te.launch.core.lm.interfaces.ICommonLaunchAttributes;
 /**
  * Defines the launch configuration attribute id's to access the launch step contexts.
  */
-public interface ILinuxAppLaunchAttributes {
+public interface IRemoteAppLaunchAttributes {
 
 	/**
 	 * Define the prefix used by all other attribute id's as prefix.

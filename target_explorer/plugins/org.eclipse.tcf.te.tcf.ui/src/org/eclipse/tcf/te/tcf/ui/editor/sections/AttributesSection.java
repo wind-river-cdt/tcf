@@ -25,7 +25,7 @@ import org.eclipse.tcf.core.TransientPeer;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
-import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistenceService;
+import org.eclipse.tcf.te.runtime.persistence.interfaces.IURIPersistenceService;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
 import org.eclipse.tcf.te.runtime.services.ServiceManager;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
@@ -59,10 +59,10 @@ public class AttributesSection extends AbstractSection {
 	 * to add to the table.
 	 */
 	private static final String[] BANNED_NAMES = new String[] {
-																IPeer.ATTR_ID, IPeer.ATTR_AGENT_ID, IPeer.ATTR_SERVICE_MANGER_ID, "ServerManagerID", //$NON-NLS-1$
-																IPeer.ATTR_NAME, IPeer.ATTR_TRANSPORT_NAME, IPeer.ATTR_IP_HOST,
-																IPeer.ATTR_IP_PORT, "PipeName" //$NON-NLS-1$
-															  };
+		IPeer.ATTR_ID, IPeer.ATTR_AGENT_ID, IPeer.ATTR_SERVICE_MANGER_ID, "ServerManagerID", //$NON-NLS-1$
+		IPeer.ATTR_NAME, IPeer.ATTR_TRANSPORT_NAME, IPeer.ATTR_IP_HOST,
+		IPeer.ATTR_IP_PORT, "PipeName" //$NON-NLS-1$
+	};
 
 	/*
 	 * The list of filtered attributes. This attributes are filtered from the data given to the
@@ -70,10 +70,10 @@ public class AttributesSection extends AbstractSection {
 	 * overview page.
 	 */
 	private static final String[] FILTERED_NAMES = new String [] {
-																	IPeer.ATTR_ID, IPeer.ATTR_NAME,
-																	IPeer.ATTR_TRANSPORT_NAME, IPeer.ATTR_IP_HOST, IPeer.ATTR_IP_PORT,
-																	"PipeName" //$NON-NLS-1$
-																 };
+		IPeer.ATTR_ID, IPeer.ATTR_NAME,
+		IPeer.ATTR_TRANSPORT_NAME, IPeer.ATTR_IP_HOST, IPeer.ATTR_IP_PORT,
+		"PipeName" //$NON-NLS-1$
+	};
 
 	/**
 	 * Constructor.
@@ -103,7 +103,7 @@ public class AttributesSection extends AbstractSection {
 		if (PeerAttributesTablePart.class.equals(adapter)) {
 			return tablePart;
 		}
-	    return super.getAdapter(adapter);
+		return super.getAdapter(adapter);
 	}
 
 	/* (non-Javadoc)
@@ -150,7 +150,7 @@ public class AttributesSection extends AbstractSection {
 		if (active) {
 			// Leave everything unchanged if the page is in dirty state
 			if (getManagedForm().getContainer() instanceof AbstractEditorPage
-					&& !((AbstractEditorPage)getManagedForm().getContainer()).isDirty()) {
+							&& !((AbstractEditorPage)getManagedForm().getContainer()).isDirty()) {
 				Object node = ((AbstractEditorPage)getManagedForm().getContainer()).getEditorInputNode();
 				if (node instanceof IPeerModel) {
 					setupData((IPeerModel)node);
@@ -176,7 +176,9 @@ public class AttributesSection extends AbstractSection {
 		wc.clearProperties();
 
 		// If no data is available, we are done
-		if (node == null) return;
+		if (node == null) {
+			return;
+		}
 
 		// Thread access to the model is limited to the executors thread.
 		// Copy the data over to the working copy to ease the access.
@@ -216,7 +218,9 @@ public class AttributesSection extends AbstractSection {
 		}
 
 		// Pass on to the table part
-		if (tablePart != null) tablePart.setAttributes(attributes);
+		if (tablePart != null) {
+			tablePart.setAttributes(attributes);
+		}
 
 		// Adjust the control enablement
 		updateEnablement();
@@ -232,7 +236,9 @@ public class AttributesSection extends AbstractSection {
 	 */
 	public void extractData(final IPeerModel node) {
 		// If no data is available, we are done
-		if (node == null) return;
+		if (node == null) {
+			return;
+		}
 
 		// Extract the table part attributes into the working copy
 		// Properties not longer available in the table part attributes
@@ -274,14 +280,18 @@ public class AttributesSection extends AbstractSection {
 					}
 				}
 				// Remove the disappeared properties
-				for (String key : removed) attributes.remove(key);
+				for (String key : removed) {
+					attributes.remove(key);
+				}
 
 				// Create the new peer
 				IPeer newPeer = oldPeer instanceof PeerRedirector ? new PeerRedirector(((PeerRedirector)oldPeer).getParent(), attributes) : new TransientPeer(attributes);
 				// Update the peer node instance (silently)
 				boolean changed = node.setChangeEventsEnabled(false);
 				node.setProperty(IPeerModelProperties.PROP_INSTANCE, newPeer);
-				if (changed) node.setChangeEventsEnabled(true);
+				if (changed) {
+					node.setChangeEventsEnabled(true);
+				}
 			}
 		});
 	}
@@ -294,10 +304,12 @@ public class AttributesSection extends AbstractSection {
 		// Remember the current dirty state
 		boolean needsSaving = isDirty();
 		// Call the super implementation (resets the dirty state)
-	    super.commit(onSave);
+		super.commit(onSave);
 
 		// Nothing to do if not on save or saving is not needed
-		if (!onSave || !needsSaving) return;
+		if (!onSave || !needsSaving) {
+			return;
+		}
 
 		// Extract the data into the original data node
 		extractData(od);
@@ -308,10 +320,12 @@ public class AttributesSection extends AbstractSection {
 		if (!odc.equals(wc)) {
 			try {
 				// Get the persistence service
-				IPersistenceService persistenceService = ServiceManager.getInstance().getService(IPersistenceService.class);
-				if (persistenceService == null) throw new IOException("Persistence service instance unavailable."); //$NON-NLS-1$
+				IURIPersistenceService uRIPersistenceService = ServiceManager.getInstance().getService(IURIPersistenceService.class);
+				if (uRIPersistenceService == null) {
+					throw new IOException("Persistence service instance unavailable."); //$NON-NLS-1$
+				}
 				// Save the peer node to the new persistence storage
-				persistenceService.write(od.getPeer().getAttributes());
+				uRIPersistenceService.write(od.getPeer(), null);
 			} catch (IOException e) {
 				// Pass on to the editor page
 			}
@@ -377,9 +391,15 @@ public class AttributesSection extends AbstractSection {
 				}
 			}
 		};
-		if (Protocol.isDispatchThread()) runnable.run();
-		else Protocol.invokeAndWait(runnable);
+		if (Protocol.isDispatchThread()) {
+			runnable.run();
+		}
+		else {
+			Protocol.invokeAndWait(runnable);
+		}
 
-		if (tablePart != null) tablePart.setReadOnly(!isStatic.get() || isRemote.get());
+		if (tablePart != null) {
+			tablePart.setReadOnly(!isStatic.get() || isRemote.get());
+		}
 	}
 }

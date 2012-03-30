@@ -10,8 +10,6 @@
 package org.eclipse.tcf.te.runtime.persistence.interfaces;
 
 import java.io.IOException;
-import java.net.URI;
-import java.util.Map;
 
 import org.eclipse.tcf.te.runtime.interfaces.extensions.IExecutableExtension;
 
@@ -21,45 +19,46 @@ import org.eclipse.tcf.te.runtime.interfaces.extensions.IExecutableExtension;
 public interface IPersistenceDelegate extends IExecutableExtension {
 
 	/**
-	 * Writes the given data to the given persistence storage.
-	 * <p>
-	 * The persistence storage location is defined by the specified URI reference. The exact
-	 * interpretation and semantic of the URI reference is up to the persistence delegate
-	 * contributor.
+	 * Writes the given context to the given persistence container using the key.
+	 * If the container does not exist yet, the class needs to be given.
 	 *
-	 * @param uri The persistence storage location URI reference. Must not be <code>null</code>.
-	 * @param data The data. Must not be <code>null</code>.
+	 * @param context The context to persist. Must not be <code>null</code>.
+	 * @param container The persistence container or class for a new one. Must not be <code>null</code>.
+	 * @param key The key for the context inside the container or <code>null</code>.
 	 *
-	 * @throws IOException - if the operation fails
+	 * @return The new or updated container instance.
 	 */
-	public void write(URI uri, Map<String, Object> data) throws IOException;
+	public Object write(Object context, Object container, String key) throws IOException;
 
 	/**
-	 * Reads the data from the given persistence storage.
-	 * <p>
-	 * The persistence storage location is defined by the specified URI reference. The exact
-	 * interpretation and semantic of the URI reference is up to the persistence delegate
-	 * contributor.
-	 *
-	 * @param uri The persistence storage location URI reference. Must not be <code>null</code>.
-	 * @return The data.
-	 *
-	 * @throws IOException - if the operation fails
+	 * Get the class or interface for the context.
+	 * 
+	 * @param context The context to persist. Must not be <code>null</code>.
+	 * @return The class or interface for the given context.
 	 */
-	public Map<String, Object> read(URI uri) throws IOException;
+	public Class<?> getPersistedClass(Object context);
 
 	/**
-	 * Deletes the given persistence storage.
-	 * <p>
-	 * The persistence storage location is defined by the specified URI reference. The exact
-	 * interpretation and semantic of the URI reference is up to the persistence delegate
-	 * contributor.
+	 * Reads the context from the given persistence container.
+	 * If the context does not exist yet, the class needs to be given.
 	 *
-	 * @param uri The persistence storage location URI reference. Must not be <code>null</code>.
-	 * @return <code>True</code> if the persistence storage is successfully deleted;
+	 * @param context The context to update or class for a new context. Must not be <code>null</code>.
+	 * @param container The persistence container. Must not be <code>null</code>.
+	 * @param key The key for the context inside the container or <code>null</code>.
+	 *
+	 * @return The new or updated context instance.
+	 */
+	public Object read(Object context, Object container, String key) throws IOException;
+
+	/**
+	 * Deletes the given context inside the container or the whole container.
+	 *
+	 * @param context The context to delete inside the storage or <code>null</code>.
+	 * @param container The persistence container. Must not be <code>null</code>.
+	 * @param key The key for the context inside the container or <code>null</code>.
+	 *
+	 * @return <code>True</code> if the persistence context or the whole storage was successfully deleted;
 	 *         <code>false</code> otherwise.
-	 *
-	 * @throws IOException - if the operation fails
 	 */
-	public boolean delete(URI uri) throws IOException;
+	public boolean delete(Object context, Object container, String key) throws IOException;
 }

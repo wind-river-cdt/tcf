@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
-import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistenceService;
+import org.eclipse.tcf.te.runtime.persistence.interfaces.IURIPersistenceService;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
 import org.eclipse.tcf.te.runtime.services.ServiceManager;
 import org.eclipse.tcf.te.runtime.statushandler.StatusHandlerManager;
@@ -47,17 +47,21 @@ public class DeleteHandlerDelegate implements IDeleteHandlerDelegate {
 			final AtomicBoolean canDelete = new AtomicBoolean();
 
 			Runnable runnable = new Runnable() {
-	            @Override
-                public void run() {
-	            	String value = ((IPeerModel)element).getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
-	            	canDelete.set(value != null && Boolean.parseBoolean(value.trim()));
-	            }
-            };
+				@Override
+				public void run() {
+					String value = ((IPeerModel)element).getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
+					canDelete.set(value != null && Boolean.parseBoolean(value.trim()));
+				}
+			};
 
-            if (Protocol.isDispatchThread()) runnable.run();
-            else Protocol.invokeAndWait(runnable);
+			if (Protocol.isDispatchThread()) {
+				runnable.run();
+			}
+			else {
+				Protocol.invokeAndWait(runnable);
+			}
 
-            return canDelete.get();
+			return canDelete.get();
 		}
 		return false;
 	}
@@ -72,13 +76,15 @@ public class DeleteHandlerDelegate implements IDeleteHandlerDelegate {
 
 		if (canDelete(element)) {
 			try {
-				IPersistenceService service = ServiceManager.getInstance().getService(IPersistenceService.class);
-				if (service == null) throw new IOException("Persistence service instance unavailable."); //$NON-NLS-1$
-				service.delete(element);
+				IURIPersistenceService service = ServiceManager.getInstance().getService(IURIPersistenceService.class);
+				if (service == null) {
+					throw new IOException("Persistence service instance unavailable."); //$NON-NLS-1$
+				}
+				service.delete(element, null);
 			} catch (IOException e) {
 				// Create the status
 				IStatus status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(),
-											Messages.DeleteHandler_error_deleteFailed, e);
+								Messages.DeleteHandler_error_deleteFailed, e);
 
 				// Fill in the status handler custom data
 				IPropertiesContainer data = new PropertiesContainer();
@@ -88,7 +94,9 @@ public class DeleteHandlerDelegate implements IDeleteHandlerDelegate {
 
 				// Get the status handler
 				IStatusHandler[] handler = StatusHandlerManager.getInstance().getHandler(element);
-				if (handler.length > 0) handler[0].handleStatus(status, data, null);
+				if (handler.length > 0) {
+					handler[0].handleStatus(status, data, null);
+				}
 			}
 
 			// Get the locator model
@@ -107,7 +115,9 @@ public class DeleteHandlerDelegate implements IDeleteHandlerDelegate {
 				}
 			}
 		} else {
-			if (callback != null) callback.done(this, Status.OK_STATUS);
+			if (callback != null) {
+				callback.done(this, Status.OK_STATUS);
+			}
 		}
 	}
 

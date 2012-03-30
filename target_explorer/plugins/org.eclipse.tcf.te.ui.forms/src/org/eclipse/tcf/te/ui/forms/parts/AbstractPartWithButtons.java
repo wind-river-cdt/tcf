@@ -86,7 +86,9 @@ public abstract class AbstractPartWithButtons extends AbstractPart {
 	 * @return The buttons panel composite or <code>null</code>.
 	 */
 	protected Composite createButtonsPanel(Composite parent, FormToolkit toolkit) {
-		if (labels.length == 0) return null;
+		if (labels.length == 0) {
+			return null;
+		}
 
 		buttons = new Button[labels.length];
 
@@ -113,6 +115,7 @@ public abstract class AbstractPartWithButtons extends AbstractPart {
 				button.setFont(JFaceResources.getDialogFont());
 				button.setText(labels[i]);
 				button.setData(Integer.valueOf(i));
+				button.setBackground(panel.getBackground());
 				button.addSelectionListener(listener);
 
 				onButtonCreated(button);

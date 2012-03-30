@@ -53,6 +53,8 @@ public abstract class AbstractStructuredViewerSection extends AbstractSection {
 		viewerPart = createViewerPart(labels);
 		viewerPart.setMinSize(50, 50);
 
+		getSection().setBackground(parent.getBackground());
+
 		createClient(getSection(), form.getToolkit());
 	}
 
@@ -151,6 +153,8 @@ public abstract class AbstractStructuredViewerSection extends AbstractSection {
 	 */
 	@Override
 	public void setFocus() {
-		if (viewerPart != null) viewerPart.getViewer().getControl().setFocus();
+		if (viewerPart != null) {
+			viewerPart.getViewer().getControl().setFocus();
+		}
 	}
 }

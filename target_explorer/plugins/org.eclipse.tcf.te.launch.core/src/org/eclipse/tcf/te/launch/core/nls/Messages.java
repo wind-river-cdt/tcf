@@ -42,4 +42,15 @@ public class Messages extends NLS {
 	public static String LaunchConfigurationDelegate_error_inaccessibleReferencedProject;
 
 	public static String AbstractLaunchConfigurationDelegate_scoped_incremental_build;
+
+	public static String FileTransferItemValidator_missingFile;
+	public static String FileTransferItemValidator_missingFileOrDirectory;
+	public static String FileTransferItemValidator_notExistingFile;
+	public static String FileTransferItemValidator_notExistingFileOrDirectory;
+	public static String FileTransferItemValidator_invalidFile;
+	public static String FileTransferItemValidator_invalidFileOrDirectory;
+
+	public static String ReferencedProjectItemValidator_missingProject;
+	public static String ReferencedProjectItemValidator_notExistingProject;
+	public static String ReferencedProjectItemValidator_closedProject;
 }

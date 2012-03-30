@@ -57,7 +57,7 @@
 <!-- Launch Manager Delegate contributions -->
    <extension point="org.eclipse.tcf.te.launch.core.launchManagerDelegates">
       <delegate
-            class="org.eclipse.tcf.te.launch.core.lm.delegates.DefaultLaunchManagerDelegate"
+            class="org.eclipse.tcf.te.tcf.launch.core.lm.delegates.RemoteAppLaunchManagerDelegate"
             id="org.eclipse.tcf.te.tcf.launch.type.remote.app.launchManagerDelegate">
       </delegate>
    </extension>
@@ -108,6 +108,78 @@
                id="org.eclipse.tcf.te.tcf.launch.core.openChannelStep">
          </requires>
       </step>
+   </extension>
+
+<!-- Persistence delegate contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.persistence.delegates">
+      <delegate 
+            id="org.eclipse.tcf.te.tcf.launch.core.persistence.fileTransferToString"
+            class="org.eclipse.tcf.te.tcf.launch.core.internal.FileTransferItemToStringPersistenceDelegate">
+      </delegate>
+      <delegate 
+            id="org.eclipse.tcf.te.tcf.launch.core.persistence.referencedProjectToString"
+            class="org.eclipse.tcf.te.tcf.launch.core.internal.ReferencedProjectItemToStringPersistenceDelegate">
+      </delegate>
+   </extension>
+
+<!-- Persistence delegate bindings contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.persistence.bindings">
+       <binding
+            delegateId="org.eclipse.tcf.te.tcf.launch.core.persistence.fileTransferToString"
+            id="org.eclipse.tcf.te.tcf.launch.core.binding.fileTransferToString">
+         <enablement>
+            <with variable="container">
+               <or>
+                  <instanceof value="java.lang.String"/>
+                  <and>
+                     <instanceof value="java.lang.Class"/>
+                     <with variable="containerClass">
+                        <equals value="java.lang.String"/>
+                     </with>
+                  </and>
+               </or>
+            </with>
+            <with variable="context">
+               <or>
+                  <instanceof value="org.eclipse.tcf.te.launch.core.interfaces.IFileTransferItem"/>
+                  <and>
+                     <instanceof value="java.lang.Class"/>
+                     <with variable="contextClass">
+                        <equals value="org.eclipse.tcf.te.launch.core.interfaces.IFileTransferItem"/>
+                     </with>
+                  </and>
+               </or>
+            </with>
+         </enablement>
+      </binding>
+       <binding
+            delegateId="org.eclipse.tcf.te.tcf.launch.core.persistence.referencedProjectToString"
+            id="org.eclipse.tcf.te.tcf.launch.core.binding.referencedProjectToString">
+         <enablement>
+            <with variable="container">
+               <or>
+                  <instanceof value="java.lang.String"/>
+                  <and>
+                     <instanceof value="java.lang.Class"/>
+                     <with variable="containerClass">
+                        <equals value="java.lang.String"/>
+                     </with>
+                  </and>
+               </or>
+            </with>
+            <with variable="context">
+               <or>
+                  <instanceof value="org.eclipse.tcf.te.launch.core.interfaces.IReferencedProjectItem"/>
+                  <and>
+                     <instanceof value="java.lang.Class"/>
+                     <with variable="contextClass">
+                        <equals value="org.eclipse.tcf.te.launch.core.interfaces.IReferencedProjectItem"/>
+                     </with>
+                  </and>
+               </or>
+            </with>
+         </enablement>
+      </binding>
    </extension>
 
 </plugin>

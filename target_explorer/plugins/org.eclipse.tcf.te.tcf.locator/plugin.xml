@@ -22,24 +22,92 @@
 <!-- Persistence delegate contributions -->
    <extension point="org.eclipse.tcf.te.runtime.persistence.delegates">
       <delegate 
-            id="org.eclipse.tcf.te.tcf.locator.persistence"
-            class="org.eclipse.tcf.te.tcf.locator.internal.PeersPersistenceDelegate">
+            id="org.eclipse.tcf.te.tcf.locator.persistence.peerToURI"
+            class="org.eclipse.tcf.te.tcf.locator.persistence.PeerToURIPersistenceDelegate">
       </delegate>
+      <delegate 
+            id="org.eclipse.tcf.te.tcf.locator.persistence.peerToString"
+            class="org.eclipse.tcf.te.tcf.locator.persistence.PeerToStringPersistenceDelegate">
+      </delegate>
+      <delegate 
+            id="org.eclipse.tcf.te.tcf.locator.persistence.propertiesToString"
+            class="org.eclipse.tcf.te.tcf.locator.persistence.AbstractPropertiesToStringPersistenceDelegate">
+      </delegate>
+   </extension>
+
+<!-- Persistence delegate bindings contributions -->
+   <extension
+         point="org.eclipse.tcf.te.runtime.persistence.bindings">
+      <binding
+            delegateId="org.eclipse.tcf.te.tcf.locator.persistence.peerToURI"
+            id="org.eclipse.tcf.te.tcf.locator.binding.peerToURI">
+         <enablement>
+            <with variable="container">
+               <instanceof value="java.net.URI"/>
+            </with>
+            <with variable="context">
+               <or>
+                  <instanceof value="org.eclipse.tcf.protocol.IPeer"/>
+                  <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                  <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider"/>
+                  <and>
+                     <instanceof value="java.lang.Class"/>
+                     <with variable="contextClass">
+                        <equals value="org.eclipse.tcf.protocol.IPeer"/>
+                     </with>
+                  </and>
+               </or>
+            </with>
+         </enablement>
+      </binding>
+      <binding
+            delegateId="org.eclipse.tcf.te.tcf.locator.persistence.peerToString"
+            id="org.eclipse.tcf.te.tcf.locator.binding.peerToString">
+         <enablement>
+            <with variable="container">
+               <or>
+                  <instanceof value="java.lang.String"/>
+                  <and>
+                     <instanceof value="java.lang.Class"/>
+                     <with variable="containerClass">
+                        <equals value="java.lang.String"/>
+                     </with>
+                  </and>
+               </or>
+            </with>
+            <with variable="context">
+               <or>
+                  <instanceof value="org.eclipse.tcf.protocol.IPeer"/>
+                  <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                  <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider"/>
+                  <and>
+                     <instanceof value="java.lang.Class"/>
+                     <with variable="contextClass">
+                        <equals value="org.eclipse.tcf.protocol.IPeer"/>
+                     </with>
+                  </and>
+               </or>
+            </with>
+         </enablement>
+      </binding>
    </extension>
 
 <!-- Adapter factory contributions -->
    <extension point="org.eclipse.core.runtime.adapters">
       <factory
-            adaptableType="java.util.Map"
-            class="org.eclipse.tcf.te.tcf.locator.internal.adapters.AdapterFactory">
-         <adapter type="org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistable"/>
-      </factory>
-      
-      <factory
             adaptableType="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"
             class="org.eclipse.tcf.te.tcf.locator.internal.adapters.AdapterFactory">
-         <adapter type="org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistable"/>
-         <adapter type="org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistable2"/>
+         <adapter type="org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistableURIProvider"/>
+      </factory>
+      <factory
+            adaptableType="org.eclipse.tcf.protocol.IPeer"
+            class="org.eclipse.tcf.te.tcf.locator.internal.adapters.AdapterFactory">
+         <adapter type="org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistableURIProvider"/>
+      </factory>
+      <factory
+            adaptableType="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider"
+            class="org.eclipse.tcf.te.tcf.locator.internal.adapters.AdapterFactory">
+         <adapter type="org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistableURIProvider"/>
       </factory>
    </extension>
    

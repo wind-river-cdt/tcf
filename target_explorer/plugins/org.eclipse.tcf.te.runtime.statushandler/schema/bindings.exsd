@@ -8,7 +8,7 @@
       <documentation>
          This extension point is used to declare the status handler bindings.
 &lt;p&gt;
-&lt;b&gt;Note:&lt;/b&gt; For the enablement expression evaluation, note that only the default variable is set and it is non-iterable. The default variable is set to the handler context, which is typically the object calling the status handler.
+&lt;b&gt;Note:&lt;/b&gt; For the enablement expression evaluation, note that only the default variable and &quot;context&quot; is set and it is non-iterable. The default variable and &quot;context&quot; is set to the handler context, which is typically the object calling the status handler.
       </documentation>
    </annotation>
 
