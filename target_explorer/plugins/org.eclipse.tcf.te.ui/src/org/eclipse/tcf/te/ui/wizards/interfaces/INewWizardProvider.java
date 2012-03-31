@@ -13,7 +13,6 @@ import org.eclipse.ui.wizards.IWizardDescriptor;
 
 /**
  * INewWizardProvider
- * @author tobias.schwarz@windriver.com
  */
 public interface INewWizardProvider extends IExecutableExtension {
 

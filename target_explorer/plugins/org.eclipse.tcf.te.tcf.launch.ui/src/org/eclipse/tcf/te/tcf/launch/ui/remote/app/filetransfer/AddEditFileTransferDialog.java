@@ -44,7 +44,6 @@ import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 
 /**
  * AddEditFileTransferDialog
- * @author tobias.schwarz@windriver.com
  */
 public class AddEditFileTransferDialog extends CustomTitleAreaDialog {
 
@@ -63,7 +62,7 @@ public class AddEditFileTransferDialog extends CustomTitleAreaDialog {
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param item The file transfer item to edit or <code>null</code> to create a new one.
 	 * @param shell The shell.
 	 * @param contextHelpId The context help id.

@@ -15,7 +15,6 @@ import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
 
 /**
  * FileTransferItem
- * @author tobias.schwarz@windriver.com
  */
 public class FileTransferItem extends PropertiesContainer implements IFileTransferItem {
 

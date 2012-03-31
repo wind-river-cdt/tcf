@@ -15,7 +15,6 @@ import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
 
 /**
  * ReferencedProjectItem
- * @author tobias.schwarz@windriver.com
  */
 public class ReferencedProjectItem extends PropertiesContainer implements IReferencedProjectItem {
 

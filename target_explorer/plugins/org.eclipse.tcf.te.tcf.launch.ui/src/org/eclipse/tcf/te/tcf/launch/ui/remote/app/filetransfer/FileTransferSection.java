@@ -70,7 +70,6 @@ import org.eclipse.ui.forms.widgets.Section;
 
 /**
  * FileTransferSection
- * @author tobias.schwarz@windriver.com
  */
 public class FileTransferSection extends AbstractTableSection implements ILaunchConfigurationTabFormPart {
 

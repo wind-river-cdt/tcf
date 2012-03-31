@@ -42,7 +42,7 @@ public abstract class AbstractPropertiesToURIPersistenceDelegate extends Abstrac
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param defaultFileExtension The default file extension.
 	 */
 	protected AbstractPropertiesToURIPersistenceDelegate(String defaultFileExtension) {
@@ -52,7 +52,7 @@ public abstract class AbstractPropertiesToURIPersistenceDelegate extends Abstrac
 	}
 
 	/**
-	 * Return the default extenion.
+	 * Return the default extension.
 	 */
 	protected String getDefaultFileExtension() {
 		return defaultFileExtension;

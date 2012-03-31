@@ -17,7 +17,6 @@ import org.eclipse.swt.widgets.Control;
 
 /**
  * AbstractDecoratedDialogPageControl
- * @author tobias.schwarz@windriver.com
  */
 public abstract class AbstractDecoratedDialogPageControl extends BaseDialogPageControl {
 

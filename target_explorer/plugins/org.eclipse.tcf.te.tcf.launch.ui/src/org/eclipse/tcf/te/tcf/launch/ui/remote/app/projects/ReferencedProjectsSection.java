@@ -68,7 +68,6 @@ import org.eclipse.ui.forms.widgets.Section;
 
 /**
  * ReferencedProjectsSection
- * @author tobias.schwarz@windriver.com
  */
 public class ReferencedProjectsSection extends AbstractTableSection implements ILaunchConfigurationTabFormPart {
 

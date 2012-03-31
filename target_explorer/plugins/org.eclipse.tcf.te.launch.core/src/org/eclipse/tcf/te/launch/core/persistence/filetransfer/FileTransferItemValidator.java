@@ -22,7 +22,6 @@ import org.eclipse.tcf.te.launch.core.nls.Messages;
 
 /**
  * FileTransferItemValidator
- * @author tobias.schwarz@windriver.com
  */
 public class FileTransferItemValidator {
 

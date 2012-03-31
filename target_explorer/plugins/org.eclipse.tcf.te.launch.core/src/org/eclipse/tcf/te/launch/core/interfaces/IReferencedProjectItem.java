@@ -14,7 +14,6 @@ import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 
 /**
  * IFileTransferItem
- * @author tobias.schwarz@windriver.com
  */
 public interface IReferencedProjectItem extends IPropertiesContainer {
 

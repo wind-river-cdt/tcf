@@ -30,7 +30,7 @@ public class FileTransferItemToStringPersistenceDelegate extends AbstractPropert
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.persistence.properties.PropertiesToURIPersistenceDelegate#getPersistedClassName(java.lang.Object)
+	 * @see org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistenceDelegate#getPersistedClass(java.lang.Object)
 	 */
 	@Override
 	public Class<?> getPersistedClass(Object context) {
@@ -38,7 +38,7 @@ public class FileTransferItemToStringPersistenceDelegate extends AbstractPropert
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.persistence.properties.PropertiesToURIPersistenceDelegate#toMap(java.lang.Object)
+	 * @see org.eclipse.tcf.te.runtime.persistence.AbstractPropertiesPersistenceDelegate#toMap(java.lang.Object)
 	 */
 	@Override
 	protected Map<String, Object> toMap(final Object context) throws IOException {
@@ -51,7 +51,7 @@ public class FileTransferItemToStringPersistenceDelegate extends AbstractPropert
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.persistence.properties.PropertiesToURIPersistenceDelegate#fromMap(java.util.Map, java.lang.Object)
+	 * @see org.eclipse.tcf.te.runtime.persistence.AbstractPropertiesPersistenceDelegate#fromMap(java.util.Map, java.lang.Object)
 	 */
 	@Override
 	protected Object fromMap(Map<String, Object> map, Object context) throws IOException {
@@ -62,8 +62,8 @@ public class FileTransferItemToStringPersistenceDelegate extends AbstractPropert
 
 	/**
 	 * Get a file transfer item from the given context.
-	 * 
-	 * @param context The context. Mut not be <code>null</code>.
+	 *
+	 * @param context The context. Must not be <code>null</code>.
 	 * @return The file transfer item or <code>null</code>.
 	 */
 	protected IFileTransferItem getFileTransferItem(Object context) {

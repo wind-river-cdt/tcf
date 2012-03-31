@@ -21,7 +21,6 @@ import org.eclipse.tcf.te.runtime.persistence.AbstractPropertiesPersistenceDeleg
 
 /**
  * AbstractPropertiesToStringPersistenceDelegate
- * @author tobias.schwarz@windriver.com
  */
 public abstract class AbstractPropertiesToStringPersistenceDelegate extends AbstractPropertiesPersistenceDelegate {
 
@@ -33,7 +32,7 @@ public abstract class AbstractPropertiesToStringPersistenceDelegate extends Abst
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.persistence.properties.PropertiesToURIPersistenceDelegate#write(java.lang.Object, java.lang.Object, java.lang.String)
+	 * @see org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistenceDelegate#write(java.lang.Object, java.lang.Object, java.lang.String)
 	 */
 	@Override
 	public Object write(final Object context, Object container, String key) throws IOException {
@@ -68,7 +67,7 @@ public abstract class AbstractPropertiesToStringPersistenceDelegate extends Abst
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.persistence.properties.PropertiesToURIPersistenceDelegate#read(java.lang.Object, java.lang.Object, java.lang.String)
+	 * @see org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistenceDelegate#read(java.lang.Object, java.lang.Object, java.lang.String)
 	 */
 	@SuppressWarnings("unchecked")
 	@Override

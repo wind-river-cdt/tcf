@@ -21,7 +21,6 @@ import org.eclipse.tcf.te.launch.core.nls.Messages;
 
 /**
  * ReferencedProjectItemValidator
- * @author tobias.schwarz@windriver.com
  */
 public class ReferencedProjectItemValidator {
 

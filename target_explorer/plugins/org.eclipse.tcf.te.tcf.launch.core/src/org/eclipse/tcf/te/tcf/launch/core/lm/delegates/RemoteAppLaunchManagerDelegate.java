@@ -32,7 +32,6 @@ import org.eclipse.tcf.te.launch.core.selection.interfaces.ISelectionContext;
 
 /**
  * RemoteAppLaunchManagerDelegate
- * @author tobias.schwarz@windriver.com
  */
 public class RemoteAppLaunchManagerDelegate extends DefaultLaunchManagerDelegate {
 
