@@ -85,7 +85,7 @@ public class DeleteHandlerDelegate implements IDeleteHandlerDelegate, IConfirmCa
 			state.setProperty(KEY_PROCESSED, state.getUUID());
 			if(confirmCallback != null) {
 				IStructuredSelection selection = (IStructuredSelection) state.getProperty(KEY_SELECTION);
-				if(confirmCallback.requires(selection) && confirmCallback.confirms(selection) == IConfirmCallback.YES) {
+				if(!confirmCallback.requires(selection) || confirmCallback.confirms(selection) == IConfirmCallback.YES) {
 					List<FSTreeNode> nodes = selection.toList();
 					FSDelete delete = new FSDelete(nodes);
 					delete.doit();
