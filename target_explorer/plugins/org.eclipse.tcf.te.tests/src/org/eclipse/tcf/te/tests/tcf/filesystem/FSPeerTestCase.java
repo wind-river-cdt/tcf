@@ -53,7 +53,6 @@ public class FSPeerTestCase extends TcfTestCase {
 		assertNotNull(peerModel);
 		assertNotNull(peer);
 
-		printMessage("The work directory of File System tests is located at:" + getTestRoot()); //$NON-NLS-1$
 		testRoot = FSModel.findTreeNode(peerModel, getTestRoot());
 		assertNotNull(testRoot);
 		String path = getTestRoot() + getPathSep() + getTestPath();

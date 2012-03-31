@@ -1,0 +1,23 @@
+/*******************************************************************************
+ * Copyright (c) 2012 Wind River Systems, Inc. and others. All rights reserved.
+ * This program and the accompanying materials are made available under the terms
+ * of the Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ * Wind River Systems - initial API and implementation
+ *******************************************************************************/
+package org.eclipse.tcf.te.tests.tcf.filesystem.filters;
+
+import org.eclipse.tcf.te.runtime.utils.Host;
+import org.eclipse.tcf.te.tcf.filesystem.filters.HiddenFilesViewerFilter;
+import org.eclipse.tcf.te.tests.tcf.filesystem.FSPeerTestCase;
+
+public class HiddenFilesViewerFilterTest extends FSPeerTestCase {
+	public void testSelect() {
+		if(Host.isWindowsHost()) {
+			HiddenFilesViewerFilter filter = new HiddenFilesViewerFilter();
+			assertTrue(filter.select(null, testFolder, testFile));
+		}
+	}
+}
