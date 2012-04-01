@@ -13,8 +13,12 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.tcf.te.tests.tcf.filesystem.adapters.AdaptersTests;
 import org.eclipse.tcf.te.tests.tcf.filesystem.callbacks.CallbackTests;
+import org.eclipse.tcf.te.tests.tcf.filesystem.controls.ControlsTests;
+import org.eclipse.tcf.te.tests.tcf.filesystem.filters.FiltersTests;
 import org.eclipse.tcf.te.tests.tcf.filesystem.operations.OperationTests;
+import org.eclipse.tcf.te.tests.tcf.filesystem.testers.TestersTests;
 import org.eclipse.tcf.te.tests.tcf.filesystem.url.URLTests;
 import org.eclipse.tcf.te.tests.tcf.filesystem.utils.UtilTests;
 
@@ -59,5 +63,9 @@ public class AllFileSystemTests {
 		suite.addTest(OperationTests.suite());
 		suite.addTest(URLTests.suite());
 		suite.addTest(UtilTests.suite());
+		suite.addTest(AdaptersTests.suite());
+		suite.addTest(ControlsTests.suite());
+		suite.addTest(FiltersTests.suite());
+		suite.addTest(TestersTests.suite());
 	}
 }
