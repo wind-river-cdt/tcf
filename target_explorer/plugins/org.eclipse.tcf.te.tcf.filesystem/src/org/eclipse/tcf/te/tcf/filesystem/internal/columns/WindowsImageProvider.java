@@ -38,12 +38,13 @@ public class WindowsImageProvider extends DefaultImageProvider {
 			image = updateDaemon.getFolderImage();
 		}
 		else if(node.isFile()) {
-			image = getProgramImage(node);
-			if(image != null) return image;
 			image = updateDaemon.getImage(node);
             if (image == null) {
             	updateDaemon.enqueue(node);
-            	image = getPredefinedImage(node);
+    			image = getProgramImage(node);
+				if (image == null) {
+					image = getPredefinedImage(node);
+				}
             }
 		}
 	    return image != null ? image : super.getImage(node);
