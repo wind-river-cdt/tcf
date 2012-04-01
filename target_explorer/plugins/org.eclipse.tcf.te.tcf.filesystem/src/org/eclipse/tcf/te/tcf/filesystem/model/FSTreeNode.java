@@ -798,4 +798,21 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 		PropertyChangeEvent event = new PropertyChangeEvent(this, "clearChildren", null, null); //$NON-NLS-1$
 		firePropertyChange(event);
     }
+	
+	/**
+	 * Called when the children query is done.
+	 */
+	public void queryDone() {
+		childrenQueryRunning = false;
+		childrenQueried = true;
+		PropertyChangeEvent event = new PropertyChangeEvent(this, "childrenQueried", Boolean.FALSE, Boolean.TRUE); //$NON-NLS-1$
+		firePropertyChange(event);
+	}
+	
+	/**
+	 * Called when the children query is started.
+	 */
+	public void queryStarted() {
+		childrenQueryRunning = true;
+	}
 }

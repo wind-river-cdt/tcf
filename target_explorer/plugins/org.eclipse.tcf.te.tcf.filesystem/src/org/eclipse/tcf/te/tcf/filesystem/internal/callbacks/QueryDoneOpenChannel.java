@@ -63,8 +63,7 @@ public class QueryDoneOpenChannel implements DoneOpenChannel {
 			@Override
             protected void internalDone(Object caller, IStatus status) {
 				// Reset the children query markers
-				parentNode.childrenQueryRunning = false;
-				parentNode.childrenQueried = true;
+				parentNode.queryDone();
 				Tcf.getChannelManager().closeChannel(channel);
 				if(callback != null) {
 					callback.done(caller, status);

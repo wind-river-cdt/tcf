@@ -64,8 +64,7 @@ public class FSCreateFolder extends FSCreate {
 	protected FSTreeNode newTreeNode() {
 		FSTreeNode node = FSTreeNode.createFolderNode(name, folder);
 		// Newly created folder does not have any children. Mark it as queried.
-		node.childrenQueried = true;
-		node.childrenQueryRunning = false;
+		node.queryDone();
 		return node;
 	}
 }

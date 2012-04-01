@@ -336,7 +336,7 @@ public class FSOperation implements IRunnableWithProgress{
 	protected void loadChildren(final FSTreeNode node, final IFileSystem service) throws TCFFileSystemException {
 		List<FSTreeNode> children = queryChildren(node, service);
 		node.addChidren(children);
-		node.childrenQueried = true;
+		node.queryDone();
 	}
 
 	/**

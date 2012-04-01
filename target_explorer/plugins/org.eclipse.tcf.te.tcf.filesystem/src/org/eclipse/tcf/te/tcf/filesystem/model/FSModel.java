@@ -273,7 +273,7 @@ public final class FSModel {
 	 */
 	public void queryChildren(FSTreeNode parentNode) {
 		Assert.isNotNull(parentNode);
-		parentNode.childrenQueryRunning = true;
+		parentNode.queryStarted();
 		Tcf.getChannelManager().openChannel(parentNode.peerNode.getPeer(), false, new QueryDoneOpenChannel(parentNode));
     }
 }

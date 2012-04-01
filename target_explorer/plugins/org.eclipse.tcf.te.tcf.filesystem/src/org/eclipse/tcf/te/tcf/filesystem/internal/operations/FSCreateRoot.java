@@ -75,13 +75,12 @@ public class FSCreateRoot extends FSOperation {
 	 * @throws TCFChannelException Thrown when opening a channel.
 	 */
 	/* default */void queryRootNodes(final FSTreeNode rootNode) throws TCFChannelException {
-		rootNode.childrenQueried = false;
 		IChannel channel = null;
 		try {
 			channel = openChannel(peerModel.getPeer());
 			IFileSystem service = getBlockingFileSystem(channel);
 			if (service != null) {
-				rootNode.childrenQueryRunning = true;
+				rootNode.queryStarted();
 				service.roots(new IFileSystem.DoneRoots() {
 					@Override
 					public void doneRoots(IToken token, FileSystemException error, DirEntry[] entries) {
@@ -94,12 +93,11 @@ public class FSCreateRoot extends FSOperation {
 					}
 				});
 				// Reset the children query markers
-				rootNode.childrenQueryRunning = false;
+				rootNode.queryDone();
 			}
 		}
 		finally {
 			if (channel != null) Tcf.getChannelManager().closeChannel(channel);
 		}
-		rootNode.childrenQueried = true;
 	}
 }
