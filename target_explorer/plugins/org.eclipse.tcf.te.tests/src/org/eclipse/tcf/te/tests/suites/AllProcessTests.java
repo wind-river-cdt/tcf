@@ -13,20 +13,12 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.tcf.te.tests.tcf.filesystem.adapters.AdaptersTests;
 import org.eclipse.tcf.te.tests.tcf.filesystem.callbacks.CallbackTests;
-import org.eclipse.tcf.te.tests.tcf.filesystem.controls.ControlsTests;
-import org.eclipse.tcf.te.tests.tcf.filesystem.dnd.DnDTests;
-import org.eclipse.tcf.te.tests.tcf.filesystem.filters.FiltersTests;
-import org.eclipse.tcf.te.tests.tcf.filesystem.operations.OperationTests;
-import org.eclipse.tcf.te.tests.tcf.filesystem.testers.TestersTests;
-import org.eclipse.tcf.te.tests.tcf.filesystem.url.URLTests;
-import org.eclipse.tcf.te.tests.tcf.filesystem.utils.UtilTests;
 
 /**
- * Links all file system tests.
+ * Links all process monitor tests.
  */
-public class AllFileSystemTests {
+public class AllProcessTests {
 
 	/**
 	 * Main method called if the tests are running as part of the nightly
@@ -47,7 +39,7 @@ public class AllFileSystemTests {
 	 * @return Any object of type <code>Test</code> containing the test to run.
 	 */
 	public static Test suite() {
-		TestSuite suite = new TestSuite("All File System Tests"); //$NON-NLS-1$
+		TestSuite suite = new TestSuite("All Process Monitor Tests"); //$NON-NLS-1$
 		addTests(suite);
 		return suite;
 	}
@@ -61,13 +53,5 @@ public class AllFileSystemTests {
 		Assert.isNotNull(suite);
 
 		suite.addTest(CallbackTests.suite());
-		suite.addTest(OperationTests.suite());
-		suite.addTest(URLTests.suite());
-		suite.addTest(UtilTests.suite());
-		suite.addTest(AdaptersTests.suite());
-		suite.addTest(ControlsTests.suite());
-		suite.addTest(FiltersTests.suite());
-		suite.addTest(TestersTests.suite());
-		suite.addTest(DnDTests.suite());
 	}
 }

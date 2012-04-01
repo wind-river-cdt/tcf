@@ -7,22 +7,15 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tests.tcf.filesystem.operations;
+package org.eclipse.tcf.te.tests.tcf.filesystem.dnd;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-public class OperationTests {
+public class DnDTests {
 	public static Test suite() {
-		TestSuite suite = new TestSuite("File System: Operation Tests"); //$NON-NLS-1$
-		suite.addTestSuite(FSCopyTests.class);
-		suite.addTestSuite(FSCreateFileTests.class);
-		suite.addTestSuite(FSCreateFolderTests.class);
-		suite.addTestSuite(FSDeleteTests.class);
-		suite.addTestSuite(FSMoveTests.class);
-		suite.addTestSuite(FSRefreshTests.class);
-		suite.addTestSuite(FSRenameTests.class);
-		suite.addTestSuite(FSUploadTest.class);
+		TestSuite suite = new TestSuite("File System: DnD Tests"); //$NON-NLS-1$
+		suite.addTestSuite(CommonDnDTest.class);
 		return suite;
 	}
 }
