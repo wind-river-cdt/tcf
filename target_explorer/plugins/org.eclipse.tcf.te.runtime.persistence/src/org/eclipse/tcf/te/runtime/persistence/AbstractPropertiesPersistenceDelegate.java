@@ -19,9 +19,7 @@ import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistenceDelegate;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
 
 /**
- * Properties file persistence delegate implementation.
- * <p>
- * The persistence delegates reads and writes a simple grouped properties file format.
+ * Abstract persistence delegate implementation.
  */
 public abstract class AbstractPropertiesPersistenceDelegate extends ExecutableExtension implements IPersistenceDelegate {
 
@@ -36,10 +34,10 @@ public abstract class AbstractPropertiesPersistenceDelegate extends ExecutableEx
 
 	/**
 	 * Convert the given context to map.
-	 * 
+	 *
 	 * @param context The context. Must not be <code>null</code>.
 	 * @return Map representing the context.
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	@SuppressWarnings("unchecked")
@@ -68,11 +66,11 @@ public abstract class AbstractPropertiesPersistenceDelegate extends ExecutableEx
 
 	/**
 	 * Convert a map into the needed context object.
-	 * 
+	 *
 	 * @param map The map representing the context. Must not be <code>null</code>.
 	 * @param context The context to put the map values in or <code>null</code>.
 	 * @return The context object.
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	protected Object fromMap(Map<String,Object> map, Object context) throws IOException {

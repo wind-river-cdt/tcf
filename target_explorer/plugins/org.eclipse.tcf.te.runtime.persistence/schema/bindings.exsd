@@ -69,7 +69,7 @@ the variable &lt;b&gt;containerClass&lt;/b&gt; is set to the name of the class i
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  persistence delegaete binding contribution.
+                  The unique id of the persistence delegate binding contribution.
                </documentation>
             </annotation>
          </attribute>
@@ -104,7 +104,7 @@ the variable &lt;b&gt;containerClass&lt;/b&gt; is set to the name of the class i
    &lt;extension point=&quot;org.eclipse.tcf.te.runtime.persistence.bindings&quot;&gt;
       &lt;binding
             id=&quot;org.eclipse.tcf.te.runtime.persistence.binding.LaunchConfigPersistenceDelegate&quot;
-            handlerId=&quot;org.eclipse.tcf.te.launch.core.persistence.LaunchConfigPersistenceDelegate&quot;&gt;
+            delegateId=&quot;org.eclipse.tcf.te.launch.core.persistence.LaunchConfigPersistenceDelegate&quot;&gt;
          &lt;enablement&gt;
             ...
          &lt;/enablement&gt;
