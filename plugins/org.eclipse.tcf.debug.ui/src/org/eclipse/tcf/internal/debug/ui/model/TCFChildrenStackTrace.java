@@ -78,6 +78,16 @@ public class TCFChildrenStackTrace extends TCFChildren {
         for (TCFNode n : getNodes()) ((TCFNodeStackFrame)n).postAllChangedDelta();
     }
 
+    Boolean checkHasChildren(Runnable done) {
+        TCFDataCache<TCFContextState> state = node.getState();
+        if (!state.validate(done)) return null;
+        if (node.isNotActive()) return false;
+        if (state.getError() != null) return false;
+        TCFContextState state_data = state.getData();
+        if (state_data == null || !state_data.is_suspended) return false;
+        return true;
+    }
+
     public TCFNodeStackFrame getTopFrame() {
         assert isValid();
         return (TCFNodeStackFrame)node.model.getNode(top_frame_id);
@@ -102,20 +112,14 @@ public class TCFChildrenStackTrace extends TCFChildren {
 
     @Override
     protected boolean startDataRetrieval() {
-        TCFDataCache<TCFContextState> state = node.getState();
-        if (!state.validate(this)) return false;
-        if (node.isNotActive()) {
-            top_frame_id = null;
-            set(null, null, new HashMap<String,TCFNode>());
-            return true;
-        }
-        Throwable state_error = state.getError();
-        TCFContextState state_data = state.getData();
-        if (state_error != null || state_data == null || !state_data.is_suspended) {
-            set(null, state_error, null);
-            return true;
-        }
+        Boolean has_children = checkHasChildren(this);
+        if (has_children == null) return false;
         final HashMap<String,TCFNode> data = new HashMap<String,TCFNode>();
+        if (!has_children) {
+            top_frame_id = null;
+            set(null, node.getState().getError(), data);
+            return true;
+        }
         IStackTrace st = node.model.getLaunch().getService(IStackTrace.class);
         if (st == null) {
             addEmulatedTopFrame(data);

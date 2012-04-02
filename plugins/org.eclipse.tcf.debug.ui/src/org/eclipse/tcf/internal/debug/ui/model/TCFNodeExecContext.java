@@ -982,7 +982,10 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
                     result.setHasChilren(false);
                     return true;
                 }
-                children = children_stack;
+                Boolean has_children = children_stack.checkHasChildren(done);
+                if (has_children == null) return false;
+                result.setHasChilren(has_children);
+                return true;
             }
             else {
                 if (!model.getAutoChildrenListUpdates() && last_children_list != null) {
