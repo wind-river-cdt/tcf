@@ -1,0 +1,199 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.tcf.te.tcf.core" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="org.eclipse.tcf.te.tcf.core" id="valueadds" name="Value-Add's"/>
+      </appinfo>
+      <documentation>
+         This extension point is used to contribute value-add&apos;s. Each value-add contribution must be bound via the &quot;org.eclipse.tcf.te.tcf.core.bindings&quot; extenions point. Multiple bindings for the same value-add are cumulative.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="valueadd" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="valueadd">
+      <annotation>
+         <documentation>
+            Declares a value-add contribution.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="class" minOccurs="0" maxOccurs="1"/>
+            <element ref="description" minOccurs="0" maxOccurs="1"/>
+         </sequence>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The unique id of the value-add contribution.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="label" type="string">
+            <annotation>
+               <documentation>
+                  The label representing the value-add within the UI.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string">
+            <annotation>
+               <documentation>
+                  The class that implements &lt;code&gt;org.eclipse.tcf.te.tcf.core.va.interfaces.IValueAdd&lt;/code&gt; or extends &lt;code&gt;org.eclipse.tcf.te.tcf.core.va.AbstractValueAdd&lt;/code&gt;.
+&lt;p&gt;
+The value-add implementation class must be specified either by the class attribute or the class child element!
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn="org.eclipse.tcf.te.tcf.core.va.AbstractValueAdd:org.eclipse.tcf.te.tcf.core.va.interfaces.IValueAdd"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="description" type="string">
+      <annotation>
+         <documentation>
+            A short description of the value-add to be presented in the UI.
+         </documentation>
+      </annotation>
+   </element>
+
+   <element name="class">
+      <annotation>
+         <documentation>
+            Used when creating an &lt;code&gt;IExecutableExtension&lt;/code&gt; with a named parameter, or more than one.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="parameter" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="class" type="string">
+            <annotation>
+               <documentation>
+                  The class that implements &lt;code&gt;org.eclipse.tcf.te.tcf.core.va.interfaces.IValueAdd&lt;/code&gt; or extends &lt;code&gt;org.eclipse.tcf.te.tcf.core.va.AbstractValueAdd&lt;/code&gt;.
+&lt;p&gt;
+The value-add implementation class must be specified either by the class attribute or the class child element!
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn="org.eclipse.tcf.te.tcf.core.va.AbstractValueAdd:org.eclipse.tcf.te.tcf.core.va.interfaces.IValueAdd"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="parameter">
+      <annotation>
+         <documentation>
+            A parameter for an &lt;code&gt;IExecutableExtension&lt;/code&gt;.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  &lt;p&gt;The parameter name.&lt;/p&gt;
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="value" type="string" use="required">
+            <annotation>
+               <documentation>
+                  &lt;p&gt;The parameter value.&lt;/p&gt;
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         Target Explorer 1.0.0
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         This is an example of the extension point usage:
+&lt;p&gt;
+&lt;pre&gt;&lt;code&gt;
+  &lt;extension point=&quot;org.eclipse.tcf.te.tcf.core.valueadds&quot;&gt;
+      &lt;valueadd
+            id=&quot;org.eclipse.tcf.te.tcf.core.valueadd.myValueAdd&quot;
+            class=&quot;org.eclipse.tcf.te.tcf.core.valueadd.MyValueAddImpl&quot;&gt;
+      &lt;/valueadd&gt;
+   &lt;/extension&gt;
+&lt;/code&gt;&lt;/pre&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="apiinfo"/>
+      </appinfo>
+      <documentation>
+         The provider of a service must implement &lt;samp&gt;org.eclipse.tcf.te.tcf.core.va.interfaces.IValueAdd&lt;/samp&gt;.
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="implementation"/>
+      </appinfo>
+      <documentation>
+         Copyright (c) 2011 Wind River Systems, Inc. and others.
+
+All rights reserved.
+
+This program and the accompanying materials are made available under the terms
+of the Eclipse Public License v1.0 which accompanies this distribution, and is
+available at http://www.eclipse.org/legal/epl-v10.html.
+      </documentation>
+   </annotation>
+
+
+</schema>

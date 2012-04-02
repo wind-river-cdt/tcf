@@ -6,6 +6,7 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.eclipse.tcf.te.tcf.core.activator.CoreBundleActivator
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime;bundle-version="3.7.0",
+ org.eclipse.core.expressions;bundle-version="3.4.300",
  org.eclipse.tcf.core;bundle-version="1.0.0",
  org.eclipse.tcf.te.runtime;bundle-version="1.0.0",
  org.eclipse.tcf.te.core;bundle-version="1.0.0"
@@ -22,9 +23,12 @@ Export-Package: org.eclipse.tcf.te.tcf.core,
  org.eclipse.tcf.te.tcf.core.interfaces.tracing,
  org.eclipse.tcf.te.tcf.core.internal;x-internal:=true,
  org.eclipse.tcf.te.tcf.core.internal.utils;x-internal:=true,
- org.eclipse.tcf.te.tcf.core.listeners;x-internal:=true,
+ org.eclipse.tcf.te.tcf.core.listeners,
  org.eclipse.tcf.te.tcf.core.listeners.interfaces,
  org.eclipse.tcf.te.tcf.core.nls;x-internal:=true,
  org.eclipse.tcf.te.tcf.core.streams,
  org.eclipse.tcf.te.tcf.core.util,
- org.eclipse.tcf.te.tcf.core.util.persistence
+ org.eclipse.tcf.te.tcf.core.util.persistence,
+ org.eclipse.tcf.te.tcf.core.va,
+ org.eclipse.tcf.te.tcf.core.va.interfaces,
+ org.eclipse.tcf.te.tcf.core.va.internal;x-internal:=true

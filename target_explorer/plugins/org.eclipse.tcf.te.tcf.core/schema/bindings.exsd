@@ -1,0 +1,130 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.tcf.te.tcf.core" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="org.eclipse.tcf.te.tcf.core" id="bindings" name="Value Add Bindings"/>
+      </appinfo>
+      <documentation>
+         This extension point is used to declare the value-add bindings.
+&lt;p&gt;
+&lt;b&gt;Note:&lt;/b&gt; For the enablement expression evaluation, the default variable and &lt;b&gt;peer&lt;/b&gt; is set to the peer the
+value-add is evaluated for.
+      </documentation>
+   </annotation>
+
+   <include schemaLocation="schema://org.eclipse.core.expressions/schema/expressionLanguage.exsd"/>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="binding" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="binding">
+      <annotation>
+         <documentation>
+            Declares a value-add binding.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="enablement" minOccurs="0" maxOccurs="1"/>
+         </sequence>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The unique id of the value-add binding contribution.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="valueAddId" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The unique id of the referenced value add.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.tcf.te.tcf.core.valueadds/valueadd/@id"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         Target Explorer 1.0.0
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         &lt;pre&gt;
+   &lt;extension point=&quot;org.eclipse.tcf.te.tcf.core.bindings&quot;&gt;
+      &lt;binding
+            id=&quot;org.eclipse.tcf.te.tcf.core.binding.MyValueAdd&quot;
+            valueAddId=&quot;org.eclipse.tcf.te.tcf.core.valueadd.myValueAdd&quot;&gt;
+         &lt;enablement&gt;
+            ...
+         &lt;/enablement&gt;
+      &lt;/binding&gt;
+   &lt;/extension&gt;
+&lt;/pre&gt;
+      </documentation>
+   </annotation>
+
+
+
+   <annotation>
+      <appinfo>
+         <meta.section type="copyright"/>
+      </appinfo>
+      <documentation>
+         Copyright (c) 2012 Wind River Systems, Inc. and others.
+
+All rights reserved.
+
+This program and the accompanying materials are made available under the terms
+of the Eclipse Public License v1.0 which accompanies this distribution, and is
+available at http://www.eclipse.org/legal/epl-v10.html.
+      </documentation>
+   </annotation>
+
+</schema>
