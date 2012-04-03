@@ -263,7 +263,7 @@ public class LocatorModelRefreshService extends AbstractLocatorModelService impl
 					for (File candidate : candidates) {
 						try {
 							IURIPersistenceService service = ServiceManager.getInstance().getService(IURIPersistenceService.class);
-							IPeer tempPeer = (IPeer)service.read(candidate.getAbsoluteFile().toURI(), IPeer.class);
+							IPeer tempPeer = (IPeer)service.read(IPeer.class, candidate.getAbsoluteFile().toURI());
 
 							Map<String,String> attrs = new HashMap<String, String>(tempPeer.getAttributes());
 

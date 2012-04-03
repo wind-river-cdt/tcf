@@ -6,15 +6,6 @@
    <extension-point id="delegates" name="%ExtensionPoint.delegates.name" schema="schema/delegates.exsd"/>
    <extension-point id="bindings" name="%ExtensionPoint.bindings.name" schema="schema/bindings.exsd"/>
    
-<!-- Persistence delegate contributions -->
-   <extension point="org.eclipse.tcf.te.runtime.persistence.delegates">
-      <delegate
-            class="org.eclipse.tcf.te.runtime.persistence.AbstractPropertiesPersistenceDelegate"
-            id="org.eclipse.tcf.te.runtime.persistence.properties"
-            label="%PropertiesFilePersistenceDelegate.label">
-      </delegate>
-   </extension>
-
 <!-- Service contributions -->
    <extension point="org.eclipse.tcf.te.runtime.services.services">
       <service

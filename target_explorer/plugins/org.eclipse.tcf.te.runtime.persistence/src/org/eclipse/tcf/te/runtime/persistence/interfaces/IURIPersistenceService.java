@@ -36,12 +36,12 @@ public interface IURIPersistenceService extends IService {
 	 * If the given URI is <code>null</code>, it will be determined by adapting the context
 	 * to a {@link IPersistableURIProvider}. In this case the context must not be <code>null</code>.
 	 *
-	 * @param uri The URI. Must not be <code>null</code>.
 	 * @param context The context object or <code>null</code>.
+	 * @param uri The URI. Must not be <code>null</code>.
 	 *
 	 * @throws IOException - if the operation fails
 	 */
-	public Object read(URI uri, Object context) throws IOException;
+	public Object read(Object context, URI uri) throws IOException;
 
 	/**
 	 * Deletes the persistence storage for the given context object via a persistence delegate.

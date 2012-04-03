@@ -47,10 +47,10 @@ public class URIPersistenceService extends AbstractService implements IURIPersis
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.persistence.interfaces.IURIPersistenceService#read(java.net.URI, java.lang.Object)
+	 * @see org.eclipse.tcf.te.runtime.persistence.interfaces.IURIPersistenceService#read(java.lang.Object, java.net.URI)
 	 */
 	@Override
-	public Object read(URI uri, Object context) throws IOException {
+	public Object read(Object context, URI uri) throws IOException {
 		Assert.isNotNull(context);
 
 		uri = uri != null ? uri : getURI(context);

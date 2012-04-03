@@ -29,10 +29,6 @@
             id="org.eclipse.tcf.te.tcf.locator.persistence.peerToString"
             class="org.eclipse.tcf.te.tcf.locator.persistence.PeerToStringPersistenceDelegate">
       </delegate>
-      <delegate 
-            id="org.eclipse.tcf.te.tcf.locator.persistence.propertiesToString"
-            class="org.eclipse.tcf.te.tcf.locator.persistence.AbstractPropertiesToStringPersistenceDelegate">
-      </delegate>
    </extension>
 
 <!-- Persistence delegate bindings contributions -->
