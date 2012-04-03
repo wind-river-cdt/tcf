@@ -56,6 +56,9 @@ public class PeerModel extends ContainerModelNode implements IPeerModel, IWorkin
 
 		// Peer model nodes can change the node parent at any time
 		allowSetParentOnNonNullParent = true;
+		// Peer model nodes does not have a parent by default
+		//   -> allow change events with null parent
+		suppressEventsOnNullParent = false;
 
 		// Enable change events
 		setChangeEventsEnabled(true);

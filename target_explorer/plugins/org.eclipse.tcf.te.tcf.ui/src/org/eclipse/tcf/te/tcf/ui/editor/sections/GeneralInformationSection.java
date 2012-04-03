@@ -259,7 +259,7 @@ public class GeneralInformationSection extends AbstractSection {
 	 * This method may called multiple times during the lifetime of the page and
 	 * the given peer node might be even <code>null</code>.
 	 *
-	 * @param node The GDB Remote configuration node or <code>null</code>.
+	 * @param node The peer node or <code>null</code>.
 	 */
 	public void extractData(final IPeerModel node) {
 		// If no data is available, we are done
@@ -288,22 +288,8 @@ public class GeneralInformationSection extends AbstractSection {
 					Map<String, String> attributes = new HashMap<String, String>(oldPeer.getAttributes());
 					// Update the (managed) attributes from the working copy
 					attributes.put(IPeer.ATTR_NAME, wc.getStringProperty(IPeer.ATTR_NAME));
-					// Update the persistence storage URI (if set)
-					//					if (attributes.containsKey(IPersistableNodeProperties.PROPERTY_URI)) {
-					//						IURIPersistenceService uRIPersistenceService = ServiceManager.getInstance().getService(IURIPersistenceService.class);
-					//						if (uRIPersistenceService != null) {
-					//							URI uri = null;
-					//							try {
-					//								uri = uRIPersistenceService.getURI(attributes);
-					//							} catch (IOException e) { /* ignored on purpose */ }
-					//							if (uri != null) {
-					//								attributes.put(IPersistableNodeProperties.PROPERTY_URI, uri.toString());
-					//							}
-					//							else {
+					// Remove the persistence storage URI (if set)
 					attributes.remove(IPersistableNodeProperties.PROPERTY_URI);
-					//							}
-					//						}
-					//					}
 					// Create the new peer
 					IPeer newPeer = oldPeer instanceof PeerRedirector ? new PeerRedirector(((PeerRedirector)oldPeer).getParent(), attributes) : new TransientPeer(attributes);
 					// Update the peer node instance (silently)
