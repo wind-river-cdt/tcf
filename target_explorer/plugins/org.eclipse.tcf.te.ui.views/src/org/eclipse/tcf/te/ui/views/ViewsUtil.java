@@ -19,6 +19,8 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartSite;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.IHandlerService;
@@ -134,7 +136,17 @@ public class ViewsUtil {
 						// Apply the selection to the "activeMenuSelection" and "selection" variable too
 						context.addVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME, selection);
 						context.addVariable(ISources.ACTIVE_MENU_SELECTION_NAME, selection);
-						context.addVariable(ISources.ACTIVE_WORKBENCH_WINDOW_NAME, PlatformUI.getWorkbench().getActiveWorkbenchWindow());
+
+						IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+						context.addVariable(ISources.ACTIVE_WORKBENCH_WINDOW_NAME, window);
+						context.addVariable(ISources.ACTIVE_SHELL_NAME, window.getShell());
+
+						IWorkbenchPart part = window.getActivePage().getActivePart();
+						IWorkbenchPartSite site = part.getSite();
+						context.addVariable(ISources.ACTIVE_PART_ID_NAME, site.getId());
+						context.addVariable(ISources.ACTIVE_PART_NAME, part);
+						context.addVariable(ISources.ACTIVE_SITE_NAME, site);
+
 						// Allow plugin activation
 						context.setAllowPluginActivation(true);
 						// And execute the event
