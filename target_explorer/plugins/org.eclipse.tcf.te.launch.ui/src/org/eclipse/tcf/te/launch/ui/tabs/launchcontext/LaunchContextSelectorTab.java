@@ -7,32 +7,32 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.launch.ui.remote.app.projects;
+package org.eclipse.tcf.te.launch.ui.tabs.launchcontext;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tcf.te.launch.ui.nls.Messages;
 import org.eclipse.tcf.te.launch.ui.tabs.AbstractFormsLaunchConfigurationTab;
-import org.eclipse.tcf.te.tcf.launch.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.forms.CustomFormToolkit;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
 
 /**
- * Referenced projetcs launch configuration tab implementation.
+ * Context selector launch configuration tab implementation.
  */
-public class ReferencedProjetcsTab extends AbstractFormsLaunchConfigurationTab {
+public class LaunchContextSelectorTab extends AbstractFormsLaunchConfigurationTab {
 	// References to the tab sub sections
-	private ReferencedProjectsSection section;
+	private LaunchContextSelectorSection selectorSection;
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.launch.ui.tabs.AbstractFormsLaunchConfigurationTab#dispose()
 	 */
 	@Override
 	public void dispose() {
-		if (section != null) { section.dispose(); section = null; }
-		super.dispose();
+		if (selectorSection != null) { selectorSection.dispose(); selectorSection = null; }
+	    super.dispose();
 	}
 
 	/* (non-Javadoc)
@@ -52,9 +52,9 @@ public class ReferencedProjetcsTab extends AbstractFormsLaunchConfigurationTab {
 		panel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		panel.setBackground(parent.getBackground());
 
-		section = new ReferencedProjectsSection(getManagedForm(), panel);
-		section.getSection().setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB, TableWrapData.TOP));
-		getManagedForm().addPart(section);
+		selectorSection = new LaunchContextSelectorSection(getManagedForm(), panel);
+		selectorSection.getSection().setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB, TableWrapData.TOP));
+		getManagedForm().addPart(selectorSection);
 	}
 
 	/* (non-Javadoc)
@@ -62,6 +62,6 @@ public class ReferencedProjetcsTab extends AbstractFormsLaunchConfigurationTab {
 	 */
 	@Override
 	public String getName() {
-		return Messages.ReferencedProjectsTab_name;
+		return Messages.LaunchContextSelectorTab_name;
 	}
 }

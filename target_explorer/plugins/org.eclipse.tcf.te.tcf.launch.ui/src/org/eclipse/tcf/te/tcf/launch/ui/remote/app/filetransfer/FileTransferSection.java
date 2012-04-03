@@ -245,10 +245,10 @@ public class FileTransferSection extends AbstractTableSection implements ILaunch
 				if (element instanceof IFileTransferItem) {
 					IFileTransferItem item = (IFileTransferItem)element;
 					switch (item.getIntProperty(IFileTransferItem.PROPERTY_DIRECTION)) {
-					case IFileTransferItem.HOST_TO_TARGET:
-						return Messages.FileTransferSection_toTarget_tooltip;
 					case IFileTransferItem.TARGET_TO_HOST:
 						return Messages.FileTransferSection_toHost_tooltip;
+					default:
+						return Messages.FileTransferSection_toTarget_tooltip;
 					}
 				}
 				return super.getToolTipText(element);
@@ -259,10 +259,10 @@ public class FileTransferSection extends AbstractTableSection implements ILaunch
 				if (element instanceof IFileTransferItem) {
 					IFileTransferItem item = (IFileTransferItem)element;
 					switch (item.getIntProperty(IFileTransferItem.PROPERTY_DIRECTION)) {
-					case IFileTransferItem.HOST_TO_TARGET:
-						return Messages.FileTransferSection_toTarget_text;
 					case IFileTransferItem.TARGET_TO_HOST:
 						return Messages.FileTransferSection_toHost_text;
+					default:
+						return Messages.FileTransferSection_toTarget_text;
 					}
 				}
 				return super.getText(element);

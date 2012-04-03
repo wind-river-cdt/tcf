@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.launch.ui.tabs.selector;
+package org.eclipse.tcf.te.launch.ui.tabs.launchcontext;
 
 import java.util.ArrayList;
 import java.util.Arrays;

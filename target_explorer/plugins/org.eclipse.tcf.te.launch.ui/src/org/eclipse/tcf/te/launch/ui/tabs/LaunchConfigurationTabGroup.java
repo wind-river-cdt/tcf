@@ -15,7 +15,7 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
-import org.eclipse.tcf.te.launch.ui.tabs.selector.LaunchContextSelectorTab;
+import org.eclipse.tcf.te.launch.ui.tabs.launchcontext.LaunchContextSelectorTab;
 
 /**
  * Default launch configuration tab group implementation.

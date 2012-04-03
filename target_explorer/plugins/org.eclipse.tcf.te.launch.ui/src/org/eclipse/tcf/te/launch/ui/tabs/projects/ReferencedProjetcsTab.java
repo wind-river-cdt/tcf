@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.launch.ui.tabs.selector;
+package org.eclipse.tcf.te.launch.ui.tabs.projects;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
@@ -20,19 +20,19 @@ import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
 
 /**
- * Context selector launch configuration tab implementation.
+ * Referenced projetcs launch configuration tab implementation.
  */
-public class LaunchContextSelectorTab extends AbstractFormsLaunchConfigurationTab {
+public class ReferencedProjetcsTab extends AbstractFormsLaunchConfigurationTab {
 	// References to the tab sub sections
-	private LaunchContextSelectorSection selectorSection;
+	private ReferencedProjectsSection section;
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.launch.ui.tabs.AbstractFormsLaunchConfigurationTab#dispose()
 	 */
 	@Override
 	public void dispose() {
-		if (selectorSection != null) { selectorSection.dispose(); selectorSection = null; }
-	    super.dispose();
+		if (section != null) { section.dispose(); section = null; }
+		super.dispose();
 	}
 
 	/* (non-Javadoc)
@@ -52,9 +52,9 @@ public class LaunchContextSelectorTab extends AbstractFormsLaunchConfigurationTa
 		panel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		panel.setBackground(parent.getBackground());
 
-		selectorSection = new LaunchContextSelectorSection(getManagedForm(), panel);
-		selectorSection.getSection().setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB, TableWrapData.TOP));
-		getManagedForm().addPart(selectorSection);
+		section = new ReferencedProjectsSection(getManagedForm(), panel);
+		section.getSection().setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB, TableWrapData.TOP));
+		getManagedForm().addPart(section);
 	}
 
 	/* (non-Javadoc)
@@ -62,6 +62,6 @@ public class LaunchContextSelectorTab extends AbstractFormsLaunchConfigurationTa
 	 */
 	@Override
 	public String getName() {
-		return Messages.LaunchContextSelectorTab_name;
+		return Messages.ReferencedProjectsTab_name;
 	}
 }

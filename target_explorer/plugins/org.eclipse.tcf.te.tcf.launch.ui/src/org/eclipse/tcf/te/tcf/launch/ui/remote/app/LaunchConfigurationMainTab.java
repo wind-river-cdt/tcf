@@ -13,7 +13,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tcf.te.launch.ui.tabs.selector.LaunchContextSelectorTab;
+import org.eclipse.tcf.te.launch.ui.tabs.launchcontext.LaunchContextSelectorTab;
 import org.eclipse.tcf.te.ui.forms.CustomFormToolkit;
 
 /**
@@ -22,7 +22,7 @@ import org.eclipse.tcf.te.ui.forms.CustomFormToolkit;
 public class LaunchConfigurationMainTab extends LaunchContextSelectorTab {
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.launch.ui.tabs.selector.LaunchContextSelectorTab#doCreateFormContent(org.eclipse.swt.widgets.Composite, org.eclipse.tcf.te.ui.forms.CustomFormToolkit)
+	 * @see org.eclipse.tcf.te.launch.ui.tabs.launchcontext.LaunchContextSelectorTab#doCreateFormContent(org.eclipse.swt.widgets.Composite, org.eclipse.tcf.te.ui.forms.CustomFormToolkit)
 	 */
 	@Override
 	protected void doCreateFormContent(Composite parent, CustomFormToolkit toolkit) {

@@ -22,12 +22,8 @@
 <!-- Persistence delegate contributions -->
    <extension point="org.eclipse.tcf.te.runtime.persistence.delegates">
       <delegate 
-            id="org.eclipse.tcf.te.tcf.locator.persistence.peerToURI"
-            class="org.eclipse.tcf.te.tcf.locator.persistence.PeerToURIPersistenceDelegate">
-      </delegate>
-      <delegate 
-            id="org.eclipse.tcf.te.tcf.locator.persistence.peerToString"
-            class="org.eclipse.tcf.te.tcf.locator.persistence.PeerToStringPersistenceDelegate">
+            id="org.eclipse.tcf.te.tcf.locator.persistence.gson.peer"
+            class="org.eclipse.tcf.te.tcf.locator.persistence.GsonPeerPersistenceDelegate">
       </delegate>
    </extension>
 
@@ -35,33 +31,12 @@
    <extension
          point="org.eclipse.tcf.te.runtime.persistence.bindings">
       <binding
-            delegateId="org.eclipse.tcf.te.tcf.locator.persistence.peerToURI"
-            id="org.eclipse.tcf.te.tcf.locator.binding.peerToURI">
-         <enablement>
-            <with variable="container">
-               <instanceof value="java.net.URI"/>
-            </with>
-            <with variable="context">
-               <or>
-                  <instanceof value="org.eclipse.tcf.protocol.IPeer"/>
-                  <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
-                  <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider"/>
-                  <and>
-                     <instanceof value="java.lang.Class"/>
-                     <with variable="contextClass">
-                        <equals value="org.eclipse.tcf.protocol.IPeer"/>
-                     </with>
-                  </and>
-               </or>
-            </with>
-         </enablement>
-      </binding>
-      <binding
-            delegateId="org.eclipse.tcf.te.tcf.locator.persistence.peerToString"
-            id="org.eclipse.tcf.te.tcf.locator.binding.peerToString">
+            delegateId="org.eclipse.tcf.te.tcf.locator.persistence.gson.peer"
+            id="org.eclipse.tcf.te.tcf.locator.binding.gson.peer">
          <enablement>
             <with variable="container">
                <or>
+                  <instanceof value="java.net.URI"/>
                   <instanceof value="java.lang.String"/>
                   <and>
                      <instanceof value="java.lang.Class"/>

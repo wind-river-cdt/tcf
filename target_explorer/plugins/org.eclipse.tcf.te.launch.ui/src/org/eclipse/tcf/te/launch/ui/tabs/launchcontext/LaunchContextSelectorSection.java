@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.launch.ui.tabs.selector;
+package org.eclipse.tcf.te.launch.ui.tabs.launchcontext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -101,7 +101,7 @@ public class LaunchContextSelectorSection extends AbstractSection implements ILa
 		// Create the section sub controls
 		selector = new LaunchContextSelectorControl(null) {
 			/* (non-Javadoc)
-			 * @see org.eclipse.tcf.te.launch.ui.tabs.selector.LaunchContextSelectorControl#onModelNodeCheckStateChanged(org.eclipse.tcf.te.runtime.model.interfaces.IModelNode, boolean)
+			 * @see org.eclipse.tcf.te.launch.ui.tabs.launchcontext.LaunchContextSelectorControl#onModelNodeCheckStateChanged(org.eclipse.tcf.te.runtime.model.interfaces.IModelNode, boolean)
 			 */
 			@Override
 			protected void onModelNodeCheckStateChanged(IModelNode node, boolean checked) {

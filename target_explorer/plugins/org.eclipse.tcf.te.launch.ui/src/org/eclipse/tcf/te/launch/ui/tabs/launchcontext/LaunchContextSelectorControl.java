@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.launch.ui.tabs.selector;
+package org.eclipse.tcf.te.launch.ui.tabs.launchcontext;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IDialogPage;
@@ -55,7 +55,7 @@ public class LaunchContextSelectorControl extends ContextSelectorControl {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.launch.ui.tabs.selector.ContextSelectorControl#initializeProperties(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
+	 * @see org.eclipse.tcf.te.launch.ui.tabs.launchcontext.ContextSelectorControl#initializeProperties(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
 	 */
 	@Override
 	protected void initializeProperties(IPropertiesContainer properties) {
@@ -85,7 +85,7 @@ public class LaunchContextSelectorControl extends ContextSelectorControl {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.launch.ui.tabs.selector.ContextSelectorControl#createTreeViewerControl(org.eclipse.swt.widgets.Composite)
+	 * @see org.eclipse.tcf.te.launch.ui.tabs.launchcontext.ContextSelectorControl#createTreeViewerControl(org.eclipse.swt.widgets.Composite)
 	 */
 	@Override
 	protected TreeViewer createTreeViewerControl(Composite parent) {
@@ -97,7 +97,7 @@ public class LaunchContextSelectorControl extends ContextSelectorControl {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.launch.ui.tabs.selector.ContextSelectorControl#getTreeViewerStyle()
+	 * @see org.eclipse.tcf.te.launch.ui.tabs.launchcontext.ContextSelectorControl#getTreeViewerStyle()
 	 */
 	@Override
 	protected int getTreeViewerStyle() {

@@ -79,4 +79,17 @@ public class Messages extends NLS {
 
 	public static String RemoteContextSelectorControl_error_noContextSelected_single;
 	public static String RemoteContextSelectorControl_error_noContextSelected_multi;
+
+	public static String ReferencedProjectsTab_name;
+
+	public static String ReferencedProjectsSection_title;
+	public static String ReferencedProjectsSection_description;
+	public static String ReferencedProjectsSection_project_column;
+	public static String ReferencedProjectsSection_add_button;
+	public static String ReferencedProjectsSection_delete_button;
+	public static String ReferencedProjectsSection_up_button;
+	public static String ReferencedProjectsSection_down_button;
+	public static String ReferencedProjectsSection_addDialog_message;
+
+
 }

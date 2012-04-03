@@ -32,4 +32,5 @@ Export-Package: org.eclipse.tcf.te.launch.ui.activator;x-internal:=true,
  org.eclipse.tcf.te.launch.ui.nls;x-internal:=true,
  org.eclipse.tcf.te.launch.ui.selection,
  org.eclipse.tcf.te.launch.ui.tabs,
- org.eclipse.tcf.te.launch.ui.tabs.selector
+ org.eclipse.tcf.te.launch.ui.tabs.launchcontext,
+ org.eclipse.tcf.te.launch.ui.tabs.projects

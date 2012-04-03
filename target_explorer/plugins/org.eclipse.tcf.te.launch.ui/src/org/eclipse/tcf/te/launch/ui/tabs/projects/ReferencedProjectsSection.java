@@ -8,7 +8,7 @@
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tcf.te.tcf.launch.ui.remote.app.projects;
+package org.eclipse.tcf.te.launch.ui.tabs.projects;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,7 +58,7 @@ import org.eclipse.tcf.te.launch.core.persistence.projects.ReferencedProjectItem
 import org.eclipse.tcf.te.launch.core.persistence.projects.ReferencedProjectItemValidator;
 import org.eclipse.tcf.te.launch.core.persistence.projects.ReferencedProjectsPersistenceDelegate;
 import org.eclipse.tcf.te.launch.ui.interfaces.ILaunchConfigurationTabFormPart;
-import org.eclipse.tcf.te.tcf.launch.ui.nls.Messages;
+import org.eclipse.tcf.te.launch.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.forms.parts.AbstractTableSection;
 import org.eclipse.tcf.te.ui.swt.listener.AbstractDecorationCellPaintListener;
 import org.eclipse.ui.dialogs.ListSelectionDialog;

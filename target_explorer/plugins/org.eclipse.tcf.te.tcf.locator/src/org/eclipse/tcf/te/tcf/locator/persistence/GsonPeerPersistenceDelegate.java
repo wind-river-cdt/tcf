@@ -19,6 +19,7 @@ import org.eclipse.tcf.core.TransientPeer;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
+import org.eclipse.tcf.te.runtime.persistence.AbstractGsonMapPersistenceDelegate;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelLookupService;
@@ -28,13 +29,13 @@ import org.eclipse.tcf.te.tcf.locator.nodes.PeerModel;
 /**
  * Peer to string persistence delegate implementation.
  */
-public class PeerToStringPersistenceDelegate extends AbstractPropertiesToStringPersistenceDelegate {
+public class GsonPeerPersistenceDelegate extends AbstractGsonMapPersistenceDelegate {
 
 	/**
 	 * Constructor.
 	 */
-	public PeerToStringPersistenceDelegate() {
-		super();
+	public GsonPeerPersistenceDelegate() {
+		super("ini"); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)

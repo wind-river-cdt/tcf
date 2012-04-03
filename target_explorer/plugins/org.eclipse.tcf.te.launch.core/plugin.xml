@@ -43,4 +43,76 @@
       </step>
    </extension>
 
+<!-- Persistence delegate contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.persistence.delegates">
+      <delegate 
+            id="org.eclipse.tcf.te.launch.core.persistence.gson.fileTransferItem"
+            class="org.eclipse.tcf.te.launch.core.internal.GsonFileTransferItemPersistenceDelegate">
+      </delegate>
+      <delegate 
+            id="org.eclipse.tcf.te.launch.core.persistence.gson.referencedProjectItem"
+            class="org.eclipse.tcf.te.launch.core.internal.GsonReferencedProjectItemPersistenceDelegate">
+      </delegate>
+   </extension>
+
+<!-- Persistence delegate bindings contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.persistence.bindings">
+       <binding
+            delegateId="org.eclipse.tcf.te.launch.core.persistence.gson.fileTransferItem"
+            id="org.eclipse.tcf.te.launch.core.binding.gson.fileTransferItem">
+         <enablement>
+            <with variable="container">
+               <or>
+                  <instanceof value="java.lang.String"/>
+                  <and>
+                     <instanceof value="java.lang.Class"/>
+                     <with variable="containerClass">
+                        <equals value="java.lang.String"/>
+                     </with>
+                  </and>
+               </or>
+            </with>
+            <with variable="context">
+               <or>
+                  <instanceof value="org.eclipse.tcf.te.launch.core.interfaces.IFileTransferItem"/>
+                  <and>
+                     <instanceof value="java.lang.Class"/>
+                     <with variable="contextClass">
+                        <equals value="org.eclipse.tcf.te.launch.core.interfaces.IFileTransferItem"/>
+                     </with>
+                  </and>
+               </or>
+            </with>
+         </enablement>
+      </binding>
+       <binding
+            delegateId="org.eclipse.tcf.te.launch.core.persistence.gson.referencedProjectItem"
+            id="org.eclipse.tcf.te.launch.core.binding.gson.referencedProjectItem">
+         <enablement>
+            <with variable="container">
+               <or>
+                  <instanceof value="java.lang.String"/>
+                  <and>
+                     <instanceof value="java.lang.Class"/>
+                     <with variable="containerClass">
+                        <equals value="java.lang.String"/>
+                     </with>
+                  </and>
+               </or>
+            </with>
+            <with variable="context">
+               <or>
+                  <instanceof value="org.eclipse.tcf.te.launch.core.interfaces.IReferencedProjectItem"/>
+                  <and>
+                     <instanceof value="java.lang.Class"/>
+                     <with variable="contextClass">
+                        <equals value="org.eclipse.tcf.te.launch.core.interfaces.IReferencedProjectItem"/>
+                     </with>
+                  </and>
+               </or>
+            </with>
+         </enablement>
+      </binding>
+   </extension>
+
 </plugin>

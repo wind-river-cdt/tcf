@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.launch.core.internal;
+package org.eclipse.tcf.te.launch.core.internal;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -15,17 +15,17 @@ import java.util.Map;
 
 import org.eclipse.tcf.te.launch.core.interfaces.IFileTransferItem;
 import org.eclipse.tcf.te.launch.core.persistence.filetransfer.FileTransferItem;
-import org.eclipse.tcf.te.tcf.locator.persistence.AbstractPropertiesToStringPersistenceDelegate;
+import org.eclipse.tcf.te.runtime.persistence.AbstractGsonMapPersistenceDelegate;
 
 /**
  * File transfer item to string delegate implementation.
  */
-public class FileTransferItemToStringPersistenceDelegate extends AbstractPropertiesToStringPersistenceDelegate {
+public class GsonFileTransferItemPersistenceDelegate extends AbstractGsonMapPersistenceDelegate {
 
 	/**
 	 * Constructor.
 	 */
-	public FileTransferItemToStringPersistenceDelegate() {
+	public GsonFileTransferItemPersistenceDelegate() {
 		super();
 	}
 
