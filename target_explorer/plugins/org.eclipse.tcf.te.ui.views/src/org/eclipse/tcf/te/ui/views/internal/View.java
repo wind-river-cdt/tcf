@@ -189,6 +189,7 @@ public class View extends CommonNavigator implements ITabbedPropertySheetPageCon
 				ctx.addVariable(ISources.ACTIVE_PART_NAME, this);
 				ctx.addVariable(ISources.ACTIVE_SITE_NAME, getViewSite());
 				ctx.addVariable(ISources.ACTIVE_SHELL_NAME, getViewSite().getShell());
+				ctx.addVariable("altPressed", Boolean.valueOf(dblClickEvent instanceof AltDoubleClickEvent)); //$NON-NLS-1$
 				ctx.setAllowPluginActivation(true);
 
 				ParameterizedCommand pCmd = ParameterizedCommand.generateCommand(command, null);

@@ -45,12 +45,15 @@ public class OpenCommandHandler extends AbstractHandler {
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
 		// The active part is the Target Explorer view instance
 		IWorkbenchPart part = HandlerUtil.getActivePart(event);
+		// ALT - Key pressed?
+		Object value = HandlerUtil.getVariable(event, "altPressed"); //$NON-NLS-1$
+		boolean altPressed = value instanceof Boolean ? ((Boolean)value).booleanValue() : false;
 
 		if (selection instanceof IStructuredSelection && !selection.isEmpty() && part instanceof CommonNavigator) {
 			// If the tree node is expandable, expand or collapse it
 			TreeViewer viewer = ((CommonNavigator)part).getCommonViewer();
 			Object element = ((IStructuredSelection)selection).getFirstElement();
-			if (viewer.isExpandable(element)) {
+			if (viewer.isExpandable(element) && !altPressed) {
 				viewer.setExpandedState(element, !viewer.getExpandedState(element));
 			} else {
 				// Node is not an expandable node, forward to the properties action.

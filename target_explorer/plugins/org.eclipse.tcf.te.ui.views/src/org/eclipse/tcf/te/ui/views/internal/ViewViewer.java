@@ -11,7 +11,11 @@ package org.eclipse.tcf.te.ui.views.internal;
 
 import java.util.EventObject;
 
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tcf.te.runtime.events.EventManager;
 import org.eclipse.tcf.te.ui.views.events.ViewerContentChangeEvent;
@@ -121,5 +125,29 @@ public class ViewViewer extends CommonViewer {
 			((ViewViewerSorter)sorter).setContentService(getNavigatorContentService());
 		}
 	    super.setSorter(sorter);
+	}
+
+	// Remember the last double click selection event state mask
+	private int lastDoubleClickSelectionEventStateMask = 0;
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.navigator.CommonViewer#handleDoubleSelect(org.eclipse.swt.events.SelectionEvent)
+	 */
+	@Override
+	protected void handleDoubleSelect(SelectionEvent event) {
+		lastDoubleClickSelectionEventStateMask = event != null ? event.stateMask : 0;
+	    super.handleDoubleSelect(event);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.StructuredViewer#fireDoubleClick(org.eclipse.jface.viewers.DoubleClickEvent)
+	 */
+	@Override
+	protected void fireDoubleClick(DoubleClickEvent event) {
+		boolean altPressed = (lastDoubleClickSelectionEventStateMask & SWT.ALT) != 0;
+		if (altPressed) {
+			event = new AltDoubleClickEvent((Viewer)event.getSource(), event.getSelection());
+		}
+	    super.fireDoubleClick(event);
 	}
 }
