@@ -413,7 +413,7 @@ public class TCFNodeRegister extends TCFNode implements IElementEditor, IWatchIn
             String s = TCFNumberFormat.toFPString(data, 0, data.length, ctx.isBigEndian());
             if (s != null) return s;
         }
-        BigInteger b = TCFNumberFormat.toBigInteger(data, 0, data.length, ctx.isBigEndian(), false);
+        BigInteger b = TCFNumberFormat.toBigInteger(data, ctx.isBigEndian(), false);
         String s = b.toString(radix);
         switch (radix) {
         case 8:

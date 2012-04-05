@@ -109,6 +109,10 @@ public class TCFNumberFormat {
         return rs;
     }
 
+    public static String toFPString(byte[] data, boolean big_endian) {
+        return toFPString(data, 0, data.length, big_endian);
+    }
+
     public static String toFPString(byte[] data, int offs, int size, boolean big_endian) {
         assert offs + size <= data.length;
         byte[] arr = new byte[size];
@@ -205,6 +209,10 @@ public class TCFNumberFormat {
         String s = a.toString();
         if (neg) s = "-" + s;
         return s;
+    }
+
+    public static BigInteger toBigInteger(byte[] data, boolean big_endian, boolean sign_extension) {
+        return toBigInteger(data, 0, data.length, big_endian, sign_extension);
     }
 
     public static BigInteger toBigInteger(byte[] data, int offs, int size, boolean big_endian, boolean sign_extension) {

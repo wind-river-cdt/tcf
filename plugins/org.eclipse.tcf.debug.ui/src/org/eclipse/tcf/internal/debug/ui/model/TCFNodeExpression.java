@@ -170,7 +170,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
                         parent_value = v.getValue();
                         if (parent_value != null) {
                             e = "(${" + v.getTypeID() + "})0x" + TCFNumberFormat.toBigInteger(
-                                    parent_value, 0, parent_value.length, v.isBigEndian(), false).toString(16);
+                                    parent_value, v.isBigEndian(), false).toString(16);
                         }
                     }
                 }
@@ -514,7 +514,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
                                             set(null, null, toASCIIString(data, 0, data.length, '"'));
                                             return true;
                                         }
-                                        BigInteger a = TCFNumberFormat.toBigInteger(data, 0, data.length, v.isBigEndian(), false);
+                                        BigInteger a = TCFNumberFormat.toBigInteger(data, v.isBigEndian(), false);
                                         if (!a.equals(BigInteger.valueOf(0))) {
                                             addr = a;
                                             Protocol.invokeLater(this);
@@ -1239,6 +1239,24 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
             if (level == 0) {
                 assert offs == 0;
                 assert size == data.length;
+                if (size > 0) {
+                    switch (type_class) {
+                    case enumeration:
+                    case integer:
+                    case cardinal:
+                    case real:
+                        bf.append("Dec: ", SWT.BOLD);
+                        bf.append(toNumberString(10, type_class, data, offs, size, big_endian));
+                        bf.append("\n");
+                        break;
+                    }
+                    bf.append("Oct: ", SWT.BOLD);
+                    bf.append(toNumberString(8, type_class, data, offs, size, big_endian));
+                    bf.append("\n");
+                    bf.append("Hex: ", SWT.BOLD);
+                    bf.append(toNumberString(16, type_class, data, offs, size, big_endian));
+                    bf.append("\n");
+                }
                 String s = getTypeName(type_class, size);
                 if (s == null) s = "not available";
                 bf.append("Type: ", SWT.BOLD);
@@ -1247,16 +1265,6 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
                 bf.append("Size: ", SWT.BOLD);
                 bf.append(size);
                 bf.append(size == 1 ? " byte\n" : " bytes\n");
-                if (size > 0) {
-                    if (type_class == ISymbols.TypeClass.integer || type_class == ISymbols.TypeClass.real) {
-                        bf.append("Dec: ", SWT.BOLD);
-                        bf.append(toNumberString(10, type_class, data, offs, size, big_endian));
-                        bf.append("\n");
-                    }
-                    bf.append("Hex: ", SWT.BOLD);
-                    bf.append(toNumberString(16, type_class, data, offs, size, big_endian));
-                    bf.append("\n");
-                }
             }
             else if (type_class == ISymbols.TypeClass.integer || type_class == ISymbols.TypeClass.real) {
                 bf.append(toNumberString(10, type_class, data, offs, size, big_endian));

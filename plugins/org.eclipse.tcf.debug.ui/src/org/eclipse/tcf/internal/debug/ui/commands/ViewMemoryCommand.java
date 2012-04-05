@@ -60,8 +60,7 @@ public class ViewMemoryCommand extends AbstractActionDelegate {
                                     else if (val_data.getRegisterID() != null) {
                                         byte[] bytes = val_data.getValue();
                                         if (bytes != null) {
-                                            addr = TCFNumberFormat.toBigInteger(bytes, 0, bytes.length,
-                                                    val_data.isBigEndian(), false);
+                                            addr = TCFNumberFormat.toBigInteger(bytes, val_data.isBigEndian(), false);
                                         }
                                     }
                                 }

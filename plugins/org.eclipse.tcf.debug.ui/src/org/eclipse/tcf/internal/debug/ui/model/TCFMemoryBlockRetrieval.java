@@ -244,7 +244,7 @@ class TCFMemoryBlockRetrieval implements IMemoryBlockRetrievalExtension {
                         else {
                             ISymbols.Symbol type = expression_type.getData();
                             boolean signed = type != null && type.getTypeClass() == ISymbols.TypeClass.integer;
-                            done(TCFNumberFormat.toBigInteger(data, 0, data.length, value.isBigEndian(), signed));
+                            done(TCFNumberFormat.toBigInteger(data, value.isBigEndian(), signed));
                         }
                     }
                 }

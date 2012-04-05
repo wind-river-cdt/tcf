@@ -45,6 +45,7 @@ import org.eclipse.tcf.internal.debug.ui.model.TCFModel;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNode;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExecContext;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNodeStackFrame;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNumberFormat;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IChannel.IChannelListener;
 import org.eclipse.tcf.protocol.IToken;
@@ -815,8 +816,9 @@ public class TCFDisassemblyBackend extends AbstractDisassemblyBackend {
                             if (error == null) {
                                 exprSvc.evaluate(context.getID(), new DoneEvaluate() {
                                     public void doneEvaluate(IToken token, Exception error, Value value) {
-                                        if (error == null) {
-                                            final BigInteger address = toBigInteger(value.getValue(), value.isBigEndian(), false);
+                                        if (error == null && value.getValue() != null) {
+                                            final BigInteger address = TCFNumberFormat.toBigInteger(
+                                                    value.getValue(), value.isBigEndian(), false);
                                             fCallback.asyncExec(new Runnable() {
                                                 public void run() {
                                                     fCallback.gotoAddress(address);
@@ -879,8 +881,9 @@ public class TCFDisassemblyBackend extends AbstractDisassemblyBackend {
                             if (error == null) {
                                 exprSvc.evaluate(context.getID(), new DoneEvaluate() {
                                     public void doneEvaluate(IToken token, Exception error, Value value) {
-                                        if (error == null) {
-                                            final BigInteger address = toBigInteger(value.getValue(), value.isBigEndian(), false);
+                                        if (error == null && value.getValue() != null) {
+                                            BigInteger address = TCFNumberFormat.toBigInteger(
+                                                    value.getValue(), value.isBigEndian(), false);
                                             done("0x" + address.toString(16));
                                         }
                                         else {
@@ -915,26 +918,6 @@ public class TCFDisassemblyBackend extends AbstractDisassemblyBackend {
         TCFNodeExecContext ctx = fMemoryContext;
         if (ctx == null) return null;
         return TCFSourceLookupDirector.lookup(ctx.getModel().getLaunch(), ctx.getID(), file);
-    }
-
-    private static BigInteger toBigInteger(byte[] data, boolean big_endian, boolean sign_extension) {
-        byte[] temp = null;
-        if (sign_extension) {
-            temp = new byte[data.length];
-        }
-        else {
-            temp = new byte[data.length + 1];
-            temp[0] = 0; // Extra byte to avoid sign extension by BigInteger
-        }
-        if (big_endian) {
-            System.arraycopy(data, 0, temp, sign_extension ? 0 : 1, data.length);
-        }
-        else {
-            for (int i = 0; i < data.length; i++) {
-                temp[temp.length - i - 1] = data[i];
-            }
-        }
-        return new BigInteger(temp);
     }
 
     /*

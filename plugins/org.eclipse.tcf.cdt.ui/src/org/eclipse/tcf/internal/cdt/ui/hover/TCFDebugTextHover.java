@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.tcf.internal.cdt.ui.hover;
 
-import java.math.BigInteger;
 import java.util.Map;
 
 import org.eclipse.cdt.debug.ui.editors.AbstractDebugTextHover;
@@ -28,6 +27,7 @@ import org.eclipse.tcf.internal.debug.ui.model.TCFNode;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExecContext;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExpression;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNodeStackFrame;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNumberFormat;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IExpressions;
@@ -147,11 +147,7 @@ public class TCFDebugTextHover extends AbstractDebugTextHover implements ITextHo
                             if (error == null) {
                                 exprSvc.evaluate(context.getID(), new DoneEvaluate() {
                                     public void doneEvaluate(IToken token, Exception error, Value value) {
-                                        if (error == null) {
-                                            done(getValueText(value));
-                                        } else {
-                                            done(null);
-                                        }
+                                        done(error == null && value != null ? getValueText(value) : null);
                                         exprSvc.dispose(context.getID(), new DoneDispose() {
                                             public void doneDispose(IToken token, Exception error) {
                                                 // no-op
@@ -159,12 +155,14 @@ public class TCFDebugTextHover extends AbstractDebugTextHover implements ITextHo
                                         });
                                     }
                                 });
-                            } else {
+                            }
+                            else {
                                 done(null);
                             }
                         }
                     });
-                } else {
+                }
+                else {
                     done(null);
                 }
             }
@@ -172,40 +170,15 @@ public class TCFDebugTextHover extends AbstractDebugTextHover implements ITextHo
     }
 
     private static String getValueText(Value value) {
-        BigInteger bigInteger = toBigInteger(value.getValue(), value.isBigEndian(), true);
+        byte[] data = value.getValue();
+        if (data == null) return "N/A";
         switch(value.getTypeClass()) {
         case integer:
-            return bigInteger.toString();
+            return TCFNumberFormat.toBigInteger(data, value.isBigEndian(), true).toString();
         case real:
-            if (value.getValue().length <= 4) {
-                return String.valueOf(Float.intBitsToFloat(bigInteger.intValue()));
-            } else if (value.getValue().length <= 8) {
-                return String.valueOf(Double.longBitsToDouble(bigInteger.longValue()));
-            } else {
-                return "N/A";
-            }
+            return TCFNumberFormat.toFPString(data, value.isBigEndian());
         default:
-            return "0x"+bigInteger.toString(16);
+            return "0x" + TCFNumberFormat.toBigInteger(data, value.isBigEndian(), false).toString(16);
         }
-    }
-
-    private static BigInteger toBigInteger(byte[] data, boolean big_endian, boolean sign_extension) {
-        byte[] temp = null;
-        if (sign_extension) {
-            temp = new byte[data.length];
-        }
-        else {
-            temp = new byte[data.length + 1];
-            temp[0] = 0; // Extra byte to avoid sign extension by BigInteger
-        }
-        if (big_endian) {
-            System.arraycopy(data, 0, temp, sign_extension ? 0 : 1, data.length);
-        }
-        else {
-            for (int i = 0; i < data.length; i++) {
-                temp[temp.length - i - 1] = data[i];
-            }
-        }
-        return new BigInteger(temp);
     }
 }
