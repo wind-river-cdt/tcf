@@ -54,7 +54,14 @@ public class FSPeerTestCase extends TcfTestCase {
 		assertNotNull(peer);
 
 		testRoot = FSModel.findTreeNode(peerModel, getTestRoot());
-		assertNotNull(testRoot);
+		if(testRoot == null) {
+			File file = new File(getTestRoot());
+			if (!file.exists()) {
+				file.mkdirs();
+			}
+			testRoot = FSModel.findTreeNode(peerModel, getTestRoot());
+		}
+
 		String path = getTestRoot() + getPathSep() + getTestPath();
 		testFolder = prepareFolder(path, getTestPath(), testRoot);
 		testFile = prepareFile(path + getPathSep() + "test.txt", "test.txt", testFolder); //$NON-NLS-1$ //$NON-NLS-2$
