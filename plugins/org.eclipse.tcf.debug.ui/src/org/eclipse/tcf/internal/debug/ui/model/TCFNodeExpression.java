@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2011 Wind River Systems, Inc. and others.
+ * Copyright (c) 2008, 2012 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -70,6 +70,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
     private boolean enabled = true;
     private IExpressions.Value prev_value;
     private IExpressions.Value next_value;
+    private byte[] parent_value;
 
     private static final RGB
         rgb_error = new RGB(192, 0, 0),
@@ -134,6 +135,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
             @Override
             protected boolean startDataRetrieval() {
                 /* Compute expression script, not including type cast */
+                parent_value = null;
                 if (script != null) {
                     set(null, null, script);
                     return true;
@@ -156,16 +158,31 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
                     set(null, null, "${" + reg_id + "}");
                     return true;
                 }
+                String e = null;
                 TCFNode n = parent;
                 while (n instanceof TCFNodeArrayPartition) n = n.parent;
-                TCFDataCache<String> t = ((TCFNodeExpression)n).base_text;
-                if (!t.validate(this)) return false;
-                String e = t.getData();
-                if (e == null) {
-                    set(null, t.getError(), null);
-                    return true;
-                }
                 String cast = model.getCastToType(n.id);
+                if (cast == null && deref) {
+                    TCFNodeExpression exp = (TCFNodeExpression)n;
+                    if (!exp.value.validate(this)) return false;
+                    IExpressions.Value v = exp.value.getData();
+                    if (v != null && v.getTypeID() != null) {
+                        parent_value = v.getValue();
+                        if (parent_value != null) {
+                            e = "(${" + v.getTypeID() + "})0x" + TCFNumberFormat.toBigInteger(
+                                    parent_value, 0, parent_value.length, v.isBigEndian(), false).toString(16);
+                        }
+                    }
+                }
+                if (e == null) {
+                    TCFDataCache<String> t = ((TCFNodeExpression)n).base_text;
+                    if (!t.validate(this)) return false;
+                    e = t.getData();
+                    if (e == null) {
+                        set(null, t.getError(), null);
+                        return true;
+                    }
+                }
                 if (cast != null) e = "(" + cast + ")(" + e + ")";
                 if (field_id != null) {
                     e = "(" + e + ")" + (deref ? "->" : ".") + "${" + field_id + "}";
@@ -343,17 +360,24 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
                 });
                 return false;
             }
-            public void reset() {
-                super.reset();
-            }
         };
         type = new TCFData<ISymbols.Symbol>(channel) {
             @Override
             protected boolean startDataRetrieval() {
                 String type_id = null;
-                if (!value.validate(this)) return false;
-                IExpressions.Value val = value.getData();
-                if (val != null) type_id = val.getTypeID();
+                if (model.getCastToType(id) == null && field_id != null) {
+                    TCFDataCache<ISymbols.Symbol> sym_cache = model.getSymbolInfoCache(field_id);
+                    if (sym_cache != null) {
+                        if (!sym_cache.validate(this)) return false;
+                        ISymbols.Symbol sym_data = sym_cache.getData();
+                        if (sym_data != null) type_id = sym_data.getTypeID();
+                    }
+                }
+                if (type_id == null) {
+                    if (!value.validate(this)) return false;
+                    IExpressions.Value val = value.getData();
+                    if (val != null) type_id = val.getTypeID();
+                }
                 if (type_id == null) {
                     if (!expression.validate(this)) return false;
                     Expression exp = expression.getData();
@@ -567,6 +591,15 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
         }
     }
 
+    private void resetBaseText() {
+        if (parent_value != null && base_text.isValid()) {
+            base_text.reset();
+            expression.cancel();
+            string.cancel();
+            value.cancel();
+        }
+    }
+
     void onSuspended(boolean func_call) {
         if (!func_call) {
             prev_value = next_value;
@@ -577,6 +610,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
         if (!func_call || value.isValid() && value.getError() != null) value.reset();
         if (!func_call || string.isValid() && string.getError() != null) string.reset();
         children.onSuspended(func_call);
+        if (!func_call) resetBaseText();
         // No need to post delta: parent posted CONTENT
     }
 
@@ -586,6 +620,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
         type_name.reset();
         string.reset();
         children.onRegisterValueChanged();
+        resetBaseText();
         postAllChangedDelta();
     }
 
@@ -595,6 +630,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
         type_name.reset();
         string.reset();
         children.onMemoryChanged();
+        resetBaseText();
         if (parent instanceof TCFNodeExpression) return;
         if (parent instanceof TCFNodeArrayPartition) return;
         postAllChangedDelta();
@@ -606,6 +642,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
         type_name.reset();
         string.reset();
         children.onMemoryMapChanged();
+        resetBaseText();
         if (parent instanceof TCFNodeExpression) return;
         if (parent instanceof TCFNodeArrayPartition) return;
         postAllChangedDelta();
@@ -617,6 +654,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
         type_name.reset();
         string.reset();
         children.onValueChanged();
+        resetBaseText();
         postAllChangedDelta();
     }
 
@@ -628,6 +666,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
         string.cancel();
         expression_text.cancel();
         children.onCastToTypeChanged();
+        resetBaseText();
         postAllChangedDelta();
     }
 
