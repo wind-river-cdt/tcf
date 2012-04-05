@@ -98,14 +98,14 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager#openChannel(org.eclipse.tcf.protocol.IPeer, boolean, org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel)
+	 * @see org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager#openChannel(org.eclipse.tcf.protocol.IPeer, java.util.Map, org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel)
 	 */
 	@Override
-	public void openChannel(final IPeer peer, final boolean forceNew, final DoneOpenChannel done) {
+	public void openChannel(final IPeer peer, final Map<String, Boolean> flags, final DoneOpenChannel done) {
 		Runnable runnable = new Runnable() {
 			@Override
             public void run() {
-				internalOpenChannel(peer, forceNew, done);
+				internalOpenChannel(peer, flags, done);
 			}
 		};
 		if (Protocol.isDispatchThread()) runnable.run();
@@ -115,18 +115,15 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 	/**
 	 * Internal implementation of {@link #openChannel(IPeer, org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel)}.
 	 * <p>
-	 * If <code>forceNew</code> is <code>true</code>, a new and not reference counted channel is opened and returned. The returned
-	 * channel must be closed by the caller himself. The channel manager is not keeping track of non reference counted channels.
-	 * <p>
 	 * Reference counted channels are cached by the channel manager and must be closed via {@link #closeChannel(IChannel)} .
 	 * <p>
 	 * Method must be called within the TCF dispatch thread.
 	 *
 	 * @param peer The peer. Must not be <code>null</code>.
-	 * @param forceNew Specify <code>true</code> to force opening a new channel, <code>false</code> otherwise.
+	 * @param flags Map containing the flags to parameterize the channel opening, or <code>null</code>.
 	 * @param done The client callback. Must not be <code>null</code>.
 	 */
-	/* default */ void internalOpenChannel(final IPeer peer, final boolean forceNew, final DoneOpenChannel done) {
+	/* default */ void internalOpenChannel(final IPeer peer, final Map<String, Boolean> flags, final DoneOpenChannel done) {
 		Assert.isNotNull(peer);
 		Assert.isNotNull(done);
 		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
@@ -138,9 +135,12 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 		final String id = peer.getID();
 
 		if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITraceIds.TRACE_CHANNEL_MANAGER)) {
-			CoreBundleActivator.getTraceHandler().trace(NLS.bind(Messages.ChannelManager_openChannel_message, id, Boolean.valueOf(forceNew)),
+			CoreBundleActivator.getTraceHandler().trace(NLS.bind(Messages.ChannelManager_openChannel_message, id, flags),
 														0, ITraceIds.TRACE_CHANNEL_MANAGER, IStatus.INFO, this);
 		}
+
+		// Extract the flags of interest form the given flags map
+		boolean forceNew = flags != null && flags.containsKey(IChannelManager.FLAG_FORCE_NEW) ? flags.get(IChannelManager.FLAG_FORCE_NEW).booleanValue() : false;
 
 		// Check if there is already a channel opened to this peer
 		channel = !forceNew ? channels.get(id) : null;
@@ -253,14 +253,14 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager#openChannel(java.util.Map, boolean, org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel)
+	 * @see org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager#openChannel(java.util.Map, java.util.Map, org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel)
 	 */
 	@Override
-	public void openChannel(final Map<String, String> peerAttributes, final boolean forceNew, final DoneOpenChannel done) {
+	public void openChannel(final Map<String, String> peerAttributes, final Map<String, Boolean> flags, final DoneOpenChannel done) {
 		Runnable runnable = new Runnable() {
 			@Override
             public void run() {
-				internalOpenChannel(peerAttributes, forceNew, done);
+				internalOpenChannel(peerAttributes, flags, done);
 			}
 		};
 		if (Protocol.isDispatchThread()) runnable.run();
@@ -273,14 +273,14 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 	 * Method must be called within the TCF dispatch thread.
 	 *
 	 * @param peerAttributes The peer attributes. Must not be <code>null</code>.
-	 * @param forceNew Specify <code>true</code> to force opening a new channel, <code>false</code> otherwise.
+	 * @param flags Map containing the flags to parameterize the channel opening, or <code>null</code>.
 	 * @param done The client callback. Must not be <code>null</code>.
 	 */
-	/* default */ void internalOpenChannel(final Map<String, String> peerAttributes, final boolean forceNew, final DoneOpenChannel done) {
+	/* default */ void internalOpenChannel(final Map<String, String> peerAttributes, final Map<String, Boolean> flags, final DoneOpenChannel done) {
 		Assert.isNotNull(peerAttributes);
 		Assert.isNotNull(done);
 		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
-		internalOpenChannel(getOrCreatePeerInstance(peerAttributes), forceNew, done);
+		internalOpenChannel(getOrCreatePeerInstance(peerAttributes), flags, done);
 	}
 
 	/**

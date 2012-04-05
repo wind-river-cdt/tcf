@@ -55,7 +55,7 @@ public class TerminateStep {
 			} else {
 				onError(node, Messages.DetachStep_error_disconnect, null, callback);
 			}
-		} 
+		}
 		else {
 			onError(node, Messages.DetachStep_error_disconnect, null, callback);
 		}
@@ -75,7 +75,7 @@ public class TerminateStep {
 		Assert.isNotNull(node);
 
 		// Open a channel
-		Tcf.getChannelManager().openChannel(node.peerNode.getPeer(), false, new IChannelManager.DoneOpenChannel() {
+		Tcf.getChannelManager().openChannel(node.peerNode.getPeer(), null, new IChannelManager.DoneOpenChannel() {
 			@Override
 			public void doneOpenChannel(final Throwable error, final IChannel channel) {
 				if (error == null) {

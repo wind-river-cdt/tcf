@@ -21,6 +21,7 @@ import java.io.PipedOutputStream;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -247,7 +248,9 @@ public class TerminalsLauncher extends PlatformObject implements ITerminalsLaunc
 		this.properties = properties;
 
 		// Open a dedicated channel to the given peer
-		Tcf.getChannelManager().openChannel(peer, true, new IChannelManager.DoneOpenChannel() {
+		Map<String, Boolean> flags = new HashMap<String, Boolean>();
+		flags.put(IChannelManager.FLAG_FORCE_NEW, Boolean.TRUE);
+		Tcf.getChannelManager().openChannel(peer, flags, new IChannelManager.DoneOpenChannel() {
 			/* (non-Javadoc)
 			 * @see org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel#doneOpenChannel(java.lang.Throwable, org.eclipse.tcf.protocol.IChannel)
 			 */

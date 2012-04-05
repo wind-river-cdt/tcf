@@ -39,7 +39,7 @@ public final class FSModel {
 	/**
 	 * Get the file system model of the peer model. If it does not
 	 * exist yet, create a new instance and store it.
-	 *  
+	 *
 	 * @param peerModel The peer model
 	 * @return The file system model connected this peer model.
 	 */
@@ -75,7 +75,7 @@ public final class FSModel {
 
 	/**
 	 * Get the root node of the peer model.
-	 * 
+	 *
 	 * @return The root node.
 	 */
 	public FSTreeNode getRoot() {
@@ -84,7 +84,7 @@ public final class FSModel {
 
 	/**
 	 * Set the root node of the peer model.
-	 * 
+	 *
 	 * @param root The root node
 	 */
 	public void setRoot(FSTreeNode root) {
@@ -93,9 +93,9 @@ public final class FSModel {
 
 	/**
 	 * Get the corresponding FSTreeNode based on the path of the local cache file.
-	 * 
+	 *
 	 * @param filePath The local cache's file path.
-	 * @return The FSTreeNode. 
+	 * @return The FSTreeNode.
 	 */
 	public static FSTreeNode getTreeNode(String filePath) {
 		String cache_root = CacheManager.getInstance().getCacheRoot().getAbsolutePath();
@@ -149,7 +149,7 @@ public final class FSModel {
 
 	/**
 	 * Find the tree node in the peer's file system tree.
-	 * 
+	 *
 	 * @param peer The peer model.
 	 * @param path The relative path to the cache file.
 	 * @return The FSTreeNode corresponding to this file.
@@ -185,7 +185,7 @@ public final class FSModel {
 	/**
 	 * Search the path in the children list. If it exists, then search the children of the found
 	 * node recursively until the whole path is found. Or else return null.
-	 * 
+	 *
 	 * @param children The children nodes to search the path.
 	 * @param path The path to be searched.
 	 * @return The leaf node that has the searched path.
@@ -232,7 +232,7 @@ public final class FSModel {
 
 	/**
 	 * Find in the children array the node that has the specified name.
-	 * 
+	 *
 	 * @param children The children array in which to find the node.
 	 * @param name The name of the node to be searched.
 	 * @return The node that has the specified name.
@@ -249,7 +249,7 @@ public final class FSModel {
 
 	/**
 	 * Create a root node for the specified peer.
-	 * 
+	 *
 	 * @param peerNode The peer.
 	 */
 	public void createRoot(final IPeerModel peerNode) {
@@ -268,12 +268,12 @@ public final class FSModel {
 
 	/**
 	 * Query the children of the given file system node.
-	 * 
+	 *
 	 * @param parentNode The file system node. Must not be <code>null</code>.
 	 */
 	public void queryChildren(FSTreeNode parentNode) {
 		Assert.isNotNull(parentNode);
 		parentNode.queryStarted();
-		Tcf.getChannelManager().openChannel(parentNode.peerNode.getPeer(), false, new QueryDoneOpenChannel(parentNode));
+		Tcf.getChannelManager().openChannel(parentNode.peerNode.getPeer(), null, new QueryDoneOpenChannel(parentNode));
     }
 }

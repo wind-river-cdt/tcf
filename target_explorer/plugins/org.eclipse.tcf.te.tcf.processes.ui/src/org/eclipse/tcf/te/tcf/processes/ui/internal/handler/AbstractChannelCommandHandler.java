@@ -62,7 +62,7 @@ public abstract class AbstractChannelCommandHandler extends AbstractHandler {
 					// If the peer is available, we can open a channel to the remote peer
 					if (peer != null) {
 						// Get the channel
-						Tcf.getChannelManager().openChannel(peer, false, new IChannelManager.DoneOpenChannel() {
+						Tcf.getChannelManager().openChannel(peer, null, new IChannelManager.DoneOpenChannel() {
 							@Override
                             public void doneOpenChannel(final Throwable error, final IChannel channel) {
 								if (error == null) {

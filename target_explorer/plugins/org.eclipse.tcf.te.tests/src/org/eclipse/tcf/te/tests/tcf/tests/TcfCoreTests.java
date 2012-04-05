@@ -9,6 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tests.tcf.tests;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import junit.framework.Test;
@@ -53,7 +55,9 @@ public class TcfCoreTests extends TcfTestCase {
 		final AtomicReference<Callback> callback = new AtomicReference<Callback>();
 		callback.set(new Callback());
 
-		Tcf.getChannelManager().openChannel(peer, true, new IChannelManager.DoneOpenChannel() {
+		Map<String, Boolean> flags = new HashMap<String, Boolean>();
+		flags.put(IChannelManager.FLAG_FORCE_NEW, Boolean.TRUE);
+		Tcf.getChannelManager().openChannel(peer, flags, new IChannelManager.DoneOpenChannel() {
 
 			@Override
 			public void doneOpenChannel(Throwable error, IChannel channel) {

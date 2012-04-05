@@ -39,8 +39,8 @@ public class ProcessModel implements IPreferenceConsts{
 
 	/**
 	 * Get the process model stored in the peer model.
-	 * If there's no process model yet, create a new process model. 
-	 * 
+	 * If there's no process model yet, create a new process model.
+	 *
 	 * @param peerModel The target's peer model.
 	 * @return The process model representing the process.
 	 */
@@ -65,7 +65,7 @@ public class ProcessModel implements IPreferenceConsts{
 		}
 		return null;
 	}
-	
+
 	// The root node of the peer model
 	private ProcessTreeNode root;
 	// The polling interval in seconds. If it is zero, then stop polling periodically.
@@ -86,7 +86,7 @@ public class ProcessModel implements IPreferenceConsts{
 
 	/**
 	 * Get the root node of the peer model.
-	 * 
+	 *
 	 * @return The root node.
 	 */
 	public ProcessTreeNode getRoot() {
@@ -95,7 +95,7 @@ public class ProcessModel implements IPreferenceConsts{
 
 	/**
 	 * Set the root node of the peer model.
-	 * 
+	 *
 	 * @param root The root node
 	 */
 	public void createRoot(IPeerModel peerModel ) {
@@ -112,9 +112,9 @@ public class ProcessModel implements IPreferenceConsts{
     }
 
 	/**
-	 * Set the status of the polling and 
+	 * Set the status of the polling and
 	 * fire a property change event.
-	 * 
+	 *
 	 * @param stopped if the polling should be stopped.
 	 */
 	void setStopped(boolean stopped) {
@@ -158,10 +158,10 @@ public class ProcessModel implements IPreferenceConsts{
 	        }};
         pollingTimer.schedule(pollingTask, interval * 1000L);
     }
-	
+
 	/**
-	 * Set new interval. 
-	 * 
+	 * Set new interval.
+	 *
 	 * @param interval The new interval.
 	 */
 	public void setInterval(int interval) {
@@ -181,7 +181,7 @@ public class ProcessModel implements IPreferenceConsts{
 
 	/**
 	 * Get the current interval.
-	 * 
+	 *
 	 * @return the current interval.
 	 */
 	public int getInterval() {
@@ -190,31 +190,31 @@ public class ProcessModel implements IPreferenceConsts{
 
 	/**
 	 * Query the children of the given process context.
-	 * 
+	 *
 	 * @param parentNode The process context node. Must not be <code>null</code>.
 	 */
 	public void queryChildren(ProcessTreeNode parentNode) {
 		Assert.isNotNull(parentNode);
 		parentNode.childrenQueryRunning = true;
-		Tcf.getChannelManager().openChannel(parentNode.peerNode.getPeer(), false, new QueryDoneOpenChannel(parentNode));
+		Tcf.getChannelManager().openChannel(parentNode.peerNode.getPeer(), null, new QueryDoneOpenChannel(parentNode));
 	}
 
 	/**
 	 * Recursively refresh the children of the given process context with a callback, which is
 	 * called when whole process is finished.
-	 * 
+	 *
 	 * @param parentNode The process context node. Must not be <code>null</code>.
 	 * @param callback The callback object, or <code>null</code> when callback is not needed.
 	 */
 	public void refresh(final ProcessTreeNode parentNode, final ICallback callback) {
 		Assert.isNotNull(parentNode);
 		parentNode.childrenQueryRunning = true;
-		Tcf.getChannelManager().openChannel(parentNode.peerNode.getPeer(), false, new RefreshDoneOpenChannel(callback, parentNode));
+		Tcf.getChannelManager().openChannel(parentNode.peerNode.getPeer(), null, new RefreshDoneOpenChannel(callback, parentNode));
 	}
 
 	/**
 	 * Recursively refresh the children of the given process context.
-	 * 
+	 *
 	 * @param parentNode The process context node. Must not be <code>null</code>.
 	 */
 	public void refresh(final ProcessTreeNode parentNode) {
@@ -224,7 +224,7 @@ public class ProcessModel implements IPreferenceConsts{
 	/**
 	 * Recursively refresh the tree from the root node with a callback, which
 	 * is called when the whole process is finished.
-	 * 
+	 *
 	 * @param callback The callback object or <code>null</code> when callback is not needed.
 	 */
 	public void refresh(ICallback callback) {
@@ -246,11 +246,11 @@ public class ProcessModel implements IPreferenceConsts{
 			refresh(this.root, null);
 		}
 	}
-	
+
 	/**
-	 * Update the most recently  used interval adding 
+	 * Update the most recently  used interval adding
 	 * a new interval.
-	 * 
+	 *
 	 * @param interval The new interval.
 	 */
 	public void addMRUInterval(int interval){
@@ -290,16 +290,16 @@ public class ProcessModel implements IPreferenceConsts{
 
 	/**
 	 * If the polling has been stopped.
-	 * 
+	 *
 	 * @return true if it is stopped.
 	 */
 	public boolean isRefreshStopped() {
 	    return stopped;
     }
-	
+
 	/**
 	 * Get the peer model associated with this model.
-	 * 
+	 *
 	 * @return The peer model.
 	 */
 	IPeerModel getPeerModel() {
@@ -308,12 +308,12 @@ public class ProcessModel implements IPreferenceConsts{
 
 	/**
 	 * Refresh the children without refreshing itself.
-	 * 
+	 *
 	 * @param parentNode The parent whose children are to be refreshed.
 	 */
 	public void refreshChildren(ProcessTreeNode parentNode) {
 		Assert.isNotNull(parentNode);
-		Tcf.getChannelManager().openChannel(parentNode.peerNode.getPeer(), false, new RefreshChildrenDoneOpenChannel(parentNode));	    
+		Tcf.getChannelManager().openChannel(parentNode.peerNode.getPeer(), null, new RefreshChildrenDoneOpenChannel(parentNode));
     }
-}	
+}
 

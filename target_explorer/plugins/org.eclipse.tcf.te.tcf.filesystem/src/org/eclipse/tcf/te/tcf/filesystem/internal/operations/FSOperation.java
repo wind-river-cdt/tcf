@@ -122,11 +122,11 @@ public class FSOperation implements IRunnableWithProgress{
 			parent.removeChild(node);
 		}
 	}
-	
+
 	/**
 	 * Check if the file exists and delete if it does. Record
 	 * the failure message if deleting fails.
-	 * 
+	 *
 	 * @param file The file to be deleted.
 	 */
 	protected void deleteFileChecked(final File file) {
@@ -209,7 +209,7 @@ public class FSOperation implements IRunnableWithProgress{
 		channelManager = BlockingCallProxy.newInstance(IChannelManager.class, channelManager);
 		final TCFChannelException[] errors = new TCFChannelException[1];
 		final IChannel[] channels = new IChannel[1];
-		channelManager.openChannel(peer, false, new DoneOpenChannel() {
+		channelManager.openChannel(peer, null, new DoneOpenChannel() {
 			@Override
 			public void doneOpenChannel(Throwable error, IChannel channel) {
 				if (error != null) {
@@ -234,15 +234,15 @@ public class FSOperation implements IRunnableWithProgress{
 	}
 
 	/**
-	 * Get a blocking file system service from the channel. The 
-	 * returned file system service is a service that delegates the 
+	 * Get a blocking file system service from the channel. The
+	 * returned file system service is a service that delegates the
 	 * method call to the file system proxy. If the method returns
 	 * asynchronously with a callback, it will block the call until
 	 * the callback returns.
 	 * <p>
-	 * <em>Note: All the method of the returned file system 
+	 * <em>Note: All the method of the returned file system
 	 * service must be called outside of the dispatching thread.</em>
-	 * 
+	 *
 	 * @param channel The channel to get the file system service.
 	 * @return The blocking file system service.
 	 */
@@ -302,7 +302,7 @@ public class FSOperation implements IRunnableWithProgress{
 
 	/**
 	 * Get the children the specified folder node. If the folder has not yet been loaded, then load it.
-	 * 
+	 *
 	 * @param node The folder node.
 	 * @return The children of the folder node.
 	 * @throws TCFException Thrown during querying the children nodes.

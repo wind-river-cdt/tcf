@@ -31,7 +31,7 @@ public class QueryChildrenCallbackTest extends FSPeerTestCase {
 				statusRef.set(status);
             }
 		};
-		Tcf.getChannelManager().openChannel(peer, false, new QueryDoneOpenChannel(testRoot,callback));
+		Tcf.getChannelManager().openChannel(peer, null, new QueryDoneOpenChannel(testRoot,callback));
 		waitAndDispatch(0, callback.getDoneConditionTester(new NullProgressMonitor()));
 		assertTrue(statusRef.get().isOK());
 	}
