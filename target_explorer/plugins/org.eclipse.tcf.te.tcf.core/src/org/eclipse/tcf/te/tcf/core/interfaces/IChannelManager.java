@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others. All rights reserved.
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -31,9 +31,12 @@ public interface IChannelManager extends IAdaptable {
 	public static final String FLAG_FORCE_NEW = "forceNew"; //$NON-NLS-1$
 
 	/**
-	 * If set to <code>true</code>, the channel is opened if necessary, but no value
-	 * add is launched and associated with the channel. This option should be used
-	 * with extreme caution.
+	 * If set to <code>true</code>, a new and not reference counted channel is is opened,
+	 * and no value add is launched and associated with the channel. This option should
+	 * be used with extreme caution.
+	 * <p>
+	 * The returned channel must be closed by the caller himself. The channel manager
+	 * is not keeping track of non reference counted channels.
 	 * <p>
 	 * If not present in the flags map passed in to open channel, the default value is
 	 * <code>false</code>.

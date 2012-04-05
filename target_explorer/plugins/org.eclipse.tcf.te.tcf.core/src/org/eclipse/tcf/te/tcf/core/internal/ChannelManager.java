@@ -141,6 +141,9 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 
 		// Extract the flags of interest form the given flags map
 		boolean forceNew = flags != null && flags.containsKey(IChannelManager.FLAG_FORCE_NEW) ? flags.get(IChannelManager.FLAG_FORCE_NEW).booleanValue() : false;
+		boolean noValueAdd = flags != null && flags.containsKey(IChannelManager.FLAG_NO_VALUE_ADD) ? flags.get(IChannelManager.FLAG_NO_VALUE_ADD).booleanValue() : false;
+		// If noValueAdd == true -> forceNew has to be true as well
+		if (noValueAdd) forceNew = true;
 
 		// Check if there is already a channel opened to this peer
 		channel = !forceNew ? channels.get(id) : null;
