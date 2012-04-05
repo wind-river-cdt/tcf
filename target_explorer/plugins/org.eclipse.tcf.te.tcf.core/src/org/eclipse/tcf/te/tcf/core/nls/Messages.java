@@ -79,6 +79,9 @@ public class Messages extends NLS {
 	public static String ChannelManager_openChannel_new_message;
 	public static String ChannelManager_openChannel_success_message;
 	public static String ChannelManager_openChannel_failed_message;
+	public static String ChannelManager_openChannel_valueAdd_check;
+	public static String ChannelManager_openChannel_valueAdd_noneApplicable;
+	public static String ChannelManager_openChannel_valueAdd_numApplicable;
 	public static String ChannelManager_createPeer_new_message;
 	public static String ChannelManager_closeChannel_message;
 	public static String ChannelManager_closeChannel_inuse_message;

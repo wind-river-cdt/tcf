@@ -27,6 +27,8 @@ import org.eclipse.tcf.te.tcf.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
 import org.eclipse.tcf.te.tcf.core.interfaces.tracing.ITraceIds;
 import org.eclipse.tcf.te.tcf.core.nls.Messages;
+import org.eclipse.tcf.te.tcf.core.va.ValueAddManager;
+import org.eclipse.tcf.te.tcf.core.va.interfaces.IValueAdd;
 
 
 /**
@@ -105,7 +107,14 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 		Runnable runnable = new Runnable() {
 			@Override
             public void run() {
-				internalOpenChannel(peer, flags, done);
+				// Check on the value-add's first
+				internalHandleValueAdds(peer, flags, new DoneHandleValueAdds() {
+					@Override
+					public void doneHandleValueAdds(Throwable error, IValueAdd[] valueAdds) {
+						// Open the channel
+						internalOpenChannel(peer, flags, done);
+					}
+				});
 			}
 		};
 		if (Protocol.isDispatchThread()) runnable.run();
@@ -193,7 +202,7 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 
 						if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITraceIds.TRACE_CHANNEL_MANAGER)) {
 							CoreBundleActivator.getTraceHandler().trace(NLS.bind(Messages.ChannelManager_openChannel_success_message, id),
-																		0, ITraceIds.TRACE_CHANNEL_MANAGER, IStatus.INFO, this);
+																		0, ITraceIds.TRACE_CHANNEL_MANAGER, IStatus.INFO, ChannelManager.this);
 						}
 
 						// Channel opening succeeded
@@ -252,7 +261,6 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 				done.doneOpenChannel(null, channel);
 			}
 		}
-
 	}
 
 	/* (non-Javadoc)
@@ -283,7 +291,9 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 		Assert.isNotNull(peerAttributes);
 		Assert.isNotNull(done);
 		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
-		internalOpenChannel(getOrCreatePeerInstance(peerAttributes), flags, done);
+		// Call openChannel(IPeer, ...) instead of calling internalOpenChannel(IPeer, ...) directly
+		// to include the value-add handling.
+		openChannel(getOrCreatePeerInstance(peerAttributes), flags, done);
 	}
 
 	/**
@@ -443,5 +453,79 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 		channels.clear();
 
 		for (IChannel channel : openChannels) internalCloseChannel(channel);
+	}
+
+	/**
+	 * Client call back interface for internalHandleValueAdds(...).
+	 */
+	interface DoneHandleValueAdds {
+		/**
+		 * Called when all the value-adds are launched or the launched failed.
+		 *
+		 * @param error The error description if operation failed, <code>null</code> if succeeded.
+		 * @param channel The channel object or <code>null</code>.
+		 */
+		void doneHandleValueAdds(Throwable error, IValueAdd[] valueAdds);
+	}
+
+	/**
+	 * Check on the value-adds for the given peer. Launch the value-adds
+	 * if necessary.
+	 *
+	 * @param id The peer id. Must not be <code>null</code>.
+	 * @param peer The peer. Must not be <code>null</code>.
+	 * @param done The client callback. Must not be <code>null</code>.
+	 */
+	/* default */ void internalHandleValueAdds(final IPeer peer, final Map<String, Boolean> flags, final DoneHandleValueAdds done) {
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+		Assert.isNotNull(peer);
+		Assert.isNotNull(done);
+
+		// Get the peer id
+		final String id = peer.getID();
+
+		if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITraceIds.TRACE_CHANNEL_MANAGER)) {
+			CoreBundleActivator.getTraceHandler().trace(NLS.bind(Messages.ChannelManager_openChannel_valueAdd_check, id),
+														0, ITraceIds.TRACE_CHANNEL_MANAGER, IStatus.INFO, this);
+		}
+
+		// Extract the flags of interest form the given flags map
+		boolean forceNew = flags != null && flags.containsKey(IChannelManager.FLAG_FORCE_NEW) ? flags.get(IChannelManager.FLAG_FORCE_NEW).booleanValue() : false;
+		boolean noValueAdd = flags != null && flags.containsKey(IChannelManager.FLAG_NO_VALUE_ADD) ? flags.get(IChannelManager.FLAG_NO_VALUE_ADD).booleanValue() : false;
+		// If noValueAdd == true -> forceNew has to be true as well
+		if (noValueAdd) forceNew = true;
+
+		// Check if there is already a channel opened to this peer
+		IChannel channel = !forceNew ? channels.get(id) : null;
+		if (channel != null && (channel.getState() == IChannel.STATE_OPEN || channel.getState() == IChannel.STATE_OPENING)) {
+			// Got an existing channel -> drop out immediately
+			done.doneHandleValueAdds(null, null);
+			return;
+		}
+
+		// Do we have applicable value-add contributions
+		IValueAdd[] valueAdds = ValueAddManager.getInstance().getValueAdd(peer);
+		if (valueAdds.length == 0) {
+			// There are no applicable value-add's -> drop out immediately
+			if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITraceIds.TRACE_CHANNEL_MANAGER)) {
+				CoreBundleActivator.getTraceHandler().trace(NLS.bind(Messages.ChannelManager_openChannel_valueAdd_noneApplicable, id),
+															0, ITraceIds.TRACE_CHANNEL_MANAGER, IStatus.INFO, this);
+			}
+			done.doneHandleValueAdds(null, null);
+			return;
+		}
+
+		// There are at least applicable value-add contributions
+		if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITraceIds.TRACE_CHANNEL_MANAGER)) {
+			CoreBundleActivator.getTraceHandler().trace(NLS.bind(Messages.ChannelManager_openChannel_valueAdd_numApplicable, Integer.valueOf(valueAdds.length), id),
+														0, ITraceIds.TRACE_CHANNEL_MANAGER, IStatus.INFO, this);
+		}
+
+		Throwable error = null;
+
+		// Loop all applicable value-adds and check if there are up and running.
+		// If not, trigger a launch of the value-add.
+
+		done.doneHandleValueAdds(error, valueAdds);
 	}
 }
