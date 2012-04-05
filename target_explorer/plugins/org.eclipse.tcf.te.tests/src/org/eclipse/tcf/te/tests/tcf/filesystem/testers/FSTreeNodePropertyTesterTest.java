@@ -41,7 +41,7 @@ public class FSTreeNodePropertyTesterTest extends FSPeerTestCase {
 	}
 	
 	public void testIsExecutable() {
-		assertFalse(tester.test(testFile, "isExecutable", null, null)); //$NON-NLS-1$
+		assertTrue(tester.test(testFile, "isExecutable", null, null)); //$NON-NLS-1$
 	}
 	
 	public void testIsRoot() {
