@@ -904,14 +904,24 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
                                 exit(error);
                             }
                             else {
+                                StringBuffer bf = new StringBuffer();
+                                bf.append('"');
+                                int l = id.length();
+                                for (int i = 0; i < l; i++) {
+                                    char ch = id.charAt(i);
+                                    if (ch == '"' || ch == '\\') bf.append('\\');
+                                    bf.append(ch);
+                                }
+                                bf.append('"');
+                                String v = bf.toString();
                                 for (String nm : names) {
                                     if (nm.equals("ID")) {
                                         String s = null;
                                         switch (rnd.nextInt(4)) {
-                                        case 0: s = "ID=" + id; break;
-                                        case 1: s = "**/ID=" + id; break;
-                                        case 2: s = "/**/ID=" + id; break;
-                                        case 3: s = "ID=" + id + ",id=" + id; break;
+                                        case 0: s = "ID=" + v; break;
+                                        case 1: s = "**/ID=" + v; break;
+                                        case 2: s = "/**/ID=" + v; break;
+                                        case 3: s = "ID=" + v + ",id=" + v; break;
                                         }
                                         srv_context_query.query(s, new IContextQuery.DoneQuery() {
                                             public void doneQuery(IToken token, Exception error, String[] contexts) {
