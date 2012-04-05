@@ -14,7 +14,6 @@ package org.eclipse.tcf.internal.cdt.ui.breakpoints;
 import org.eclipse.cdt.debug.core.model.ICBreakpoint;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -31,13 +30,11 @@ public class TCFBreakpointThreadFilterPage extends PropertyPage {
     @Override
     protected Control createContents(Composite parent) {
         noDefaultAndApplyButton();
-        Composite mainComposite = new Composite(parent, SWT.NONE);
-        mainComposite.setFont(parent.getFont());
-        mainComposite.setLayout(new GridLayout());
-        mainComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
-        createThreadFilterEditor(mainComposite);
+        Composite fieldEditorComposite = new Composite(parent, SWT.NONE);
+        fieldEditorComposite.setLayout( new GridLayout(1, false));
+        createThreadFilterEditor(fieldEditorComposite);
         setValid(true);
-        return mainComposite;
+        return fieldEditorComposite;
     }
 
     protected ICBreakpoint getBreakpoint() {

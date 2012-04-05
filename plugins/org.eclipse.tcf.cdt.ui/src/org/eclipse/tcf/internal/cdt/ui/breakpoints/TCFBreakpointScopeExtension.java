@@ -23,6 +23,7 @@ import org.eclipse.tcf.internal.debug.model.TCFBreakpointsModel;
 public class TCFBreakpointScopeExtension implements ICBreakpointExtension {
 
     private String[] fContextIds;
+    private String fProperties;
     private ICBreakpoint fBreakpoint;
 
     public void initialize(ICBreakpoint breakpoint) throws CoreException {
@@ -31,6 +32,7 @@ public class TCFBreakpointScopeExtension implements ICBreakpointExtension {
         if (m != null && m.exists()) {
             String contextIdAttr = m.getAttribute(TCFBreakpointsModel.ATTR_CONTEXTIDS, null);
             if (contextIdAttr != null) fContextIds = contextIdAttr.split(",\\s*");
+            fProperties = m.getAttribute(TCFBreakpointsModel.ATTR_CONTEXT_QUERY, null);
         }
     }
 
@@ -64,6 +66,23 @@ public class TCFBreakpointScopeExtension implements ICBreakpointExtension {
         catch (Exception e) {
             Activator.log(e);
         }
+    }      
+    public void setPropertiesFilter(String properties) {
+        fProperties = properties;
+        if (fBreakpoint == null) return;
+        try {
+            ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
+                public void run(IProgressMonitor monitor) throws CoreException {
+                    final IMarker m = fBreakpoint.getMarker();
+                    if (m == null || !m.exists()) return;
+                    if (fProperties.length() != 0)
+                        m.setAttribute(TCFBreakpointsModel.ATTR_CONTEXT_QUERY, fProperties);
+                }
+            }, null);
+        }
+        catch (Exception e) {
+            Activator.log(e);
+        }        
     }
 
     public String[] getThreadFilters() {

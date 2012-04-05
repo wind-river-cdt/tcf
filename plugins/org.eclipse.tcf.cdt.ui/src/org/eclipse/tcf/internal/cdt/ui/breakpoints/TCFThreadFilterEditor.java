@@ -18,12 +18,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.cdt.debug.core.model.ICBreakpoint;
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugUIConstants;
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
@@ -31,18 +39,35 @@ import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StackLayout;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.tcf.internal.cdt.ui.Activator;
 import org.eclipse.tcf.internal.cdt.ui.ImageCache;
+import org.eclipse.tcf.internal.debug.model.TCFBreakpointsModel;
 import org.eclipse.tcf.internal.debug.model.TCFLaunch;
 import org.eclipse.tcf.internal.debug.ui.model.TCFChildren;
 import org.eclipse.tcf.internal.debug.ui.model.TCFModel;
 import org.eclipse.tcf.internal.debug.ui.model.TCFModelManager;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNode;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExecContext;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.services.IContextQuery;
 import org.eclipse.tcf.services.IRunControl;
 import org.eclipse.tcf.util.TCFDataCache;
 import org.eclipse.tcf.util.TCFTask;
@@ -227,7 +252,6 @@ public class TCFThreadFilterEditor {
         }
     }
 
-
     private TCFBreakpointThreadFilterPage fPage;
     private CheckboxTreeViewer fThreadViewer;
     private final ThreadFilterContentProvider fContentProvider;
@@ -235,33 +259,325 @@ public class TCFThreadFilterEditor {
     private final List<Context> fContexts = new ArrayList<Context>();
     private final Map<TCFLaunch, Context[]> fContainersPerLaunch = new HashMap<TCFLaunch, Context[]>();
     private final Map<Context, Context[]> fContextsPerContainer = new HashMap<Context, Context[]>();
+    private StackLayout stackLayout;
+    private Composite basicPage;
+    private Composite advancedPage;
+    private Combo scopeExprCombo;
+    private ControlDecoration scopeExpressionDecoration;
+    private Button radioBasic;
+    private Button radioAdvanced;
+    
+    public class ScopingModeListener implements SelectionListener {
+        private Composite fParent;
 
+        public ScopingModeListener(Composite parent) {
+            fParent = parent;
+        }
+        public void widgetSelected(SelectionEvent e) {
+            if (radioBasic.getSelection()) {
+                stackLayout.topControl = basicPage;
+            }    
+            else {
+                stackLayout.topControl = advancedPage;
+            }
+            fParent.layout();
+        }
+        public void widgetDefaultSelected(SelectionEvent e) {
+        }
+    }
+ 
+    /**
+     * Returns the dialog settings or <code>null</code> if none
+     *
+     * @param create
+     *            whether to create the settings
+     */
+    private IDialogSettings getDialogSettings(boolean create) {
+        IDialogSettings settings = Activator.getDefault()
+                .getDialogSettings();
+        IDialogSettings section = settings.getSection(this.getClass()
+                .getName());
+        if (section == null & create) {
+            section = settings.addNewSection(this.getClass().getName());
+        }
+        return section;
+    }
+    
     public TCFThreadFilterEditor(Composite parent, TCFBreakpointThreadFilterPage page) {
         fPage = page;
         fContentProvider = new ThreadFilterContentProvider();
         fCheckHandler = new CheckHandler();
-        createThreadViewer(parent);
+        Composite buttonComposite = new Composite(parent, SWT.NONE);
+        buttonComposite.setLayout( new GridLayout(3, false));
+        buttonComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        Composite mainComposite = new Composite(parent, SWT.NONE);
+        mainComposite.setFont(parent.getFont());
+        stackLayout = new StackLayout();
+        mainComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        mainComposite.setLayout(stackLayout);
+
+        radioBasic = new Button(buttonComposite, SWT.RADIO);
+        radioBasic.setText(Messages.TCFThreadFilterQueryButtonBasic);
+        radioBasic.addSelectionListener(new ScopingModeListener(mainComposite));
+        radioAdvanced = new Button(buttonComposite, SWT.RADIO);
+        radioAdvanced.setText(Messages.TCFThreadFilterQueryButtonAdvanced);
+        radioAdvanced.addSelectionListener(new ScopingModeListener(mainComposite));
+        
+        IDialogSettings settings= getDialogSettings(false);
+        if (settings != null) {
+            boolean basicSelected = settings.getBoolean(Messages.TCFThreadFilterQueryModeButtonState);
+            if ( basicSelected ) {
+                radioBasic.setSelection(true); 
+            }
+            else {
+                radioAdvanced.setSelection(true);
+            }
+        }
+        else {
+            radioBasic.setSelection(true);
+        }
+        createThreadViewer(mainComposite);
     }
 
     protected TCFBreakpointThreadFilterPage getPage() {
         return fPage;
     }
+    
+    private String getBPFilterExpression() {
+        String expression = null;
+        ICBreakpoint bp = (ICBreakpoint)fPage.getElement().getAdapter(ICBreakpoint.class);
+        if (bp != null) {
+            IMarker marker = bp.getMarker();
+            if (marker != null) {
+                try {
+                    expression = (String)marker.getAttribute(TCFBreakpointsModel.ATTR_CONTEXT_QUERY);
+                }
+                catch (CoreException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        
+        return expression;
+    }
+    
+    private String[] getAvailableAttributes() {
+        String[] result = null;
+        TCFLaunch launch = (TCFLaunch)getAttributeLaunch();
+        if (launch == null) {
+            return result;
+        }
+        final IChannel channel = launch.getChannel();
+        if (channel == null) {
+            return result;
+        }
+        result = new TCFTask<String[]>() {
+            public void run() {
+                IContextQuery service = channel.getRemoteService(IContextQuery.class);                                        
+                service.getAttrNames(new IContextQuery.DoneGetAttrNames() {
+                    public void doneGetAttrNames(IToken token, Exception error, String[] attributes) {
+                        if (error != null) {
+                            done(null);
+                        }
+                        done(attributes);
+                    }
+                });
+                return;
+            }
+        }.getE();
+        return result;
+    }
 
+    boolean missingParameterValue(String expression) {
+        boolean result = false;
+        int lastIndex = expression.length();
+        int fromIndex = 0;
+        if (lastIndex != 0) {
+            fromIndex = expression.indexOf('=', fromIndex);
+            if (fromIndex == -1) {
+                result = true;
+            }
+            else {
+                fromIndex = 0;
+            }
+            while (fromIndex != -1) {
+                fromIndex = expression.indexOf('=', fromIndex);
+                if (fromIndex != -1) {
+                    if (fromIndex == 0 || fromIndex == lastIndex-1) {
+                        result = true;
+                        break;
+                    }
+                    else {
+                        String testChar = expression.substring(fromIndex-1, fromIndex);
+                        String testNextChar = expression.substring(fromIndex+1,fromIndex+2);
+                        int foundComma = expression.indexOf(',', fromIndex);
+                        if (testChar.matches("[,\\s]") || testNextChar.matches("[,\\s]")) {
+                            result = true;
+                            break;
+                        }
+                        else if (foundComma != -1 && expression.indexOf('=', fromIndex) != -1) {
+                            result = true;
+                        }
+                        else {
+                            result = false;
+                        }
+                        fromIndex++;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    private class ExpressionModifier implements ModifyListener {
+        public void modifyText(ModifyEvent e) {
+            String expression = scopeExprCombo.getText();
+            if (missingParameterValue(expression)) {
+                scopeExpressionDecoration.show();
+                fPage.setErrorMessage(Messages.TCFThreadFilterEditorFormatError);
+                fPage.setValid(false);
+            }
+            else {
+                scopeExpressionDecoration.hide();
+                fPage.setErrorMessage(null);
+                fPage.setValid(true);
+            }
+        }
+    }
+
+    private class ExpressionSelectButton implements Listener {
+        
+        private Shell parentShell;
+        
+        public ExpressionSelectButton(Shell shell) {
+            parentShell = shell;
+        }
+
+        public void handleEvent(Event event) {
+            String[] attrsList = getAvailableAttributes();
+            String result = null;            
+            TCFContextQueryExpressionDialog dlg = new TCFContextQueryExpressionDialog(parentShell, attrsList, scopeExprCombo.getText());
+            
+            if (dlg.open() == Window.OK) {
+                result = dlg.getExpression();
+            }
+            if (result != null) {
+            	scopeExprCombo.setText(result);
+            }
+        }
+    }
+    
+    private void setupScopeExpressionCombo(IDialogSettings settings, String bpContextQuery) {
+        String [] expresionList = null;        
+        if ( settings != null ) {
+            expresionList = settings.getArray(Messages.TCFThreadFilterQueryExpressionStore);
+            if ( expresionList != null ) {
+                int index;
+                // Find if there is a null entry.
+                for(index = 0; index < expresionList.length; index++) {
+                    String member = expresionList[index];
+                    if (member == null || member.length() == 0) {
+                        break;
+                    }
+                }
+                String[] copyList = new String[index];
+                int found = -1;
+                for (int loop = 0; loop < index; loop++) {
+                    copyList[loop] = expresionList[loop];  
+                    if (bpContextQuery != null && copyList[loop].equals(bpContextQuery)) {
+                        found = loop;
+                    }
+                }
+                if (found != -1) {
+                    scopeExprCombo.setItems(copyList);
+                    scopeExprCombo.select(found);                            
+                }
+                else {
+                    int pad = 0;
+                    if (bpContextQuery != null) {
+                        pad = 1;
+                    }
+                    String[] setList = new String[index+pad];
+                    if (bpContextQuery != null) {
+                        setList[0] = bpContextQuery;
+                    }
+                    System.arraycopy(copyList, 0, setList, pad, copyList.length);
+                    scopeExprCombo.setItems(setList);
+                    if (bpContextQuery != null) {
+                        scopeExprCombo.select(0);
+                    }
+                }
+            }
+            else if (bpContextQuery != null) {
+                scopeExprCombo.setItems(new String[]{bpContextQuery});
+                scopeExprCombo.select(0);                            
+            }
+        }
+        else if (bpContextQuery != null) {
+            scopeExprCombo.setItems(new String[]{bpContextQuery});
+            scopeExprCombo.select(0);            
+        }          
+    }
+    
     private void createThreadViewer(Composite parent) {
-        Label label = new Label(parent, SWT.NONE);
-        label.setText("Restrict to Selected Contexts:"); //$NON-NLS-1$
-        label.setFont(parent.getFont());
-        label.setLayoutData(new GridData());
+        GridData twoColumnLayout = new GridData(SWT.FILL,0, true, false);
+        twoColumnLayout.horizontalSpan = 2;
+        advancedPage = new Composite(parent,SWT.NONE);  
+        advancedPage.setLayout(new GridLayout(2,false));
+        advancedPage.setFont(parent.getFont());
+        Label epressionLabel = new Label(advancedPage, SWT.NONE);
+        epressionLabel.setText(Messages.TCFThreadFilterQueryAdvancedLabel);
+        epressionLabel.setFont(advancedPage.getFont());
+        epressionLabel.setLayoutData(twoColumnLayout);
+        scopeExprCombo = new Combo(advancedPage,SWT.DROP_DOWN);
+        GridData comboGridData = new GridData(SWT.FILL,0, true, false);
+        comboGridData .horizontalIndent = 5;
+        scopeExprCombo.setLayoutData(comboGridData);
+        scopeExprCombo.addModifyListener(new ExpressionModifier());
+        scopeExpressionDecoration = new ControlDecoration(scopeExprCombo, SWT.LEFT, advancedPage);
+        scopeExpressionDecoration.hide();
+        scopeExpressionDecoration.setDescriptionText(Messages.TCFThreadFilterEditorFormatError); 
+        FieldDecoration fieldDecoration = FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_ERROR); 
+        scopeExpressionDecoration.setImage(fieldDecoration.getImage());
+        
+        String bpContextQuery = getBPFilterExpression();
+        IDialogSettings settings= getDialogSettings(false);
+        setupScopeExpressionCombo(settings, bpContextQuery);
+        Button selectExpression = new Button(advancedPage, SWT.PUSH);
+        selectExpression.setText(Messages.TCFThreadFilterQueryButtonEdit);
+        selectExpression.setLayoutData(new GridData(SWT.RIGHT,0, false, false));
+        selectExpression.addListener(SWT.Selection, new ExpressionSelectButton(parent.getShell()));
+        
+        basicPage = new Composite(parent, SWT.NONE);
+        basicPage .setLayout(new GridLayout(1,false));
+        basicPage .setFont(parent.getFont());
+        Label contextTreeLabel = new Label(basicPage, SWT.NONE);
+        contextTreeLabel.setText(Messages.TCFThreadFilterQueryTreeViewLabel); //$NON-NLS-1$
+        contextTreeLabel.setFont(basicPage.getFont());
+        contextTreeLabel.setLayoutData(new GridData(SWT.FILL,0, true, false));
         GridData data = new GridData(GridData.FILL_BOTH);
         data.heightHint = 100;
-        fThreadViewer = new CheckboxTreeViewer(parent, SWT.BORDER);
+        fThreadViewer = new CheckboxTreeViewer(basicPage, SWT.BORDER);
         fThreadViewer.addCheckStateListener(fCheckHandler);
         fThreadViewer.getTree().setLayoutData(data);
-        fThreadViewer.getTree().setFont(parent.getFont());
+        fThreadViewer.getTree().setFont(basicPage.getFont());
         fThreadViewer.setContentProvider(fContentProvider);
         fThreadViewer.setLabelProvider(new ThreadFilterLabelProvider());
         fThreadViewer.setInput(DebugPlugin.getDefault().getLaunchManager());
-        setInitialCheckedState();
+        setInitialCheckedState();        
+
+        if (radioBasic.getSelection()) {
+            stackLayout.topControl = basicPage;
+        }    
+        else {
+            stackLayout.topControl = advancedPage;
+        }
+        parent.layout();        
+    }
+
+    protected ILaunch getAttributeLaunch() {
+        IAdaptable dbgContext = DebugUITools.getDebugContext();
+        return (ILaunch)dbgContext.getAdapter(ILaunch.class);
     }
 
     protected ILaunch[] getLaunches() {
@@ -302,6 +618,10 @@ public class TCFThreadFilterEditor {
 
     protected final CheckboxTreeViewer getThreadViewer() {
         return fThreadViewer;
+    }
+    
+    protected final String getScopeExpression() {
+        return  scopeExprCombo.getText();
     }
 
     /**
@@ -357,29 +677,64 @@ public class TCFThreadFilterEditor {
         }
         return null;
     }
-
-    protected void doStore() {
-        CheckboxTreeViewer viewer = getThreadViewer();
-        Object[] elements = viewer.getCheckedElements();
-        String[] threadIds;
-        List<String> checkedIds = new ArrayList<String>();
-        for (int i = 0; i < elements.length; ++i) {
-            if (elements[i] instanceof Context) {
-                Context ctx = (Context) elements[i];
-                if (!viewer.getGrayed(ctx)) {
-                    checkedIds.add(ctx.fScopeId);
-                }
+    
+    void updateExpressionsDialogSettings(IDialogSettings settings, String scopedExpression) {
+        String[] list = settings.getArray(Messages.TCFThreadFilterQueryExpressionStore);
+        if (list == null) {
+            list = new String[20];
+        }
+        for(int i=0; i < list.length; i++) {
+            String member = list[i];
+            if (member != null && member.equals(scopedExpression)) {
+                return;
+            }
+            else if (member == null) {
+                list[i] = scopedExpression;
+                settings.put(Messages.TCFThreadFilterQueryExpressionStore, list);
+                return;
             }
         }
-        if (checkedIds.size() == fContexts.size()) {
-            threadIds = null;
+        String[] copyList = new String[20];
+        copyList[0] = scopedExpression;
+        System.arraycopy(list, 0, copyList, 1, list.length-1);
+        settings.put(Messages.TCFThreadFilterQueryExpressionStore, copyList);
+    }
+    
+    protected void doStore() {
+        IDialogSettings settings= getDialogSettings(true);
+        if (settings != null) {
+            settings.put(Messages.TCFThreadFilterQueryModeButtonState, radioBasic.getSelection());
         }
-        else {
-            threadIds = checkedIds.toArray(new String[checkedIds.size()]);
+        if (radioAdvanced.getSelection()) {
+            String scopedExpression = getScopeExpression();
+            updateExpressionsDialogSettings(settings, scopedExpression);
+            TCFBreakpointScopeExtension filterExtension = fPage.getFilterExtension();
+            if (filterExtension == null) return;
+            filterExtension.setPropertiesFilter(scopedExpression);
         }
-        TCFBreakpointScopeExtension filterExtension = fPage.getFilterExtension();
-        if (filterExtension == null) return;
-        filterExtension.setThreadFilter(threadIds);
+        if (radioBasic.getSelection()) {
+            CheckboxTreeViewer viewer = getThreadViewer();
+            Object[] elements = viewer.getCheckedElements();
+            String[] threadIds;
+            List<String> checkedIds = new ArrayList<String>();
+            for (int i = 0; i < elements.length; ++i) {
+                if (elements[i] instanceof Context) {
+                    Context ctx = (Context) elements[i];
+                    if (!viewer.getGrayed(ctx)) {
+                        checkedIds.add(ctx.fScopeId);
+                    }
+                }
+            }
+            if (checkedIds.size() == fContexts.size()) {
+                threadIds = null;
+            }
+            else {
+                threadIds = checkedIds.toArray(new String[checkedIds.size()]);
+            }
+            TCFBreakpointScopeExtension filterExtension = fPage.getFilterExtension();
+            if (filterExtension == null) return;
+            filterExtension.setThreadFilter(threadIds);        
+        }
     }
 
     private Context[] syncGetContainers(final TCFLaunch launch) {
