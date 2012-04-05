@@ -15,8 +15,8 @@ import java.beans.PropertyChangeEvent;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.tcf.te.core.utils.PropertyChangeProvider;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
-import org.eclipse.tcf.te.ui.utils.PropertyChangeProvider;
 import org.eclipse.ui.PlatformUI;
 
 /**

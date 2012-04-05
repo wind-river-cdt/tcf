@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.ui.utils;
+package org.eclipse.tcf.te.core.utils;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;

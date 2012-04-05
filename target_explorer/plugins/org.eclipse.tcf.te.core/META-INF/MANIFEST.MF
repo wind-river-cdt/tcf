@@ -21,4 +21,5 @@ Export-Package: org.eclipse.tcf.te.core.activator;x-internal:=true,
  org.eclipse.tcf.te.core.interfaces,
  org.eclipse.tcf.te.core.nls;x-internal:=true,
  org.eclipse.tcf.te.core.nodes.interfaces.wire,
+ org.eclipse.tcf.te.core.utils,
  org.eclipse.tcf.te.core.utils.text
