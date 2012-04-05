@@ -179,18 +179,23 @@ function stop_vm()
 function get_make_options()
 {
   # Currently we cannot test login feature of Terminals service
+  OPTS="-DTERMINALS_NO_LOGIN=1 $CFLAGS"
+  # Disable signal handlers for better error reporting
+  OPTS="-DENABLE_SignalHandlers=0 $OPTS"
+  # Hardware breakpoints are broken in VirtualBox
+  OPTS="-DENABLE_HardwareBreakpoints=0 $OPTS"
   case $CC in
   gcc)
-    OPTS="CC=gcc 'CFLAGS=-Werror -DTERMINALS_NO_LOGIN=1 -DENABLE_SignalHandlers=0 $CFLAGS'"
+    OPTS="CC=gcc 'CFLAGS=-Werror $OPTS'"
     ;;
   g++)
-    OPTS="CC=g++ 'CFLAGS=-Werror -DTERMINALS_NO_LOGIN=1 -DENABLE_SignalHandlers=0 $CFLAGS'"
+    OPTS="CC=g++ 'CFLAGS=-Werror $OPTS'"
     ;;
   msvc++)
-    OPTS="'CFLAGS=-x c++ -DENABLE_SignalHandlers=0 $CFLAGS'"
+    OPTS="'CFLAGS=-x c++ $OPTS'"
     ;;
   *)
-    OPTS="'CFLAGS=-DENABLE_SignalHandlers=0 $CFLAGS'"
+    OPTS="'CFLAGS=$OPTS'"
     ;;
   esac
   echo "OPSYS=$OPSYS CONF=$CONF $OPTS"
