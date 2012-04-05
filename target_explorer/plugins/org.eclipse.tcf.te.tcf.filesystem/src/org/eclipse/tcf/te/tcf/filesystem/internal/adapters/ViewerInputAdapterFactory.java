@@ -13,9 +13,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.te.core.interfaces.IViewerInput;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
-import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 
 /**
  * The adapter factory for IViewerInput.

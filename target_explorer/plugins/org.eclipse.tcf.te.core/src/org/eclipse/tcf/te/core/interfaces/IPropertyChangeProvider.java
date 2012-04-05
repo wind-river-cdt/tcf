@@ -7,10 +7,10 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.ui.interfaces;
+package org.eclipse.tcf.te.core.interfaces;
 
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  * A property change provider is an observable object that fires property
@@ -32,7 +32,7 @@ public interface IPropertyChangeProvider {
 	 * 
 	 * @param listener The property change listener
 	 */
-	void addPropertyChangeListener(IPropertyChangeListener listener);
+	void addPropertyChangeListener(PropertyChangeListener listener);
 
 	/**
 	 * Remove a property change listener from the provider if it is already
@@ -40,7 +40,7 @@ public interface IPropertyChangeProvider {
 	 * 
 	 * @param listener The property change listener
 	 */
-	void removePropertyChangeListener(IPropertyChangeListener listener);
+	void removePropertyChangeListener(PropertyChangeListener listener);
 
 	/**
 	 * Fire the property change event to the property change listeners

@@ -10,6 +10,8 @@
 package org.eclipse.tcf.te.ui.trees;
 
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeEvent;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -32,8 +34,6 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ColumnViewerEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
@@ -69,11 +69,11 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.tcf.te.core.interfaces.IViewerInput;
 import org.eclipse.tcf.te.runtime.utils.Host;
 import org.eclipse.tcf.te.ui.WorkbenchPartControl;
 import org.eclipse.tcf.te.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.forms.CustomFormToolkit;
-import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 import org.eclipse.tcf.te.ui.interfaces.ImageConsts;
 import org.eclipse.tcf.te.ui.nls.Messages;
 import org.eclipse.ui.IDecoratorManager;
@@ -94,7 +94,7 @@ import org.eclipse.ui.part.MultiPageSelectionProvider;
  * Abstract tree control implementation.
  */
 public abstract class AbstractTreeControl extends WorkbenchPartControl implements SelectionListener,
-								IDoubleClickListener, IPropertyChangeListener, ISelectionChangedListener, FocusListener {
+								IDoubleClickListener, PropertyChangeListener, ISelectionChangedListener, FocusListener {
 	// Reference to the tree viewer instance
 	private TreeViewer viewer;
 	// Reference to the selection changed listener
@@ -888,7 +888,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
+	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
 	 */
 	@Override
 	public void propertyChange(final PropertyChangeEvent event) {

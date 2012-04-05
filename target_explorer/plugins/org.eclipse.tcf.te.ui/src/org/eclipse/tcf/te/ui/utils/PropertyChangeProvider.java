@@ -9,15 +9,15 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.utils;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.PlatformObject;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.tcf.te.ui.interfaces.IPropertyChangeProvider;
+import org.eclipse.tcf.te.core.interfaces.IPropertyChangeProvider;
 
 /**
  * The base property change provider implementation. Classes that want to implement
@@ -28,7 +28,7 @@ public class PropertyChangeProvider extends PlatformObject implements IPropertyC
 	/**
 	 * The property change listeners added to this node.
 	 */
-	private List<IPropertyChangeListener> propertyChangeListeners = Collections.synchronizedList(new ArrayList<IPropertyChangeListener>());
+	private List<PropertyChangeListener> propertyChangeListeners = Collections.synchronizedList(new ArrayList<PropertyChangeListener>());
 	
 	/*
 	 * (non-Javadoc)
@@ -37,7 +37,7 @@ public class PropertyChangeProvider extends PlatformObject implements IPropertyC
 	@Override
     public void firePropertyChange(PropertyChangeEvent event) {
 		synchronized (propertyChangeListeners) {
-			for(IPropertyChangeListener listener : propertyChangeListeners) {
+			for(PropertyChangeListener listener : propertyChangeListeners) {
 				listener.propertyChange(event);
 			}
 		}
@@ -48,7 +48,7 @@ public class PropertyChangeProvider extends PlatformObject implements IPropertyC
 	 * @see org.eclipse.tcf.te.ui.interfaces.IViewerInput#addPropertyChangeListener(org.eclipse.jface.util.IPropertyChangeListener)
 	 */
 	@Override
-    public void addPropertyChangeListener(IPropertyChangeListener listener) {
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
 		Assert.isNotNull(listener);
 		if(!propertyChangeListeners.contains(listener)) {
 			propertyChangeListeners.add(listener);
@@ -60,7 +60,7 @@ public class PropertyChangeProvider extends PlatformObject implements IPropertyC
 	 * @see org.eclipse.tcf.te.ui.interfaces.IViewerInput#removePropertyChangeListener(org.eclipse.jface.util.IPropertyChangeListener)
 	 */
 	@Override
-    public void removePropertyChangeListener(IPropertyChangeListener listener) {
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
 		Assert.isNotNull(listener);
 		if(propertyChangeListeners.contains(listener)) {
 			propertyChangeListeners.remove(listener);

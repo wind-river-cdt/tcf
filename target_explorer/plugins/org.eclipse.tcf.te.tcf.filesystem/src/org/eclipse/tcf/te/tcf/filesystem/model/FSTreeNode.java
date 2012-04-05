@@ -12,6 +12,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.model;
 
+import java.beans.PropertyChangeEvent;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -31,11 +32,11 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.content.IContentType;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.DirEntry;
 import org.eclipse.tcf.services.IFileSystem.FileAttrs;
+import org.eclipse.tcf.te.core.interfaces.IViewerInput;
 import org.eclipse.tcf.te.tcf.filesystem.interfaces.IWindowsFileAttributes;
 import org.eclipse.tcf.te.tcf.filesystem.internal.UserAccount;
 import org.eclipse.tcf.te.tcf.filesystem.internal.testers.TargetPropertyTester;
@@ -45,7 +46,6 @@ import org.eclipse.tcf.te.tcf.filesystem.internal.utils.UserManager;
 import org.eclipse.tcf.te.tcf.filesystem.nls.Messages;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
-import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 
 /**
  * Representation of a file system tree node.

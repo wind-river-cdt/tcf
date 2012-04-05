@@ -11,7 +11,7 @@ package org.eclipse.tcf.te.tcf.filesystem.internal.operations;
 
 import java.util.List;
 
-import org.eclipse.jface.util.PropertyChangeEvent;
+import java.beans.PropertyChangeEvent;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.widgets.Display;

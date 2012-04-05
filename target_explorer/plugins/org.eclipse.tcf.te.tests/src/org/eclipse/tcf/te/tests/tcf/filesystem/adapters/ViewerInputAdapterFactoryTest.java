@@ -10,8 +10,8 @@
 package org.eclipse.tcf.te.tests.tcf.filesystem.adapters;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.tcf.te.core.interfaces.IViewerInput;
 import org.eclipse.tcf.te.tests.tcf.filesystem.FSPeerTestCase;
-import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 
 public class ViewerInputAdapterFactoryTest extends FSPeerTestCase {
 	public void testViewerInputAdapter() {

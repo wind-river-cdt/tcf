@@ -19,8 +19,8 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.tcf.te.ui.interfaces.IPropertyChangeProvider;
-import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
+import org.eclipse.tcf.te.core.interfaces.IPropertyChangeProvider;
+import org.eclipse.tcf.te.core.interfaces.IViewerInput;
 
 /**
  * The base tree content provider that defines several default methods.

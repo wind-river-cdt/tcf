@@ -30,23 +30,20 @@ public class WindowsImageProvider extends DefaultImageProvider {
 	 */
 	@Override
     public Image getImage(FSTreeNode node) {
-		Image image = null;
 		if (node.isRoot()) {
-            image = updateDaemon.getDiskImage();
+            return updateDaemon.getDiskImage();
 		}
 		else if (node.isDirectory()) {
-			image = updateDaemon.getFolderImage();
+			return updateDaemon.getFolderImage();
 		}
 		else if(node.isFile()) {
-			image = updateDaemon.getImage(node);
-            if (image == null) {
-            	updateDaemon.enqueue(node);
-    			image = getProgramImage(node);
-				if (image == null) {
-					image = getPredefinedImage(node);
-				}
-            }
+			Image image = updateDaemon.getImage(node);
+			if (image == null) {
+				updateDaemon.enqueue(node);
+				image = getPredefinedImage(node);
+			}
+			return image;
 		}
-	    return image != null ? image : super.getImage(node);
+	    return super.getImage(node);
     }
 }

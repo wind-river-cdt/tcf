@@ -1882,7 +1882,7 @@
             adaptableType="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"
             class="org.eclipse.tcf.te.tcf.filesystem.internal.adapters.ViewerInputAdapterFactory">
          <adapter
-               type="org.eclipse.tcf.te.ui.interfaces.IViewerInput">
+               type="org.eclipse.tcf.te.core.interfaces.IViewerInput">
          </adapter>
       </factory>
    </extension>

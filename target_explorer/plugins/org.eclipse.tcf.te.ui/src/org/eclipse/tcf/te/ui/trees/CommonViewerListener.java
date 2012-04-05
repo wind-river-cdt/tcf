@@ -9,9 +9,12 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.trees;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EventObject;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,7 +24,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Display;
@@ -32,14 +34,14 @@ import org.eclipse.ui.PlatformUI;
  * CommonViewerListener listens to the property change event from the
  *  tree and update the viewer accordingly.
  */
-class CommonViewerListener implements IPropertyChangeListener {
+class CommonViewerListener implements PropertyChangeListener, IPropertyChangeListener {
 	// The timer that process the property events periodically.
 	private static Timer viewerTimer;
 	static {
 		viewerTimer = new Timer("Viewer_Refresher", true); //$NON-NLS-1$
 	}
 	// The interval of the refreshing timer.
-	private static final long INTERVAL = 200;
+	private static final long INTERVAL = 333;
 	// Maximum delay before immediate refreshing.
 	private static final long MAX_DELAY = 1000;
 	// The NULL object stands for refreshing the whole tree.
@@ -67,7 +69,7 @@ class CommonViewerListener implements IPropertyChangeListener {
 		this.task = new TimerTask(){
 			@Override
             public void run() {
-				handleEvent();
+				handleEvent(true);
             }};
 		viewerTimer.schedule(this.task, INTERVAL, INTERVAL);
 		this.queue = Collections.synchronizedList(new ArrayList<Object>());
@@ -75,20 +77,38 @@ class CommonViewerListener implements IPropertyChangeListener {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
+	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
 	 */
 	@Override
     public void propertyChange(PropertyChangeEvent event) {
+		processEvent(event);
+    }
+	
+	/**
+	 * Adding the event object into the queue and trigger the scheduling.
+	 * 
+	 * @param event The event object.
+	 */
+	private void processEvent(EventObject event) {
 		Object object = event.getSource();
 		Assert.isTrue(object != null);
 		queue.add(object);
 		viewerTimer.schedule(new TimerTask(){
 			@Override
             public void run() {
-				handleEvent();
+				handleEvent(false);
             }}, 0);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
+	 */
+	@Override
+    public void propertyChange(org.eclipse.jface.util.PropertyChangeEvent event) {
+		processEvent(event);
     }
-	
+
 	/**
 	 * Get and empty the queued objects.
 	 * 
@@ -106,10 +126,11 @@ class CommonViewerListener implements IPropertyChangeListener {
 	 * Check if it is ready for next run. If the time
 	 * has expired, then mark last run time and return true.
 	 * 
+	 * @param scheduled if this processing is scheduled
 	 * @return true if it is time.
 	 */
-	synchronized boolean checkReady() {
-		if (System.currentTimeMillis() - lastRun > MAX_DELAY) {
+	synchronized boolean checkReady(boolean scheduled) {
+		if (scheduled || System.currentTimeMillis() - lastRun > MAX_DELAY) {
 			lastRun = System.currentTimeMillis();
 			return true;
 		}
@@ -118,9 +139,11 @@ class CommonViewerListener implements IPropertyChangeListener {
 
 	/**
 	 * Handle the current events in the event queue.
+	 * 
+	 * @param scheduled if this handling is scheduled.
 	 */
-	void handleEvent() {
-		if (checkReady()) {
+	void handleEvent(boolean scheduled) {
+		if (checkReady(scheduled)) {
 			Object[] objects = emptyQueue();
 			if (objects.length > 0) {
 				List<Object> list = mergeObjects(objects);

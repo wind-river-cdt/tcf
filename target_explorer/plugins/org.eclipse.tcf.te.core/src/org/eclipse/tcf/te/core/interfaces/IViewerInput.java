@@ -7,9 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.ui.interfaces;
-
-import org.eclipse.tcf.te.ui.trees.AbstractTreeControl;
+package org.eclipse.tcf.te.core.interfaces;
 
 /**
  * A viewer input is an input of the AbstractTreeControl.

@@ -9,22 +9,22 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.processes.ui.model;
 
+import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.PlatformObject;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.IProcesses.ProcessContext;
 import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.services.ISysMonitor.SysMonitorContext;
+import org.eclipse.tcf.te.core.interfaces.IViewerInput;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
 import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
-import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 
 /**
  * Representation of a process tree node.

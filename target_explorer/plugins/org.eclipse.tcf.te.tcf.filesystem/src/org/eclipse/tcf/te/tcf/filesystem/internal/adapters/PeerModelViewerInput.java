@@ -9,8 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.internal.adapters;
 
+import org.eclipse.tcf.te.core.interfaces.IViewerInput;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
-import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 import org.eclipse.tcf.te.ui.utils.PropertyChangeProvider;
 
 /**

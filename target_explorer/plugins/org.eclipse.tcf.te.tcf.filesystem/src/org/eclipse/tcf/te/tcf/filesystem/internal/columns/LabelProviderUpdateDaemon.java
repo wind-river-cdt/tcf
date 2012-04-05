@@ -12,6 +12,7 @@ package org.eclipse.tcf.te.tcf.filesystem.internal.columns;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -26,12 +27,11 @@ import javax.swing.filechooser.FileSystemView;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.tcf.te.core.interfaces.IViewerInput;
 import org.eclipse.tcf.te.tcf.filesystem.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.internal.utils.CacheManager;
 import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
-import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 
 /**
  * The background daemon that updates the images of the file system using

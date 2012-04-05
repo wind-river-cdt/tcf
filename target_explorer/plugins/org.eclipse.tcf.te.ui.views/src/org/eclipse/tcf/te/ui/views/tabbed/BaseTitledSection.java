@@ -9,9 +9,10 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.views.tabbed;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
@@ -23,9 +24,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.tcf.te.core.interfaces.IViewerInput;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
-import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
@@ -36,7 +37,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 /**
  * The base section that displays a title in a title bar.
  */
-public abstract class BaseTitledSection extends AbstractPropertySection implements IPropertyChangeListener {
+public abstract class BaseTitledSection extends AbstractPropertySection implements PropertyChangeListener {
 
 	// The main composite used to create the section content.
 	protected Composite composite;
@@ -220,7 +221,7 @@ public abstract class BaseTitledSection extends AbstractPropertySection implemen
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
+	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
 	 */
 	@Override
     public void propertyChange(PropertyChangeEvent event) {

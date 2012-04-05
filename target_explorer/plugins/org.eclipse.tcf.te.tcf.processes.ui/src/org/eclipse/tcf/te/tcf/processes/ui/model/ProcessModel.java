@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.processes.ui.model;
 
+import java.beans.PropertyChangeEvent;
 import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -18,8 +19,8 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.te.core.interfaces.IViewerInput;
 import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.core.Tcf;
@@ -29,7 +30,6 @@ import org.eclipse.tcf.te.tcf.processes.ui.internal.callbacks.QueryDoneOpenChann
 import org.eclipse.tcf.te.tcf.processes.ui.internal.callbacks.RefreshChildrenDoneOpenChannel;
 import org.eclipse.tcf.te.tcf.processes.ui.internal.callbacks.RefreshDoneOpenChannel;
 import org.eclipse.tcf.te.tcf.processes.ui.internal.preferences.IPreferenceConsts;
-import org.eclipse.tcf.te.ui.interfaces.IViewerInput;
 
 /**
  * The process tree model implementation.
