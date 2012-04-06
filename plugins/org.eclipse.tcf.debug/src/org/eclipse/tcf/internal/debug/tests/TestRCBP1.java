@@ -73,6 +73,7 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
     private final Map<String,Map<String,Object>[]> disassembly_capabilities = new HashMap<String,Map<String,Object>[]>();
     private final Set<String> running = new HashSet<String>();
     private final Set<IToken> get_state_cmds = new HashSet<IToken>();
+    private final Set<IToken> bp_change_cmds = new HashSet<IToken>();
     private final Map<String,Map<String,IRegisters.RegistersContext>> regs =
         new HashMap<String,Map<String,IRegisters.RegistersContext>>();
     private final Map<String,Map<String,Object>> bp_list = new HashMap<String,Map<String,Object>>();
@@ -133,6 +134,29 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
         @SuppressWarnings("unchecked")
         public void breakpointStatusChanged(String id, Map<String,Object> status) {
             if (bp_list.get(id) != null && test_context != null && bp_cnt < 40) {
+                if (bp_change_cmds.size() == 0) {
+                    Map<String,Object> m = bp_list.get(id);
+                    Collection<String> prop_ids = (Collection<String>)m.get(IBreakpoints.PROP_CONTEXT_IDS);
+                    if (prop_ids != null) {
+                        Collection<Map<String,Object>> list = (Collection<Map<String,Object>>)
+                                status.get(IBreakpoints.STATUS_INSTANCES);
+                        if (list != null) {
+                            for (Map<String,Object> map : list) {
+                                String ctx = (String)map.get(IBreakpoints.INSTANCE_CONTEXT);
+                                if (prop_ids.contains(ctx)) continue;
+                                boolean ok = false;
+                                for (String s : prop_ids) {
+                                    IRunControl.RunControlContext x = test_rc.getContext(s);
+                                    if (x != null && ctx.equals(x.getBPGroup())) ok = true;
+                                }
+                                if (!ok) {
+                                    exit(new Error("Breakpoint " + id + ": invalid planting context " + ctx));
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
                 String prs = test_context.getProcessID();
                 if (prs != null) {
                     for (ITCFTest test : test_suite.getActiveTests()) {
@@ -145,7 +169,8 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
                 }
                 String err = (String)status.get(IBreakpoints.STATUS_ERROR);
                 if (err == null) {
-                    Collection<Map<String,Object>> list = (Collection<Map<String,Object>>)status.get(IBreakpoints.STATUS_INSTANCES);
+                    Collection<Map<String,Object>> list = (Collection<Map<String,Object>>)
+                            status.get(IBreakpoints.STATUS_INSTANCES);
                     if (list != null) {
                         for (Map<String,Object> map : list) {
                             String ctx = (String)map.get(IBreakpoints.INSTANCE_CONTEXT);
@@ -171,6 +196,7 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
         }
 
         public void contextChanged(Map<String,Object>[] bps) {
+            if (bp_change_cmds.size() > 1) return;
             for (Map<String,Object> m0 : bps) {
                 String id = (String)m0.get(IBreakpoints.PROP_ID);
                 Map<String,Object> m1 = bp_list.get(id);
@@ -300,7 +326,7 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
         }
         if (test_id != null) {
             if (!bp_change_done) {
-                changeBreakpoints();
+                changeBreakpoint5();
                 return;
             }
             if (!mem_map_test_done) {
@@ -587,8 +613,8 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
             case 7:
                 // Data breakpoint
                 m[i].put(IBreakpoints.PROP_LOCATION, "&tcf_test_char");
-                m[i].put(IBreakpoints.PROP_ACCESSMODE, IBreakpoints.ACCESSMODE_WRITE);
-                Number ca = (Number)bp_capabilities.get(IBreakpoints.CAPABILITY_ACCESSMODE);
+                m[i].put(IBreakpoints.PROP_ACCESS_MODE, IBreakpoints.ACCESSMODE_WRITE);
+                Number ca = (Number)bp_capabilities.get(IBreakpoints.CAPABILITY_ACCESS_MODE);
                 if (data_bp_area != null && ca != null && (ca.intValue() & IBreakpoints.ACCESSMODE_WRITE) != 0) {
                     m[i].put(IBreakpoints.PROP_FILE, data_bp_area.file);
                     m[i].put(IBreakpoints.PROP_LINE, data_bp_area.start_line);
@@ -767,14 +793,14 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
         runTest();
     }
 
-    private void changeBreakpoints() {
+    private void changeBreakpoint5() {
         assert !bp_change_done;
         final String bp_id = "TcfTestBP5" + channel_id;
         final Map<String,Object> m = bp_list.get(bp_id);
         ArrayList<String> l = new ArrayList<String>();
         l.add(test_context.getProcessID());
-        Boolean ci = (Boolean)bp_capabilities.get(IBreakpoints.CAPABILITY_CONTEXTIDS);
-        if (ci != null && ci) m.put(IBreakpoints.PROP_CONTEXTIDS, l);
+        Boolean ci = (Boolean)bp_capabilities.get(IBreakpoints.CAPABILITY_CONTEXT_IDS);
+        if (ci != null && ci) m.put(IBreakpoints.PROP_CONTEXT_IDS, l);
         Boolean sg = (Boolean)bp_capabilities.get(IBreakpoints.CAPABILITY_STOP_GROUP);
         if (sg != null && sg) m.put(IBreakpoints.PROP_STOP_GROUP, l);
         StringBuffer bf = new StringBuffer();
@@ -785,12 +811,13 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
             bf.append('"');
         }
         m.put(IBreakpoints.PROP_CONDITION, bf.toString());
-        srv_breakpoints.change(m, new IBreakpoints.DoneCommand() {
+        bp_change_cmds.add(srv_breakpoints.change(m, new IBreakpoints.DoneCommand() {
             public void doneCommand(IToken token, Exception error) {
+                bp_change_cmds.remove(token);
                 bp_change_done = true;
                 if (error != null) exit(error);
             }
-        });
+        }));
         srv_breakpoints.getIDs(new IBreakpoints.DoneGetIDs() {
             public void doneGetIDs(IToken token, Exception error, String[] ids) {
                 if (error != null) {
@@ -858,6 +885,50 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
                 runTest();
             }
         });
+    }
+
+    private void changeBreakpoint6() {
+        assert bp_change_done;
+        if (threads.size() < 5) return;
+        final String bp_id = "TcfTestBP6" + channel_id;
+        final Map<String,Object> m = bp_list.get(bp_id);
+        ArrayList<String> l = new ArrayList<String>();
+        for (String id : threads.keySet()) l.add(id);
+        m.remove(IBreakpoints.PROP_CONTEXT_IDS);
+        m.remove(IBreakpoints.PROP_STOP_GROUP);
+        m.remove(IBreakpoints.PROP_CONTEXT_QUERY);
+        m.remove(IBreakpoints.PROP_CONDITION);
+        if (rnd.nextBoolean()) {
+            Boolean b = (Boolean)bp_capabilities.get(IBreakpoints.CAPABILITY_CONTEXT_IDS);
+            if (b != null && b) m.put(IBreakpoints.PROP_CONTEXT_IDS, l);
+        }
+        if (rnd.nextBoolean()) {
+            Boolean b = (Boolean)bp_capabilities.get(IBreakpoints.CAPABILITY_STOP_GROUP);
+            if (b != null && b) m.put(IBreakpoints.PROP_STOP_GROUP, l);
+        }
+        if (rnd.nextBoolean()) {
+            Boolean b = (Boolean)bp_capabilities.get(IBreakpoints.CAPABILITY_CONTEXT_QUERY);
+            if (b != null && b) {
+                String q = "ID=\"" + test_context.getProcessID() + "\"/HasState=true";
+                m.put(IBreakpoints.PROP_CONTEXT_QUERY, q);
+            }
+        }
+        if (rnd.nextBoolean()) {
+            StringBuffer bf = new StringBuffer();
+            for (String id : threads.keySet()) {
+                if (bf.length() > 0) bf.append(" || ");
+                bf.append("$thread==\"");
+                bf.append(id);
+                bf.append('"');
+            }
+            m.put(IBreakpoints.PROP_CONDITION, bf.toString());
+        }
+        bp_change_cmds.add(srv_breakpoints.change(m, new IBreakpoints.DoneCommand() {
+            public void doneCommand(IToken token, Exception error) {
+                bp_change_cmds.remove(token);
+                if (error != null) exit(error);
+            }
+        }));
     }
 
     public void containerResumed(String[] context_ids) {
@@ -1079,13 +1150,14 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
                 final Map<String,Object> m = bp_list.get(temp_bp_id);
                 ArrayList<String> l = new ArrayList<String>();
                 l.add(main_thread_id);
-                m.put(IBreakpoints.PROP_CONTEXTIDS, l);
+                m.put(IBreakpoints.PROP_CONTEXT_IDS, l);
                 m.put(IBreakpoints.PROP_ENABLED, true);
-                srv_breakpoints.change(m, new IBreakpoints.DoneCommand() {
+                bp_change_cmds.add(srv_breakpoints.change(m, new IBreakpoints.DoneCommand() {
                     public void doneCommand(IToken token, Exception error) {
+                        bp_change_cmds.remove(token);
                         if (error != null) exit(error);
                     }
-                });
+                }));
             }
         }
         if (main_thread_id == null) {
@@ -1129,7 +1201,7 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
             }
         };
         if (my_breakpoint) {
-            switch (rnd.nextInt(5)) {
+            switch (rnd.nextInt(6)) {
             case 0:
                 runMemoryTest(sc, done);
                 break;
@@ -1141,6 +1213,10 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
                 break;
             case 3:
                 runSymbolsTest(sc, done);
+                break;
+            case 4:
+                changeBreakpoint6();
+                done.run();
                 break;
             default:
                 done.run();
