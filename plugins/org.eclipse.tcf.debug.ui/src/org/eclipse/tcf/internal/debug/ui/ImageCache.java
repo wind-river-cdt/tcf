@@ -52,6 +52,8 @@ public class ImageCache {
         IMG_VARIABLE_POINTER = "icons/var_pointer.gif",
         IMG_VARIABLE_AGGREGATE = "icons/var_aggr.gif",
 
+        IMG_NEW_EXPRESSION = "icons/full/elcl16/monitorexpression_tsk.gif",
+
         IMG_SIGNALS = "icons/signals.gif",
         IMG_MEMORY_MAP = "icons/memory-map.gif",
 

@@ -18,6 +18,7 @@ import org.eclipse.tcf.internal.debug.ui.Activator;
 import org.eclipse.tcf.internal.debug.ui.ImageCache;
 import org.eclipse.tcf.internal.debug.ui.model.ICastToType;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNode;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExpression;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.ui.IWorkbenchWindow;
 
@@ -70,7 +71,10 @@ public class CastToTypeCommand extends AbstractActionDelegate {
 
     private TCFNode getCastToTypeNode() {
         TCFNode node = getSelectedNode();
-        if (node instanceof ICastToType) return node;
+        if (node instanceof ICastToType) {
+            if (node instanceof TCFNodeExpression && ((TCFNodeExpression)node).isEmpty()) return null;
+            return node;
+        }
         return null;
     }
 }

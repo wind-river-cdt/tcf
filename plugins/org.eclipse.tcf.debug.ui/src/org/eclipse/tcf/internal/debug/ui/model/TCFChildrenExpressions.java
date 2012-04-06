@@ -45,6 +45,14 @@ public class TCFChildrenExpressions extends TCFChildren {
         return null;
     }
 
+    private TCFNodeExpression findEmpty() {
+        for (TCFNode n : getNodes()) {
+            TCFNodeExpression e = (TCFNodeExpression)n;
+            if (e.isEmpty()) return e;
+        }
+        return null;
+    }
+
     @Override
     protected boolean startDataRetrieval() {
         int cnt = 0;
@@ -57,6 +65,10 @@ public class TCFChildrenExpressions extends TCFChildren {
             if (e instanceof IWatchExpression) n.setEnabled(((IWatchExpression)e).isEnabled());
             data.put(n.id, n);
         }
+        TCFNodeExpression n = findEmpty();
+        if (n == null) add(n = new TCFNodeExpression(node, null, null, null, null, -1, false));
+        n.setSortPosition(cnt++);
+        data.put(n.id, n);
         set(null, null, data);
         return true;
     }

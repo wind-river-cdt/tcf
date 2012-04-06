@@ -16,6 +16,9 @@ import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.tcf.internal.debug.ui.Activator;
 import org.eclipse.tcf.internal.debug.ui.model.IWatchInExpressions;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNode;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExecContext;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExpression;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeStackFrame;
 import org.eclipse.tcf.util.TCFDataCache;
 import org.eclipse.tcf.util.TCFTask;
 import org.eclipse.ui.IWorkbenchPage;
@@ -70,6 +73,12 @@ public class WatchInExpressionsCommand extends AbstractActionDelegate {
     private TCFNode[] getNodes() {
         TCFNode[] arr = getSelectedNodes();
         for (TCFNode n : arr) {
+            if (n instanceof TCFNodeExpression) {
+                if (((TCFNodeExpression)n).isEmpty()) return new TCFNode[0];
+                if (IDebugUIConstants.ID_EXPRESSION_VIEW.equals(getView().getViewSite().getId()) &&
+                    (n.getParent() instanceof TCFNodeExecContext || n.getParent() instanceof TCFNodeStackFrame))
+                return new TCFNode[0];
+            }
             if (n instanceof IWatchInExpressions) continue;
             return new TCFNode[0];
         }
