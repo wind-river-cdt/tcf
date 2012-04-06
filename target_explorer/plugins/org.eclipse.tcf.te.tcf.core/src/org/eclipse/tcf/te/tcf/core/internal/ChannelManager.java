@@ -23,6 +23,7 @@ import org.eclipse.tcf.core.TransientPeer;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.te.runtime.concurrent.util.ExecutorsUtil;
 import org.eclipse.tcf.te.tcf.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
 import org.eclipse.tcf.te.tcf.core.interfaces.tracing.ITraceIds;
@@ -504,7 +505,7 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 		}
 
 		// Do we have applicable value-add contributions
-		IValueAdd[] valueAdds = ValueAddManager.getInstance().getValueAdd(peer);
+		final IValueAdd[] valueAdds = ValueAddManager.getInstance().getValueAdd(peer);
 		if (valueAdds.length == 0) {
 			// There are no applicable value-add's -> drop out immediately
 			if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITraceIds.TRACE_CHANNEL_MANAGER)) {
@@ -521,10 +522,41 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 														0, ITraceIds.TRACE_CHANNEL_MANAGER, IStatus.INFO, this);
 		}
 
+		// Launching the value-add's may take a little while and must happen
+		// outside of the TCF dispatch thread.
+		ExecutorsUtil.execute(new Runnable() {
+			@Override
+			public void run() {
+				doHandleValueAdds(id, valueAdds, done);
+			}
+		});
+	}
+
+	/**
+	 * Tests all given value-add's to be alive and launch them if necessary.
+	 *
+	 * @param id The peer id. Must not be <code>null</code>.
+	 * @param valueAdds The list of value-add's to check. Must not be <code>null</code>.
+	 * @param done The client callback. Must not be <code>null</code>.
+	 */
+	/* default */ void doHandleValueAdds(final String id, final IValueAdd[] valueAdds, final DoneHandleValueAdds done) {
+		Assert.isTrue(!Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+		Assert.isNotNull(id);
+		Assert.isNotNull(valueAdds);
+		Assert.isNotNull(done);
+
 		Throwable error = null;
 
 		// Loop all applicable value-adds and check if there are up and running.
 		// If not, trigger a launch of the value-add.
+		for (IValueAdd valueAdd : valueAdds) {
+			boolean alive = valueAdd.isAlive(id);
+			// If the value-add is not alive, launch it
+			if (!alive) {
+				error = valueAdd.launch(id);
+			}
+			if (error != null) break;
+		}
 
 		done.doneHandleValueAdds(error, valueAdds);
 	}
