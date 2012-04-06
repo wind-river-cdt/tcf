@@ -43,20 +43,20 @@ public interface IBreakpoints extends IService {
         PROP_ID = "ID",                           // String
         PROP_ENABLED = "Enabled",                 // Boolean
         PROP_TYPE = "BreakpointType",             // String
-        PROP_CONTEXTNAMES = "ContextNames",       // Array
-        PROP_CONTEXTIDS = "ContextIds",           // Array
-        PROP_EXECUTABLEPATHS = "ExecPaths",       // Array
+        PROP_CONTEXT_NAMES = "ContextNames",      // Array
+        PROP_CONTEXT_IDS = "ContextIds",          // Array
+        PROP_EXECUTABLE_PATHS = "ExecPaths",      // Array
         PROP_CONTEXT_QUERY = "ContextQuery",      // String, see IContextQuery
         PROP_LOCATION = "Location",               // String
         PROP_SIZE = "Size",                       // Number
-        PROP_ACCESSMODE = "AccessMode",           // Number
+        PROP_ACCESS_MODE = "AccessMode",          // Number
         PROP_FILE = "File",                       // String
         PROP_LINE = "Line",                       // Number
         PROP_COLUMN = "Column",                   // Number
         PROP_PATTERN = "MaskValue",               // Number
         PROP_MASK = "Mask",                       // Number
         PROP_STOP_GROUP = "StopGroup",            // Array
-        PROP_IGNORECOUNT = "IgnoreCount",         // Number
+        PROP_IGNORE_COUNT = "IgnoreCount",        // Number
         PROP_TIME = "Time",                       // Number
         PROP_SCALE = "TimeScale",                 // String
         PROP_UNITS = "TimeUnits",                 // String
@@ -65,6 +65,16 @@ public interface IBreakpoints extends IService {
         PROP_EVENT_TYPE = "EventType",            // String
         PROP_EVENT_ARGS = "EventArgs",            // String or Object
         PROP_CLIENT_DATA = "ClientData";          // Object
+
+    /**
+     * @deprecated
+     */
+    static final String
+        PROP_CONTEXTNAMES = "ContextNames",       // Array
+        PROP_CONTEXTIDS = "ContextIds",           // Array
+        PROP_EXECUTABLEPATHS = "ExecPaths",       // Array
+        PROP_ACCESSMODE = "AccessMode",           // Number
+        PROP_IGNORECOUNT = "IgnoreCount";         // Number
 
     /**
      * BreakpointType values
@@ -129,13 +139,23 @@ public interface IBreakpoints extends IService {
         CAPABILITY_CONDITION = "Condition",             // Boolean
         CAPABILITY_FILE_LINE = "FileLine",              // Boolean
         CAPABILITY_FILE_MAPPING = "FileMapping",        // Boolean
-        CAPABILITY_CONTEXTIDS = "ContextIds",           // Boolean
-        CAPABILITY_CONTEXTNAMES = "ContextNames",       // Boolean
+        CAPABILITY_CONTEXT_IDS = "ContextIds",          // Boolean
+        CAPABILITY_CONTEXT_NAMES = "ContextNames",      // Boolean
+        CAPABILITY_CONTEXT_QUERY = "ContextQuery",      // Boolean
         CAPABILITY_STOP_GROUP = "StopGroup",            // Boolean
         CAPABILITY_TEMPORARY = "Temporary",             // Boolean
-        CAPABILITY_IGNORECOUNT = "IgnoreCount",         // Boolean
-        CAPABILITY_ACCESSMODE = "AccessMode",           // Number
+        CAPABILITY_IGNORE_COUNT = "IgnoreCount",        // Boolean
+        CAPABILITY_ACCESS_MODE = "AccessMode",          // Number
         CAPABILITY_CLIENT_DATA = "ClientData";          // Boolean
+
+    /**
+     * @deprecated
+     */
+    static final String
+        CAPABILITY_CONTEXTNAMES = "ContextNames",
+        CAPABILITY_CONTEXTIDS = "ContextIds",
+        CAPABILITY_IGNORECOUNT = "IgnoreCount",
+        CAPABILITY_ACCESSMODE = "AccessMode";
 
     /**
      * Call back interface for breakpoint service commands.

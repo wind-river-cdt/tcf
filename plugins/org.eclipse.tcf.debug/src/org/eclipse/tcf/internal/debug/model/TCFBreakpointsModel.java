@@ -72,9 +72,9 @@ public class TCFBreakpointsModel {
         ATTR_REQESTED_CHAR = "requestedCharStart",
         ATTR_CONDITION     = "org.eclipse.cdt.debug.core.condition",
         ATTR_IGNORE_COUNT  = "org.eclipse.cdt.debug.core.ignoreCount",
-        ATTR_CONTEXTNAMES  = ITCFConstants.ID_TCF_DEBUG_MODEL + '.' + IBreakpoints.PROP_CONTEXTNAMES,
-        ATTR_CONTEXTIDS    = ITCFConstants.ID_TCF_DEBUG_MODEL + '.' + IBreakpoints.PROP_CONTEXTIDS,
-        ATTR_EXE_PATHS     = ITCFConstants.ID_TCF_DEBUG_MODEL + '.' + IBreakpoints.PROP_EXECUTABLEPATHS,
+        ATTR_CONTEXTNAMES  = ITCFConstants.ID_TCF_DEBUG_MODEL + '.' + IBreakpoints.PROP_CONTEXT_NAMES,
+        ATTR_CONTEXTIDS    = ITCFConstants.ID_TCF_DEBUG_MODEL + '.' + IBreakpoints.PROP_CONTEXT_IDS,
+        ATTR_EXE_PATHS     = ITCFConstants.ID_TCF_DEBUG_MODEL + '.' + IBreakpoints.PROP_EXECUTABLE_PATHS,
         ATTR_STOP_GROUP    = ITCFConstants.ID_TCF_DEBUG_MODEL + '.' + IBreakpoints.PROP_STOP_GROUP,
         ATTR_CONTEXT_QUERY = ITCFConstants.ID_TCF_DEBUG_MODEL + '.' + IBreakpoints.PROP_CONTEXT_QUERY,
         ATTR_EVENT_TYPE    = "org.eclipse.cdt.debug.core.eventbreakpoint_event_id",
@@ -479,7 +479,7 @@ public class TCFBreakpointsModel {
             if (key.equals(IBreakpoints.PROP_LINE)) continue;
             if (key.equals(IBreakpoints.PROP_COLUMN)) continue;
             if (key.equals(IBreakpoints.PROP_LOCATION)) continue;
-            if (key.equals(IBreakpoints.PROP_ACCESSMODE)) continue;
+            if (key.equals(IBreakpoints.PROP_ACCESS_MODE)) continue;
             if (key.equals(IBreakpoints.PROP_SIZE)) continue;
             if (key.equals(IBreakpoints.PROP_CONDITION)) continue;
             if (key.equals(IBreakpoints.PROP_EVENT_TYPE)) continue;
@@ -509,7 +509,7 @@ public class TCFBreakpointsModel {
         String location = (String)p.get(IBreakpoints.PROP_LOCATION);
         if (location != null && location.length() > 0) {
             int access_mode = IBreakpoints.ACCESSMODE_EXECUTE;
-            Number access_mode_num = (Number)p.get(IBreakpoints.PROP_ACCESSMODE);
+            Number access_mode_num = (Number)p.get(IBreakpoints.PROP_ACCESS_MODE);
             if (access_mode_num != null) access_mode = access_mode_num.intValue();
             if ((access_mode & IBreakpoints.ACCESSMODE_EXECUTE) != 0) {
                 if (Character.isDigit(location.charAt(0))) {
@@ -552,7 +552,7 @@ public class TCFBreakpointsModel {
         if (event_type != null && event_type.length() > 0) m.put(ATTR_EVENT_TYPE, event_type);
         String event_args = (String)p.get(IBreakpoints.PROP_EVENT_ARGS);
         if (event_args != null && event_args.length() > 0) m.put(ATTR_EVENT_ARGS, event_args);
-        Number ignore_count = (Number)p.get(IBreakpoints.PROP_IGNORECOUNT);
+        Number ignore_count = (Number)p.get(IBreakpoints.PROP_IGNORE_COUNT);
         if (ignore_count != null) m.put(ATTR_IGNORE_COUNT, ignore_count);
         return m;
     }
@@ -589,12 +589,12 @@ public class TCFBreakpointsModel {
             Object val = e.getValue();
             if (key.startsWith(ITCFConstants.ID_TCF_DEBUG_MODEL)) {
                 String tcf_key = key.substring(ITCFConstants.ID_TCF_DEBUG_MODEL.length() + 1);
-                if (IBreakpoints.PROP_CONTEXTIDS.equals(tcf_key)) {
+                if (IBreakpoints.PROP_CONTEXT_IDS.equals(tcf_key)) {
                     val = filterContextIds(channel, ((String)val).split(",\\s*"));
                 }
-                else if (IBreakpoints.PROP_CONTEXTNAMES.equals(tcf_key) ||
+                else if (IBreakpoints.PROP_CONTEXT_NAMES.equals(tcf_key) ||
                         IBreakpoints.PROP_STOP_GROUP.equals(tcf_key) ||
-                        IBreakpoints.PROP_EXECUTABLEPATHS.equals(tcf_key)) {
+                        IBreakpoints.PROP_EXECUTABLE_PATHS.equals(tcf_key)) {
                     val = ((String)val).split(",\\s*");
                 }
                 m.put(tcf_key, val);
@@ -637,7 +637,7 @@ public class TCFBreakpointsModel {
                 int accessMode = 0;
                 if (readAccess) accessMode |= IBreakpoints.ACCESSMODE_READ;
                 if (writeAccess) accessMode |= IBreakpoints.ACCESSMODE_WRITE;
-                m.put(IBreakpoints.PROP_ACCESSMODE, Integer.valueOf(accessMode));
+                m.put(IBreakpoints.PROP_ACCESS_MODE, Integer.valueOf(accessMode));
                 Object range = p.get(ATTR_SIZE);
                 if (range != null) {
                     int size = Integer.parseInt(range.toString());
@@ -664,7 +664,7 @@ public class TCFBreakpointsModel {
         String event_args = (String)p.get(ATTR_EVENT_ARGS);
         if (event_args != null && event_args.length() > 0) m.put(IBreakpoints.PROP_EVENT_ARGS, event_args);
         Number ignore_count = (Number)p.get(ATTR_IGNORE_COUNT);
-        if (ignore_count != null && ignore_count.intValue() > 0) m.put(IBreakpoints.PROP_IGNORECOUNT, ignore_count);
+        if (ignore_count != null && ignore_count.intValue() > 0) m.put(IBreakpoints.PROP_IGNORE_COUNT, ignore_count);
         return m;
     }
 

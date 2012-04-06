@@ -15,7 +15,6 @@ import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.tcf.internal.debug.ui.model.TCFModelManager;
 import org.eclipse.tcf.internal.debug.ui.model.TCFModelPresentation;
 
 public class TCFBreakpointAdapterFactory implements IAdapterFactory {
@@ -51,7 +50,6 @@ public class TCFBreakpointAdapterFactory implements IAdapterFactory {
     @SuppressWarnings("rawtypes")
     public Object getAdapter(Object obj, Class cls) {
         if (obj instanceof IBreakpoint) {
-            //TCFModelManager.getModelManager().
             if (cls == ILabelProvider.class) return label_provider;
         }
         return null;
