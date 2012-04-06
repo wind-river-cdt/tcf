@@ -32,14 +32,14 @@ public class TCFContextQueryExpressionDialog extends SelectionDialog {
     private String[] attributeList;
     private ParameterDataModel[] parameterData;
     final String[] columnNames = new String[] {"Parameter","Value"};
-    
+
     protected TCFContextQueryExpressionDialog(Shell parentShell, String[] attributes, String initialExpression) {
         super(parentShell);
         setShellStyle(getShellStyle() | SWT.RESIZE);
         expression = initialExpression;
         attributeList = attributes;
     }
-    
+
     String getParameterInitialValue (String comparator, int initIndex){
        if (expression != null && expression.length() > 0) {
            int indexExpr = expression.indexOf (comparator, initIndex);
@@ -49,8 +49,8 @@ public class TCFContextQueryExpressionDialog extends SelectionDialog {
                    String testChar = expression.substring(indexExpr-1, indexExpr);
                    if (!testChar.equals(",")) {
                        return getParameterInitialValue(comparator,indexExpr+1);
-                   }                   
-               }         
+                   }
+               }
                int startOfVal = expression.indexOf ('=', indexExpr) + 1;
                int endOfVal = -1;
                if (startOfVal != 0) {
@@ -71,7 +71,7 @@ public class TCFContextQueryExpressionDialog extends SelectionDialog {
     *
     */
    public static class ParameterDataModel {
-   
+
        private String attribute;
        private String value;
 
@@ -79,19 +79,19 @@ public class TCFContextQueryExpressionDialog extends SelectionDialog {
            attribute = label;
            value ="";
          }
-   
+
        public String getLabel() {
          return attribute;
        }
-   
+
        public void setLabel(String label) {
          attribute = label;
        }
-   
+
        public String getData() {
          return value;
        }
-   
+
        public void setData(Object data) {
            if (data != null) {
                value = (String)data;
@@ -114,7 +114,7 @@ public class TCFContextQueryExpressionDialog extends SelectionDialog {
        }
        return parameterData;
    }
-   
+
    public final class ParameterTableLabelProvider extends LabelProvider implements ITableLabelProvider {
        public Image getColumnImage(Object element, int columnIndex) {
          return null;
@@ -131,7 +131,7 @@ public class TCFContextQueryExpressionDialog extends SelectionDialog {
            }
        }
      }
-   
+
    public class ValueCellEditor extends TextCellEditor {
        private Object tableElement;
        public ValueCellEditor(Composite parent) {
@@ -160,13 +160,13 @@ public class TCFContextQueryExpressionDialog extends SelectionDialog {
                    String testChar = expression.substring(indexExpr-1, indexExpr);
                    if (!testChar.equals(",")) {
                        return findParameter(comparator,indexExpr+1);
-                   }                   
+                   }
                }
            }
-       }        
+       }
        return indexExpr;
    }
-   
+
    public final class CellEditorListener implements ICellEditorListener {
        private ValueCellEditor fcellEditor;
        public CellEditorListener(ValueCellEditor cellEditor) {
@@ -183,7 +183,7 @@ public class TCFContextQueryExpressionDialog extends SelectionDialog {
            if (cellString == null) {
                return;
            }
-           cellString = cellString.trim();           
+           cellString = cellString.trim();
            if (cellString.length() != 0) {
                if (expression == null || expression.length() == 0) {
                    expression = new String(paramName + "=" + cellString);
@@ -207,7 +207,7 @@ public class TCFContextQueryExpressionDialog extends SelectionDialog {
                        String testChar = expression.substring(strIndex+paramName.length(), strIndex+1+paramName.length());
                        if (!testChar.equals("=")) {
                            // malformed expression
-                           getButton(IDialogConstants.OK_ID).setEnabled(false);                           
+                           getButton(IDialogConstants.OK_ID).setEnabled(false);
                            return;
                        }
                        testChar = expression.substring(strIndex-1, strIndex);
@@ -218,7 +218,7 @@ public class TCFContextQueryExpressionDialog extends SelectionDialog {
                        }
                        else {
                            strIndex-=1;
-                       }                       
+                       }
                    }
                    int endLocation = expression.indexOf(',', strIndex+1);
                    if (endLocation == -1) {
@@ -233,7 +233,7 @@ public class TCFContextQueryExpressionDialog extends SelectionDialog {
                getButton(IDialogConstants.OK_ID).setEnabled(false);
            }
            else {
-               getButton(IDialogConstants.OK_ID).setEnabled(true);               
+               getButton(IDialogConstants.OK_ID).setEnabled(true);
            }
       }
 
@@ -283,8 +283,8 @@ public class TCFContextQueryExpressionDialog extends SelectionDialog {
                fviewer.update(element, null);
            }
        }
-   }   
-  
+   }
+
     protected Control createDialogArea(Composite parent) {
         Composite page = new Composite(parent, SWT.NONE);
         GridLayout gridLayout = new GridLayout(1, true);
@@ -318,14 +318,14 @@ public class TCFContextQueryExpressionDialog extends SelectionDialog {
         });
         return parent;
     }
-    
+
     public String getExpression() {
         return expression;
     }
-    
+
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets
      * .Shell)
@@ -334,7 +334,7 @@ public class TCFContextQueryExpressionDialog extends SelectionDialog {
         super.configureShell(newShell);
         newShell.setText("Select Expression Parameters");
     }
-    
+
     public void create() {
         super.create();
         getButton(IDialogConstants.OK_ID).setEnabled(false);

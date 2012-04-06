@@ -266,7 +266,7 @@ public class TCFThreadFilterEditor {
     private ControlDecoration scopeExpressionDecoration;
     private Button radioBasic;
     private Button radioAdvanced;
-    
+
     public class ScopingModeListener implements SelectionListener {
         private Composite fParent;
 
@@ -276,7 +276,7 @@ public class TCFThreadFilterEditor {
         public void widgetSelected(SelectionEvent e) {
             if (radioBasic.getSelection()) {
                 stackLayout.topControl = basicPage;
-            }    
+            }
             else {
                 stackLayout.topControl = advancedPage;
             }
@@ -285,7 +285,7 @@ public class TCFThreadFilterEditor {
         public void widgetDefaultSelected(SelectionEvent e) {
         }
     }
- 
+
     /**
      * Returns the dialog settings or <code>null</code> if none
      *
@@ -302,7 +302,7 @@ public class TCFThreadFilterEditor {
         }
         return section;
     }
-    
+
     public TCFThreadFilterEditor(Composite parent, TCFBreakpointThreadFilterPage page) {
         fPage = page;
         fContentProvider = new ThreadFilterContentProvider();
@@ -322,12 +322,12 @@ public class TCFThreadFilterEditor {
         radioAdvanced = new Button(buttonComposite, SWT.RADIO);
         radioAdvanced.setText(Messages.TCFThreadFilterQueryButtonAdvanced);
         radioAdvanced.addSelectionListener(new ScopingModeListener(mainComposite));
-        
+
         IDialogSettings settings= getDialogSettings(false);
         if (settings != null) {
             boolean basicSelected = settings.getBoolean(Messages.TCFThreadFilterQueryModeButtonState);
             if ( basicSelected ) {
-                radioBasic.setSelection(true); 
+                radioBasic.setSelection(true);
             }
             else {
                 radioAdvanced.setSelection(true);
@@ -342,7 +342,7 @@ public class TCFThreadFilterEditor {
     protected TCFBreakpointThreadFilterPage getPage() {
         return fPage;
     }
-    
+
     private String getBPFilterExpression() {
         String expression = null;
         ICBreakpoint bp = (ICBreakpoint)fPage.getElement().getAdapter(ICBreakpoint.class);
@@ -357,10 +357,10 @@ public class TCFThreadFilterEditor {
                 }
             }
         }
-        
+
         return expression;
     }
-    
+
     private String[] getAvailableAttributes() {
         String[] result = null;
         TCFLaunch launch = (TCFLaunch)getAttributeLaunch();
@@ -373,7 +373,7 @@ public class TCFThreadFilterEditor {
         }
         result = new TCFTask<String[]>() {
             public void run() {
-                IContextQuery service = channel.getRemoteService(IContextQuery.class);                                        
+                IContextQuery service = channel.getRemoteService(IContextQuery.class);
                 service.getAttrNames(new IContextQuery.DoneGetAttrNames() {
                     public void doneGetAttrNames(IToken token, Exception error, String[] attributes) {
                         if (error != null) {
@@ -446,29 +446,29 @@ public class TCFThreadFilterEditor {
     }
 
     private class ExpressionSelectButton implements Listener {
-        
+
         private Shell parentShell;
-        
+
         public ExpressionSelectButton(Shell shell) {
             parentShell = shell;
         }
 
         public void handleEvent(Event event) {
             String[] attrsList = getAvailableAttributes();
-            String result = null;            
+            String result = null;
             TCFContextQueryExpressionDialog dlg = new TCFContextQueryExpressionDialog(parentShell, attrsList, scopeExprCombo.getText());
-            
+
             if (dlg.open() == Window.OK) {
                 result = dlg.getExpression();
             }
             if (result != null) {
-            	scopeExprCombo.setText(result);
+                scopeExprCombo.setText(result);
             }
         }
     }
-    
+
     private void setupScopeExpressionCombo(IDialogSettings settings, String bpContextQuery) {
-        String [] expresionList = null;        
+        String [] expresionList = null;
         if ( settings != null ) {
             expresionList = settings.getArray(Messages.TCFThreadFilterQueryExpressionStore);
             if ( expresionList != null ) {
@@ -483,14 +483,14 @@ public class TCFThreadFilterEditor {
                 String[] copyList = new String[index];
                 int found = -1;
                 for (int loop = 0; loop < index; loop++) {
-                    copyList[loop] = expresionList[loop];  
+                    copyList[loop] = expresionList[loop];
                     if (bpContextQuery != null && copyList[loop].equals(bpContextQuery)) {
                         found = loop;
                     }
                 }
                 if (found != -1) {
                     scopeExprCombo.setItems(copyList);
-                    scopeExprCombo.select(found);                            
+                    scopeExprCombo.select(found);
                 }
                 else {
                     int pad = 0;
@@ -510,19 +510,19 @@ public class TCFThreadFilterEditor {
             }
             else if (bpContextQuery != null) {
                 scopeExprCombo.setItems(new String[]{bpContextQuery});
-                scopeExprCombo.select(0);                            
+                scopeExprCombo.select(0);
             }
         }
         else if (bpContextQuery != null) {
             scopeExprCombo.setItems(new String[]{bpContextQuery});
-            scopeExprCombo.select(0);            
-        }          
+            scopeExprCombo.select(0);
+        }
     }
-    
+
     private void createThreadViewer(Composite parent) {
         GridData twoColumnLayout = new GridData(SWT.FILL,0, true, false);
         twoColumnLayout.horizontalSpan = 2;
-        advancedPage = new Composite(parent,SWT.NONE);  
+        advancedPage = new Composite(parent,SWT.NONE);
         advancedPage.setLayout(new GridLayout(2,false));
         advancedPage.setFont(parent.getFont());
         Label epressionLabel = new Label(advancedPage, SWT.NONE);
@@ -536,10 +536,10 @@ public class TCFThreadFilterEditor {
         scopeExprCombo.addModifyListener(new ExpressionModifier());
         scopeExpressionDecoration = new ControlDecoration(scopeExprCombo, SWT.LEFT, advancedPage);
         scopeExpressionDecoration.hide();
-        scopeExpressionDecoration.setDescriptionText(Messages.TCFThreadFilterEditorFormatError); 
-        FieldDecoration fieldDecoration = FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_ERROR); 
+        scopeExpressionDecoration.setDescriptionText(Messages.TCFThreadFilterEditorFormatError);
+        FieldDecoration fieldDecoration = FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_ERROR);
         scopeExpressionDecoration.setImage(fieldDecoration.getImage());
-        
+
         String bpContextQuery = getBPFilterExpression();
         IDialogSettings settings= getDialogSettings(false);
         setupScopeExpressionCombo(settings, bpContextQuery);
@@ -547,7 +547,7 @@ public class TCFThreadFilterEditor {
         selectExpression.setText(Messages.TCFThreadFilterQueryButtonEdit);
         selectExpression.setLayoutData(new GridData(SWT.RIGHT,0, false, false));
         selectExpression.addListener(SWT.Selection, new ExpressionSelectButton(parent.getShell()));
-        
+
         basicPage = new Composite(parent, SWT.NONE);
         basicPage .setLayout(new GridLayout(1,false));
         basicPage .setFont(parent.getFont());
@@ -564,15 +564,15 @@ public class TCFThreadFilterEditor {
         fThreadViewer.setContentProvider(fContentProvider);
         fThreadViewer.setLabelProvider(new ThreadFilterLabelProvider());
         fThreadViewer.setInput(DebugPlugin.getDefault().getLaunchManager());
-        setInitialCheckedState();        
+        setInitialCheckedState();
 
         if (radioBasic.getSelection()) {
             stackLayout.topControl = basicPage;
-        }    
+        }
         else {
             stackLayout.topControl = advancedPage;
         }
-        parent.layout();        
+        parent.layout();
     }
 
     protected ILaunch getAttributeLaunch() {
@@ -619,7 +619,7 @@ public class TCFThreadFilterEditor {
     protected final CheckboxTreeViewer getThreadViewer() {
         return fThreadViewer;
     }
-    
+
     protected final String getScopeExpression() {
         return  scopeExprCombo.getText();
     }
@@ -677,7 +677,7 @@ public class TCFThreadFilterEditor {
         }
         return null;
     }
-    
+
     void updateExpressionsDialogSettings(IDialogSettings settings, String scopedExpression) {
         String[] list = settings.getArray(Messages.TCFThreadFilterQueryExpressionStore);
         if (list == null) {
@@ -699,7 +699,7 @@ public class TCFThreadFilterEditor {
         System.arraycopy(list, 0, copyList, 1, list.length-1);
         settings.put(Messages.TCFThreadFilterQueryExpressionStore, copyList);
     }
-    
+
     protected void doStore() {
         IDialogSettings settings= getDialogSettings(true);
         if (settings != null) {
@@ -733,7 +733,7 @@ public class TCFThreadFilterEditor {
             }
             TCFBreakpointScopeExtension filterExtension = fPage.getFilterExtension();
             if (filterExtension == null) return;
-            filterExtension.setThreadFilter(threadIds);        
+            filterExtension.setThreadFilter(threadIds);
         }
     }
 

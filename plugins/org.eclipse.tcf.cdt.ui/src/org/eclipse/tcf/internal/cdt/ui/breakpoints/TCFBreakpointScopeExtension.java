@@ -66,7 +66,8 @@ public class TCFBreakpointScopeExtension implements ICBreakpointExtension {
         catch (Exception e) {
             Activator.log(e);
         }
-    }      
+    }
+
     public void setPropertiesFilter(String properties) {
         fProperties = properties;
         if (fBreakpoint == null) return;
@@ -82,7 +83,7 @@ public class TCFBreakpointScopeExtension implements ICBreakpointExtension {
         }
         catch (Exception e) {
             Activator.log(e);
-        }        
+        }
     }
 
     public String[] getThreadFilters() {
