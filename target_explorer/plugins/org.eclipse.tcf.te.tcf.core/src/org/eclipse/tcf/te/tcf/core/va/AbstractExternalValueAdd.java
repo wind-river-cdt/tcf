@@ -9,13 +9,22 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.core.va;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.tcf.core.TransientPeer;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
+import org.eclipse.tcf.protocol.JSON;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.te.runtime.concurrent.util.ExecutorsUtil;
+import org.eclipse.tcf.te.runtime.utils.net.IPAddressUtil;
+import org.eclipse.tcf.te.tcf.core.nls.Messages;
 
 /**
  * Abstract external value add implementation.
@@ -120,11 +129,113 @@ public abstract class AbstractExternalValueAdd extends AbstractValueAdd {
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.tcf.core.va.interfaces.IValueAdd#launch(java.lang.String)
 	 */
-	@Override
-	public Throwable launch(String id) {
+	@SuppressWarnings("unchecked")
+    @Override
+	public Throwable launch(final String id) {
 		Assert.isTrue(!Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 		Assert.isNotNull(id);
 
-	    return null;
+		Throwable error = null;
+
+		// Get the location of the executable image
+		IPath path = getLocation();
+		if (path != null && path.toFile().canRead()) {
+			ValueAddLauncher launcher = new ValueAddLauncher(path);
+			try {
+				launcher.launch();
+			} catch (Throwable e) {
+				error = e;
+			}
+
+			// Prepare the value-add entry
+			ValueAddEntry entry = new ValueAddEntry();
+
+			if (error == null) {
+				// Get the external process
+				Process process = launcher.getProcess();
+				try {
+					// Check if the process exited right after the launch
+					int exitCode = process.exitValue();
+					// Died -> Fail the launch
+					error = new IOException("Value-add process died with exit code " + exitCode); //$NON-NLS-1$
+				} catch (IllegalThreadStateException e) {
+					// Still running -> Associate the process with the entry
+					entry.process = process;
+				}
+			}
+
+			String output = null;
+
+			if (error == null) {
+				// The agent is started with "-S" to write out the peer attributes in JSON format.
+				int counter = 10;
+				while (counter > 0 && output == null) {
+					// Try to read in the output
+					output = launcher.getOutputReader().getOutput();
+					if ("".equals(output)) { //$NON-NLS-1$
+						output = null;
+						ExecutorsUtil.waitAndExecute(200, null);
+					}
+					counter--;
+				}
+				if (output == null) {
+					error = new IOException("Failed to read output from value-add."); //$NON-NLS-1$
+				}
+			}
+
+			 Map<String, String> attrs = null;
+
+			if (error == null) {
+				// Strip away "Server-Properties:"
+				output = output.replace("Server-Properties:", " "); //$NON-NLS-1$ //$NON-NLS-2$
+				output = output.trim();
+
+				// Read into an object
+				Object object = null;
+				try {
+					object = JSON.parseOne(output.getBytes("UTF-8")); //$NON-NLS-1$
+			        attrs = new HashMap<String, String>((Map<String, String>)object);
+				} catch (IOException e) {
+					error = e;
+				}
+			}
+
+			if (error == null) {
+				// Construct the peer id from peer attributes
+
+				// The expected peer id is "<transport>:<canonical IP>:<port>"
+				String transport = attrs.get(IPeer.ATTR_TRANSPORT_NAME);
+				String port = attrs.get(IPeer.ATTR_IP_PORT);
+				String ip = IPAddressUtil.getInstance().getCanonicalAddress();
+
+				if (transport != null && ip != null && port != null) {
+					String peerId = transport + ":" + ip + ":" + port; //$NON-NLS-1$ //$NON-NLS-2$
+					attrs.put(IPeer.ATTR_ID, peerId);
+					attrs.put(IPeer.ATTR_IP_HOST, ip);
+
+					entry.peer = new TransientPeer(attrs);
+				} else {
+					error = new IOException("Invalid or incomplete peer attributes reported by value-add."); //$NON-NLS-1$
+				}
+			}
+
+			if (error == null) {
+				Assert.isNotNull(entry.process);
+				Assert.isNotNull(entry.peer);
+
+				entries.put(id, entry);
+			}
+		} else {
+			error = new FileNotFoundException(NLS.bind(Messages.AbstractExternalValueAdd_error_invalidLocation, this.getId()));
+		}
+
+	    return error;
 	}
+
+	/**
+	 * Returns the absolute path to the value-add executable image.
+	 *
+	 * @return The absolute path or <code>null</code> if not found.
+	 */
+	protected abstract IPath getLocation();
 }

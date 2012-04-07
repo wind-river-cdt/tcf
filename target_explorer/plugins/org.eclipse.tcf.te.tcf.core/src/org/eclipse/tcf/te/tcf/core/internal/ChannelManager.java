@@ -558,6 +558,13 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 			if (error != null) break;
 		}
 
-		done.doneHandleValueAdds(error, valueAdds);
+		// The callback must be invoked within the TCF dispatch thread
+		final Throwable finError = error;
+		Protocol.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				done.doneHandleValueAdds(finError, valueAdds);
+			}
+		});
 	}
 }
