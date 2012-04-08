@@ -426,9 +426,11 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 			}
 
 			// Shutdown the value-add's for the associated remote peer
-			IValueAdd[] valueAdds = ValueAddManager.getInstance().getValueAdd(channel.getRemotePeer());
-			if (valueAdds != null) {
-				internalShutdownValueAdds(channel.getRemotePeer(), valueAdds);
+			if (forceValueAddShutdown) {
+				IValueAdd[] valueAdds = ValueAddManager.getInstance().getValueAdd(channel.getRemotePeer());
+				if (valueAdds != null) {
+					internalShutdownValueAdds(channel.getRemotePeer(), valueAdds);
+				}
 			}
 
 			// Clean the reference counter and the channel map
@@ -469,9 +471,16 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 
 		refCounters.clear();
 		channels.clear();
+		forceValueAddShutdown = true;
 
 		for (IChannel channel : openChannels) internalCloseChannel(channel);
 	}
+
+	/**
+	 * Set be {@link #internalCloseAll()} to signal that we should force
+	 * a shutdown of all associated value-adds on closing the channels.
+	 */
+	/* default */ boolean forceValueAddShutdown = false;
 
 	/**
 	 * Shutdown the given value-adds for the given peer.
@@ -492,6 +501,7 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 				@Override
 				public void run() {
 					doShutdownValueAdds(id, valueAdds);
+					forceValueAddShutdown = false;
 				}
 			});
 		}
