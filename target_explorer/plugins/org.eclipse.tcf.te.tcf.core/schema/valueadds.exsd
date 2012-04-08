@@ -84,6 +84,13 @@ The value-add implementation class must be specified either by the class attribu
                </appinfo>
             </annotation>
          </attribute>
+         <attribute name="optional" type="boolean">
+            <annotation>
+               <documentation>
+                  If set to &quot;true&quot;, than it marks the value-add as optional. Optional value-add are silently ignored if the necessary executable is not present or the launch of such value-add is failing. If not set, the attribute does default to &quot;false&quot;.
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 

@@ -9,14 +9,18 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.core.internal;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.PlatformObject;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.core.AbstractPeer;
 import org.eclipse.tcf.core.TransientPeer;
@@ -111,9 +115,16 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 				// Check on the value-add's first
 				internalHandleValueAdds(peer, flags, new DoneHandleValueAdds() {
 					@Override
-					public void doneHandleValueAdds(Throwable error, IValueAdd[] valueAdds) {
-						// Open the channel
-						internalOpenChannel(peer, flags, done);
+					public void doneHandleValueAdds(final Throwable error, final IValueAdd[] valueAdds) {
+						// If the error is null, continue and open the channel
+						if (error == null) {
+							internalOpenChannel(peer, flags, done);
+						} else {
+							// Shutdown the value-add's launched
+							internalShutdownValueAdds(peer, valueAdds);
+							// Fail the channel opening
+							done.doneOpenChannel(error, null);
+						}
 					}
 				});
 			}
@@ -414,6 +425,12 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 															0, ITraceIds.TRACE_CHANNEL_MANAGER, IStatus.INFO, this);
 			}
 
+			// Shutdown the value-add's for the associated remote peer
+			IValueAdd[] valueAdds = ValueAddManager.getInstance().getValueAdd(channel.getRemotePeer());
+			if (valueAdds != null) {
+				internalShutdownValueAdds(channel.getRemotePeer(), valueAdds);
+			}
+
 			// Clean the reference counter and the channel map
 			refCounters.remove(id);
 			channels.remove(id);
@@ -454,6 +471,46 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 		channels.clear();
 
 		for (IChannel channel : openChannels) internalCloseChannel(channel);
+	}
+
+	/**
+	 * Shutdown the given value-adds for the given peer.
+	 *
+	 * @param peer The peer. Must not be <code>null</code>.
+	 * @param valueAdds The list of value-adds. Must not be <code>null</code>.
+	 */
+	/* default */ void internalShutdownValueAdds(final IPeer peer, final IValueAdd[] valueAdds) {
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+		Assert.isNotNull(peer);
+		Assert.isNotNull(valueAdds);
+
+		// Get the peer id
+		final String id = peer.getID();
+
+		if (valueAdds.length > 0) {
+			ExecutorsUtil.execute(new Runnable() {
+				@Override
+				public void run() {
+					doShutdownValueAdds(id, valueAdds);
+				}
+			});
+		}
+	}
+
+	/**
+	 * Shutdown the given value-adds for the given peer id.
+	 *
+	 * @param id The peer id. Must not be <code>null</code>.
+	 * @param valueAdds The list of value-add's. Must not be <code>null</code>.
+	 */
+	/* default */ void doShutdownValueAdds(final String id, final IValueAdd[] valueAdds) {
+		Assert.isTrue(!Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+		Assert.isNotNull(id);
+		Assert.isNotNull(valueAdds);
+
+		for (IValueAdd valueAdd : valueAdds) {
+			valueAdd.shutdown(id);
+		}
 	}
 
 	/**
@@ -545,6 +602,7 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 		Assert.isNotNull(valueAdds);
 		Assert.isNotNull(done);
 
+		final List<IValueAdd> available = new ArrayList<IValueAdd>();
 		Throwable error = null;
 
 		// Loop all applicable value-adds and check if there are up and running.
@@ -554,6 +612,19 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 			// If the value-add is not alive, launch it
 			if (!alive) {
 				error = valueAdd.launch(id);
+				// If we got an error and the value-add is optional,
+				// log the error as warning and drop the value-add
+				if (error != null && valueAdd.isOptional()) {
+					IStatus status = new Status(IStatus.WARNING, CoreBundleActivator.getUniqueIdentifier(),
+												NLS.bind(Messages.ChannelManager_valueAdd_launchFailed, valueAdd.getLabel(), error.getLocalizedMessage()),
+												error);
+					Platform.getLog(CoreBundleActivator.getContext().getBundle()).log(status);
+
+					// Reset the error
+					error = null;
+				} else {
+					available.add(valueAdd);
+				}
 			}
 			if (error != null) break;
 		}
@@ -563,7 +634,7 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 		Protocol.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				done.doneHandleValueAdds(finError, valueAdds);
+				done.doneHandleValueAdds(finError, available.toArray(new IValueAdd[available.size()]));
 			}
 		});
 	}

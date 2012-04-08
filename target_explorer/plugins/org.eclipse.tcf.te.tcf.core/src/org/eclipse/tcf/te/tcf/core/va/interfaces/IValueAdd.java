@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.core.va.interfaces;
 
+import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.te.runtime.interfaces.extensions.IExecutableExtension;
 
 /**
@@ -17,6 +18,13 @@ import org.eclipse.tcf.te.runtime.interfaces.extensions.IExecutableExtension;
  * <b>Note:</b> All methods of this interface must be called from <b>outside</b> of the TCF dispatch thread.
  */
 public interface IValueAdd extends IExecutableExtension {
+
+	/**
+	 * Returns if or if not the value-add is optional.
+	 *
+	 * @return <code>True</code> if the value-add is optional, <code>false</code> otherwise.
+	 */
+	public boolean isOptional();
 
 	/**
 	 * Returns if or if not the value-add is alive for the given target peer.
@@ -36,4 +44,20 @@ public interface IValueAdd extends IExecutableExtension {
 	 * @return A throwable describing the error if the launch failed, <code>null</code> if the launch succeeds.
 	 */
 	public Throwable launch(String id);
+
+	/**
+	 * Shuts down the value-add for the given target peer.
+	 *
+	 * @param id The target peer id. Must not be <code>null</code>.
+	 * @return A throwable describing the error if the shutdown failed, <code>null</code> if the shutdown succeeds.
+	 */
+	public Throwable shutdown(String id);
+
+	/**
+	 * Returns the peer representing the value add for the given target peer.
+	 *
+	 * @param id The target peer id. Must not be <code>null</code>.
+	 * @return The value-add's peer.
+	 */
+	public IPeer getPeer(String id);
 }

@@ -42,6 +42,24 @@ public abstract class AbstractExternalValueAdd extends AbstractValueAdd {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.core.va.interfaces.IValueAdd#getPeer(java.lang.String)
+	 */
+	@Override
+	public IPeer getPeer(String id) {
+		Assert.isTrue(!Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+		Assert.isNotNull(id);
+
+		IPeer peer = null;
+
+		ValueAddEntry entry = entries.get(id);
+		if (entry != null) {
+			peer = entry.peer;
+		}
+
+	    return peer;
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.tcf.core.va.interfaces.IValueAdd#isAlive(java.lang.String)
 	 */
 	@Override
@@ -238,4 +256,25 @@ public abstract class AbstractExternalValueAdd extends AbstractValueAdd {
 	 * @return The absolute path or <code>null</code> if not found.
 	 */
 	protected abstract IPath getLocation();
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.core.va.interfaces.IValueAdd#shutdown(java.lang.String)
+	 */
+	@Override
+	public Throwable shutdown(String id) {
+		Assert.isTrue(!Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+		Assert.isNotNull(id);
+
+		Throwable error = null;
+
+		final ValueAddEntry entry = entries.get(id);
+		if (entry != null) {
+			if (isAlive(id)) {
+				entries.remove(id);
+				entry.process.destroy();
+			}
+		}
+
+		return error;
+	}
 }
