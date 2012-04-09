@@ -136,7 +136,7 @@ public class LocalFileSaveable extends Saveable implements
 			//Trigger upload action
 			FSTreeNode node = fileElement.getFSTreeNode();
 			IOpExecutor executor = new UiExecutor(Messages.CacheManager_UploadingProgress);
-			executor.execute(new OpCacheCommit(new FSTreeNode[]{node}, true));
+			executor.execute(new OpCacheCommit(true, node));
 		}
 	}
 

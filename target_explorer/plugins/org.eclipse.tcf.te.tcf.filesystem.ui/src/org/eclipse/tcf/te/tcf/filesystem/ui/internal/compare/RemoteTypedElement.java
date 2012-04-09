@@ -73,6 +73,8 @@ public class RemoteTypedElement extends MergeTypedElement {
 	 *            The monitor used to display downloading progress.
 	 * @throws InvocationTargetException
 	 *             throws when an exception occurs during downloading.
+	 *          InterruptedException
+	 *          	throws when the loading process is canceled.
 	 */
 	public void cacheContents(IProgressMonitor monitor)
 			throws InvocationTargetException, InterruptedException {

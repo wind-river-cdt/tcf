@@ -79,7 +79,7 @@ public class OperationTestBase extends FSPeerTestCase {
 	}
 
 	protected void commitCache(FSTreeNode testFile) throws Exception {
-		OpCacheCommit commit = new OpCacheCommit(new FSTreeNode[]{testFile}, false);
+		OpCacheCommit commit = new OpCacheCommit(testFile);
 		commit.run(new NullProgressMonitor());
 	}
 

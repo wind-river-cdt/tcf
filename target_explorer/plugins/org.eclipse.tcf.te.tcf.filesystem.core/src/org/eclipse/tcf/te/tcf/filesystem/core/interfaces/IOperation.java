@@ -13,8 +13,13 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
+/**
+ * A class that implement this interface represents an file system operation,
+ * which is an abstract of the action operated over files/folders. 
+ * 
+ * @since Target Explorer 1.0.0
+ */
 public interface IOperation {
-
     /**
      * Runs this operation.  Progress should be reported to the given progress monitor.
      * A request to cancel the operation should be honored and acknowledged 

@@ -33,7 +33,7 @@ public class OpCreateFolder extends OpCreate {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.wizards.FSCreate#create(org.eclipse.tcf.services.IFileSystem)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpCreate#create(org.eclipse.tcf.services.IFileSystem)
 	 */
 	@Override
 	protected void create(IFileSystem service) throws TCFFileSystemException {
@@ -58,7 +58,7 @@ public class OpCreateFolder extends OpCreate {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSCreate#newTreeNode()
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpCreate#newTreeNode()
 	 */
 	@Override
 	protected FSTreeNode newTreeNode() {

@@ -1,3 +1,12 @@
+/*******************************************************************************
+ * Copyright (c) 2012 Wind River Systems, Inc. and others. All rights reserved.
+ * This program and the accompanying materials are made available under the terms
+ * of the Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ * Wind River Systems - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.core.activator;
 
 import java.util.Hashtable;
@@ -11,15 +20,22 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.url.URLConstants;
 import org.osgi.service.url.URLStreamHandlerService;
 
+/**
+ * The activator class of the core file system plugin. 
+ */
 public class CorePlugin extends Plugin {
 
+	// The bundle context of this plugin.
 	private static BundleContext context;
 	// The shared instance of this plug-in.
 	private static CorePlugin plugin;
 	// The service registration for the "tcf" URL stream handler.
 	private ServiceRegistration<?> regURLStreamHandlerService;
 
-
+	/**
+	 * Get the bundle context of this plugin.
+	 * @return The bundle context object.
+	 */
 	static BundleContext getContext() {
 		return context;
 	}

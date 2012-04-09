@@ -34,17 +34,26 @@ public class OpMove extends Operation {
 	List<FSTreeNode> nodes;
 	// The destination folder to be moved to.
 	FSTreeNode dest;
-	// 
+	// The callback
 	IConfirmCallback confirmCallback;
 
-	public OpMove(List<FSTreeNode> nodes, FSTreeNode dest) {
-		this(nodes, dest, null);
-	}
 	/**
 	 * Create a move operation to move the specified nodes to the destination folder.
 	 *
 	 * @param nodes The nodes to be moved.
 	 * @param dest the destination folder to move to.
+	 */
+	public OpMove(List<FSTreeNode> nodes, FSTreeNode dest) {
+		this(nodes, dest, null);
+	}
+
+	/**
+	 * Create a move operation to move the specified nodes to the destination folder
+	 * and a confirmation callback.
+	 *
+	 * @param nodes The nodes to be moved.
+	 * @param dest the destination folder to move to.
+	 * @param confirmCallback the confirmation callback.
 	 */
 	public OpMove(List<FSTreeNode> nodes, FSTreeNode dest, IConfirmCallback confirmCallback) {
 		super();
@@ -55,10 +64,11 @@ public class OpMove extends Operation {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation#run(org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.Operation#run(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+		super.run(monitor);
 		// Remove its self from the clipped nodes.
 		nodes.remove(dest);
 		IChannel channel = null;
@@ -74,7 +84,7 @@ public class OpMove extends Operation {
 						monitor.beginTask(Messages.FSMove_MovingFile, nodes.size());
 						for (FSTreeNode node : nodes) {
 							// Move each node.
-							moveNode(monitor, service, node, dest);
+							moveNode(service, node, dest);
 						}
 					}
 					else {
@@ -103,7 +113,7 @@ public class OpMove extends Operation {
 	 * @throws TCFFileSystemException The exception thrown during moving.
 	 * @throws InterruptedException Thrown when the operation is canceled.
 	 */
-	void moveNode(IProgressMonitor monitor, IFileSystem service, final FSTreeNode node, FSTreeNode dest) throws TCFFileSystemException, InterruptedException {
+	void moveNode(IFileSystem service, final FSTreeNode node, FSTreeNode dest) throws TCFFileSystemException, InterruptedException {
 		if (monitor.isCanceled()) throw new InterruptedException();
 		monitor.subTask(NLS.bind(Messages.FSMove_Moving, node.name));
 		FSTreeNode copy = findChild(service, dest, node.name);
@@ -111,7 +121,7 @@ public class OpMove extends Operation {
 			if (copy != null && copy.isDirectory() && node.isDirectory()) {
 				List<FSTreeNode> children = getChildren(node, service);
 				for (FSTreeNode child : children) {
-					moveNode(monitor, service, child, copy);
+					moveNode(service, child, copy);
 				}
 				removeFolder(node, service);
 				monitor.worked(1);

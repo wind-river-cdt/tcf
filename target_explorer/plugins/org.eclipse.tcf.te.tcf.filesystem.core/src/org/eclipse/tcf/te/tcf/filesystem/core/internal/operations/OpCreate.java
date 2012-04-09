@@ -27,7 +27,7 @@ import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
 
 /**
- * The base file operation class for creating a file or a folder in the file system of Target
+ * The base operation class for creating a file or a folder in the file system of Target
  * Explorer.
  */
 public abstract class OpCreate extends Operation {
@@ -51,10 +51,11 @@ public abstract class OpCreate extends Operation {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation#run(org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.Operation#run(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+		super.run(monitor);
 		IChannel channel = null;
 		try {
 			int total = folder.childrenQueried ? 5 : 6;

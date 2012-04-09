@@ -17,10 +17,7 @@ import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IChannel;
-import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IFileSystem;
-import org.eclipse.tcf.services.IFileSystem.DoneRemove;
-import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IConfirmCallback;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.exceptions.TCFException;
@@ -35,6 +32,7 @@ import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
 public class OpDelete extends Operation {
 	//The nodes to be deleted.
 	List<FSTreeNode> nodes;
+	//The callback invoked to confirm deleting read-only files.
 	IConfirmCallback confirmCallback;
 
 	/**
@@ -49,10 +47,11 @@ public class OpDelete extends Operation {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation#run(org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.Operation#run(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+		super.run(monitor);
 		FSTreeNode head = nodes.get(0);
 		IChannel channel = null;
 		try {
@@ -65,7 +64,7 @@ public class OpDelete extends Operation {
 					int count = count(service, nodes);
 					monitor.beginTask(Messages.FSDelete_Deleting, count);
 					for (FSTreeNode node : nodes) {
-						remove(monitor, node, service);
+						remove(node, service);
 					}
 				}
 				else {
@@ -92,12 +91,12 @@ public class OpDelete extends Operation {
 	 * @throws TCFFileSystemException The exception thrown during deleting.
 	 * @throws InterruptedException Thrown when the operation is canceled.
 	 */
-	void remove(IProgressMonitor monitor, FSTreeNode node, IFileSystem service) throws TCFFileSystemException, InterruptedException {
+	void remove(FSTreeNode node, IFileSystem service) throws TCFFileSystemException, InterruptedException {
 		if (node.isFile()) {
-			removeFile(monitor, node, service);
+			removeFile(node, service);
 		}
 		else if (node.isDirectory()) {
-			removeFolder(monitor, node, service);
+			removeFolder(node, service);
 		}
 	}
 
@@ -110,59 +109,29 @@ public class OpDelete extends Operation {
 	 * @throws TCFFileSystemException The exception thrown during deleting.
 	 * @throws InterruptedException Thrown when the operation is canceled.
 	 */
-	private void removeFolder(IProgressMonitor monitor, final FSTreeNode node, IFileSystem service) throws TCFFileSystemException, InterruptedException {
+	@Override
+	protected void removeFolder(final FSTreeNode node, IFileSystem service) throws TCFFileSystemException, InterruptedException {
 		List<FSTreeNode> children = getChildren(node, service);
 		if (!children.isEmpty()) {
 			for (FSTreeNode child : children) {
 				// Delete each child node.
-				remove(monitor, child, service);
+				remove(child, service);
 			}
 		}
-		if (monitor.isCanceled()) throw new InterruptedException();
 		monitor.subTask(NLS.bind(Messages.FSDelete_RemovingFileFolder, node.name));
-		removeFolder(service, node);
+		super.removeFolder(node, service);
 		monitor.worked(1);
-	}
-
-	/**
-	 * Delete the folder node using the file system service.
-	 *
-	 * @param monitor The monitor to report the progress.
-	 * @param node The folder node to be deleted.
-	 * @param service The file system service.
-	 * @throws TCFFileSystemException The exception thrown during deleting.
-	 * @throws InterruptedException Thrown when the operation is canceled.
-	 */
-	private void removeFolder(IFileSystem service, final FSTreeNode node) throws TCFFileSystemException {
-		final TCFFileSystemException[] errors = new TCFFileSystemException[1];
-		String path = node.getLocation(true);
-		service.rmdir(path, new DoneRemove() {
-			@Override
-			public void doneRemove(IToken token, FileSystemException error) {
-				if (error == null) {
-					cleanUpFolder(node);
-				}
-				else {
-					String message = NLS.bind(Messages.FSDelete_CannotRemoveFolder, node.name, error);
-					errors[0] = new TCFFileSystemException(message, error);
-				}
-			}
-		});
-		if (errors[0] != null) {
-			throw errors[0];
-		}
 	}
 
 	/**
 	 * Delete the file node using the file system service.
 	 *
-	 * @param monitor The monitor to report the progress.
 	 * @param node The file node to be deleted.
 	 * @param service The file system service.
 	 * @throws TCFFileSystemException The exception thrown during deleting.
 	 * @throws InterruptedException Thrown when the operation is canceled.
 	 */
-	private void removeFile(IProgressMonitor monitor, final FSTreeNode node, IFileSystem service) throws TCFFileSystemException, InterruptedException {
+	protected void removeFile(final FSTreeNode node, IFileSystem service) throws TCFFileSystemException, InterruptedException {
 		if (monitor.isCanceled()) throw new InterruptedException();
 		monitor.subTask(NLS.bind(Messages.FSDelete_RemovingFileFolder, node.name));
 		// If the file is read only on windows or not writable on unix, then make it deletable.
@@ -201,7 +170,7 @@ public class OpDelete extends Operation {
 				}
 			});
 		}
-		removeFile(node, service);
+		super.removeFile(node, service);
 		monitor.worked(1);
 	}
 }

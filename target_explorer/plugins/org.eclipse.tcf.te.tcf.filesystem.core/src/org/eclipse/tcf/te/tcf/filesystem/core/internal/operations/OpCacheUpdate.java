@@ -9,55 +9,49 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.core.internal.operations;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.SafeRunner;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.CacheManager;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.PersistenceManager;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.StateManager;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
-import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
 
-public class OpCacheUpdate extends OpStreamOp {
-	
-	protected FSTreeNode node;
+/**
+ * The operation class that updates the local cache to target file systems. 
+ */
+public class OpCacheUpdate extends OpDownload {
 
-	public OpCacheUpdate(FSTreeNode node) {
-		this.node = node;
+	/**
+	 * Create an instance of an OpCacheUpdate which
+	 * updates the specified nodes.
+	 * 
+	 * @param nodes The nodes to be updated.
+	 */
+	public OpCacheUpdate(FSTreeNode... nodes) {
+		super(nodes);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpDownload#run(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-		monitor.beginTask(NLS.bind(Messages.CacheManager_DowloadingFile, node.name), 100);
-		OutputStream output = null;
-		try {
+		for (FSTreeNode node : srcNodes) {
 			// Write the data to its local cache file.
 			File file = CacheManager.getInstance().getCachePath(node).toFile();
-			if(file.exists() && !file.canWrite()){
+			if (file.exists() && !file.canWrite()) {
 				// If the file exists and is read-only, delete it.
 				deleteFileChecked(file);
 			}
-			output = new BufferedOutputStream(new FileOutputStream(file));
-			download2OutputStream(node, output, monitor);
-			if (monitor.isCanceled())
-				throw new InterruptedException();
-		} catch (IOException e) {
-			throw new InvocationTargetException(e);
+		}
+		try {
+			super.run(monitor);
 		} finally {
-			if (output != null) {
-				try {
-					output.close();
-				} catch (Exception e) {
-				}
-			}
 			if(!monitor.isCanceled()){
 				SafeRunner.run(new ISafeRunnable() {
 					@Override
@@ -66,14 +60,16 @@ public class OpCacheUpdate extends OpStreamOp {
                     }
 					@Override
 					public void run() throws Exception {
-						File file = CacheManager.getInstance().getCachePath(node).toFile();
-						if (file.exists()) {
-							// If downloading is successful, update the attributes of the file and
-							// set the last modified time to that of its corresponding file.
-							PersistenceManager.getInstance().setBaseTimestamp(node.getLocationURI(), node.attr.mtime);
-							setLastModifiedChecked(file, node.attr.mtime);
-							if (!node.isWritable()) setReadOnlyChecked(file);
-							StateManager.getInstance().refreshState(node);
+						for (FSTreeNode node : srcNodes) {
+							File file = CacheManager.getInstance().getCachePath(node).toFile();
+							if (file.exists()) {
+								// If downloading is successful, update the attributes of the file and
+								// set the last modified time to that of its corresponding file.
+								PersistenceManager.getInstance().setBaseTimestamp(node.getLocationURI(), node.attr.mtime);
+								setLastModifiedChecked(file, node.attr.mtime);
+								if (!node.isWritable()) setReadOnlyChecked(file);
+								StateManager.getInstance().refreshState(node);
+							}
 						}
 					}
 				});

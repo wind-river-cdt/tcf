@@ -9,29 +9,23 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.core.internal.operations;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
 import java.text.DecimalFormat;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
 
+/**
+ * The operation class that streams file upward downward. It is the base
+ * class for uploading, downloading, cache update and commit. 
+ */
 public class OpStreamOp extends Operation {
 	// The formatter used to format the size displayed while downloading.
 	protected static final DecimalFormat SIZE_FORMAT = new DecimalFormat("#,##0.##"); //$NON-NLS-1$
 	// The default chunk size of the buffer used during downloading files.
 	protected static final int DEFAULT_CHUNK_SIZE = 5 * 1024;
-	
-	public OpStreamOp() {
-	}
 	
 	/**
 	 * Check if the file exists and set its last modified time if it does. Record
@@ -53,59 +47,6 @@ public class OpStreamOp extends Operation {
                 public void handleException(Throwable exception) {
 					// Ignore on purpose
                 }});
-		}
-	}
-
-	/**
-	 * Download the specified file into an output stream using the monitor to report the progress.
-	 *
-	 * @param node
-	 *            The file to be downloaded.
-	 * @param output
-	 * 				The output stream.
-	 * @param monitor
-	 *            The monitor used to report the progress.
-	 * @throws IOException
-	 *             an IOException thrown during downloading and storing data.
-	 */
-	protected void download2OutputStream(FSTreeNode node, OutputStream output, IProgressMonitor monitor) throws IOException {
-		InputStream input = null;
-		// Open the input stream of the node using the tcf stream protocol.
-		try{
-			URL url = node.getLocationURL();
-			InputStream in = url.openStream();
-			input = new BufferedInputStream(in);
-			// The buffer used to download the file.
-			byte[] data = new byte[DEFAULT_CHUNK_SIZE];
-			// Calculate the chunk size of one percent.
-			int chunk_size = (int) node.attr.size / 100;
-			// Total size displayed on the progress dialog.
-			String total_size = formatSize(node.attr.size);
-
-			int percentRead = 0;
-			long bytesRead = 0;
-			int length;
-			while ((length = input.read(data)) >= 0 && !monitor.isCanceled()) {
-				output.write(data, 0, length);
-				output.flush();
-				bytesRead += length;
-				if (chunk_size != 0) {
-					int percent = (int) bytesRead / chunk_size;
-					if (percent != percentRead) { // Update the progress.
-						monitor.worked(percent - percentRead);
-						percentRead = percent; // Remember the percentage.
-						// Report the progress.
-						monitor.subTask(NLS.bind(Messages.CacheManager_DownloadingProgress, formatSize(bytesRead), total_size));
-					}
-				}
-			}
-		}finally{
-			if (input != null) {
-				try {
-					input.close();
-				} catch (Exception e) {
-				}
-			}
 		}
 	}
 

@@ -192,7 +192,7 @@ public final class FSModel {
 	 * @return The leaf node that has the searched path.
 	 * @throws TCFException Thrown during searching.
 	 */
-	static FSTreeNode findPath(IPeer peer, FSTreeNode[] children, String path) throws TCFException {
+	static FSTreeNode findPath(IPeer peer, FSTreeNode[] children, String path) throws TCFException, InterruptedException {
 		Assert.isTrue(children != null && children.length != 0);
 		Assert.isTrue(path != null && path.length() != 0);
 		FSTreeNode node = children[0];

@@ -35,10 +35,20 @@ public class OpClipboard extends PropertyChangeProvider {
 		operation = NONE;
 	}
 	
+	/**
+	 * If the current operation is a cut operation.
+	 * 
+	 * @return true if it is.
+	 */
 	public boolean isCutOp() {
 		return operation == CUT;
 	}
 	
+	/**
+	 * If the current operation is a copy operation.
+	 * 
+	 * @return true if it is.
+	 */
 	public boolean isCopyOp() {
 		return operation == COPY;
 	}

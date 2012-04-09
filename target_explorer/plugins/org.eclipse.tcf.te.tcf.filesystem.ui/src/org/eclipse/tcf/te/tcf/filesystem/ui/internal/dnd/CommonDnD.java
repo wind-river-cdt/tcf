@@ -132,8 +132,10 @@ public class CommonDnD implements IConfirmCallback {
 		return new Callback() {
 			@Override
 			protected void internalDone(Object caller, IStatus status) {
-				IOpExecutor executor = new JobExecutor(NLS.bind(Messages.RefreshDirectoryHandler_RefreshJobTitle, target.name), getSelectionCallback(viewer, files, target));
-				executor.execute(new OpRefresh(target));
+				if (status.isOK()) {
+					IOpExecutor executor = new JobExecutor(NLS.bind(Messages.RefreshDirectoryHandler_RefreshJobTitle, target.name), getSelectionCallback(viewer, files, target));
+					executor.execute(new OpRefresh(target));
+				}
 			}
 		};
 	}
@@ -151,17 +153,17 @@ public class CommonDnD implements IConfirmCallback {
 		return new Callback() {
 			@Override
 			protected void internalDone(Object caller, IStatus status) {
-				boolean successful = true;
-				if (status != null && status.isOK()) {
+				if (status.isOK()) {
+					boolean successful = true;
 					for (String path : files) {
 						File file = new File(path);
 						successful &= file.delete();
 					}
-				}
-				if (successful) {
-					FSTreeNode root = FSModel.getFSModel(target.peerNode).getRoot();
-					IOpExecutor executor = new JobExecutor(NLS.bind(Messages.RefreshDirectoryHandler_RefreshJobTitle, target.name), getSelectionCallback(viewer, files, target));
-					executor.execute(new OpRefresh(root));
+					if (successful) {
+						FSTreeNode root = FSModel.getFSModel(target.peerNode).getRoot();
+						IOpExecutor executor = new JobExecutor(NLS.bind(Messages.RefreshDirectoryHandler_RefreshJobTitle, target.name), getSelectionCallback(viewer, files, target));
+						executor.execute(new OpRefresh(root));
+					}
 				}
 			}
 		};
@@ -179,23 +181,25 @@ public class CommonDnD implements IConfirmCallback {
 		return new Callback() {
 			@Override
 			protected void internalDone(Object caller, IStatus status) {
-				List<FSTreeNode> nodes = new ArrayList<FSTreeNode>();
-				List<FSTreeNode> children = target.unsafeGetChildren();
-				for (String path : paths) {
-					File file = new File(path);
-					String name = file.getName();
-					for (FSTreeNode child : children) {
-						if (name.equals(child.name)) {
-							nodes.add(child);
-							break;
+				if(status.isOK()) {
+					List<FSTreeNode> nodes = new ArrayList<FSTreeNode>();
+					List<FSTreeNode> children = target.unsafeGetChildren();
+					for (String path : paths) {
+						File file = new File(path);
+						String name = file.getName();
+						for (FSTreeNode child : children) {
+							if (name.equals(child.name)) {
+								nodes.add(child);
+								break;
+							}
 						}
 					}
-				}
-				Assert.isNotNull(Display.getCurrent());
-				if (viewer != null) {
-					viewer.refresh(target);
-					IStructuredSelection selection = new StructuredSelection(nodes.toArray());
-					viewer.setSelection(selection, true);
+					Assert.isNotNull(Display.getCurrent());
+					if (viewer != null) {
+						viewer.refresh(target);
+						IStructuredSelection selection = new StructuredSelection(nodes.toArray());
+						viewer.setSelection(selection, true);
+					}
 				}
 			}
 		};

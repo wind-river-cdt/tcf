@@ -11,23 +11,36 @@ package org.eclipse.tcf.te.tcf.filesystem.core.internal.utils;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.tcf.te.runtime.persistence.AbstractGsonMapPersistenceDelegate;
 
+/**
+ * The persistence delegate to persist or restore a map whose keys are URIs.
+ */
 public class URIKeyMapPersistenceDelegate extends AbstractGsonMapPersistenceDelegate {
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistenceDelegate#getPersistedClass(java.lang.Object)
+	 */
 	@Override
 	public Class<?> getPersistedClass(Object context) {
 		return Map.class;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.persistence.AbstractGsonMapPersistenceDelegate#toMap(java.lang.Object)
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	protected Map<String, Object> toMap(Object context) throws IOException {
@@ -46,7 +59,7 @@ public class URIKeyMapPersistenceDelegate extends AbstractGsonMapPersistenceDele
 				}
 				else if (object instanceof Map) {
 					Map<QualifiedName, String> map = (Map<QualifiedName, String>) object;
-					Map<String, Object> valueMap = translate2Map(map);
+					Map<String, Object> valueMap = qNames2Map(map);
 					result.put(key.toString(), valueMap);
 				}
 				else {
@@ -57,7 +70,14 @@ public class URIKeyMapPersistenceDelegate extends AbstractGsonMapPersistenceDele
 		return result;
 	}
 
-	private Map<String, Object> translate2Map(Map<QualifiedName, String> map) {
+	/**
+	 * Translate the specified map whose keys are QualifiedNames to a
+	 * map whose keys are strings.
+	 * 
+	 * @param map The map to be translated.
+	 * @return a map with string keys.
+	 */
+	private Map<String, Object> qNames2Map(Map<QualifiedName, String> map) {
 		Map<String, Object> result = new HashMap<String, Object>();
 		for (QualifiedName name : map.keySet()) {
 			result.put(name.toString(), map.get(name));
@@ -65,6 +85,10 @@ public class URIKeyMapPersistenceDelegate extends AbstractGsonMapPersistenceDele
 		return result;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.persistence.AbstractGsonMapPersistenceDelegate#fromMap(java.util.Map, java.lang.Object)
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	protected Object fromMap(Map<String, Object> map, Object context) throws IOException {
@@ -95,16 +119,23 @@ public class URIKeyMapPersistenceDelegate extends AbstractGsonMapPersistenceDele
 				result.put(uri, Long.valueOf(((Number) v).longValue()));
 			}
 			else if (v instanceof Map) {
-				Map<QualifiedName, String> valueMap = reverse((Map<String, String>) v);
+				Map<QualifiedName, String> valueMap = toQNameMap((Map<String, String>) v);
 				result.put(uri, valueMap);
 			}
 		}
 		return result;
 	}
 
-	private Map<QualifiedName, String> reverse(Map<String, String> v) {
+	/**
+	 * Translate the specified map with string keys to a map whose keys are
+	 * qualified names.
+	 * 
+	 * @param strMap The map with string keys.
+	 * @return A map with qualified names as keys.
+	 */
+	private Map<QualifiedName, String> toQNameMap(Map<String, String> strMap) {
 		Map<QualifiedName, String> result = new HashMap<QualifiedName, String>();
-		for (String key : v.keySet()) {
+		for (String key : strMap.keySet()) {
 			int dot = key.lastIndexOf(":");
 			String qualifier = null;
 			String local = key;
@@ -113,18 +144,28 @@ public class URIKeyMapPersistenceDelegate extends AbstractGsonMapPersistenceDele
 				local = key.substring(dot + 1);
 			}
 			QualifiedName name = new QualifiedName(qualifier, local);
-			result.put(name,  v.get(key));
+			result.put(name,  strMap.get(key));
 		}
 		return result;
 	}
 
-	private URI toURI(String string) {
-		try {
-			return new URI(string);
-		}
-		catch (URISyntaxException e) {
-			e.printStackTrace();
-			return null;
-		}
+	/**
+	 * Convert the string to a URI.
+	 * 
+	 * @param string The string to be converted.
+	 * @return the URI or null if there're issues when parsing.
+	 */
+	private URI toURI(final String string) {
+		final AtomicReference<URI> ref = new AtomicReference<URI>();
+		SafeRunner.run(new ISafeRunnable(){
+			@Override
+            public void handleException(Throwable exception) {
+				// Ignore on purpose.
+            }
+			@Override
+            public void run() throws Exception {
+				ref.set(new URI(string));
+            }});
+		return ref.get();
 	}
 }

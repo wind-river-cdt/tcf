@@ -181,6 +181,9 @@ public class Messages extends NLS {
 	public static String LinuxPermissionsSection_Permissions;
 	public static String LocalTypedElement_SavingFile;
 
+	public static String OpDownload_DownloadingMultipleFiles;
+	public static String OpDownload_Downloading;
+	public static String OpDownload_DownloadingSingleFile;
 	public static String OpenFileHandler_Cancel;
 	public static String OpenFileHandler_ConflictingMessage;
 	public static String OpenFileHandler_ConflictingTitle;

@@ -27,25 +27,34 @@ import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
 
 /**
- * FSCopy copies selected FSTreeNodes to a specify destination folder.
+ * The operation class that copies selected FSTreeNodes to a specify destination folder.
  */
 public class OpCopy extends Operation {
 	// The nodes to be copied.
 	List<FSTreeNode> nodes;
 	// The destination folder to be copied to.
 	FSTreeNode dest;
-	// 
+	// The callback invoked to confirm overwriting when there're files with same names.
 	IConfirmCallback confirmCallback;
-	//
+	// If it is required to copy the permissions.
 	boolean cpPermission;
+	// If it is required to copy the ownership.
 	boolean cpOwnership;
 	
+	/**
+	 * Create a copy operation using the specified nodes and destination folder.
+	 * 
+	 * @param nodes The file/folder nodes to be copied.
+	 * @param dest The destination folder to be copied to.
+	 */
 	public OpCopy(List<FSTreeNode> nodes, FSTreeNode dest) {
 		this(nodes, dest, false, false, null);
 	}
 
 	/**
-	 * Create a copy operation using the specified nodes and destination folder.
+	 * Create a copy operation using the specified nodes and destination folder,
+	 * using the specified flags of copying permissions and ownership and a callback
+	 * to confirm to overwrite existing files.
 	 *
 	 * @param nodes The file/folder nodes to be copied.
 	 * @param dest The destination folder to be copied to.
@@ -61,10 +70,11 @@ public class OpCopy extends Operation {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation#run(org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.Operation#run(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+		super.run(monitor);
 		FSTreeNode head = nodes.get(0);
 		IChannel channel = null;
 		try {
@@ -79,7 +89,7 @@ public class OpCopy extends Operation {
 					for (FSTreeNode node : nodes) {
 						// Iterate the nodes and copy each of them to the destination
 						// folder.
-						copyNode(monitor, service, node, dest);
+						copyNode(service, node, dest);
 					}
 				}
 				else {
@@ -100,33 +110,31 @@ public class OpCopy extends Operation {
 	/**
 	 * Copy the file/folder represented by the specified node to the destination folder.
 	 *
-	 * @param monitor The monitor to report the progress.
 	 * @param service The file system service to do the remote copying.
 	 * @param node The file/folder node to be copied.
 	 * @param dest The destination folder.
 	 * @throws TCFFileSystemException The exception thrown during copying
 	 * @throws InterruptedException The exception thrown when the operation is canceled.
 	 */
-	void copyNode(IProgressMonitor monitor, IFileSystem service, FSTreeNode node, FSTreeNode dest) throws TCFFileSystemException, InterruptedException {
+	void copyNode(IFileSystem service, FSTreeNode node, FSTreeNode dest) throws TCFFileSystemException, InterruptedException {
 		if (node.isFile()) {
-			copyFile(monitor, service, node, dest);
+			copyFile(service, node, dest);
 		}
 		else if (node.isDirectory()) {
-			copyFolder(monitor, service, node, dest);
+			copyFolder(service, node, dest);
 		}
 	}
 
 	/**
 	 * Copy the folder represented by the specified node to the destination folder.
 	 *
-	 * @param monitor The monitor to report the progress.
 	 * @param service The file system service to do the remote copying.
 	 * @param node The folder node to be copied.
 	 * @param dest The destination folder.
 	 * @throws TCFFileSystemException The exception thrown during copying
 	 * @throws InterruptedException The exception thrown when the operation is canceled.
 	 */
-	private void copyFolder(IProgressMonitor monitor, IFileSystem service, FSTreeNode node, FSTreeNode dest) throws TCFFileSystemException, InterruptedException {
+	private void copyFolder(IFileSystem service, FSTreeNode node, FSTreeNode dest) throws TCFFileSystemException, InterruptedException {
 		if (monitor.isCanceled()) throw new InterruptedException();
 		FSTreeNode copy = findChild(service, dest, node.name);
 		if (copy == null) {
@@ -134,15 +142,15 @@ public class OpCopy extends Operation {
 			copy = (FSTreeNode) node.clone();
 			addChild(service, dest, copy);
 			mkdir(service, copy);
-			copyChildren(monitor, service, node, copy);
+			copyChildren(service, node, copy);
 		}
 		else if (node.equals(copy)) {
 			copy = createCopyDestination(service, node, dest);
 			mkdir(service, copy);
-			copyChildren(monitor, service, node, copy);
+			copyChildren(service, node, copy);
 		}
 		else if (confirmReplace(node, confirmCallback)) {
-			copyChildren(monitor, service, node, copy);
+			copyChildren(service, node, copy);
 		}
 		monitor.worked(1);
 	}
@@ -150,19 +158,18 @@ public class OpCopy extends Operation {
 	/**
 	 * Copy the children of the node to the destination folder.
 	 *
-	 * @param monitor The monitor to report the progress.
 	 * @param service The file system service to do the remote copying.
 	 * @param node The folder node to be copied.
 	 * @param dest The destination folder.
 	 * @throws TCFFileSystemException The exception thrown during copying
 	 * @throws InterruptedException The exception thrown when the operation is canceled.
 	 */
-	private void copyChildren(IProgressMonitor monitor, IFileSystem service, FSTreeNode node, FSTreeNode dest) throws TCFFileSystemException, InterruptedException {
+	private void copyChildren(IFileSystem service, FSTreeNode node, FSTreeNode dest) throws TCFFileSystemException, InterruptedException {
 	    List<FSTreeNode> children = getChildren(node, service);
 	    if (!children.isEmpty()) {
 	    	for (FSTreeNode child : children) {
 	    		// Iterate and copy its children nodes.
-	    		copyNode(monitor, service, child, dest);
+	    		copyNode(service, child, dest);
 	    	}
 	    }
     }
@@ -170,14 +177,13 @@ public class OpCopy extends Operation {
 	/**
 	 * Copy the file represented by the specified node to the destination folder.
 	 *
-	 * @param monitor The monitor to report the progress.
 	 * @param service The file system service to do the remote copying.
 	 * @param node The file node to be copied.
 	 * @param dest The destination folder.
 	 * @throws TCFFileSystemException The exception thrown during copying
 	 * @throws InterruptedException The exception thrown when the operation is canceled.
 	 */
-	private void copyFile(IProgressMonitor monitor, IFileSystem service, FSTreeNode node, FSTreeNode dest) throws TCFFileSystemException, InterruptedException {
+	private void copyFile(IFileSystem service, FSTreeNode node, FSTreeNode dest) throws TCFFileSystemException, InterruptedException {
 		if (monitor.isCanceled()) throw new InterruptedException();
 		monitor.subTask(NLS.bind(Messages.FSCopy_Copying, node.name));
 		// Create the copy target file

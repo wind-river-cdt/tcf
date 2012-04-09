@@ -34,7 +34,7 @@ public class CommitHandler extends AbstractHandler {
 		IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getCurrentSelectionChecked(event);
 		FSTreeNode node = (FSTreeNode) selection.getFirstElement();
 		IOpExecutor executor = new UiExecutor(Messages.CacheManager_UploadingProgress);
-		executor.execute(new OpCacheCommit(new FSTreeNode[]{node}, true));
+		executor.execute(new OpCacheCommit(true, node));
 		return null;
 	}
 

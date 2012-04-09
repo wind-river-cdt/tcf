@@ -45,6 +45,11 @@ public class ContentTypeHelper {
 		}
 		return instance;
 	}
+	
+	/**
+	 * Hide the constructor.
+	 */
+	private ContentTypeHelper(){}
 
 	/**
 	 * Judges if the node is a binary file.

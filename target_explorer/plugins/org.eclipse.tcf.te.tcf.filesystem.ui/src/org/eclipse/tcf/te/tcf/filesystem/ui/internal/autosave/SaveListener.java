@@ -56,7 +56,7 @@ public class SaveListener implements IExecutionListener {
 		if (dirtyNode != null) {
 			if (UIPlugin.isAutoSaving()) {
 				IOpExecutor executor = new UiExecutor(Messages.CacheManager_UploadingProgress);
-				executor.execute(new OpCacheCommit(new FSTreeNode[]{dirtyNode}, false));
+				executor.execute(new OpCacheCommit(dirtyNode));
 			}
 			else {
 				SafeRunner.run(new SafeRunnable(){

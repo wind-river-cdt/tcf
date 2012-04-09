@@ -16,7 +16,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.tcf.te.runtime.persistence.interfaces.IURIPersistenceService;
 import org.eclipse.tcf.te.runtime.services.ServiceManager;
@@ -62,37 +64,40 @@ public class PersistenceManager {
 	 */
 	@SuppressWarnings("unchecked")
     private PersistenceManager() {
-		try {
-			IURIPersistenceService service = ServiceManager.getInstance()
-			                .getService(IURIPersistenceService.class);
-			File location = CacheManager.getInstance().getCacheRoot();
-			File resolvedFile = new File(location, "resolved.ini");
-			resolved = new HashMap<URI, IContentType>();
-			if (resolvedFile.exists()) {
-				resolved = (Map<URI, IContentType>) service.read(resolved, resolvedFile
-				                .getAbsoluteFile().toURI());
-			}
-			File unresolvedFile = new File(location, "unresolved.ini");
-			unresolved = new HashMap<URI, URI>();
-			if (unresolvedFile.exists()) {
-				unresolved = (Map<URI, URI>) service.read(unresolved, unresolvedFile
-				                .getAbsoluteFile().toURI());
-			}
-			File timestampFile = new File(location, "timestamps.ini");
-			timestamps = new HashMap<URI, Long>();
-			if (timestampFile.exists()) {
-				timestamps = (Map<URI, Long>) service.read(timestamps, timestampFile
-				                .getAbsoluteFile().toURI());
-			}
-			File persistentFile = new File(location, PERSISTENT_FILE);
-			properties = new HashMap<URI, Map<QualifiedName, String>>();
-			if (persistentFile.exists()) {
-				properties = (Map<URI, Map<QualifiedName, String>>) service.read(properties, persistentFile.getAbsoluteFile().toURI());
-			}
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
+		SafeRunner.run(new ISafeRunnable(){
+			@Override
+            public void handleException(Throwable exception) {
+				// Ignore on purpose
+            }
+			@Override
+            public void run() throws Exception {
+				IURIPersistenceService service = ServiceManager.getInstance()
+				                .getService(IURIPersistenceService.class);
+				File location = CacheManager.getInstance().getCacheRoot();
+				File resolvedFile = new File(location, "resolved.ini");
+				resolved = new HashMap<URI, IContentType>();
+				if (resolvedFile.exists()) {
+					resolved = (Map<URI, IContentType>) service.read(resolved, resolvedFile
+					                .getAbsoluteFile().toURI());
+				}
+				File unresolvedFile = new File(location, "unresolved.ini");
+				unresolved = new HashMap<URI, URI>();
+				if (unresolvedFile.exists()) {
+					unresolved = (Map<URI, URI>) service.read(unresolved, unresolvedFile
+					                .getAbsoluteFile().toURI());
+				}
+				File timestampFile = new File(location, "timestamps.ini");
+				timestamps = new HashMap<URI, Long>();
+				if (timestampFile.exists()) {
+					timestamps = (Map<URI, Long>) service.read(timestamps, timestampFile
+					                .getAbsoluteFile().toURI());
+				}
+				File persistentFile = new File(location, PERSISTENT_FILE);
+				properties = new HashMap<URI, Map<QualifiedName, String>>();
+				if (persistentFile.exists()) {
+					properties = (Map<URI, Map<QualifiedName, String>>) service.read(properties, persistentFile.getAbsoluteFile().toURI());
+				}
+            }});
 	}
 
 	/**
@@ -184,22 +189,24 @@ public class PersistenceManager {
 	 * properties.
 	 */
 	public void dispose() {
-		try {
-			IURIPersistenceService service = ServiceManager.getInstance()
-			                .getService(IURIPersistenceService.class);
-			File location = CacheManager.getInstance().getCacheRoot();
-			File resolvedFile = new File(location, "resolved.ini");
-			service.write(resolved, resolvedFile.getAbsoluteFile().toURI());
-			File unresolvedFile = new File(location, "unresolved.ini");
-			service.write(unresolved, unresolvedFile.getAbsoluteFile().toURI());
-			File timestampFile = new File(location, "timestamps.ini");
-			service.write(timestamps, timestampFile.getAbsoluteFile().toURI());
-			File persistentFile = new File(location, PERSISTENT_FILE);
-			service.write(properties, persistentFile.getAbsoluteFile().toURI());
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
+		SafeRunner.run(new ISafeRunnable(){
+			@Override
+            public void handleException(Throwable exception) {
+				// Ignore on purpose.
+            }
+			@Override
+            public void run() throws Exception {
+				IURIPersistenceService service = ServiceManager.getInstance().getService(IURIPersistenceService.class);
+				File location = CacheManager.getInstance().getCacheRoot();
+				File resolvedFile = new File(location, "resolved.ini");
+				service.write(resolved, resolvedFile.getAbsoluteFile().toURI());
+				File unresolvedFile = new File(location, "unresolved.ini");
+				service.write(unresolved, unresolvedFile.getAbsoluteFile().toURI());
+				File timestampFile = new File(location, "timestamps.ini");
+				service.write(timestamps, timestampFile.getAbsoluteFile().toURI());
+				File persistentFile = new File(location, PERSISTENT_FILE);
+				service.write(properties, persistentFile.getAbsoluteFile().toURI());
+            }});
 	}
 
 	/**

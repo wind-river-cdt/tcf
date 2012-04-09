@@ -50,8 +50,10 @@ public class UserManager {
 		return instance;
 	}
 
-	private UserManager() {
-	}
+	/**
+	 * Hide the constructor.
+	 */
+	private UserManager() {}
 
 	/**
 	 * Get the user account from the peer using the channel connected to the

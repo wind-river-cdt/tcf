@@ -19,21 +19,21 @@ import org.eclipse.tcf.te.tcf.filesystem.core.activator.CorePlugin;
 import org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IOperation;
 
 /**
- * The job that wraps an IRunnableWithProgress object.
+ * The job that wraps an IOperation object.
  */
 public class OpJob extends Job {
-	// The runnable object.
+	// The operation object.
 	private IOperation operation;
 
 	/**
 	 * Create a job with the specified name and the runnable object.
 	 * 
 	 * @param name The job's name.
-	 * @param runnable The runnable object.
+	 * @param operation The runnable object.
 	 */
-	public OpJob(String name, IOperation runnable) {
+	public OpJob(String name, IOperation operation) {
 		super(name);
-		this.operation = runnable;
+		this.operation = operation;
 	}
 
 	/*

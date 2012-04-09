@@ -14,8 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.ISafeRunnable;
-import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.services.IFileSystem;
@@ -29,9 +27,7 @@ import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
  * FSRefresh refreshes a specified tree node and its children and grand children recursively.
  */
 public class OpRefresh extends Operation {
-	/**
-	 * The root node to be refreshed.
-	 */
+	//The root node to be refreshed.
 	FSTreeNode node;
 
 	/**
@@ -46,10 +42,11 @@ public class OpRefresh extends Operation {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation#run(org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.Operation#run(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+		super.run(monitor);
 		if (node.childrenQueried) {
 			IChannel channel = null;
 			try {
@@ -81,18 +78,11 @@ public class OpRefresh extends Operation {
 	 * @param service The file system service.
 	 * @throws TCFFileSystemException Thrown during refreshing.
 	 */
-	void refresh(final FSTreeNode node, final IFileSystem service) {
+	void refresh(final FSTreeNode node, final IFileSystem service) throws TCFException, InterruptedException {
+		if(monitor.isCanceled()) throw new InterruptedException();
 		if ((node.isSystemRoot() || node.isDirectory()) && node.childrenQueried) {
 			if (!node.isSystemRoot()) {
-				SafeRunner.run(new ISafeRunnable(){
-					@Override
-                    public void handleException(Throwable e) {
-						// Ignore exception
-                    }
-					@Override
-                    public void run() throws Exception {
-						updateChildren(node, service);
-                    }});
+				updateChildren(node, service);
 			}
 			List<FSTreeNode> children = node.unsafeGetChildren();
 			for (FSTreeNode child : children) {
@@ -109,7 +99,8 @@ public class OpRefresh extends Operation {
 	 * @param service The file system service.
 	 * @throws TCFFileSystemException Thrown during querying the children nodes.
 	 */
-	protected void updateChildren(final FSTreeNode node, final IFileSystem service) throws TCFFileSystemException {
+	protected void updateChildren(final FSTreeNode node, final IFileSystem service) throws TCFFileSystemException, InterruptedException {
+		if(monitor.isCanceled()) throw new InterruptedException();
 		List<FSTreeNode> current = node.unsafeGetChildren();
 		List<FSTreeNode> latest = queryChildren(node, service);
 		List<FSTreeNode> newNodes = diff(latest, current);

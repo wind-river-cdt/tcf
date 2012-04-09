@@ -61,7 +61,7 @@ public class SaveAllListener implements IExecutionListener {
 			if (UIPlugin.isAutoSaving()) {
 				FSTreeNode[] nodes = fDirtyNodes.toArray(new FSTreeNode[fDirtyNodes.size()]);
 				IOpExecutor executor = new UiExecutor(Messages.CacheManager_UploadingProgress);
-				executor.execute(new OpCacheCommit(nodes, false));
+				executor.execute(new OpCacheCommit(nodes));
 			}
 			else {
 				SafeRunner.run(new SafeRunnable(){

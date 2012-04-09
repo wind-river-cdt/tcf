@@ -46,12 +46,15 @@ import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
 
 /**
- * FSOperation is the base class of file system operation classes including FSCopy, FSDelete, FSMove
- * and FSRename.
+ * Operation is the base class of file system operation classes.
+ * @see IOperation
  */
 public class Operation implements IOperation {
 	// The flag indicating if the following action should be executed without asking.
 	protected boolean yes2All;
+	
+	// The current progress monitor, probably null.
+	protected IProgressMonitor monitor;
 
 	/**
 	 * Create an instance.
@@ -59,6 +62,7 @@ public class Operation implements IOperation {
 	public Operation() {
 		this.yes2All = false;
 	}
+	
 
 	/**
 	 * Get the top most nodes of the specified node list, removing those nodes whose ancestors are
@@ -139,6 +143,7 @@ public class Operation implements IOperation {
 	 * @param file The file that is opened.
 	 */
 	protected void closeEditor(final File file) {
+		// TODO Adding code to close editor.
 	}
 
 	/**
@@ -229,7 +234,7 @@ public class Operation implements IOperation {
 	 * @return The count of the total nodes.
 	 * @throws TCFFileSystemException Thrown when expanding the unexpanded folders.
 	 */
-	protected int count(IFileSystem service, List<FSTreeNode> nodes) throws TCFFileSystemException {
+	protected int count(IFileSystem service, List<FSTreeNode> nodes) throws TCFFileSystemException, InterruptedException {
 		int count = 0;
 		for (FSTreeNode node : nodes) {
 			if (node.isFile()) {
@@ -252,7 +257,7 @@ public class Operation implements IOperation {
 	 * @return The children of the folder node.
 	 * @throws TCFFileSystemException Thrown during querying the children nodes.
 	 */
-	protected List<FSTreeNode> getChildren(final FSTreeNode node, final IFileSystem service) throws TCFFileSystemException {
+	protected List<FSTreeNode> getChildren(final FSTreeNode node, final IFileSystem service) throws TCFFileSystemException, InterruptedException {
 		if (node.childrenQueried) {
 			return node.unsafeGetChildren();
 		}
@@ -267,7 +272,7 @@ public class Operation implements IOperation {
 	 * @return The children of the folder node.
 	 * @throws TCFException Thrown during querying the children nodes.
 	 */
-	public List<FSTreeNode> getChildren(final FSTreeNode node) throws TCFException {
+	public List<FSTreeNode> getChildren(final FSTreeNode node) throws TCFException, InterruptedException {
 		if(node.childrenQueried) {
 			return node.unsafeGetChildren();
 		}
@@ -293,7 +298,7 @@ public class Operation implements IOperation {
 	 * @param service The file system service.
 	 * @throws TCFFileSystemException Thrown during querying the children nodes.
 	 */
-	protected void loadChildren(final FSTreeNode node, final IFileSystem service) throws TCFFileSystemException {
+	protected void loadChildren(final FSTreeNode node, final IFileSystem service) throws TCFFileSystemException, InterruptedException {
 		List<FSTreeNode> children = queryChildren(node, service);
 		node.addChidren(children);
 		node.queryDone();
@@ -307,7 +312,8 @@ public class Operation implements IOperation {
 	 * @return The children of the folder node.
 	 * @throws TCFFileSystemException Thrown during querying the children nodes.
 	 */
-	protected List<FSTreeNode> queryChildren(final FSTreeNode node, final IFileSystem service) throws TCFFileSystemException {
+	protected List<FSTreeNode> queryChildren(final FSTreeNode node, final IFileSystem service) throws TCFFileSystemException, InterruptedException {
+		if(monitor.isCanceled()) throw new InterruptedException();
 		final TCFFileSystemException[] errors = new TCFFileSystemException[1];
 		final IFileHandle[] handles = new IFileHandle[1];
 		try {
@@ -375,7 +381,7 @@ public class Operation implements IOperation {
 	 * @param child The child node to be removed.
 	 * @throws TCFFileSystemException Thrown during children querying.
 	 */
-	protected void removeChild(final IFileSystem service, final FSTreeNode folder, final FSTreeNode child) throws TCFFileSystemException {
+	protected void removeChild(final IFileSystem service, final FSTreeNode folder, final FSTreeNode child) throws TCFFileSystemException, InterruptedException {
 		if (Protocol.isDispatchThread()) {
 			if (!folder.childrenQueried) {
 				loadChildren(folder, service);
@@ -385,6 +391,7 @@ public class Operation implements IOperation {
 		}
 		else {
 			final TCFFileSystemException[] errors = new TCFFileSystemException[1];
+			final InterruptedException[] iexs = new InterruptedException[1];
 			Protocol.invokeAndWait(new Runnable() {
 
 				@Override
@@ -395,9 +402,13 @@ public class Operation implements IOperation {
 					catch (TCFFileSystemException e) {
 						errors[0] = e;
 					}
+					catch (InterruptedException e) {
+						iexs[0] = e;
+					}
 				}
 			});
 			if (errors[0] != null) throw errors[0];
+			if (iexs[0] != null) throw iexs[0];
 		}
 	}
 
@@ -410,7 +421,7 @@ public class Operation implements IOperation {
 	 * @return The node with the specified name or null if no such node is found.
 	 * @throws TCFFileSystemException Thrown when querying the children.
 	 */
-	protected FSTreeNode findChild(IFileSystem service, FSTreeNode folder, String name) throws TCFFileSystemException {
+	protected FSTreeNode findChild(IFileSystem service, FSTreeNode folder, String name) throws TCFFileSystemException, InterruptedException {
 		List<FSTreeNode> children = getChildren(folder, service);
 		for (FSTreeNode child : children) {
 			if (child.name.equals(name)) return child;
@@ -428,7 +439,7 @@ public class Operation implements IOperation {
 	 * @return The new target node with the new name following the rule.
 	 * @throws TCFFileSystemException Thrown during children querying.
 	 */
-	protected FSTreeNode createCopyDestination(IFileSystem service, FSTreeNode node, FSTreeNode dest) throws TCFFileSystemException {
+	protected FSTreeNode createCopyDestination(IFileSystem service, FSTreeNode node, FSTreeNode dest) throws TCFFileSystemException, InterruptedException {
 		FSTreeNode copy = (FSTreeNode) node.clone();
 		String name = node.name;
 		FSTreeNode possibleChild = findChild(service, dest, name);
@@ -502,7 +513,7 @@ public class Operation implements IOperation {
 	 * @param child The child node to be added.
 	 * @throws TCFFileSystemException Thrown during children querying.
 	 */
-	protected void addChild(final IFileSystem service, final FSTreeNode folder, final FSTreeNode child) throws TCFFileSystemException {
+	protected void addChild(final IFileSystem service, final FSTreeNode folder, final FSTreeNode child) throws TCFFileSystemException, InterruptedException {
 		if (Protocol.isDispatchThread()) {
 			if (!folder.childrenQueried) {
 				loadChildren(folder, service);
@@ -512,6 +523,7 @@ public class Operation implements IOperation {
 		}
 		else {
 			final TCFFileSystemException[] errors = new TCFFileSystemException[1];
+			final InterruptedException[] iexs = new InterruptedException[1];
 			Protocol.invokeAndWait(new Runnable() {
 
 				@Override
@@ -522,9 +534,13 @@ public class Operation implements IOperation {
 					catch (TCFFileSystemException e) {
 						errors[0] = e;
 					}
+					catch (InterruptedException e) {
+						iexs[0] = e;
+					}
 				}
 			});
 			if (errors[0] != null) throw errors[0];
+			if (iexs[0] != null) throw iexs[0];
 		}
 	}
 
@@ -535,7 +551,8 @@ public class Operation implements IOperation {
 	 * @param service
 	 * @throws TCFFileSystemException
 	 */
-	protected void removeFile(final FSTreeNode node, IFileSystem service) throws TCFFileSystemException {
+	protected void removeFile(final FSTreeNode node, IFileSystem service) throws TCFFileSystemException, InterruptedException {
+		if (monitor.isCanceled()) throw new InterruptedException();
 		// Do the actual deleting.
 		String path = node.getLocation(true);
 		final TCFFileSystemException[] errors = new TCFFileSystemException[1];
@@ -563,7 +580,8 @@ public class Operation implements IOperation {
 	 * @param service
 	 * @throws TCFFileSystemException
 	 */
-	protected void removeFolder(final FSTreeNode node, IFileSystem service) throws TCFFileSystemException {
+	protected void removeFolder(final FSTreeNode node, IFileSystem service) throws TCFFileSystemException, InterruptedException {
+		if (monitor.isCanceled()) throw new InterruptedException();
 		// Do the actual deleting.
 		String path = node.getLocation(true);
 		final TCFFileSystemException[] errors = new TCFFileSystemException[1];
@@ -584,7 +602,12 @@ public class Operation implements IOperation {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IOperation#run(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+		this.monitor = monitor;
     }
 }

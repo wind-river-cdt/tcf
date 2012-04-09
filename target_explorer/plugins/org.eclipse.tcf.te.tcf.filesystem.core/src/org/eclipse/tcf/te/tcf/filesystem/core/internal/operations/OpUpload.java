@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IConfirmCallback;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.url.TcfURLConnection;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.CacheManager;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
 
@@ -40,30 +41,68 @@ import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
 public class OpUpload extends OpStreamOp {
 	// The source files to be uploaded.
 	File[] srcFiles;
-	//
+	// The destination URLs to be uploaded to.
 	URL[] dstURLs;
 	// The confirm callback
 	IConfirmCallback confirmCallback;
-	//
+	// The parent folder map to search files that have same names.
 	Map<File, FSTreeNode> parentFolders;
 	
+	/**
+	 * Constructor.
+	 * 
+	 * @param srcFile The source file to be uploaded.
+	 * @param dstURL The destination URL.
+	 */
 	public OpUpload(File srcFile, URL dstURL) {
 		this(new File[]{srcFile}, new URL[]{dstURL});
 	}
 	
+	/**
+	 * Constructor.
+	 * 
+	 * @param srcFiles The source files to be uploaded.
+	 * @param dstURLs The destination URLs.
+	 */
 	public OpUpload(File[] srcFiles, URL[] dstURLs) {
 		this(srcFiles, dstURLs, null);
 	}
 	
+	/**
+	 * Constructor.
+	 * 
+	 * @param sourceFiles The source files in the native file system to be uploaded.
+	 * @param targetFolder The taret parent folder to upload these files to.
+	 */
+	public OpUpload(String[]sourceFiles, FSTreeNode targetFolder) {
+		this(sourceFiles, targetFolder, null);
+	}
+	
+	/**
+	 * Constructor.
+	 * 
+	 * @param sourceFiles The source files in the native file system to be uploaded.
+	 * @param targetFolder The target parent folder to upload these files to.
+	 * @param confirmCallback the confirmation callback to confirm overwriting.
+	 */
 	public OpUpload(File[] srcFiles, URL[] dstURLs, IConfirmCallback confirmCallback) {
-	    super();
 		this.srcFiles = srcFiles;
 		this.dstURLs = dstURLs;
 	    this.confirmCallback = confirmCallback;
 	}
 	
-	public OpUpload(String[]sourceFiles, final FSTreeNode targetFolder) {
-		this(sourceFiles, targetFolder, null);
+	/**
+	 * Constructor that upload the local cache files of the specified nodes.
+	 * 
+	 * @param nodes The nodes to be uploaded.
+	 */
+	public OpUpload(FSTreeNode[] nodes) {
+		srcFiles = new File[nodes.length];
+		dstURLs = new URL[nodes.length];
+		for (int i = 0; i < nodes.length; i++) {
+			srcFiles[i] = CacheManager.getInstance().getCacheFile(nodes[i]);
+			dstURLs[i] = nodes[i].getLocationURL();
+		}
 	}
 	
 	/**
@@ -73,8 +112,7 @@ public class OpUpload extends OpStreamOp {
 	 * @param targetFolder the target folder to upload the files to.
 	 * @param callback the callback that is invoked after uploading.
 	 */
-	public OpUpload(String[] sourceFiles, final FSTreeNode targetFolder, IConfirmCallback confirmCallback) {
-	    super();
+	public OpUpload(String[] sourceFiles, FSTreeNode targetFolder, IConfirmCallback confirmCallback) {
 	    this.confirmCallback = confirmCallback;
 		List<File> fileList = new ArrayList<File>();
 		List<URL> urlList = new ArrayList<URL>();
@@ -89,6 +127,7 @@ public class OpUpload extends OpStreamOp {
 	 */
 	@Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+		super.run(monitor);
 		try {
 			String message;
 			if(srcFiles.length==1)
@@ -96,7 +135,8 @@ public class OpUpload extends OpStreamOp {
 			else
 				message = NLS.bind(Messages.CacheManager_UploadNFiles, Long.valueOf(srcFiles.length));
 			monitor.beginTask(message, 100);
-			uploadFiles(monitor, srcFiles, dstURLs);
+			uploadFiles(srcFiles, dstURLs);
+			if(monitor.isCanceled()) throw new InterruptedException();
 		} catch (MalformedURLException e) {
 			throw new InvocationTargetException(e);
 		} catch (IOException e) {
@@ -110,7 +150,16 @@ public class OpUpload extends OpStreamOp {
 		return parentFolders != null && confirmCallback != null && !yes2All && confirmCallback.requires(file) && findNode(file) != null;
 	}
 	
-	private void uploadFiles(IProgressMonitor monitor, File[] files, URL[] urls) throws IOException {
+	/**
+	 * Upload the specified file list to the specified locations, reporting the progress 
+	 * using the specified monitor.
+	 * 
+	 * @param files The file list to be uploaded.
+	 * @param urls The 
+	 * @param monitor
+	 * @throws IOException
+	 */
+	private void uploadFiles(File[] files, URL[] urls) throws IOException {
 		BufferedInputStream input = null;
 		BufferedOutputStream output = null;
 		// The buffer used to download the file.
