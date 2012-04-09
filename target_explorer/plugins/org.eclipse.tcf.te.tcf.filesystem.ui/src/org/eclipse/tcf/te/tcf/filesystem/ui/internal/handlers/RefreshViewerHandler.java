@@ -12,13 +12,11 @@ package org.eclipse.tcf.te.tcf.filesystem.ui.internal.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpRefresh;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
-import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.JobExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.IOpExecutor;
-import org.eclipse.tcf.te.tcf.filesystem.ui.nls.Messages;
+import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.JobExecutor;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -39,7 +37,7 @@ public class RefreshViewerHandler extends AbstractHandler {
 		if (peer != null) {
 			FSTreeNode root = FSModel.getFSModel(peer).getRoot();
 			if (root != null) {
-				IOpExecutor executor = new JobExecutor(NLS.bind(Messages.RefreshDirectoryHandler_RefreshJobTitle, root.name));
+				IOpExecutor executor = new JobExecutor();
 				executor.execute(new OpRefresh(root));
 			}
 		}

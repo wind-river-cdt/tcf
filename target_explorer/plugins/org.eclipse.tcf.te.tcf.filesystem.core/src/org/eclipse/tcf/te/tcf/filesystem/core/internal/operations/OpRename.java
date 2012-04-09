@@ -74,6 +74,7 @@ public class OpRename extends Operation {
 		}
 		finally {
 			if (channel != null) Tcf.getChannelManager().closeChannel(channel);
+			monitor.done();
 		}
 	}
 	
@@ -110,8 +111,17 @@ public class OpRename extends Operation {
 				}
 			}
 		});
+		monitor.worked(1);
 		if (errors[0] != null) {
 			throw errors[0];
 		}
 	}
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IOperation#getName()
+	 */
+	@Override
+    public String getName() {
+	    return Messages.RenameFilesHandler_TitleRename;
+    }
 }

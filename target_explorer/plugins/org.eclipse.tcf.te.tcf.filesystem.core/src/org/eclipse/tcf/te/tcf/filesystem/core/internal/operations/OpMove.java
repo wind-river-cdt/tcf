@@ -79,9 +79,6 @@ public class OpMove extends Operation {
 				if (channel != null) {
 					IFileSystem service = getBlockingFileSystem(channel);
 					if (service != null) {
-						monitor.beginTask(Messages.FSMove_PrepareToMove, IProgressMonitor.UNKNOWN);
-						monitor.worked(1);
-						monitor.beginTask(Messages.FSMove_MovingFile, nodes.size());
 						for (FSTreeNode node : nodes) {
 							// Move each node.
 							moveNode(service, node, dest);
@@ -186,4 +183,22 @@ public class OpMove extends Operation {
 			}
 		}
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IOperation#getName()
+	 */
+	@Override
+    public String getName() {
+	    return Messages.FSMove_MovingFile;
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IOperation#getTotalWork()
+	 */
+	@Override
+    public int getTotalWork() {
+	    return nodes == null ? IProgressMonitor.UNKNOWN : nodes.size();
+    }
 }

@@ -129,12 +129,6 @@ public class OpUpload extends OpStreamOp {
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 		super.run(monitor);
 		try {
-			String message;
-			if(srcFiles.length==1)
-				message = NLS.bind(Messages.CacheManager_UploadSingleFile, srcFiles[0].getName());
-			else
-				message = NLS.bind(Messages.CacheManager_UploadNFiles, Long.valueOf(srcFiles.length));
-			monitor.beginTask(message, 100);
 			uploadFiles(srcFiles, dstURLs);
 			if(monitor.isCanceled()) throw new InterruptedException();
 		} catch (MalformedURLException e) {
@@ -393,5 +387,28 @@ public class OpUpload extends OpStreamOp {
 			}
 		}
 	    return null;
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IOperation#getName()
+	 */
+	@Override
+    public String getName() {
+		String message;
+		if(srcFiles.length==1)
+			message = NLS.bind(Messages.CacheManager_UploadSingleFile, srcFiles[0].getName());
+		else
+			message = NLS.bind(Messages.CacheManager_UploadNFiles, Long.valueOf(srcFiles.length));
+		return message;
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IOperation#getTotalWork()
+	 */
+	@Override
+    public int getTotalWork() {
+	    return 100;
     }
 }

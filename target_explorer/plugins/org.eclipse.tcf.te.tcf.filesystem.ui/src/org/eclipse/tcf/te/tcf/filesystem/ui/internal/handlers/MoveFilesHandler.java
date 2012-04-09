@@ -26,7 +26,6 @@ import org.eclipse.tcf.te.tcf.filesystem.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.ui.dialogs.FSFolderSelectionDialog;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.IOpExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.UiExecutor;
-import org.eclipse.tcf.te.tcf.filesystem.ui.nls.Messages;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.ui.handlers.HandlerUtil;
 /**
@@ -50,7 +49,7 @@ public class MoveFilesHandler extends AbstractHandler {
 			Object obj = dialog.getFirstResult();
 			Assert.isTrue(obj instanceof FSTreeNode);
 			FSTreeNode dest = (FSTreeNode) obj;
-			IOpExecutor executor = new UiExecutor(Messages.FSMove_MovingFile, new Callback(){
+			IOpExecutor executor = new UiExecutor(new Callback(){
 				@Override
                 protected void internalDone(Object caller, IStatus status) {
 					UIPlugin.getClipboard().clear();

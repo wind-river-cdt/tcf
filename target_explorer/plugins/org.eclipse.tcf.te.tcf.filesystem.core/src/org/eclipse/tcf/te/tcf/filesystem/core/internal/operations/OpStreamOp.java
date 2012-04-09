@@ -21,7 +21,7 @@ import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
  * The operation class that streams file upward downward. It is the base
  * class for uploading, downloading, cache update and commit. 
  */
-public class OpStreamOp extends Operation {
+public abstract class OpStreamOp extends Operation {
 	// The formatter used to format the size displayed while downloading.
 	protected static final DecimalFormat SIZE_FORMAT = new DecimalFormat("#,##0.##"); //$NON-NLS-1$
 	// The default chunk size of the buffer used during downloading files.

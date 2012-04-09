@@ -92,6 +92,7 @@ public class OpOutStreamOp extends OpStreamOp {
 				catch (Exception e) {
 				}
 			}
+			monitor.done();
 		}
 	}
 }

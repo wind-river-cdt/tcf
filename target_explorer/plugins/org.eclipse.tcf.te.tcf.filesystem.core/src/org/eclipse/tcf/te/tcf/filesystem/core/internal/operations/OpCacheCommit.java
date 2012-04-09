@@ -68,7 +68,6 @@ public class OpCacheCommit extends OpUpload {
 					public void handleException(Throwable e) {
 						// Ignore exception
 					}
-
 					@Override
 					public void run() throws Exception {
 						PersistenceManager.getInstance().setBaseTimestamp(node.getLocationURI(), node.attr.mtime);
@@ -80,6 +79,7 @@ public class OpCacheCommit extends OpUpload {
 					}
 				});
 			}
+			monitor.done();
 		}
     }
 }

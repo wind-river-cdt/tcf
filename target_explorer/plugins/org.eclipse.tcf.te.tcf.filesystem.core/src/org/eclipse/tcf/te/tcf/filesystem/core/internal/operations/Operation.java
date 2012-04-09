@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IChannel;
@@ -51,18 +52,16 @@ import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
  */
 public class Operation implements IOperation {
 	// The flag indicating if the following action should be executed without asking.
-	protected boolean yes2All;
+	protected boolean yes2All = false;
 	
 	// The current progress monitor, probably null.
-	protected IProgressMonitor monitor;
+	protected IProgressMonitor monitor = new NullProgressMonitor();
 
 	/**
 	 * Create an instance.
 	 */
 	public Operation() {
-		this.yes2All = false;
 	}
-	
 
 	/**
 	 * Get the top most nodes of the specified node list, removing those nodes whose ancestors are
@@ -609,5 +608,23 @@ public class Operation implements IOperation {
 	@Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 		this.monitor = monitor;
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IOperation#getName()
+	 */
+	@Override
+    public String getName() {
+	    return null;
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IOperation#getTotalWork()
+	 */
+	@Override
+    public int getTotalWork() {
+	    return IProgressMonitor.UNKNOWN;
     }
 }

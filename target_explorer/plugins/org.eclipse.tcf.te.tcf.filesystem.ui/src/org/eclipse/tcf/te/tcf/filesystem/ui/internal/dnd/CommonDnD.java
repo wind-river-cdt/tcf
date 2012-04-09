@@ -40,8 +40,8 @@ import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.ImageConsts;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.handlers.MoveCopyCallback;
-import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.JobExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.IOpExecutor;
+import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.JobExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.UiExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.ui.nls.Messages;
 import org.eclipse.ui.PlatformUI;
@@ -105,12 +105,12 @@ public class CommonDnD implements IConfirmCallback {
 			Shell parent = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 			if (MessageDialog.openQuestion(parent, Messages.FSDropTargetListener_ConfirmMoveTitle, question)) {
 				ICallback callback = getMoveCallback(viewer, files, target);
-				executor = new UiExecutor(Messages.FSUpload_UploadTitle, callback);
+				executor = new UiExecutor(callback);
 			}
 		}
 		else if ((operations & DND.DROP_COPY) != 0) {
 			ICallback callback = getCopyCallback(viewer, files, target);
-			executor = new UiExecutor(Messages.FSUpload_UploadTitle, callback);
+			executor = new UiExecutor(callback);
 		}
 		if (executor != null) {
 			IStatus status = executor.execute(new OpUpload(files, target, this));
@@ -133,7 +133,7 @@ public class CommonDnD implements IConfirmCallback {
 			@Override
 			protected void internalDone(Object caller, IStatus status) {
 				if (status.isOK()) {
-					IOpExecutor executor = new JobExecutor(NLS.bind(Messages.RefreshDirectoryHandler_RefreshJobTitle, target.name), getSelectionCallback(viewer, files, target));
+					IOpExecutor executor = new JobExecutor(getSelectionCallback(viewer, files, target));
 					executor.execute(new OpRefresh(target));
 				}
 			}
@@ -161,7 +161,7 @@ public class CommonDnD implements IConfirmCallback {
 					}
 					if (successful) {
 						FSTreeNode root = FSModel.getFSModel(target.peerNode).getRoot();
-						IOpExecutor executor = new JobExecutor(NLS.bind(Messages.RefreshDirectoryHandler_RefreshJobTitle, target.name), getSelectionCallback(viewer, files, target));
+						IOpExecutor executor = new JobExecutor(getSelectionCallback(viewer, files, target));
 						executor.execute(new OpRefresh(root));
 					}
 				}
@@ -215,26 +215,23 @@ public class CommonDnD implements IConfirmCallback {
 	 */
 	public boolean dropLocalSelection(FSTreeNode target, int operations, IStructuredSelection selection) {
 		List<FSTreeNode> nodes = selection.toList();
-		ICallback callback = new Callback(){
-			@Override
-            protected void internalDone(Object caller, IStatus status) {
-				UIPlugin.getClipboard().clear();
-            }
-		};
 		IOperation operation = null;
-		IOpExecutor executor = null;
 		if ((operations & DND.DROP_MOVE) != 0) {
 			operation = new OpMove(nodes, target, new MoveCopyCallback());
-			executor = new UiExecutor(Messages.FSMove_MovingFile, callback);
 		}
 		else if ((operations & DND.DROP_COPY) != 0) {
 			FSTreeNode dest = getCopyDestination(target, nodes);
 			boolean cpPerm = UIPlugin.isCopyPermission();
 			boolean cpOwn = UIPlugin.isCopyOwnership();
 			operation = new OpCopy(nodes, dest, cpPerm, cpOwn, new MoveCopyCallback());
-			executor = new UiExecutor(Messages.FSCopy_CopyingFile, callback);
 		}
-		if (executor != null) {
+		if (operation != null) {
+			IOpExecutor executor = new UiExecutor(new Callback(){
+				@Override
+	            protected void internalDone(Object caller, IStatus status) {
+					UIPlugin.getClipboard().clear();
+	            }
+			});
 			IStatus status = executor.execute(operation);
 			return status != null && status.isOK();
 		}

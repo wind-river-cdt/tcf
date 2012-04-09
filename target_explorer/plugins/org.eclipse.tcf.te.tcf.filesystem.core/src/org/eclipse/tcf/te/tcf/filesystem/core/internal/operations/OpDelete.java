@@ -11,6 +11,7 @@ package org.eclipse.tcf.te.tcf.filesystem.core.internal.operations;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
@@ -59,10 +60,6 @@ public class OpDelete extends Operation {
 			if (channel != null) {
 				IFileSystem service = getBlockingFileSystem(channel);
 				if (service != null) {
-					monitor.beginTask(Messages.FSDelete_PrepareToDelete, IProgressMonitor.UNKNOWN);
-					monitor.worked(1);
-					int count = count(service, nodes);
-					monitor.beginTask(Messages.FSDelete_Deleting, count);
 					for (FSTreeNode node : nodes) {
 						remove(node, service);
 					}
@@ -173,4 +170,53 @@ public class OpDelete extends Operation {
 		super.removeFile(node, service);
 		monitor.worked(1);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IOperation#getName()
+	 */
+	@Override
+    public String getName() {
+	    return Messages.FSDelete_Deleting;
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IOperation#getTotalWork()
+	 */
+	@Override
+    public int getTotalWork() {
+		if(nodes != null && !nodes.isEmpty()) {
+			final AtomicReference<Integer> ref = new AtomicReference<Integer>();
+			SafeRunner.run(new ISafeRunnable(){
+				@Override
+                public void handleException(Throwable exception) {
+					// Ignore on purpose.
+                }
+				@Override
+                public void run() throws Exception {
+					FSTreeNode head = nodes.get(0);
+					IChannel channel = null;
+					try {
+						channel = openChannel(head.peerNode.getPeer());
+						if (channel != null) {
+							IFileSystem service = getBlockingFileSystem(channel);
+							if (service != null) {
+								ref.set(Integer.valueOf(count(service, nodes)));
+							}
+							else {
+								String message = NLS.bind(Messages.FSOperation_NoFileSystemError, head.peerNode.getPeerId());
+								throw new TCFFileSystemException(message);
+							}
+						}
+					}
+					finally {
+						if (channel != null) Tcf.getChannelManager().closeChannel(channel);
+					}
+                }});
+			Integer value = ref.get();
+			return value == null ? IProgressMonitor.UNKNOWN : value.intValue();
+		}
+		return IProgressMonitor.UNKNOWN;
+    }
 }

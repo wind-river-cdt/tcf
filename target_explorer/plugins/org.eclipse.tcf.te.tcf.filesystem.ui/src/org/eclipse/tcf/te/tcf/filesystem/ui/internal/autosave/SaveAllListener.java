@@ -31,7 +31,6 @@ import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.IOpExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.UiExecutor;
-import org.eclipse.tcf.te.tcf.filesystem.ui.nls.Messages;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IURIEditorInput;
@@ -60,7 +59,7 @@ public class SaveAllListener implements IExecutionListener {
 		if (!fDirtyNodes.isEmpty()) {
 			if (UIPlugin.isAutoSaving()) {
 				FSTreeNode[] nodes = fDirtyNodes.toArray(new FSTreeNode[fDirtyNodes.size()]);
-				IOpExecutor executor = new UiExecutor(Messages.CacheManager_UploadingProgress);
+				IOpExecutor executor = new UiExecutor();
 				executor.execute(new OpCacheCommit(nodes));
 			}
 			else {

@@ -58,8 +58,6 @@ public abstract class OpCreate extends Operation {
 		super.run(monitor);
 		IChannel channel = null;
 		try {
-			int total = folder.childrenQueried ? 5 : 6;
-			monitor.beginTask(NLS.bind(Messages.FSCreate_TaskName, name), total);
 			channel = openChannel(folder.peerNode.getPeer());
 			monitor.worked(1);
 			IFileSystem service = getBlockingFileSystem(channel);
@@ -87,6 +85,7 @@ public abstract class OpCreate extends Operation {
 		}
 		finally {
 			if (channel != null) Tcf.getChannelManager().closeChannel(channel);
+			monitor.done();
 		}
 	}	
 
@@ -170,4 +169,22 @@ public abstract class OpCreate extends Operation {
 	public FSTreeNode getNode() {
 		return node;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IOperation#getName()
+	 */
+	@Override
+    public String getName() {
+	    return NLS.bind(Messages.FSCreate_TaskName, name);
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IOperation#getTotalWork()
+	 */
+	@Override
+    public int getTotalWork() {
+	    return folder.childrenQueried ? 5 : 6;
+    }
 }

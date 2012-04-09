@@ -35,7 +35,6 @@ import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.compare.EditableSharedDocumentAdapter.ISharedDocumentAdapterListener;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.IOpExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.UiExecutor;
-import org.eclipse.tcf.te.tcf.filesystem.ui.nls.Messages;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.ISaveablesLifecycleListener;
@@ -135,7 +134,7 @@ public class LocalFileSaveable extends Saveable implements
 			monitor.done();
 			//Trigger upload action
 			FSTreeNode node = fileElement.getFSTreeNode();
-			IOpExecutor executor = new UiExecutor(Messages.CacheManager_UploadingProgress);
+			IOpExecutor executor = new UiExecutor();
 			executor.execute(new OpCacheCommit(true, node));
 		}
 	}

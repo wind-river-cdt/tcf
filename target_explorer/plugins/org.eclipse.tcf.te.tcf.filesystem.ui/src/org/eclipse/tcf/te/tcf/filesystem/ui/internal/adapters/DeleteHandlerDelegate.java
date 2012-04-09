@@ -95,7 +95,7 @@ public class DeleteHandlerDelegate implements IDeleteHandlerDelegate {
 				IStructuredSelection selection = (IStructuredSelection) state.getProperty(KEY_SELECTION);
 				if(!confirmCallback.requires(selection) || confirmCallback.confirms(selection) == IConfirmCallback.YES) {
 					List<FSTreeNode> nodes = selection.toList();
-					IOpExecutor executor = new UiExecutor(Messages.FSDelete_Deleting, callback);
+					IOpExecutor executor = new UiExecutor(callback);
 					executor.execute(new OpDelete(nodes, readonlyCallback));
 				}
 			}

@@ -379,7 +379,7 @@ public class OpenWithMenu extends ContributionItem {
 		File file = CacheManager.getInstance().getCacheFile(node);
 		if (!file.exists()) {
 			// If the file node's local cache does not exist yet, download it.
-			IOpExecutor executor = new UiExecutor(Messages.CacheManager_DowloadingFile);
+			IOpExecutor executor = new UiExecutor();
 			IStatus status = executor.execute(new OpCacheUpdate(node));
 			if (!status.isOK()) {
 				return;

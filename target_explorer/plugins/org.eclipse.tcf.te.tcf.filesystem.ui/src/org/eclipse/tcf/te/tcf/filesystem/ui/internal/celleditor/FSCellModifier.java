@@ -15,9 +15,8 @@ import org.eclipse.swt.widgets.Item;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpRename;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.handlers.RenameCallback;
-import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.JobExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.IOpExecutor;
-import org.eclipse.tcf.te.tcf.filesystem.ui.nls.Messages;
+import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.JobExecutor;
 
 /**
  * FSCellModifier is an <code>ICellModifier</code> of the file system tree of the target explorer.
@@ -83,7 +82,7 @@ public class FSCellModifier implements ICellModifier {
 				Assert.isTrue(value != null && value instanceof String);
 				String newName = (String) value;
 				// Rename the node with the new name using an FSRename.
-				IOpExecutor executor = new JobExecutor(Messages.FSRename_JobTitle, new RenameCallback());
+				IOpExecutor executor = new JobExecutor(new RenameCallback());
 				executor.execute(new OpRename(node, newName));
 			}
 		}

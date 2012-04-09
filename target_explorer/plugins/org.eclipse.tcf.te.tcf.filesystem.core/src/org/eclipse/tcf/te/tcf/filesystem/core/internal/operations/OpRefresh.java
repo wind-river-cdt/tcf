@@ -67,7 +67,11 @@ public class OpRefresh extends Operation {
 			}
 			finally {
 				if (channel != null) Tcf.getChannelManager().closeChannel(channel);
+				monitor.done();
 			}
+		}
+		else {
+			monitor.done();
 		}
 	}
 	
@@ -80,6 +84,7 @@ public class OpRefresh extends Operation {
 	 */
 	void refresh(final FSTreeNode node, final IFileSystem service) throws TCFException, InterruptedException {
 		if(monitor.isCanceled()) throw new InterruptedException();
+		monitor.worked(1);
 		if ((node.isSystemRoot() || node.isDirectory()) && node.childrenQueried) {
 			if (!node.isSystemRoot()) {
 				updateChildren(node, service);
@@ -132,4 +137,13 @@ public class OpRefresh extends Operation {
 		}
 		return newList;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IOperation#getName()
+	 */
+	@Override
+    public String getName() {
+	    return NLS.bind(Messages.RefreshDirectoryHandler_RefreshJobTitle, node == null ? "" : node.name);
+    }
 }

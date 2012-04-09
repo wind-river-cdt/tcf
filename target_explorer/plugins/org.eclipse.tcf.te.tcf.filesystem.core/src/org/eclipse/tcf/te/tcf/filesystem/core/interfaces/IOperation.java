@@ -36,4 +36,22 @@ public interface IOperation {
      *
      */
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException;
+    
+    /**
+     * Get the operation's name. This name will be used as the task name of
+     * the given monitor.
+     * 
+     * @see IProgressMonitor#beginTask(String, int)
+     * @return The name of the operation.
+     */
+    public String getName();
+    
+    /**
+     * Get the total amount of work which will used by the progress 
+     * monitor to set the total work.
+     * 
+     * @see IProgressMonitor#beginTask(String, int)
+     * @return The total amount of work or UNKNOWN if it is in-determinant
+     */
+    public int getTotalWork();
 }

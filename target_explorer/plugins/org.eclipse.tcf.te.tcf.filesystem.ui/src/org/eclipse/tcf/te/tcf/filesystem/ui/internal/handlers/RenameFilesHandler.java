@@ -24,8 +24,8 @@ import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpRename;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.celleditor.FSCellValidator;
-import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.JobExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.IOpExecutor;
+import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.JobExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.dialogs.RenameDialog;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -64,7 +64,7 @@ public class RenameFilesHandler extends AbstractHandler {
 					// Do the renaming.
 					String newName = dialog.getNewName();
 					// Rename the node with the new name using an FSRename.
-					IOpExecutor executor = new JobExecutor(Messages.FSRename_JobTitle, new RenameCallback());
+					IOpExecutor executor = new JobExecutor(new RenameCallback());
 					executor.execute(new OpRename(node, newName));
 				}
 			}

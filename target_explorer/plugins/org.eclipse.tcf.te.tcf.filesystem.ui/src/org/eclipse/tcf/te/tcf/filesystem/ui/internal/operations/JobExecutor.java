@@ -9,7 +9,10 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
@@ -18,7 +21,7 @@ import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IOperation;
-import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpJob;
+import org.eclipse.tcf.te.tcf.filesystem.ui.activator.UIPlugin;
 import org.eclipse.ui.PlatformUI;
 
 /**
@@ -27,26 +30,20 @@ import org.eclipse.ui.PlatformUI;
 public class JobExecutor implements IOpExecutor{
 	// The callback
 	protected ICallback callback;
-	// The job's name.
-	private String jobName;
-
-	/**
-	 * Create an instance with the specified name.
-	 * 
-	 * @param jobName The job's name.
-	 */
-	public JobExecutor(String jobName) {
-		this(jobName, null);
-    }
 	
 	/**
-	 * Create an instance with the specified name and callback.
+	 * Create an instance with no callback.
+	 */
+	public JobExecutor() {
+		this(null);
+	}
+	
+	/**
+	 * Create an instance with the specified callback.
 	 *
-	 * @param jobName the job's name.
 	 * @param callback called when the creation is done.
 	 */
-	public JobExecutor(String jobName, ICallback callback) {
-		this.jobName = jobName;
+	public JobExecutor(ICallback callback) {
 		this.callback = callback;
 	}
 
@@ -55,8 +52,26 @@ public class JobExecutor implements IOpExecutor{
 	 * @see org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.IOpExecutor#execute(org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IOperation)
 	 */
 	@Override
-    public IStatus execute(IOperation operation) {
-		Job job = new OpJob(jobName, operation);
+    public IStatus execute(final IOperation operation) {
+		Job job = new Job(operation.getName()){
+			@Override
+            protected IStatus run(IProgressMonitor monitor) {
+				try {
+					monitor.setTaskName(operation.getName());
+					monitor.beginTask(operation.getName(), operation.getTotalWork());
+					operation.run(monitor);
+					return Status.OK_STATUS;
+				}
+				catch (InvocationTargetException e) {
+					return new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), e.getLocalizedMessage(), e);
+				}
+				catch (InterruptedException e) {
+					return Status.CANCEL_STATUS;
+				}
+				finally {
+					monitor.done();
+				}
+            }};
 		job.addJobChangeListener(new JobChangeAdapter(){
 			@Override
             public void done(final IJobChangeEvent event) {

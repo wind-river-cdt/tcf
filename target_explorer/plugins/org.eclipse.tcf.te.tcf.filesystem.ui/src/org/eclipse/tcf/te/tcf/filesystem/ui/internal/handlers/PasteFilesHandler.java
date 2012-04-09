@@ -30,7 +30,6 @@ import org.eclipse.tcf.te.tcf.filesystem.ui.internal.dnd.CommonDnD;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.FsClipboard;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.IOpExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.UiExecutor;
-import org.eclipse.tcf.te.tcf.filesystem.ui.nls.Messages;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
@@ -71,7 +70,7 @@ public class PasteFilesHandler extends AbstractHandler {
 			if (cb.isCutOp()) {
 				FSTreeNode dest = (FSTreeNode) selection.getFirstElement();
 				operation = new OpMove(nodes, dest, new MoveCopyCallback());
-				executor = new UiExecutor(Messages.FSMove_MovingFile, callback);
+				executor = new UiExecutor(callback);
 			}
 			else if (cb.isCopyOp()) {
 				FSTreeNode hovered = (FSTreeNode) selection.getFirstElement();
@@ -79,7 +78,7 @@ public class PasteFilesHandler extends AbstractHandler {
 				boolean cpPerm = UIPlugin.isCopyPermission();
 				boolean cpOwn = UIPlugin.isCopyOwnership();
 				operation = new OpCopy(nodes, dest, cpPerm, cpOwn, new MoveCopyCallback());
-				executor = new UiExecutor(Messages.FSCopy_CopyingFile, callback);
+				executor = new UiExecutor(callback);
 			}
 			if (executor != null) {
 				executor.execute(operation);

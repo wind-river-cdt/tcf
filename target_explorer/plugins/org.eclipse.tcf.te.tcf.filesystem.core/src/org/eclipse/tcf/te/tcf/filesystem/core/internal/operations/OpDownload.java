@@ -79,12 +79,6 @@ public class OpDownload extends OpStreamOp {
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 		super.run(monitor);
 		try {
-			String message;
-			if(dstFiles.length==1)
-				message = NLS.bind(Messages.OpDownload_DownloadingSingleFile, dstFiles[0].getName());
-			else
-				message = NLS.bind(Messages.OpDownload_DownloadingMultipleFiles, Long.valueOf(dstFiles.length));
-			monitor.beginTask(message, 100);
 			downloadFiles(dstFiles, srcNodes);
 			if(monitor.isCanceled()) throw new InterruptedException();
 		} catch (MalformedURLException e) {
@@ -163,4 +157,27 @@ public class OpDownload extends OpStreamOp {
 			}
 		}
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IOperation#getName()
+	 */
+	@Override
+    public String getName() {
+		String message;
+		if(dstFiles.length==1)
+			message = NLS.bind(Messages.OpDownload_DownloadingSingleFile, dstFiles[0].getName());
+		else
+			message = NLS.bind(Messages.OpDownload_DownloadingMultipleFiles, Long.valueOf(dstFiles.length));
+		return message;
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IOperation#getTotalWork()
+	 */
+	@Override
+    public int getTotalWork() {
+	    return 100;
+    }
 }

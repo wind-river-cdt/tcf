@@ -18,7 +18,6 @@ import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpCacheUpdate;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.IOpExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.UiExecutor;
-import org.eclipse.tcf.te.tcf.filesystem.ui.nls.Messages;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
@@ -35,7 +34,7 @@ public class UpdateHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getCurrentSelectionChecked(event);
 		FSTreeNode node = (FSTreeNode) selection.getFirstElement();
-		IOpExecutor executor = new UiExecutor(Messages.CacheManager_DowloadingFile);
+		IOpExecutor executor = new UiExecutor();
 		executor.execute(new OpCacheUpdate(node));
 		return null;
 	}

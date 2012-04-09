@@ -31,27 +31,21 @@ import org.eclipse.ui.PlatformUI;
 public class UiExecutor implements IOpExecutor {
 	// The callback
 	protected ICallback callback;
-	// The operation's name to be displayed.
-	private String opName;
 	
 	/**
-	 * Create a UI executor with the specified name.
-	 * 
-	 * @param opName The operation's name.
+	 * Create a UI executor with no callback.
 	 */
-	public UiExecutor(String opName) {
-		this(opName, null);
+	public UiExecutor() {
+		this(null);
 	}
 	
 	/**
-	 * Create a UI executor with the specified name and
-	 * a callback that will be invoked after execution.
+	 * Create a UI executor with a callback that will be 
+	 * invoked after execution.
 	 * 
-	 * @param opName The operation's name.
 	 * @param callback The callback to be invoked after execution.
 	 */
-	public UiExecutor(String opName, ICallback callback) {
-		this.opName = opName;
+	public UiExecutor(ICallback callback) {
 		this.callback = callback;
 	}
 
@@ -67,8 +61,15 @@ public class UiExecutor implements IOpExecutor {
 		final IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			@Override
             public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-				operation.run(monitor);
-            }};
+				try {
+					monitor.setTaskName(operation.getName());
+					monitor.beginTask(operation.getName(), operation.getTotalWork());
+					operation.run(monitor);
+				}
+				finally {
+					monitor.done();
+				}
+			}};
 		dialog.setCancelable(true);
 		IStatus status = null;
 		try {
@@ -78,7 +79,7 @@ public class UiExecutor implements IOpExecutor {
 		catch (InvocationTargetException e) {
 			// Display the error during copy.
 			Throwable throwable = e.getTargetException() != null ? e.getTargetException() : e;
-			MessageDialog.openError(parent, opName, throwable.getLocalizedMessage());
+			MessageDialog.openError(parent, operation.getName(), throwable.getLocalizedMessage());
 			status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), throwable.getLocalizedMessage(), throwable);
 		}
 		catch (InterruptedException e) {

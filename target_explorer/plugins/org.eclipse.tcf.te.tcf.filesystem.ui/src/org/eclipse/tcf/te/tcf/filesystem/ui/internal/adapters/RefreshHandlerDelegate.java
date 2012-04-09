@@ -12,7 +12,6 @@ package org.eclipse.tcf.te.tcf.filesystem.ui.internal.adapters;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.exceptions.TCFException;
@@ -20,8 +19,8 @@ import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpRefresh;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.StateManager;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.activator.UIPlugin;
-import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.JobExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.IOpExecutor;
+import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.JobExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate;
 
@@ -54,7 +53,7 @@ public class RefreshHandlerDelegate implements IRefreshHandlerDelegate {
 		if (canRefresh(element)) {
 			FSTreeNode node = (FSTreeNode) element;
 			if (node.isSystemRoot() || node.isRoot() || node.isDirectory()) {
-				IOpExecutor executor = new JobExecutor(NLS.bind(Messages.RefreshDirectoryHandler_RefreshJobTitle, node.name), callback);
+				IOpExecutor executor = new JobExecutor(callback);
 				executor.execute(new OpRefresh(node));
 			}
 			else if (node.isFile() && !UIPlugin.isAutoSaving()) {
