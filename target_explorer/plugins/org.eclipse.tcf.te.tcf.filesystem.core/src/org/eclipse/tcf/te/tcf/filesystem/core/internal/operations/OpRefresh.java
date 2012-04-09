@@ -84,11 +84,11 @@ public class OpRefresh extends Operation {
 	 */
 	void refresh(final FSTreeNode node, final IFileSystem service) throws TCFException, InterruptedException {
 		if(monitor.isCanceled()) throw new InterruptedException();
-		monitor.worked(1);
 		if ((node.isSystemRoot() || node.isDirectory()) && node.childrenQueried) {
 			if (!node.isSystemRoot()) {
 				updateChildren(node, service);
 			}
+			monitor.worked(1);
 			List<FSTreeNode> children = node.unsafeGetChildren();
 			for (FSTreeNode child : children) {
 				refresh(child, service);
@@ -146,4 +146,32 @@ public class OpRefresh extends Operation {
     public String getName() {
 	    return NLS.bind(Messages.RefreshDirectoryHandler_RefreshJobTitle, node == null ? "" : node.name);
     }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.Operation#getTotalWork()
+	 */
+	@Override
+	public int getTotalWork() {
+		return count(node);
+	}
+	
+	/**
+	 * Count the nodes that should be refreshed under 
+	 * the specified directory.
+	 * 
+	 * @param node The specified directory.
+	 * @return the total count of the qualified nodes.
+	 */
+	private int count(FSTreeNode node) {
+		if ((node.isSystemRoot() || node.isDirectory()) && node.childrenQueried) {
+			int total = 1;
+			List<FSTreeNode> children = node.unsafeGetChildren();
+			for (FSTreeNode child : children) {
+				total += count(child);
+			}
+			return total;
+		}
+		return 0;
+	}
 }
