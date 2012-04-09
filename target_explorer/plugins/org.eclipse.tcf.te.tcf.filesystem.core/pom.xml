@@ -12,6 +12,6 @@
   </parent>
 
   <version>1.0.0.qualifier</version>
-  <artifactId>org.eclipse.tcf.te.tcf.filesystem.ui</artifactId>
+  <artifactId>org.eclipse.tcf.te.tcf.filesystem.core</artifactId>
   <packaging>eclipse-plugin</packaging>
 </project>
