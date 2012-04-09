@@ -181,6 +181,8 @@ public class StateManager {
 	 * @return true if they are equal in minute precision.
 	 */
 	private boolean isUnchanged(long mtime, long btime){
-		return Math.abs(mtime-btime)/60000 == 0;
+		long msecond = mtime/1000;
+		long bsecond = btime/1000;
+		return msecond == bsecond;
 	}
 }
