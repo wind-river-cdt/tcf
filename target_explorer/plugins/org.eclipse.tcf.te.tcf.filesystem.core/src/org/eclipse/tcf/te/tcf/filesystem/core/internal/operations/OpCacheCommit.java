@@ -70,12 +70,12 @@ public class OpCacheCommit extends OpUpload {
 					}
 					@Override
 					public void run() throws Exception {
+						StateManager.getInstance().refreshState(node);
 						PersistenceManager.getInstance().setBaseTimestamp(node.getLocationURI(), node.attr.mtime);
 						if (sync) {
 							File file = CacheManager.getInstance().getCacheFile(node);
 							setLastModifiedChecked(file, node.attr.mtime);
 						}
-						StateManager.getInstance().refreshState(node);
 					}
 				});
 			}
