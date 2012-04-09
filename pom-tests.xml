@@ -47,7 +47,8 @@
 		<module>target_explorer/plugins/org.eclipse.tcf.te.tcf.core.scripting</module>
 		<module>target_explorer/plugins/org.eclipse.tcf.te.tcf.launch.core</module>
 		<module>target_explorer/plugins/org.eclipse.tcf.te.tcf.launch.ui</module>
-		<module>target_explorer/plugins/org.eclipse.tcf.te.tcf.filesystem</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.tcf.filesystem.core</module>
+		<module>target_explorer/plugins/org.eclipse.tcf.te.tcf.filesystem.ui</module>
 		<module>target_explorer/plugins/org.eclipse.tcf.te.tcf.locator</module>
 		<module>target_explorer/plugins/org.eclipse.tcf.te.tcf.log.core</module>
 		<module>target_explorer/plugins/org.eclipse.tcf.te.tcf.processes.core</module>

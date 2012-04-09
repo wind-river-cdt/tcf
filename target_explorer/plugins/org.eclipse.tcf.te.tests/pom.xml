@@ -216,12 +216,21 @@
 											</sourcefiles>
 										</group>
 										
-										<group name="org.eclipse.tcf.te.tcf.filesystem">
+										<group name="org.eclipse.tcf.te.tcf.filesystem.core">
 											<classfiles>
-												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.filesystem/target/classes"/>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.filesystem.core/target/classes"/>
 											</classfiles>
 											<sourcefiles>
-												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.filesystem/src"/>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.filesystem.core/src"/>
+											</sourcefiles>
+										</group>
+
+										<group name="org.eclipse.tcf.te.tcf.filesystem.ui">
+											<classfiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.filesystem.ui/target/classes"/>
+											</classfiles>
+											<sourcefiles>
+												<fileset dir="${basedir}/../org.eclipse.tcf.te.tcf.filesystem.ui/src"/>
 											</sourcefiles>
 										</group>
 										
