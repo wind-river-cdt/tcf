@@ -13,8 +13,19 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IOperation;
 
 /**
- * The operation that is executed as a back ground job.
+ * The interface is to defined an operation executor, which executes
+ * the given operation providing the context including the progress monitor.
+ * 
+ * @see JobExecutor
+ * @see UiExecutor
  */
 public interface IOpExecutor {
+	/**
+	 * Execute the specified operation providing an execution
+	 * context.
+	 * 
+	 * @param operation The operation to be executed.
+	 * @return a result status of the execution.
+	 */
 	public IStatus execute(IOperation operation);
 }

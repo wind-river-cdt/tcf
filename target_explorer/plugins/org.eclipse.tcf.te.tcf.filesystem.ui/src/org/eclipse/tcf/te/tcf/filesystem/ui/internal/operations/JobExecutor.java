@@ -27,26 +27,32 @@ import org.eclipse.ui.PlatformUI;
 public class JobExecutor implements IOpExecutor{
 	// The callback
 	protected ICallback callback;
+	// The job's name.
 	private String jobName;
 
+	/**
+	 * Create an instance with the specified name.
+	 * 
+	 * @param jobName The job's name.
+	 */
 	public JobExecutor(String jobName) {
 		this(jobName, null);
     }
 	
 	/**
-	 * Create an instance with the specified callback.
+	 * Create an instance with the specified name and callback.
 	 *
+	 * @param jobName the job's name.
 	 * @param callback called when the creation is done.
 	 */
 	public JobExecutor(String jobName, ICallback callback) {
 		this.jobName = jobName;
 		this.callback = callback;
 	}
-	
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation#doit()
+	 * @see org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.IOpExecutor#execute(org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IOperation)
 	 */
 	@Override
     public IStatus execute(IOperation operation) {
