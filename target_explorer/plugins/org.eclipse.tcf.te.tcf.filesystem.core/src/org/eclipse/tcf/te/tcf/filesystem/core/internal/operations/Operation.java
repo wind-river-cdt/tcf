@@ -135,26 +135,12 @@ public class Operation implements IOperation {
 	}
 
 	/**
-	 * Close the editor that opens the specified file.
-	 * <p>
-	 * <b>Note:</b> The method must be called within the UI thread.
-	 *
-	 * @param file The file that is opened.
-	 */
-	protected void closeEditor(File file) {
-		// TODO Adding code to close editor.
-	}
-
-	/**
 	 * Clean up the file node after moving, deleting or copying.
 	 *
 	 * @param node the file node that is to be cleaned.
 	 */
 	protected void cleanUpFile(FSTreeNode node) {
 		final File file = CacheManager.getInstance().getCacheFile(node);
-		if (file.exists()) {
-			closeEditor(file);
-		}
 		deleteFileChecked(file);
 		PersistenceManager.getInstance().removeBaseTimestamp(node.getLocationURI());
 		FSTreeNode parent = node.parent;
