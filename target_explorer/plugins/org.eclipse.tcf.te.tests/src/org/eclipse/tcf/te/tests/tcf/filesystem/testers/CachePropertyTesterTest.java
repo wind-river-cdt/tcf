@@ -9,7 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tests.tcf.filesystem.testers;
 
-import org.eclipse.tcf.te.tcf.filesystem.internal.testers.CachePropertyTester;
+import org.eclipse.tcf.te.tcf.filesystem.ui.internal.testers.CachePropertyTester;
 import org.eclipse.tcf.te.tests.tcf.filesystem.FSPeerTestCase;
 
 @SuppressWarnings("restriction")

@@ -16,8 +16,8 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
-import org.eclipse.tcf.te.tcf.filesystem.interfaces.IConfirmCallback;
-import org.eclipse.tcf.te.tcf.filesystem.internal.adapters.DeleteHandlerDelegate;
+import org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IConfirmCallback;
+import org.eclipse.tcf.te.tcf.filesystem.ui.internal.adapters.DeleteHandlerDelegate;
 import org.eclipse.tcf.te.tests.tcf.filesystem.FSPeerTestCase;
 import org.eclipse.tcf.te.ui.views.interfaces.handler.IDeleteHandlerDelegate;
 

@@ -12,10 +12,9 @@ package org.eclipse.tcf.te.tests.tcf.filesystem.operations;
 import java.io.File;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSRefresh;
-import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpRefresh;
+import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 
-@SuppressWarnings("restriction")
 public class FSRefreshTests extends OperationTestBase {
 
 	@Override
@@ -28,7 +27,7 @@ public class FSRefreshTests extends OperationTestBase {
     }
 
 	public void testRefresh() throws Exception {
-		FSRefresh refresh = new FSRefresh(testRoot, null);
+		OpRefresh refresh = new OpRefresh(testRoot);
 		refresh.run(new NullProgressMonitor());
 	    String path = getTestRoot() + getPathSep() + getTestPath()+getPathSep()+"newdir"; //$NON-NLS-1$
 		FSTreeNode node = getFSNode(path);

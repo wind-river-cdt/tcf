@@ -10,10 +10,9 @@
 package org.eclipse.tcf.te.tests.tcf.filesystem.testers;
 
 import org.eclipse.tcf.te.runtime.utils.Host;
-import org.eclipse.tcf.te.tcf.filesystem.internal.testers.FSTreeNodePropertyTester;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.testers.FSTreeNodePropertyTester;
 import org.eclipse.tcf.te.tests.tcf.filesystem.FSPeerTestCase;
 
-@SuppressWarnings("restriction")
 public class FSTreeNodePropertyTesterTest extends FSPeerTestCase {
 	private FSTreeNodePropertyTester tester;
     @Override

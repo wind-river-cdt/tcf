@@ -9,7 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tests.tcf.filesystem.controls;
 
-import org.eclipse.tcf.te.tcf.filesystem.controls.FSNavigatorContentProvider;
+import org.eclipse.tcf.te.tcf.filesystem.ui.controls.FSNavigatorContentProvider;
 import org.eclipse.tcf.te.tests.tcf.filesystem.FSPeerTestCase;
 
 public class ContentProviderTest extends FSPeerTestCase {

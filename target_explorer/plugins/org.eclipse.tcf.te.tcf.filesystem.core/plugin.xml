@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.tcf.te.runtime.persistence.delegates">
+      <delegate
+            class="org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.URIKeyMapPersistenceDelegate"
+            id="org.eclipse.tcf.te.tcf.filesystem.core.map">
+      </delegate>
+   </extension>
+   <extension
+         point="org.eclipse.tcf.te.runtime.persistence.bindings">
+      <binding
+            delegateId="org.eclipse.tcf.te.tcf.filesystem.core.map"
+            id="org.eclipse.tcf.te.tcf.filesystem.core.map.binding">
+         <enablement>
+            <with variable="container">
+               <instanceof
+                     value="java.net.URI">
+               </instanceof>
+            </with>
+            <with variable="context">
+               <instanceof
+                     value="java.util.Map">
+               </instanceof>
+            </with>
+         </enablement>
+       </binding>
+   </extension>
+   <extension point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.eclipse.tcf.te.tcf.filesystem.core.internal.testers.FSTreeNodePropertyTester"
+            id="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode"
+            namespace="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode"
+            properties="isFile,isDirectory,isBinaryFile,isReadable,isWritable,isExecutable,isRoot,isReadOnly,isHidden,isWindows,testParent,getCacheState,isSystemRoot"
+            type="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
+      </propertyTester>
+      <propertyTester
+            class="org.eclipse.tcf.te.tcf.filesystem.core.internal.testers.TargetPropertyTester"
+            id="org.eclipse.tcf.te.tcf.filesystem.propertytester.peer"
+            namespace="org.eclipse.tcf.te.tcf.filesystem.propertytester.peer"
+            properties="isWindows"
+            type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel">
+      </propertyTester>
+   </extension>
+
+</plugin>

@@ -10,7 +10,7 @@
 package org.eclipse.tcf.te.tests.tcf.filesystem.filters;
 
 import org.eclipse.tcf.te.runtime.utils.Host;
-import org.eclipse.tcf.te.tcf.filesystem.filters.HiddenFilesViewerFilter;
+import org.eclipse.tcf.te.tcf.filesystem.ui.filters.HiddenFilesViewerFilter;
 import org.eclipse.tcf.te.tests.tcf.filesystem.FSPeerTestCase;
 
 public class HiddenFilesViewerFilterTest extends FSPeerTestCase {

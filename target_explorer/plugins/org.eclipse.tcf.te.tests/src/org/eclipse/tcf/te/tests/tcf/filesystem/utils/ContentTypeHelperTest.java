@@ -11,7 +11,6 @@ package org.eclipse.tcf.te.tests.tcf.filesystem.utils;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -20,13 +19,12 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
-import org.eclipse.tcf.te.tcf.filesystem.internal.utils.CacheManager;
-import org.eclipse.tcf.te.tcf.filesystem.internal.utils.ContentTypeHelper;
-import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpUpload;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.ContentTypeHelper;
+import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tests.activator.UIPlugin;
 import org.osgi.framework.Bundle;
 
-@SuppressWarnings("restriction")
 public class ContentTypeHelperTest extends UtilsTestBase {
 	private FSTreeNode agentNode;
 	@Override
@@ -43,7 +41,7 @@ public class ContentTypeHelperTest extends UtilsTestBase {
 		writeFileContent(content.toString());
     }
 	
-    private void uploadAgent() throws MalformedURLException, IOException {
+    private void uploadAgent() throws Exception {
 	    IPath path = getWin32Agent();
 	    assertNotNull("Cannot find Windows agent!", path); //$NON-NLS-1$
 		assertTrue("Invalid agent location: " + path.toString(), path.toFile().isFile()); //$NON-NLS-1$
@@ -53,7 +51,8 @@ public class ContentTypeHelperTest extends UtilsTestBase {
 		if (agentNode == null) {
 			URL rootURL = testRoot.getLocationURL();
 			URL agentURL = new URL(rootURL, agentFile.getName());
-			CacheManager.getInstance().uploadFiles(new NullProgressMonitor(), new File[] { agentFile }, new URL[] { agentURL }, null);
+			OpUpload upload = new OpUpload(agentFile, agentURL);
+			upload.run(new NullProgressMonitor());
 			agentNode = getFSNode(agentPath);
 			assertNotNull(agentNode);
 		}

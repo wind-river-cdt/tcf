@@ -9,10 +9,9 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tests.tcf.filesystem.utils;
 
-import org.eclipse.tcf.te.tcf.filesystem.internal.utils.StateManager;
-import org.eclipse.tcf.te.tcf.filesystem.model.CacheState;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.StateManager;
+import org.eclipse.tcf.te.tcf.filesystem.core.model.CacheState;
 
-@SuppressWarnings("restriction")
 public class StateManagerTest extends UtilsTestBase {
 
 	@Override

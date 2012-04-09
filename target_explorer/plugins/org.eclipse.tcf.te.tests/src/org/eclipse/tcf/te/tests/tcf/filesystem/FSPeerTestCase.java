@@ -19,15 +19,14 @@ import org.eclipse.tcf.services.IFileSystem.DoneStat;
 import org.eclipse.tcf.services.IFileSystem.FileAttrs;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.te.tcf.core.Tcf;
-import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSCreateFile;
-import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSCreateFolder;
-import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSOperation;
-import org.eclipse.tcf.te.tcf.filesystem.internal.operations.FSRefresh;
-import org.eclipse.tcf.te.tcf.filesystem.model.FSModel;
-import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpCreateFile;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpCreateFolder;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.Operation;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpRefresh;
+import org.eclipse.tcf.te.tcf.filesystem.core.model.FSModel;
+import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tests.tcf.TcfTestCase;
 
-@SuppressWarnings("restriction")
 public class FSPeerTestCase extends TcfTestCase {
 
 	protected FSTreeNode testRoot;
@@ -89,7 +88,7 @@ public class FSPeerTestCase extends TcfTestCase {
 		printDebugMessage("Prepare folder " + folderPath); //$NON-NLS-1$
 		FSTreeNode testFolder = getFSNode(folderPath);
 		if (testFolder == null) {
-			FSCreateFolder fs = new FSCreateFolder(parentFolder, folderName);
+			OpCreateFolder fs = new OpCreateFolder(parentFolder, folderName);
 			fs.run(new NullProgressMonitor());
 			testFolder = getFSNode(folderPath);
 		}
@@ -99,9 +98,9 @@ public class FSPeerTestCase extends TcfTestCase {
 	protected boolean pathExists(String path) {
 		IChannel channel = null;
 		try {
-			channel = FSOperation.openChannel(peer);
+			channel = Operation.openChannel(peer);
 			if (channel != null) {
-				IFileSystem service = FSOperation.getBlockingFileSystem(channel);
+				IFileSystem service = Operation.getBlockingFileSystem(channel);
 				if (service != null) {
 					final boolean[] exists = new boolean[1];
 					service.lstat(path, new DoneStat() {
@@ -125,7 +124,7 @@ public class FSPeerTestCase extends TcfTestCase {
 	protected FSTreeNode getFSNode(String path) {
 		FSTreeNode node = FSModel.findTreeNode(peerModel, path);
 		if (node == null) {
-			FSRefresh refresh = new FSRefresh(testRoot, null);
+			OpRefresh refresh = new OpRefresh(testRoot);
 			try {
 				refresh.run(new NullProgressMonitor());
 			} catch (Exception e) {}
@@ -139,7 +138,7 @@ public class FSPeerTestCase extends TcfTestCase {
 		printDebugMessage("Prepare file " + filePath); //$NON-NLS-1$
 		FSTreeNode testFile = getFSNode(filePath);
 		if (testFile == null) {
-			FSCreateFile fs = new FSCreateFile(parentFolder, fileName);
+			OpCreateFile fs = new OpCreateFile(parentFolder, fileName);
 			fs.run(new NullProgressMonitor());
 			testFile = getFSNode(filePath);
 		}

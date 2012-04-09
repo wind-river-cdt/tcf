@@ -23,6 +23,8 @@ public class OperationTests {
 		suite.addTestSuite(FSRefreshTests.class);
 		suite.addTestSuite(FSRenameTests.class);
 		suite.addTestSuite(FSUploadTest.class);
+		suite.addTestSuite(FSCacheCommitTest.class);
+		suite.addTestSuite(FSCacheUpdateTest.class);
 		return suite;
 	}
 }

@@ -15,10 +15,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 
-import org.eclipse.tcf.te.tcf.filesystem.internal.url.TcfURLConnection;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.url.TcfURLConnection;
 import org.eclipse.tcf.te.tests.tcf.filesystem.FSPeerTestCase;
 
-@SuppressWarnings("restriction")
 public class URLTestBase extends FSPeerTestCase {
 
 	protected String readFileContent() throws IOException {

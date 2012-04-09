@@ -11,7 +11,7 @@
          </includes>
       </viewerContentBinding>
       <dragAssistant
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.dnd.FSDragAdapterAssistant"
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.dnd.FSDragAdapterAssistant"
             viewerId="org.eclipse.tcf.te.ui.views.View">
       </dragAssistant>
    </extension>
@@ -19,10 +19,10 @@
    <extension point="org.eclipse.ui.navigator.navigatorContent">
       <navigatorContent
             activeByDefault="false"
-            contentProvider="org.eclipse.tcf.te.tcf.filesystem.controls.FSNavigatorContentProvider"
+            contentProvider="org.eclipse.tcf.te.tcf.filesystem.ui.controls.FSNavigatorContentProvider"
             icon="icons/obj16/rootdrive.gif"
             id="org.eclipse.tcf.te.tcf.filesystem.navigator.content"
-            labelProvider="org.eclipse.tcf.te.tcf.filesystem.internal.columns.FSTreeElementLabelProvider"
+            labelProvider="org.eclipse.tcf.te.tcf.filesystem.ui.internal.columns.FSTreeElementLabelProvider"
             name="%navigatorContent.name"
             priority="normal">
             <triggerPoints>
@@ -35,18 +35,18 @@
                 </test>
             </triggerPoints>
             <possibleChildren>
-            	<instanceof value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode"/>
+            	<instanceof value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode"/>
             </possibleChildren>
             <commonSorter
-                  class="org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeViewerSorter"
+                  class="org.eclipse.tcf.te.tcf.filesystem.ui.controls.FSTreeViewerSorter"
                   id="org.eclipse.tcf.te.tcf.filesystem.navigator.sorter">
             </commonSorter>
             <dropAssistant
-                  class="org.eclipse.tcf.te.tcf.filesystem.internal.dnd.FSDropAdapterAssistant"
+                  class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.dnd.FSDropAdapterAssistant"
                   id="org.eclipse.tcf.te.tcf.filesystem.dropAssistant">
                <possibleDropTargets>
                   <instanceof
-                        value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                        value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                   </instanceof></possibleDropTargets>
             </dropAssistant>
             <commonWizard
@@ -54,7 +54,7 @@
                   wizardId="org.eclipse.tcf.te.tcf.filesystem.wizards.NewFileWizard">
                <enablement>
                   <instanceof
-                        value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                        value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                   </instanceof>
                   <test
                         property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isDirectory">
@@ -68,7 +68,7 @@
                   wizardId="org.eclipse.tcf.te.tcf.filesystem.wizards.NewFolderWizard">
                <enablement>
                   <instanceof
-                        value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                        value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                   </instanceof>
                   <test
                         property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isDirectory">
@@ -81,14 +81,14 @@
       </navigatorContent>
       <commonFilter
             activeByDefault="true"
-            class="org.eclipse.tcf.te.tcf.filesystem.filters.HiddenFilesViewerFilter"
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.filters.HiddenFilesViewerFilter"
             id="org.eclipse.tcf.te.tcf.filesystem.navigator.filter.hiddenFiles"
             name="%FSTreeViewerFilter.hiddenFiles"
             visibleInUI="true">
       </commonFilter>
       <commonFilter
             activeByDefault="true"
-            class="org.eclipse.tcf.te.tcf.filesystem.filters.SystemFilesViewerFilter"
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.filters.SystemFilesViewerFilter"
             id="org.eclipse.tcf.te.tcf.filesystem.navigator.filter.systemFiles"
             name="%FSTreeViewerFilter.systemFiles"
             visibleInUI="true">
@@ -116,7 +116,7 @@
                   <test property="org.eclipse.tcf.te.tcf.locator.hasRemoteService" value="FileSystem"/>
                   <test
                         property="org.eclipse.tcf.te.runtime.preference"
-                        args="bundleId=org.eclipse.tcf.te.tcf.filesystem,key=te.tcf.filesystem.core.feature.editor.content.enable"
+                        args="bundleId=org.eclipse.tcf.te.tcf.filesystem.ui,key=te.tcf.filesystem.core.feature.editor.content.enable"
                         value="true">
                   </test>
                </and>
@@ -142,7 +142,7 @@
                   </count>
                   <iterate>
                      <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                      </instanceof>
                   </iterate>
                </with>
@@ -173,7 +173,7 @@
                <with variable="selection">
                   <count value="1"/>
                   <iterate>
-                     <instanceof value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode"/>
+                     <instanceof value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode"/>
                      <test property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isFile"/>
                      <test
                            property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isReadable">
@@ -196,7 +196,7 @@
                   </count>
                   <iterate>
                      <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                      </instanceof>
                      <test
                            property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isFile">
@@ -213,7 +213,7 @@
                </with>
             </visibleWhen>
             <dynamic
-                  class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.OpenWithContribution"
+                  class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.handlers.OpenWithContribution"
                   id="openWithMenu">
             </dynamic>
          </menu>
@@ -238,7 +238,7 @@
                   </count>
                   <iterate>
                      <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                      </instanceof>
                   </iterate>
                </with>
@@ -261,7 +261,7 @@
                   </count>
                   <iterate>
                      <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                      </instanceof>
                   </iterate>
                </with>
@@ -284,7 +284,7 @@
                   </count>
                   <iterate>
                      <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                      </instanceof>
                   </iterate>
                </with>
@@ -310,7 +310,7 @@
                   </count>
                   <iterate>
                      <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                      </instanceof>
                   </iterate>
                </with>
@@ -332,7 +332,7 @@
                   </count>
                   <iterate>
                      <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                      </instanceof>
                   </iterate>
                </with>
@@ -415,7 +415,7 @@
                   </count>
                   <iterate>
                      <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                      </instanceof>
                      <test
                            property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isFile">
@@ -446,7 +446,7 @@
                   </count>
                   <iterate>
                      <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                      </instanceof>
                      <test
                            property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isFile">
@@ -477,7 +477,7 @@
                   </count>
                   <iterate>
                      <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                      </instanceof>
                      <test
                            property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isFile">
@@ -508,7 +508,7 @@
                   </count>
                   <iterate>
                      <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                      </instanceof>
                      <test
                            property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isFile">
@@ -536,7 +536,7 @@
                      <iterate operator="and" ifEmpty="false">
                         <and>
                            <instanceof
-                                 value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                                 value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                            </instanceof>
                            <not>
                               <test
@@ -562,7 +562,7 @@
                      <iterate operator="and" ifEmpty="false">
                         <and>
                            <instanceof
-                                 value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                                 value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                            </instanceof>
                            <not>
                               <test
@@ -586,7 +586,7 @@
                <with variable="selection">
                   <count value="1"/>
                   <iterate>
-                     <instanceof value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode"/>
+                     <instanceof value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode"/>
                      <test property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isFile"/>
                      <test
                            property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isReadable">
@@ -609,7 +609,7 @@
                   </count>
                   <iterate>
                      <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                      </instanceof>
                      <test
                            property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isFile">
@@ -626,7 +626,7 @@
                </with>
             </visibleWhen>
             <dynamic
-                  class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.OpenWithContribution"
+                  class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.handlers.OpenWithContribution"
                   id="openWithMenu">
             </dynamic>
          </menu>
@@ -651,7 +651,7 @@
                   </count>
                   <iterate>
                      <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                      </instanceof>
                   </iterate>
                </with>
@@ -674,7 +674,7 @@
                   </count>
                   <iterate>
                      <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                      </instanceof>
                   </iterate>
                </with>
@@ -697,7 +697,7 @@
                   </count>
                   <iterate>
                      <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                      </instanceof>
                   </iterate>
                </with>
@@ -723,7 +723,7 @@
                   </count>
                   <iterate>
                      <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                      </instanceof>
                   </iterate>
                </with>
@@ -745,7 +745,7 @@
                   </count>
                   <iterate>
                      <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                      </instanceof>
                   </iterate>
                </with>
@@ -771,7 +771,7 @@
                      </count>
                      <iterate>
                         <instanceof
-                              value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                              value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                         </instanceof>
                         <test
                               property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isFile">
@@ -802,7 +802,7 @@
                      </count>
                      <iterate>
                         <instanceof
-                              value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                              value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                         </instanceof>
                         <test
                               property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isFile">
@@ -833,7 +833,7 @@
                      </count>
                      <iterate>
                         <instanceof
-                              value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                              value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                         </instanceof>
                         <test
                               property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isFile">
@@ -864,7 +864,7 @@
                      </count>
                      <iterate>
                         <instanceof
-                              value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                              value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                         </instanceof>
                         <test
                               property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isFile">
@@ -895,13 +895,13 @@
 <!-- Property page contributions -->   
    <extension point="org.eclipse.ui.propertyPages">
       <page
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.properties.GeneralInformationPage"
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.properties.GeneralInformationPage"
             id="org.eclipse.tcf.te.tcf.filesystem.pages.basic"
             name="%GeneralInformationPage.name">
          <enabledWhen>
             <and>
                <instanceof
-                     value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                     value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                </instanceof>
                <not>
                   <test
@@ -916,39 +916,25 @@
 <!-- Property tester contributions -->   
    <extension point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.testers.FSTreeNodePropertyTester"
-            id="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode"
-            namespace="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode"
-            properties="isFile,isDirectory,isBinaryFile,isReadable,isWritable,isExecutable,isRoot,isReadOnly,isHidden,isWindows,testParent,getCacheState,isSystemRoot"
-            type="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
-      </propertyTester>
-      <propertyTester
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.testers.CachePropertyTester"
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.testers.CachePropertyTester"
             id="org.eclipse.tcf.te.tcf.filesystem.propertytester.cache"
             namespace="org.eclipse.tcf.te.tcf.filesystem.propertytester.cache"
             properties="isAutoSavingOn"
             type="java.lang.Object">
       </propertyTester>
       <propertyTester
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.testers.ClipboardPropertyTester"
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.testers.ClipboardPropertyTester"
             id="org.eclipse.tcf.te.tcf.filesystem.propertytester.clipboard"
             namespace="org.eclipse.tcf.te.tcf.filesystem.propertytester.clipboard"
             properties="canPaste"
             type="org.eclipse.jface.viewers.IStructuredSelection">
       </propertyTester>
       <propertyTester
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.testers.EditorActivationEventPropertyTester"
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.testers.EditorActivationEventPropertyTester"
             id="org.eclipse.tcf.te.tcf.filesystem.propertytester.event"
             namespace="org.eclipse.tcf.te.tcf.filesystem.propertytester.event"
             properties="isEditorActivation"
             type="org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent">
-      </propertyTester>
-      <propertyTester
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.testers.TargetPropertyTester"
-            id="org.eclipse.tcf.te.tcf.filesystem.propertytester.peer"
-            namespace="org.eclipse.tcf.te.tcf.filesystem.propertytester.peer"
-            properties="isWindows"
-            type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel">
       </propertyTester>
    </extension>
    
@@ -989,7 +975,7 @@
       <!-- This handler contribution is for the double click behaviour in the
            Target Explore tree view -->
       <handler
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.OpenFileHandler"
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.handlers.OpenFileHandler"
             commandId="org.eclipse.ui.navigator.Open">
          <activeWhen>
             <and>
@@ -1011,7 +997,7 @@
                   </count>
                   <iterate>
                      <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                      </instanceof>
                      <test
                            forcePluginActivation="true"
@@ -1039,7 +1025,7 @@
                </count>
                <iterate>
                   <instanceof
-                        value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                        value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                   </instanceof>
                   <test
                         forcePluginActivation="true"
@@ -1060,7 +1046,7 @@
          </enabledWhen>
       </handler>
       <handler
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.UpdateHandler"
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.handlers.UpdateHandler"
             commandId="org.eclipse.tcf.te.tcf.filesystem.commands.update">
          <activeWhen>
             <with
@@ -1084,7 +1070,7 @@
                   </count>
                   <iterate>
                      <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                      </instanceof>
                      <test
                            property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isFile">
@@ -1104,7 +1090,7 @@
          </enabledWhen>
       </handler>
       <handler
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.CommitHandler"
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.handlers.CommitHandler"
             commandId="org.eclipse.tcf.te.tcf.filesystem.commands.commit">
          <activeWhen>
             <with
@@ -1128,7 +1114,7 @@
                   </count>
                   <iterate>
                      <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                      </instanceof>
                      <test
                            property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isFile">
@@ -1148,7 +1134,7 @@
          </enabledWhen>
       </handler>
       <handler
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.MergeHandler"
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.handlers.MergeHandler"
             commandId="org.eclipse.tcf.te.tcf.filesystem.commands.merge">
          <activeWhen>
             <with
@@ -1172,7 +1158,7 @@
                   </count>
                   <iterate>
                      <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                      </instanceof>
                      <test
                            property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isFile">
@@ -1192,7 +1178,7 @@
          </enabledWhen>
       </handler>
       <handler
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.UpdateHandler"
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.handlers.UpdateHandler"
             commandId="org.eclipse.tcf.te.tcf.filesystem.commands.revert">
          <activeWhen>
             <with
@@ -1216,7 +1202,7 @@
                   </count>
                   <iterate>
                      <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                      </instanceof>
                      <test
                            property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isFile">
@@ -1244,7 +1230,7 @@
       
       
       <handler
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.CutFilesHandler"
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.handlers.CutFilesHandler"
             commandId="org.eclipse.ui.edit.cut">
          <activeWhen>
             <with
@@ -1267,7 +1253,7 @@
                </count>
                <iterate>
                   <instanceof
-                        value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                        value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                   </instanceof>
                   <not>
                      <test
@@ -1301,7 +1287,7 @@
          </enabledWhen>
       </handler>
       <handler
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.CopyFilesHandler"
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.handlers.CopyFilesHandler"
             commandId="org.eclipse.ui.edit.copy">
          <activeWhen>
             <with
@@ -1324,7 +1310,7 @@
                </count>
                <iterate>
                   <instanceof
-                        value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                        value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                   </instanceof>
                   <test
                         property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isReadable">
@@ -1339,7 +1325,7 @@
          </enabledWhen>
       </handler>
       <handler
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.PasteFilesHandler"
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.handlers.PasteFilesHandler"
             commandId="org.eclipse.ui.edit.paste">
          <activeWhen>
             <with
@@ -1363,7 +1349,7 @@
                </count>
                <iterate>
                   <instanceof
-                        value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                        value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                   </instanceof>
                </iterate>
                <test
@@ -1374,7 +1360,7 @@
          </enabledWhen>
       </handler>
       <handler
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.MoveFilesHandler"
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.handlers.MoveFilesHandler"
             commandId="org.eclipse.ui.edit.move">
          <activeWhen>
             <with
@@ -1397,7 +1383,7 @@
                </count>
                <iterate>
                   <instanceof
-                        value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                        value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                   </instanceof>
                   <not>
                      <test
@@ -1431,7 +1417,7 @@
          </enabledWhen>
       </handler>
       <handler
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.RenameFilesHandler"
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.handlers.RenameFilesHandler"
             commandId="org.eclipse.ui.edit.rename">
          <activeWhen>
             <with
@@ -1454,7 +1440,7 @@
                </count>
                <iterate>
                   <instanceof
-                        value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                        value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                   </instanceof>
                   <not>
                      <test
@@ -1488,7 +1474,7 @@
          </enabledWhen>
       </handler>
       <handler
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.NewFileHandler"
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.handlers.NewFileHandler"
             commandId="org.eclipse.tcf.te.tcf.filesystem.commands.newFile">
          <activeWhen>
                <with
@@ -1506,7 +1492,7 @@
                </count>
                <iterate>
                   <instanceof
-                        value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                        value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                   </instanceof>
                   <or>
                      <and>
@@ -1532,7 +1518,7 @@
          </enabledWhen>
       </handler>
       <handler
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.NewFolderHandler"
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.handlers.NewFolderHandler"
             commandId="org.eclipse.tcf.te.tcf.filesystem.commands.newFolder">
          <activeWhen>
             <with
@@ -1550,7 +1536,7 @@
                </count>
                <iterate>
                   <instanceof
-                        value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                        value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                   </instanceof>
                   <or>
                      <and>
@@ -1576,7 +1562,7 @@
          </enabledWhen>
       </handler>
       <handler
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.handlers.RefreshViewerHandler"
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.handlers.RefreshViewerHandler"
             commandId="org.eclipse.tcf.te.tcf.filesystem.commands.refreshViewer">
       </handler>
    </extension>
@@ -1626,7 +1612,7 @@
          </enablement>
       </decorator>
       <decorator
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.decorators.PhantomDecorator"
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.decorators.PhantomDecorator"
             id="org.eclipse.tcf.te.tcf.filesystem.decorators.cut"
             label="%decorator.label.cut"
             state="true">
@@ -1638,7 +1624,7 @@
          </enablement>
       </decorator>
       <decorator
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.decorators.PhantomDecorator"
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.decorators.PhantomDecorator"
             id="org.eclipse.tcf.te.tcf.filesystem.decorators.hidden"
             label="%decorator.hidden.label"
             state="true">
@@ -1653,14 +1639,14 @@
    
 <!-- Preference contributions -->
    <extension point="org.eclipse.core.runtime.preferences">
-      <initializer class="org.eclipse.tcf.te.tcf.filesystem.internal.preferences.PreferencesInitializer"/>
+      <initializer class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.preferences.PreferencesInitializer"/>
    </extension>
 
 <!-- Preference page contributions -->
    <extension point="org.eclipse.ui.preferencePages">
       <page
             category="org.eclipse.tcf.te.ui.preferences.general"
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.preferences.PreferencePage"
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.preferences.PreferencePage"
             id="org.eclipse.tcf.te.ui.preferences.tcf.filesystem"
             name="%preference.page.name">
       </page>
@@ -1669,8 +1655,8 @@
 <!-- Adapter contributions -->   
    <extension point="org.eclipse.core.runtime.adapters">
       <factory
-            adaptableType="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode"
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.adapters.FSTreeNodeAdapterFactory">
+            adaptableType="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode"
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.adapters.FSTreeNodeAdapterFactory">
          <adapter
                type="org.eclipse.ui.IActionFilter">
          </adapter>
@@ -1689,7 +1675,7 @@
 <!-- CellEditor factory contributions -->   
    <extension point="org.eclipse.tcf.te.ui.cellEditors">
       <cellEditor
-            editorFactory="org.eclipse.tcf.te.tcf.filesystem.internal.celleditor.FSViewerCellEditorFactory">
+            editorFactory="org.eclipse.tcf.te.tcf.filesystem.ui.internal.celleditor.FSViewerCellEditorFactory">
          <activation>
             <and>
                <with
@@ -1699,7 +1685,7 @@
                   </count>
                   <iterate>
                      <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode">
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                      </instanceof>
                   </iterate>
                </with>
@@ -1725,7 +1711,7 @@
       <wizard
             canFinishEarly="false"
             category="org.eclipse.tcf.te.tcf.ui.newWizards.category"
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.wizards.NewFileWizard"
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.wizards.NewFileWizard"
             hasPages="true"
             icon="icons/obj16/newfile_wiz.gif"
             id="org.eclipse.tcf.te.tcf.filesystem.wizards.NewFileWizard"
@@ -1737,7 +1723,7 @@
       <wizard
             canFinishEarly="false"
             category="org.eclipse.tcf.te.tcf.ui.newWizards.category"
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.wizards.NewFolderWizard"
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.wizards.NewFolderWizard"
             hasPages="true"
             icon="icons/obj16/newfolder_wiz.gif"
             id="org.eclipse.tcf.te.tcf.filesystem.wizards.NewFolderWizard"
@@ -1751,7 +1737,7 @@
    <extension point="org.eclipse.tcf.te.ui.viewers">
        <viewer
              autoExpandLevel="0"
-             contentProvider="org.eclipse.tcf.te.tcf.filesystem.controls.FSTreeContentProvider"
+             contentProvider="org.eclipse.tcf.te.tcf.filesystem.ui.controls.FSTreeContentProvider"
              doubleClickCommand="org.eclipse.ui.navigator.Open"
              helpId="org.eclipse.tcf.te.tcf.filesystem.FSExplorerEditorPage"
              id="org.eclipse.tcf.te.ui.controls.viewer.fs"
@@ -1762,7 +1748,7 @@
              <style name="SWT.MULTI" />
           </creation>
           <dragSupport
-                class="org.eclipse.tcf.te.tcf.filesystem.internal.dnd.FSDragSourceListener">
+                class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.dnd.FSDragSourceListener">
              <operations>
              	<operation name="DND.DROP_COPY" />
              	<operation name="DND.DROP_MOVE" />
@@ -1773,7 +1759,7 @@
 			 </transferTypes>
           </dragSupport>
           <dropSupport
-                class="org.eclipse.tcf.te.tcf.filesystem.internal.dnd.FSDropTargetListener">
+                class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.dnd.FSDropTargetListener">
              <operations>
              	<operation name="DND.DROP_COPY" />
              	<operation name="DND.DROP_MOVE" />
@@ -1790,9 +1776,9 @@
       <columnContribution viewerId="org.eclipse.tcf.te.ui.controls.viewer.fs">
          <column
                alignment="SWT.LEFT"
-               comparator="org.eclipse.tcf.te.tcf.filesystem.internal.columns.FSTreeElementComparator"
+               comparator="org.eclipse.tcf.te.tcf.filesystem.ui.internal.columns.FSTreeElementComparator"
                id="name"
-               labelProvider="org.eclipse.tcf.te.tcf.filesystem.internal.columns.FSTreeElementLabelProvider"
+               labelProvider="org.eclipse.tcf.te.tcf.filesystem.ui.internal.columns.FSTreeElementLabelProvider"
                moveable="true"
                name="%column.name.name"
                resizable="true"
@@ -1802,9 +1788,9 @@
          </column>
          <column
                alignment="SWT.RIGHT"
-               comparator="org.eclipse.tcf.te.tcf.filesystem.internal.columns.SizeComparator"
+               comparator="org.eclipse.tcf.te.tcf.filesystem.ui.internal.columns.SizeComparator"
                id="size"
-               labelProvider="org.eclipse.tcf.te.tcf.filesystem.internal.columns.SizeLabelProvider"
+               labelProvider="org.eclipse.tcf.te.tcf.filesystem.ui.internal.columns.SizeLabelProvider"
                moveable="true"
                name="%column.name.size"
                resizable="true"
@@ -1814,9 +1800,9 @@
          </column>
          <column
                alignment="SWT.LEFT"
-               comparator="org.eclipse.tcf.te.tcf.filesystem.internal.columns.FileTypeComparator"
+               comparator="org.eclipse.tcf.te.tcf.filesystem.ui.internal.columns.FileTypeComparator"
                id="type"
-               labelProvider="org.eclipse.tcf.te.tcf.filesystem.internal.columns.FileTypeLabelProvider"
+               labelProvider="org.eclipse.tcf.te.tcf.filesystem.ui.internal.columns.FileTypeLabelProvider"
                moveable="true"
                name="%column.name.type"
                resizable="true"
@@ -1826,9 +1812,9 @@
          </column>
          <column
                alignment="SWT.RIGHT"
-               comparator="org.eclipse.tcf.te.tcf.filesystem.internal.columns.ModificationTimeComparator"
+               comparator="org.eclipse.tcf.te.tcf.filesystem.ui.internal.columns.ModificationTimeComparator"
                id="modified"
-               labelProvider="org.eclipse.tcf.te.tcf.filesystem.internal.columns.ModificationTimeLabelProvider"
+               labelProvider="org.eclipse.tcf.te.tcf.filesystem.ui.internal.columns.ModificationTimeLabelProvider"
                moveable="true"
                name="%column.name.modified"
                resizable="true"
@@ -1838,9 +1824,9 @@
          </column>
          <column
                alignment="SWT.RIGHT"
-               comparator="org.eclipse.tcf.te.tcf.filesystem.internal.columns.AccessTimeComparator"
+               comparator="org.eclipse.tcf.te.tcf.filesystem.ui.internal.columns.AccessTimeComparator"
                id="accessed"
-               labelProvider="org.eclipse.tcf.te.tcf.filesystem.internal.columns.AccessTimeLabelProvider"
+               labelProvider="org.eclipse.tcf.te.tcf.filesystem.ui.internal.columns.AccessTimeLabelProvider"
                moveable="true"
                name="%column.name.accessed"
                resizable="true"
@@ -1852,7 +1838,7 @@
       
       <filterContribution viewerId="org.eclipse.tcf.te.ui.controls.viewer.fs">
          <filter
-               class="org.eclipse.tcf.te.tcf.filesystem.filters.HiddenFilesViewerFilter"
+               class="org.eclipse.tcf.te.tcf.filesystem.ui.filters.HiddenFilesViewerFilter"
                description="%filter.description.hidden"
                enabled="true"
                id="org.eclipse.tcf.te.tcf.filesystem.navigator.filter.hiddenFiles"
@@ -1861,7 +1847,7 @@
                visibleInUI="true">
          </filter>
          <filter
-               class="org.eclipse.tcf.te.tcf.filesystem.filters.SystemFilesViewerFilter"
+               class="org.eclipse.tcf.te.tcf.filesystem.ui.filters.SystemFilesViewerFilter"
                description="%filter.description.system"
                enabled="true"
                id="org.eclipse.tcf.te.tcf.filesystem.navigator.filter.systemFiles"
@@ -1880,7 +1866,7 @@
          point="org.eclipse.core.runtime.adapters">
       <factory
             adaptableType="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"
-            class="org.eclipse.tcf.te.tcf.filesystem.internal.adapters.ViewerInputAdapterFactory">
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.adapters.ViewerInputAdapterFactory">
          <adapter
                type="org.eclipse.tcf.te.core.interfaces.IViewerInput">
          </adapter>
@@ -1914,53 +1900,53 @@
       <propertySections
             contributorId="org.eclipse.tcf.te.ui">
          <propertySection
-               class="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.BasicFolderSection"
+               class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.tabbed.BasicFolderSection"
                enablesFor="1"
-               filter="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.FolderFilter"
+               filter="org.eclipse.tcf.te.tcf.filesystem.ui.internal.tabbed.FolderFilter"
                id="org.eclipse.tcf.te.tcf.filesystem.propertysection.folder.basic"
                tab="org.eclipse.tcf.te.tcf.filesystem.propertytab.general">
          </propertySection>
          <propertySection
-               class="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.BasicFileSection"
+               class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.tabbed.BasicFileSection"
                enablesFor="1"
-               filter="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.FileFilter"
+               filter="org.eclipse.tcf.te.tcf.filesystem.ui.internal.tabbed.FileFilter"
                id="org.eclipse.tcf.te.tcf.filesystem.propertysection.file.basic"
                tab="org.eclipse.tcf.te.tcf.filesystem.propertytab.general">
          </propertySection>
          <propertySection
                afterSection="org.eclipse.tcf.te.tcf.filesystem.propertysection.folder.basic,org.eclipse.tcf.te.tcf.filesystem.propertysection.file.basic"
-               class="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.WindowsAttributesSection"
+               class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.tabbed.WindowsAttributesSection"
                enablesFor="1"
-               filter="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.WindowsFilter"
+               filter="org.eclipse.tcf.te.tcf.filesystem.ui.internal.tabbed.WindowsFilter"
                id="org.eclipse.tcf.te.tcf.filesystem.propertysection.windows.attributes"
                tab="org.eclipse.tcf.te.tcf.filesystem.propertytab.general">
          </propertySection>
          <propertySection
-               class="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.LinuxPermissionsSection"
+               class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.tabbed.LinuxPermissionsSection"
                enablesFor="1"
-               filter="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.LinuxFilter"
+               filter="org.eclipse.tcf.te.tcf.filesystem.ui.internal.tabbed.LinuxFilter"
                id="org.eclipse.tcf.te.tcf.filesystem.propertysection.linux.permissions"
                tab="org.eclipse.tcf.te.tcf.filesystem.propertytab.permissions">
          </propertySection>
          <propertySection
-               class="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.WindowsFolderAISection"
+               class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.tabbed.WindowsFolderAISection"
                enablesFor="1"
-               filter="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.WindowsFolderFilter"
+               filter="org.eclipse.tcf.te.tcf.filesystem.ui.internal.tabbed.WindowsFolderFilter"
                id="org.eclipse.tcf.te.tcf.filesystem.propertysection.windows.folderAI"
                tab="org.eclipse.tcf.te.tcf.filesystem.propertytab.advanced">
          </propertySection>
          <propertySection
-               class="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.WindowsFileAISection"
+               class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.tabbed.WindowsFileAISection"
                enablesFor="1"
-               filter="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.WindowsFileFilter"
+               filter="org.eclipse.tcf.te.tcf.filesystem.ui.internal.tabbed.WindowsFileFilter"
                id="org.eclipse.tcf.te.tcf.filesystem.propertysection.windows.fileAI"
                tab="org.eclipse.tcf.te.tcf.filesystem.propertytab.advanced">
          </propertySection>
          <propertySection
                afterSection="org.eclipse.tcf.te.tcf.filesystem.propertysection.windows.folderAI,"
-               class="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.WindowsAttributesCESection"
+               class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.tabbed.WindowsAttributesCESection"
                enablesFor="1"
-               filter="org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.WindowsFilter"
+               filter="org.eclipse.tcf.te.tcf.filesystem.ui.internal.tabbed.WindowsFilter"
                id="org.eclipse.tcf.te.tcf.filesystem.propertysection.windows.attributesCE"
                tab="org.eclipse.tcf.te.tcf.filesystem.propertytab.advanced">
          </propertySection>

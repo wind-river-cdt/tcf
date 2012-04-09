@@ -16,10 +16,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.tcf.core.Tcf;
-import org.eclipse.tcf.te.tcf.filesystem.internal.callbacks.QueryDoneOpenChannel;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.callbacks.QueryDoneOpenChannel;
 import org.eclipse.tcf.te.tests.tcf.filesystem.FSPeerTestCase;
 
-@SuppressWarnings("restriction")
 public class QueryChildrenCallbackTest extends FSPeerTestCase {
 	public void testQueryChildren() throws Exception {
 		Assert.isNotNull(testRoot);

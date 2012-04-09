@@ -14,8 +14,8 @@ import java.io.File;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.dnd.DND;
-import org.eclipse.tcf.te.tcf.filesystem.internal.dnd.CommonDnD;
-import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
+import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
+import org.eclipse.tcf.te.tcf.filesystem.ui.internal.dnd.CommonDnD;
 import org.eclipse.tcf.te.tests.tcf.filesystem.operations.OperationTestBase;
 
 @SuppressWarnings("restriction")

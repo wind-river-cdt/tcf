@@ -9,7 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tests.tcf.filesystem.operations;
 
-import org.eclipse.tcf.te.tcf.filesystem.model.FSTreeNode;
+import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 
 
 public class FSCopyTests extends OperationTestBase {

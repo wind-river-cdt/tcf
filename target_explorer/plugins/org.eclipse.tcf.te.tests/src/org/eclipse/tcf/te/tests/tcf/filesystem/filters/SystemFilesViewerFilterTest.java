@@ -10,7 +10,7 @@
 package org.eclipse.tcf.te.tests.tcf.filesystem.filters;
 
 import org.eclipse.tcf.te.runtime.utils.Host;
-import org.eclipse.tcf.te.tcf.filesystem.filters.SystemFilesViewerFilter;
+import org.eclipse.tcf.te.tcf.filesystem.ui.filters.SystemFilesViewerFilter;
 import org.eclipse.tcf.te.tests.tcf.filesystem.FSPeerTestCase;
 
 public class SystemFilesViewerFilterTest extends FSPeerTestCase {

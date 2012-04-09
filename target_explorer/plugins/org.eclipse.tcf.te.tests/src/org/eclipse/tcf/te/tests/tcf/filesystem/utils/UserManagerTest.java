@@ -9,11 +9,10 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tests.tcf.filesystem.utils;
 
-import org.eclipse.tcf.te.tcf.filesystem.internal.UserAccount;
-import org.eclipse.tcf.te.tcf.filesystem.internal.utils.UserManager;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.UserAccount;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.UserManager;
 
 
-@SuppressWarnings("restriction")
 public class UserManagerTest extends UtilsTestBase {
 	public void testUserAccount() {
 		assertNotNull(peerModel);
