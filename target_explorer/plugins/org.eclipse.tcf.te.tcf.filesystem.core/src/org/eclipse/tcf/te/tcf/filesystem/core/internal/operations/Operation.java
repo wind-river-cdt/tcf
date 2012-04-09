@@ -141,7 +141,7 @@ public class Operation implements IOperation {
 	 *
 	 * @param file The file that is opened.
 	 */
-	protected void closeEditor(final File file) {
+	protected void closeEditor(File file) {
 		// TODO Adding code to close editor.
 	}
 

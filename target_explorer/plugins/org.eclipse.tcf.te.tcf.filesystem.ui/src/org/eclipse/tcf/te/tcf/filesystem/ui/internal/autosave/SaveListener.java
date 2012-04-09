@@ -18,7 +18,6 @@ import org.eclipse.core.commands.IExecutionListener;
 import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.util.SafeRunnable;
@@ -85,9 +84,9 @@ public class SaveListener implements IExecutionListener {
 				IFileStore store = EFS.getStore(uri);
 				File localFile = store.toLocalFile(0, new NullProgressMonitor());
 				if (localFile != null) {
-					dirtyNode = FSModel.getTreeNode(localFile.toString());
+					dirtyNode = FSModel.getTreeNode(localFile.getCanonicalPath());
 				}
-			}catch(CoreException e){
+			}catch(Exception e){
 			}
 		}
 	}

@@ -20,7 +20,6 @@ import org.eclipse.core.commands.IExecutionListener;
 import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.util.SafeRunnable;
@@ -112,10 +111,10 @@ public class SaveAllListener implements IExecutionListener {
 				File localFile = store.toLocalFile(0, new NullProgressMonitor());
 				if (localFile != null) {
 					// Get the file's mapped FSTreeNode.
-					FSTreeNode node = FSModel.getTreeNode(localFile.toString());
+					FSTreeNode node = FSModel.getTreeNode(localFile.getCanonicalPath());
 					return node;
 				}
-			}catch(CoreException e){}
+			}catch(Exception e){}
 		}
 		return null;
 	}
