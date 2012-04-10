@@ -73,7 +73,7 @@ public class PersistenceManager {
             public void run() throws Exception {
 				IURIPersistenceService service = ServiceManager.getInstance()
 				                .getService(IURIPersistenceService.class);
-				File location = CacheManager.getInstance().getCacheRoot();
+				File location = CacheManager.getCacheRoot();
 				File resolvedFile = new File(location, "resolved.ini");
 				resolved = new HashMap<URI, IContentType>();
 				if (resolvedFile.exists()) {
@@ -197,7 +197,7 @@ public class PersistenceManager {
 			@Override
             public void run() throws Exception {
 				IURIPersistenceService service = ServiceManager.getInstance().getService(IURIPersistenceService.class);
-				File location = CacheManager.getInstance().getCacheRoot();
+				File location = CacheManager.getCacheRoot();
 				File resolvedFile = new File(location, "resolved.ini");
 				service.write(resolved, resolvedFile.getAbsoluteFile().toURI());
 				File unresolvedFile = new File(location, "unresolved.ini");

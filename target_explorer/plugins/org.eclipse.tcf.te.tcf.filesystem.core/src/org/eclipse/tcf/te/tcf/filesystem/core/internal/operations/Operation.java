@@ -103,7 +103,7 @@ public class Operation implements IOperation {
 	 * @param node the folder node that is to be cleaned.
 	 */
 	protected void cleanUpFolder(FSTreeNode node) {
-		File file = CacheManager.getInstance().getCacheFile(node);
+		File file = CacheManager.getCacheFile(node);
 		deleteFileChecked(file);
 		FSTreeNode parent = node.parent;
 		if (parent != null) {
@@ -140,7 +140,7 @@ public class Operation implements IOperation {
 	 * @param node the file node that is to be cleaned.
 	 */
 	protected void cleanUpFile(FSTreeNode node) {
-		final File file = CacheManager.getInstance().getCacheFile(node);
+		final File file = CacheManager.getCacheFile(node);
 		deleteFileChecked(file);
 		PersistenceManager.getInstance().removeBaseTimestamp(node.getLocationURI());
 		FSTreeNode parent = node.parent;

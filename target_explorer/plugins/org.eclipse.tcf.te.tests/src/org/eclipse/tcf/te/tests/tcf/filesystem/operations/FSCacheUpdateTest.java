@@ -47,7 +47,7 @@ public class FSCacheUpdateTest extends OperationTestBase {
 	
 	public void testUpdate() throws Exception {
 		updateCache(testFile);
-		File file = CacheManager.getInstance().getCacheFile(testFile);
+		File file = CacheManager.getCacheFile(testFile);
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 		String content=""; //$NON-NLS-1$
 		String line;

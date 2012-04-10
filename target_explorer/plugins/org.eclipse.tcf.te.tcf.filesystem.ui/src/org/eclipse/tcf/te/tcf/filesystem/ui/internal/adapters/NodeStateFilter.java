@@ -46,7 +46,7 @@ public class NodeStateFilter implements IActionFilter {
 		if (name.equals("cache.state") && node.isFile()) { //$NON-NLS-1$
 			if(UIPlugin.isAutoSaving())
 				return false;
-			CacheState state = StateManager.getInstance().getCacheState(node);
+			CacheState state = StateManager.getCacheState(node);
 			if (value == null)
 				value = CacheState.consistent.name();
 			return value.equals(state.name());

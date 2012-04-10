@@ -70,7 +70,7 @@ public class SaveAllListener implements IExecutionListener {
 					@Override
                     public void run() throws Exception {
 						for (FSTreeNode dirtyNode : fDirtyNodes) {
-							StateManager.getInstance().refreshState(dirtyNode);
+							StateManager.refreshState(dirtyNode);
 						}
                     }});
 			}

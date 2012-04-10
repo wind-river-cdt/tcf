@@ -99,7 +99,7 @@ public class OpRename extends Operation {
 					errors[0] = new TCFFileSystemException(message, error);
 				}
 				else {
-					final File file = CacheManager.getInstance().getCacheFile(node);
+					final File file = CacheManager.getCacheFile(node);
 					if (node.isFile() && file.exists()) {
 						PersistenceManager.getInstance().removeBaseTimestamp(node.getLocationURI());
 					}

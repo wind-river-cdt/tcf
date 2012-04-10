@@ -31,25 +31,6 @@ import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 public class ContentTypeHelper {
 	// The binary content type's id.
 	private static final String CONTENT_TYPE_BINARY_ID = "org.eclipse.cdt.core.binaryFile"; //$NON-NLS-1$
-	// The singleton of the content type helper.
-	private static volatile ContentTypeHelper instance;
-
-	/**
-	 * Get the singleton instance of the content type helper.
-	 *
-	 * @return The singleton instance of the content type helper.
-	 */
-	public static ContentTypeHelper getInstance() {
-		if (instance == null) {
-			instance = new ContentTypeHelper();
-		}
-		return instance;
-	}
-	
-	/**
-	 * Hide the constructor.
-	 */
-	private ContentTypeHelper(){}
 
 	/**
 	 * Judges if the node is a binary file.
@@ -58,7 +39,7 @@ public class ContentTypeHelper {
 	 *            The file node.
 	 * @return true if the node is a binary file or else false.
 	 */
-	public boolean isBinaryFile(FSTreeNode node) {
+	public static boolean isBinaryFile(FSTreeNode node) {
 		IContentType contentType = getContentType(node);
 		if (contentType != null) {
 			IContentType binaryFile = Platform.getContentTypeManager()
@@ -76,7 +57,7 @@ public class ContentTypeHelper {
 	 *            The file node.
 	 * @return The content type of the file node.
 	 */
-	public IContentType getContentType(FSTreeNode node) {
+	public static IContentType getContentType(FSTreeNode node) {
 		if (PersistenceManager.getInstance().isUnresovled(node))
 			// If it is already known unresolvable.
 			return null;
@@ -112,13 +93,13 @@ public class ContentTypeHelper {
 	 * @throws IOException
 	 *             If something goes wrong during the content type parsing.
 	 */
-	private IContentType findContentTypeByStream(FSTreeNode node) throws CoreException, IOException {
+	private static IContentType findContentTypeByStream(FSTreeNode node) throws CoreException, IOException {
 		InputStream is = null;
 		try {
-			File file = CacheManager.getInstance().getCacheFile(node);
+			File file = CacheManager.getCacheFile(node);
 			if (file.exists()) {
 				// If the local cache file exits.
-				IPath path = CacheManager.getInstance().getCachePath(node);
+				IPath path = CacheManager.getCachePath(node);
 				IFileStore fileStore = EFS.getLocalFileSystem().getStore(path);
 				is = fileStore.openInputStream(EFS.NONE, null);
 			} else {

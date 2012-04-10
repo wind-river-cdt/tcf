@@ -34,7 +34,7 @@ public class CacheFileImageUpdater implements ImageUpdateAdapter {
 	 */
 	@Override
 	public File getMirrorFile(FSTreeNode node) {
-	    return CacheManager.getInstance().getCacheFile(node);
+	    return CacheManager.getCacheFile(node);
     }
 
 	/*
@@ -43,10 +43,10 @@ public class CacheFileImageUpdater implements ImageUpdateAdapter {
 	 */
 	@Override
 	public File getImageFile(FSTreeNode node) {
-		File cacheFile = CacheManager.getInstance().getCacheFile(node);
+		File cacheFile = CacheManager.getCacheFile(node);
 		File parentDir = cacheFile.getParentFile();
 		if (!parentDir.exists() && !parentDir.mkdirs()) {
-			parentDir = CacheManager.getInstance().getCacheRoot();
+			parentDir = CacheManager.getCacheRoot();
 		}
 		return new File(parentDir, node.name + ".png"); //$NON-NLS-1$
 	}

@@ -228,7 +228,7 @@ public class OpenWithMenu extends ContributionItem {
 		}
 
 		IContentType contentType = null;
-		contentType = ContentTypeHelper.getInstance().getContentType(node);
+		contentType = ContentTypeHelper.getContentType(node);
 		// Try lookup with filename
 		return registry.getDefaultEditor(node.name, contentType);
 	}
@@ -243,8 +243,7 @@ public class OpenWithMenu extends ContributionItem {
 		IEditorDescriptor defaultEditor = registry.findEditor(DEFAULT_TEXT_EDITOR);
 		IEditorDescriptor preferredEditor = getDefaultEditor();
 
-		IEditorDescriptor[] editors = registry.getEditors(node.name, ContentTypeHelper
-		                .getInstance().getContentType(node));
+		IEditorDescriptor[] editors = registry.getEditors(node.name, ContentTypeHelper.getContentType(node));
 		Collections.sort(Arrays.asList(editors), comparer);
 
 		boolean defaultFound = false;
@@ -376,7 +375,7 @@ public class OpenWithMenu extends ContributionItem {
 	 * @param openUsingDescriptor If an external editor should be used to open the node.
 	 */
 	protected void syncOpen(IEditorDescriptor editorDescriptor, boolean openUsingDescriptor) {
-		File file = CacheManager.getInstance().getCacheFile(node);
+		File file = CacheManager.getCacheFile(node);
 		if (!file.exists()) {
 			// If the file node's local cache does not exist yet, download it.
 			IOpExecutor executor = new UiExecutor();
@@ -397,7 +396,7 @@ public class OpenWithMenu extends ContributionItem {
 	 */
 	private void openInEditor(IEditorDescriptor editorDescriptor, boolean openUsingDescriptor) {
 		try {
-			IPath path = CacheManager.getInstance().getCachePath(node);
+			IPath path = CacheManager.getCachePath(node);
 			IFileStore fileStore = EFS.getLocalFileSystem().getStore(path);
 			FileStoreEditorInput input = new FileStoreEditorInput(fileStore);
 			if (openUsingDescriptor) {

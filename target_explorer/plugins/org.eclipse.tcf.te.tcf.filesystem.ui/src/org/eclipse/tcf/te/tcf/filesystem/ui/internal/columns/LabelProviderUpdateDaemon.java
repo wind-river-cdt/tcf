@@ -121,7 +121,7 @@ public class LabelProviderUpdateDaemon extends Thread {
 	 * @return an image update adapter, either cache based or extension based.
 	 */
 	private ImageUpdateAdapter getUpdateAdapter(FSTreeNode node) {
-		File cacheFile = CacheManager.getInstance().getCacheFile(node);
+		File cacheFile = CacheManager.getCacheFile(node);
 		if (cacheFile.exists()) {
 			return cacheAdapter;
 		}
@@ -215,7 +215,7 @@ public class LabelProviderUpdateDaemon extends Thread {
 	 * @return
 	 */
 	protected File getTempDir() {
-		File cacheRoot = CacheManager.getInstance().getCacheRoot();
+		File cacheRoot = CacheManager.getCacheRoot();
 		File tempDir = new File(cacheRoot, ".tmp"); //$NON-NLS-1$
 		if (!tempDir.exists() && !tempDir.mkdirs()) {
 			tempDir = cacheRoot;

@@ -43,7 +43,7 @@ public class OpCacheUpdate extends OpDownload {
 	public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 		for (FSTreeNode node : srcNodes) {
 			// Write the data to its local cache file.
-			File file = CacheManager.getInstance().getCachePath(node).toFile();
+			File file = CacheManager.getCachePath(node).toFile();
 			if (file.exists() && !file.canWrite()) {
 				// If the file exists and is read-only, delete it.
 				deleteFileChecked(file);
@@ -61,14 +61,14 @@ public class OpCacheUpdate extends OpDownload {
 					@Override
 					public void run() throws Exception {
 						for (FSTreeNode node : srcNodes) {
-							File file = CacheManager.getInstance().getCachePath(node).toFile();
+							File file = CacheManager.getCachePath(node).toFile();
 							if (file.exists()) {
 								// If downloading is successful, update the attributes of the file and
 								// set the last modified time to that of its corresponding file.
 								PersistenceManager.getInstance().setBaseTimestamp(node.getLocationURI(), node.attr.mtime);
 								setLastModifiedChecked(file, node.attr.mtime);
 								if (!node.isWritable()) setReadOnlyChecked(file);
-								StateManager.getInstance().refreshState(node);
+								StateManager.refreshState(node);
 							}
 						}
 					}

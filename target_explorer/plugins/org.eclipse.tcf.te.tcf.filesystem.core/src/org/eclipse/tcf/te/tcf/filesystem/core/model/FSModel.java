@@ -99,7 +99,7 @@ public final class FSModel {
 	 */
 	@SuppressWarnings("unchecked")
     public static FSTreeNode getTreeNode(String filePath) {
-		String cache_root = CacheManager.getInstance().getCacheRoot().getAbsolutePath();
+		String cache_root = CacheManager.getCacheRoot().getAbsolutePath();
 		if (filePath.startsWith(cache_root)) {
 			filePath = filePath.substring(cache_root.length() + 1);
 			int slash = filePath.indexOf(File.separator);

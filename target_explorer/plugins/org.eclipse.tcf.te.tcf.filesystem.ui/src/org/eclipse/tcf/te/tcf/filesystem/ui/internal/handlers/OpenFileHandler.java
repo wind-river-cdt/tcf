@@ -49,7 +49,7 @@ public class OpenFileHandler extends AbstractHandler {
 		IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getCurrentSelectionChecked(event);
 		final FSTreeNode node = (FSTreeNode) selection.getFirstElement();
 		IWorkbenchPage page = HandlerUtil.getActiveSite(event).getPage();
-		if (ContentTypeHelper.getInstance().isBinaryFile(node)) {
+		if (ContentTypeHelper.isBinaryFile(node)) {
 			// If the file is a binary file.
 			Shell parent = HandlerUtil.getActiveShell(event);
 			MessageDialog.openWarning(parent, Messages.OpenFileHandler_Warning,
@@ -72,7 +72,7 @@ public class OpenFileHandler extends AbstractHandler {
 	 *            The workbench page in which the editor is opened.
 	 */
 	private void openFile(FSTreeNode node, IWorkbenchPage page) {
-		File file = CacheManager.getInstance().getCacheFile(node);
+		File file = CacheManager.getCacheFile(node);
 		if (!file.exists()) {
 			// If the file node's local cache does not exist yet, download it.
 			IOpExecutor executor = new UiExecutor();
@@ -97,7 +97,7 @@ public class OpenFileHandler extends AbstractHandler {
 		display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				IPath path = CacheManager.getInstance().getCachePath(node);
+				IPath path = CacheManager.getCachePath(node);
 				IFileStore fileStore = EFS.getLocalFileSystem().getStore(path);
 				String editorID = PersistenceManager.getInstance().getPersistentProperties(node).get(IDE.EDITOR_KEY);
 				try {

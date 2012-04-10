@@ -17,20 +17,20 @@ import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.CacheManager;
 public class CacheManagerTest extends UtilsTestBase {
 
 	public void testCachePath() throws Exception {
-		IPath path = CacheManager.getInstance().getCachePath(test11File);
+		IPath path = CacheManager.getCachePath(test11File);
 		File file = path.toFile();
 		String abspath = file.getAbsolutePath();
 		assertNotNull(abspath);
 	}
 
 	public void testCacheFile() throws Exception {
-		File file = CacheManager.getInstance().getCacheFile(test11File);
+		File file = CacheManager.getCacheFile(test11File);
 		String abspath = file.getAbsolutePath();
 		assertNotNull(abspath);
 	}
 
 	public void testCacheRoot() throws Exception {
-		File file = CacheManager.getInstance().getCacheRoot();
+		File file = CacheManager.getCacheRoot();
 		String abspath = file.getAbsolutePath();
 		assertNotNull(abspath);
 	}

@@ -29,27 +29,6 @@ import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
 public class CacheManager {
 	public static final char PATH_ESCAPE_CHAR = '$';
 
-	// The singleton instance.
-	private static volatile CacheManager instance;
-
-	/**
-	 * Get the singleton cache manager.
-	 *
-	 * @return The singleton cache manager.
-	 */
-	public static CacheManager getInstance() {
-		if (instance == null) {
-			instance = new CacheManager();
-		}
-		return instance;
-	}
-
-	/**
-	 * Create a cache manager.
-	 */
-	private CacheManager() {
-	}
-
 	/**
 	 * Get the local path of a node's cached file.
 	 * <p>
@@ -63,7 +42,7 @@ public class CacheManager {
 	 *            The file/folder node.
 	 * @return The local path of the node's cached file.
 	 */
-	public IPath getCachePath(FSTreeNode node) {
+	public static IPath getCachePath(FSTreeNode node) {
         File location = getCacheRoot();
 		String agentId = node.peerNode.getPeerId();
 		// Use Math.abs to avoid negative hash value.
@@ -80,7 +59,7 @@ public class CacheManager {
 	 *  
 	 * @param file The file to be deleted.
 	 */
-	void mkdirChecked(final File dir) {
+	static void mkdirChecked(final File dir) {
 		if(!dir.exists()) {
 			SafeRunner.run(new ISafeRunnable(){
 				@Override
@@ -103,7 +82,7 @@ public class CacheManager {
 	 * 
 	 * @param file The file to be deleted.
 	 */
-	void deleteFileChecked(final File file) {
+	static void deleteFileChecked(final File file) {
 		if (file.exists()) {
 			SafeRunner.run(new ISafeRunnable(){
 				@Override
@@ -127,7 +106,7 @@ public class CacheManager {
 	 * @param file The file to be set.
 	 * @param lastModified the last modified time.
 	 */
-	void setLastModifiedChecked(final File file, final long lastModified) {
+	static void setLastModifiedChecked(final File file, final long lastModified) {
 		if (file.exists()) {
 			SafeRunner.run(new ISafeRunnable(){
 				@Override
@@ -149,7 +128,7 @@ public class CacheManager {
 	 * 
 	 * @param file The file to be set.
 	 */
-	void setReadOnlyChecked(final File file) {
+	static void setReadOnlyChecked(final File file) {
 		if (file.exists()) {
 			SafeRunner.run(new ISafeRunnable(){
 				@Override
@@ -180,7 +159,7 @@ public class CacheManager {
 	 *            The file/folder node.
 	 * @return The file object of the node's local cache.
 	 */
-	public File getCacheFile(FSTreeNode node){
+	public static File getCacheFile(FSTreeNode node){
 		return getCachePath(node).toFile();
 	}
 
@@ -190,7 +169,7 @@ public class CacheManager {
 	 *
 	 * @return The root folder's location of the cache file system.
 	 */
-	public File getCacheRoot() {
+	public static File getCacheRoot() {
 		File location;
         try {
         	location = CorePlugin.getDefault().getStateLocation().toFile();
@@ -214,7 +193,7 @@ public class CacheManager {
 	 *            The file/folder node.
 	 * @return The path to the node.
 	 */
-	private IPath appendNodePath(IPath path, FSTreeNode node) {
+	private static IPath appendNodePath(IPath path, FSTreeNode node) {
 		if (!node.isRoot() && node.parent!=null) {
 			path = appendNodePath(path, node.parent);
 			return appendPathSegment(node, path, node.name);
@@ -237,7 +216,7 @@ public class CacheManager {
 	 * @param name The segment's name.
 	 * @return The path with the segment "name" appended.
 	 */
-	private IPath appendPathSegment(FSTreeNode node, IPath path, String name) {
+	private static IPath appendPathSegment(FSTreeNode node, IPath path, String name) {
 		IPath newPath = path.append(name);
 		File newFile = newPath.toFile();
 		if (node.isDirectory()) {

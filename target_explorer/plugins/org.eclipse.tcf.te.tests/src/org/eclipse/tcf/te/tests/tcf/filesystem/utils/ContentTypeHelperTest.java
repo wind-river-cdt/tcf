@@ -79,7 +79,7 @@ public class ContentTypeHelperTest extends UtilsTestBase {
 	
 	public void testBinaryFile() {
 		printMessage("The agent's location is: "+agentNode.getLocation()); //$NON-NLS-1$
-		IContentType contentType = ContentTypeHelper.getInstance().getContentType(agentNode);
+		IContentType contentType = ContentTypeHelper.getContentType(agentNode);
 		if (contentType != null) {
 			IContentType binaryFile = Platform.getContentTypeManager().getContentType("org.eclipse.cdt.core.binaryFile"); //$NON-NLS-1$
 			if (binaryFile != null) {
@@ -100,7 +100,7 @@ public class ContentTypeHelperTest extends UtilsTestBase {
 	}
 	
 	public void testContentType() {
-		IContentType contentType = ContentTypeHelper.getInstance().getContentType(testFile);
+		IContentType contentType = ContentTypeHelper.getContentType(testFile);
 		assertEquals("Text", contentType.getName()); //$NON-NLS-1$
 	}
 }

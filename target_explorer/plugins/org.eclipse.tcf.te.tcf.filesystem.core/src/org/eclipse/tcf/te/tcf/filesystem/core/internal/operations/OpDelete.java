@@ -163,7 +163,7 @@ public class OpDelete extends Operation {
                 }
 				@Override
 				public void run() throws Exception {
-					StateManager.getInstance().setFileAttrs(node, clone.attr);
+					StateManager.setFileAttrs(node, clone.attr);
 				}
 			});
 		}

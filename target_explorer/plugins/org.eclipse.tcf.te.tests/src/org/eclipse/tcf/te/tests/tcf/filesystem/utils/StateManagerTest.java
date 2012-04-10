@@ -17,11 +17,11 @@ public class StateManagerTest extends UtilsTestBase {
 	@Override
     protected void setUp() throws Exception {
 	    super.setUp();
-	    StateManager.getInstance().refreshState(testFile);
+	    StateManager.refreshState(testFile);
     }
 
 	public void testCacheState() {
-		CacheState cacheState = StateManager.getInstance().getCacheState(testFile);
+		CacheState cacheState = StateManager.getCacheState(testFile);
 		assertEquals(CacheState.consistent, cacheState);
 	}
 }

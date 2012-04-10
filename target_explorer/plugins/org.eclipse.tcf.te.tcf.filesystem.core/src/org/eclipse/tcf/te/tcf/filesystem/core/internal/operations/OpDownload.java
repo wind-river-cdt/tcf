@@ -67,7 +67,7 @@ public class OpDownload extends OpStreamOp {
 		this.srcNodes = srcNodes;
 		this.dstFiles = new File[srcNodes.length];
 		for (int i = 0; i < srcNodes.length; i++) {
-			this.dstFiles[i] = CacheManager.getInstance().getCacheFile(srcNodes[i]);
+			this.dstFiles[i] = CacheManager.getCacheFile(srcNodes[i]);
 		}
 	}
 

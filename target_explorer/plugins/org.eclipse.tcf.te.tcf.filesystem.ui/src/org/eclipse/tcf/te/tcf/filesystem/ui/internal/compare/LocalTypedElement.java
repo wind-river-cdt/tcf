@@ -110,7 +110,7 @@ public class LocalTypedElement extends MergeTypedElement implements
 	@Override
 	protected InputStream createStream() throws CoreException {
 		try {
-			IPath cachePath = CacheManager.getInstance().getCachePath(node);
+			IPath cachePath = CacheManager.getCachePath(node);
 			File cacheFile = cachePath.toFile();
 			return new BufferedInputStream(new FileInputStream(cacheFile));
 		} catch (FileNotFoundException e) {
@@ -194,7 +194,7 @@ public class LocalTypedElement extends MergeTypedElement implements
 	 */
 	@Override
 	public String toString() {
-		File cacheFile = CacheManager.getInstance().getCacheFile(node);
+		File cacheFile = CacheManager.getCacheFile(node);
 		return cacheFile.toString();
 	}
 
@@ -250,7 +250,7 @@ public class LocalTypedElement extends MergeTypedElement implements
 	 * @return The editor input.
 	 */
 	public IEditorInput getEditorInput() {
-		IPath path = CacheManager.getInstance().getCachePath(node);
+		IPath path = CacheManager.getCachePath(node);
 		IFileStore fileStore = EFS.getLocalFileSystem().getStore(path);
 		return new FileStoreEditorInput(fileStore);
 	}
@@ -262,7 +262,7 @@ public class LocalTypedElement extends MergeTypedElement implements
 	 *            The monitor that reports the progress.
 	 */
 	public void store2Cache(IProgressMonitor monitor) throws CoreException {
-		File cacheFile = CacheManager.getInstance().getCacheFile(node);
+		File cacheFile = CacheManager.getCacheFile(node);
 		monitor.beginTask(Messages.LocalTypedElement_SavingFile + cacheFile.getName(), 100);
 		InputStream is = getContents();
 		BufferedOutputStream bos = null;

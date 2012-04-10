@@ -77,7 +77,7 @@ public class FSTreeNodePropertyTester extends PropertyTester {
 		} else if (property.equals("isDirectory")) { //$NON-NLS-1$
 			return node.isDirectory();
 		} else if (property.equals("isBinaryFile")) { //$NON-NLS-1$
-			return ContentTypeHelper.getInstance().isBinaryFile(node);
+			return ContentTypeHelper.isBinaryFile(node);
 		} else if (property.equals("isReadable")){ //$NON-NLS-1$
 			return node.isReadable();
 		} else if (property.equals("isWritable")){ //$NON-NLS-1$
@@ -97,10 +97,10 @@ public class FSTreeNodePropertyTester extends PropertyTester {
 		} else if (property.equals("testParent")) { //$NON-NLS-1$
 			return testParent(node, args, expectedValue);
 		} else if (property.equals("getCacheState")){ //$NON-NLS-1$
-			File file = CacheManager.getInstance().getCacheFile(node);
+			File file = CacheManager.getCacheFile(node);
 			if(!file.exists())
 				return false;
-			CacheState state = StateManager.getInstance().getCacheState(node);
+			CacheState state = StateManager.getCacheState(node);
 			return state.name().equals(expectedValue);
 		}
 		return false;

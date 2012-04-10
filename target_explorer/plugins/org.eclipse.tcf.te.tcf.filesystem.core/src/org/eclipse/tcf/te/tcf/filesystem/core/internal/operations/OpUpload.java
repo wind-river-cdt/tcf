@@ -100,7 +100,7 @@ public class OpUpload extends OpStreamOp {
 		srcFiles = new File[nodes.length];
 		dstURLs = new URL[nodes.length];
 		for (int i = 0; i < nodes.length; i++) {
-			srcFiles[i] = CacheManager.getInstance().getCacheFile(nodes[i]);
+			srcFiles[i] = CacheManager.getCacheFile(nodes[i]);
 			dstURLs[i] = nodes[i].getLocationURL();
 		}
 	}

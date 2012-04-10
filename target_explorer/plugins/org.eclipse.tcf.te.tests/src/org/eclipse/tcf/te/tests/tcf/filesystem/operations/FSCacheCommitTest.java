@@ -24,7 +24,7 @@ public class FSCacheCommitTest extends OperationTestBase {
 	@Override
     protected void setUp() throws Exception {
 	    super.setUp();
-		File file = CacheManager.getInstance().getCacheFile(testFile);
+		File file = CacheManager.getCacheFile(testFile);
 		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 		writer.write("Hello, world, this is called from client!"); //$NON-NLS-1$
 		writer.close();

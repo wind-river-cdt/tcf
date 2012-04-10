@@ -59,7 +59,7 @@ public class RefreshHandlerDelegate implements IRefreshHandlerDelegate {
 			else if (node.isFile() && !UIPlugin.isAutoSaving()) {
 				IStatus status = Status.OK_STATUS;
 				try {
-					StateManager.getInstance().refreshState(node);
+					StateManager.refreshState(node);
 				}
 				catch (TCFException e) {
 					status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), Messages.StateManager_RefreshFailureTitle, e);

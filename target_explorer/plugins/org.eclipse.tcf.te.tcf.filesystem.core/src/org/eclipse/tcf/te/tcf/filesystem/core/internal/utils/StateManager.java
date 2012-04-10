@@ -35,34 +35,13 @@ import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
  */
 public class StateManager {
 
-	// The singleton instance.
-	private static volatile StateManager instance;
-
-	/**
-	 * Get the singleton user manager.
-	 *
-	 * @return The singleton cache manager.
-	 */
-	public static StateManager getInstance() {
-		if (instance == null) {
-			instance = new StateManager();
-		}
-		return instance;
-	}
-
-	/**
-	 * Create a StateManager fInstance.
-	 */
-	private StateManager() {
-	}
-
 	/**
 	 * Refresh the state of the specified node.
 	 *
 	 * @param node The tree node whose state is going to be refreshed.
 	 * @throws TCFException
 	 */
-	public void refreshState(final FSTreeNode node) throws TCFException {
+	public static void refreshState(final FSTreeNode node) throws TCFException {
 		IChannel channel = null;
 		try {
 			channel = Operation.openChannel(node.peerNode.getPeer());
@@ -102,7 +81,7 @@ public class StateManager {
 	 * @param attrs The new file attributes.
 	 * @throws TCFException
 	 */
-	public void setFileAttrs(final FSTreeNode node, final IFileSystem.FileAttrs attrs) throws TCFException {
+	public static void setFileAttrs(final FSTreeNode node, final IFileSystem.FileAttrs attrs) throws TCFException {
 	    IChannel channel = null;
 		try {
 			channel = Operation.openChannel(node.peerNode.getPeer());
@@ -141,7 +120,7 @@ public class StateManager {
 	 * @param node The tree node whose file attribute is to committed.
 	 * @param attr The new file attribute.
 	 */
-	void commitNodeAttr(FSTreeNode node, FileAttrs attr){
+	static void commitNodeAttr(FSTreeNode node, FileAttrs attr){
 		node.setAttributes(attr);
 		PersistenceManager.getInstance().setBaseTimestamp(node.getLocationURI(), attr.mtime);
 	}
@@ -153,8 +132,8 @@ public class StateManager {
 	 * @param node The tree node whose local file state is going to retrieved.
 	 * @return The tree node's latest cache state.
 	 */
-	public CacheState getCacheState(FSTreeNode node) {
-		File file = CacheManager.getInstance().getCacheFile(node);
+	public static CacheState getCacheState(FSTreeNode node) {
+		File file = CacheManager.getCacheFile(node);
 		if(!file.exists())
 			return CacheState.consistent;
 		long ltime = file.lastModified();
@@ -180,7 +159,7 @@ public class StateManager {
 	 * @param btime The base timestamp cached.
 	 * @return true if they are equal in minute precision.
 	 */
-	private boolean isUnchanged(long mtime, long btime){
+	private static boolean isUnchanged(long mtime, long btime){
 		long msecond = mtime/1000;
 		long bsecond = btime/1000;
 		return msecond == bsecond;
