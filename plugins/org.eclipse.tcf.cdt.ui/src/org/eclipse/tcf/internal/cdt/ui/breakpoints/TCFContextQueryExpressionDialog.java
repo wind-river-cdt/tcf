@@ -55,7 +55,7 @@ public class TCFContextQueryExpressionDialog extends SelectionDialog {
                }
                int startOfVal = expression.indexOf ('=', indexExpr);
                if (startOfVal != -1) {
-                   startOfVal += 1;                   
+                   startOfVal += 1;
                    int endOfVal = -1;
                    if (startOfVal != 0) {
                        endOfVal = expression.indexOf (',', startOfVal);
@@ -198,7 +198,7 @@ public class TCFContextQueryExpressionDialog extends SelectionDialog {
 
        return true;
    }
-   
+
    public final class CellEditorListener implements ICellEditorListener {
        private ValueCellEditor fcellEditor;
        public CellEditorListener(ValueCellEditor cellEditor) {

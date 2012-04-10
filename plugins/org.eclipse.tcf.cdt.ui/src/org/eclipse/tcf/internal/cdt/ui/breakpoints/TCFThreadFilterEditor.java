@@ -395,7 +395,7 @@ public class TCFThreadFilterEditor {
             String failPattern = new String("[=,\\s]");
             int equalsIndex = expression.indexOf('=', fromIndex);
             int commaIndex = expression.indexOf(',', fromIndex);
-            int nextEqualsIndex = expression.indexOf('=',equalsIndex+1);            
+            int nextEqualsIndex = expression.indexOf('=',equalsIndex+1);
             if (commaIndex == lastIndex-1 || equalsIndex == -1 || equalsIndex == lastIndex-1) {
                 return true;
             }
