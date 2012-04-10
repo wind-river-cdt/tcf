@@ -9,6 +9,13 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tests.tcf.filesystem.utils;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpCacheUpdate;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.CacheManager;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.StateManager;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.CacheState;
 
@@ -17,11 +24,47 @@ public class StateManagerTest extends UtilsTestBase {
 	@Override
     protected void setUp() throws Exception {
 	    super.setUp();
-	    StateManager.refreshState(testFile);
+	    OpCacheUpdate update = new OpCacheUpdate(testFile);
+	    update.run(new NullProgressMonitor());
     }
 
-	public void testCacheState() {
+	public void testCacheStateConsistent() throws Exception {
+	    OpCacheUpdate update = new OpCacheUpdate(testFile);
+	    update.run(new NullProgressMonitor());
 		CacheState cacheState = StateManager.getCacheState(testFile);
 		assertEquals(CacheState.consistent, cacheState);
+	}
+	
+	public void testCacheStateModified() throws Exception {
+	    OpCacheUpdate update = new OpCacheUpdate(testFile);
+	    update.run(new NullProgressMonitor());
+	    File file = CacheManager.getCacheFile(testFile);
+	    BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+	    writer.write("hello, world"); //$NON-NLS-1$
+	    writer.close();
+		CacheState cacheState = StateManager.getCacheState(testFile);
+	    assertEquals(CacheState.modified, cacheState);
+	}
+	
+	public void testCacheStateOutdated() throws Exception {
+	    OpCacheUpdate update = new OpCacheUpdate(testFile);
+	    update.run(new NullProgressMonitor());
+		writeFileContent("hello,world!"); //$NON-NLS-1$
+	    StateManager.refreshState(testFile);
+		CacheState cacheState = StateManager.getCacheState(testFile);
+		assertEquals(CacheState.outdated, cacheState);
+	}
+	
+	public void testCacheStateConflict() throws Exception {
+	    OpCacheUpdate update = new OpCacheUpdate(testFile);
+	    update.run(new NullProgressMonitor());
+		writeFileContent("hello,world!"); //$NON-NLS-1$
+	    StateManager.refreshState(testFile);
+	    File file = CacheManager.getCacheFile(testFile);
+	    BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+	    writer.write("hello, world"); //$NON-NLS-1$
+	    writer.close();
+		CacheState cacheState = StateManager.getCacheState(testFile);
+		assertEquals(CacheState.conflict, cacheState);
 	}
 }
