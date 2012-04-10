@@ -388,42 +388,31 @@ public class TCFThreadFilterEditor {
         return result;
     }
 
-    boolean missingParameterValue(String expression) {
+    boolean missingParameterValue(String expression, int fromIndex) {
         boolean result = false;
         int lastIndex = expression.length();
-        int fromIndex = 0;
-        if (lastIndex != 0) {
-            fromIndex = expression.indexOf('=', fromIndex);
-            if (fromIndex == -1) {
-                result = true;
+        if (lastIndex != 0 && fromIndex <= lastIndex) {
+            String failPattern = new String("[=,\\s]");
+            int equalsIndex = expression.indexOf('=', fromIndex);
+            int commaIndex = expression.indexOf(',', fromIndex);
+            int nextEqualsIndex = expression.indexOf('=',equalsIndex+1);            
+            if (commaIndex == lastIndex-1 || equalsIndex == -1 || equalsIndex == lastIndex-1) {
+                return true;
             }
-            else {
-                fromIndex = 0;
+            String testChar = expression.substring(equalsIndex-1, equalsIndex);
+            String testNextChar = expression.substring(equalsIndex+1,equalsIndex+2);
+            if (testChar.matches(failPattern) || testNextChar.matches(failPattern) ||
+                    (commaIndex != -1 && commaIndex < equalsIndex) ||
+                    (nextEqualsIndex != -1 && (commaIndex == -1 || nextEqualsIndex < commaIndex))) {
+                return true;
             }
-            while (fromIndex != -1) {
-                fromIndex = expression.indexOf('=', fromIndex);
-                if (fromIndex != -1) {
-                    if (fromIndex == 0 || fromIndex == lastIndex-1) {
-                        result = true;
-                        break;
-                    }
-                    else {
-                        String testChar = expression.substring(fromIndex-1, fromIndex);
-                        String testNextChar = expression.substring(fromIndex+1,fromIndex+2);
-                        int foundComma = expression.indexOf(',', fromIndex);
-                        if (testChar.matches("[,\\s]") || testNextChar.matches("[,\\s]")) {
-                            result = true;
-                            break;
-                        }
-                        else if (foundComma != -1 && expression.indexOf('=', fromIndex) != -1) {
-                            result = true;
-                        }
-                        else {
-                            result = false;
-                        }
-                        fromIndex++;
-                    }
+            if (commaIndex!=-1) {
+                testChar = expression.substring(commaIndex-1, commaIndex);
+                testNextChar = expression.substring(commaIndex+1,commaIndex+2);
+                if (testChar.matches(failPattern) || testNextChar.matches(failPattern)) {
+                    return true;
                 }
+                result = missingParameterValue(expression, commaIndex+1);
             }
         }
         return result;
@@ -432,7 +421,7 @@ public class TCFThreadFilterEditor {
     private class ExpressionModifier implements ModifyListener {
         public void modifyText(ModifyEvent e) {
             String expression = scopeExprCombo.getText();
-            if (missingParameterValue(expression)) {
+            if (missingParameterValue(expression, 0)) {
                 scopeExpressionDecoration.show();
                 fPage.setErrorMessage(Messages.TCFThreadFilterEditorFormatError);
                 fPage.setValid(false);

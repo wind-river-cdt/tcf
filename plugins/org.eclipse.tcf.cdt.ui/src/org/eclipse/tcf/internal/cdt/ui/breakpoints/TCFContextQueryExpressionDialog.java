@@ -29,7 +29,8 @@ import org.eclipse.ui.dialogs.SelectionDialog;
 public class TCFContextQueryExpressionDialog extends SelectionDialog {
 
     private String expression;
-    private String[] attributeList;
+    final private String originalExpression;
+    final private String[] attributeList;
     private ParameterDataModel[] parameterData;
     final String[] columnNames = new String[] {"Parameter","Value"};
 
@@ -37,6 +38,7 @@ public class TCFContextQueryExpressionDialog extends SelectionDialog {
         super(parentShell);
         setShellStyle(getShellStyle() | SWT.RESIZE);
         expression = initialExpression;
+        originalExpression = initialExpression;
         attributeList = attributes;
     }
 
@@ -51,15 +53,18 @@ public class TCFContextQueryExpressionDialog extends SelectionDialog {
                        return getParameterInitialValue(comparator,indexExpr+1);
                    }
                }
-               int startOfVal = expression.indexOf ('=', indexExpr) + 1;
-               int endOfVal = -1;
-               if (startOfVal != 0) {
-                   endOfVal = expression.indexOf (',', startOfVal);
-                   if (endOfVal == -1) {
-                       endOfVal = expression.length();
+               int startOfVal = expression.indexOf ('=', indexExpr);
+               if (startOfVal != -1) {
+                   startOfVal += 1;                   
+                   int endOfVal = -1;
+                   if (startOfVal != 0) {
+                       endOfVal = expression.indexOf (',', startOfVal);
+                       if (endOfVal == -1) {
+                           endOfVal = expression.length();
+                       }
                    }
+                   return expression.substring(startOfVal, endOfVal);
                }
-               return expression.substring(startOfVal, endOfVal);
            }
        }
        return null;
@@ -167,6 +172,33 @@ public class TCFContextQueryExpressionDialog extends SelectionDialog {
        return indexExpr;
    }
 
+   private boolean replaceParameter(String parameter, String replaceString, int index) {
+       if (index != 0) {
+           String testChar = expression.substring(index+parameter.length(), index+1+parameter.length());
+           if (!testChar.equals("=")) {
+               return false;
+           }
+           testChar = expression.substring(index-1, index);
+           if (!testChar.equals(",")) {
+               return false;
+           }
+           else {
+               index-=1;
+           }
+       }
+       int endLocation = expression.indexOf(',', index+1);
+       if (endLocation == -1) {
+           endLocation = expression.length();
+       }
+       else if (index == 0 && replaceString.length() == 0) {
+           endLocation++;
+       }
+       String removeStr = expression.substring(index, endLocation);
+       expression = expression.replace(removeStr, replaceString);
+
+       return true;
+   }
+   
    public final class CellEditorListener implements ICellEditorListener {
        private ValueCellEditor fcellEditor;
        public CellEditorListener(ValueCellEditor cellEditor) {
@@ -189,47 +221,33 @@ public class TCFContextQueryExpressionDialog extends SelectionDialog {
                    expression = new String(paramName + "=" + cellString);
                    }
                else {
-                   String nameValuePair = paramName + "=" + cellString ;
-                   if (expression.lastIndexOf(nameValuePair) == -1) {
-                       expression +=",";
-                       expression += nameValuePair;
+                   String nameValuePair = paramName + "=" + cellString;
+                   int strIndex = findParameter(paramName, 0);
+                   if (strIndex == -1) {
+                       expression += "," + nameValuePair;
+                   }
+                   else {
+                       if (strIndex != 0) {
+                           nameValuePair = "," + nameValuePair;
+                       }
+                       if (!replaceParameter(paramName,nameValuePair,strIndex)) {
+                           getButton(IDialogConstants.OK_ID).setEnabled(false);
+                       }
                    }
                }
                param.setData(cellString);
-               getButton(IDialogConstants.OK_ID).setEnabled(true);
            }
            else if (expression != null && expression.length() != 0){
                fcellEditor.setValue(cellString);
-               // Check to remove expression value.
                int strIndex = findParameter(paramName, 0);
                if (strIndex != -1) {
-                   if (strIndex != 0) {
-                       String testChar = expression.substring(strIndex+paramName.length(), strIndex+1+paramName.length());
-                       if (!testChar.equals("=")) {
-                           // malformed expression
-                           getButton(IDialogConstants.OK_ID).setEnabled(false);
-                           return;
-                       }
-                       testChar = expression.substring(strIndex-1, strIndex);
-                       if (!testChar.equals(",")) {
-                           // malformed expression
-                           getButton(IDialogConstants.OK_ID).setEnabled(false);
-                           return;
-                       }
-                       else {
-                           strIndex-=1;
-                       }
+                   if (!replaceParameter(paramName,"",strIndex)) {
+                       getButton(IDialogConstants.OK_ID).setEnabled(false);
                    }
-                   int endLocation = expression.indexOf(',', strIndex+1);
-                   if (endLocation == -1) {
-                       endLocation = expression.length();
-                   }
-                   String removeStr = expression.substring(strIndex, endLocation);
-                   expression = expression.replace(removeStr, "");
                    param.setData("");
                }
            }
-           if (expression != null && expression.length() == 0) {
+           if (expression == null || expression.length() == 0 || originalExpression.contentEquals(expression)) {
                getButton(IDialogConstants.OK_ID).setEnabled(false);
            }
            else {
