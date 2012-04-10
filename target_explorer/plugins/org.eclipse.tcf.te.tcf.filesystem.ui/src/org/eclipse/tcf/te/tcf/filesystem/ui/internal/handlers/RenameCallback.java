@@ -15,9 +15,17 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.tcf.filesystem.ui.nls.Messages;
 import org.eclipse.ui.PlatformUI;
-
+/**
+ * The callback implementation for Renaming.
+ */
 public class RenameCallback extends Callback implements Runnable {
+	// The message to be displayed.
 	private String message;
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.callback.Callback#internalDone(java.lang.Object, org.eclipse.core.runtime.IStatus)
+	 */
 	@Override
     protected void internalDone(Object caller, IStatus status) {
 		if (!status.isOK()) {
@@ -25,6 +33,11 @@ public class RenameCallback extends Callback implements Runnable {
 			PlatformUI.getWorkbench().getDisplay().asyncExec(this);
 		}
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Runnable#run()
+	 */
 	@Override
     public void run() {
 		Shell parent = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();

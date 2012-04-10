@@ -32,6 +32,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
  * The handler that moves the selected files or folders to a destination folder.
  */
 public class MoveFilesHandler extends AbstractHandler {
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)

@@ -21,13 +21,24 @@ import org.eclipse.tcf.te.tcf.filesystem.ui.internal.ImageConsts;
 import org.eclipse.tcf.te.tcf.filesystem.ui.nls.Messages;
 import org.eclipse.ui.PlatformUI;
 
+/**
+ * The confirmation callback implementation for operation "Move" and "Copy". 
+ */
 public class MoveCopyCallback implements IConfirmCallback {
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IConfirmCallback#requires(java.lang.Object)
+	 */
 	@Override
 	public boolean requires(Object object) {
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IConfirmCallback#confirms(java.lang.Object)
+	 */
 	@Override
 	public int confirms(Object object) {
 		final FSTreeNode node = (FSTreeNode) object;

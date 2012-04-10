@@ -24,6 +24,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
  * The handler that cuts the selected files or folders to the clip board.
  */
 public class CutFilesHandler extends AbstractHandler {
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)

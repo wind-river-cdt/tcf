@@ -19,10 +19,12 @@ import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpClipboard;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.activator.UIPlugin;
 import org.eclipse.ui.handlers.HandlerUtil;
+
 /**
  * The handler that copies the selected files or folders to the clip board.
  */
 public class CopyFilesHandler extends AbstractHandler {
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
