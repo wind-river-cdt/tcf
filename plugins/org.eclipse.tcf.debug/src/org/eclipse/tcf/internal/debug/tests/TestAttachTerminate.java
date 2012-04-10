@@ -30,6 +30,7 @@ class TestAttachTerminate implements ITCFTest, IRunControl.RunControlListener {
     private final Random rnd = new Random();
 
     private int cnt = 0;
+    private int timer = 0;
 
     private final HashSet<String> test_ctx_ids = new HashSet<String>();
 
@@ -55,14 +56,13 @@ class TestAttachTerminate implements ITCFTest, IRunControl.RunControlListener {
                     else if (list.length > 0) {
                         startTestContext(list[rnd.nextInt(list.length)]);
                         Protocol.invokeLater(100, new Runnable() {
-                            int cnt = 0;
                             public void run() {
                                 if (!test_suite.isActive(TestAttachTerminate.this)) return;
-                                cnt++;
+                                timer++;
                                 if (test_suite.cancel) {
                                     exit(null);
                                 }
-                                else if (cnt < 600) {
+                                else if (timer < 600) {
                                     Protocol.invokeLater(100, this);
                                 }
                                 else if (test_ctx_ids.isEmpty()) {
@@ -139,7 +139,7 @@ class TestAttachTerminate implements ITCFTest, IRunControl.RunControlListener {
 
     public void contextRemoved(String[] context_ids) {
         for (String id : context_ids) {
-            test_ctx_ids.remove(id);
+            if (test_ctx_ids.remove(id)) timer = 0;
         }
         if (cnt == 0 && test_ctx_ids.isEmpty()) exit(null);
     }
