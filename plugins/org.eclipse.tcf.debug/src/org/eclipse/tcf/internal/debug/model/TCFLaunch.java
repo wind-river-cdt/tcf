@@ -393,7 +393,7 @@ public class TCFLaunch extends Launch {
         done.run();
     }
 
-    private void downloadMemoryMaps(final ILaunchConfiguration cfg, final Runnable done) throws Exception {
+    private void downloadMemoryMaps(ILaunchConfiguration cfg, final Runnable done) throws Exception {
         final IMemoryMap mmap = channel.getRemoteService(IMemoryMap.class);
         if (mmap == null) {
             done.run();
@@ -428,7 +428,7 @@ public class TCFLaunch extends Launch {
                 try {
                     Set<String> set = new HashSet<String>(maps.keySet());
                     maps.clear();
-                    TCFLaunchDelegate.getMemMapsAttribute(maps, cfg);
+                    TCFLaunchDelegate.getMemMapsAttribute(maps, getLaunchConfiguration());
                     for (String id : maps.keySet()) {
                         ArrayList<IMemoryMap.MemoryRegion> map = maps.get(id);
                         TCFMemoryRegion[] arr = map.toArray(new TCFMemoryRegion[map.size()]);
