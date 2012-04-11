@@ -99,7 +99,7 @@ public class MyPropertyTester extends PropertyTester {
 		}
 
 		if ("isValueAdd".equals(property)) { //$NON-NLS-1$
-			String value = node.getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
+			String value = node.getPeer().getAttributes().get("ValueAdd"); //$NON-NLS-1$
 			boolean isValueAdd = value != null && ("1".equals(value.trim()) || Boolean.parseBoolean(value.trim())); //$NON-NLS-1$
 			if (expectedValue instanceof Boolean) return ((Boolean)expectedValue).booleanValue() == isValueAdd;
 		}

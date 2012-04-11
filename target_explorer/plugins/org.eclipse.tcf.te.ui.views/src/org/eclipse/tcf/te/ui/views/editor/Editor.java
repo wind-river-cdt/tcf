@@ -81,7 +81,7 @@ public final class Editor extends FormEditor implements IPersistableEditor, ITab
 		// Get all applicable editor page bindings
 		List<EditorPageBinding> bindings = new ArrayList<EditorPageBinding>(Arrays.asList(EditorPageBindingExtensionPointManager.getInstance().getApplicableEditorPageBindings(input)));
 		// Get a copy of the currently added pages
-		List<Object> oldPages = new ArrayList<Object>(Arrays.asList(pages.toArray()));
+		List<Object> oldPages = pages != null ? new ArrayList<Object>(Arrays.asList(pages.toArray())) : new ArrayList<Object>();
 		// Loop through the old pages and determine if the page is still applicable
 		Iterator<Object> iterator = oldPages.iterator();
 		while (iterator.hasNext()) {
