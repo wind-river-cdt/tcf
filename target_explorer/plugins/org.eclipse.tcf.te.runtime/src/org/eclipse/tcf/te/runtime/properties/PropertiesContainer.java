@@ -131,9 +131,7 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 	@Override
 	public final boolean setChangeEventsEnabled(boolean enabled) {
 		boolean changed = changeEventsEnabled != enabled;
-		if (changed) {
-			changeEventsEnabled = enabled;
-		}
+		if (changed) changeEventsEnabled = enabled;
 		return changed;
 	}
 
@@ -152,9 +150,7 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 	public void fireChangeEvent(String key, Object oldValue, Object newValue) {
 		Assert.isNotNull(key);
 		EventObject event = newEvent(this, key, oldValue, newValue);
-		if (event != null) {
-			EventManager.getInstance().fireEvent(event);
-		}
+		if (event != null) EventManager.getInstance().fireEvent(event);
 	}
 
 	/**
@@ -286,13 +282,15 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 				return ((Long)value).longValue();
 			}
 			if (value instanceof Number) {
-				return ((Long)value).longValue();
+				return ((Number)value).longValue();
 			}
+			if (value != null) {
+				return Long.decode(value.toString()).longValue();
+			}
+		} catch (Exception e) {
+			/* ignored on purpose */
+		}
 
-			return Long.decode(value.toString()).longValue();
-		}
-		catch (Exception e) {
-		}
 		return -1;
 	}
 
@@ -309,11 +307,13 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 			if (value instanceof Number) {
 				return ((Number)value).intValue();
 			}
+			if (value != null) {
+				return Integer.decode(value.toString()).intValue();
+			}
+		} catch (Exception e) {
+			/* ignored on purpose */
+		}
 
-			return Integer.decode(value.toString()).intValue();
-		}
-		catch (Exception e) {
-		}
 		return -1;
 	}
 
@@ -324,7 +324,7 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 	public final String getStringProperty(String key) {
 		Object value = getProperty(key);
 		return value instanceof String ? (String)value :
-			(value != null ? value.toString() : null);
+					(value != null ? value.toString() : null);
 	}
 
 	/* (non-Javadoc)
@@ -340,11 +340,13 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 			if (value instanceof Number) {
 				return ((Number)value).floatValue();
 			}
+			if (value != null) {
+				return Float.parseFloat(value.toString());
+			}
+		} catch (Exception e) {
+			/* ignored on purpose */
+		}
 
-			return Float.parseFloat(value.toString());
-		}
-		catch (Exception e) {
-		}
 		return Float.NaN;
 	}
 
@@ -359,13 +361,15 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 				return ((Double)value).doubleValue();
 			}
 			if (value instanceof Number) {
-				return ((Double)value).doubleValue();
+				return ((Number)value).doubleValue();
 			}
+			if (value != null) {
+				return Double.parseDouble(value.toString());
+			}
+		} catch (Exception e) {
+			/* ignored on purpose */
+		}
 
-			return Double.parseDouble(value.toString());
-		}
-		catch (Exception e) {
-		}
 		return Double.NaN;
 	}
 
