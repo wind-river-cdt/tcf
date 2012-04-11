@@ -98,6 +98,8 @@ public class MemoryMapWidget {
     private ILaunchConfiguration cfg;
     private final HashSet<String> loaded_files = new HashSet<String>();
     private String selected_mem_map_id;
+    private final ArrayList<ModifyListener> modify_listeners =
+            new ArrayList<ModifyListener>();
 
     private final IStructuredContentProvider content_provider = new IStructuredContentProvider() {
 
@@ -326,6 +328,7 @@ public class MemoryMapWidget {
                     if (lst == null) cur_maps.put(id, lst = new ArrayList<IMemoryMap.MemoryRegion>());
                     lst.add(new TCFMemoryRegion(props));
                     table_viewer.refresh();
+                    notifyModifyListeners();
                 }
             }
         });
@@ -343,6 +346,7 @@ public class MemoryMapWidget {
                         table_viewer.getSelection()).getFirstElement();
                 if (r == null) return;
                 editRegion(r);
+                notifyModifyListeners();
             }
         });
         final MenuItem item_edit = new MenuItem(menu, SWT.PUSH);
@@ -362,6 +366,7 @@ public class MemoryMapWidget {
                 if (r == null) return;
                 ArrayList<IMemoryMap.MemoryRegion> lst = cur_maps.get(id);
                 if (lst != null && lst.remove(r)) table_viewer.refresh();
+                notifyModifyListeners();
             }
         });
         final MenuItem item_remove = new MenuItem(menu, SWT.PUSH);
@@ -628,5 +633,13 @@ public class MemoryMapWidget {
             return true;
         }
         return false;
+    }
+
+    public void addModifyListener(ModifyListener l) {
+        modify_listeners.add(l);
+    }
+
+    private void notifyModifyListeners() {
+        for (ModifyListener l : modify_listeners) l.modifyText(null);
     }
 }
