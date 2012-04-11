@@ -14,7 +14,7 @@
             class="org.eclipse.tcf.te.tcf.locator.internal.MyPropertyTester"
             id="org.eclipse.tcf.te.tcf.locator.LocatorModelPropertyTester"
             namespace="org.eclipse.tcf.te.tcf.locator"
-            properties="name,hasLocalService,hasRemoteService,isStaticPeer,isRedirected"
+            properties="name,hasLocalService,hasRemoteService,isStaticPeer,isRedirected,isProxy,isValueAdd"
             type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel">
       </propertyTester>
    </extension>
@@ -74,6 +74,7 @@
             adaptableType="org.eclipse.tcf.protocol.IPeer"
             class="org.eclipse.tcf.te.tcf.locator.internal.adapters.AdapterFactory">
          <adapter type="org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistableURIProvider"/>
+         <adapter type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
       </factory>
       <factory
             adaptableType="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider"

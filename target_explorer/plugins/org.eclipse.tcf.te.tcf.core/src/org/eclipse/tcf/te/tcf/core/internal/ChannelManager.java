@@ -27,7 +27,7 @@ import org.eclipse.tcf.core.TransientPeer;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
-import org.eclipse.tcf.te.runtime.concurrent.util.ExecutorsUtil;
+import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.tcf.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
 import org.eclipse.tcf.te.tcf.core.interfaces.tracing.ITraceIds;
@@ -112,13 +112,22 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 		Runnable runnable = new Runnable() {
 			@Override
             public void run() {
+				Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+
 				// Check on the value-add's first
 				internalHandleValueAdds(peer, flags, new DoneHandleValueAdds() {
 					@Override
 					public void doneHandleValueAdds(final Throwable error, final IValueAdd[] valueAdds) {
 						// If the error is null, continue and open the channel
 						if (error == null) {
-							internalOpenChannel(peer, flags, done);
+							// Do we have any value add in the chain?
+							if (valueAdds.length > 0) {
+								// There are value-add's -> chain them now
+								internalChainValueAdds(valueAdds, peer, flags, done);
+							} else {
+								// No value-add's -> open a channel to the target peer directly
+								internalOpenChannel(peer, flags, done);
+							}
 						} else {
 							// Shutdown the value-add's launched
 							internalShutdownValueAdds(peer, valueAdds);
@@ -283,6 +292,7 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 		Runnable runnable = new Runnable() {
 			@Override
             public void run() {
+				Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 				internalOpenChannel(peerAttributes, flags, done);
 			}
 		};
@@ -353,6 +363,7 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 		Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
+				Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 				channel.set(internalGetChannel(peer));
 			}
 		};
@@ -384,6 +395,7 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 		Runnable runnable = new Runnable() {
 			@Override
             public void run() {
+				Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 				internalCloseChannel(channel);
 			}
 		};
@@ -452,6 +464,7 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 		Runnable runnable = new Runnable() {
 			@Override
             public void run() {
+				Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 				internalCloseAll();
 			}
 		};
@@ -497,13 +510,8 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 		final String id = peer.getID();
 
 		if (valueAdds.length > 0) {
-			ExecutorsUtil.execute(new Runnable() {
-				@Override
-				public void run() {
-					doShutdownValueAdds(id, valueAdds);
-					forceValueAddShutdown = false;
-				}
-			});
+			doShutdownValueAdds(id, valueAdds);
+			forceValueAddShutdown = false;
 		}
 	}
 
@@ -514,12 +522,16 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 	 * @param valueAdds The list of value-add's. Must not be <code>null</code>.
 	 */
 	/* default */ void doShutdownValueAdds(final String id, final IValueAdd[] valueAdds) {
-		Assert.isTrue(!Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 		Assert.isNotNull(id);
 		Assert.isNotNull(valueAdds);
 
 		for (IValueAdd valueAdd : valueAdds) {
-			valueAdd.shutdown(id);
+			valueAdd.shutdown(id, new Callback() {
+				@Override
+				protected void internalDone(Object caller, IStatus status) {
+				}
+			});
 		}
 	}
 
@@ -531,10 +543,12 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 		 * Called when all the value-adds are launched or the launched failed.
 		 *
 		 * @param error The error description if operation failed, <code>null</code> if succeeded.
-		 * @param channel The channel object or <code>null</code>.
+		 * @param valueAdds The list of value-adds or <code>null</code>.
 		 */
 		void doneHandleValueAdds(Throwable error, IValueAdd[] valueAdds);
 	}
+
+	/* default */ final Map<IPeer, List<DoneHandleValueAdds>> inProgress = new HashMap<IPeer, List<DoneHandleValueAdds>>();
 
 	/**
 	 * Check on the value-adds for the given peer. Launch the value-adds
@@ -571,6 +585,34 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 			return;
 		}
 
+		// If a launch for the same value add is in progress already, attach the new done to
+		// the list to call and drop out
+		if (inProgress.containsKey(peer)) {
+			List<DoneHandleValueAdds> dones = inProgress.get(peer);
+			Assert.isNotNull(dones);
+			dones.add(done);
+			return;
+		}
+
+		// Add the done callback to a list of waiting callbacks per peer
+		List<DoneHandleValueAdds> dones = new ArrayList<DoneHandleValueAdds>();
+		dones.add(done);
+		inProgress.put(peer, dones);
+
+		// The "myDone" callback is invoking the callbacks from the list
+		// of waiting callbacks.
+		final DoneHandleValueAdds myDone = new DoneHandleValueAdds() {
+
+			@Override
+			public void doneHandleValueAdds(Throwable error, IValueAdd[] valueAdds) {
+				// Get the list of the original done callbacks
+				List<DoneHandleValueAdds> dones = inProgress.remove(peer);
+				for (DoneHandleValueAdds done : dones) {
+					done.doneHandleValueAdds(error, valueAdds);
+				}
+			}
+		};
+
 		// Do we have applicable value-add contributions
 		final IValueAdd[] valueAdds = ValueAddManager.getInstance().getValueAdd(peer);
 		if (valueAdds.length == 0) {
@@ -579,7 +621,7 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 				CoreBundleActivator.getTraceHandler().trace(NLS.bind(Messages.ChannelManager_openChannel_valueAdd_noneApplicable, id),
 															0, ITraceIds.TRACE_CHANNEL_MANAGER, IStatus.INFO, this);
 			}
-			done.doneHandleValueAdds(null, null);
+			myDone.doneHandleValueAdds(null, valueAdds);
 			return;
 		}
 
@@ -589,62 +631,255 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 														0, ITraceIds.TRACE_CHANNEL_MANAGER, IStatus.INFO, this);
 		}
 
-		// Launching the value-add's may take a little while and must happen
-		// outside of the TCF dispatch thread.
-		ExecutorsUtil.execute(new Runnable() {
+		final List<IValueAdd> available = new ArrayList<IValueAdd>();
+
+		final DoneLaunchValueAdd innerDone = new DoneLaunchValueAdd() {
 			@Override
-			public void run() {
-				doHandleValueAdds(id, valueAdds, done);
+			public void doneLaunchValueAdd(Throwable error, List<IValueAdd> available) {
+				myDone.doneHandleValueAdds(error, available.toArray(new IValueAdd[available.size()]));
+			}
+		};
+
+		doLaunchValueAdd(id, valueAdds, 0, available, innerDone);
+	}
+
+	/**
+	 * Client call back interface for doLaunchValueAdd(...).
+	 */
+	interface DoneLaunchValueAdd {
+		/**
+		 * Called when a value-add has been chained.
+		 *
+		 * @param error The error description if operation failed, <code>null</code> if succeeded.
+		 * @param available The list of available value-adds.
+		 */
+		void doneLaunchValueAdd(Throwable error, List<IValueAdd> available);
+	}
+
+	/**
+	 * Test the value-add at the given index to be alive. Launch the value-add if necessary.
+	 *
+	 * @param id The peer id. Must not be <code>null</code>.
+	 * @param valueAdds The list of value-add's to check. Must not be <code>null</code>.
+	 * @param i The index.
+	 * @param available The list of available value-adds. Must not be <code>null</code>.
+	 * @param done The client callback. Must not be <code>null</code>.
+	 */
+	/* default */ void doLaunchValueAdd(final String id, final IValueAdd[] valueAdds, final int i, final List<IValueAdd> available, final DoneLaunchValueAdd done) {
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+		Assert.isNotNull(id);
+		Assert.isNotNull(valueAdds);
+		Assert.isTrue(valueAdds.length > 0);
+		Assert.isNotNull(available);
+		Assert.isNotNull(done);
+
+		// Get the value-add to launch
+		final IValueAdd valueAdd = valueAdds[i];
+
+		// Check if the value-add to launch is alive
+		valueAdd.isAlive(id, new Callback() {
+			@Override
+			protected void internalDone(Object caller, IStatus status) {
+				boolean alive = ((Boolean)getResult()).booleanValue();
+
+				if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITraceIds.TRACE_CHANNEL_MANAGER)) {
+					CoreBundleActivator.getTraceHandler().trace(NLS.bind(Messages.ChannelManager_openChannel_valueAdd_isAlive, new Object[] { Integer.valueOf(i), valueAdd.getLabel(), Boolean.valueOf(alive), id }),
+																0, ITraceIds.TRACE_CHANNEL_MANAGER, IStatus.INFO, ChannelManager.this);
+				}
+
+				if (!alive) {
+					// Launch the value-add
+					valueAdd.launch(id, new Callback() {
+						@Override
+						protected void internalDone(Object caller, IStatus status) {
+							Throwable error = status.getException();
+
+							if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITraceIds.TRACE_CHANNEL_MANAGER)) {
+								CoreBundleActivator.getTraceHandler().trace(NLS.bind(Messages.ChannelManager_openChannel_valueAdd_launch, new Object[] { Integer.valueOf(i), valueAdd.getLabel(),
+												(error == null ? "success" : "failed"), //$NON-NLS-1$ //$NON-NLS-2$
+												(error != null ? error.getLocalizedMessage() : null),
+												id }),
+												0, ITraceIds.TRACE_CHANNEL_MANAGER, IStatus.INFO, ChannelManager.this);
+							}
+
+							// If we got an error and the value-add is optional,
+							// log the error as warning and drop the value-add
+							if (error != null && valueAdd.isOptional()) {
+								status = new Status(IStatus.WARNING, CoreBundleActivator.getUniqueIdentifier(),
+												NLS.bind(Messages.ChannelManager_valueAdd_launchFailed, valueAdd.getLabel(), error.getLocalizedMessage()),
+												error);
+								Platform.getLog(CoreBundleActivator.getContext().getBundle()).log(status);
+
+								// Reset the error
+								error = null;
+							} else {
+								available.add(valueAdd);
+							}
+
+							// If the value-add failed to launch, no other value-add's are launched
+							if (error != null) {
+								done.doneLaunchValueAdd(error, available);
+							} else {
+								// Launch the next one, if there is any
+								if (i + 1 < valueAdds.length) {
+									DoneLaunchValueAdd innerDone = new DoneLaunchValueAdd() {
+										@Override
+										public void doneLaunchValueAdd(Throwable error, List<IValueAdd> available) {
+											done.doneLaunchValueAdd(error, available);
+										}
+									};
+									doLaunchValueAdd(id, valueAdds, i + 1, available, innerDone);
+								} else {
+									// Last value-add in chain launched -> call parent callback
+									done.doneLaunchValueAdd(null, available);
+								}
+							}
+						}
+					});
+				} else {
+					// Already alive -> add it to the list of available value-add's
+					available.add(valueAdd);
+					// Launch the next one, if there is any
+					if (i + 1 < valueAdds.length) {
+						DoneLaunchValueAdd innerDone = new DoneLaunchValueAdd() {
+							@Override
+							public void doneLaunchValueAdd(Throwable error, List<IValueAdd> available) {
+								done.doneLaunchValueAdd(error, available);
+							}
+						};
+						doLaunchValueAdd(id, valueAdds, i + 1, available, innerDone);
+					} else {
+						// Last value-add in chain launched -> call parent callback
+						done.doneLaunchValueAdd(null, available);
+					}
+				}
 			}
 		});
 	}
 
 	/**
-	 * Tests all given value-add's to be alive and launch them if necessary.
+	 * Client call back interface for doChainValueAdd(...).
+	 */
+	interface DoneChainValueAdd {
+		/**
+		 * Called when a value-add has been chained.
+		 *
+		 * @param error The error description if operation failed, <code>null</code> if succeeded.
+		 * @param channel The channel object or <code>null</code>.
+		 */
+		void doneChainValueAdd(Throwable error, IChannel channel);
+	}
+
+	/**
+	 * Chain the value-adds until the original target peer is reached.
 	 *
-	 * @param id The peer id. Must not be <code>null</code>.
-	 * @param valueAdds The list of value-add's to check. Must not be <code>null</code>.
+	 * @param valueAdds The list of value-add's to chain. Must not be <code>null</code>.
+	 * @param peer The original target peer. Must not be <code>null</code>.
+	 * @param flags Map containing the flags to parameterize the channel opening, or <code>null</code>.
 	 * @param done The client callback. Must not be <code>null</code>.
 	 */
-	/* default */ void doHandleValueAdds(final String id, final IValueAdd[] valueAdds, final DoneHandleValueAdds done) {
-		Assert.isTrue(!Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+	/* default */ void internalChainValueAdds(final IValueAdd[] valueAdds, final IPeer peer, final Map<String, Boolean> flags, final DoneOpenChannel done) {
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+		Assert.isNotNull(valueAdds);
+		Assert.isNotNull(peer);
+		Assert.isNotNull(done);
+
+		// Get the peer id
+		final String id = peer.getID();
+
+		if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITraceIds.TRACE_CHANNEL_MANAGER)) {
+			CoreBundleActivator.getTraceHandler().trace(NLS.bind(Messages.ChannelManager_openChannel_valueAdd_startChaining, id),
+														0, ITraceIds.TRACE_CHANNEL_MANAGER, IStatus.INFO, this);
+		}
+
+		// Extract the flags of interest form the given flags map
+		boolean forceNew = flags != null && flags.containsKey(IChannelManager.FLAG_FORCE_NEW) ? flags.get(IChannelManager.FLAG_FORCE_NEW).booleanValue() : false;
+		boolean noValueAdd = flags != null && flags.containsKey(IChannelManager.FLAG_NO_VALUE_ADD) ? flags.get(IChannelManager.FLAG_NO_VALUE_ADD).booleanValue() : false;
+		// If noValueAdd == true -> forceNew has to be true as well
+		if (noValueAdd) forceNew = true;
+
+		// Check if there is already a channel opened to this peer
+		IChannel channel = !forceNew ? channels.get(id) : null;
+		if (channel != null && (channel.getState() == IChannel.STATE_OPEN || channel.getState() == IChannel.STATE_OPENING)) {
+			// Got an existing channel -> drop out immediately
+			done.doneOpenChannel(null, channel);
+			return;
+		}
+
+		// No existing channel -> open a new one
+		final DoneChainValueAdd innerDone = new DoneChainValueAdd() {
+			@Override
+			public void doneChainValueAdd(Throwable error, IChannel channel) {
+				done.doneOpenChannel(error, channel);
+			}
+		};
+
+		doChainValueAdd(id, peer.getAttributes(), 0, valueAdds, innerDone);
+	}
+
+	/* default */ void doChainValueAdd(final String id, final Map<String, String> attrs, final int index, final IValueAdd[] valueAdds, final DoneChainValueAdd done) {
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 		Assert.isNotNull(id);
+		Assert.isNotNull(attrs);
 		Assert.isNotNull(valueAdds);
 		Assert.isNotNull(done);
 
-		final List<IValueAdd> available = new ArrayList<IValueAdd>();
-		Throwable error = null;
+		// Get the value-add to chain
+		final IValueAdd valueAdd = valueAdds[index];
+		Assert.isNotNull(valueAdd);
+		// Get the next value-add in chain
+		final IValueAdd nextValueAdd = index + 1 < valueAdds.length ? valueAdds[index + 1] : null;
 
-		// Loop all applicable value-adds and check if there are up and running.
-		// If not, trigger a launch of the value-add.
-		for (IValueAdd valueAdd : valueAdds) {
-			boolean alive = valueAdd.isAlive(id);
-			// If the value-add is not alive, launch it
-			if (!alive) {
-				error = valueAdd.launch(id);
-				// If we got an error and the value-add is optional,
-				// log the error as warning and drop the value-add
-				if (error != null && valueAdd.isOptional()) {
-					IStatus status = new Status(IStatus.WARNING, CoreBundleActivator.getUniqueIdentifier(),
-												NLS.bind(Messages.ChannelManager_valueAdd_launchFailed, valueAdd.getLabel(), error.getLocalizedMessage()),
-												error);
-					Platform.getLog(CoreBundleActivator.getContext().getBundle()).log(status);
-
-					// Reset the error
-					error = null;
-				} else {
-					available.add(valueAdd);
-				}
-			}
-			if (error != null) break;
+		// Get the peer for the value-add to chain
+		IPeer valueAddPeer = valueAdd.getPeer(id);
+		if (valueAddPeer == null) {
+			done.doneChainValueAdd(new IllegalStateException("Invalid value-add peer."), null); //$NON-NLS-1$
+			return;
 		}
 
-		// The callback must be invoked within the TCF dispatch thread
-		final Throwable finError = error;
-		Protocol.invokeLater(new Runnable() {
+		// Get the peer for the next value-add in chain
+		IPeer nextValueAddPeer = nextValueAdd != null ? nextValueAdd.getPeer(id) : null;
+		if (nextValueAdd != null && nextValueAddPeer == null) {
+			done.doneChainValueAdd(new IllegalStateException("Invalid value-add peer."), null); //$NON-NLS-1$
+			return;
+		}
+
+		// Open a channel to the value-add
+		final IChannel channel = valueAddPeer.openChannel();
+		// Redirect the channel to the next value-add in chain
+		channel.redirect(nextValueAddPeer != null ? nextValueAddPeer.getAttributes() : attrs);
+		// Attach the channel listener to catch open/closed events
+		channel.addChannelListener(new IChannel.IChannelListener() {
 			@Override
-			public void run() {
-				done.doneHandleValueAdds(finError, available.toArray(new IValueAdd[available.size()]));
+			public void onChannelOpened() {
+				// Remove ourself as channel listener
+				channel.removeChannelListener(this);
+				// Channel opened. Check if we are done.
+				if (nextValueAdd == null) {
+					// No other value-add in the chain -> all done
+					done.doneChainValueAdd(null, channel);
+				} else {
+					DoneChainValueAdd innerDone = new DoneChainValueAdd() {
+						@Override
+						public void doneChainValueAdd(Throwable error, IChannel channel2) {
+							done.doneChainValueAdd(error, channel);
+						}
+					};
+
+					doChainValueAdd(id, attrs, index + 1, valueAdds, innerDone);
+				}
+			}
+
+			@Override
+			public void onChannelClosed(Throwable error) {
+				// Remove ourself as channel listener
+				channel.removeChannelListener(this);
+				// Channel opening failed -> This will break everything
+				done.doneChainValueAdd(error, null);
+			}
+
+			@Override
+			public void congestionLevel(int level) {
 			}
 		});
 	}

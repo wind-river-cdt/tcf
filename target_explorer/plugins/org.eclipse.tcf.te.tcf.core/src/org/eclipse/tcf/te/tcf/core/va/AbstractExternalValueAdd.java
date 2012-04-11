@@ -16,14 +16,18 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.core.TransientPeer;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.JSON;
 import org.eclipse.tcf.protocol.Protocol;
-import org.eclipse.tcf.te.runtime.concurrent.util.ExecutorsUtil;
+import org.eclipse.tcf.te.runtime.callback.Callback;
+import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.runtime.utils.net.IPAddressUtil;
+import org.eclipse.tcf.te.tcf.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.tcf.core.nls.Messages;
 
 /**
@@ -31,7 +35,7 @@ import org.eclipse.tcf.te.tcf.core.nls.Messages;
  */
 public abstract class AbstractExternalValueAdd extends AbstractValueAdd {
 	// The per peer id value add entry map
-	private final Map<String, ValueAddEntry> entries = new HashMap<String, ValueAddEntry>();
+	/* default */ final Map<String, ValueAddEntry> entries = new HashMap<String, ValueAddEntry>();
 
 	/**
 	 * Class representing a value add entry
@@ -46,7 +50,7 @@ public abstract class AbstractExternalValueAdd extends AbstractValueAdd {
 	 */
 	@Override
 	public IPeer getPeer(String id) {
-		Assert.isTrue(!Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 		Assert.isNotNull(id);
 
 		IPeer peer = null;
@@ -60,14 +64,16 @@ public abstract class AbstractExternalValueAdd extends AbstractValueAdd {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.core.va.interfaces.IValueAdd#isAlive(java.lang.String)
+	 * @see org.eclipse.tcf.te.tcf.core.va.interfaces.IValueAdd#isAlive(java.lang.String, org.eclipse.tcf.te.runtime.interfaces.callback.ICallback)
 	 */
 	@Override
-	public boolean isAlive(final String id) {
-		Assert.isTrue(!Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+	public void isAlive(final String id, final ICallback done) {
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 		Assert.isNotNull(id);
+		Assert.isNotNull(done);
 
-		boolean alive = false;
+		// Assume that the value-add is not alive
+		done.setResult(Boolean.FALSE);
 
 		// Query the associated entry
 		final ValueAddEntry entry = entries.get(id);
@@ -89,69 +95,51 @@ public abstract class AbstractExternalValueAdd extends AbstractValueAdd {
 			// If the process is still running, try to open a channel
 			if (!exited) {
 				final IChannel channel = entry.peer.openChannel();
-				Protocol.invokeAndWait(new Runnable() {
+				channel.addChannelListener(new IChannel.IChannelListener() {
+
 					@Override
-					public void run() {
-						channel.addChannelListener(new IChannel.IChannelListener() {
+					public void onChannelOpened() {
+						// Remove ourself as channel listener
+						channel.removeChannelListener(this);
+						// Close the channel, it is not longer needed
+						channel.close();
+						// Invoke the callback
+						done.setResult(Boolean.TRUE);
+						done.done(AbstractExternalValueAdd.this, Status.OK_STATUS);
+					}
 
-							@Override
-							public void onChannelOpened() {
-								synchronized(entry) {
-									entry.notifyAll();
-								}
-							}
+					@Override
+					public void onChannelClosed(Throwable error) {
+						// Remove ourself as channel listener
+						channel.removeChannelListener(this);
+						// External value-add is not longer alive, clean up
+						entries.remove(id);
+						entry.process.destroy();
+						// Invoke the callback
+						done.done(AbstractExternalValueAdd.this, Status.OK_STATUS);
+					}
 
-							@Override
-							public void onChannelClosed(Throwable error) {
-								synchronized(entry) {
-									entry.notifyAll();
-								}
-							}
-
-							@Override
-							public void congestionLevel(int level) {
-							}
-						});
+					@Override
+					public void congestionLevel(int level) {
 					}
 				});
-
-				// Wait until the channel opening completed
-				synchronized(entry) {
-					try {
-	                    entry.wait();
-                    } catch (InterruptedException e) {
-	                    /* ignored on purpose */
-                    }
-				}
-
-				// Check if the channel got successfully opened
-				if (channel.getState() == IChannel.STATE_OPEN) {
-					alive = true;
-					// Close the channel, it is not longer needed
-					channel.close();
-				}
+			} else {
+				done.done(AbstractExternalValueAdd.this, Status.OK_STATUS);
 			}
-
-			// If the external value-add is not longer alive, clean up
-			if (!alive) {
-				entries.remove(id);
-				if (!exited) {
-					entry.process.destroy();
-				}
-			}
+		} else {
+			done.done(AbstractExternalValueAdd.this, Status.OK_STATUS);
 		}
-
-		return alive;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.core.va.interfaces.IValueAdd#launch(java.lang.String)
+	 * @see org.eclipse.tcf.te.tcf.core.va.interfaces.IValueAdd#launch(java.lang.String, org.eclipse.tcf.te.runtime.interfaces.callback.ICallback)
 	 */
 	@SuppressWarnings("unchecked")
-    @Override
-	public Throwable launch(final String id) {
-		Assert.isTrue(!Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+	@Override
+	public void launch(String id, ICallback done) {
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 		Assert.isNotNull(id);
+		Assert.isNotNull(done);
 
 		Throwable error = null;
 
@@ -192,7 +180,11 @@ public abstract class AbstractExternalValueAdd extends AbstractValueAdd {
 					output = launcher.getOutputReader().getOutput();
 					if ("".equals(output)) { //$NON-NLS-1$
 						output = null;
-						ExecutorsUtil.waitAndExecute(200, null);
+						try {
+	                        Thread.sleep(200);
+                        } catch (InterruptedException e) {
+	                        /* ignored on purpose */
+                        }
 					}
 					counter--;
 				}
@@ -247,7 +239,13 @@ public abstract class AbstractExternalValueAdd extends AbstractValueAdd {
 			error = new FileNotFoundException(NLS.bind(Messages.AbstractExternalValueAdd_error_invalidLocation, this.getId()));
 		}
 
-	    return error;
+		IStatus status = Status.OK_STATUS;
+		if (error != null) {
+			status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
+								error.getLocalizedMessage(), error);
+		}
+
+	    done.done(AbstractExternalValueAdd.this, status);
 	}
 
 	/**
@@ -258,23 +256,29 @@ public abstract class AbstractExternalValueAdd extends AbstractValueAdd {
 	protected abstract IPath getLocation();
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.core.va.interfaces.IValueAdd#shutdown(java.lang.String)
+	 * @see org.eclipse.tcf.te.tcf.core.va.interfaces.IValueAdd#shutdown(java.lang.String, org.eclipse.tcf.te.runtime.interfaces.callback.ICallback)
 	 */
 	@Override
-	public Throwable shutdown(String id) {
-		Assert.isTrue(!Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+	public void shutdown(final String id, final ICallback done) {
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 		Assert.isNotNull(id);
-
-		Throwable error = null;
+		Assert.isNotNull(done);
 
 		final ValueAddEntry entry = entries.get(id);
 		if (entry != null) {
-			if (isAlive(id)) {
-				entries.remove(id);
-				entry.process.destroy();
-			}
+			isAlive(id, new Callback() {
+				@Override
+				protected void internalDone(Object caller, IStatus status) {
+					boolean alive = ((Boolean)getResult()).booleanValue();
+					if (alive) {
+						entries.remove(id);
+						entry.process.destroy();
+					}
+					done.done(AbstractExternalValueAdd.this, Status.OK_STATUS);
+				}
+			});
+		} else {
+			done.done(AbstractExternalValueAdd.this, Status.OK_STATUS);
 		}
-
-		return error;
 	}
 }

@@ -10,12 +10,13 @@
 package org.eclipse.tcf.te.tcf.core.va.interfaces;
 
 import org.eclipse.tcf.protocol.IPeer;
+import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.runtime.interfaces.extensions.IExecutableExtension;
 
 /**
  * Interface to be implemented by value-add's.
  * <p>
- * <b>Note:</b> All methods of this interface must be called from <b>outside</b> of the TCF dispatch thread.
+ * <b>Note:</b> Asynchronous methods must be called from within of the TCF dispatch thread.
  */
 public interface IValueAdd extends IExecutableExtension {
 
@@ -33,25 +34,25 @@ public interface IValueAdd extends IExecutableExtension {
 	 * up, running and responsive.
 	 *
 	 * @param id The target peer id. Must not be <code>null</code>.
-	 * @return <code>True</code> if the value-add is alive, <code>false</code> otherwise.
+	 * @param done The client callback. Must not be <code>null</code>.
 	 */
-	public boolean isAlive(String id);
+	public void isAlive(String id, ICallback done);
 
 	/**
 	 * Launch the value-add for the given target peer.
 	 *
 	 * @param id The target peer id. Must not be <code>null</code>.
-	 * @return A throwable describing the error if the launch failed, <code>null</code> if the launch succeeds.
+	 * @param done The client callback. Must not be <code>null</code>.
 	 */
-	public Throwable launch(String id);
+	public void launch(String id, ICallback done);
 
 	/**
 	 * Shuts down the value-add for the given target peer.
 	 *
 	 * @param id The target peer id. Must not be <code>null</code>.
-	 * @return A throwable describing the error if the shutdown failed, <code>null</code> if the shutdown succeeds.
+	 * @param done The client callback. Must not be <code>null</code>.
 	 */
-	public Throwable shutdown(String id);
+	public void shutdown(String id, ICallback done);
 
 	/**
 	 * Returns the peer representing the value add for the given target peer.

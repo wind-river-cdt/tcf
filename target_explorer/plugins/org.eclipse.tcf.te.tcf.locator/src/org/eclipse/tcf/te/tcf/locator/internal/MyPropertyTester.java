@@ -93,6 +93,18 @@ public class MyPropertyTester extends PropertyTester {
 			if (expectedValue instanceof Boolean) return ((Boolean)expectedValue).booleanValue() == isRedirected;
 		}
 
+		if ("isProxy".equals(property)) { //$NON-NLS-1$
+			boolean isProxy = node.getPeer().getAttributes().containsKey("Proxy"); //$NON-NLS-1$
+			if (expectedValue instanceof Boolean) return ((Boolean)expectedValue).booleanValue() == isProxy;
+		}
+
+		if ("isValueAdd".equals(property)) { //$NON-NLS-1$
+			String value = node.getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
+			boolean isValueAdd = value != null && ("1".equals(value.trim()) || Boolean.parseBoolean(value.trim())); //$NON-NLS-1$
+			if (expectedValue instanceof Boolean) return ((Boolean)expectedValue).booleanValue() == isValueAdd;
+		}
+
+
 		return false;
 	}
 }

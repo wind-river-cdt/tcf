@@ -76,7 +76,7 @@ public class ValueAddLauncher extends ProcessLauncher implements IDisposable {
 	public void launch() throws Throwable {
 		IPath dir = path.removeLastSegments(1);
 		String cmd = Host.isWindowsHost() ? path.toOSString() : "./" + path.lastSegment(); //$NON-NLS-1$
-		process = Runtime.getRuntime().exec(new String[] { cmd, "-I300", "-S" }, null, dir.toFile()); //$NON-NLS-1$ //$NON-NLS-2$
+		process = Runtime.getRuntime().exec(new String[] { cmd, "-I180", "-S", "-sTCP::;ValueAdd=1" }, null, dir.toFile()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		// Launch the process output reader
 		outputReader = new ProcessOutputReaderThread(null, new InputStream[] { process.getInputStream() });
