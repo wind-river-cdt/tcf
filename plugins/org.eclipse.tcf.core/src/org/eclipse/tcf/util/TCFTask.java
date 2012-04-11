@@ -102,7 +102,8 @@ public abstract class TCFTask<V> implements Runnable, Future<V> {
                         }
 
                         public void onChannelClosed(final Throwable error) {
-                            cancel(true);
+                            if (error != null) error(error);
+                            else cancel(true);
                         }
 
                         public void onChannelOpened() {
