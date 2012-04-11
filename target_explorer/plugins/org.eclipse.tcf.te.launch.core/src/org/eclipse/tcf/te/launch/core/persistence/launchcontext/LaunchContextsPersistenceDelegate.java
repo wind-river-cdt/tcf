@@ -17,7 +17,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.tcf.te.launch.core.lm.interfaces.IContextSelectorLaunchAttributes;
+import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchContextLaunchAttributes;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification;
 import org.eclipse.tcf.te.launch.core.persistence.AbstractItemListPersistenceDelegate;
 import org.eclipse.tcf.te.launch.core.persistence.AbstractItemListXMLParser;
@@ -43,7 +43,7 @@ public class LaunchContextsPersistenceDelegate {
 	private static final String TAG_LAUNCH_CONTEXT = "context"; //$NON-NLS-1$
 
 	private static final AbstractItemListPersistenceDelegate<IModelNode> delegate =
-					new AbstractItemListPersistenceDelegate<IModelNode>(TAG_LAUNCH_CONTEXT, IContextSelectorLaunchAttributes.ATTR_LAUNCH_CONTEXTS) {
+					new AbstractItemListPersistenceDelegate<IModelNode>(TAG_LAUNCH_CONTEXT, ILaunchContextLaunchAttributes.ATTR_LAUNCH_CONTEXTS) {
 		@Override
 		protected AbstractItemListXMLParser<IModelNode> getXMLParser() {
 			return new AbstractItemListXMLParser<IModelNode>(TAG_LAUNCH_CONTEXT) {

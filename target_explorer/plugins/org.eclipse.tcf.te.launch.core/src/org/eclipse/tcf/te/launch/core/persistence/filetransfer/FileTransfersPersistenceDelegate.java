@@ -13,11 +13,11 @@ import java.util.List;
 
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.tcf.te.launch.core.interfaces.IFileTransferItem;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.IFileTransferLaunchAttributes;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification;
 import org.eclipse.tcf.te.launch.core.persistence.AbstractItemListPersistenceDelegate;
 import org.eclipse.tcf.te.launch.core.persistence.AbstractItemListXMLParser;
+import org.eclipse.tcf.te.runtime.services.interfaces.filetransfer.IFileTransferItem;
 
 /**
  * File transfer persistence delegate.

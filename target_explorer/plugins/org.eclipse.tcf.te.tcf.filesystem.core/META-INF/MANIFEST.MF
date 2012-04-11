@@ -27,4 +27,5 @@ Export-Package: org.eclipse.tcf.te.tcf.filesystem.core.interfaces,
  org.eclipse.tcf.te.tcf.filesystem.core.internal.testers;x-friends:="org.eclipse.tcf.te.tests",
  org.eclipse.tcf.te.tcf.filesystem.core.internal.url;x-friends:="org.eclipse.tcf.te.tests",
  org.eclipse.tcf.te.tcf.filesystem.core.internal.utils;x-friends:="org.eclipse.tcf.te.tcf.filesystem.ui,org.eclipse.tcf.te.tests",
- org.eclipse.tcf.te.tcf.filesystem.core.model
+ org.eclipse.tcf.te.tcf.filesystem.core.model,
+ org.eclipse.tcf.te.tcf.filesystem.core.services

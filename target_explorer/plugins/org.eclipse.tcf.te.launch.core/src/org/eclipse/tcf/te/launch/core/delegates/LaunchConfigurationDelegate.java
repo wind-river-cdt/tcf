@@ -34,7 +34,7 @@ import org.eclipse.tcf.te.launch.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.launch.core.bindings.LaunchConfigTypeBindingsManager;
 import org.eclipse.tcf.te.launch.core.interfaces.IReferencedProjectItem;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ICommonLaunchAttributes;
-import org.eclipse.tcf.te.launch.core.lm.interfaces.IContextSelectorLaunchAttributes;
+import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchContextLaunchAttributes;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchManagerDelegate;
 import org.eclipse.tcf.te.launch.core.nls.Messages;
 import org.eclipse.tcf.te.launch.core.persistence.launchcontext.LaunchContextsPersistenceDelegate;
@@ -118,8 +118,8 @@ public class LaunchConfigurationDelegate extends AbstractLaunchConfigurationDele
 											launch.getLaunchMode()));
 
 			IModelNode[] contexts = LaunchContextsPersistenceDelegate.decodeLaunchContexts(
-							launchConfig.getAttribute(IContextSelectorLaunchAttributes.ATTR_LAUNCH_CONTEXTS, (String)null));
-			properties.setProperty(IContextSelectorLaunchAttributes.ATTR_ACTIVE_LAUNCH_CONTEXT, contexts != null && contexts.length > 0 ? contexts[0] : null);
+							launchConfig.getAttribute(ILaunchContextLaunchAttributes.ATTR_LAUNCH_CONTEXTS, (String)null));
+			properties.setProperty(ILaunchContextLaunchAttributes.ATTR_ACTIVE_LAUNCH_CONTEXT, contexts != null && contexts.length > 0 ? contexts[0] : null);
 
 			// Initialize the stepper
 			IStepContext context = (IStepContext)launch.getAdapter(IStepContext.class);

@@ -3,7 +3,7 @@
 <plugin>
 
 <!-- Extension points -->
-   <extension-point id="services" name="Service Contributions" schema="schema/services.exsd"/>
+   <extension-point id="services" name="%ExtensionPoint.service" schema="schema/services.exsd"/>
 
 <!-- Property tester contributions -->
    <extension point="org.eclipse.core.expressions.propertyTesters">

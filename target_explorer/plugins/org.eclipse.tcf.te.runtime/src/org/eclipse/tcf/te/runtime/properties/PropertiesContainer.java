@@ -131,7 +131,9 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 	@Override
 	public final boolean setChangeEventsEnabled(boolean enabled) {
 		boolean changed = changeEventsEnabled != enabled;
-		if (changed) changeEventsEnabled = enabled;
+		if (changed) {
+			changeEventsEnabled = enabled;
+		}
 		return changed;
 	}
 
@@ -150,7 +152,9 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 	public void fireChangeEvent(String key, Object oldValue, Object newValue) {
 		Assert.isNotNull(key);
 		EventObject event = newEvent(this, key, oldValue, newValue);
-		if (event != null) EventManager.getInstance().fireEvent(event);
+		if (event != null) {
+			EventManager.getInstance().fireEvent(event);
+		}
 	}
 
 	/**
@@ -176,10 +180,10 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 			// Log the event dropping if tracing is enabled
 			if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITraceIds.TRACE_EVENTS)) {
 				CoreBundleActivator.getTraceHandler().trace("Drop event notification (not created change event)\n\t\t" + //$NON-NLS-1$
-						"for eventId  = " + key + ",\n\t\t" + //$NON-NLS-1$ //$NON-NLS-2$
-						"currentValue = " + oldValue + ",\n\t\t" + //$NON-NLS-1$ //$NON-NLS-2$
-						"newValue     = " + newValue, //$NON-NLS-1$
-						0, ITraceIds.TRACE_EVENTS, IStatus.WARNING, this);
+								"for eventId  = " + key + ",\n\t\t" + //$NON-NLS-1$ //$NON-NLS-2$
+								"currentValue = " + oldValue + ",\n\t\t" + //$NON-NLS-1$ //$NON-NLS-2$
+								"newValue     = " + newValue, //$NON-NLS-1$
+								0, ITraceIds.TRACE_EVENTS, IStatus.WARNING, this);
 			}
 			return null;
 		}
@@ -266,7 +270,7 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 		if (value instanceof String) {
 			String val = ((String)value).trim();
 			return "TRUE".equalsIgnoreCase(val) || "1".equals(val) || "Y".equalsIgnoreCase(val) ||  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			"JA".equalsIgnoreCase(val) || "YES".equalsIgnoreCase(val); //$NON-NLS-1$ //$NON-NLS-2$
+							"JA".equalsIgnoreCase(val) || "YES".equalsIgnoreCase(val); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return false;
 	}
@@ -277,17 +281,17 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 	@Override
 	public final long getLongProperty(String key) {
 		Object value = getProperty(key);
-		if (value instanceof Long) {
-			return ((Long)value).longValue();
-		}
-		else if (value instanceof Integer) {
-			return ((Integer)value).intValue();
-		}
-		else if (value != null) {
-			try {
-				return Long.decode(value.toString()).longValue();
+		try {
+			if (value instanceof Long) {
+				return ((Long)value).longValue();
 			}
-			catch (Exception e) {}
+			if (value instanceof Number) {
+				return ((Long)value).longValue();
+			}
+
+			return Long.decode(value.toString()).longValue();
+		}
+		catch (Exception e) {
 		}
 		return -1;
 	}
@@ -299,12 +303,18 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 	public final int getIntProperty(String key) {
 		Object value = getProperty(key);
 		try {
-			return value instanceof Integer ? ((Integer)value).intValue() :
-				(value != null ? Integer.decode(value.toString()).intValue() : -1);
+			if (value instanceof Integer) {
+				return ((Integer)value).intValue();
+			}
+			if (value instanceof Number) {
+				return ((Number)value).intValue();
+			}
+
+			return Integer.decode(value.toString()).intValue();
 		}
 		catch (Exception e) {
-			return -1;
 		}
+		return -1;
 	}
 
 	/* (non-Javadoc)
@@ -324,12 +334,18 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 	public final float getFloatProperty(String key) {
 		Object value = getProperty(key);
 		try {
-			return value instanceof Float ? ((Float)value).floatValue() :
-				(value != null ? Float.parseFloat(value.toString()) : Float.NaN);
+			if (value instanceof Float) {
+				return ((Float)value).floatValue();
+			}
+			if (value instanceof Number) {
+				return ((Number)value).floatValue();
+			}
+
+			return Float.parseFloat(value.toString());
 		}
 		catch (Exception e) {
-			return Float.NaN;
 		}
+		return Float.NaN;
 	}
 
 	/* (non-Javadoc)
@@ -339,13 +355,18 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 	public final double getDoubleProperty(String key) {
 		Object value = getProperty(key);
 		try {
-			return value instanceof Double ? ((Double)value).doubleValue() :
-				(value != null ? Double.parseDouble(value.toString()) : Double.NaN);
+			if (value instanceof Double) {
+				return ((Double)value).doubleValue();
+			}
+			if (value instanceof Number) {
+				return ((Double)value).doubleValue();
+			}
+
+			return Double.parseDouble(value.toString());
 		}
 		catch (Exception e) {
-			return Double.NaN;
 		}
-
+		return Double.NaN;
 	}
 
 	/* (non-Javadoc)
@@ -357,7 +378,9 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 		Assert.isNotNull(properties);
 
 		// Change the properties only if they have changed really
-		if (this.properties.equals(properties)) return;
+		if (this.properties.equals(properties)) {
+			return;
+		}
 
 		// Clear out all old properties
 		this.properties.clear();
@@ -491,7 +514,7 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 	@Override
 	public boolean isEmpty() {
 		Assert.isTrue(checkThreadAccess(), "Illegal Thread Access"); //$NON-NLS-1$
-	    return properties.isEmpty();
+		return properties.isEmpty();
 	}
 
 	/* (non-Javadoc)

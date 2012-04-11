@@ -9,46 +9,46 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.launch.core.selection;
 
-import org.eclipse.tcf.te.launch.core.selection.interfaces.IStepContextSelectionContext;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
+import org.eclipse.tcf.te.launch.core.selection.interfaces.IRemoteSelectionContext;
+import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
 
 /**
  * Step context selection context implementation.
  */
-public class StepContextSelectionContext extends AbstractSelectionContext implements IStepContextSelectionContext {
+public class RemoteSelectionContext extends AbstractSelectionContext implements IRemoteSelectionContext {
 	// The step context
-	private IStepContext stepCtx = null;
+	private IModelNode remoteCtx = null;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param stepCtx The step context or <code>null</code>.
+	 * @param remoteCtx The remote context or <code>null</code>.
 	 * @param isPreferred <code>True</code> to mark the selection context the preferred context,
 	 *            <code>false</code> otherwise.
 	 */
-	public StepContextSelectionContext(IStepContext remoteCtx, boolean isPreferred) {
+	public RemoteSelectionContext(IModelNode remoteCtx, boolean isPreferred) {
 		this(remoteCtx, null, isPreferred);
 	}
 
 	/**
 	 * Constructor.
 	 *
-	 * @param stepCtx The step context or <code>null</code>.
+	 * @param remoteCtx The remote context or <code>null</code>.
 	 * @param selections The selected objects or <code>null</code>.
 	 * @param isPreferred <code>True</code> to mark the selection context the preferred context,
 	 *            <code>false</code> otherwise.
 	 */
-	public StepContextSelectionContext(IStepContext remoteCtx, Object[] selections, boolean isPreferred) {
+	public RemoteSelectionContext(IModelNode remoteCtx, Object[] selections, boolean isPreferred) {
 		super(selections, isPreferred);
-		this.stepCtx = remoteCtx;
+		this.remoteCtx = remoteCtx;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.launch.core.selection.interfaces.IStepContextSelectionContext#getRemoteCtx()
+	 * @see org.eclipse.tcf.te.launch.core.selection.interfaces.IRemoteSelectionContext#getRemoteCtx()
 	 */
 	@Override
-	public IStepContext getStepCtx() {
-	    return stepCtx;
+	public IModelNode getRemoteCtx() {
+		return remoteCtx;
 	}
 
 	/* (non-Javadoc)
@@ -58,8 +58,8 @@ public class StepContextSelectionContext extends AbstractSelectionContext implem
 	public String toString() {
 		StringBuffer toString = new StringBuffer();
 
-		if (stepCtx != null) {
-			toString.append(stepCtx.toString());
+		if (remoteCtx != null) {
+			toString.append(remoteCtx.toString());
 		}
 		toString.append(toString.length() > 0 ? " " : ""); //$NON-NLS-1$ //$NON-NLS-2$
 		toString.append(super.toString());

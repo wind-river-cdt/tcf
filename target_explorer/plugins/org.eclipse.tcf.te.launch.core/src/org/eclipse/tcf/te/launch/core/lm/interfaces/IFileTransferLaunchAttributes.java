@@ -21,4 +21,8 @@ public interface IFileTransferLaunchAttributes {
 	 */
 	public static final String ATTR_FILE_TRANSFERS = ICommonLaunchAttributes.ATTR_PREFIX + ".file_transfers"; //$NON-NLS-1$
 
+	/**
+	 * Launch attribute: The file transfer item the launch is currently operating with.
+	 */
+	public static final String ATTR_ACTIVE_FILE_TRANSFER = ICommonLaunchAttributes.ATTR_PREFIX + ".file_transfer"; //$NON-NLS-1$
 }

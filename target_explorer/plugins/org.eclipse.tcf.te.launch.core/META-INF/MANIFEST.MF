@@ -19,10 +19,8 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: org.eclipse.tcf.te.launch.core.activator;x-internal:=true,
- org.eclipse.tcf.te.launch.core.adapters.internal;x-internal:=true,
  org.eclipse.tcf.te.launch.core.bindings,
  org.eclipse.tcf.te.launch.core.bindings.interfaces,
- org.eclipse.tcf.te.launch.core.bindings.internal;x-friends:="org.eclipse.tcf.te.launch.ui",
  org.eclipse.tcf.te.launch.core.delegates,
  org.eclipse.tcf.te.launch.core.exceptions,
  org.eclipse.tcf.te.launch.core.interfaces,
@@ -30,7 +28,6 @@ Export-Package: org.eclipse.tcf.te.launch.core.activator;x-internal:=true,
  org.eclipse.tcf.te.launch.core.lm,
  org.eclipse.tcf.te.launch.core.lm.delegates,
  org.eclipse.tcf.te.launch.core.lm.interfaces,
- org.eclipse.tcf.te.launch.core.lm.internal;x-internal:=true,
  org.eclipse.tcf.te.launch.core.nls;x-internal:=true,
  org.eclipse.tcf.te.launch.core.persistence,
  org.eclipse.tcf.te.launch.core.persistence.filetransfer,
@@ -39,4 +36,5 @@ Export-Package: org.eclipse.tcf.te.launch.core.activator;x-internal:=true,
  org.eclipse.tcf.te.launch.core.preferences,
  org.eclipse.tcf.te.launch.core.selection,
  org.eclipse.tcf.te.launch.core.selection.interfaces,
- org.eclipse.tcf.te.launch.core.steps
+ org.eclipse.tcf.te.launch.core.steps,
+ org.eclipse.tcf.te.launch.core.steps.iterators

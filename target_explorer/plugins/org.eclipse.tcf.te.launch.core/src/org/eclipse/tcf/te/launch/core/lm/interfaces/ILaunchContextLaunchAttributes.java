@@ -12,7 +12,7 @@ package org.eclipse.tcf.te.launch.core.lm.interfaces;
 /**
  * Defines the launch configuration attribute id's to access the launch step contexts.
  */
-public interface IContextSelectorLaunchAttributes {
+public interface ILaunchContextLaunchAttributes {
 
 	/**
 	 * Launch configuration attribute: The active launch context the launch is operating with.

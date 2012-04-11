@@ -8,7 +8,7 @@
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tcf.te.launch.core.persistence.filetransfer;
+package org.eclipse.tcf.te.tcf.launch.core.filetransfer;
 
 import java.io.File;
 import java.util.HashMap;
@@ -17,8 +17,8 @@ import java.util.Map;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.tcf.te.launch.core.interfaces.IFileTransferItem;
-import org.eclipse.tcf.te.launch.core.nls.Messages;
+import org.eclipse.tcf.te.runtime.services.interfaces.filetransfer.IFileTransferItem;
+import org.eclipse.tcf.te.tcf.launch.core.nls.Messages;
 
 /**
  * FileTransferItemValidator

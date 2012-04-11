@@ -33,14 +33,15 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.te.core.cdt.elf.ElfUtils;
 import org.eclipse.tcf.te.launch.core.selection.LaunchSelection;
 import org.eclipse.tcf.te.launch.core.selection.ProjectSelectionContext;
-import org.eclipse.tcf.te.launch.core.selection.StepContextSelectionContext;
+import org.eclipse.tcf.te.launch.core.selection.RemoteSelectionContext;
 import org.eclipse.tcf.te.launch.core.selection.interfaces.ILaunchSelection;
 import org.eclipse.tcf.te.launch.core.selection.interfaces.ISelectionContext;
 import org.eclipse.tcf.te.launch.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.launch.ui.nls.Messages;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNodeProvider;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
+import org.eclipse.tcf.te.runtime.services.ServiceManager;
+import org.eclipse.tcf.te.runtime.services.interfaces.IPropertiesAccessService;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
@@ -68,7 +69,7 @@ public class LaunchSelectionManager {
 	// Some operations to determine the corresponding selection contexts may consume
 	// a lot of time. Avoid to redo them if not really needed.
 	private IStructuredSelection lastRemoteCtxInputSelection = null;
-	private Map<IStepContext, Set<IModelNode>> lastRemoteCtxOutputSelections = null;
+	private Map<IModelNode, Set<IModelNode>> lastRemoteCtxOutputSelections = null;
 	private IStructuredSelection lastProjectInputSelection = null;
 	private long lastProjectHash = 0;
 	private Map<IProject, Set<IPath>> lastProjectOutputSelections = null;
@@ -109,18 +110,18 @@ public class LaunchSelectionManager {
 		List<ISelectionContext> contexts = new ArrayList<ISelectionContext>();
 
 		// Get the selected remote contexts
-		Map<IStepContext, Set<IModelNode>> remoteCtxSelections = getRemoteCtxSelections(getPartSelection(PART_ID_TE_VIEW));
+		Map<IModelNode, Set<IModelNode>> remoteCtxSelections = getRemoteCtxSelections(getPartSelection(PART_ID_TE_VIEW));
 
-		for (IStepContext remoteCtx : remoteCtxSelections.keySet()) {
-			contexts.add(new StepContextSelectionContext(remoteCtx, remoteCtxSelections.get(remoteCtx).toArray(),
-														   PART_ID_TE_VIEW.equalsIgnoreCase(preferredPartId)));
+		for (IModelNode remoteCtx : remoteCtxSelections.keySet()) {
+			contexts.add(new RemoteSelectionContext(remoteCtx, remoteCtxSelections.get(remoteCtx).toArray(),
+							PART_ID_TE_VIEW.equalsIgnoreCase(preferredPartId)));
 		}
 
 		// Get the selected project contexts
 		Map<IProject, Set<IPath>> projectSelections = getProjectSelections(getPartSelection(PART_ID_PROJECT_VIEW), true);
 		for (IProject prj : projectSelections.keySet()) {
 			contexts.add(new ProjectSelectionContext(prj, projectSelections.get(prj).toArray(),
-													 PART_ID_PROJECT_VIEW.equalsIgnoreCase(preferredPartId)));
+							PART_ID_PROJECT_VIEW.equalsIgnoreCase(preferredPartId)));
 		}
 
 		return contexts.toArray(new ISelectionContext[contexts.size()]);
@@ -132,15 +133,15 @@ public class LaunchSelectionManager {
 	 * @param structSel The UI selection or <code>null</code>.
 	 * @return The remote context selections or an empty map.
 	 */
-	private Map<IStepContext, Set<IModelNode>> getRemoteCtxSelections(IStructuredSelection structSel) {
+	private Map<IModelNode, Set<IModelNode>> getRemoteCtxSelections(IStructuredSelection structSel) {
 		if (structSel != null && structSel.equals(lastRemoteCtxInputSelection) && lastRemoteCtxOutputSelections != null) {
 			return lastRemoteCtxOutputSelections;
 		}
 
-		Map<IStepContext, Set<IModelNode>> remoteCtxSelections = new HashMap<IStepContext, Set<IModelNode>>();
+		Map<IModelNode, Set<IModelNode>> remoteCtxSelections = new HashMap<IModelNode, Set<IModelNode>>();
 		if (structSel != null && !structSel.isEmpty()) {
 			for (Object sel : structSel.toArray()) {
-				IStepContext remoteCtx = null;
+				IModelNode remoteCtx = null;
 				IModelNode node = null;
 
 				if (sel instanceof IModelNodeProvider) {
@@ -150,11 +151,14 @@ public class LaunchSelectionManager {
 				}
 
 				if (node != null) {
-					// Adapt the selected node to an IStepContext
-					remoteCtx = (IStepContext)node.getAdapter(IStepContext.class);
-					// Adapt failed? Probably the adapter is not loaded yet?
-					if (remoteCtx == null) {
-						remoteCtx = (IStepContext)Platform.getAdapterManager().loadAdapter(node, IStepContext.class.getName());
+					IPropertiesAccessService service = ServiceManager.getInstance().getService(node, IPropertiesAccessService.class);
+					if (service != null) {
+						remoteCtx = node;
+						IModelNode parent = (IModelNode)service.getParent(node);
+						while (parent != null) {
+							remoteCtx = parent;
+							parent = (IModelNode)service.getParent(node);
+						}
 					}
 				}
 
@@ -230,7 +234,7 @@ public class LaunchSelectionManager {
 	public Map<IProject, Set<IPath>> getProjectSelections(IStructuredSelection selection, boolean storeToCache) {
 		long projectHash = 0;
 		if (selection != null && selection.equals(lastProjectInputSelection) &&
-			lastProjectOutputSelections != null) {
+						lastProjectOutputSelections != null) {
 			projectHash = getProjectHash(selection);
 			if (lastProjectHash == 0 || lastProjectHash == projectHash) {
 				return lastProjectOutputSelections;
@@ -254,14 +258,14 @@ public class LaunchSelectionManager {
 						try {
 							int elfType = ElfUtils.getELFType(filePath);
 							if (file.exists() &&
-								(elfType == Attribute.ELF_TYPE_EXE || elfType == Attribute.ELF_TYPE_OBJ)) {
+											(elfType == Attribute.ELF_TYPE_EXE || elfType == Attribute.ELF_TYPE_OBJ)) {
 								location = file.getLocation();
 							}
 						}
 						catch (IOException e) {
 							if (Platform.inDebugMode()) {
 								IStatus status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(),
-															NLS.bind(Messages.LaunchSelectionManager_error_failedToDetermineElfType, filePath.getAbsolutePath()), e);
+												NLS.bind(Messages.LaunchSelectionManager_error_failedToDetermineElfType, filePath.getAbsolutePath()), e);
 								UIPlugin.getDefault().getLog().log(status);
 							}
 						}
@@ -282,7 +286,7 @@ public class LaunchSelectionManager {
 							catch (Exception e) {
 								if (Platform.inDebugMode()) {
 									IStatus status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(),
-																NLS.bind(Messages.LaunchSelectionManager_error_failedToDetermineElfType, location.toFile().getAbsolutePath()), e);
+													NLS.bind(Messages.LaunchSelectionManager_error_failedToDetermineElfType, location.toFile().getAbsolutePath()), e);
 									UIPlugin.getDefault().getLog().log(status);
 								}
 								location = null;

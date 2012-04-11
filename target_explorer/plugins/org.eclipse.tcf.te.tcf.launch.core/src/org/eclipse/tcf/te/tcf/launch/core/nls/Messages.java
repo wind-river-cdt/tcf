@@ -29,4 +29,11 @@ public class Messages extends NLS {
 
 	// **** Declare externalized string id's down here *****
 
+	public static String FileTransferItemValidator_missingFile;
+	public static String FileTransferItemValidator_missingFileOrDirectory;
+	public static String FileTransferItemValidator_notExistingFile;
+	public static String FileTransferItemValidator_notExistingFileOrDirectory;
+	public static String FileTransferItemValidator_invalidFile;
+	public static String FileTransferItemValidator_invalidFileOrDirectory;
+
 }

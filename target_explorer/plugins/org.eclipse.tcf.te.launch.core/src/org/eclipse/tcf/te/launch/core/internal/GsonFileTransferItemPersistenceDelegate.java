@@ -13,9 +13,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.tcf.te.launch.core.interfaces.IFileTransferItem;
-import org.eclipse.tcf.te.launch.core.persistence.filetransfer.FileTransferItem;
 import org.eclipse.tcf.te.runtime.persistence.AbstractGsonMapPersistenceDelegate;
+import org.eclipse.tcf.te.runtime.services.filetransfer.FileTransferItem;
+import org.eclipse.tcf.te.runtime.services.interfaces.filetransfer.IFileTransferItem;
 
 /**
  * File transfer item to string delegate implementation.

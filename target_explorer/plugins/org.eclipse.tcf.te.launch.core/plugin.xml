@@ -74,11 +74,11 @@
             </with>
             <with variable="context">
                <or>
-                  <instanceof value="org.eclipse.tcf.te.launch.core.interfaces.IFileTransferItem"/>
+                  <instanceof value="org.eclipse.tcf.te.runtime.services.interfaces.filetransfer.IFileTransferItem"/>
                   <and>
                      <instanceof value="java.lang.Class"/>
                      <with variable="contextClass">
-                        <equals value="org.eclipse.tcf.te.launch.core.interfaces.IFileTransferItem"/>
+                        <equals value="org.eclipse.tcf.te.runtime.services.interfaces.filetransfer.IFileTransferItem"/>
                      </with>
                   </and>
                </or>

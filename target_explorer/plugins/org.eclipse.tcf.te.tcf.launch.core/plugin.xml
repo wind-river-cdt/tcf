@@ -70,6 +70,7 @@
             locked="false">
          <references>
             <reference id="org.eclipse.tcf.te.tcf.launch.core.openChannelStep"/>
+            <reference id="org.eclipse.tcf.te.tcf.launch.core.fileTransferStepGroup"/>
             <reference id="org.eclipse.tcf.te.tcf.launch.core.launchProcessStep"/>
             <reference id="org.eclipse.tcf.te.tcf.launch.core.closeChannelStep"/>
             <reference id="org.eclipse.tcf.te.launch.core.removeLaunchStep">
@@ -83,26 +84,43 @@
             </reference>
          </references>
       </stepGroup>
+      <stepGroup
+            id="org.eclipse.tcf.te.tcf.launch.core.fileTransferStepGroup"
+            label="%LaunchStepGroup.FileTransfer.name"
+            iterator="org.eclipse.tcf.te.tcf.launch.core.steps.iterators.FileTransferIterator"
+            locked="false">
+         <references>
+            <reference id="org.eclipse.tcf.te.tcf.launch.core.fileTransferStep"/>
+         </references>
+      </stepGroup>
    </extension>
    
 <!-- Launch Step contributions -->
    <extension point="org.eclipse.tcf.te.runtime.stepper.steps">
       <step
-            class="org.eclipse.tcf.te.tcf.launch.core.steps.OpenChannelStep"
             id="org.eclipse.tcf.te.tcf.launch.core.openChannelStep"
+            class="org.eclipse.tcf.te.tcf.launch.core.steps.OpenChannelStep"
             label="%LaunchStep.OpenChannel.name">
       </step>
       <step
-            class="org.eclipse.tcf.te.tcf.launch.core.steps.LaunchProcessStep"
+            id="org.eclipse.tcf.te.tcf.launch.core.fileTransferStep"
+            class="org.eclipse.tcf.te.tcf.launch.core.steps.FileTransferStep"
+            label="%LaunchStep.FileTransfer.name">
+         <requires
+               id="org.eclipse.tcf.te.tcf.launch.core.openChannelStep">
+         </requires>
+      </step>
+      <step
             id="org.eclipse.tcf.te.tcf.launch.core.launchProcessStep"
+            class="org.eclipse.tcf.te.tcf.launch.core.steps.LaunchProcessStep"
             label="%LaunchStep.LaunchProcess.name">
          <requires
                id="org.eclipse.tcf.te.tcf.launch.core.openChannelStep">
          </requires>
       </step>
       <step
-            class="org.eclipse.tcf.te.tcf.launch.core.steps.CloseChannelStep"
             id="org.eclipse.tcf.te.tcf.launch.core.closeChannelStep"
+            class="org.eclipse.tcf.te.tcf.launch.core.steps.CloseChannelStep"
             label="%LaunchStep.CloseChannel.name">
          <requires
                id="org.eclipse.tcf.te.tcf.launch.core.openChannelStep">
