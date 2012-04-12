@@ -66,11 +66,6 @@ class RunControl {
         public void contextSuspended(final String id, String pc, String reason, Map<String,Object> params) {
             if (enable_trace) System.out.println("" + channel_id + " suspended " + id);
             suspended_ctx_ids.add(id);
-            Protocol.invokeLater(new Runnable() {
-                public void run() {
-                    resume(id, IRunControl.RM_RESUME);
-                }
-            });
         }
 
         public void contextResumed(String id) {
@@ -90,7 +85,6 @@ class RunControl {
             }
             for (String id : suspended_ids) {
                 suspended_ctx_ids.add(id);
-                resume(id, IRunControl.RM_RESUME);
             }
         }
 
@@ -155,29 +149,17 @@ class RunControl {
                                                 }
                                                 else {
                                                     if (suspended) suspended_ctx_ids.add(id);
-                                                    getStateDone();
                                                 }
                                             }
                                         }));
                                     }
-                                    getStateDone();
                                 }
                             }
                         }));
                     }
-                    getStateDone();
                 }
             }
         }));
-    }
-
-    private void getStateDone() {
-        if (get_state_cmds.size() > 0) return;
-        if (channel.getState() != IChannel.STATE_OPEN) return;
-        if (suspended_ctx_ids.size() > 0) {
-            String[] arr = suspended_ctx_ids.toArray(new String[suspended_ctx_ids.size()]);
-            resume(arr[rnd.nextInt(arr.length)], IRunControl.RM_RESUME);
-        }
     }
 
     private void startTimer() {
@@ -312,7 +294,7 @@ class RunControl {
                         test_id.equals(ctx.getCreatorID())) {
                     String thread_id = ctx.getID();
                     test_suite.getCanceledTests().put(thread_id, test_id);
-                    resume(thread_id, 0);
+                    resume(thread_id, IRunControl.RM_RESUME);
                 }
             }
         }

@@ -67,6 +67,7 @@ class TestExpressions implements ITCFTest,
     private final Map<String,ISymbols.Symbol> expr_sym = new HashMap<String,ISymbols.Symbol>();
     private final Map<String,String[]> expr_chld = new HashMap<String,String[]>();
     private final Set<String> expr_to_dispose = new HashSet<String>();
+    private int timer = 0;
 
     private static String[] global_var_names = {
         "tcf_test_char",
@@ -159,14 +160,13 @@ class TestExpressions implements ITCFTest,
                             test_id = list[rnd.nextInt(list.length)];
                             runTest();
                             Protocol.invokeLater(100, new Runnable() {
-                                int cnt = 0;
                                 public void run() {
                                     if (!test_suite.isActive(TestExpressions.this)) return;
-                                    cnt++;
+                                    timer++;
                                     if (test_suite.cancel) {
                                         exit(null);
                                     }
-                                    else if (cnt < 600) {
+                                    else if (timer < 600) {
                                         if (test_done && !cancel_test_sent) {
                                             test_rc.cancel(test_ctx_id);
                                             cancel_test_sent = true;
@@ -211,6 +211,7 @@ class TestExpressions implements ITCFTest,
 
     @SuppressWarnings("unchecked")
     private void runTest() {
+        timer = 0;
         if (bp_id == null) {
             bp.set(null, new IBreakpoints.DoneCommand() {
                 public void doneCommand(IToken token, Exception error) {
@@ -363,7 +364,6 @@ class TestExpressions implements ITCFTest,
             BigInteger pc1 = new BigInteger(suspended_pc);
             if (!pc0.equals(pc1)) {
                 waiting_suspend = true;
-                test_rc.resume(thread_id, IRunControl.RM_RESUME);
                 return;
             }
             run_to_bp_done = true;
@@ -590,7 +590,6 @@ class TestExpressions implements ITCFTest,
             return;
         }
         test_done = true;
-        test_rc.resume(thread_id, IRunControl.RM_RESUME);
     }
 
     private void exit(Throwable x) {
