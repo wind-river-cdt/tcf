@@ -41,17 +41,15 @@ public class MyPropertyTester extends PropertyTester {
 				}
 			}
 			else {
-				if (Protocol.isDispatchThread()) {
-					result.set(testPeerModel((IPeerModel) receiver, property, args, expectedValue));
-				}
-				else {
-					Protocol.invokeAndWait(new Runnable() {
-						@Override
-						public void run() {
-							result.set(testPeerModel((IPeerModel) receiver, property, args, expectedValue));
-						}
-					});
-				}
+				Runnable runnable = new Runnable() {
+					@Override
+					public void run() {
+						result.set(testPeerModel((IPeerModel) receiver, property, args, expectedValue));
+					}
+				};
+
+				if (Protocol.isDispatchThread()) runnable.run();
+				else Protocol.invokeAndWait(runnable);
 			}
 
 			return result.get();

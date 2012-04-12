@@ -437,14 +437,6 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 															0, ITraceIds.TRACE_CHANNEL_MANAGER, IStatus.INFO, this);
 			}
 
-			// Shutdown the value-add's for the associated remote peer
-			if (forceValueAddShutdown) {
-				IValueAdd[] valueAdds = ValueAddManager.getInstance().getValueAdd(channel.getRemotePeer());
-				if (valueAdds != null) {
-					internalShutdownValueAdds(channel.getRemotePeer(), valueAdds);
-				}
-			}
-
 			// Clean the reference counter and the channel map
 			refCounters.remove(id);
 			channels.remove(id);
@@ -484,16 +476,11 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 
 		refCounters.clear();
 		channels.clear();
-		forceValueAddShutdown = true;
 
 		for (IChannel channel : openChannels) internalCloseChannel(channel);
-	}
 
-	/**
-	 * Set be {@link #internalCloseAll()} to signal that we should force
-	 * a shutdown of all associated value-adds on closing the channels.
-	 */
-	/* default */ boolean forceValueAddShutdown = false;
+		internalShutdownAllValueAdds();
+	}
 
 	/**
 	 * Shutdown the given value-adds for the given peer.
@@ -511,7 +498,6 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 
 		if (valueAdds.length > 0) {
 			doShutdownValueAdds(id, valueAdds);
-			forceValueAddShutdown = false;
 		}
 	}
 
@@ -528,6 +514,23 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 
 		for (IValueAdd valueAdd : valueAdds) {
 			valueAdd.shutdown(id, new Callback() {
+				@Override
+				protected void internalDone(Object caller, IStatus status) {
+				}
+			});
+		}
+	}
+
+	/**
+	 * Shutdown all value-add's running. Called from {@link #closeAll()}
+	 */
+	/* default */ void internalShutdownAllValueAdds() {
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+
+		// Get all value-add's
+		IValueAdd[] valueAdds = ValueAddManager.getInstance().getValueAdds(false);
+		for (IValueAdd valueAdd : valueAdds) {
+			valueAdd.shutdownAll(new Callback() {
 				@Override
 				protected void internalDone(Object caller, IStatus status) {
 				}

@@ -24,10 +24,12 @@ import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.JSON;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.te.core.async.AsyncCallbackCollector;
 import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.runtime.utils.net.IPAddressUtil;
 import org.eclipse.tcf.te.tcf.core.activator.CoreBundleActivator;
+import org.eclipse.tcf.te.tcf.core.async.CallbackInvocationDelegate;
 import org.eclipse.tcf.te.tcf.core.nls.Messages;
 
 /**
@@ -280,5 +282,23 @@ public abstract class AbstractExternalValueAdd extends AbstractValueAdd {
 		} else {
 			done.done(AbstractExternalValueAdd.this, Status.OK_STATUS);
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.core.va.interfaces.IValueAdd#shutdownAll(org.eclipse.tcf.te.runtime.interfaces.callback.ICallback)
+	 */
+	@Override
+	public void shutdownAll(ICallback done) {
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+		Assert.isNotNull(done);
+
+		AsyncCallbackCollector collector = new AsyncCallbackCollector(done, new CallbackInvocationDelegate());
+
+		for (String id : entries.keySet()) {
+			ICallback callback = new AsyncCallbackCollector.SimpleCollectorCallback(collector);
+			shutdown(id, callback);
+		}
+
+		collector.initDone();
 	}
 }

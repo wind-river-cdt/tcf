@@ -189,6 +189,13 @@ public class LocatorModelPeerNodeQueryService extends AbstractLocatorModelServic
 			}
 		};
 
+		// Do not try to open a channel to peers known to be unreachable
+		int state = node.getIntProperty(IPeerModelProperties.PROP_STATE);
+		if (state == IPeerModelProperties.STATE_ERROR || state == IPeerModelProperties.STATE_NOT_REACHABLE) {
+			innerDone.doneQueryServices(null);
+			return;
+		}
+
 		// Opens a channel with the full value-add chain
 		Tcf.getChannelManager().openChannel(node.getPeer(), null, new IChannelManager.DoneOpenChannel() {
 

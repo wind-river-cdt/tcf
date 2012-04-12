@@ -55,6 +55,13 @@ public interface IValueAdd extends IExecutableExtension {
 	public void shutdown(String id, ICallback done);
 
 	/**
+	 * Shutdown the value-add's for all target peer's.
+	 *
+	 * @param done The client callback. Must not be <code>null</code>.
+	 */
+	public void shutdownAll(ICallback done);
+
+	/**
 	 * Returns the peer representing the value add for the given target peer.
 	 *
 	 * @param id The target peer id. Must not be <code>null</code>.
