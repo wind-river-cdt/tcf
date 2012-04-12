@@ -62,7 +62,7 @@ class TestAttachTerminate implements ITCFTest, IRunControl.RunControlListener {
                                 if (test_suite.cancel) {
                                     exit(null);
                                 }
-                                else if (timer < 600) {
+                                else if (timer < 600 * TCFTestSuite.NUM_CHANNELS) {
                                     Protocol.invokeLater(100, this);
                                 }
                                 else if (test_ctx_ids.isEmpty()) {
@@ -116,16 +116,11 @@ class TestAttachTerminate implements ITCFTest, IRunControl.RunControlListener {
     }
 
     public void containerResumed(String[] context_ids) {
-        for (String id : context_ids) contextResumed(id);
     }
 
     public void containerSuspended(String main_context, String pc,
             String reason, Map<String, Object> params,
             String[] suspended_ids) {
-        for (String context : suspended_ids) {
-            assert context != null;
-            contextSuspended(context, null, null, null);
-        }
     }
 
     public void contextAdded(RunControlContext[] contexts) {

@@ -33,7 +33,7 @@ import org.eclipse.tcf.services.IPathMap;
  */
 public class TCFTestSuite {
 
-    private final static int NUM_CHANNELS = 4;
+    final static int NUM_CHANNELS = 4;
 
     private final TestListener listener;
     private final IChannel[] channels;
