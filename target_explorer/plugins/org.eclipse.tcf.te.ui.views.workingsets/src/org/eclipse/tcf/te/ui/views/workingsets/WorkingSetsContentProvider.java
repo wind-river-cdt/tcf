@@ -236,7 +236,7 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 	 */
 	@Override
 	public Object getParent(Object element) {
-		CommonNavigator navigator = viewer.getCommonNavigator();
+		CommonNavigator navigator = viewer != null ? viewer.getCommonNavigator() : null;
 		WorkingSetViewStateManager manager = navigator != null ? (WorkingSetViewStateManager)Platform.getAdapterManager().getAdapter(navigator, WorkingSetViewStateManager.class) : null;
 
 		if (element instanceof IWorkingSet) {
