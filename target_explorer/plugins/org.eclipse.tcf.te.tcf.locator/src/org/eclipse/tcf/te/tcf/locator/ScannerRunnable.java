@@ -133,15 +133,6 @@ public class ScannerRunnable implements Runnable, IChannel.IChannelListener {
 			// Get the parent model from the model mode
 			final ILocatorModel model = (ILocatorModel)peerNode.getAdapter(ILocatorModel.class);
 			if (model != null) {
-				// Get the local service
-				Collection<String> localServices = new ArrayList<String>(channel.getLocalServices());
-				// Get the remote services
-				Collection<String> remoteServices = new ArrayList<String>(channel.getRemoteServices());
-
-				// Update the services
-				ILocatorModelUpdateService updateService = model.getService(ILocatorModelUpdateService.class);
-				updateService.updatePeerServices(peerNode, localServices, remoteServices);
-
 				// Use the open channel to ask the remote peer what other peers it knows
 				ILocator locator = channel.getRemoteService(ILocator.class);
 				if (locator != null) {

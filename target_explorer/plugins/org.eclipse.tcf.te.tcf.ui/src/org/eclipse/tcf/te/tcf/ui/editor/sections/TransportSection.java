@@ -35,6 +35,7 @@ import org.eclipse.tcf.te.tcf.core.interfaces.ITransportTypes;
 import org.eclipse.tcf.te.tcf.locator.ScannerRunnable;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
+import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelUpdateService;
 import org.eclipse.tcf.te.tcf.locator.nodes.PeerRedirector;
 import org.eclipse.tcf.te.tcf.ui.controls.CustomTransportPanel;
 import org.eclipse.tcf.te.tcf.ui.controls.PipeTransportPanel;
@@ -334,11 +335,13 @@ public class TransportSection extends AbstractSection {
 				// As the transport changed, we have to reset the state back to "unknown"
 				// and clear out the services and DNS markers
 				node.setProperty(IPeerModelProperties.PROP_STATE, IPeerModelProperties.STATE_UNKNOWN);
-				node.setProperty(IPeerModelProperties.PROP_LOCAL_SERVICES, null);
-				node.setProperty(IPeerModelProperties.PROP_REMOTE_SERVICES, null);
 				node.setProperty("dns.name.transient", null); //$NON-NLS-1$
 				node.setProperty("dns.lastIP.transient", null); //$NON-NLS-1$
 				node.setProperty("dns.skip.transient", null); //$NON-NLS-1$
+
+				ILocatorModelUpdateService service = node.getModel().getService(ILocatorModelUpdateService.class);
+				service.updatePeerServices(node, null, null);
+
 				if (changed) {
 					node.setChangeEventsEnabled(true);
 				}

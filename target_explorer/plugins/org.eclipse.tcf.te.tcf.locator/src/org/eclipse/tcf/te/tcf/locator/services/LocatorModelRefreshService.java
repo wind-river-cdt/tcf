@@ -66,7 +66,7 @@ public class LocatorModelRefreshService extends AbstractLocatorModelService impl
 	 */
 	@Override
 	public void refresh() {
-		Assert.isTrue(Protocol.isDispatchThread());
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 
 		// Get the parent locator model
 		ILocatorModel model = getLocatorModel();
@@ -204,7 +204,7 @@ public class LocatorModelRefreshService extends AbstractLocatorModelService impl
 	 */
 	@Override
 	public void refreshStaticPeers() {
-		Assert.isTrue(Protocol.isDispatchThread());
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 
 		// This method might be called reentrant while processing. Return immediately
 		// in this case.

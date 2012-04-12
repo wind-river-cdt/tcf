@@ -35,12 +35,14 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.preferences.IPreferenceKeys;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelLookupService;
+import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelPeerNodeQueryService;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelRefreshService;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelService;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelUpdateService;
 import org.eclipse.tcf.te.tcf.locator.listener.ChannelStateChangeListener;
 import org.eclipse.tcf.te.tcf.locator.listener.LocatorListener;
 import org.eclipse.tcf.te.tcf.locator.services.LocatorModelLookupService;
+import org.eclipse.tcf.te.tcf.locator.services.LocatorModelPeerNodeQueryService;
 import org.eclipse.tcf.te.tcf.locator.services.LocatorModelRefreshService;
 import org.eclipse.tcf.te.tcf.locator.services.LocatorModelUpdateService;
 
@@ -76,6 +78,8 @@ public class LocatorModel extends PlatformObject implements ILocatorModel {
 	private final ILocatorModelLookupService lookupService = new LocatorModelLookupService(this);
 	// Reference to the update service
 	private final ILocatorModelUpdateService updateService = new LocatorModelUpdateService(this);
+	// Reference to the query service
+	private final ILocatorModelPeerNodeQueryService queryService = new LocatorModelPeerNodeQueryService(this);
 
 	/**
 	 * Constructor.
@@ -243,6 +247,9 @@ public class LocatorModel extends PlatformObject implements ILocatorModel {
 		}
 		if (adapter.isAssignableFrom(ILocatorModelUpdateService.class)) {
 			return updateService;
+		}
+		if (adapter.isAssignableFrom(ILocatorModelPeerNodeQueryService.class)) {
+			return queryService;
 		}
 		if (adapter.isAssignableFrom(Map.class)) {
 			return peers;

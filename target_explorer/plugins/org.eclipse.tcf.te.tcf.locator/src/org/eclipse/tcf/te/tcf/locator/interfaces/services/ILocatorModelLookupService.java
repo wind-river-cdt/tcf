@@ -53,6 +53,8 @@ public interface ILocatorModelLookupService extends ILocatorModelService {
 
 	/**
 	 * Lookup matching peer model instances which supports the listed local and remote services.
+	 * <p>
+	 * <b>Note:</b> This method must be called outside the TCF dispatch thread.
 	 *
 	 * @param expectedLocalServices The list of local service names to be supported, or <code>null</code>.
 	 * @param expectedRemoteServices The list of remote service names to be supported, or <code>null</code>.

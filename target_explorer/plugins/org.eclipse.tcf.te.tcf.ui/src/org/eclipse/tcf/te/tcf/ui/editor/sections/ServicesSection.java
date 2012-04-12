@@ -10,6 +10,7 @@
 package org.eclipse.tcf.te.tcf.ui.editor.sections;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
@@ -23,6 +24,7 @@ import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
+import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelPeerNodeQueryService;
 import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.forms.parts.AbstractSection;
 import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
@@ -133,6 +135,20 @@ public class ServicesSection extends AbstractSection {
 
 		// If no data is available, we are done
 		if (node == null) return;
+
+		// Trigger the query of the services provided by the node
+		final AtomicBoolean needQueryServices = new AtomicBoolean();
+		Protocol.invokeAndWait(new Runnable() {
+			@Override
+			public void run() {
+				needQueryServices.set(node.getStringProperty(IPeerModelProperties.PROP_LOCAL_SERVICES) != null
+										|| node.getStringProperty(IPeerModelProperties.PROP_REMOTE_SERVICES) != null);
+			}
+		});
+
+		if (needQueryServices.get()) {
+			node.getModel().getService(ILocatorModelPeerNodeQueryService.class).queryLocalServices(node);
+		}
 
 		// Thread access to the model is limited to the executors thread.
 		// Copy the data over to the working copy to ease the access.

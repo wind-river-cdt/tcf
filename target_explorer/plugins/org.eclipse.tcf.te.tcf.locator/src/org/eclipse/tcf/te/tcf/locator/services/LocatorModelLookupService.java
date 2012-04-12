@@ -17,8 +17,8 @@ import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
-import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelLookupService;
+import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelPeerNodeQueryService;
 
 
 /**
@@ -120,20 +120,22 @@ public class LocatorModelLookupService extends AbstractLocatorModelService imple
 	 */
 	@Override
 	public IPeerModel[] lkupPeerModelBySupportedServices(String[] expectedLocalServices, String[] expectedRemoteServices) {
-		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+		Assert.isTrue(!Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+
+		ILocatorModel model = getLocatorModel();
+		ILocatorModelPeerNodeQueryService queryService = model.getService(ILocatorModelPeerNodeQueryService.class);
 
 		List<IPeerModel> nodes = new ArrayList<IPeerModel>();
-		for (IPeerModel candidate : getLocatorModel().getPeers()) {
-			String localServices = candidate.getStringProperty(IPeerModelProperties.PROP_LOCAL_SERVICES);
-			String remoteServices = candidate.getStringProperty(IPeerModelProperties.PROP_REMOTE_SERVICES);
+		for (IPeerModel candidate : model.getPeers()) {
+			String services = queryService.queryLocalServices(candidate);
 
 			boolean matchesExpectations = true;
 
 			// Ignore the local services if not expectations are set
 			if (expectedLocalServices != null && expectedLocalServices.length > 0) {
-				if (localServices != null) {
+				if (services != null) {
 					for (String service : expectedLocalServices) {
-						if (!localServices.contains(service)) {
+						if (!services.contains(service)) {
 							matchesExpectations = false;
 							break;
 						}
@@ -145,11 +147,13 @@ public class LocatorModelLookupService extends AbstractLocatorModelService imple
 
 			if (!matchesExpectations) continue;
 
+			services = queryService.queryRemoteServices(candidate);
+
 			// Ignore the remote services if not expectations are set
 			if (expectedRemoteServices != null && expectedRemoteServices.length > 0) {
-				if (remoteServices != null) {
+				if (services != null) {
 					for (String service : expectedRemoteServices) {
-						if (!remoteServices.contains(service)) {
+						if (!services.contains(service)) {
 							matchesExpectations = false;
 							break;
 						}
@@ -164,4 +168,5 @@ public class LocatorModelLookupService extends AbstractLocatorModelService imple
 
 		return nodes.toArray(new IPeerModel[nodes.size()]);
 	}
+
 }
