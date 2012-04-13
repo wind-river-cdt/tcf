@@ -9,13 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tests.tcf.filesystem.adapters;
 
-import java.util.concurrent.atomic.AtomicReference;
-
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.tcf.te.runtime.callback.Callback;
-import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
 import org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IConfirmCallback;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.adapters.DeleteHandlerDelegate;
 import org.eclipse.tcf.te.tests.tcf.filesystem.FSPeerTestCase;
@@ -49,6 +43,7 @@ public class DeleteHandlerDelegateTest extends FSPeerTestCase {
 		assertTrue(delegate.canDelete(test11File));
 	}
 
+	/*
 	public void testDelete() throws Exception {
 		final AtomicReference<IStatus> ref = new AtomicReference<IStatus>();
 		PropertiesContainer props = new PropertiesContainer();
@@ -66,4 +61,5 @@ public class DeleteHandlerDelegateTest extends FSPeerTestCase {
 		test11File = getFSNode(location);
 		assertNull(test11File);
 	}
+	*/
 }
