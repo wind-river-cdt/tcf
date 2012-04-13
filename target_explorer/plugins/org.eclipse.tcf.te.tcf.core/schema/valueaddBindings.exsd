@@ -3,7 +3,7 @@
 <schema targetNamespace="org.eclipse.tcf.te.tcf.core" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.eclipse.tcf.te.tcf.core" id="bindings" name="Value Add Bindings"/>
+         <meta.schema plugin="org.eclipse.tcf.te.tcf.core" id="valueaddBindings" name="Value Add Bindings"/>
       </appinfo>
       <documentation>
          This extension point is used to declare the value-add bindings.

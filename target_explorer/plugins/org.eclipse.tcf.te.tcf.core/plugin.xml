@@ -2,7 +2,7 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension-point id="valueadds" name="%ExtensionPoint.valueadds.name" schema="schema/valueadds.exsd"/>
-   <extension-point id="bindings" name="%ExtensionPoint.bindings.name" schema="schema/bindings.exsd"/>
+   <extension-point id="valueaddBindings" name="%ExtensionPoint.valueaddBindings.name" schema="schema/valueaddBindings.exsd"/>
 
 <!-- TCF framework startup participant -->   
    <extension point="org.eclipse.tcf.startup">

@@ -59,7 +59,7 @@ public class BindingExtensionPointManager extends AbstractExtensionPointManager<
 	 */
 	@Override
 	protected String getExtensionPointId() {
-		return "org.eclipse.tcf.te.tcf.core.bindings"; //$NON-NLS-1$
+		return "org.eclipse.tcf.te.tcf.core.valueaddBindings"; //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
