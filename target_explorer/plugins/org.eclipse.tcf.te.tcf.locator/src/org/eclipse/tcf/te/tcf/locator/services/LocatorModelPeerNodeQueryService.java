@@ -14,11 +14,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.te.runtime.interfaces.IConditionTester;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
@@ -26,7 +28,6 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelPeerNodeQueryService;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelUpdateService;
-import org.eclipse.tcf.util.TCFTask;
 
 /**
  * Default locator model peer node query service implementation.
@@ -66,24 +67,35 @@ public class LocatorModelPeerNodeQueryService extends AbstractLocatorModelServic
 
 		// Get the service asynchronously and block the caller thread until
 		// the callback returned
-		TCFTask<String> task = new TCFTask<String>() {
+		final AtomicBoolean completed = new AtomicBoolean(false);
+		Protocol.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				doQueryServices(node, new DoneQueryServices() {
 					@Override
 					public void doneQueryServices(Throwable error) {
-						if (error == null) done(node.getStringProperty(IPeerModelProperties.PROP_LOCAL_SERVICES));
-						else error(error);
+						if (error == null) services.set(node.getStringProperty(IPeerModelProperties.PROP_LOCAL_SERVICES));
+						completed.set(true);
 					}
 				});
 			}
+		});
+
+		final long startTime = System.currentTimeMillis();
+		final IConditionTester tester = new IConditionTester() {
+			@Override
+			public boolean isConditionFulfilled() {
+				return completed.get();
+			}
+
+			@Override
+			public void cleanup() {}
 		};
 
-		try {
-			services.set(task.get());
-		}
-		catch (Exception e) {
-			/* Ignored on purpose */
+		while ((startTime + 1000) < System.currentTimeMillis() && !tester.isConditionFulfilled()) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) { /* ignored on purpose */ }
 		}
 
 		return services.get();
@@ -113,24 +125,35 @@ public class LocatorModelPeerNodeQueryService extends AbstractLocatorModelServic
 
 		// Get the service asynchronously and block the caller thread until
 		// the callback returned
-		TCFTask<String> task = new TCFTask<String>() {
+		final AtomicBoolean completed = new AtomicBoolean(false);
+		Protocol.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				doQueryServices(node, new DoneQueryServices() {
 					@Override
 					public void doneQueryServices(Throwable error) {
-						if (error == null) done(node.getStringProperty(IPeerModelProperties.PROP_REMOTE_SERVICES));
-						else error(error);
+						if (error == null) services.set(node.getStringProperty(IPeerModelProperties.PROP_REMOTE_SERVICES));
+						completed.set(true);
 					}
 				});
 			}
+		});
+
+		final long startTime = System.currentTimeMillis();
+		final IConditionTester tester = new IConditionTester() {
+			@Override
+			public boolean isConditionFulfilled() {
+				return completed.get();
+			}
+
+			@Override
+			public void cleanup() {}
 		};
 
-		try {
-			services.set(task.get());
-		}
-		catch (Exception e) {
-			/* Ignored on purpose */
+		while ((startTime + 1000) < System.currentTimeMillis() && !tester.isConditionFulfilled()) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) { /* ignored on purpose */ }
 		}
 
 		return services.get();
@@ -191,7 +214,7 @@ public class LocatorModelPeerNodeQueryService extends AbstractLocatorModelServic
 
 		// Do not try to open a channel to peers known to be unreachable
 		int state = node.getIntProperty(IPeerModelProperties.PROP_STATE);
-		if (state == IPeerModelProperties.STATE_ERROR || state == IPeerModelProperties.STATE_NOT_REACHABLE) {
+		if (state == IPeerModelProperties.STATE_ERROR || state == IPeerModelProperties.STATE_NOT_REACHABLE || !node.isComplete()) {
 			innerDone.doneQueryServices(null);
 			return;
 		}

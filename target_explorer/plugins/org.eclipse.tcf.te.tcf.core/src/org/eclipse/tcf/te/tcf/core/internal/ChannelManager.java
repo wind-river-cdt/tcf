@@ -204,59 +204,68 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 															0, ITraceIds.TRACE_CHANNEL_MANAGER, IStatus.INFO, this);
 			}
 
-			channel = peer.openChannel();
+			try {
+				channel = peer.openChannel();
 
-			if (channel != null) {
-				if (!forceNew) channels.put(id, channel);
-				if (!forceNew) refCounters.put(id, new AtomicInteger(1));
+				if (channel != null) {
+					if (!forceNew) channels.put(id, channel);
+					if (!forceNew) refCounters.put(id, new AtomicInteger(1));
 
-				// Register the channel listener
-				final IChannel finChannel = channel;
-				channel.addChannelListener(new IChannel.IChannelListener() {
+					// Register the channel listener
+					final IChannel finChannel = channel;
+					channel.addChannelListener(new IChannel.IChannelListener() {
 
-					@Override
-					public void onChannelOpened() {
-						// Remove ourself as listener from the channel
-						finChannel.removeChannelListener(this);
-						// Register the channel monitor
-						finChannel.addChannelListener(new ChannelMonitor(id, finChannel));
+						@Override
+						public void onChannelOpened() {
+							// Remove ourself as listener from the channel
+							finChannel.removeChannelListener(this);
+							// Register the channel monitor
+							finChannel.addChannelListener(new ChannelMonitor(id, finChannel));
 
-						if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITraceIds.TRACE_CHANNEL_MANAGER)) {
-							CoreBundleActivator.getTraceHandler().trace(NLS.bind(Messages.ChannelManager_openChannel_success_message, id),
-																		0, ITraceIds.TRACE_CHANNEL_MANAGER, IStatus.INFO, ChannelManager.this);
+							if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITraceIds.TRACE_CHANNEL_MANAGER)) {
+								CoreBundleActivator.getTraceHandler().trace(NLS.bind(Messages.ChannelManager_openChannel_success_message, id),
+																			0, ITraceIds.TRACE_CHANNEL_MANAGER, IStatus.INFO, ChannelManager.this);
+							}
+
+							// Channel opening succeeded
+							done.doneOpenChannel(null, finChannel);
 						}
 
-						// Channel opening succeeded
-						done.doneOpenChannel(null, finChannel);
-					}
+						@Override
+						public void onChannelClosed(Throwable error) {
+							// Remove ourself as listener from the channel
+							finChannel.removeChannelListener(this);
+							// Clean the reference counter and the channel map
+							channels.remove(id);
+							refCounters.remove(id);
 
-					@Override
-					public void onChannelClosed(Throwable error) {
-						// Remove ourself as listener from the channel
-						finChannel.removeChannelListener(this);
-						// Clean the reference counter and the channel map
-						channels.remove(id);
-						refCounters.remove(id);
+							if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITraceIds.TRACE_CHANNEL_MANAGER)) {
+								CoreBundleActivator.getTraceHandler().trace(NLS.bind(Messages.ChannelManager_openChannel_failed_message, id, error),
+																			0, ITraceIds.TRACE_CHANNEL_MANAGER, IStatus.INFO, this);
+							}
 
-						if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITraceIds.TRACE_CHANNEL_MANAGER)) {
-							CoreBundleActivator.getTraceHandler().trace(NLS.bind(Messages.ChannelManager_openChannel_failed_message, id, error),
-																		0, ITraceIds.TRACE_CHANNEL_MANAGER, IStatus.INFO, this);
+							// Channel opening failed
+							done.doneOpenChannel(error, finChannel);
 						}
 
-						// Channel opening failed
-						done.doneOpenChannel(error, finChannel);
-					}
+						@Override
+						public void congestionLevel(int level) {
+							// ignored
+						}
+					});
+				} else {
+					// Channel is null? Something went terrible wrong.
+					done.doneOpenChannel(new Exception("Unexpected null return value from IPeer#openChannel()!"), null); //$NON-NLS-1$
+				}
+			} catch (Throwable e) {
+				if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITraceIds.TRACE_CHANNEL_MANAGER)) {
+					CoreBundleActivator.getTraceHandler().trace(NLS.bind(Messages.ChannelManager_openChannel_failed_message, id, e),
+																0, ITraceIds.TRACE_CHANNEL_MANAGER, IStatus.INFO, this);
+				}
 
-					@Override
-					public void congestionLevel(int level) {
-						// ignored
-					}
-				});
-			} else {
-				// Channel is null? Something went terrible wrong.
-				done.doneOpenChannel(new Exception("Unexpected null return value from IPeer#openChannel()!"), null); //$NON-NLS-1$
+				// Channel opening failed
+				done.doneOpenChannel(e, channel);
 			}
-
 		} else {
 			// Wait for the channel to be fully opened if still in "OPENING" state
 			if (channel.getState() == IChannel.STATE_OPENING) {
