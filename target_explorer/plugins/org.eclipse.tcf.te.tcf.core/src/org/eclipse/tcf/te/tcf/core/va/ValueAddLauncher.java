@@ -10,18 +10,29 @@
 package org.eclipse.tcf.te.tcf.core.va;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.te.runtime.interfaces.IDisposable;
 import org.eclipse.tcf.te.runtime.processes.ProcessLauncher;
 import org.eclipse.tcf.te.runtime.processes.ProcessOutputReaderThread;
 import org.eclipse.tcf.te.runtime.utils.Host;
+import org.eclipse.tcf.te.tcf.core.activator.CoreBundleActivator;
+import org.eclipse.tcf.te.tcf.core.interfaces.tracing.ITraceIds;
+import org.eclipse.tcf.te.tcf.core.nls.Messages;
+import org.osgi.framework.Bundle;
 
 /**
  * Value-add launcher implementation.
  */
 public class ValueAddLauncher extends ProcessLauncher implements IDisposable {
+	// The target peer id
+	private final String id;
 	// The path of the value-add to launch
 	private final IPath path;
 	// The process handle
@@ -32,10 +43,14 @@ public class ValueAddLauncher extends ProcessLauncher implements IDisposable {
 	/**
 	 * Constructor.
 	 *
+	 * @param id The target peer id. Must not be <code>null</code>.
 	 * @param path The value-add path. Must not be <code>null</code>.
 	 */
-	public ValueAddLauncher(IPath path) {
+	public ValueAddLauncher(String id, IPath path) {
 		super(null, null, 0);
+
+		Assert.isNotNull(id);
+		this.id = id;
 		Assert.isNotNull(path);
 		this.path = path;
 	}
@@ -76,7 +91,43 @@ public class ValueAddLauncher extends ProcessLauncher implements IDisposable {
 	public void launch() throws Throwable {
 		IPath dir = path.removeLastSegments(1);
 		String cmd = Host.isWindowsHost() ? path.toOSString() : "./" + path.lastSegment(); //$NON-NLS-1$
-		process = Runtime.getRuntime().exec(new String[] { cmd, "-I180", "-S", "-sTCP::;ValueAdd=1" }, null, dir.toFile()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+		// Build up the command
+		List<String> command = new ArrayList<String>();
+		command.add(cmd);
+		command.add("-I180"); //$NON-NLS-1$
+		command.add("-S"); //$NON-NLS-1$
+		command.add("-sTCP::;ValueAdd=1"); //$NON-NLS-1$
+
+		// Enable logging?
+		if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITraceIds.VA_LOGGING_ENABLE)) {
+			// Calculate the location and name of the log file
+			Bundle bundle = Platform.getBundle("org.eclipse.tcf.te.tcf.log.core"); //$NON-NLS-1$
+			IPath location = bundle != null ? Platform.getStateLocation(bundle) : null;
+			if (location != null) {
+				location = location.append(".logs"); //$NON-NLS-1$
+
+				String name = "ValueAdd_" + id + "-Output.log"; //$NON-NLS-1$ //$NON-NLS-2$
+				name = name.replaceAll("\\s", "_"); //$NON-NLS-1$ //$NON-NLS-2$
+				name = name.replaceAll("[:/\\;,]", "_"); //$NON-NLS-1$ //$NON-NLS-2$
+
+				location = location.append(name);
+				command.add("-L" + location.toString()); //$NON-NLS-1$
+
+				String level = Platform.getDebugOption(CoreBundleActivator.getUniqueIdentifier() + "/" + ITraceIds.VA_LOGGING_LEVEL); //$NON-NLS-1$
+				if (level != null && !"".equals(level.trim())) { //$NON-NLS-1$
+					command.add("-l" + level.trim()); //$NON-NLS-1$
+				}
+			}
+		}
+
+		if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITraceIds.TRACE_CHANNEL_MANAGER)) {
+			CoreBundleActivator.getTraceHandler().trace(NLS.bind(Messages.ValueAddLauncher_launch_command, command, id),
+														0, ITraceIds.TRACE_CHANNEL_MANAGER, IStatus.INFO, this);
+		}
+
+		// Launch the value-add
+		process = Runtime.getRuntime().exec(command.toArray(new String[command.size()]), null, dir.toFile());
 
 		// Launch the process output reader
 		outputReader = new ProcessOutputReaderThread(null, new InputStream[] { process.getInputStream() });

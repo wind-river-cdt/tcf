@@ -1,3 +1,5 @@
 org.eclipse.tcf.te.tcf.core/debugmode = 0
 org.eclipse.tcf.te.tcf.core/trace/channels = false
 org.eclipse.tcf.te.tcf.core/trace/channelManager = false
+org.eclipse.tcf.te.tcf.core/va/logging/enable = false
+org.eclipse.tcf.te.tcf.core/va/logging/level = 0x0620

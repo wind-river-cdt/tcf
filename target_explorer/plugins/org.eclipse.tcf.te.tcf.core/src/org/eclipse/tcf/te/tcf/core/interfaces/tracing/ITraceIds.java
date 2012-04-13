@@ -23,4 +23,14 @@ public interface ITraceIds {
 	 * If activated, tracing information about the channel manager is printed out.
 	 */
 	public static String TRACE_CHANNEL_MANAGER = "trace/channelManager"; //$NON-NLS-1$
+
+	/**
+	 * If activated, the value-add is launched with logging enabled.
+	 */
+	public static String VA_LOGGING_ENABLE = "va/logging/enable"; //$NON-NLS-1$
+
+	/**
+	 * The value-add log level. Defaults to <code>0x0620</code>.
+	 */
+	public static String VA_LOGGING_LEVEL = "va/logging/level"; //$NON-NLS-1$
 }

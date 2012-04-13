@@ -30,6 +30,7 @@ import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.runtime.utils.net.IPAddressUtil;
 import org.eclipse.tcf.te.tcf.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.tcf.core.async.CallbackInvocationDelegate;
+import org.eclipse.tcf.te.tcf.core.interfaces.tracing.ITraceIds;
 import org.eclipse.tcf.te.tcf.core.nls.Messages;
 
 /**
@@ -148,7 +149,7 @@ public abstract class AbstractExternalValueAdd extends AbstractValueAdd {
 		// Get the location of the executable image
 		IPath path = getLocation();
 		if (path != null && path.toFile().canRead()) {
-			ValueAddLauncher launcher = new ValueAddLauncher(path);
+			ValueAddLauncher launcher = createLauncher(id, path);
 			try {
 				launcher.launch();
 			} catch (Throwable e) {
@@ -198,6 +199,11 @@ public abstract class AbstractExternalValueAdd extends AbstractValueAdd {
 			 Map<String, String> attrs = null;
 
 			if (error == null) {
+				if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITraceIds.TRACE_CHANNEL_MANAGER)) {
+					CoreBundleActivator.getTraceHandler().trace(NLS.bind(Messages.AbstractExternalValueAdd_output, output, id),
+																0, ITraceIds.TRACE_CHANNEL_MANAGER, IStatus.INFO, this);
+				}
+
 				// Strip away "Server-Properties:"
 				output = output.replace("Server-Properties:", " "); //$NON-NLS-1$ //$NON-NLS-2$
 				output = output.trim();
@@ -256,6 +262,22 @@ public abstract class AbstractExternalValueAdd extends AbstractValueAdd {
 	 * @return The absolute path or <code>null</code> if not found.
 	 */
 	protected abstract IPath getLocation();
+
+	/**
+	 * Create a new value-add launcher instance.
+	 *
+	 * @param id The target peer id. Must not be <code>null</code>.
+	 * @param path The absolute path to the value-add executable image. Must not be <code>null</code>.
+	 *
+	 * @return The value-add launcher instance.
+	 */
+	protected ValueAddLauncher createLauncher(String id, IPath path) {
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+		Assert.isNotNull(id);
+		Assert.isNotNull(path);
+
+		return new ValueAddLauncher(id, path);
+	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.tcf.core.va.interfaces.IValueAdd#shutdown(java.lang.String, org.eclipse.tcf.te.runtime.interfaces.callback.ICallback)

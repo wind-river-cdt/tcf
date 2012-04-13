@@ -92,4 +92,7 @@ public class Messages extends NLS {
 	public static String ChannelManager_valueAdd_launchFailed;
 
 	public static String AbstractExternalValueAdd_error_invalidLocation;
+	public static String AbstractExternalValueAdd_output;
+
+	public static String ValueAddLauncher_launch_command;
 }
