@@ -26,7 +26,7 @@ public class UIPlugin extends AbstractUIPlugin {
 	// The shared instance
 	private static UIPlugin plugin;
 	// The trace handler instance
-	private static TraceHandler traceHandler;
+	private static volatile TraceHandler traceHandler;
 
 	/**
 	 * The constructor

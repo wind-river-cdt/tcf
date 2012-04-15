@@ -23,7 +23,7 @@ public class CoreBundleActivator implements BundleActivator {
 	// The scoped preferences instance
 	private static ScopedEclipsePreferences scopedPreferences = null;
 	// The trace handler instance
-	private static TraceHandler traceHandler;
+	private static volatile TraceHandler traceHandler;
 
 	/**
 	 * Returns the bundle context

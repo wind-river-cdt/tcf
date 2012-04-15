@@ -23,7 +23,7 @@ public class CoreBundleActivator extends Plugin {
 	// The shared instance
 	private static CoreBundleActivator plugin;
 	// The trace handler instance
-	private static TraceHandler traceHandler;
+	private static volatile TraceHandler traceHandler;
 
 	/**
 	 * Returns the shared instance

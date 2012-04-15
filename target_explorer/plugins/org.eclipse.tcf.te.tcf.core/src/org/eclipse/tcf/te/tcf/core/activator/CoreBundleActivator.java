@@ -22,7 +22,7 @@ public class CoreBundleActivator implements BundleActivator {
 	// The bundle context
 	private static BundleContext context;
 	// The trace handler instance
-	private static TraceHandler traceHandler;
+	private static volatile TraceHandler traceHandler;
 
 	/**
 	 * Returns the bundle context
