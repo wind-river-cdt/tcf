@@ -166,8 +166,9 @@ public class AsyncCallbackCollector extends AsyncCallbackHandler {
 				@Override
 				public void run() {
 					Throwable error = getError();
-					IStatus status = new Status((error != null ? (error instanceof OperationCanceledException ? IStatus.CANCEL : IStatus.ERROR) : IStatus.OK), CoreBundleActivator
-					                .getUniqueIdentifier(), 0, (error != null ? error.getMessage() : null), error);
+					IStatus status = new Status((error != null ? (error instanceof OperationCanceledException ? IStatus.CANCEL : IStatus.ERROR) : IStatus.OK),
+									CoreBundleActivator.getUniqueIdentifier() != null ? CoreBundleActivator.getUniqueIdentifier() : "", //$NON-NLS-1$
+									0, (error != null ? error.getMessage() : null), error);
 					callback.done(this, status);
 				}
 			});
