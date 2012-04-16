@@ -143,11 +143,16 @@ public class FileState {
 			node.refreshState();
 		}
 		if (cache_digest == null || target_digest == null) return CacheState.consistent;
+		if(isUnchanged(target_digest, cache_digest)) {
+			base_digest = target_digest;
+			return CacheState.consistent;
+		}
 		if(isUnchanged(base_digest, cache_digest)){
-			if (isUnchanged(target_digest, base_digest)) return CacheState.consistent;
 			return CacheState.outdated;
 		}
-		if (isUnchanged(target_digest, base_digest)) return CacheState.modified;
+		if (isUnchanged(target_digest, base_digest)) {
+			return CacheState.modified;
+		}
 		return CacheState.conflict;
 	}
 	
