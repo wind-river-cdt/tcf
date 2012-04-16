@@ -20,6 +20,9 @@ import org.eclipse.tcf.te.tcf.core.va.interfaces.IValueAdd;
 public abstract class AbstractValueAdd extends ExecutableExtension implements IValueAdd {
 	// Flag marking the value-add as optional
 	private boolean optional = false;
+	// For internal debugging purpose, a value-add can be redirected to an
+	// manual launched value-add via "-DVA_<id>.peerId=<peerId>"
+	private String debugPeerId = null;
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.runtime.extensions.ExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
@@ -32,6 +35,11 @@ public abstract class AbstractValueAdd extends ExecutableExtension implements IV
 	    if (value != null && !"".equals(value.trim())) { //$NON-NLS-1$
 	    	optional = Boolean.valueOf(value.trim()).booleanValue();
 	    }
+
+	    value = System.getProperty("VA_" + getId() + ".peerId"); //$NON-NLS-1$1 //$NON-NLS-2$2
+	    if (value != null && !"".equals(value.trim())) { //$NON-NLS-1$
+	    	debugPeerId = value.trim();
+	    }
 	}
 
 	/* (non-Javadoc)
@@ -42,4 +50,12 @@ public abstract class AbstractValueAdd extends ExecutableExtension implements IV
 		return optional;
 	}
 
+	/**
+	 * Returns the peer id to use if set manually for debugging purpose.
+	 *
+	 * @return The peer id or <code>null</code>.
+	 */
+	protected final String getDebugPeerId() {
+		return debugPeerId;
+	}
 }

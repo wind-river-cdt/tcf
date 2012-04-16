@@ -79,7 +79,30 @@ public abstract class AbstractExternalValueAdd extends AbstractValueAdd {
 		done.setResult(Boolean.FALSE);
 
 		// Query the associated entry
-		final ValueAddEntry entry = entries.get(id);
+		ValueAddEntry entry = entries.get(id);
+
+		// If no entry is available yet, but a debug peer id
+		// is set, create a corresponding entry for it
+		if (entry == null && getDebugPeerId() != null) {
+			String[] attrs = getDebugPeerId().split(":"); //$NON-NLS-1$
+			if (attrs.length == 3) {
+				Map<String, String> props = new HashMap<String, String>();
+				props.put(IPeer.ATTR_ID, getDebugPeerId());
+				props.put(IPeer.ATTR_TRANSPORT_NAME, attrs[0]);
+				if (attrs[1].length() > 0) {
+					props.put(IPeer.ATTR_IP_HOST, attrs[1]);
+				} else {
+					props.put(IPeer.ATTR_IP_HOST, IPAddressUtil.getInstance().getIPv4LoopbackAddress());
+				}
+				props.put(IPeer.ATTR_IP_PORT, attrs[2]);
+
+				entry = new ValueAddEntry();
+				entry.peer = new TransientPeer(props);
+
+				entries.put(id, entry);
+			}
+		}
+
 		if (entry != null) {
 			// Check if the process is still alive or has auto-exited already
 			boolean exited = false;
@@ -97,6 +120,7 @@ public abstract class AbstractExternalValueAdd extends AbstractValueAdd {
 
 			// If the process is still running, try to open a channel
 			if (!exited) {
+				final ValueAddEntry finEntry = entry;
 				final IChannel channel = entry.peer.openChannel();
 				channel.addChannelListener(new IChannel.IChannelListener() {
 
@@ -117,7 +141,9 @@ public abstract class AbstractExternalValueAdd extends AbstractValueAdd {
 						channel.removeChannelListener(this);
 						// External value-add is not longer alive, clean up
 						entries.remove(id);
-						entry.process.destroy();
+						if (finEntry.process != null) {
+							finEntry.process.destroy();
+						}
 						// Invoke the callback
 						done.done(AbstractExternalValueAdd.this, Status.OK_STATUS);
 					}
@@ -224,7 +250,7 @@ public abstract class AbstractExternalValueAdd extends AbstractValueAdd {
 				// The expected peer id is "<transport>:<canonical IP>:<port>"
 				String transport = attrs.get(IPeer.ATTR_TRANSPORT_NAME);
 				String port = attrs.get(IPeer.ATTR_IP_PORT);
-				String ip = IPAddressUtil.getInstance().getCanonicalAddress();
+				String ip = IPAddressUtil.getInstance().getIPv4LoopbackAddress();
 
 				if (transport != null && ip != null && port != null) {
 					String peerId = transport + ":" + ip + ":" + port; //$NON-NLS-1$ //$NON-NLS-2$
@@ -296,7 +322,9 @@ public abstract class AbstractExternalValueAdd extends AbstractValueAdd {
 					boolean alive = ((Boolean)getResult()).booleanValue();
 					if (alive) {
 						entries.remove(id);
-						entry.process.destroy();
+						if (entry.process != null) {
+							entry.process.destroy();
+						}
 					}
 					done.done(AbstractExternalValueAdd.this, Status.OK_STATUS);
 				}

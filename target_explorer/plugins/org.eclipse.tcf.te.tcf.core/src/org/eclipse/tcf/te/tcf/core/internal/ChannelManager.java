@@ -867,7 +867,7 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 		}
 
 		// Get the peer for the next value-add in chain
-		IPeer nextValueAddPeer = nextValueAdd != null ? nextValueAdd.getPeer(id) : null;
+		final IPeer nextValueAddPeer = nextValueAdd != null ? nextValueAdd.getPeer(id) : null;
 		if (nextValueAdd != null && nextValueAddPeer == null) {
 			done.doneChainValueAdd(new IllegalStateException("Invalid value-add peer."), null); //$NON-NLS-1$
 			return;
@@ -919,7 +919,8 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 						finChannel.removeChannelListener(this);
 
 						if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITraceIds.TRACE_CHANNEL_MANAGER)) {
-							CoreBundleActivator.getTraceHandler().trace(NLS.bind(Messages.ChannelManager_openChannel_valueAdd_redirect_failed, valueAddPeer.getID(), finChannel.getRemotePeer().getID()),
+							CoreBundleActivator.getTraceHandler().trace(NLS.bind(Messages.ChannelManager_openChannel_valueAdd_redirect_failed, valueAddPeer.getID(),
+																				 nextValueAddPeer != null ? nextValueAddPeer.getID() : id),
 																		0, ITraceIds.TRACE_CHANNEL_MANAGER, IStatus.INFO, ChannelManager.this);
 						}
 
