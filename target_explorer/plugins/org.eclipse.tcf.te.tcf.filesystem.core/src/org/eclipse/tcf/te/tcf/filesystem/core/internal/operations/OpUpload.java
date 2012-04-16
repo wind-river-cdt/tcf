@@ -17,21 +17,24 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IConfirmCallback;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.url.TcfURLConnection;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.CacheManager;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.FileState;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.PersistenceManager;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
 
@@ -47,7 +50,9 @@ public class OpUpload extends OpStreamOp {
 	IConfirmCallback confirmCallback;
 	// The parent folder map to search files that have same names.
 	Map<File, FSTreeNode> parentFolders;
-	
+	// The files that are to be committed to its target file system.
+	FSTreeNode[] nodes;
+
 	/**
 	 * Constructor.
 	 * 
@@ -96,13 +101,14 @@ public class OpUpload extends OpStreamOp {
 	 * 
 	 * @param nodes The nodes to be uploaded.
 	 */
-	public OpUpload(FSTreeNode[] nodes) {
+	public OpUpload(FSTreeNode... nodes) {
 		srcFiles = new File[nodes.length];
 		dstURLs = new URL[nodes.length];
 		for (int i = 0; i < nodes.length; i++) {
 			srcFiles[i] = CacheManager.getCacheFile(nodes[i]);
 			dstURLs[i] = nodes[i].getLocationURL();
 		}
+		this.nodes = nodes;
 	}
 	
 	/**
@@ -139,7 +145,12 @@ public class OpUpload extends OpStreamOp {
 			monitor.done();
 		}
     }
-	
+	/**
+	 * Test if the specified file should be confirmed.
+	 * 
+	 * @param file The file to be confirmed.
+	 * @return true if it is.
+	 */
 	private boolean requireConfirmation(File file) {
 		return parentFolders != null && confirmCallback != null && !yes2All && confirmCallback.requires(file) && findNode(file) != null;
 	}
@@ -154,8 +165,6 @@ public class OpUpload extends OpStreamOp {
 	 * @throws IOException
 	 */
 	private void uploadFiles(File[] files, URL[] urls) throws IOException {
-		BufferedInputStream input = null;
-		BufferedOutputStream output = null;
 		// The buffer used to download the file.
 		byte[] data = new byte[DEFAULT_CHUNK_SIZE];
 		// Calculate the total size.
@@ -199,12 +208,26 @@ public class OpUpload extends OpStreamOp {
 					continue;
 				}
 			}
+			BufferedInputStream input = null;
+			BufferedOutputStream output = null;
+			MessageDigest digest = null;
 			try {
 				URL url = urls[i];
 				TcfURLConnection connection = (TcfURLConnection) url.openConnection();
 				connection.setDoInput(false);
 				connection.setDoOutput(true);
-				input = new BufferedInputStream(new FileInputStream(file));
+				if (nodes != null) {
+					try {
+	                    digest = MessageDigest.getInstance("MD5");
+						input = new BufferedInputStream(new DigestInputStream(new FileInputStream(file), digest));
+                    }
+                    catch (NoSuchAlgorithmException e) {
+    					input = new BufferedInputStream(new FileInputStream(file));
+                    }
+				}
+				else {
+					input = new BufferedInputStream(new FileInputStream(file));
+				}
 				output = new BufferedOutputStream(connection.getOutputStream());
 
 				// Total size displayed on the progress dialog.
@@ -236,6 +259,10 @@ public class OpUpload extends OpStreamOp {
 						input.close();
 					} catch (Exception e) {
 					}
+				}
+				if(digest != null && nodes != null) {
+					FileState filedigest = PersistenceManager.getInstance().getFileDigest(nodes[i]);
+					filedigest.reset(digest.digest());
 				}
 			}
 		}
@@ -292,19 +319,9 @@ public class OpUpload extends OpStreamOp {
 		} else if(file.isDirectory()) {
 			FSTreeNode node = findNode(file);
 			if(node == null) {
-				final AtomicReference<FSTreeNode> reference = new AtomicReference<FSTreeNode>();
-				SafeRunner.run(new ISafeRunnable(){
-					@Override
-	                public void run() throws Exception {
-						OpCreateFolder create = new OpCreateFolder(parent, file.getName());
-						create.run(new NullProgressMonitor());
-						reference.set(create.getNode());
-	                }
-					@Override
-                    public void handleException(Throwable exception) {
-						// Ignore on purpose
-                    }});
-				node = reference.get();
+				OpCreateFolder create = new OpCreateFolder(parent, file.getName());
+				new NullOpExecutor().execute(create);
+				node = create.getNode();
 			}
 			File[] children = file.listFiles();
 			for(File child : children) {

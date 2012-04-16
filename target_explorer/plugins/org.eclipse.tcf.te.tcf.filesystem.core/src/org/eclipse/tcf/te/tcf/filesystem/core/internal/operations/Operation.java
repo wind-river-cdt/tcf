@@ -142,7 +142,7 @@ public class Operation implements IOperation {
 	protected void cleanUpFile(FSTreeNode node) {
 		final File file = CacheManager.getCacheFile(node);
 		deleteFileChecked(file);
-		PersistenceManager.getInstance().removeBaseTimestamp(node.getLocationURI());
+		PersistenceManager.getInstance().removeFileDigest(node.getLocationURI());
 		FSTreeNode parent = node.parent;
 		if (parent != null) {
 			parent.removeChild(node);

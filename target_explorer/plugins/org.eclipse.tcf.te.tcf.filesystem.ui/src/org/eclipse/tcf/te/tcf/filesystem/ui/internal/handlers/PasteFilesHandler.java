@@ -22,13 +22,13 @@ import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IOperation;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.IOpExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpCopy;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpMove;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.dnd.CommonDnD;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.FsClipboard;
-import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.IOpExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.UiExecutor;
 import org.eclipse.ui.handlers.HandlerUtil;
 

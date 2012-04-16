@@ -13,6 +13,7 @@
 package org.eclipse.tcf.te.tcf.filesystem.core.model;
 
 import java.beans.PropertyChangeEvent;
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -28,6 +29,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ISafeRunnable;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.core.runtime.SafeRunner;
@@ -37,12 +39,22 @@ import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.DirEntry;
 import org.eclipse.tcf.services.IFileSystem.FileAttrs;
 import org.eclipse.tcf.te.core.interfaces.IViewerInput;
+import org.eclipse.tcf.te.runtime.callback.Callback;
+import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
+import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IWindowsFileAttributes;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.UserAccount;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.callbacks.DigestStatus;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.callbacks.QueryDoneOpenChannel;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.callbacks.RefreshStateDoneOpenChannel;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.NullOpExecutor;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpUser;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.testers.TargetPropertyTester;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.url.TcfURLConnection;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.url.TcfURLStreamHandlerService;
-import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.UserManager;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.CacheManager;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.FileState;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.PersistenceManager;
 import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
@@ -54,8 +66,6 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
  * event dispatch thread.
  */
 public final class FSTreeNode extends PlatformObject implements Cloneable, IPeerModelProvider {
-	// The pending node constant.
-	public static final FSTreeNode PENDING_NODE = createPendingNode();
 	// The constant to access the Windows Attributes.
 	private static final String KEY_WIN32_ATTRS = "Win32Attrs"; //$NON-NLS-1$
 
@@ -85,7 +95,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 	 * The tree node parent.
 	 */
 	public FSTreeNode parent = null;
-
+	
 	/**
 	 * The tree node children.
 	 */
@@ -173,7 +183,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 	 * @param b true if the agent is granted with its write permission.
 	 */
 	public void setWritable(boolean b) {
-		UserAccount account = UserManager.getInstance().getUserAccount(peerNode);
+		UserAccount account = getUserAccount(peerNode);
 		if (account != null && attr != null) {
 			int bit;
 			if (attr.uid == account.getEUID()) {
@@ -187,6 +197,12 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 			setPermissions(b ? (permissions | bit):(permissions & ~ bit));
 		}
     }
+	
+	private UserAccount getUserAccount(IPeerModel peerNode) {
+		OpUser user = new OpUser(peerNode);
+		new NullOpExecutor().execute(user);
+		return user.getUserAccount();
+	}
 
 	/**
 	 * Set the file's permissions.
@@ -499,7 +515,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 	 * @return true if it is readable.
 	 */
 	public boolean isReadable() {
-		UserAccount account = UserManager.getInstance().getUserAccount(peerNode);
+		UserAccount account = getUserAccount(peerNode);
 		if (account != null && attr != null) {
 			if (attr.uid == account.getEUID()) {
 				return (attr.permissions & IFileSystem.S_IRUSR) != 0;
@@ -518,7 +534,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 	 * @return true if the agent is the owner of this file/folder.
 	 */
 	public boolean isAgentOwner() {
-		UserAccount account = UserManager.getInstance().getUserAccount(peerNode);
+		UserAccount account = getUserAccount(peerNode);
 		if (account != null && attr != null) {
 			return attr.uid == account.getEUID();
 		}
@@ -531,7 +547,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 	 * @return true if it is writable.
 	 */
 	public boolean isWritable() {
-		UserAccount account = UserManager.getInstance().getUserAccount(peerNode);
+		UserAccount account = getUserAccount(peerNode);
 		if (account != null && attr != null) {
 			if (attr.uid == account.getEUID()) {
 				return (attr.permissions & IFileSystem.S_IWUSR) != 0;
@@ -550,7 +566,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 	 * @return true if it is executable.
 	 */
 	public boolean isExecutable() {
-		UserAccount account = UserManager.getInstance().getUserAccount(peerNode);
+		UserAccount account = getUserAccount(peerNode);
 		if (account != null && attr != null) {
 			if (attr.uid == account.getEUID()) {
 				return (attr.permissions & IFileSystem.S_IXUSR) != 0;
@@ -625,11 +641,25 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 	}
 	
 	/**
+	 * Get the local file's state of the specified tree node. The local file must exist
+	 * before calling this method to get its state.
+	 *
+	 * @param node The tree node whose local file state is going to retrieved.
+	 * @return The tree node's latest cache state.
+	 */
+	public CacheState getCacheState() {
+		File file = CacheManager.getCacheFile(this);
+		if (!file.exists()) return CacheState.consistent;
+		FileState digest = PersistenceManager.getInstance().getFileDigest(this);
+		return digest.getCacheState();
+	}
+	
+	/**
 	 * Fire a property change event to notify one of the node's property has changed.
 	 * 
 	 * @param event The property change event.
 	 */
-	protected void firePropertyChange(PropertyChangeEvent event) {
+	public void firePropertyChange(PropertyChangeEvent event) {
 		if(peerNode != null) {
 			IViewerInput viewerInput = (IViewerInput) peerNode.getAdapter(IViewerInput.class);
 			viewerInput.firePropertyChange(event);
@@ -652,89 +682,12 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 	}
 
 	/**
-	 * Create a root node for the peer.
-	 * 
-	 * @param peerNode The peer.
-	 * @return The root file system node.
-	 */
-	public static FSTreeNode createRootNode(IPeerModel peerNode) {
-		FSTreeNode node = new FSTreeNode();
-		node.type = "FSRootNode"; //$NON-NLS-1$
-		node.peerNode = peerNode;
-		node.name = Messages.FSTreeNodeContentProvider_rootNode_label;
-	    return node;
-    }
-
-	/**
 	 * Return if this node is a pending node.
 	 * 
 	 * @return true if it is a pending node.
 	 */
 	public boolean isPendingNode() {
 	    return type != null && type.equals("FSPendingNode"); //$NON-NLS-1$
-    }
-
-
-	/**
-	 * Create a pending node.
-	 * 
-	 * @return A pending node.
-	 */
-	static FSTreeNode createPendingNode() {
-		if (Protocol.isDispatchThread()) {
-			FSTreeNode pendingNode = new FSTreeNode();
-			pendingNode.name = Messages.PendingOperation_label;
-			pendingNode.type = "FSPendingNode"; //$NON-NLS-1$
-			return pendingNode;
-		}
-		final AtomicReference<FSTreeNode> reference = new AtomicReference<FSTreeNode>();
-		Protocol.invokeAndWait(new Runnable() {
-
-			@Override
-			public void run() {
-				reference.set(createPendingNode());
-			}
-		});
-		return reference.get();
-	}
-	
-	/**
-	 * Create a file node under the folder specified folder using the new name.
-	 * 
-	 * @param name The file's name.
-	 * @param folder The parent folder.
-	 * @return The file tree node.
-	 */
-	public static FSTreeNode createFileNode(String name, FSTreeNode folder) {
-		return createTreeNode(name, "FSFileNode", folder); //$NON-NLS-1$
-    }
-
-	/**
-	 * Create a folder node under the folder specified folder using the new name.
-	 * 
-	 * @param name The folder's name.
-	 * @param folder The parent folder.
-	 * @return The folder tree node.
-	 */
-	public static FSTreeNode createFolderNode(String name, FSTreeNode folder) {
-		return createTreeNode(name, "FSDirNode", folder); //$NON-NLS-1$
-    }
-
-	/**
-	 * Create a tree node under the folder specified folder using the new name.
-	 * 
-	 * @param name The tree node's name.
-	 * @param type The new node's type.
-	 * @param folder The parent folder.
-	 * @return The tree node.
-	 */
-	private static FSTreeNode createTreeNode(String name, String type, FSTreeNode folder) {
-	    FSTreeNode node = new FSTreeNode();
-		node.name = name;
-		node.parent = folder;
-		node.peerNode = folder.peerNode;
-		node.type = type;
-	    return node;
     }
 
 	/*
@@ -815,4 +768,40 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 	public void queryStarted() {
 		childrenQueryRunning = true;
 	}
+	
+	/**
+	 * Refresh the state of the specified node.
+	 */
+	public void refreshState() {
+		refreshState(null);
+	}
+
+	/**
+	 * Refresh the state of the specified node. This method is invoked
+	 * asynchronously with a callback invoked when the state is refreshed.
+	 *
+	 * @param updateTargetDigest If the target digest should be updated. 
+	 * @param node The tree node whose state is going to be refreshed.
+	 */
+	public void refreshState(final ICallback callback) {
+		final FileState digest = PersistenceManager.getInstance().getFileDigest(this);
+		ICallback cb = new Callback(){
+			@Override
+            protected void internalDone(Object caller, IStatus status) {
+				if (status.isOK() && status instanceof DigestStatus) {
+					digest.updateTargetDigest(((DigestStatus) status).getDigest());
+				}
+				if (callback != null) callback.done(caller, status);
+            }
+		};
+		Tcf.getChannelManager().openChannel(peerNode.getPeer(), null, new RefreshStateDoneOpenChannel(this, cb));
+	}
+	
+	/**
+	 * Query the children of this file system node.
+	 */
+	public void queryChildren() {
+		queryStarted();
+		Tcf.getChannelManager().openChannel(peerNode.getPeer(), null, new QueryDoneOpenChannel(this));
+    }
 }

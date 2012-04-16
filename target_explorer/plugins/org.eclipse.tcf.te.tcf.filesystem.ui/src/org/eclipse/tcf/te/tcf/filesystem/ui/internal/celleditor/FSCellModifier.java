@@ -12,10 +12,10 @@ package org.eclipse.tcf.te.tcf.filesystem.ui.internal.celleditor;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.swt.widgets.Item;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.IOpExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpRename;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.handlers.RenameCallback;
-import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.IOpExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.JobExecutor;
 
 /**

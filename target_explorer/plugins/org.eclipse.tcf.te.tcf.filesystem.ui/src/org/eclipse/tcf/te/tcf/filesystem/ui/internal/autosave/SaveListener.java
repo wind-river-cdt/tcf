@@ -21,12 +21,12 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.util.SafeRunnable;
-import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpCacheCommit;
-import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.StateManager;
-import org.eclipse.tcf.te.tcf.filesystem.core.model.FSModel;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.IOpExecutor;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.NullOpExecutor;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpParsePath;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpUpload;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.activator.UIPlugin;
-import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.IOpExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.UiExecutor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IURIEditorInput;
@@ -54,7 +54,7 @@ public class SaveListener implements IExecutionListener {
 		if (dirtyNode != null) {
 			if (UIPlugin.isAutoSaving()) {
 				IOpExecutor executor = new UiExecutor();
-				executor.execute(new OpCacheCommit(dirtyNode));
+				executor.execute(new OpUpload(dirtyNode));
 			}
 			else {
 				SafeRunner.run(new SafeRunnable(){
@@ -64,7 +64,7 @@ public class SaveListener implements IExecutionListener {
                     }
 					@Override
                     public void run() throws Exception {
-						StateManager.refreshState(dirtyNode);
+						dirtyNode.refreshState();
                     }});
 			}
 		}
@@ -84,7 +84,9 @@ public class SaveListener implements IExecutionListener {
 				IFileStore store = EFS.getStore(uri);
 				File localFile = store.toLocalFile(0, new NullProgressMonitor());
 				if (localFile != null) {
-					dirtyNode = FSModel.getTreeNode(localFile.getCanonicalPath());
+					OpParsePath parser = new OpParsePath(localFile.getCanonicalPath());
+					new NullOpExecutor().execute(parser);
+					dirtyNode = parser.getResult();
 				}
 			}catch(Exception e){
 			}

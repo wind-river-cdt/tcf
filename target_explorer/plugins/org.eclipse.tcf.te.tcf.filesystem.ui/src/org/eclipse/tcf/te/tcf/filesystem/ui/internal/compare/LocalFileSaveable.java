@@ -30,10 +30,10 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpCacheCommit;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.IOpExecutor;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpUpload;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.compare.EditableSharedDocumentAdapter.ISharedDocumentAdapterListener;
-import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.IOpExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.UiExecutor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPropertyListener;
@@ -135,7 +135,7 @@ public class LocalFileSaveable extends Saveable implements
 			//Trigger upload action
 			FSTreeNode node = fileElement.getFSTreeNode();
 			IOpExecutor executor = new UiExecutor();
-			executor.execute(new OpCacheCommit(true, node));
+			executor.execute(new OpUpload(node));
 		}
 	}
 

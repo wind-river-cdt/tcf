@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpCacheCommit;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpCacheUpdate;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpCopy;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpCreateFile;
@@ -21,6 +20,7 @@ import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpCreateFolder
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpDelete;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpMove;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpRename;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpUpload;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tests.tcf.filesystem.FSPeerTestCase;
 
@@ -79,7 +79,7 @@ public class OperationTestBase extends FSPeerTestCase {
 	}
 
 	protected void commitCache(FSTreeNode testFile) throws Exception {
-		OpCacheCommit commit = new OpCacheCommit(testFile);
+		OpUpload commit = new OpUpload(testFile);
 		commit.run(new NullProgressMonitor());
 	}
 

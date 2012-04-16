@@ -18,7 +18,6 @@ import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.CacheManager;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.ContentTypeHelper;
-import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.StateManager;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.CacheState;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 
@@ -100,7 +99,7 @@ public class FSTreeNodePropertyTester extends PropertyTester {
 			File file = CacheManager.getCacheFile(node);
 			if(!file.exists())
 				return false;
-			CacheState state = StateManager.getCacheState(node);
+			CacheState state = node.getCacheState();
 			return state.name().equals(expectedValue);
 		}
 		return false;

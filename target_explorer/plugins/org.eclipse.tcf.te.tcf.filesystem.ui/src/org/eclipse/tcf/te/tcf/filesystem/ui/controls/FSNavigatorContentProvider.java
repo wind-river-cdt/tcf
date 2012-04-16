@@ -23,6 +23,8 @@ import org.eclipse.tcf.te.ui.trees.TreeContentProvider;
  * File system content provider for the common navigator of Target Explorer.
  */
 public class FSNavigatorContentProvider extends TreeContentProvider {
+	// The pending node constant.
+	private static final FSTreeNode PENDING_NODE = FSModel.createPendingNode();
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
@@ -77,9 +79,6 @@ public class FSNavigatorContentProvider extends TreeContentProvider {
 
 			// If the file system model root node hasn't been created, create
 			// and initialize the root node now.
-			if (model.getRoot() == null) {
-				model.createRoot(peerNode);
-			}
 			if (isRootNodeVisible()) {
 				return new Object[] { model.getRoot() };
 			}
@@ -92,11 +91,10 @@ public class FSNavigatorContentProvider extends TreeContentProvider {
 			if(!node.childrenQueried) {
 				if(!node.childrenQueryRunning) {
 					// Get the file system model root node, if already stored
-					FSModel model = FSModel.getFSModel(node.peerNode);
-					model.queryChildren(node);
+					node.queryChildren();
 				}
 				if(node.unsafeGetChildren().isEmpty()) {
-					return new Object[] {FSTreeNode.PENDING_NODE};
+					return new Object[] {PENDING_NODE};
 				}
 			}
 			return node.unsafeGetChildren().toArray();

@@ -12,89 +12,63 @@ package org.eclipse.tcf.te.tcf.filesystem.core.internal.operations;
 /**
  * The file operation class to create the root node in the file system of Target Explorer.
  */
-import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.ISafeRunnable;
-import org.eclipse.core.runtime.SafeRunner;
+import java.lang.reflect.InvocationTargetException;
+
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
-import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.DirEntry;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.exceptions.TCFChannelException;
-import org.eclipse.tcf.te.tcf.filesystem.core.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
-import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 
-public class OpCreateRoot extends Operation {
-	// The peer model in which the file system root is going to be created.
-	/* default */IPeerModel peerModel;
+/**
+ * The operation to refresh the root of the file system.
+ */
+public class OpRefreshRoots extends Operation {
+	/* default */FSTreeNode root;
 
 	/**
 	 * Create an instance using the peer model.
 	 *
 	 * @param peerModel The peer model.
 	 */
-	public OpCreateRoot(IPeerModel peerModel) {
-		this.peerModel = peerModel;
+	public OpRefreshRoots(FSTreeNode root) {
+		this.root = root;
 	}
 
-	/**
-	 * Create the file system's root node.
-	 *
-	 * @return The root file system node.
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.Operation#run(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public FSTreeNode create() {
-		Assert.isTrue (!Protocol.isDispatchThread());
-		final FSTreeNode[] result = new FSTreeNode[1];
-		Protocol.invokeAndWait(new Runnable() {
-			@Override
-			public void run() {
-				result[0] = FSTreeNode.createRootNode(peerModel);
-			    FSModel.getFSModel(peerModel).setRoot(result[0]);
-			}
-		});
-		SafeRunner.run(new ISafeRunnable() {
-			@Override
-            public void handleException(Throwable e) {
-				// Ignore exception
-            }
-			@Override
-			public void run() throws Exception {
-				queryRootNodes(result[0]);
-			}
-		});
-		return result[0];
-	}
-
-	/**
-	 * Query the root file system node's children nodes.
-	 *
-	 * @param rootNode The root file system node.
-	 * @throws TCFChannelException Thrown when opening a channel.
-	 */
-	/* default */void queryRootNodes(final FSTreeNode rootNode) throws TCFChannelException {
+	@Override
+    public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+	    super.run(monitor);
 		IChannel channel = null;
 		try {
-			channel = openChannel(peerModel.getPeer());
+			channel = openChannel(root.peerNode.getPeer());
 			IFileSystem service = getBlockingFileSystem(channel);
 			if (service != null) {
-				rootNode.queryStarted();
+				root.queryStarted();
 				service.roots(new IFileSystem.DoneRoots() {
 					@Override
 					public void doneRoots(IToken token, FileSystemException error, DirEntry[] entries) {
 						if (error == null) {
 							for (DirEntry entry : entries) {
-								FSTreeNode node = new FSTreeNode(rootNode, entry, true);
-								rootNode.addChild(node);
+								FSTreeNode node = new FSTreeNode(root, entry, true);
+								root.addChild(node);
 							}
 						}
 					}
 				});
 				// Reset the children query markers
-				rootNode.queryDone();
+				root.queryDone();
 			}
+		}
+		catch(TCFChannelException e) {
+			throw new InvocationTargetException(e);
 		}
 		finally {
 			if (channel != null) Tcf.getChannelManager().closeChannel(channel);

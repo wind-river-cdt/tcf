@@ -33,7 +33,7 @@ public class PersistenceManager {
 	private static volatile PersistenceManager instance;
 
 	// The time stamp for each file.
-	private Map<URI, Long> timestamps;
+	private Map<URI, FileState> digests;
 
 	// Already known resolved content type of file nodes specified by their URIs.
 	private Map<URI, IContentType> resolved;
@@ -86,10 +86,10 @@ public class PersistenceManager {
 					unresolved = (Map<URI, URI>) service.read(unresolved, unresolvedFile
 					                .getAbsoluteFile().toURI());
 				}
-				File timestampFile = new File(location, "timestamps.ini");
-				timestamps = new HashMap<URI, Long>();
-				if (timestampFile.exists()) {
-					timestamps = (Map<URI, Long>) service.read(timestamps, timestampFile
+				File digestFile = new File(location, "digests.ini");
+				digests = new HashMap<URI, FileState>();
+				if (digestFile.exists()) {
+					digests = (Map<URI, FileState>) service.read(digests, digestFile
 					                .getAbsoluteFile().toURI());
 				}
 				File persistentFile = new File(location, PERSISTENT_FILE);
@@ -143,10 +143,10 @@ public class PersistenceManager {
 	 * Set the time stamp of the FSTreeNode with the specified location.
 	 *
 	 * @param uri The FSTreeNode's location URI.
-	 * @param timestamp The new base time stamp to be set.
+	 * @param digest The new base time stamp to be set.
 	 */
-	public void setBaseTimestamp(URI uri, long timestamp) {
-		timestamps.put(uri, Long.valueOf(timestamp));
+	public void setFileDigest(URI uri, FileState digest) {
+		digests.put(uri, digest);
 	}
 
 	/**
@@ -154,8 +154,8 @@ public class PersistenceManager {
 	 *
 	 * @param uri The URI key.
 	 */
-	public void removeBaseTimestamp(URI uri) {
-		timestamps.remove(uri);
+	public void removeFileDigest(URI uri) {
+		digests.remove(uri);
 	}
 
 	/**
@@ -164,9 +164,15 @@ public class PersistenceManager {
 	 * @param uri The FSTreeNode's location URI.
 	 * @return The FSTreeNode's base time stamp.
 	 */
-	public long getBaseTimestamp(URI uri) {
-		Long timestamp = timestamps.get(uri);
-		return timestamp == null ? 0L : timestamp.longValue();
+	public FileState getFileDigest(FSTreeNode node) {
+		URI uri = node.getLocationURI();
+		FileState digest = digests.get(uri);
+		if(digest == null) {
+			digest = new FileState(node);
+			digests.put(uri, digest);
+		}
+		digest.setNode(node);
+		return digest;
 	}
 
 	/**
@@ -185,7 +191,7 @@ public class PersistenceManager {
 	}
 
 	/**
-	 * Dispose the cache manager so that it has a chance to save the timestamps and the persistent
+	 * Dispose the cache manager so that it has a chance to save the digests and the persistent
 	 * properties.
 	 */
 	public void dispose() {
@@ -202,8 +208,8 @@ public class PersistenceManager {
 				service.write(resolved, resolvedFile.getAbsoluteFile().toURI());
 				File unresolvedFile = new File(location, "unresolved.ini");
 				service.write(unresolved, unresolvedFile.getAbsoluteFile().toURI());
-				File timestampFile = new File(location, "timestamps.ini");
-				service.write(timestamps, timestampFile.getAbsoluteFile().toURI());
+				File digestFile = new File(location, "digests.ini");
+				service.write(digests, digestFile.getAbsoluteFile().toURI());
 				File persistentFile = new File(location, PERSISTENT_FILE);
 				service.write(properties, persistentFile.getAbsoluteFile().toURI());
             }});

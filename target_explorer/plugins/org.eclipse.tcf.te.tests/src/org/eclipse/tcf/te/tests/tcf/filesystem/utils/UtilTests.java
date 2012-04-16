@@ -18,7 +18,6 @@ public class UtilTests {
 		suite.addTestSuite(CacheManagerTest.class);
 		suite.addTestSuite(ContentTypeHelperTest.class);
 		suite.addTestSuite(StateManagerTest.class);
-		suite.addTestSuite(UserManagerTest.class);
 		return suite;
 	}
 }

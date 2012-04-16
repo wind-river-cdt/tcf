@@ -19,11 +19,12 @@ import org.eclipse.tcf.services.IFileSystem.DoneStat;
 import org.eclipse.tcf.services.IFileSystem.FileAttrs;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.te.tcf.core.Tcf;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.NullOpExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpCreateFile;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpCreateFolder;
-import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.Operation;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpParsePath;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpRefresh;
-import org.eclipse.tcf.te.tcf.filesystem.core.model.FSModel;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.Operation;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tests.tcf.TcfTestCase;
 
@@ -52,13 +53,17 @@ public class FSPeerTestCase extends TcfTestCase {
 		assertNotNull(peerModel);
 		assertNotNull(peer);
 
-		testRoot = FSModel.findTreeNode(peerModel, getTestRoot());
+		OpParsePath parser = new OpParsePath(peerModel, getTestRoot());
+		new NullOpExecutor().execute(parser);
+		testRoot = parser.getResult();
 		if(testRoot == null) {
 			File file = new File(getTestRoot());
 			if (!file.exists()) {
 				file.mkdirs();
 			}
-			testRoot = FSModel.findTreeNode(peerModel, getTestRoot());
+			parser = new OpParsePath(peerModel, getTestRoot());
+			new NullOpExecutor().execute(parser);
+			testRoot = parser.getResult();
 		}
 
 		String path = getTestRoot() + getPathSep() + getTestPath();
@@ -122,14 +127,18 @@ public class FSPeerTestCase extends TcfTestCase {
 	}
 
 	protected FSTreeNode getFSNode(String path) {
-		FSTreeNode node = FSModel.findTreeNode(peerModel, path);
+		OpParsePath parser = new OpParsePath(peerModel, path);
+		new NullOpExecutor().execute(parser);
+		FSTreeNode node = parser.getResult();
 		if (node == null) {
 			OpRefresh refresh = new OpRefresh(testRoot);
 			try {
 				refresh.run(new NullProgressMonitor());
 			} catch (Exception e) {}
-
-			node = FSModel.findTreeNode(peerModel, path);
+			
+			parser = new OpParsePath(peerModel, path);
+			new NullOpExecutor().execute(parser);
+			node = parser.getResult();
 		}
 		return node;
 	}

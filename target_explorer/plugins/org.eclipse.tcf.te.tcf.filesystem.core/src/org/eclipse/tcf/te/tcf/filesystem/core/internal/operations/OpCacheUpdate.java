@@ -13,11 +13,9 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.ISafeRunnable;
-import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.CacheManager;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.FileState;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.PersistenceManager;
-import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.StateManager;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 
 /**
@@ -52,29 +50,27 @@ public class OpCacheUpdate extends OpDownload {
 		try {
 			super.run(monitor);
 		} finally {
-			if(!monitor.isCanceled()){
-				SafeRunner.run(new ISafeRunnable() {
-					@Override
-                    public void handleException(Throwable e) {
-						// Ignore exception
-                    }
-					@Override
-					public void run() throws Exception {
-						for (FSTreeNode node : srcNodes) {
-							File file = CacheManager.getCachePath(node).toFile();
-							if (file.exists()) {
-								// If downloading is successful, update the attributes of the file and
-								// set the last modified time to that of its corresponding file.
-								PersistenceManager.getInstance().setBaseTimestamp(node.getLocationURI(), node.attr.mtime);
-								setLastModifiedChecked(file, node.attr.mtime);
-								if (!node.isWritable()) setReadOnlyChecked(file);
-								StateManager.refreshState(node);
-							}
-						}
+			if (!monitor.isCanceled()) {
+				for (FSTreeNode node : srcNodes) {
+					File file = CacheManager.getCachePath(node).toFile();
+					if (file.exists()) {
+						// If downloading is successful, update the attributes of the file and
+						// set the last modified time to that of its corresponding file.
+						if (!node.isWritable()) setReadOnlyChecked(file);
 					}
-				});
+				}
 			}
 			monitor.done();
 		}
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpDownload#updateNodeDigest(org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode, byte[])
+	 */
+	@Override
+	protected void updateNodeDigest(FSTreeNode node, byte[] digest) {
+		FileState fdigest = PersistenceManager.getInstance().getFileDigest(node);
+		fdigest.reset(digest);
+    }
 }

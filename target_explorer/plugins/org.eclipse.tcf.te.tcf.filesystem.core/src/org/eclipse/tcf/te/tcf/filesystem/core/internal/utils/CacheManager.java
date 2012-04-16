@@ -100,29 +100,6 @@ public class CacheManager {
 	}
 	
 	/**
-	 * Check if the file exists and set its last modified time if it does. Record
-	 * the failure message if it fails.
-	 * 
-	 * @param file The file to be set.
-	 * @param lastModified the last modified time.
-	 */
-	static void setLastModifiedChecked(final File file, final long lastModified) {
-		if (file.exists()) {
-			SafeRunner.run(new ISafeRunnable(){
-				@Override
-                public void run() throws Exception {
-					if (!file.setLastModified(lastModified)) {
-						throw new Exception(NLS.bind(Messages.CacheManager_SetLastModifiedFailed, file.getAbsolutePath()));
-					}
-                }
-				@Override
-                public void handleException(Throwable exception) {
-					// Ignore on purpose
-                }});
-		}
-	}
-	
-	/**
 	 * Check if the file exists and set its read-only attribute if it does. Record
 	 * the failure message if it fails.
 	 * 

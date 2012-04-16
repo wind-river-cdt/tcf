@@ -1,16 +1,18 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * Copyright (c) 2012 Wind River Systems, Inc. and others. All rights reserved.
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  * Wind River Systems - initial API and implementation
- * William Chen (Wind River)- [345552] Edit the remote files with a proper editor
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.filesystem.core.internal.utils;
+package org.eclipse.tcf.te.tcf.filesystem.core.internal.operations;
+
+import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.osgi.util.NLS;
@@ -24,36 +26,71 @@ import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.core.activator.CorePlugin;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.UserAccount;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.exceptions.TCFFileSystemException;
-import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.Operation;
 import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 
 /**
- * A facility class to retrieve the user's information for a target file system.
+ * The operation to get the user account of a specified peer.
  */
-public class UserManager {
+public class OpUser extends Operation {
 	// The key to save and retrieve the user account in a peer model.
 	/* default */ static final String USER_ACCOUNT_KEY = CorePlugin.getUniqueIdentifier()+".user.account"; //$NON-NLS-1$
 
-	// The singleton fInstance.
-	private static volatile UserManager instance;
-
+	// The target peer.
+	IPeerModel peerNode;
+	// The resulting account.
+	UserAccount result;
+	
 	/**
-	 * Get the singleton user manager.
-	 *
-	 * @return The singleton cache manager.
+	 * Create an operation using the target peer.
+	 * @param peerNode The peer whose user account to be checked.
 	 */
-	public static UserManager getInstance() {
-		if (instance == null) {
-			instance = new UserManager();
-		}
-		return instance;
+	public OpUser(IPeerModel peerNode) {
+		this.peerNode = peerNode;
 	}
-
+	
 	/**
-	 * Hide the constructor.
+	 * Get the checking result.
+	 * 
+	 * @return The user account checked.
 	 */
-	private UserManager() {}
+	public UserAccount getUserAccount() {
+		return result;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.Operation#run(org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	@Override
+    public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+		if(peerNode != null) {
+			result = getUserFromPeer(peerNode);
+			if (result == null) {
+				final UserAccount[] accounts = new UserAccount[1];
+				SafeRunner.run(new ISafeRunnable(){
+					@Override
+                    public void handleException(Throwable e) {
+						// Just ignore it.
+                    }
+					@Override
+                    public void run() throws Exception {
+						IChannel channel = null;
+						try {
+							channel = Operation.openChannel(peerNode.getPeer());
+							if (channel != null) {
+								accounts[0] = getUserByChannel(channel);
+								if (accounts[0] != null) setUserToPeer(peerNode, accounts[0]);
+							}
+						}
+						finally {
+							if (channel != null) Tcf.getChannelManager().closeChannel(channel);
+						}
+                    }});
+				result = accounts[0];
+			}
+		}
+    }
 
 	/**
 	 * Get the user account from the peer using the channel connected to the
@@ -86,42 +123,6 @@ public class UserManager {
 		}
 		String message = NLS.bind(Messages.UserManager_TCFNotProvideFSMessage, channel.getRemotePeer().getID());
 		throw new TCFFileSystemException(message);
-	}
-
-	/**
-	 * Get the information of the client user account.
-	 *
-	 * @return The client user account's information.
-	 */
-	public UserAccount getUserAccount(final IPeerModel peerNode) {
-		if(peerNode != null) {
-			UserAccount account = getUserFromPeer(peerNode);
-			if (account == null) {
-				final UserAccount[] accounts = new UserAccount[1];
-				SafeRunner.run(new ISafeRunnable(){
-					@Override
-                    public void handleException(Throwable e) {
-						// Just ignore it.
-                    }
-					@Override
-                    public void run() throws Exception {
-						IChannel channel = null;
-						try {
-							channel = Operation.openChannel(peerNode.getPeer());
-							if (channel != null) {
-								accounts[0] = getUserByChannel(channel);
-								if (accounts[0] != null) setUserToPeer(peerNode, accounts[0]);
-							}
-						}
-						finally {
-							if (channel != null) Tcf.getChannelManager().closeChannel(channel);
-						}
-                    }});
-				return accounts[0];
-			}
-			return account;
-		}
-		return null;
 	}
 
 	/**

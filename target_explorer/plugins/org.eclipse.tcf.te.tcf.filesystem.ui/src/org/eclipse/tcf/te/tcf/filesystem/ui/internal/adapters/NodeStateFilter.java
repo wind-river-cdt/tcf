@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpClipboard;
-import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.StateManager;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.CacheState;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.activator.UIPlugin;
@@ -46,7 +45,7 @@ public class NodeStateFilter implements IActionFilter {
 		if (name.equals("cache.state") && node.isFile()) { //$NON-NLS-1$
 			if(UIPlugin.isAutoSaving())
 				return false;
-			CacheState state = StateManager.getCacheState(node);
+			CacheState state = node.getCacheState();
 			if (value == null)
 				value = CacheState.consistent.name();
 			return value.equals(state.name());

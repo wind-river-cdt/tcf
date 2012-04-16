@@ -57,6 +57,10 @@ public class URIKeyMapPersistenceDelegate extends AbstractGsonMapPersistenceDele
 					String value = "contenttype:" + ((IContentType) object).getId();
 					result.put(key.toString(), value);
 				}
+				else if(object instanceof FileState) {
+					Map<String, Object> value = digest2map((FileState)object);
+					result.put(key.toString(), value);
+				}
 				else if (object instanceof Map) {
 					Map<QualifiedName, String> map = (Map<QualifiedName, String>) object;
 					Map<String, Object> valueMap = qNames2Map(map);
@@ -79,6 +83,7 @@ public class URIKeyMapPersistenceDelegate extends AbstractGsonMapPersistenceDele
 	 */
 	private Map<String, Object> qNames2Map(Map<QualifiedName, String> map) {
 		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("map.type", "QNames");
 		for (QualifiedName name : map.keySet()) {
 			result.put(name.toString(), map.get(name));
 		}
@@ -97,34 +102,92 @@ public class URIKeyMapPersistenceDelegate extends AbstractGsonMapPersistenceDele
 		}
 		Map<URI, Object> result = (Map<URI, Object>) context;
 		for (String key : map.keySet()) {
-			Object v = map.get(key);
+			Object value = map.get(key);
 			URI uri = toURI(key);
 			Assert.isNotNull(uri);
-			if (v instanceof String) {
-				String value = (String) map.get(key);
+			if (value instanceof String) {
+				String string = (String) map.get(key);
 				Object object = null;
-				if (value.startsWith("uri:")) {
-					value = value.substring("uri:".length());
-					object = toURI(value);
+				if (string.startsWith("uri:")) {
+					string = string.substring("uri:".length());
+					object = toURI(string);
 					Assert.isNotNull(object);
 					result.put(uri, object);
 				}
-				else if (value.startsWith("contenttype:")) {
-					value = value.substring("contenttype:".length());
-					object = Platform.getContentTypeManager().getContentType(value);
+				else if (string.startsWith("contenttype:")) {
+					string = string.substring("contenttype:".length());
+					object = Platform.getContentTypeManager().getContentType(string);
 					result.put(uri, object);
+				}				
+			}
+			else if (value instanceof Map) {
+				Map<String, ?> vMap = (Map<String, ?>) value;
+				if("QNames".equals(vMap.get("map.type"))){
+					Map<QualifiedName, String> valueMap = toQNameMap((Map<String, String>) value);
+					result.put(uri, valueMap);
+				}
+				else if("Digest".equals(vMap.get("map.type"))) {
+					FileState digest = map2digest((Map<String, Object>)value);
+					result.put(uri, digest);
 				}
 			}
-			else if (v instanceof Number) {
-				result.put(uri, Long.valueOf(((Number) v).longValue()));
-			}
-			else if (v instanceof Map) {
-				Map<QualifiedName, String> valueMap = toQNameMap((Map<String, String>) v);
-				result.put(uri, valueMap);
+			else {
+				result.put(uri, value);
 			}
 		}
 		return result;
 	}
+	
+	private FileState map2digest(Map<String, Object> value) {
+		byte[] base_digest = string2digest((String) value.get("base"));
+		byte[] cache_digest = string2digest((String) value.get("cache"));
+		byte[] target_digest = string2digest((String) value.get("target"));
+		Number number = (Number) value.get("mtime");
+		long mtime = number.longValue();
+		return new FileState(mtime, cache_digest, target_digest, base_digest);
+    }
+
+	private Map<String, Object> digest2map(FileState digest) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("map.type", "Digest");
+		map.put("base", digest2string(digest.getBaseDigest()));
+		map.put("cache", digest2string(digest.getCacheDigest()));
+		map.put("target", digest2string(digest.getTargetDigest()));
+		map.put("mtime", digest.getCacheMTime());
+		return map;
+    }
+	
+	private String digest2string(byte[] digest) {
+		if(digest != null && digest.length > 0) {
+			StringBuilder buffer = new StringBuilder();
+			for (int i = 0; i < digest.length; i++) {
+				int d = digest[i] & 0xff;
+				String sByte = Integer.toHexString(d);
+				while(sByte.length() < 2) sByte = "0"+sByte;
+				buffer.append(sByte.toLowerCase());
+			}
+			return buffer.toString();
+		}
+	    return "";
+	}
+
+	private byte[] string2digest(String string) {
+		if(string != null && string.length() > 0) {
+			int count = string.length() / 2;
+			byte[] digest = new byte[count];
+			for (int i = 0; i < count; i++) {
+				try {
+					String seg = string.substring(2*i, 2*(i + 1));
+					int d = Integer.parseInt(seg, 16);
+					digest[i] = (byte)d;
+				}
+				catch (Exception e) {
+				}
+			}
+			return digest;
+		}
+	    return new byte[0];
+    }
 
 	/**
 	 * Translate the specified map with string keys to a map whose keys are

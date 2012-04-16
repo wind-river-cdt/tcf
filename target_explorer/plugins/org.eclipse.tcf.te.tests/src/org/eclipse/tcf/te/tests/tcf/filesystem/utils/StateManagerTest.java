@@ -16,7 +16,6 @@ import java.io.FileWriter;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpCacheUpdate;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.CacheManager;
-import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.StateManager;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.CacheState;
 
 public class StateManagerTest extends UtilsTestBase {
@@ -31,7 +30,7 @@ public class StateManagerTest extends UtilsTestBase {
 	public void testCacheStateConsistent() throws Exception {
 	    OpCacheUpdate update = new OpCacheUpdate(testFile);
 	    update.run(new NullProgressMonitor());
-		CacheState cacheState = StateManager.getCacheState(testFile);
+		CacheState cacheState = testFile.getCacheState();
 		assertEquals(CacheState.consistent, cacheState);
 	}
 	
@@ -42,7 +41,7 @@ public class StateManagerTest extends UtilsTestBase {
 	    BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 	    writer.write("hello, world"); //$NON-NLS-1$
 	    writer.close();
-		CacheState cacheState = StateManager.getCacheState(testFile);
+		CacheState cacheState = testFile.getCacheState();
 	    assertEquals(CacheState.modified, cacheState);
 	}
 	
@@ -50,8 +49,8 @@ public class StateManagerTest extends UtilsTestBase {
 	    OpCacheUpdate update = new OpCacheUpdate(testFile);
 	    update.run(new NullProgressMonitor());
 		writeFileContent("hello,world!"); //$NON-NLS-1$
-	    StateManager.refreshState(testFile);
-		CacheState cacheState = StateManager.getCacheState(testFile);
+		testFile.refreshState();
+		CacheState cacheState = testFile.getCacheState();
 		assertEquals(CacheState.outdated, cacheState);
 	}
 	
@@ -59,12 +58,12 @@ public class StateManagerTest extends UtilsTestBase {
 	    OpCacheUpdate update = new OpCacheUpdate(testFile);
 	    update.run(new NullProgressMonitor());
 		writeFileContent("hello,world!"); //$NON-NLS-1$
-	    StateManager.refreshState(testFile);
+		testFile.refreshState();
 	    File file = CacheManager.getCacheFile(testFile);
 	    BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 	    writer.write("hello, world"); //$NON-NLS-1$
 	    writer.close();
-		CacheState cacheState = StateManager.getCacheState(testFile);
+		CacheState cacheState = testFile.getCacheState();
 		assertEquals(CacheState.conflict, cacheState);
 	}
 }

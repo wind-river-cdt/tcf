@@ -23,12 +23,12 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.util.SafeRunnable;
-import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpCacheCommit;
-import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.StateManager;
-import org.eclipse.tcf.te.tcf.filesystem.core.model.FSModel;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.IOpExecutor;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.NullOpExecutor;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpParsePath;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpUpload;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.activator.UIPlugin;
-import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.IOpExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.UiExecutor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -59,7 +59,7 @@ public class SaveAllListener implements IExecutionListener {
 			if (UIPlugin.isAutoSaving()) {
 				FSTreeNode[] nodes = fDirtyNodes.toArray(new FSTreeNode[fDirtyNodes.size()]);
 				IOpExecutor executor = new UiExecutor();
-				executor.execute(new OpCacheCommit(nodes));
+				executor.execute(new OpUpload(nodes));
 			}
 			else {
 				SafeRunner.run(new SafeRunnable(){
@@ -70,7 +70,7 @@ public class SaveAllListener implements IExecutionListener {
 					@Override
                     public void run() throws Exception {
 						for (FSTreeNode dirtyNode : fDirtyNodes) {
-							StateManager.refreshState(dirtyNode);
+							dirtyNode.refreshState();
 						}
                     }});
 			}
@@ -87,36 +87,27 @@ public class SaveAllListener implements IExecutionListener {
 		IEditorPart[] editors = page.getDirtyEditors();
 		for (IEditorPart editor : editors) {
 			IEditorInput input = editor.getEditorInput();
-			FSTreeNode node = getEditedNode(input);
-			if (node != null) {
-				// If it is a modified node, add it to the dirty node list.
-				fDirtyNodes.add(node);
+			FSTreeNode node = null;
+			if (input instanceof IURIEditorInput) {
+				//Get the file that is being edited.
+				IURIEditorInput fileInput = (IURIEditorInput) input;
+				URI uri = fileInput.getURI();
+				try {
+					IFileStore store = EFS.getStore(uri);
+					File localFile = store.toLocalFile(0, new NullProgressMonitor());
+					if (localFile != null) {
+						// Get the file's mapped FSTreeNode.
+						OpParsePath parser = new OpParsePath(localFile.getCanonicalPath());
+						new NullOpExecutor().execute(parser);
+						node = parser.getResult();
+						if (node != null) {
+							// If it is a modified node, add it to the dirty node list.
+							fDirtyNodes.add(node);
+						}
+					}
+				}catch(Exception e){}
 			}
 		}
-	}
-
-	/**
-	 * Get the corresponding FSTreeNode from the input.
-	 * If the input has no corresponding FSTreeNode, return null;
-	 * @param input The editor input.
-	 * @return The corresponding FSTreeNode or null if it has not.
-	 */
-	private FSTreeNode getEditedNode(IEditorInput input){
-		if (input instanceof IURIEditorInput) {
-			//Get the file that is being edited.
-			IURIEditorInput fileInput = (IURIEditorInput) input;
-			URI uri = fileInput.getURI();
-			try {
-				IFileStore store = EFS.getStore(uri);
-				File localFile = store.toLocalFile(0, new NullProgressMonitor());
-				if (localFile != null) {
-					// Get the file's mapped FSTreeNode.
-					FSTreeNode node = FSModel.getTreeNode(localFile.getCanonicalPath());
-					return node;
-				}
-			}catch(Exception e){}
-		}
-		return null;
 	}
 
 	/* (non-Javadoc)

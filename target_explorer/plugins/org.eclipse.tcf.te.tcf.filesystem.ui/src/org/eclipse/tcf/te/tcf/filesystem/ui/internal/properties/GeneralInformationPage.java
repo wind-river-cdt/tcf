@@ -16,9 +16,7 @@ import java.util.Date;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.ISafeRunnable;
-import org.eclipse.core.runtime.SafeRunner;
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -31,7 +29,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.StateManager;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.NullOpExecutor;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpCommitAttr;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.nls.Messages;
 import org.eclipse.ui.dialogs.PropertyPage;
@@ -312,24 +311,9 @@ public class GeneralInformationPage extends PropertyPage {
 	@Override
     public boolean performOk() {
 		if (hasAttrsChanged()) {
-			final boolean[] success = new boolean[1];
-			success[0] = true;
-			SafeRunner.run(new ISafeRunnable() {
-				@Override
-				public void handleException(Throwable exception) {
-					String errorMessage = NLS
-					                .bind(Messages.GeneralInformationPage_PropertiesChangeFailure, new Object[] { node.name, exception
-					                                .getLocalizedMessage() });
-					MessageDialog.openError(getShell(), Messages.GeneralInformationPage_PropertiesChangeTitle, errorMessage);
-					success[0] = false;
-				}
-
-				@Override
-				public void run() throws Exception {
-					StateManager.setFileAttrs(node, clone.attr);
-				}
-			});
-			return success[0];
+			OpCommitAttr op = new OpCommitAttr(node, clone.attr); 
+			IStatus status = new NullOpExecutor().execute(op);
+			return status.isOK();
 		}
 		return true;
     }

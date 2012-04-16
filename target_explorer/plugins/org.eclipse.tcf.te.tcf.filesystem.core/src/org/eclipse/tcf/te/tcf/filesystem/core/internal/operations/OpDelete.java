@@ -23,7 +23,6 @@ import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IConfirmCallback;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.exceptions.TCFFileSystemException;
-import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.StateManager;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
 
@@ -156,16 +155,7 @@ public class OpDelete extends Operation {
 				clone.setWritable(true);
 			}
 			// Make the file writable.
-			SafeRunner.run(new ISafeRunnable() {
-				@Override
-                public void handleException(Throwable e) {
-					// Ignore exception
-                }
-				@Override
-				public void run() throws Exception {
-					StateManager.setFileAttrs(node, clone.attr);
-				}
-			});
+			new NullOpExecutor().execute(new OpCommitAttr(node, clone.attr));
 		}
 		super.removeFile(node, service);
 		monitor.worked(1);

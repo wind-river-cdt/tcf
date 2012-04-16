@@ -26,7 +26,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.tcf.te.tcf.filesystem.core.model.FSModel;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.NullOpExecutor;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpParsePath;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.controls.FSTreeContentProvider;
 import org.eclipse.tcf.te.tcf.filesystem.ui.controls.FSTreeViewerSorter;
@@ -356,7 +357,9 @@ public abstract class NewNodeWizardPage extends AbstractValidatingWizardPage {
 		final String text = folderControl.getEditFieldControlText();
 		if (text != null) {
 			String path = text.trim();
-			return FSModel.findTreeNode(peer, path);
+			OpParsePath parser = new OpParsePath(peer, path);
+			new NullOpExecutor().execute(parser);
+			return parser.getResult();
 		}
 		return null;
 	}

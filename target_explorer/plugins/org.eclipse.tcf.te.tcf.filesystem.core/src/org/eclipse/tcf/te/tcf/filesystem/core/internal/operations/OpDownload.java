@@ -17,6 +17,9 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osgi.util.NLS;
@@ -44,7 +47,7 @@ public class OpDownload extends OpStreamOp {
 	public OpDownload(File dstFile, FSTreeNode srcNode) {
 		this(new File[]{dstFile}, new FSTreeNode[]{srcNode});
 	}
-	
+
 	/**
 	 * Create a download operation to download file nodes
 	 * to local files.
@@ -100,8 +103,6 @@ public class OpDownload extends OpStreamOp {
 	 * @throws IOException The exception reported during downloading.
 	 */
 	private void downloadFiles(File[] dstFiles, FSTreeNode[] srcNodes) throws IOException {
-		BufferedInputStream input = null;
-		BufferedOutputStream output = null;
 		// The buffer used to download the file.
 		byte[] data = new byte[DEFAULT_CHUNK_SIZE];
 		// Calculate the total size.
@@ -118,10 +119,19 @@ public class OpDownload extends OpStreamOp {
 		for (int i = 0; i < srcNodes.length && !monitor.isCanceled(); i++) {
 			FSTreeNode node = srcNodes[i];
 			long size = node.attr == null ? 0L : node.attr.size;
+			MessageDigest digest = null;
+			BufferedInputStream input = null;
+			BufferedOutputStream output = null;
 			try {
 				URL url = node.getLocationURL();
 				TcfURLConnection connection = (TcfURLConnection) url.openConnection();
-				input = new BufferedInputStream(connection.getInputStream());
+				try {
+					digest = MessageDigest.getInstance("MD5");
+					input = new BufferedInputStream(new DigestInputStream(connection.getInputStream(), digest));
+				}
+				catch (NoSuchAlgorithmException e) {
+					input = new BufferedInputStream(connection.getInputStream());
+				}
 				output = new BufferedOutputStream(new FileOutputStream(dstFiles[i]));
 
 				// Total size displayed on the progress dialog.
@@ -141,7 +151,8 @@ public class OpDownload extends OpStreamOp {
 						}
 					}
 				}
-			} finally {
+			}
+			finally {
 				if (output != null) {
 					try {
 						output.close();
@@ -154,9 +165,21 @@ public class OpDownload extends OpStreamOp {
 					} catch (Exception e) {
 					}
 				}
+				if(digest != null) {
+					updateNodeDigest(node, digest.digest());
+				}
 			}
 		}
 	}
+
+	/**
+	 * Update the node's digest using the digest data.
+	 * 
+	 * @param node The node whose digest should updated.
+	 * @param digest The digest data.
+	 */
+	protected void updateNodeDigest(FSTreeNode node, byte[] digest) {
+    }
 
 	/*
 	 * (non-Javadoc)

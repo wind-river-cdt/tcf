@@ -101,7 +101,7 @@ public class OpRename extends Operation {
 				else {
 					final File file = CacheManager.getCacheFile(node);
 					if (node.isFile() && file.exists()) {
-						PersistenceManager.getInstance().removeBaseTimestamp(node.getLocationURI());
+						PersistenceManager.getInstance().removeFileDigest(node.getLocationURI());
 					}
 					deleteFileChecked(file);
 					node.setName(newName);

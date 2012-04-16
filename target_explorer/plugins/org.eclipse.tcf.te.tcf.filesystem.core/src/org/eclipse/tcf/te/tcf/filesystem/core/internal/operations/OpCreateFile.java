@@ -16,6 +16,7 @@ import org.eclipse.tcf.services.IFileSystem.DoneOpen;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.services.IFileSystem.IFileHandle;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.exceptions.TCFFileSystemException;
+import org.eclipse.tcf.te.tcf.filesystem.core.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
 
@@ -74,6 +75,6 @@ public class OpCreateFile extends OpCreate {
 	 */
 	@Override
 	protected FSTreeNode newTreeNode() {
-		return FSTreeNode.createFileNode(name, folder);
+		return FSModel.createFileNode(name, folder);
 	}
 }
