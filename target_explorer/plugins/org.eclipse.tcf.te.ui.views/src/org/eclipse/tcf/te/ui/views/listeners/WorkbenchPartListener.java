@@ -68,12 +68,13 @@ public class WorkbenchPartListener implements IPartListener2 {
 	 */
 	@Override
 	public void partActivated(IWorkbenchPartReference partRef) {
-		if (IUIConstants.ID_EXPLORER.equals(partRef.getId())) {
+		if (IUIConstants.ID_EXPLORER.equals(partRef.getId()) ||
+						IUIConstants.ID_EDITOR.equals(partRef.getId())) {
 			IWorkbenchPart part = partRef.getPart(false);
 			if (part != null && part.getSite() != null) {
 				IContextService service = (IContextService)part.getSite().getService(IContextService.class);
 				if (service != null) {
-					IContextActivation activation = service.activateContext(IUIConstants.ID_EXPLORER);
+					IContextActivation activation = service.activateContext(partRef.getId());
 					if (activation != null) {
 						activations.put(partRef, activation);
 					} else {
