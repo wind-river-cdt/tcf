@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.core.internal.operations;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.exceptions.TCFFileSystemException;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.CacheManager;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
 
@@ -92,6 +94,12 @@ public class OpRefresh extends Operation {
 			List<FSTreeNode> children = node.unsafeGetChildren();
 			for (FSTreeNode child : children) {
 				refresh(child, service);
+			}
+		}
+		else if(node.isFile()) {
+			File file = CacheManager.getCacheFile(node);
+			if(file.exists()) {
+				node.refreshState();
 			}
 		}
 	}
