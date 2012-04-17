@@ -207,5 +207,7 @@ public class FileState {
 		cache_digest = digest;
 		target_digest = digest;
 		base_digest = digest;
+		PropertyChangeEvent event = new PropertyChangeEvent(node, "reset_digest", null, digest);
+		node.firePropertyChange(event);
     }	
 }
