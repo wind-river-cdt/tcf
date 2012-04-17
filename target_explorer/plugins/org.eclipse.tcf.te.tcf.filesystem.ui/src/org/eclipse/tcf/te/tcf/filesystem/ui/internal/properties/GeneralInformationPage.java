@@ -32,7 +32,9 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.IOpExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.NullOpExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpCommitAttr;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpRefresh;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
+import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.JobExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.ui.nls.Messages;
 import org.eclipse.ui.dialogs.PropertyPage;
 
@@ -336,7 +338,14 @@ public class GeneralInformationPage extends PropertyPage {
 		IStatus status = null;
 		for (int i = 0; i < RETRY_TIMES; i++) {
 			status = executor.execute(op);
-			if (status.isOK()) return status;
+			if (status.isOK()) {
+				if (!node.isRoot()) {
+					// Refresh the parent so that the filters work!
+					executor = new JobExecutor();
+					executor.execute(new OpRefresh(node.parent));
+				}
+				return status;
+			}
 		}
 		return status;
 	}
