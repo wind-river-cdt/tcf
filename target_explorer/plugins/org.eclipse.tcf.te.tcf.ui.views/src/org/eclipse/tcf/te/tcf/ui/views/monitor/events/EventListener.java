@@ -36,8 +36,6 @@ public class EventListener extends AbstractEventListener {
 			MonitorEvent.Message message = monitorEvent.getMessage();
 
 			switch (type) {
-				case OPEN:
-					break;
 				case CLOSE:
 					// Channel close messages are logged only if there is an error
 					if (message != null && message.text != null && !message.text.contains("(error=null)")) { //$NON-NLS-1$
@@ -56,6 +54,9 @@ public class EventListener extends AbstractEventListener {
 						Assert.isNotNull(console);
 						console.appendMessage(message.type, message.text);
 					}
+					break;
+				case OPEN:
+				default:
 					break;
 			}
 		}

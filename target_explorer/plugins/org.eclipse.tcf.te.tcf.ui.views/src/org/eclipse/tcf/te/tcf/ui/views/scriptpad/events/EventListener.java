@@ -44,6 +44,7 @@ public class EventListener extends AbstractEventListener {
 					}
 					break;
 				case STOP:
+				default:
 					break;
 			}
 		}
