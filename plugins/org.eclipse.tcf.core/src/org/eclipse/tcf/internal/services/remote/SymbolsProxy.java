@@ -274,6 +274,22 @@ public class SymbolsProxy implements ISymbols {
         }.token;
     }
 
+    public IToken getLocationInfo(String symbol_id, final DoneGetLocationInfo done) {
+        return new Command(channel, this, "getLocationInfo", new Object[]{ symbol_id }) {
+            @Override
+            @SuppressWarnings("unchecked")
+            public void done(Exception error, Object[] args) {
+                Map<String,Object> props = null;
+                if (error == null) {
+                    assert args.length == 2;
+                    error = toError(args[0]);
+                    props = (Map<String,Object>)args[1];
+                }
+                done.doneGetLocationInfo(token, error, props);
+            }
+        }.token;
+    }
+
     public IToken findFrameInfo(String context_id, Number address, final DoneFindFrameInfo done) {
         return new Command(channel, this, "findFrameInfo", new Object[]{ context_id, address }) {
             @Override

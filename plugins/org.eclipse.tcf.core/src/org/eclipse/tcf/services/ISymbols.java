@@ -433,14 +433,14 @@ public interface ISymbols extends IService {
         CMD_NUMBER      = 1,
 
         /** Load a register value to the evaluation stack. Command argument is the register ID. */
-        CMD_REGISTER    = 2,
+        CMD_RD_REG      = 2,
 
         /** Load frame address to the evaluation stack. */
         CMD_FP          = 3,
 
         /** Read memory at address on the top of the evaluation stack. Command arguments are
          *  the value size (Number) and endianness (Boolean, false - little-endian, true - big-endian). */
-        CMD_DEREF       = 4,
+        CMD_RD_MEM      = 4,
 
         /** Integer arithmetic and bit-wise boolean operations */
         CMD_ADD         = 5,
@@ -463,11 +463,59 @@ public interface ISymbols extends IService {
 
         /** Evaluate DWARF location expression. Command arguments are byte array of
          *  DWARF expression instructions and an object that contains evaluation parameters. */
-        CMD_LOCATION    = 20;
+        CMD_LOCATION    = 20,
+
+        CMD_FCALL       = 21,
+        CMD_WR_REG      = 22,
+        CMD_WR_MEM      = 23,
+        CMD_PIECE       = 24;
+
+    /**
+     * @deprecated
+     */
+    static final int
+        CMD_REGISTER    = 2,
+        CMD_DEREF       = 4;
+
+    /**
+     * Symbol location properties.
+     */
+    static final String
+        /** Number, start address of code range where the location info is valid, or null if it is valid everywhere */
+        LOC_CODE_ADDR = "CodeAddr",
+        /** Number, size in bytes of code range where the location info is valid, or null if it is valid everywhere */
+        LOC_CODE_SIZE = "CodeSize",
+        /** Number, number of argument required to execute location instructions */
+        LOC_ARG_CNT = "ArgCnt",
+        /** List, instructions to compute object value location, e.g. address, or offset, or register ID, etc. */
+        LOC_VALUE_CMDS = "ValueCmds",
+        /** List, instructions to compute dynamic array length location */
+        LOC_LENGTH_CMDS = "LengthCmds";
+
+    /**
+     * Retrieve symbol location information.
+     * @param symbol_id - symbol ID.
+     * @param done - call back interface called when operation is completed.
+     * @return - pending command handle.
+     */
+    IToken getLocationInfo(String symbol_id, DoneGetLocationInfo done);
+
+    /**
+     * Client call back interface for getLocationInfo().
+     */
+    interface DoneGetLocationInfo {
+        /**
+         * Called when location information retrieval is done.
+         * @param token - command handle.
+         * @param error – error description if operation failed, null if succeeded.
+         * @param props - symbol location properties, see LOC_*.
+         */
+        void doneGetLocationInfo(IToken token, Exception error, Map<String,Object> props);
+    }
 
     /**
      * Retrieve stack tracing commands for given instruction address in a context memory.
-     * @param context_id - exacutable context ID.
+     * @param context_id - executable context ID.
      * @param address - instruction address.
      * @param done - call back interface called when operation is completed.
      * @return - pending command handle.
