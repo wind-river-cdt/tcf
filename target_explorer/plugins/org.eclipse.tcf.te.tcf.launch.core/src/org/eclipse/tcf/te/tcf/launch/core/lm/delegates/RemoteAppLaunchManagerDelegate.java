@@ -33,6 +33,7 @@ import org.eclipse.tcf.te.launch.core.selection.interfaces.ISelectionContext;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
 import org.eclipse.tcf.te.runtime.services.filetransfer.FileTransferItem;
 import org.eclipse.tcf.te.runtime.services.interfaces.filetransfer.IFileTransferItem;
+import org.eclipse.tcf.te.tcf.launch.core.interfaces.IRemoteAppLaunchAttributes;
 
 /**
  * RemoteAppLaunchManagerDelegate
@@ -52,6 +53,9 @@ public class RemoteAppLaunchManagerDelegate extends DefaultLaunchManagerDelegate
 
 		if (launchSpec.hasAttribute(ILaunchContextLaunchAttributes.ATTR_LAUNCH_CONTEXTS)) {
 			wc.setAttribute(ILaunchContextLaunchAttributes.ATTR_LAUNCH_CONTEXTS, (String)launchSpec.getAttribute(ILaunchContextLaunchAttributes.ATTR_LAUNCH_CONTEXTS).getValue());
+		}
+		if (launchSpec.hasAttribute(IRemoteAppLaunchAttributes.ATTR_PROCESS_IMAGE)) {
+			wc.setAttribute(IRemoteAppLaunchAttributes.ATTR_PROCESS_IMAGE, (String)launchSpec.getAttribute(IRemoteAppLaunchAttributes.ATTR_PROCESS_IMAGE).getValue());
 		}
 		if (launchSpec.hasAttribute(IFileTransferLaunchAttributes.ATTR_FILE_TRANSFERS)) {
 			wc.setAttribute(IFileTransferLaunchAttributes.ATTR_FILE_TRANSFERS, (String)launchSpec.getAttribute(IFileTransferLaunchAttributes.ATTR_FILE_TRANSFERS).getValue());
@@ -76,6 +80,7 @@ public class RemoteAppLaunchManagerDelegate extends DefaultLaunchManagerDelegate
 		else if (selectionContext instanceof IProjectSelectionContext) {
 			List<IFileTransferItem> transfers = new ArrayList<IFileTransferItem>(Arrays.asList(FileTransfersPersistenceDelegate.getFileTransfers(launchSpec)));
 			List<IReferencedProjectItem> projects = new ArrayList<IReferencedProjectItem>(Arrays.asList(ReferencedProjectsPersistenceDelegate.getReferencedProjects(launchSpec)));
+			String processImage = null;
 
 			boolean added = false;
 			for (Object selection : selectionContext.getSelections()) {
@@ -85,8 +90,11 @@ public class RemoteAppLaunchManagerDelegate extends DefaultLaunchManagerDelegate
 					transfer.setProperty(IFileTransferItem.PROPERTY_ENABLED, true);
 					transfer.setProperty(IFileTransferItem.PROPERTY_HOST, path.toPortableString());
 					transfer.setProperty(IFileTransferItem.PROPERTY_DIRECTION, IFileTransferItem.HOST_TO_TARGET);
-					transfer.setProperty(IFileTransferItem.PROPERTY_HOST, new Path("/tmp/").toPortableString()); //$NON-NLS-1$
+					transfer.setProperty(IFileTransferItem.PROPERTY_TARGET, new Path("/tmp/").toPortableString()); //$NON-NLS-1$
 					transfers.add(transfer);
+					if (!added) {
+						processImage = "/tmp/" + path.lastSegment(); //$NON-NLS-1$
+					}
 					added = true;
 				}
 			}
@@ -100,6 +108,7 @@ public class RemoteAppLaunchManagerDelegate extends DefaultLaunchManagerDelegate
 
 			FileTransfersPersistenceDelegate.setFileTransfers(launchSpec, transfers.toArray(new IFileTransferItem[transfers.size()]));
 			ReferencedProjectsPersistenceDelegate.setReferencedProjects(launchSpec, projects.toArray(new IReferencedProjectItem[projects.size()]));
+			launchSpec.addAttribute(IRemoteAppLaunchAttributes.ATTR_PROCESS_IMAGE, processImage);
 		}
 
 		return launchSpec;

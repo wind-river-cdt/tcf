@@ -41,7 +41,6 @@ public abstract class AbstractPartWithButtons extends AbstractPart {
 	 */
 	public AbstractPartWithButtons(String[] labels) {
 		super();
-		Assert.isNotNull(labels);
 		this.labels = labels;
 	}
 
@@ -52,7 +51,7 @@ public abstract class AbstractPartWithButtons extends AbstractPart {
 	public void createControl(Composite parent, int style, int span, FormToolkit toolkit) {
 		Assert.isNotNull(parent);
 		createMainLabel(parent, span, toolkit);
-		createMainControl(parent, style, span - 1, toolkit);
+		createMainControl(parent, style, span - ((labels != null && labels.length > 0) ? 1 : 0), toolkit);
 		createButtonsPanel(parent, toolkit);
 	}
 
@@ -86,7 +85,7 @@ public abstract class AbstractPartWithButtons extends AbstractPart {
 	 * @return The buttons panel composite or <code>null</code>.
 	 */
 	protected Composite createButtonsPanel(Composite parent, FormToolkit toolkit) {
-		if (labels.length == 0) {
+		if (labels == null || labels.length == 0) {
 			return null;
 		}
 
@@ -176,6 +175,9 @@ public abstract class AbstractPartWithButtons extends AbstractPart {
 	 * @throws ArrayIndexOutOfBoundsException if the label is invalid.
 	 */
 	public Button getButton(String label) {
+		if (labels == null) {
+			throw new ArrayIndexOutOfBoundsException();
+		}
 		return getButton(Arrays.asList(labels).indexOf(label));
 	}
 
@@ -188,6 +190,9 @@ public abstract class AbstractPartWithButtons extends AbstractPart {
 	 * @throws ArrayIndexOutOfBoundsException if the index is out of bounds.
 	 */
 	public Button getButton(int index) {
+		if (buttons == null) {
+			throw new ArrayIndexOutOfBoundsException();
+		}
 		return buttons[index];
 	}
 }
