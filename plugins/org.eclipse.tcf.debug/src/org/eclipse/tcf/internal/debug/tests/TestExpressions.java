@@ -14,6 +14,7 @@ import java.math.BigInteger;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -51,6 +52,7 @@ class TestExpressions implements ITCFTest,
     private String process_id;
     private String thread_id;
     private boolean run_to_bp_done;
+    private boolean loc_info_done;
     private boolean no_cpp;
     private boolean test_done;
     private boolean cancel_test_sent;
@@ -60,8 +62,11 @@ class TestExpressions implements ITCFTest,
     private boolean waiting_suspend;
     private String[] stack_trace;
     private IStackTrace.StackTraceContext[] stack_frames;
-    private String[] local_var_ids;
+    private String[] local_var_expr_ids;
     private final Map<String,String> global_var_ids = new HashMap<String,String>();
+    private final Map<String,String> local_var_ids = new HashMap<String,String>();
+    private final Map<String,SymbolLocation> global_var_location = new HashMap<String,SymbolLocation>();
+    private final Map<String,SymbolLocation> local_var_location = new HashMap<String,SymbolLocation>();
     private final Map<String,IExpressions.Expression> expr_ctx = new HashMap<String,IExpressions.Expression>();
     private final Map<String,IExpressions.Value> expr_val = new HashMap<String,IExpressions.Value>();
     private final Map<String,ISymbols.Symbol> expr_sym = new HashMap<String,ISymbols.Symbol>();
@@ -129,6 +134,12 @@ class TestExpressions implements ITCFTest,
         "tcf_cpp_test_class::tcf_cpp_test_class_nested::s_int == 2",
         "tcf_cpp_test_class_extension::tcf_cpp_test_class_nested::s_int == 2",
     };
+
+    @SuppressWarnings("unused")
+    private static class SymbolLocation {
+        Exception error;
+        Map<String,Object> props;
+    }
 
     TestExpressions(TCFTestSuite test_suite, RunControl test_rc, IChannel channel) {
         this.test_suite = test_suite;
@@ -403,24 +414,24 @@ class TestExpressions implements ITCFTest,
             });
             return;
         }
-        if (local_var_ids == null) {
+        if (local_var_expr_ids == null) {
             expr.getChildren(stack_trace[stack_trace.length - 2], new IExpressions.DoneGetChildren() {
                 public void doneGetChildren(IToken token, Exception error, String[] context_ids) {
                     if (error != null || context_ids == null) {
                         // Need to continue tests even if local variables info is not available.
                         // TODO: need to distinguish absence of debug info from other errors.
-                        local_var_ids = new String[0];
+                        local_var_expr_ids = new String[0];
                         runTest();
                     }
                     else {
-                        local_var_ids = context_ids;
+                        local_var_expr_ids = context_ids;
                         runTest();
                     }
                 }
             });
             return;
         }
-        for (final String id : local_var_ids) {
+        for (final String id : local_var_expr_ids) {
             if (expr_ctx.get(id) == null) {
                 expr.getContext(id, new IExpressions.DoneGetContext() {
                     public void doneGetContext(IToken token, Exception error, IExpressions.Expression ctx) {
@@ -429,6 +440,7 @@ class TestExpressions implements ITCFTest,
                         }
                         else {
                             expr_ctx.put(id, ctx);
+                            local_var_ids.put(id, ctx.getSymbolID());
                             runTest();
                         }
                     }
@@ -436,7 +448,7 @@ class TestExpressions implements ITCFTest,
                 return;
             }
         }
-        if (syms != null && local_var_ids.length > 0) {
+        if (syms != null && local_var_expr_ids.length > 0) {
             for (final String nm : global_var_names) {
                 if (!global_var_ids.containsKey(nm)) {
                     syms.find(process_id, new BigInteger(suspended_pc), nm, new ISymbols.DoneFind() {
@@ -465,15 +477,74 @@ class TestExpressions implements ITCFTest,
                 }
             }
         }
+        if (syms != null && !loc_info_done) {
+            for (final String id : global_var_ids.values()) {
+                if (id != null && global_var_location.get(id) == null) {
+                    syms.getLocationInfo(id, new ISymbols.DoneGetLocationInfo() {
+                        public void doneGetLocationInfo(IToken token, Exception error, Map<String, Object> props) {
+                            SymbolLocation l = new SymbolLocation();
+                            l.error = error;
+                            l.props = props;
+                            global_var_location.put(id, l);
+                            List<Object> cmds = (List<Object>)props.get(ISymbols.LOC_VALUE_CMDS);
+                            if (error != null) {
+                                if (error instanceof IErrorReport &&
+                                        ((IErrorReport)error).getErrorCode() == IErrorReport.TCF_ERROR_INV_COMMAND) {
+                                    runTest();
+                                    return;
+                                }
+                                exit(error);
+                            }
+                            else if (cmds == null || cmds.size() == 0) {
+                                exit(new Exception("Invalid symbol location info"));
+                            }
+                            else {
+                                runTest();
+                            }
+                        }
+                    });
+                    return;
+                }
+            }
+            for (final String id : local_var_ids.values()) {
+                if (id != null && local_var_location.get(id) == null) {
+                    syms.getLocationInfo(id, new ISymbols.DoneGetLocationInfo() {
+                        public void doneGetLocationInfo(IToken token, Exception error, Map<String, Object> props) {
+                            SymbolLocation l = new SymbolLocation();
+                            l.error = error;
+                            l.props = props;
+                            local_var_location.put(id, l);
+                            List<Object> cmds = (List<Object>)props.get(ISymbols.LOC_VALUE_CMDS);
+                            if (error != null) {
+                                if (error instanceof IErrorReport &&
+                                        ((IErrorReport)error).getErrorCode() == IErrorReport.TCF_ERROR_INV_COMMAND) {
+                                    runTest();
+                                    return;
+                                }
+                                exit(error);
+                            }
+                            else if (cmds == null || cmds.size() == 0) {
+                                exit(new Exception("Invalid symbol location info"));
+                            }
+                            else {
+                                runTest();
+                            }
+                        }
+                    });
+                    return;
+                }
+            }
+            loc_info_done = true;
+        }
         for (final String txt : test_expressions) {
-            if (local_var_ids.length == 0) {
+            if (local_var_expr_ids.length == 0) {
                 // Debug info not available
                 if (txt.indexOf("func2_local") >= 0) continue;
                 if (txt.indexOf("test_struct") >= 0) continue;
                 if (txt.indexOf("tcf_test_array") >= 0) continue;
                 if (txt.indexOf("(char *)") >= 0) continue;
             }
-            if (local_var_ids.length == 0 || no_cpp) {
+            if (local_var_expr_ids.length == 0 || no_cpp) {
                 // Agent is not build with C++ compiler
                 if (txt.indexOf("tcf_cpp_test") >= 0) continue;
                 if (txt.indexOf("(bool)") >= 0) continue;
@@ -494,7 +565,7 @@ class TestExpressions implements ITCFTest,
                 return;
             }
         }
-        for (final String id : local_var_ids) {
+        for (final String id : local_var_expr_ids) {
             if (expr_val.get(id) == null) {
                 expr.evaluate(id, new IExpressions.DoneEvaluate() {
                     public void doneEvaluate(IToken token, Exception error, IExpressions.Value ctx) {
