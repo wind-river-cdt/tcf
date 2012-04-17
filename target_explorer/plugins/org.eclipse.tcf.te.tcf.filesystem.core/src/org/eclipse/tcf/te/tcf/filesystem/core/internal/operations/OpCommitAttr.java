@@ -61,8 +61,7 @@ public class OpCommitAttr extends Operation {
 							if (error == null) {
 								node.setAttributes(attrs);
 							} else {
-								String message = NLS.bind(Messages.StateManager_CannotSetFileStateMessage, new Object[] { node.name, error });
-								errors[0] = new TCFFileSystemException(message, error);
+								errors[0] = newTCFException(error);
 							}
 						}
 					});

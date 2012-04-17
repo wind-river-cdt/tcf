@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.IOpExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.NullOpExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpCommitAttr;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
@@ -39,6 +40,8 @@ import org.eclipse.ui.dialogs.PropertyPage;
  * The general information page of a file's properties dialog.
  */
 public class GeneralInformationPage extends PropertyPage {
+	// The times of retrying before failure.
+	private static final int RETRY_TIMES = 3;
 	// The formatter for the size of a file.
 	private static final DecimalFormat SIZE_FORMAT = new DecimalFormat();
 	// The original node.
@@ -311,12 +314,32 @@ public class GeneralInformationPage extends PropertyPage {
 	@Override
     public boolean performOk() {
 		if (hasAttrsChanged()) {
-			OpCommitAttr op = new OpCommitAttr(node, clone.attr); 
-			IStatus status = new NullOpExecutor().execute(op);
-			return status.isOK();
+			IStatus status = commitAttr();
+			if(!status.isOK()) {
+				setErrorMessage(status.getMessage());
+				return false;
+			}
 		}
 		return true;
     }
+	
+	/**
+	 * Commit the new attributes of the file and
+	 * return a status. This operation will try
+	 * several times before reporting failure.
+	 * 
+	 * @return The committing status.
+	 */
+	private IStatus commitAttr() {
+		OpCommitAttr op = new OpCommitAttr(node, clone.attr);
+		IOpExecutor executor = new NullOpExecutor();
+		IStatus status = null;
+		for (int i = 0; i < RETRY_TIMES; i++) {
+			status = executor.execute(op);
+			if (status.isOK()) return status;
+		}
+		return status;
+	}
 
 	/**
 	 * If the attributes has been changed.

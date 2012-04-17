@@ -111,8 +111,7 @@ public class OpUser extends Operation {
 					if (error == null) {
 						accounts[0] = new UserAccount(real_uid, real_gid, effective_uid, effective_gid, home);
 					}else {
-						String message = NLS.bind(Messages.UserManager_CannotGetUserAccountMessage, channel.getRemotePeer().getID());
-						errors[0] = new TCFFileSystemException(message, error);
+						errors[0] = newTCFException(error);
 					}
 				}
 			});

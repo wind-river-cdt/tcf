@@ -22,7 +22,7 @@ import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 /**
  * The callback handler that handles the event when the roots are listed.
  */
-public class QueryDoneRoots implements DoneRoots {
+public class QueryDoneRoots extends CallbackBase implements DoneRoots {
 	// The parent directory node.
 	FSTreeNode parentNode;
 	// The callback object
@@ -57,7 +57,7 @@ public class QueryDoneRoots implements DoneRoots {
 			}
 		}
 		if(callback != null) {
-			IStatus status = error == null ? Status.OK_STATUS : new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), error.getLocalizedMessage(), error);
+			IStatus status = error == null ? Status.OK_STATUS : new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), getErrorMessage(error), error);
 			callback.done(this, status);
 		}
 	}

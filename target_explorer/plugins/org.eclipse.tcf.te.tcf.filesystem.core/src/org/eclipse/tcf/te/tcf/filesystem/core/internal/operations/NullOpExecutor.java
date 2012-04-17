@@ -36,7 +36,8 @@ public class NullOpExecutor implements IOpExecutor {
 			return Status.OK_STATUS;
 		}
 		catch (InvocationTargetException e) {
-			return new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), e.getLocalizedMessage(), e);
+			Throwable throwable = e.getTargetException();
+			return new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), throwable.getLocalizedMessage(), throwable);
 		}
 		catch (InterruptedException e) {
 			return Status.CANCEL_STATUS;

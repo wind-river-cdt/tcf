@@ -9,8 +9,6 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.core.internal.callbacks;
 
-import java.net.ConnectException;
-
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
@@ -29,7 +27,7 @@ import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
  * The callback to process the channel opened event for refreshing the state of a 
  * file system node.
  */
-public class RefreshStateDoneOpenChannel implements IChannelManager.DoneOpenChannel{
+public class RefreshStateDoneOpenChannel extends CallbackBase implements IChannelManager.DoneOpenChannel{
 	// The node to be refreshed.
 	FSTreeNode node;
 	// The callback after the refreshing is done.
@@ -51,13 +49,7 @@ public class RefreshStateDoneOpenChannel implements IChannelManager.DoneOpenChan
 	public void doneOpenChannel(Throwable error, IChannel channel) {
 		IPeer peer = node.peerNode.getPeer();
 		if (error != null) {
-			String message = null;
-			if (error instanceof ConnectException) {
-				message = NLS.bind(Messages.FSOperation_NotResponding, peer.getID());
-			}
-			else {
-				message = NLS.bind(Messages.OpeningChannelFailureMessage, peer.getID(), error.getLocalizedMessage());
-			}
+			String message = getErrorMessage(error);
 			IStatus status = new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), message, error);
 			invokeCallback(status);
 		}

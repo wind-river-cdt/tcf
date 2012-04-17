@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IChannel;
@@ -30,6 +31,7 @@ import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
  * FSDelete deletes the selected FSTreeNode list.
  */
 public class OpDelete extends Operation {
+	private static final int RETRY_TIMES = 3;
 	//The nodes to be deleted.
 	List<FSTreeNode> nodes;
 	//The callback invoked to confirm deleting read-only files.
@@ -147,18 +149,36 @@ public class OpDelete extends Operation {
 					throw new InterruptedException();
 				}
 			}
-			final FSTreeNode clone = (FSTreeNode) node.clone();
-			if (node.isWindowsNode()) {
-				clone.setReadOnly(false);
-			}
-			else {
-				clone.setWritable(true);
-			}
-			// Make the file writable.
-			new NullOpExecutor().execute(new OpCommitAttr(node, clone.attr));
+			IStatus status = mkWritable(node);
+			if (!status.isOK()) return;
 		}
 		super.removeFile(node, service);
 		monitor.worked(1);
+	}
+	
+	/**
+	 * Make the file/folder writable by changing its properties.
+	 * It will try several times before return.
+	 * 
+	 * @param node the file/folder node.
+	 */
+	private IStatus mkWritable(FSTreeNode node) {
+		final FSTreeNode clone = (FSTreeNode) node.clone();
+		if (node.isWindowsNode()) {
+			clone.setReadOnly(false);
+		}
+		else {
+			clone.setWritable(true);
+		}
+		// Make the file writable.
+		OpCommitAttr op = new OpCommitAttr(node, clone.attr);
+		IOpExecutor executor = new NullOpExecutor();
+		IStatus status = null;
+		for (int i = 0; i < RETRY_TIMES; i++) {
+			status = executor.execute(op);
+			if (status.isOK()) return status;
+		}
+		return status;
 	}
 
 	/*

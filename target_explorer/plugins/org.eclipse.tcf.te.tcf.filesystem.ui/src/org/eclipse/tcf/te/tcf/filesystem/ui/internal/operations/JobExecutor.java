@@ -64,7 +64,8 @@ public class JobExecutor implements IOpExecutor{
 					return Status.OK_STATUS;
 				}
 				catch (InvocationTargetException e) {
-					return new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), e.getLocalizedMessage(), e);
+					Throwable throwable = e.getTargetException();
+					return new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), throwable.getLocalizedMessage(), throwable);
 				}
 				catch (InterruptedException e) {
 					return Status.CANCEL_STATUS;

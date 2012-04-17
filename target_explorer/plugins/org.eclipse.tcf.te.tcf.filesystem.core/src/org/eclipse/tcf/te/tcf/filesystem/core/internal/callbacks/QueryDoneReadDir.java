@@ -25,7 +25,7 @@ import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 /**
  * The callback handler that handles the event when a directory is read.
  */
-public class QueryDoneReadDir implements DoneReadDir {
+public class QueryDoneReadDir extends CallbackBase implements DoneReadDir {
 	// The tcf channel.
 	IChannel channel;
 	// The file system service.
@@ -83,7 +83,7 @@ public class QueryDoneReadDir implements DoneReadDir {
 				service.readdir(handle, new QueryDoneReadDir(callback, channel, service, handle, parentNode));
 			}
 		} else if(callback != null) {
-			Status status = new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), error.getLocalizedMessage(), error);
+			Status status = new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), getErrorMessage(error), error);
 			callback.done(this, status);
 		}
 	}

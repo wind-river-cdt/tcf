@@ -14,7 +14,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IFileSystem.DoneStat;
@@ -26,13 +25,12 @@ import org.eclipse.tcf.te.tcf.filesystem.core.activator.CorePlugin;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.FileState;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.PersistenceManager;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
-import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
 
 /**
  * The callback to process the stat done event when
  * refreshing the state of a file system node.
  */
-public class RefreshStateDoneStat implements DoneStat {
+public class RefreshStateDoneStat extends CallbackBase implements DoneStat {
 	// The channel used to refresh the node's state.
 	IChannel channel;
 	// The node whose state is being refreshed.
@@ -72,7 +70,7 @@ public class RefreshStateDoneStat implements DoneStat {
 			}
 		}
 		else {
-			String message = NLS.bind(Messages.StateManager_CannotGetFileStatMessage, new Object[] { node.name, error });
+			String message = getErrorMessage(error);
 			IStatus status = new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), message, error);
 			invokeCallback(status);
 		}

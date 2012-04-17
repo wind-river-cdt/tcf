@@ -26,7 +26,7 @@ import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
 /**
  * The callback handler that handles the event when the channel opens.
  */
-public class QueryDoneOpenChannel implements DoneOpenChannel {
+public class QueryDoneOpenChannel extends CallbackBase implements DoneOpenChannel {
 	// The parent node to be queried.
 	FSTreeNode parentNode;
 	// Callback object.
@@ -70,21 +70,26 @@ public class QueryDoneOpenChannel implements DoneOpenChannel {
 				}
             }
 		};
-		if(error == null && channel != null) {
-			IFileSystem service = channel.getRemoteService(IFileSystem.class);
-			if(service != null) {
-				if(parentNode.isSystemRoot()) {
-					service.roots(new QueryDoneRoots(proxy, parentNode));
+		if(error == null) {
+			if(channel != null) {
+				IFileSystem service = channel.getRemoteService(IFileSystem.class);
+				if(service != null) {
+					if(parentNode.isSystemRoot()) {
+						service.roots(new QueryDoneRoots(proxy, parentNode));
+					} else {
+						String absPath = parentNode.getLocation();
+						service.opendir(absPath, new QueryDoneOpen(proxy, channel, service, parentNode));
+					}
 				} else {
-					String absPath = parentNode.getLocation();
-					service.opendir(absPath, new QueryDoneOpen(proxy, channel, service, parentNode));
+					Status status = new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), Messages.QueryDoneOpenChannel_NoFService, null);
+					proxy.done(this, status);
 				}
-			} else {
-				Status status = new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), Messages.QueryDoneOpenChannel_NoFService, null);
-				proxy.done(this, status);
+			}
+			else {
+				proxy.done(this, Status.OK_STATUS);
 			}
 		} else {
-			IStatus status = error == null ? Status.OK_STATUS : new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), error.getLocalizedMessage(), error);
+			IStatus status = new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), getErrorMessage(error), error);
 			proxy.done(this, status);
 		}
 	}

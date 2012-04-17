@@ -279,10 +279,8 @@ public class Messages extends NLS {
 	public static String SaveListener_StateChangedDialogTitle;
 	public static String SaveListener_StateChangedMessage;
 
-	public static String StateManager_CannotGetFileStateMessage2;
 	public static String StateManager_CannotGetFileStatMessage;
 	public static String StateManager_CannotSetFileStateMessage;
-	public static String StateManager_CannotSetFileStateMessage2;
 	public static String StateManager_CommitFailureTitle;
 	public static String StateManager_RefreshFailureTitle;
 	public static String StateManager_TCFNotProvideFSMessage;

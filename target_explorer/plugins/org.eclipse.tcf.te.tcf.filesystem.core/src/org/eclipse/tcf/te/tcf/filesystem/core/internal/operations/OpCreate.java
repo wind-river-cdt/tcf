@@ -106,9 +106,7 @@ public abstract class OpCreate extends Operation {
 						node.setAttributes(attrs);
 					}
 					else {
-						String message = NLS
-						                .bind(Messages.StateManager_CannotGetFileStatMessage, new Object[] { node.name, error });
-						errors[0] = new TCFFileSystemException(message, error);
+						errors[0] = newTCFException(error);
 					}
 				}
 			});

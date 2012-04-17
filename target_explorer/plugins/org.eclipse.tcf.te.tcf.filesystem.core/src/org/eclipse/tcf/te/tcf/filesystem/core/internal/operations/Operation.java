@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IErrorReport;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.protocol.Protocol;
@@ -81,6 +82,21 @@ public class Operation implements IOperation {
 		return result;
 	}
 
+	/**
+	 * Create a TCFFileSystemException from a FileSystemException.
+	 * 
+	 * @param error The FileSystemException
+	 * @return a TCFFileSystemException
+	 */
+	protected TCFFileSystemException newTCFException(FileSystemException error) {
+	    String message = null;
+	    if(error instanceof IErrorReport) {
+	    	IErrorReport report = (IErrorReport) error;
+	    	message = (String)report.getAttributes().get(IErrorReport.ERROR_FORMAT);
+	    }
+	    return new TCFFileSystemException(message, error);
+    }	
+	
 	/**
 	 * If the target node has ancestor in the specified node list.
 	 *
@@ -337,8 +353,7 @@ public class Operation implements IOperation {
 							}
 						}
 						else {
-							String message = NLS.bind(Messages.FSOperation_CannotReadDir, node.name, error);
-							errors[0] = new TCFFileSystemException(message, error);
+							errors[0] = newTCFException(error);
 						}
 					}
 				});
@@ -548,8 +563,7 @@ public class Operation implements IOperation {
 					cleanUpFile(node);
 				}
 				else {
-					String message = NLS.bind(Messages.FSDelete_CannotRemoveFile, node.name, error);
-					errors[0] = new TCFFileSystemException(message, error);
+					errors[0] = newTCFException(error);
 				}
 			}
 		});
@@ -577,8 +591,7 @@ public class Operation implements IOperation {
 					cleanUpFolder(node);
 				}
 				else {
-					String message = NLS.bind(Messages.FSDelete_CannotRemoveFile, node.name, error);
-					errors[0] = new TCFFileSystemException(message, error);
+					errors[0] = newTCFException(error);
 				}
 			}
 		});
