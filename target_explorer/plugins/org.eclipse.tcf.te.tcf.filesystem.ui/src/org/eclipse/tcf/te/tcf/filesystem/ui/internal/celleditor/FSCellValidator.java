@@ -33,7 +33,7 @@ public class FSCellValidator implements ICellEditorValidator {
 	private TreeViewer viewer;
 	/**
 	 * Create an FSCellValidator for the specified file system tree.
-	 * 
+	 *
 	 * @param viewer The tree viewer for the file system.
 	 */
 	public FSCellValidator(TreeViewer viewer) {
@@ -53,7 +53,6 @@ public class FSCellValidator implements ICellEditorValidator {
 		if (value == null) return Messages.FSRenamingAssistant_SpecifyNonEmptyName;
 		String text = value.toString().trim();
 		if (text.length() == 0) return Messages.FSRenamingAssistant_SpecifyNonEmptyName;
-		if (node == null) return Messages.FSRenamingAssistant_NoNodeSelected;
 		if (hasChild(node, text)) {
 			return Messages.FSRenamingAssistant_NameAlreadyExists;
 		}
@@ -65,7 +64,7 @@ public class FSCellValidator implements ICellEditorValidator {
 	}
 	/**
 	 * To test if the folder has a child with the specified name.
-	 * 
+	 *
 	 * @param folder The folder node.
 	 * @param name The name.
 	 * @return true if it has a child with the name.
@@ -79,5 +78,5 @@ public class FSCellValidator implements ICellEditorValidator {
 			else if (node.name.equals(name)) return true;
 		}
 		return false;
-	}	
+	}
 }
