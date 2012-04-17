@@ -302,7 +302,7 @@ public abstract class AbstractExternalValueAdd extends AbstractValueAdd {
 		Assert.isNotNull(id);
 		Assert.isNotNull(path);
 
-		return new ValueAddLauncher(id, path);
+		return new ValueAddLauncher(id, path, getLabel() != null ? getLabel() : getId());
 	}
 
 	/* (non-Javadoc)

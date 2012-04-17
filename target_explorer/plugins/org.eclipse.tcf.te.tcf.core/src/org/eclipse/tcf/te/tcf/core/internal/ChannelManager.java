@@ -843,32 +843,39 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 			}
 		};
 
-		doChainValueAdd(id, peer.getAttributes(), forceNew, 0, valueAdds, innerDone);
+		doChainValueAdd(id, peer.getAttributes(), forceNew, valueAdds, innerDone);
 	}
 
-	/* default */ void doChainValueAdd(final String id, final Map<String, String> attrs, final boolean forceNew, final int index, final IValueAdd[] valueAdds, final DoneChainValueAdd done) {
+	/* default */ void doChainValueAdd(final String id, final Map<String, String> attrs, final boolean forceNew, final IValueAdd[] valueAdds, final DoneChainValueAdd done) {
 		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 		Assert.isNotNull(id);
 		Assert.isNotNull(attrs);
 		Assert.isNotNull(valueAdds);
 		Assert.isNotNull(done);
 
+		// The index of the currently processed value-add
+		final AtomicInteger index = new AtomicInteger(0);
+
 		// Get the value-add to chain
-		final IValueAdd valueAdd = valueAdds[index];
-		Assert.isNotNull(valueAdd);
+		final AtomicReference<IValueAdd> valueAdd = new AtomicReference<IValueAdd>();
+		valueAdd.set(valueAdds[index.get()]);
+		Assert.isNotNull(valueAdd.get());
 		// Get the next value-add in chain
-		final IValueAdd nextValueAdd = index + 1 < valueAdds.length ? valueAdds[index + 1] : null;
+		final AtomicReference<IValueAdd> nextValueAdd = new AtomicReference<IValueAdd>();
+		nextValueAdd.set(index.get() + 1 < valueAdds.length ? valueAdds[index.get() + 1] : null);
 
 		// Get the peer for the value-add to chain
-		final IPeer valueAddPeer = valueAdd.getPeer(id);
-		if (valueAddPeer == null) {
+		final AtomicReference<IPeer> valueAddPeer = new AtomicReference<IPeer>();
+		valueAddPeer.set(valueAdd.get().getPeer(id));
+		if (valueAddPeer.get() == null) {
 			done.doneChainValueAdd(new IllegalStateException("Invalid value-add peer."), null); //$NON-NLS-1$
 			return;
 		}
 
 		// Get the peer for the next value-add in chain
-		final IPeer nextValueAddPeer = nextValueAdd != null ? nextValueAdd.getPeer(id) : null;
-		if (nextValueAdd != null && nextValueAddPeer == null) {
+		final AtomicReference<IPeer> nextValueAddPeer = new AtomicReference<IPeer>();
+		nextValueAddPeer.set(nextValueAdd.get() != null ? nextValueAdd.get().getPeer(id) : null);
+		if (nextValueAdd.get() != null && nextValueAddPeer.get() == null) {
 			done.doneChainValueAdd(new IllegalStateException("Invalid value-add peer."), null); //$NON-NLS-1$
 			return;
 		}
@@ -876,40 +883,64 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 		IChannel channel = null;
 		try {
 			// Open a channel to the value-add
-			channel = valueAddPeer.openChannel();
+			channel = valueAddPeer.get().openChannel();
 			if (channel != null) {
 				if (!forceNew) channels.put(id, channel);
 				if (!forceNew) refCounters.put(id, new AtomicInteger(1));
 
 				// Redirect the channel to the next value-add in chain
 				// Note: If the redirect succeeds, channel.getRemotePeer().getID() will be identical to id.
-				channel.redirect(nextValueAddPeer != null ? nextValueAddPeer.getAttributes() : attrs);
+				channel.redirect(nextValueAddPeer.get() != null ? nextValueAddPeer.get().getAttributes() : attrs);
 				// Attach the channel listener to catch open/closed events
 				final IChannel finChannel = channel;
 				channel.addChannelListener(new IChannel.IChannelListener() {
 					@Override
 					public void onChannelOpened() {
-						// Remove ourself as channel listener
-						finChannel.removeChannelListener(this);
-
 						if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITraceIds.TRACE_CHANNEL_MANAGER)) {
-							CoreBundleActivator.getTraceHandler().trace(NLS.bind(Messages.ChannelManager_openChannel_valueAdd_redirect_succeeded, valueAddPeer.getID(), finChannel.getRemotePeer().getID()),
+							CoreBundleActivator.getTraceHandler().trace(NLS.bind(Messages.ChannelManager_openChannel_valueAdd_redirect_succeeded,
+																				 new Object[] { valueAddPeer.get().getID(), finChannel.getRemotePeer().getID(), Integer.valueOf(index.get()) }),
 																		0, ITraceIds.TRACE_CHANNEL_MANAGER, IStatus.INFO, ChannelManager.this);
 						}
 
 						// Channel opened. Check if we are done.
-						if (nextValueAdd == null) {
+						if (nextValueAdd.get() == null) {
+							// Remove ourself as channel listener
+							finChannel.removeChannelListener(this);
+
 							// No other value-add in the chain -> all done
 							done.doneChainValueAdd(null, finChannel);
 						} else {
-							DoneChainValueAdd innerDone = new DoneChainValueAdd() {
-								@Override
-								public void doneChainValueAdd(Throwable error, IChannel channel2) {
-									done.doneChainValueAdd(error, finChannel);
-								}
-							};
+							// Process the next value-add in chain
+							index.incrementAndGet();
 
-							doChainValueAdd(id, attrs, forceNew, index + 1, valueAdds, innerDone);
+							// Update the value-add references
+							valueAdd.set(nextValueAdd.get());
+							valueAddPeer.set(nextValueAddPeer.get());
+
+							if (valueAddPeer.get() == null) {
+								// Remove ourself as channel listener
+								finChannel.removeChannelListener(this);
+								// Close the channel
+								finChannel.close();
+								// Invoke the callback
+								done.doneChainValueAdd(new IllegalStateException("Invalid value-add peer."), null); //$NON-NLS-1$
+								return;
+							}
+
+							nextValueAdd.set(index.get() + 1 < valueAdds.length ? valueAdds[index.get() + 1] : null);
+							nextValueAddPeer.set(nextValueAdd.get() != null ? nextValueAdd.get().getPeer(id) : null);
+							if (nextValueAdd.get() != null && nextValueAddPeer.get() == null) {
+								// Remove ourself as channel listener
+								finChannel.removeChannelListener(this);
+								// Close the channel
+								finChannel.close();
+								// Invoke the callback
+								done.doneChainValueAdd(new IllegalStateException("Invalid value-add peer."), null); //$NON-NLS-1$
+								return;
+							}
+
+							// Redirect the channel to the next value-add in chain
+							finChannel.redirect(nextValueAddPeer.get() != null ? nextValueAddPeer.get().getAttributes() : attrs);
 						}
 					}
 
@@ -919,8 +950,8 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 						finChannel.removeChannelListener(this);
 
 						if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITraceIds.TRACE_CHANNEL_MANAGER)) {
-							CoreBundleActivator.getTraceHandler().trace(NLS.bind(Messages.ChannelManager_openChannel_valueAdd_redirect_failed, valueAddPeer.getID(),
-																				 nextValueAddPeer != null ? nextValueAddPeer.getID() : id),
+							CoreBundleActivator.getTraceHandler().trace(NLS.bind(Messages.ChannelManager_openChannel_valueAdd_redirect_failed, valueAddPeer.get().getID(),
+																				 nextValueAddPeer.get() != null ? nextValueAddPeer.get().getID() : id),
 																		0, ITraceIds.TRACE_CHANNEL_MANAGER, IStatus.INFO, ChannelManager.this);
 						}
 

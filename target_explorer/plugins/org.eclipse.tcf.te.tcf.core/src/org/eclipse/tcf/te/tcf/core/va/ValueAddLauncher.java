@@ -35,6 +35,8 @@ public class ValueAddLauncher extends ProcessLauncher implements IDisposable {
 	private final String id;
 	// The path of the value-add to launch
 	private final IPath path;
+	// The value-add id
+	private final String valueAddId;
 	// The process handle
 	private Process process;
 	// The process output reader
@@ -45,14 +47,17 @@ public class ValueAddLauncher extends ProcessLauncher implements IDisposable {
 	 *
 	 * @param id The target peer id. Must not be <code>null</code>.
 	 * @param path The value-add path. Must not be <code>null</code>.
+	 * @param valueAddId The value-add id. Must not be <code>null</code>.
 	 */
-	public ValueAddLauncher(String id, IPath path) {
+	public ValueAddLauncher(String id, IPath path, String valueAddId) {
 		super(null, null, 0);
 
 		Assert.isNotNull(id);
 		this.id = id;
 		Assert.isNotNull(path);
 		this.path = path;
+		Assert.isNotNull(valueAddId);
+		this.valueAddId = valueAddId;
 	}
 
 	/* (non-Javadoc)
@@ -95,9 +100,9 @@ public class ValueAddLauncher extends ProcessLauncher implements IDisposable {
 		// Build up the command
 		List<String> command = new ArrayList<String>();
 		command.add(cmd);
-		command.add("-I180"); //$NON-NLS-1$
-		command.add("-S"); //$NON-NLS-1$
-		command.add("-sTCP::;ValueAdd=1"); //$NON-NLS-1$
+		addToCommand(command, "-I180"); //$NON-NLS-1$
+		addToCommand(command, "-S"); //$NON-NLS-1$
+		addToCommand(command, "-sTCP::;ValueAdd=1"); //$NON-NLS-1$
 
 		// Enable logging?
 		if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITraceIds.VA_LOGGING_ENABLE)) {
@@ -107,22 +112,22 @@ public class ValueAddLauncher extends ProcessLauncher implements IDisposable {
 			if (location != null) {
 				location = location.append(".logs"); //$NON-NLS-1$
 
-				String name = "ValueAdd_" + id + "-Output.log"; //$NON-NLS-1$ //$NON-NLS-2$
+				String name = "Output_" + valueAddId + "_" + id + ".log"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				name = name.replaceAll("\\s", "_"); //$NON-NLS-1$ //$NON-NLS-2$
 				name = name.replaceAll("[:/\\;,]", "_"); //$NON-NLS-1$ //$NON-NLS-2$
 
 				location = location.append(name);
-				command.add("-L" + location.toString()); //$NON-NLS-1$
+				addToCommand(command, "-L" + location.toString()); //$NON-NLS-1$
 
 				String level = Platform.getDebugOption(CoreBundleActivator.getUniqueIdentifier() + "/" + ITraceIds.VA_LOGGING_LEVEL); //$NON-NLS-1$
 				if (level != null && !"".equals(level.trim())) { //$NON-NLS-1$
-					command.add("-l" + level.trim()); //$NON-NLS-1$
+					addToCommand(command, "-l" + level.trim()); //$NON-NLS-1$
 				}
 			}
 		}
 
 		if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITraceIds.TRACE_CHANNEL_MANAGER)) {
-			CoreBundleActivator.getTraceHandler().trace(NLS.bind(Messages.ValueAddLauncher_launch_command, command, id),
+			CoreBundleActivator.getTraceHandler().trace(NLS.bind(Messages.ValueAddLauncher_launch_command, new Object[] { command, id, valueAddId }),
 														0, ITraceIds.TRACE_CHANNEL_MANAGER, IStatus.INFO, this);
 		}
 
@@ -132,6 +137,21 @@ public class ValueAddLauncher extends ProcessLauncher implements IDisposable {
 		// Launch the process output reader
 		outputReader = new ProcessOutputReaderThread(null, new InputStream[] { process.getInputStream() });
 		outputReader.start();
+	}
+
+	/**
+	 * Adds the given argument to the given command.
+	 * <p>
+	 * Custom value add launcher implementations may overwrite this method to
+	 * validate and/or modify the command used to launch the value-add.
+	 *
+	 * @param command The command. Must not be <code>null</code>.
+	 * @param arg The argument. Must not be <code>null</code>.
+	 */
+	protected void addToCommand(List<String> command, String arg) {
+		Assert.isNotNull(command);
+		Assert.isNotNull(arg);
+		command.add(arg);
 	}
 
 }
