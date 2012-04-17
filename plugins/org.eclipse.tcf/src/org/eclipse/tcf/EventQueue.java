@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2010 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2012 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -75,13 +75,9 @@ class EventQueue implements IEventQueue, Runnable {
             }
             thread.join();
         }
-        catch (Exception e) {
+        catch (Throwable e) {
             Protocol.log("Failed to shutdown TCF event dispatch thread", e); //$NON-NLS-1$
         }
-    }
-
-    private void error(Throwable x) {
-        Protocol.log("Unhandled exception in TCF event dispatch", x); //$NON-NLS-1$
     }
 
     public void run() {
@@ -99,7 +95,7 @@ class EventQueue implements IEventQueue, Runnable {
                 r.run();
             }
             catch (Throwable x) {
-                error(x);
+                Protocol.log("Unhandled exception in TCF event dispatch", x); //$NON-NLS-1$
             }
         }
     }

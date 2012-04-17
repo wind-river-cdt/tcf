@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Wind River Systems, Inc. and others.
+ * Copyright (c) 2009, 2012 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,16 +19,16 @@ import org.eclipse.tcf.Activator;
 import org.eclipse.tcf.internal.nls.TcfPluginMessages;
 
 /**
- * TCF extension proxy implementation. The use of the proxy asures the
+ * TCF extension proxy implementation. The use of the proxy ensures the
  * lazy plug-in activation policy for the contributing plug-in.
  */
 public class TcfExtensionProxy<V> {
     // The extension instance. Create on first access
-    private V fInstance;
+    private V instance;
     // The configuration element
-    private final IConfigurationElement fElement;
+    private final IConfigurationElement element;
     // The unique id of the extension.
-    private String fId;
+    private final String id;
 
     /**
      * Constructor.
@@ -39,19 +39,15 @@ public class TcfExtensionProxy<V> {
      */
     public TcfExtensionProxy(IConfigurationElement element) throws CoreException {
         assert element != null;
-        fElement = element;
+        this.element = element;
 
         // The <id> attribute is mandatory.
-        fId = element.getAttribute("id"); //$NON-NLS-1$
-        if (fId == null || fId.trim().length() == 0) {
-            throw new CoreException(new Status(IStatus.ERROR,
-                    Activator.PLUGIN_ID,
-                    0,
+        id = element.getAttribute("id"); //$NON-NLS-1$
+        if (id == null || id.trim().length() == 0) {
+            throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, 0,
                     NLS.bind(TcfPluginMessages.Extension_error_missingRequiredAttribute, "id", element.getContributor().getName()), //$NON-NLS-1$
                     null));
         }
-
-        fInstance = null;
     }
 
     /**
@@ -59,8 +55,8 @@ public class TcfExtensionProxy<V> {
      *
      * @return The unique id.
      */
-    public String getId() {
-        return fId;
+    public final String getId() {
+        return id;
     }
 
     /**
@@ -68,34 +64,31 @@ public class TcfExtensionProxy<V> {
      *
      * @return The configuration element.
      */
-    protected IConfigurationElement getConfigurationElement() {
-        return fElement;
+    protected final IConfigurationElement getConfigurationElement() {
+        return element;
     }
 
     /**
      * Returns the extension class instance. The contributing
      * plug-in will be activated if not yet activated anyway.
      *
-     * @return The extension class instance. Might be <code>null</code> if the instanciation fails.
+     * @return The extension class instance. Might be <code>null</code> if the instantiation fails.
      */
     @SuppressWarnings("unchecked")
     public V getInstance() {
-        if (fInstance == null) {
-            IConfigurationElement element = getConfigurationElement();
-            assert element != null;
-            if (element != null && element.getAttribute("class") != null) { //$NON-NLS-1$
-                try {
-                    fInstance = (V)element.createExecutableExtension("class"); //$NON-NLS-1$
-                } catch (Exception e) {
-                    // Possible exceptions: CoreException, ClassCastException.
-                    IStatus status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
-                            NLS.bind(TcfPluginMessages.Extension_error_invalidExtensionPoint, element.getDeclaringExtension().getUniqueIdentifier()),
-                            e);
-                    Activator.getDefault().getLog().log(status);
-                }
+        if (instance == null && element.getAttribute("class") != null) { //$NON-NLS-1$
+            try {
+                instance = (V)element.createExecutableExtension("class"); //$NON-NLS-1$
+            }
+            catch (Exception e) {
+                // Possible exceptions: CoreException, ClassCastException.
+                IStatus status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                        NLS.bind(TcfPluginMessages.Extension_error_invalidExtensionPoint, element.getDeclaringExtension().getUniqueIdentifier()),
+                        e);
+                Activator.getDefault().getLog().log(status);
             }
         }
-        return fInstance;
+        return instance;
     }
 
     /* (non-Javadoc)
@@ -106,7 +99,7 @@ public class TcfExtensionProxy<V> {
         // Proxies are equal if they have encapsulate an element
         // with the same unique id
         if (obj instanceof TcfExtensionProxy<?>) {
-            return getId().equals(((TcfExtensionProxy<?>)obj).getId());
+            return id.equals(((TcfExtensionProxy<?>)obj).id);
         }
         return super.equals(obj);
     }
@@ -117,7 +110,6 @@ public class TcfExtensionProxy<V> {
     @Override
     public int hashCode() {
         // The hash code of a proxy is the one from the id
-        return getId().hashCode();
+        return id.hashCode();
     }
-
 }

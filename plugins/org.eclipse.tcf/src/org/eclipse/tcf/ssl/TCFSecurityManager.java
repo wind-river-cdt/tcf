@@ -102,7 +102,7 @@ public class TCFSecurityManager {
         try {
             final File usr_certs = getCertificatesDirectory();
             final File sys_certs = getSysCertificatesDirectory();
-            if (!usr_certs.exists()) usr_certs.mkdirs();
+            if (!usr_certs.exists() && !usr_certs.mkdirs()) throw new Exception("Cannot create directory: " + usr_certs);
             final CertificateFactory cf = CertificateFactory.getInstance("X.509"); //$NON-NLS-1$
             SSLContext context = SSLContext.getInstance("TLS"); //$NON-NLS-1$
 
@@ -111,14 +111,21 @@ public class TCFSecurityManager {
                 public X509Certificate[] getCertificateChain(String alias) {
                     File f = new File(usr_certs, "local.cert"); //$NON-NLS-1$
                     if (!f.exists() && sys_certs != null) f = new File(sys_certs, "local.cert"); //$NON-NLS-1$
+                    InputStream inp = null;
                     try {
-                        InputStream inp = new BufferedInputStream(new FileInputStream(f));
+                        inp = new BufferedInputStream(new FileInputStream(f));
                         X509Certificate cert = (X509Certificate)cf.generateCertificate(inp);
                         inp.close();
                         return new X509Certificate[] { cert };
                     }
                     catch (Exception x) {
                         Protocol.log("Cannot read certificate: " + f, x); //$NON-NLS-1$
+                        try {
+                            if (inp != null) inp.close();
+                        }
+                        catch (IOException e) {
+                            Protocol.log("Cannot close certificate file: " + f, x); //$NON-NLS-1$
+                        }
                         return null;
                     }
                 }
@@ -126,13 +133,14 @@ public class TCFSecurityManager {
                 public PrivateKey getPrivateKey(String alias) {
                     File f = new File(usr_certs, "local.priv"); //$NON-NLS-1$
                     if (!f.exists() && sys_certs != null) f = new File(sys_certs, "local.priv"); //$NON-NLS-1$
+                    BufferedReader r = null;
                     try {
-                        BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(f), "ASCII")); //$NON-NLS-1$
+                        r = new BufferedReader(new InputStreamReader(new FileInputStream(f), "ASCII")); //$NON-NLS-1$
                         StringBuffer bf = new StringBuffer();
                         boolean app = false;
                         for (;;) {
                             String s = r.readLine();
-                            if (s == null) new Exception("Invalid format"); //$NON-NLS-1$
+                            if (s == null) throw new Exception("Invalid format"); //$NON-NLS-1$
                             else if (s.indexOf("-----BEGIN ") == 0) app = true; //$NON-NLS-1$
                             else if (s.indexOf("-----END ") == 0) break; //$NON-NLS-1$
                             else if (app) bf.append(s);
@@ -144,6 +152,12 @@ public class TCFSecurityManager {
                     }
                     catch (Exception x) {
                         Protocol.log("Cannot read private key: " + f, x); //$NON-NLS-1$
+                        try {
+                            if (r != null) r.close();
+                        }
+                        catch (IOException e) {
+                            Protocol.log("Cannot close private key file: " + f, x); //$NON-NLS-1$
+                        }
                         return null;
                     }
                 }
@@ -189,14 +203,21 @@ public class TCFSecurityManager {
                     ArrayList<X509Certificate> list = new ArrayList<X509Certificate>();
                     for (String fnm : usr_certs.list()) {
                         if (!fnm.endsWith(".cert")) continue; //$NON-NLS-1$
+                        InputStream inp = null;
                         try {
-                            InputStream inp = new BufferedInputStream(new FileInputStream(new File(usr_certs, fnm)));
+                            inp = new BufferedInputStream(new FileInputStream(new File(usr_certs, fnm)));
                             X509Certificate cert = (X509Certificate)cf.generateCertificate(inp);
                             inp.close();
                             list.add(cert);
                         }
                         catch (Throwable x) {
                             Protocol.log("Cannot load certificate: " + fnm, x); //$NON-NLS-1$
+                            try {
+                                if (inp != null) inp.close();
+                            }
+                            catch (IOException e) {
+                                Protocol.log("Cannot close certificate file: " + fnm, x); //$NON-NLS-1$
+                            }
                         }
                     }
                     if (sys_certs != null) {
@@ -204,14 +225,21 @@ public class TCFSecurityManager {
                         if (arr != null) {
                             for (String fnm : arr) {
                                 if (!fnm.endsWith(".cert")) continue; //$NON-NLS-1$
+                                InputStream inp = null;
                                 try {
-                                    InputStream inp = new BufferedInputStream(new FileInputStream(new File(sys_certs, fnm)));
+                                    inp = new BufferedInputStream(new FileInputStream(new File(sys_certs, fnm)));
                                     X509Certificate cert = (X509Certificate)cf.generateCertificate(inp);
                                     inp.close();
                                     list.add(cert);
                                 }
                                 catch (Throwable x) {
                                     Protocol.log("Cannot load certificate: " + fnm, x); //$NON-NLS-1$
+                                    try {
+                                        if (inp != null) inp.close();
+                                    }
+                                    catch (IOException e) {
+                                        Protocol.log("Cannot close certificate file: " + fnm, x); //$NON-NLS-1$
+                                    }
                                 }
                             }
                         }
