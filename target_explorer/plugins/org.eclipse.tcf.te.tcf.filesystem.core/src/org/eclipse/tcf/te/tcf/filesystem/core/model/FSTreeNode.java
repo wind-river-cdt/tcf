@@ -198,6 +198,12 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 		}
     }
 	
+	/**
+	 * Get the user account of the specified TCF peer.
+	 * 
+	 * @param peerNode The peer node of the TCF agent.
+	 * @return The user account that runs the agent.
+	 */
 	private UserAccount getUserAccount(IPeerModel peerNode) {
 		OpUser user = new OpUser(peerNode);
 		new NullOpExecutor().execute(user);
