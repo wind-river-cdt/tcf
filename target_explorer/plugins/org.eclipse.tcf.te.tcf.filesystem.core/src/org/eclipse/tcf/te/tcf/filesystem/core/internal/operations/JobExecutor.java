@@ -73,7 +73,7 @@ public class JobExecutor implements IOpExecutor{
 		job.addJobChangeListener(new JobChangeAdapter(){
 			@Override
 			public void done(final IJobChangeEvent event) {
-				doCallback(event);
+				doCallback(operation, event);
 			}
 		});
 		job.schedule();
@@ -81,14 +81,15 @@ public class JobExecutor implements IOpExecutor{
 	}
 	
 	/**
-	 * Called when the creation is done. Must be called within UI-thread.
+	 * Called when the creation is done.
 	 * 
+	 * @param operation The operation object.
 	 * @param event The job change event.
 	 */
-	void doCallback(IJobChangeEvent event) {
+	void doCallback(IOperation operation, IJobChangeEvent event) {
 		IStatus status = event.getResult();
 		if(callback != null) {
-			callback.done(this, status);
+			callback.done(operation, status);
 		}
 	}	
 }

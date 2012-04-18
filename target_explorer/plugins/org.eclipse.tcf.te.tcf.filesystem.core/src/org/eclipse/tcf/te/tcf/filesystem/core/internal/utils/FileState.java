@@ -12,7 +12,10 @@ package org.eclipse.tcf.te.tcf.filesystem.core.internal.utils;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
 
-import org.eclipse.tcf.te.tcf.filesystem.core.internal.callbacks.CacheFileDigestJob;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.tcf.te.runtime.callback.Callback;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.JobExecutor;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpCacheFileDigest;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.CacheState;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 
@@ -136,7 +139,13 @@ public class FileState {
 		if (!cache_digest_running && (cache_digest == null || this.cache_mtime != cache_mtime)) {
 			cache_digest_running = true;
 			this.cache_mtime = cache_mtime;
-			new CacheFileDigestJob(node).schedule();
+			final OpCacheFileDigest op = new OpCacheFileDigest(node);
+			new JobExecutor(new Callback(){
+				@Override
+                protected void internalDone(Object caller, IStatus status) {
+					if (status.isOK()) updateCacheDigest(op.getDigest());
+                }
+			}).execute(op);
 		}
 		if (!target_digest_running && target_digest == null) {
 			target_digest_running = true;

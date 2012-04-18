@@ -87,9 +87,7 @@ public class UiExecutor implements IOpExecutor {
 			// It is canceled.
 			status = Status.OK_STATUS;
 		}
-		if(callback != null) {
-			callback.done(this, status);
-		}
+		if (callback != null) callback.done(operation, status);
 		return status;
 	}
 }

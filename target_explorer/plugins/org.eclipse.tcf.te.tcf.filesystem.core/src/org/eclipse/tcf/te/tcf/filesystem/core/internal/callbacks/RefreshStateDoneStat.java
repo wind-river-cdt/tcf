@@ -11,9 +11,6 @@ package org.eclipse.tcf.te.tcf.filesystem.core.internal.callbacks;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IFileSystem.DoneStat;
@@ -22,6 +19,8 @@ import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.core.activator.CorePlugin;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.JobExecutor;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpTargetFileDigest;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.FileState;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.PersistenceManager;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
@@ -93,13 +92,7 @@ public class RefreshStateDoneStat extends CallbackBase implements DoneStat {
 	 * when the job is done.
 	 */
 	private void updateTargetDigest() {
-		Job job = new TargetFileDigestJob(node);
-		job.addJobChangeListener(new JobChangeAdapter(){
-			@Override
-            public void done(IJobChangeEvent event) {
-				invokeCallback(event.getResult());
-			}
-		});
-		job.schedule();
+		JobExecutor executor = new JobExecutor(callback);
+		executor.execute(new OpTargetFileDigest(node));
     }
 }

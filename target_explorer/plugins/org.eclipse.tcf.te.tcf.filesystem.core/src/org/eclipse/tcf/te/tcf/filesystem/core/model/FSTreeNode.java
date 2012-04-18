@@ -44,10 +44,10 @@ import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IWindowsFileAttributes;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.UserAccount;
-import org.eclipse.tcf.te.tcf.filesystem.core.internal.callbacks.DigestStatus;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.callbacks.QueryDoneOpenChannel;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.callbacks.RefreshStateDoneOpenChannel;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.NullOpExecutor;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpTargetFileDigest;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpUser;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.testers.TargetPropertyTester;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.url.TcfURLConnection;
@@ -788,8 +788,8 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 		ICallback cb = new Callback(){
 			@Override
             protected void internalDone(Object caller, IStatus status) {
-				if (status.isOK() && status instanceof DigestStatus) {
-					digest.updateTargetDigest(((DigestStatus) status).getDigest());
+				if (status.isOK() && caller instanceof OpTargetFileDigest) {
+					digest.updateTargetDigest(((OpTargetFileDigest) caller).getDigest());
 				}
 				if (callback != null) callback.done(caller, status);
             }
