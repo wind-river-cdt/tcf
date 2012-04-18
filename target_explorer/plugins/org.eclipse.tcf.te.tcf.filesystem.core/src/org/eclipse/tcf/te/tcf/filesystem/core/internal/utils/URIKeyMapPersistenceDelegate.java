@@ -50,11 +50,11 @@ public class URIKeyMapPersistenceDelegate extends AbstractGsonMapPersistenceDele
 			for (URI key : attrs.keySet()) {
 				Object object = attrs.get(key);
 				if (object instanceof URI) {
-					String value = "uri:" + object.toString();
+					String value = "uri:" + object.toString(); //$NON-NLS-1$
 					result.put(key.toString(), value);
 				}
 				else if (object instanceof IContentType) {
-					String value = "contenttype:" + ((IContentType) object).getId();
+					String value = "contenttype:" + ((IContentType) object).getId(); //$NON-NLS-1$
 					result.put(key.toString(), value);
 				}
 				else if(object instanceof FileState) {
@@ -83,7 +83,7 @@ public class URIKeyMapPersistenceDelegate extends AbstractGsonMapPersistenceDele
 	 */
 	private Map<String, Object> qNames2Map(Map<QualifiedName, String> map) {
 		Map<String, Object> result = new HashMap<String, Object>();
-		result.put("map.type", "QNames");
+		result.put("map.type", "QNames");  //$NON-NLS-1$//$NON-NLS-2$
 		for (QualifiedName name : map.keySet()) {
 			result.put(name.toString(), map.get(name));
 		}
@@ -108,25 +108,25 @@ public class URIKeyMapPersistenceDelegate extends AbstractGsonMapPersistenceDele
 			if (value instanceof String) {
 				String string = (String) map.get(key);
 				Object object = null;
-				if (string.startsWith("uri:")) {
-					string = string.substring("uri:".length());
+				if (string.startsWith("uri:")) { //$NON-NLS-1$
+					string = string.substring("uri:".length()); //$NON-NLS-1$
 					object = toURI(string);
 					Assert.isNotNull(object);
 					result.put(uri, object);
 				}
-				else if (string.startsWith("contenttype:")) {
-					string = string.substring("contenttype:".length());
+				else if (string.startsWith("contenttype:")) { //$NON-NLS-1$
+					string = string.substring("contenttype:".length()); //$NON-NLS-1$
 					object = Platform.getContentTypeManager().getContentType(string);
 					result.put(uri, object);
 				}				
 			}
 			else if (value instanceof Map) {
 				Map<String, ?> vMap = (Map<String, ?>) value;
-				if("QNames".equals(vMap.get("map.type"))){
+				if("QNames".equals(vMap.get("map.type"))){  //$NON-NLS-1$//$NON-NLS-2$
 					Map<QualifiedName, String> valueMap = toQNameMap((Map<String, String>) value);
 					result.put(uri, valueMap);
 				}
-				else if("Digest".equals(vMap.get("map.type"))) {
+				else if("Digest".equals(vMap.get("map.type"))) {  //$NON-NLS-1$//$NON-NLS-2$
 					FileState digest = map2digest((Map<String, Object>)value);
 					result.put(uri, digest);
 				}
@@ -139,21 +139,21 @@ public class URIKeyMapPersistenceDelegate extends AbstractGsonMapPersistenceDele
 	}
 	
 	private FileState map2digest(Map<String, Object> value) {
-		byte[] base_digest = string2digest((String) value.get("base"));
-		byte[] cache_digest = string2digest((String) value.get("cache"));
-		byte[] target_digest = string2digest((String) value.get("target"));
-		Number number = (Number) value.get("mtime");
+		byte[] base_digest = string2digest((String) value.get("base")); //$NON-NLS-1$
+		byte[] cache_digest = string2digest((String) value.get("cache")); //$NON-NLS-1$
+		byte[] target_digest = string2digest((String) value.get("target")); //$NON-NLS-1$
+		Number number = (Number) value.get("mtime"); //$NON-NLS-1$
 		long mtime = number.longValue();
 		return new FileState(mtime, cache_digest, target_digest, base_digest);
     }
 
 	private Map<String, Object> digest2map(FileState digest) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("map.type", "Digest");
-		map.put("base", digest2string(digest.getBaseDigest()));
-		map.put("cache", digest2string(digest.getCacheDigest()));
-		map.put("target", digest2string(digest.getTargetDigest()));
-		map.put("mtime", digest.getCacheMTime());
+		map.put("map.type", "Digest");  //$NON-NLS-1$//$NON-NLS-2$
+		map.put("base", digest2string(digest.getBaseDigest())); //$NON-NLS-1$
+		map.put("cache", digest2string(digest.getCacheDigest())); //$NON-NLS-1$
+		map.put("target", digest2string(digest.getTargetDigest())); //$NON-NLS-1$
+		map.put("mtime", Long.valueOf(digest.getCacheMTime())); //$NON-NLS-1$
 		return map;
     }
 	
@@ -163,12 +163,12 @@ public class URIKeyMapPersistenceDelegate extends AbstractGsonMapPersistenceDele
 			for (int i = 0; i < digest.length; i++) {
 				int d = digest[i] & 0xff;
 				String sByte = Integer.toHexString(d);
-				while(sByte.length() < 2) sByte = "0"+sByte;
+				while(sByte.length() < 2) sByte = "0"+sByte; //$NON-NLS-1$
 				buffer.append(sByte.toLowerCase());
 			}
 			return buffer.toString();
 		}
-	    return "";
+	    return ""; //$NON-NLS-1$
 	}
 
 	private byte[] string2digest(String string) {
@@ -199,7 +199,7 @@ public class URIKeyMapPersistenceDelegate extends AbstractGsonMapPersistenceDele
 	private Map<QualifiedName, String> toQNameMap(Map<String, String> strMap) {
 		Map<QualifiedName, String> result = new HashMap<QualifiedName, String>();
 		for (String key : strMap.keySet()) {
-			int dot = key.lastIndexOf(":");
+			int dot = key.lastIndexOf(":"); //$NON-NLS-1$
 			String qualifier = null;
 			String local = key;
 			if(dot != -1) {

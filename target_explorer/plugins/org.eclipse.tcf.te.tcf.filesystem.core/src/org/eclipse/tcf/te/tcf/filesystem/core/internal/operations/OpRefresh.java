@@ -152,7 +152,7 @@ public class OpRefresh extends Operation {
 	 */
 	@Override
     public String getName() {
-	    return NLS.bind(Messages.RefreshDirectoryHandler_RefreshJobTitle, node == null ? "" : node.name);
+	    return NLS.bind(Messages.RefreshDirectoryHandler_RefreshJobTitle, node == null ? "" : node.name); //$NON-NLS-1$
     }
 
 	/*

@@ -35,7 +35,7 @@ public class TargetFileDigestJob extends Job {
 	 * @param node The file system node.
 	 */
 	public TargetFileDigestJob(FSTreeNode node) {
-	    super("Update target digest");
+	    super("Update target digest"); //$NON-NLS-1$
 	    this.node = node;
     }
 
@@ -48,11 +48,11 @@ public class TargetFileDigestJob extends Job {
 		BufferedInputStream input = null;
 		try {
 			URL url = node.getLocationURL();
-			MessageDigest digest = MessageDigest.getInstance("MD5");
+			MessageDigest digest = MessageDigest.getInstance("MD5"); //$NON-NLS-1$
 			input = new BufferedInputStream(new DigestInputStream(url.openStream(), digest));
 			// The buffer used to download the file.
 			byte[] data = new byte[OpStreamOp.DEFAULT_CHUNK_SIZE];
-			while (input.read(data) >= 0);
+			while (input.read(data) >= 0){}
 			return new DigestStatus(digest.digest());
 		}
 		catch(Exception e) {

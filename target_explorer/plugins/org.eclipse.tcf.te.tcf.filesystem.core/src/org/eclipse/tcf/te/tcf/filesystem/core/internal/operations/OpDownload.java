@@ -126,7 +126,7 @@ public class OpDownload extends OpStreamOp {
 				URL url = node.getLocationURL();
 				TcfURLConnection connection = (TcfURLConnection) url.openConnection();
 				try {
-					digest = MessageDigest.getInstance("MD5");
+					digest = MessageDigest.getInstance("MD5"); //$NON-NLS-1$
 					input = new BufferedInputStream(new DigestInputStream(connection.getInputStream(), digest));
 				}
 				catch (NoSuchAlgorithmException e) {

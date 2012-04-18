@@ -39,7 +39,7 @@ public class CacheFileDigestJob extends Job {
 	 * @param node The file system node.
 	 */
 	public CacheFileDigestJob(FSTreeNode node) {
-		super("Update cache digest");
+		super("Update cache digest"); //$NON-NLS-1$
 		this.node = node;
 		final FileState filedigest = PersistenceManager.getInstance().getFileDigest(node);
 		this.addJobChangeListener(new JobChangeAdapter(){
@@ -62,10 +62,10 @@ public class CacheFileDigestJob extends Job {
 		final File file = CacheManager.getCacheFile(node);
 		BufferedInputStream input = null;
 		try {
-			MessageDigest digest = MessageDigest.getInstance("MD5");
+			MessageDigest digest = MessageDigest.getInstance("MD5"); //$NON-NLS-1$
 			input = new BufferedInputStream(new DigestInputStream(new FileInputStream(file), digest));
 			byte[] data = new byte[OpStreamOp.DEFAULT_CHUNK_SIZE];
-			while (input.read(data) >= 0);
+			while (input.read(data) >= 0){}
 			return new DigestStatus(digest.digest());
 		}
 		catch (Exception e) {}

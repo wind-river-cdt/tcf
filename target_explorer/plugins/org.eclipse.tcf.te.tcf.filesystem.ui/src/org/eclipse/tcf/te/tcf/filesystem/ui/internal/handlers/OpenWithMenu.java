@@ -132,7 +132,7 @@ public class OpenWithMenu extends ContributionItem {
 			imageDesc = editorDesc.getImageDescriptor();
 		}
 		if (imageDesc == null) {
-			if (editorDesc.getId().equals(IEditorRegistry.SYSTEM_EXTERNAL_EDITOR_ID)) {
+			if (editorDesc != null && editorDesc.getId().equals(IEditorRegistry.SYSTEM_EXTERNAL_EDITOR_ID)) {
 				imageDesc = registry.getSystemExternalEditorImageDescriptor(node.name);
 			}
 		}

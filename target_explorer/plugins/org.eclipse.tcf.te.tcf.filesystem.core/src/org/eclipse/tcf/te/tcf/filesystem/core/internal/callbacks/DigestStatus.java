@@ -24,7 +24,7 @@ public class DigestStatus extends Status {
 	 * @param digest
 	 */
 	public DigestStatus(byte[] digest) {
-        super(IStatus.OK, CorePlugin.getUniqueIdentifier(), "OK");
+        super(IStatus.OK, CorePlugin.getUniqueIdentifier(), "OK"); //$NON-NLS-1$
         this.digest = digest;
     }
 	
@@ -32,7 +32,7 @@ public class DigestStatus extends Status {
 	 * Create a digest status with an error status.
 	 */
 	public DigestStatus() {
-		super(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), "FAILED");
+		super(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), "FAILED"); //$NON-NLS-1$
 	}
 	
 	/**

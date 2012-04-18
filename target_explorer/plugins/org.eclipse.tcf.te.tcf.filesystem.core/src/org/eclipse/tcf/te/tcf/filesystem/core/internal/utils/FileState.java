@@ -164,7 +164,7 @@ public class FileState {
 	public void updateTargetDigest(byte[] target_digest) {
 		target_digest_running = false;
 		this.target_digest = target_digest;
-		PropertyChangeEvent event = new PropertyChangeEvent(this, "target_digest", null, target_digest);
+		PropertyChangeEvent event = new PropertyChangeEvent(this, "target_digest", null, target_digest); //$NON-NLS-1$
 		node.firePropertyChange(event);
 	}
 	
@@ -194,7 +194,7 @@ public class FileState {
 		cache_digest_running = false;
 		byte[] old_digest = cache_digest;
 		this.cache_digest = cache_digest;
-		PropertyChangeEvent event = new PropertyChangeEvent(node, "cache_digest", old_digest, cache_digest);
+		PropertyChangeEvent event = new PropertyChangeEvent(node, "cache_digest", old_digest, cache_digest); //$NON-NLS-1$
 		node.firePropertyChange(event);
     }
 
@@ -207,7 +207,7 @@ public class FileState {
 		cache_digest = digest;
 		target_digest = digest;
 		base_digest = digest;
-		PropertyChangeEvent event = new PropertyChangeEvent(node, "reset_digest", null, digest);
+		PropertyChangeEvent event = new PropertyChangeEvent(node, "reset_digest", null, digest); //$NON-NLS-1$
 		node.firePropertyChange(event);
     }	
 }
