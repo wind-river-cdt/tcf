@@ -218,7 +218,7 @@ public class OpUpload extends OpStreamOp {
 				connection.setDoOutput(true);
 				if (nodes != null) {
 					try {
-	                    digest = MessageDigest.getInstance("MD5"); //$NON-NLS-1$
+	                    digest = MessageDigest.getInstance(MD_ALG);
 						input = new BufferedInputStream(new DigestInputStream(new FileInputStream(file), digest));
                     }
                     catch (NoSuchAlgorithmException e) {
