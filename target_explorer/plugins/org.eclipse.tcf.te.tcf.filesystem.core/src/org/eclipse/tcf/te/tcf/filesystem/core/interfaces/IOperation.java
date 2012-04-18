@@ -20,6 +20,12 @@ import org.eclipse.core.runtime.IProgressMonitor;
  * @since Target Explorer 1.0.0
  */
 public interface IOperation {
+	
+	/**
+	 * The algorithm of calculating the message digest of a file.
+	 */
+	public static final String MD_ALG = "MD5";  //$NON-NLS-1$
+	
     /**
      * Runs this operation.  Progress should be reported to the given progress monitor.
      * A request to cancel the operation should be honored and acknowledged 

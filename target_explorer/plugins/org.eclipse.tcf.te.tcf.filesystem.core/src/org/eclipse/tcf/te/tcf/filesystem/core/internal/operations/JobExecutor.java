@@ -7,23 +7,19 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations;
+package org.eclipse.tcf.te.tcf.filesystem.core.internal.operations;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
+import org.eclipse.tcf.te.tcf.filesystem.core.activator.CorePlugin;
 import org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IOperation;
-import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.IOpExecutor;
-import org.eclipse.tcf.te.tcf.filesystem.ui.activator.UIPlugin;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * The operation that is executed as a back ground job.
@@ -65,7 +61,7 @@ public class JobExecutor implements IOpExecutor{
 				}
 				catch (InvocationTargetException e) {
 					Throwable throwable = e.getTargetException();
-					return new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), throwable.getLocalizedMessage(), throwable);
+					return new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), throwable.getLocalizedMessage(), throwable);
 				}
 				catch (InterruptedException e) {
 					return Status.CANCEL_STATUS;
@@ -76,13 +72,10 @@ public class JobExecutor implements IOpExecutor{
             }};
 		job.addJobChangeListener(new JobChangeAdapter(){
 			@Override
-            public void done(final IJobChangeEvent event) {
-				PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable(){
-					@Override
-                    public void run() {
-						doCallback(event);
-                    }});
-            }});
+			public void done(final IJobChangeEvent event) {
+				doCallback(event);
+			}
+		});
 		job.schedule();
 		return Status.OK_STATUS;
 	}
@@ -93,7 +86,6 @@ public class JobExecutor implements IOpExecutor{
 	 * @param event The job change event.
 	 */
 	void doCallback(IJobChangeEvent event) {
-		Assert.isNotNull(Display.getCurrent());
 		IStatus status = event.getResult();
 		if(callback != null) {
 			callback.done(this, status);

@@ -10,15 +10,18 @@
 package org.eclipse.tcf.te.tcf.filesystem.ui.internal.adapters;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.IOpExecutor;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.JobExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpRefresh;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.activator.UIPlugin;
-import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.JobExecutor;
 import org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * File System tree node refresh handler delegate implementation.
@@ -49,7 +52,16 @@ public class RefreshHandlerDelegate implements IRefreshHandlerDelegate {
 		if (canRefresh(element)) {
 			final FSTreeNode node = (FSTreeNode) element;
 			if (node.isSystemRoot() || node.isRoot() || node.isDirectory()) {
-				IOpExecutor executor = new JobExecutor(callback);
+				IOpExecutor executor = new JobExecutor(new Callback(){
+					@Override
+                    protected void internalDone(final Object caller, final IStatus status) {
+						PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable(){
+							@Override
+                            public void run() {
+								if (callback != null) callback.done(caller, status);
+                            }});
+                    }
+				});
 				executor.execute(new OpRefresh(node));
 			}
 			else if (node.isFile() && !UIPlugin.isAutoSaving()) {

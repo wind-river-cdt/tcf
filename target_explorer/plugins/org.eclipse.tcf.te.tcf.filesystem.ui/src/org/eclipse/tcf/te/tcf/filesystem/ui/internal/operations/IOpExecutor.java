@@ -11,6 +11,7 @@ package org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IOperation;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.JobExecutor;
 
 /**
  * The interface is to defined an operation executor, which executes

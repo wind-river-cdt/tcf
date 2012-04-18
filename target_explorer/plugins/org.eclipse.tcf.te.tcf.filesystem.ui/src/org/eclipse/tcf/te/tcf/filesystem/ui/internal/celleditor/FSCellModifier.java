@@ -13,10 +13,10 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.swt.widgets.Item;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.IOpExecutor;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.JobExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpRename;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.handlers.RenameCallback;
-import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.JobExecutor;
 
 /**
  * FSCellModifier is an <code>ICellModifier</code> of the file system tree of the target explorer.

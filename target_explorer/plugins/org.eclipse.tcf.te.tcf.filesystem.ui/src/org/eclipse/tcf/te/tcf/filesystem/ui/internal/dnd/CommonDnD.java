@@ -13,7 +13,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.util.LocalSelectionTransfer;
@@ -32,6 +31,7 @@ import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IConfirmCallback;
 import org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IOperation;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.IOpExecutor;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.JobExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpCopy;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpMove;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpRefresh;
@@ -41,7 +41,6 @@ import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.ImageConsts;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.handlers.MoveCopyCallback;
-import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.JobExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.UiExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.ui.nls.Messages;
 import org.eclipse.ui.PlatformUI;
@@ -194,17 +193,36 @@ public class CommonDnD implements IConfirmCallback {
 							}
 						}
 					}
-					Assert.isNotNull(Display.getCurrent());
 					if (viewer != null) {
-						viewer.refresh(target);
-						IStructuredSelection selection = new StructuredSelection(nodes.toArray());
-						viewer.setSelection(selection, true);
+						updateViewer(viewer, target, nodes);
 					}
 				}
 			}
 		};
 	}
 
+	/**
+	 * Update the tree viewer after DnD and select the nodes that being dropped.
+	 * 
+	 * @param viewer The tree viewer in which the DnD takes place.
+	 * @param target The target node that the drop operation happens.
+	 * @param nodes The nodes that are being dropped.
+	 */
+	protected void updateViewer(final TreeViewer viewer, final FSTreeNode target, final List<FSTreeNode> nodes) {
+		if (Display.getCurrent() != null) {
+			viewer.refresh(target);
+			IStructuredSelection selection = new StructuredSelection(nodes.toArray());
+			viewer.setSelection(selection, true);
+		}
+		else {
+			PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable(){
+				@Override
+                public void run() {
+					updateViewer(viewer, target, nodes);
+                }});
+		}
+    }
+	
 	/**
 	 * Perform the drop operation over dragged selection.
 	 * 
