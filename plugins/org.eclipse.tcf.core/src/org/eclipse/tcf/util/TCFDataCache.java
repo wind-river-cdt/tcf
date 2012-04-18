@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 Wind River Systems, Inc. and others.
+ * Copyright (c) 2008, 2012 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -45,6 +45,8 @@ import org.eclipse.tcf.protocol.Protocol;
  * @param <V> - type of data to be stored in the cache.
  */
 public abstract class TCFDataCache<V> implements Runnable {
+
+    private final int WAITING_LIST_SIZE = 8;
 
     private Throwable error;
     private boolean valid;
@@ -125,10 +127,23 @@ public abstract class TCFDataCache<V> implements Runnable {
             waiting_cnt = 0;
             for (int i = 0; i < cnt; i++) {
                 Runnable r = arr[i];
-                if (r instanceof TCFDataCache<?> && ((TCFDataCache<?>)r).posted) continue;
-                r.run();
+                if (r instanceof TCFDataCache<?>) {
+                    TCFDataCache<?> c = (TCFDataCache<?>)r;
+                    if (!c.posted && c.waiting_cnt > 0) {
+                        Protocol.invokeLater(c);
+                        c.posted = true;
+                    }
+                }
+                else if (r instanceof TCFTask<?>) {
+                    TCFTask<?> t = (TCFTask<?>)r;
+                    if (!t.isDone()) t.run();
+                }
+                else {
+                    r.run();
+                }
+                arr[i] = null;
             }
-            if (waiting_list == null) waiting_list = arr;
+            if (waiting_list == null && arr.length <= WAITING_LIST_SIZE) waiting_list = arr;
         }
     }
 
@@ -144,7 +159,7 @@ public abstract class TCFDataCache<V> implements Runnable {
         assert !disposed;
         assert !valid;
         if (cb != null && !isWaiting(cb)) {
-            if (waiting_list == null) waiting_list = new Runnable[8];
+            if (waiting_list == null) waiting_list = new Runnable[WAITING_LIST_SIZE];
             if (waiting_cnt >= waiting_list.length) {
                 Runnable[] tmp = new Runnable[waiting_cnt * 2];
                 System.arraycopy(waiting_list, 0, tmp, 0, waiting_list.length);
@@ -160,7 +175,6 @@ public abstract class TCFDataCache<V> implements Runnable {
      * @return true if 'cb' is in the wait list.
      */
     public boolean isWaiting(Runnable cb) {
-        if (waiting_list == null) return false;
         for (int i = 0; i < waiting_cnt; i++) {
             if (waiting_list[i] == cb) return true;
         }
