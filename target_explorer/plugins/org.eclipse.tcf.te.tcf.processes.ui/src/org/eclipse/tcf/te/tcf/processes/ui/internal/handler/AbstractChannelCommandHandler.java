@@ -142,7 +142,7 @@ public abstract class AbstractChannelCommandHandler extends AbstractHandler {
 			if (exception instanceof CoreException) ((CoreException)exception).getStatus();
 			else {
 				// Construct the status from the exception
-				status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), 0, exception.getLocalizedMessage(), exception);
+				status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), 0, exception.getMessage(), exception);
 			}
 
 			// Handle the status (Take the first status handler in the list)

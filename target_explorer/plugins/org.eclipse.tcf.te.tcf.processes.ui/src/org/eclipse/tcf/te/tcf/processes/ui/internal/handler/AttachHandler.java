@@ -116,7 +116,7 @@ public class AttachHandler extends AbstractHandler {
 							} catch (Exception e) {
 								// If the platform is in debug mode, we print the exception to the log view
 								if (Platform.inDebugMode()) {
-									status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), e.getLocalizedMessage(), e);
+									status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), e.getMessage(), e);
 									UIPlugin.getDefault().getLog().log(status);
 								}
 							}

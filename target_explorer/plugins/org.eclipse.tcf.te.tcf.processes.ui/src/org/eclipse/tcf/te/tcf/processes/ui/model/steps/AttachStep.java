@@ -169,7 +169,7 @@ public class AttachStep {
 	protected void onError(Object context, String message, Throwable error, ICallback callback) {
 		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 
-		String detailMessage = error != null ? error.getLocalizedMessage() : null;
+		String detailMessage = error != null ? error.getMessage() : null;
 		if (detailMessage != null && detailMessage.contains("\n")) { //$NON-NLS-1$
 			detailMessage = detailMessage.replaceAll("\n", ", "); //$NON-NLS-1$ //$NON-NLS-2$
 			detailMessage = detailMessage.replaceAll(":, ", ": "); //$NON-NLS-1$ //$NON-NLS-2$

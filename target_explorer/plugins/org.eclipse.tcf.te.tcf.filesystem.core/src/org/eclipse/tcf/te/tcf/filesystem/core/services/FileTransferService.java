@@ -341,7 +341,7 @@ public class FileTransferService {
 						errors[0] = new TCFChannelException(message);
 					}
 					else {
-						String message = NLS.bind(Messages.OpeningChannelFailureMessage, peer.getID(), error.getLocalizedMessage());
+						String message = NLS.bind(Messages.OpeningChannelFailureMessage, peer.getID(), error.getMessage());
 						errors[0] = new TCFChannelException(message, error);
 					}
 				}

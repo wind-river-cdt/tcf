@@ -70,7 +70,7 @@ public class OpRename extends Operation {
 			}
 		}
 		catch (TCFException e) {
-			throw new InvocationTargetException(e, e.getLocalizedMessage());
+			throw new InvocationTargetException(e, e.getMessage());
 		}
 		finally {
 			if (channel != null) Tcf.getChannelManager().closeChannel(channel);

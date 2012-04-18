@@ -150,7 +150,7 @@ public abstract class NewNodeWizard extends AbstractWizard implements INewWizard
 				return true;
             }
             catch (InvocationTargetException e) {
-    			newPage.setErrorMessage(e.getLocalizedMessage());
+    			newPage.setErrorMessage(e.getMessage());
             }
             catch (InterruptedException e) {
             }

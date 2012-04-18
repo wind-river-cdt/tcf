@@ -167,7 +167,7 @@ public class TcfURLConnection extends URLConnection {
 			// Open the channel
 			channel = Operation.openChannel(peer);
 		} catch (TCFChannelException e) {
-			throw new IOException(e.getLocalizedMessage());
+			throw new IOException(e.getMessage());
 		}
 		if (channel != null) {
 			service = Operation.getBlockingFileSystem(channel);

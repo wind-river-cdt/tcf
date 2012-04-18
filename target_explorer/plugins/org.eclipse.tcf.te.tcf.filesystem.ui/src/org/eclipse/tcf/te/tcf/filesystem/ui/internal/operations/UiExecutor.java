@@ -80,8 +80,8 @@ public class UiExecutor implements IOpExecutor {
 		catch (InvocationTargetException e) {
 			// Display the error during copy.
 			Throwable throwable = e.getTargetException() != null ? e.getTargetException() : e;
-			MessageDialog.openError(parent, operation.getName(), throwable.getLocalizedMessage());
-			status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), throwable.getLocalizedMessage(), throwable);
+			MessageDialog.openError(parent, operation.getName(), throwable.getMessage());
+			status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), throwable.getMessage(), throwable);
 		}
 		catch (InterruptedException e) {
 			// It is canceled.

@@ -60,7 +60,7 @@ public class RemoteTypedElement extends MergeTypedElement {
 			return node.getLocationURL().openStream();
 		} catch (IOException e) {
 			Status error = new Status(IStatus.ERROR,
-					UIPlugin.getUniqueIdentifier(), e.getLocalizedMessage(), e);
+					UIPlugin.getUniqueIdentifier(), e.getMessage(), e);
 			throw new CoreException(error);
 		}
 	}

@@ -67,7 +67,7 @@ public class QueryDoneGetChildren implements ISysMonitor.DoneGetChildren {
 	 		}
 		}
 		else if (callback != null) {
-			IStatus status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), error.getLocalizedMessage(), error);
+			IStatus status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), error.getMessage(), error);
 			callback.done(this, status);
 		}
     }

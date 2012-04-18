@@ -78,7 +78,7 @@ public class QueryDoneOpenChannel implements IChannelManager.DoneOpenChannel {
 			}
 		}
 		else if (callback != null) {
-			IStatus status = error == null ? Status.OK_STATUS : new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), error.getLocalizedMessage(), error);
+			IStatus status = error == null ? Status.OK_STATUS : new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), error.getMessage(), error);
 			callback.done(this, status);
 		}
     }

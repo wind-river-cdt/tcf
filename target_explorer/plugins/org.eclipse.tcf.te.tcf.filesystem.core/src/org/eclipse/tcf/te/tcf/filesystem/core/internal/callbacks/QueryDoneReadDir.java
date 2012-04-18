@@ -73,7 +73,7 @@ public class QueryDoneReadDir extends CallbackBase implements DoneReadDir {
 					@Override
                     public void doneClose(IToken token, FileSystemException error) {
 						if(callback != null) {
-							IStatus status = error == null ? Status.OK_STATUS : new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), error.getLocalizedMessage(), error);
+							IStatus status = error == null ? Status.OK_STATUS : new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), error.getMessage(), error);
 							callback.done(this, status);
 						}
                     }});

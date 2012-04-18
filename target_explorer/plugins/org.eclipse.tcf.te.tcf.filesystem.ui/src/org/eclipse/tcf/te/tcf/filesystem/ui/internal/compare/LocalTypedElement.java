@@ -115,7 +115,7 @@ public class LocalTypedElement extends MergeTypedElement implements
 			return new BufferedInputStream(new FileInputStream(cacheFile));
 		} catch (FileNotFoundException e) {
 			IStatus error = new Status(IStatus.ERROR,
-					UIPlugin.getUniqueIdentifier(), e.getLocalizedMessage(), e);
+					UIPlugin.getUniqueIdentifier(), e.getMessage(), e);
 			throw new CoreException(error);
 		}
 	}
@@ -286,7 +286,7 @@ public class LocalTypedElement extends MergeTypedElement implements
 			setDirty(false);
 		} catch (IOException e) {
 			throw new CoreException(new Status(IStatus.ERROR,
-					UIPlugin.getUniqueIdentifier(), e.getLocalizedMessage(), e));
+					UIPlugin.getUniqueIdentifier(), e.getMessage(), e));
 		} finally {
 			if (is != null)
 				try {
