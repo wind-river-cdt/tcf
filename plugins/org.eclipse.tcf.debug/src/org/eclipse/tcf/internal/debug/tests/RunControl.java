@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others.
+ * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -66,6 +66,11 @@ class RunControl {
         public void contextSuspended(final String id, String pc, String reason, Map<String,Object> params) {
             if (enable_trace) System.out.println("" + channel_id + " suspended " + id);
             suspended_ctx_ids.add(id);
+            Protocol.invokeLater(new Runnable() {
+                public void run() {
+                    resume();
+                }
+            });
         }
 
         public void contextResumed(String id) {
@@ -86,6 +91,11 @@ class RunControl {
             for (String id : suspended_ids) {
                 suspended_ctx_ids.add(id);
             }
+            Protocol.invokeLater(new Runnable() {
+                public void run() {
+                    resume();
+                }
+            });
         }
 
         public void containerResumed(String[] context_ids) {
@@ -168,15 +178,19 @@ class RunControl {
                 if (channel.getState() != IChannel.STATE_OPEN) return;
                 if (test_suite.cancel) return;
                 Protocol.invokeLater(50, this);
-                Set<String> s = test_suite.getCanceledTests().keySet();
-                if (s.size() > 0 || suspended_ctx_ids.size() > 0) {
-                    Set<String> ids = new HashSet<String>(s);
-                    ids.addAll(suspended_ctx_ids);
-                    String[] arr = ids.toArray(new String[ids.size()]);
-                    resume(arr[rnd.nextInt(arr.length)], IRunControl.RM_RESUME);
-                }
+                resume();
             }
         });
+    }
+
+    private void resume() {
+        Set<String> s = test_suite.getCanceledTests().keySet();
+        if (s.size() > 0 || suspended_ctx_ids.size() > 0) {
+            Set<String> ids = new HashSet<String>(s);
+            ids.addAll(suspended_ctx_ids);
+            String[] arr = ids.toArray(new String[ids.size()]);
+            resume(arr[rnd.nextInt(arr.length)], IRunControl.RM_RESUME);
+        }
     }
 
     private void exit(Throwable error) {
