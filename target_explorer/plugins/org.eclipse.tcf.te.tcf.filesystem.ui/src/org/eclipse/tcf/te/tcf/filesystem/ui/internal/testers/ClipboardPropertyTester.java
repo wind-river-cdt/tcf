@@ -39,33 +39,7 @@ public class ClipboardPropertyTester extends PropertyTester {
 		Assert.isTrue(receiver instanceof IStructuredSelection);
 		if (property.equals("canPaste")) { //$NON-NLS-1$
 			FsClipboard cb = UIPlugin.getClipboard();
-			Clipboard clipboard = cb.getSystemClipboard();
-			Object contents = clipboard.getContents(FileTransfer.getInstance());
-			if(contents != null) {
-				List<FSTreeNode> selection = ((IStructuredSelection) receiver).toList();
-				FSTreeNode hovered = null;
-				Assert.isTrue(!selection.isEmpty());
-				if (selection.size() == 1) {
-					FSTreeNode node = selection.get(0);
-					if (node.isFile()) {
-						hovered = node.parent;
-					}
-					else {
-						hovered = node;
-					}
-				}
-				else {
-					for (FSTreeNode node : selection) {
-						if (hovered == null) hovered = node.parent;
-						else if (hovered != node.parent) return false;
-					}
-				}
-				if (hovered.isDirectory() && hovered.isWritable()) {
-					return true;
-				}
-				return false;
-			} 
-			else if (!cb.isEmpty()) {
+			if (!cb.isEmpty()) {
 				List<FSTreeNode> nodes = cb.getFiles();
 				boolean moving = cb.isCutOp();
 				boolean copying = cb.isCopyOp();
@@ -102,6 +76,34 @@ public class ClipboardPropertyTester extends PropertyTester {
 						}
 						return true;
 					}
+				}
+			}
+			else {
+				Clipboard clipboard = cb.getSystemClipboard();
+				Object contents = clipboard.getContents(FileTransfer.getInstance());
+				if (contents != null) {
+					List<FSTreeNode> selection = ((IStructuredSelection) receiver).toList();
+					FSTreeNode hovered = null;
+					Assert.isTrue(!selection.isEmpty());
+					if (selection.size() == 1) {
+						FSTreeNode node = selection.get(0);
+						if (node.isFile()) {
+							hovered = node.parent;
+						}
+						else {
+							hovered = node;
+						}
+					}
+					else {
+						for (FSTreeNode node : selection) {
+							if (hovered == null) hovered = node.parent;
+							else if (hovered != node.parent) return false;
+						}
+					}
+					if (hovered.isDirectory() && hovered.isWritable()) {
+						return true;
+					}
+					return false;
 				}
 			}
 		}

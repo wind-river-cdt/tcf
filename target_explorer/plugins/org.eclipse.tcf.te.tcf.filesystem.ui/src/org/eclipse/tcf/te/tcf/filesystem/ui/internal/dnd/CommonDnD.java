@@ -215,23 +215,25 @@ public class CommonDnD implements IConfirmCallback {
 	 */
 	public boolean dropLocalSelection(FSTreeNode target, int operations, IStructuredSelection selection) {
 		List<FSTreeNode> nodes = selection.toList();
+		IOpExecutor executor = null;
 		IOperation operation = null;
 		if ((operations & DND.DROP_MOVE) != 0) {
 			operation = new OpMove(nodes, target, new MoveCopyCallback());
+			executor = new UiExecutor(new Callback(){
+				@Override
+	            protected void internalDone(Object caller, IStatus status) {
+					UIPlugin.getClipboard().clear();
+	            }
+			});
 		}
 		else if ((operations & DND.DROP_COPY) != 0) {
 			FSTreeNode dest = getCopyDestination(target, nodes);
 			boolean cpPerm = UIPlugin.isCopyPermission();
 			boolean cpOwn = UIPlugin.isCopyOwnership();
 			operation = new OpCopy(nodes, dest, cpPerm, cpOwn, new MoveCopyCallback());
+			executor = new UiExecutor();
 		}
-		if (operation != null) {
-			IOpExecutor executor = new UiExecutor(new Callback(){
-				@Override
-	            protected void internalDone(Object caller, IStatus status) {
-					UIPlugin.getClipboard().clear();
-	            }
-			});
+		if (operation != null && executor != null) {
 			IStatus status = executor.execute(operation);
 			return status != null && status.isOK();
 		}

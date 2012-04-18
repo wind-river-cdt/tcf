@@ -15,15 +15,12 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.IOpExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpMove;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
-import org.eclipse.tcf.te.tcf.filesystem.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.ui.dialogs.FSFolderSelectionDialog;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.UiExecutor;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
@@ -50,12 +47,7 @@ public class MoveFilesHandler extends AbstractHandler {
 			Object obj = dialog.getFirstResult();
 			Assert.isTrue(obj instanceof FSTreeNode);
 			FSTreeNode dest = (FSTreeNode) obj;
-			IOpExecutor executor = new UiExecutor(new Callback(){
-				@Override
-                protected void internalDone(Object caller, IStatus status) {
-					UIPlugin.getClipboard().clear();
-                }
-			});
+			IOpExecutor executor = new UiExecutor();
 			executor.execute(new OpMove(nodes, dest, new MoveCopyCallback()));
 		}
 		return null;

@@ -20,7 +20,6 @@ import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.tcf.te.runtime.callback.Callback;
-import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IOperation;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.IOpExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpCopy;
@@ -45,32 +44,21 @@ public class PasteFilesHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		FsClipboard cb = UIPlugin.getClipboard();
-		Clipboard clipboard = cb.getSystemClipboard();
-		Object contents = clipboard.getContents(FileTransfer.getInstance());
-		if(contents != null) {
-			String[] files = (String[]) contents;
-			// Get the files/folders from the clip board.
-			IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getCurrentSelectionChecked(event);
-			FSTreeNode hovered = (FSTreeNode) selection.getFirstElement();
-			CommonDnD dnd = new CommonDnD();
-			dnd.dropFiles(null, files, DND.DROP_COPY, hovered);
-		} 
-		else if (!cb.isEmpty()) {
+		if (!cb.isEmpty()) {
 			// Get the files/folders from the clip board.
 			IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getCurrentSelectionChecked(event);
 			List<FSTreeNode> nodes = cb.getFiles();
-			ICallback callback = new Callback(){
-				@Override
-                protected void internalDone(Object caller, IStatus status) {
-					UIPlugin.getClipboard().clear();
-                }
-			};
 			IOpExecutor executor = null;
 			IOperation operation = null;
 			if (cb.isCutOp()) {
 				FSTreeNode dest = (FSTreeNode) selection.getFirstElement();
 				operation = new OpMove(nodes, dest, new MoveCopyCallback());
-				executor = new UiExecutor(callback);
+				executor = new UiExecutor(new Callback(){
+					@Override
+	                protected void internalDone(Object caller, IStatus status) {
+						UIPlugin.getClipboard().clear();
+	                }
+				});
 			}
 			else if (cb.isCopyOp()) {
 				FSTreeNode hovered = (FSTreeNode) selection.getFirstElement();
@@ -78,10 +66,23 @@ public class PasteFilesHandler extends AbstractHandler {
 				boolean cpPerm = UIPlugin.isCopyPermission();
 				boolean cpOwn = UIPlugin.isCopyOwnership();
 				operation = new OpCopy(nodes, dest, cpPerm, cpOwn, new MoveCopyCallback());
-				executor = new UiExecutor(callback);
+				executor = new UiExecutor();
 			}
-			if (executor != null) {
+			if (executor != null && operation != null) {
 				executor.execute(operation);
+			}
+		}
+		else {
+			Clipboard clipboard = cb.getSystemClipboard();
+			Object contents = clipboard.getContents(FileTransfer.getInstance());
+			if (contents != null) {
+				String[] files = (String[]) contents;
+				// Get the files/folders from the clip board.
+				IStructuredSelection selection = (IStructuredSelection) HandlerUtil
+				                .getCurrentSelectionChecked(event);
+				FSTreeNode hovered = (FSTreeNode) selection.getFirstElement();
+				CommonDnD dnd = new CommonDnD();
+				dnd.dropFiles(null, files, DND.DROP_COPY, hovered);
 			}
 		}
 		return null;
