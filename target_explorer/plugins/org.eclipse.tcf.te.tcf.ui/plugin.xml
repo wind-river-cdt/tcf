@@ -101,7 +101,7 @@
             class="org.eclipse.tcf.te.tcf.ui.filter.ValueAddFilter"
             id="org.eclipse.tcf.te.tcf.ui.navigator.ValueAddFilter"
             name="%ValueAddFilter.name"
-            visibleInUI="true">
+            visibleInUI="false">
       </commonFilter>
    </extension>
 
