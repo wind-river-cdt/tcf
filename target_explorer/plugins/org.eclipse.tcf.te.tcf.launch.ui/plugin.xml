@@ -20,10 +20,11 @@
    </extension>
 
 <!-- Editor page binding contributions -->
+<!--
    <extension point="org.eclipse.tcf.te.ui.views.editorPageBindings">
       <editorPageBinding
             id="org.eclispe.tcf.te.tcf.launch.ui.editor.LaunchEditorPage"
-            pageId="org.eclispe.tcf.te.launch.ui.editor.LaunchEditorPage"
+            pageId="org.eclipse.tcf.te.launch.ui.editor.LaunchEditorPage"
             insertAfter="org.eclipse.tcf.te.tcf.ui.OverviewEditorPage">
          <enablement>
             <with variable="activeEditorInput">
@@ -32,5 +33,6 @@
          </enablement>
       </editorPageBinding>
    </extension>
+-->
 
 </plugin>
