@@ -432,8 +432,10 @@ public class MemoryMapWidget {
 
     private void writeMemoryMapAttribute(ILaunchConfigurationWorkingCopy copy) throws Exception {
         String s = null;
-        final ArrayList<IMemoryMap.MemoryRegion> lst = new ArrayList<IMemoryMap.MemoryRegion>();
-        for (ArrayList<IMemoryMap.MemoryRegion> x : cur_maps.values()) lst.addAll(x);
+        final ArrayList<Map<String,Object>> lst = new ArrayList<Map<String,Object>>();
+        for (ArrayList<IMemoryMap.MemoryRegion> x : cur_maps.values()) {
+            for (IMemoryMap.MemoryRegion r : x) lst.add(r.getProperties());
+        }
         if (lst.size() > 0) {
             s = new TCFTask<String>() {
                 public void run() {
