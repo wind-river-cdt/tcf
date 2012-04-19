@@ -27,14 +27,18 @@ import org.eclipse.tcf.protocol.Protocol;
  */
 public class ResetMap {
     
+    public interface IResettable {
+        public void reset();
+    }
+    
     public static final String ANY_ID = "";
     
-    private Map<String, List<AbstractCache<?>>> fValid = new TreeMap<String, List<AbstractCache<?>>>();
+    private Map<String, List<IResettable>> fValid = new TreeMap<String, List<IResettable>>();
     private Map<String, Set<String>> fChildren = new TreeMap<String, Set<String>>();
     private Map<String, String> fParents = new TreeMap<String, String>();
-    private Map<AbstractCache<?>, Set<String>> fPending = new LinkedHashMap<AbstractCache<?>, Set<String>>();
+    private Map<IResettable, Set<String>> fPending = new LinkedHashMap<IResettable, Set<String>>();
 
-    public synchronized Set<String> removePending(AbstractCache<?> cache) {
+    public synchronized Set<String> removePending(IResettable cache) {
         Set<String> pendingIds = fPending.remove(cache);
         if (pendingIds == null) {
             pendingIds = Collections.emptySet();
@@ -42,23 +46,23 @@ public class ResetMap {
         return pendingIds;
     }
 
-    public synchronized void addValid(String id, AbstractCache<?> cache) {
+    public synchronized void addValid(String id, IResettable cache) {
         assert !fPending.containsKey(cache);
         
-        List<AbstractCache<?>> list = fValid.get(id);
+        List<IResettable> list = fValid.get(id);
         if (list == null) {
-            list = new ArrayList<AbstractCache<?>>();
+            list = new ArrayList<IResettable>();
             fValid.put(id, list);
         }
         list.add(cache);
     }
 
-    public synchronized void addValid(String id, String[] childrenIds, AbstractCache<?> cache) {
+    public synchronized void addValid(String id, String[] childrenIds, IResettable cache) {
         assert !fPending.containsKey(cache);
         
-        List<AbstractCache<?>> list = fValid.get(id);
+        List<IResettable> list = fValid.get(id);
         if (list == null) {
-            list = new ArrayList<AbstractCache<?>>();
+            list = new ArrayList<IResettable>();
             fValid.put(id, list);
         }
         list.add(cache);
@@ -67,13 +71,13 @@ public class ResetMap {
         }
     }
 
-    public synchronized void addValid(List<String> ids, AbstractCache<?> cache) {
+    public synchronized void addValid(List<String> ids, IResettable cache) {
         assert !fPending.containsKey(cache);
 
         String id = ids.get(0);
-        List<AbstractCache<?>> list = fValid.get(id);
+        List<IResettable> list = fValid.get(id);
         if (list == null) {
-            list = new ArrayList<AbstractCache<?>>();
+            list = new ArrayList<IResettable>();
             fValid.put(id, list);
         }
         list.add(cache);
@@ -88,8 +92,8 @@ public class ResetMap {
         }
     }
 
-    public synchronized List<AbstractCache<?>> getCaches(String id) {
-        List<AbstractCache<?>> list = fValid.get(id);
+    public synchronized List<IResettable> getCaches(String id) {
+        List<IResettable> list = fValid.get(id);
         if (list == null) {
             list = Collections.emptyList();
         }
@@ -105,9 +109,9 @@ public class ResetMap {
         
         // Do not call reset while holding lock to reset map.  Instead collect 
         // caches to reset and reset them outside the lock.
-        List<AbstractCache<?>> anyList = Collections.emptyList();
-        List<AbstractCache<?>> idList = Collections.emptyList();
-        List<AbstractCache<?>> parentList = Collections.emptyList();
+        List<IResettable> anyList = Collections.emptyList();
+        List<IResettable> idList = Collections.emptyList();
+        List<IResettable> parentList = Collections.emptyList();
         synchronized (this) {
             for (Set<String> pendingIds : fPending.values()) {
                 pendingIds.add(id);
@@ -115,7 +119,7 @@ public class ResetMap {
             anyList = fValid.remove(ANY_ID);
             
             if (resetChildren && fChildren.containsKey(id)) {
-                idList = new ArrayList<AbstractCache<?>>();
+                idList = new ArrayList<IResettable>();
                 collectChildren(id, idList);
             } else {
                 idList = fValid.remove(id);
@@ -133,7 +137,7 @@ public class ResetMap {
         resetList(parentList);        
     }
     
-    private void collectChildren(String id, List<AbstractCache<?>> caches) {
+    private void collectChildren(String id, List<IResettable> caches) {
         caches.addAll( fValid.remove(id) );
         Set<String> children = fChildren.remove(id);
         if (children != null) {
@@ -143,17 +147,15 @@ public class ResetMap {
         }
     }
     
-    private void resetList(List<AbstractCache<?>> list) {
+    private void resetList(List<IResettable> list) {
         if (list != null) {
-            for (AbstractCache<?> cache : list) {
-                if (cache.isValid()) {
-                    cache.reset();
-                }
+            for (IResettable cache : list) {
+                cache.reset();
             }
         }
     }
     
-    public synchronized void addPending(AbstractCache<?> cache) {
+    public synchronized void addPending(IResettable cache) {
         fPending.put(cache, new TreeSet<String>());
     }
 }

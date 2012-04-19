@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import org.eclipse.tcf.debug.test.services.ResetMap.IResettable;
 import org.eclipse.tcf.debug.test.util.AbstractCache;
 import org.eclipse.tcf.debug.test.util.CallbackCache;
 import org.eclipse.tcf.debug.test.util.DataCallback;
@@ -63,7 +64,7 @@ public class SymbolsCM extends AbstractCacheManager {
         ANY_ID_PARENTS.add(ResetMap.ANY_ID);
     }
 
-    abstract private class SymbolCache<V> extends CallbackCache<V> {
+    abstract private class SymbolCache<V> extends CallbackCache<V> implements IResettable {
         protected final AbstractCache<V> fInner;
         private Symbol fSymbol;
         private List<String> fParents = new ArrayList<String>(4);

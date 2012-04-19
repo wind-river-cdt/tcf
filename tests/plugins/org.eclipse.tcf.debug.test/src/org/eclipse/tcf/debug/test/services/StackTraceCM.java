@@ -10,10 +10,18 @@
  *******************************************************************************/
 package org.eclipse.tcf.debug.test.services;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
+import org.eclipse.tcf.debug.test.services.ResetMap.IResettable;
+import org.eclipse.tcf.debug.test.util.DataCallback;
 import org.eclipse.tcf.debug.test.util.ICache;
+import org.eclipse.tcf.debug.test.util.RangeCache;
 import org.eclipse.tcf.debug.test.util.TokenCache;
+import org.eclipse.tcf.debug.test.util.Transaction;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IRunControl;
 import org.eclipse.tcf.services.IRunControl.RunControlContext;
@@ -26,6 +34,7 @@ import org.eclipse.tcf.services.IStackTrace.StackTraceContext;
 public class StackTraceCM extends AbstractCacheManager implements IRunControl.RunControlListener  {
     private IStackTrace fService;
     private IRunControl fRunControl;
+    private final ResetMap fRunControlStateResetMap = new ResetMap();
     
     public StackTraceCM(IStackTrace service, IRunControl runControl) {
         fService = service;
@@ -39,70 +48,90 @@ public class StackTraceCM extends AbstractCacheManager implements IRunControl.Ru
         super.dispose();
     }
 
-    private class ChildrenCache extends TokenCache<String[]> implements IStackTrace.DoneGetChildren {
-        private final String fId;
-        public ChildrenCache(String id) {
-            fId = id;
-        }
+    public ICache<String[]> getChildren(final String id) {
+        class MyCache extends TokenCache<String[]> implements IStackTrace.DoneGetChildren {
+            @Override
+            protected IToken retrieveToken() {
+                fRunControlStateResetMap.addPending(this);
+                return fService.getChildren(id, this);
+            }
+            
+            public void doneGetChildren(IToken token, Exception error, String[] context_ids) {
+                fRunControlStateResetMap.removePending(this);
+                fRunControlStateResetMap.addValid(id, this);
+                set(token, context_ids, error);
+            }
+        };
+
+        return mapCache(new IdKey<MyCache>(MyCache.class, id) {
+            @Override MyCache createCache() { return new MyCache(); }
+        });
+    }
+
+    public RangeCache<StackTraceContext> getContextRange(final String parentId) {
         
-        @Override
-        protected IToken retrieveToken() {
-            return fService.getChildren(fId, this);
-        }
-        public void doneGetChildren(IToken token, Exception error, String[] context_ids) {
-            set(token, context_ids, error);
-        }
-        public void resetChildren() {
-            if (isValid()) reset();
-        }
-    };
+        class MyCache extends RangeCache<StackTraceContext> implements IResettable {
+            boolean fIsValid = false;
+            boolean fIsPending = false;
+            @Override
+            protected void retrieve(final long offset, final int count, DataCallback<List<StackTraceContext>> rm) {
+                if (!fIsPending) fRunControlStateResetMap.addPending(MyCache.this);
+                new Transaction<List<StackTraceContext>>() {
+                    @Override
+                    protected List<StackTraceContext> process() throws InvalidCacheException, ExecutionException {
+                        String[] ids = validate(getChildren(parentId));
+                        int adjustedCount = Math.min(count, ids.length + (int)offset);
+                        String[] subIds = new String[adjustedCount]; 
+                        System.arraycopy(ids, (int)offset, subIds, 0, adjustedCount);
+                        StackTraceContext[] contexts = validate(getContexts(subIds));
+                        if (!fIsValid) {
+                            fRunControlStateResetMap.removePending(MyCache.this);
+                            fRunControlStateResetMap.addValid(parentId, MyCache.this);
+                        }
+                        return Arrays.asList(contexts);
+                        
+                    }
+                }.request(rm);
+            }
+            
+            public void reset() {
+                fIsValid = false;
+                fIsPending = false;
+                @SuppressWarnings("unchecked")
+                List<StackTraceContext> emptyData = (List<StackTraceContext>)Collections.EMPTY_LIST;
+                set(0, 0, emptyData, new Throwable("Cache invalid") );
+            }
+            
+        };
 
-    private class ChildrenCacheKey extends IdKey<ChildrenCache> {
-        public ChildrenCacheKey(String id) {
-            super(ChildrenCache.class, id);
-        }
-        @Override ChildrenCache createCache() { return new ChildrenCache(fId); }        
+        return mapCache(new IdKey<MyCache>(MyCache.class, parentId) {
+            @Override MyCache createCache() { return new MyCache(); }        
+        });        
+
     }
     
-    public ICache<String[]> getChildren(String id) {
-        return mapCache(new ChildrenCacheKey(id));
+    public ICache<StackTraceContext[]> getContexts(final String[] ids) {
+        class MyCache extends TokenCache<StackTraceContext[]> implements IStackTrace.DoneGetContext {
+            @Override
+            protected IToken retrieveToken() {
+                fRunControlStateResetMap.addPending(this);
+                return fService.getContext(ids, this);
+            }
+            
+            public void doneGetContext(IToken token, Exception error, StackTraceContext[] contexts) {
+                fRunControlStateResetMap.removePending(this);
+                fRunControlStateResetMap.addValid(contexts[0].getParentID(), this);
+                set(token, contexts, error);
+            }
+        }
+
+        return mapCache(new IdKey<MyCache>(MyCache.class, Arrays.toString(ids)) {
+            @Override MyCache createCache() { return new MyCache(); }        
+        });
     }
 
-    class ContextCache extends TokenCache<StackTraceContext> implements IStackTrace.DoneGetContext {
-        private final String fId;
-        
-        public ContextCache(String id) {
-            fId = id;
-        }
-        @Override
-        protected IToken retrieveToken() {
-            return fService.getContext(new String[] { fId }, this);
-        }
-        public void doneGetContext(IToken token, Exception error, StackTraceContext[] contexts) {
-            StackTraceContext context = contexts != null && contexts.length > 0 ? contexts[0] : null;
-            set(token, context, error);
-        }
-        public void resetContext() {
-            if (isValid()) reset();
-        }
-    }
     
-    private class ContextCacheKey extends IdKey<ContextCache> {
-        public ContextCacheKey(String id) {
-            super(ContextCache.class, id);
-        }
-        @Override ContextCache createCache() { return new ContextCache(fId); }        
-    }
     
-    public ICache<StackTraceContext>[] getContext(final String[] ids) {
-        @SuppressWarnings("unchecked")
-        ICache<StackTraceContext>[] caches = (ICache<StackTraceContext>[])new ICache[ids.length];
-        for (int i = 0; i < ids.length; i++) {
-            caches[i] = mapCache(new ContextCacheKey(ids[i]));
-        }
-        return caches;
-    }
-
     public void contextAdded(RunControlContext[] contexts) {
         // TODO Auto-generated method stub
         
@@ -110,53 +139,39 @@ public class StackTraceCM extends AbstractCacheManager implements IRunControl.Ru
 
     public void contextChanged(RunControlContext[] contexts) {
         for (RunControlContext context : contexts) {
-            resetRunControlContext(context.getID());
+            fRunControlStateResetMap.reset(context.getID());
         }
     }
 
     public void contextRemoved(String[] context_ids) {
         for (String id : context_ids) {
-            resetRunControlContext(id);
+            fRunControlStateResetMap.reset(id);
         }
     }
 
     public void contextSuspended(String context, String pc, String reason, Map<String, Object> params) {
-        resetRunControlContext(context);
+        fRunControlStateResetMap.reset(context);
     }
 
     public void contextResumed(String context) {
-        resetRunControlContext(context);
+        fRunControlStateResetMap.reset(context);
     }
 
     public void containerSuspended(String context, String pc, String reason, Map<String, Object> params,
         String[] suspended_ids) 
     {
         for (String id : suspended_ids) {
-            resetRunControlContext(id);
+            fRunControlStateResetMap.reset(id);
         }
     }
 
     public void containerResumed(String[] context_ids) {
         for (String id : context_ids) {
-            resetRunControlContext(id);
+            fRunControlStateResetMap.reset(id);
         }
     }
 
     public void contextException(String context, String msg) {
-        resetRunControlContext(context);
-    }
-
-    private void resetRunControlContext(String id) {
-        ChildrenCache childrenCache = getCache(new ChildrenCacheKey(id));
-        if (childrenCache != null && childrenCache.isValid() && childrenCache.getData() != null) {
-            String[] frameIds = childrenCache.getData();
-            for (String frameId : frameIds) {
-                ContextCache contextCache = getCache(new ContextCacheKey(frameId));
-                if (contextCache != null) {
-                    contextCache.resetContext();
-                }
-            }
-            childrenCache.resetChildren();
-        }
+        fRunControlStateResetMap.reset(context);
     }
 }
