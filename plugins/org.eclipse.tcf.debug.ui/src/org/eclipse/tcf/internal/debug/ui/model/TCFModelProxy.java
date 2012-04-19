@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2010 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2012 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -44,6 +44,7 @@ import org.eclipse.tcf.protocol.Protocol;
  * fires deltas to notify listeners of changes in the model.
  * Model proxy listeners are debuggers views.
  */
+@SuppressWarnings("restriction")
 public class TCFModelProxy extends AbstractModelProxy implements IModelProxy, Runnable {
 
     private static final TCFNode[] EMPTY_NODE_ARRAY = new TCFNode[0];
@@ -71,6 +72,7 @@ public class TCFModelProxy extends AbstractModelProxy implements IModelProxy, Ru
 
         public void run() {
             posted = false;
+            if (pending_node != null) return;
             long idle_time = System.currentTimeMillis() - last_update_time;
             long min_idle_time = model.getMinViewUpdatesInterval();
             if (model.getViewUpdatesThrottleEnabled()) {
@@ -287,7 +289,7 @@ public class TCFModelProxy extends AbstractModelProxy implements IModelProxy, Ru
     public void post() {
         assert Protocol.isDispatchThread();
         assert installed && !disposed;
-        if (!posted) {
+        if (!posted && pending_node == null) {
             long idle_time = System.currentTimeMillis() - last_update_time;
             Protocol.invokeLater(model.getMinViewUpdatesInterval() - idle_time, timer);
             if (model.getWaitForViewsUpdateAfterStep()) launch.addPendingClient(this);
@@ -457,7 +459,7 @@ public class TCFModelProxy extends AbstractModelProxy implements IModelProxy, Ru
         }
     }
 
-    public void run() {
+    private void postDelta() {
         assert Protocol.isDispatchThread();
         if (disposed) return;
         if (node2flags.isEmpty() && selection.isEmpty()) return;
@@ -541,20 +543,26 @@ public class TCFModelProxy extends AbstractModelProxy implements IModelProxy, Ru
         }
 
         if (pending_node == null) {
-            launch.removePendingClient(this);
+            if (auto_expand_created_nodes != null) {
+                for (TCFNode node : auto_expand_created_nodes) {
+                    auto_expand_set.remove(node.id);
+                    addDelta(node, IModelDelta.EXPAND);
+                }
+                auto_expand_created_nodes = null;
+                post();
+            }
         }
         else if (pending_node.getLockedData(children_count_update, this)) {
             assert false;
             Protocol.invokeLater(this);
         }
         node2children.clear();
-        if (auto_expand_created_nodes != null) {
-            for (TCFNode node : auto_expand_created_nodes) {
-                auto_expand_set.remove(node.id);
-                addDelta(node, IModelDelta.EXPAND);
-            }
-            auto_expand_created_nodes = null;
-            post();
+    }
+
+    public void run() {
+        postDelta();
+        if (!posted && pending_node == null) {
+            launch.removePendingClient(this);
         }
     }
 }
