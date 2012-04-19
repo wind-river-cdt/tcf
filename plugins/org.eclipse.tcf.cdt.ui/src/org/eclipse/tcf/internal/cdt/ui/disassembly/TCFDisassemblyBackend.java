@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2011 Wind River Systems, Inc. and others.
+ * Copyright (c) 2010, 2012 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -512,9 +512,8 @@ public class TCFDisassemblyBackend extends AbstractDisassemblyBackend {
                 }
                 final String contextId = mem.getID();
                 Map<String, Object> params = new HashMap<String, Object>();
-                disass.disassemble(contextId, startAddress, linesHint*4, params, new DoneDisassemble() {
-                    public void doneDisassemble(IToken token, final Throwable error,
-                            final IDisassemblyLine[] disassembly) {
+                disass.disassemble(contextId, startAddress, linesHint * 4, params, new DoneDisassemble() {
+                    public void doneDisassemble(IToken token, final Throwable error, IDisassemblyLine[] disassembly) {
                         if (execContext != fExecContext) return;
                         if (error != null) {
                             fCallback.asyncExec(new Runnable() {
@@ -534,7 +533,7 @@ public class TCFDisassemblyBackend extends AbstractDisassemblyBackend {
                     }
 
                     private void doneGetDisassembly(final IDisassemblyLine[] disassembly) {
-                        if (!showSymbols) {
+                        if (disassembly == null || disassembly.length == 0 || !showSymbols) {
                             doneGetSymbols(disassembly, null);
                             return;
                         }
@@ -587,30 +586,30 @@ public class TCFDisassemblyBackend extends AbstractDisassemblyBackend {
                     }
 
                     private void doneGetSymbols(final IDisassemblyLine[] disassembly, final ISymbols.Symbol[] symbols) {
-                        ILineNumbers lineNumbers = null;
-                        if (mixed) {
-                            lineNumbers = channel.getRemoteService(ILineNumbers.class);
+                        if (disassembly == null || disassembly.length == 0 || !mixed) {
+                            doneGetLineNumbers(disassembly, symbols, null);
+                            return;
                         }
+                        ILineNumbers lineNumbers = channel.getRemoteService(ILineNumbers.class);
                         if (lineNumbers == null) {
                             doneGetLineNumbers(disassembly, symbols, null);
+                            return;
                         }
-                        else {
-                            AddressRange range = getAddressRange(disassembly);
-                            lineNumbers.mapToSource(contextId, range.start, range.end, new DoneMapToSource() {
-                                public void doneMapToSource(IToken token, Exception error, final CodeArea[] areas) {
-                                    if (error != null) {
-                                        Activator.log(error);
-                                        doneGetLineNumbers(disassembly, symbols, null);
-                                    }
-                                    else {
-                                        doneGetLineNumbers(disassembly, symbols, areas);
-                                    }
+                        AddressRange range = getAddressRange(disassembly);
+                        lineNumbers.mapToSource(contextId, range.start, range.end, new DoneMapToSource() {
+                            public void doneMapToSource(IToken token, Exception error, final CodeArea[] areas) {
+                                if (error != null) {
+                                    Activator.log(error);
+                                    doneGetLineNumbers(disassembly, symbols, null);
                                 }
-                            });
-                        }
+                                else {
+                                    doneGetLineNumbers(disassembly, symbols, areas);
+                                }
+                            }
+                        });
                     }
 
-                    private void doneGetLineNumbers( final IDisassemblyLine[] disassembly, final ISymbols.Symbol[] symbols, final CodeArea[] areas) {
+                    private void doneGetLineNumbers(final IDisassemblyLine[] disassembly, final ISymbols.Symbol[] symbols, final CodeArea[] areas) {
                         fCallback.asyncExec(new Runnable() {
                             public void run() {
                                 insertDisassembly(modCount, startAddress, disassembly, symbols, areas);
@@ -652,8 +651,8 @@ public class TCFDisassemblyBackend extends AbstractDisassemblyBackend {
         try {
             fCallback.lockScroller();
 
-            AddressRangePosition p= null;
-            for (IDisassemblyLine instruction : instructions) {
+            AddressRangePosition p = null;
+            if (instructions != null) for (IDisassemblyLine instruction : instructions) {
                 BigInteger address = JSON.toBigInteger(instruction.getAddress());
                 if (startAddress == null) {
                     startAddress = address;
@@ -687,16 +686,14 @@ public class TCFDisassemblyBackend extends AbstractDisassemblyBackend {
                 int firstLine = -1;
                 int lastLine = -1;
                 CodeArea area = findCodeArea(address, codeAreas);
-                if (area != null) {
-                    if (area.file != null) {
-                        IPath filePath = new Path(area.file);
-                        if (!filePath.isAbsolute() && area.directory != null) {
-                            filePath = new Path(area.directory).append(filePath);
-                        }
-                        sourceFile = filePath.toString();
-                        firstLine = area.start_line - 1;
-                        lastLine = area.end_line - 2;
+                if (area != null && area.file != null) {
+                    IPath filePath = new Path(area.file);
+                    if (!filePath.isAbsolute() && area.directory != null) {
+                        filePath = new Path(area.directory).append(filePath);
                     }
+                    sourceFile = filePath.toString();
+                    firstLine = area.start_line - 1;
+                    lastLine = area.end_line - 2;
                 }
                 if (sourceFile != null && firstLine >= 0) {
                     try {
@@ -720,9 +717,7 @@ public class TCFDisassemblyBackend extends AbstractDisassemblyBackend {
                 String instr = formatInstruction(instrAttrs);
 
                 p = fCallback.getDocument().insertDisassemblyLine(p, address, instrLength, functionOffset.toString(), instr, sourceFile, firstLine);
-                if (p == null) {
-                    break;
-                }
+                if (p == null) break;
                 insertedAnyAddress = true;
             }
         }
@@ -863,9 +858,7 @@ public class TCFDisassemblyBackend extends AbstractDisassemblyBackend {
 
     public String evaluateExpression(final String expression) {
         final TCFNodeStackFrame activeFrame = fActiveFrame;
-        if (activeFrame == null) {
-            return null;
-        }
+        if (activeFrame == null) return null;
         String value = new TCFTask<String>(activeFrame.getChannel()) {
             public void run() {
                 if (activeFrame != fActiveFrame) {
