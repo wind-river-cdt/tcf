@@ -17,6 +17,7 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.AssertionFailedException;
 import org.eclipse.jface.dialogs.IDialogPage;
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
@@ -37,6 +38,7 @@ import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
+import org.eclipse.tcf.te.launch.ui.nls.Messages;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
@@ -45,14 +47,12 @@ import org.eclipse.tcf.te.runtime.services.interfaces.IPropertiesAccessService;
 import org.eclipse.tcf.te.ui.controls.AbstractDecoratedDialogPageControl;
 import org.eclipse.tcf.te.ui.jface.interfaces.IValidatingContainer;
 import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
-import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
-import org.eclipse.tcf.te.ui.views.internal.ViewRoot;
+import org.eclipse.tcf.te.ui.views.interfaces.ICategory;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
-import org.eclipse.ui.internal.navigator.NavigatorContentService;
 import org.eclipse.ui.navigator.CommonViewerSorter;
 
 /**
- * Context selector control.
+ * Abstract context selector control.
  * <p>
  * Allows to present a configurable set of elements from the data model from which the user can
  * select one or more elements.
@@ -60,15 +60,28 @@ import org.eclipse.ui.navigator.CommonViewerSorter;
  * Default properties:
  * <ul>
  * <li>PROPERTY_SHOW_GHOST_MODEL_NODES = false</li>
+ * <li>PROPERTY_MULTI_CONTEXT_SELECTOR = false</li>
  * </ul>
  */
-@SuppressWarnings("restriction")
-public class ContextSelectorControl extends AbstractDecoratedDialogPageControl implements ISelectionProvider {
+public abstract class AbstractContextSelectorControl extends AbstractDecoratedDialogPageControl implements ISelectionProvider {
 
 	/**
 	 * Property: If set to <code>true</code>, ghost model nodes will be shown within the tree.
 	 */
 	public static final String PROPERTY_SHOW_GHOST_MODEL_NODES = "showGhostModelNodes"; //$NON-NLS-1$
+
+	/**
+	 * Property: If set to <code>true</code>, the control will be created as multi
+	 *           context control. That means that more than one tree item will be
+	 *           checkmarkable. In single context selector mode, only one tree item
+	 *           can be checkmarked at the same time.
+	 */
+	public static final String PROPERTY_MULTI_CONTEXT_SELECTOR = "multiContextSelector"; //$NON-NLS-1$
+
+	// The last failure cause
+	private Throwable lastFailureCause;
+	// Flag for controlling if at least one element has to be selected
+	private boolean requireSelection = true;
 
 	/**
 	 * List of selection changed listeners.
@@ -85,9 +98,6 @@ public class ContextSelectorControl extends AbstractDecoratedDialogPageControl i
 	private TreeViewer viewer;
 	// The current selection within the tree viewer.
 	/* default */ ISelection selection;
-
-	// Reference to the navigator content service used
-	private NavigatorContentService contentService;
 
 	/**
 	 * Constant to return an empty viewer filter array.
@@ -187,7 +197,9 @@ public class ContextSelectorControl extends AbstractDecoratedDialogPageControl i
 			// If the element is a ghost model element, then we have to check
 			// on the parent as well.
 			if (!skipDoubleCheckParentState) {
-				skipDoubleCheckParentState |= ((IModelNode) element).getParent() == null || !isGhost(((IModelNode) element).getParent());
+				IPropertiesAccessService service = ServiceManager.getInstance().getService(IPropertiesAccessService.class);
+				IModelNode parent = service != null ? (IModelNode)service.getParent(element) : null;
+				skipDoubleCheckParentState |= parent == null || !isGhost(parent);
 			}
 
 			// Call the super implementation to check the item and
@@ -262,8 +274,13 @@ public class ContextSelectorControl extends AbstractDecoratedDialogPageControl i
 		@Override
 		public void checkStateChanged(CheckStateChangedEvent event) {
 			Object element = event.getElement();
-			if (element instanceof IModelNode) {
-				onModelNodeCheckStateChanged((IModelNode) element, event.getChecked());
+			boolean checked = event.getChecked();
+
+			onCheckStateChanged(element, checked);
+
+			// validate the parent page if there is one set
+			if (getParentPage() instanceof IValidatingContainer) {
+				((IValidatingContainer) getParentPage()).validate();
 			}
 		}
 	}
@@ -288,13 +305,17 @@ public class ContextSelectorControl extends AbstractDecoratedDialogPageControl i
 		 */
 		@Override
 		public boolean select(Viewer viewer, Object parentElement, Object element) {
-			if (element instanceof IModelNode) {
+			if (element instanceof ICategory) {
+				return true;
+			}
+			else if (element instanceof IModelNode) {
 				if (isGhost((IModelNode) element)) {
 					return doShowGhostModelElements();
 				}
+				return true;
 			}
 
-			return true;
+			return false;
 		}
 	}
 
@@ -304,7 +325,7 @@ public class ContextSelectorControl extends AbstractDecoratedDialogPageControl i
 	 * @param parentPage The parent target connection page this control is embedded in. Might be
 	 *            <code>null</code> if the control is not associated with a page.
 	 */
-	public ContextSelectorControl(IDialogPage parentPage) {
+	public AbstractContextSelectorControl(IDialogPage parentPage) {
 		super(parentPage);
 		selectionListeners.clear();
 		// initialize the properties
@@ -328,6 +349,28 @@ public class ContextSelectorControl extends AbstractDecoratedDialogPageControl i
 	protected void initializeProperties(IPropertiesContainer properties) {
 		Assert.isNotNull(properties);
 		properties.setProperty(PROPERTY_SHOW_GHOST_MODEL_NODES, false);
+		properties.setProperty(PROPERTY_MULTI_CONTEXT_SELECTOR, false);
+	}
+
+	/**
+	 * Set the last failure cause to display.
+	 *
+	 * @param cause The last failure case or <code>null</code>.
+	 */
+	public final void setLastFailureCause(Throwable cause) {
+		lastFailureCause = cause;
+		if (getParentPage() instanceof IValidatingContainer) {
+			((IValidatingContainer)getParentPage()).validate();
+		}
+	}
+
+	/**
+	 * Returns the last failure cause to display.
+	 *
+	 * @return The last failure cause or <code>null</code>.
+	 */
+	public final Throwable getLastFailureCause() {
+		return lastFailureCause;
 	}
 
 	/**
@@ -347,11 +390,6 @@ public class ContextSelectorControl extends AbstractDecoratedDialogPageControl i
 	 */
 	@Override
 	public void dispose() {
-		// Dispose the navigator content service
-		if (contentService != null) {
-			contentService.dispose();
-			contentService = null;
-		}
 
 		viewer = null;
 
@@ -403,6 +441,37 @@ public class ContextSelectorControl extends AbstractDecoratedDialogPageControl i
 			}
 		}
 		return NO_CONTEXTS;
+	}
+
+
+	/**
+	 * Called from the default check state listener implementation if the checked state of an element has changed.
+	 *
+	 * @param element The element checked or unchecked. Must not be <code>null</code>.
+	 * @param checked <code>True</code> if the model node has been checked, <code>false</code> if
+	 *            unchecked.
+	 */
+	protected void onCheckStateChanged(Object element, boolean checked) {
+		// In case the control is operating in single context selector mode,
+		// we have to uncheck any other element than the given checked one.
+		if (checked && getPropertiesContainer().isProperty(PROPERTY_MULTI_CONTEXT_SELECTOR, false)) {
+			if (getViewer() instanceof ContextSelectorTreeViewer) {
+				// Node: Within here, only methods which do not fire the check state listeners
+				//       again must be used!
+				ContextSelectorTreeViewer viewer = (ContextSelectorTreeViewer)getViewer();
+
+				// If the checked node is a container node and has children, select
+				// the first children of the container.
+				Item[] childItems = viewer.getChildren(element);
+				if (childItems != null && childItems.length > 1) {
+					// Take the first item as element to be checked
+					viewer.setCheckedElements(new Object[] { childItems[0].getData() });
+				} else {
+					// Set the passed in element node checked
+					viewer.setCheckedElements(new Object[] { element });
+				}
+			}
+		}
 	}
 
 	/**
@@ -526,13 +595,7 @@ public class ContextSelectorControl extends AbstractDecoratedDialogPageControl i
 		viewer.setUseHashlookup(true);
 
 		doConfigureTreeLayoutData(viewer.getTree());
-
-		// Create the navigator content service
-		contentService = new NavigatorContentService(IUIConstants.ID_EXPLORER, viewer);
-		Assert.isNotNull(contentService);
-
-		viewer.setContentProvider(contentService.createCommonContentProvider());
-		viewer.setLabelProvider(contentService.createCommonLabelProvider());
+		doConfigureTreeContentAndLabelProvider(viewer);
 		viewer.setSorter(doCreateViewerSorter());
 
 		if ((getTreeViewerStyle() & SWT.CHECK) != 0 && getViewerCheckStateListener(viewer) != null) {
@@ -577,7 +640,7 @@ public class ContextSelectorControl extends AbstractDecoratedDialogPageControl i
 	 * @return The style bits to apply to the tree viewer.
 	 */
 	protected int getTreeViewerStyle() {
-		return SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER;
+		return SWT.CHECK | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.MULTI;
 	}
 
 	/**
@@ -655,28 +718,17 @@ public class ContextSelectorControl extends AbstractDecoratedDialogPageControl i
 	}
 
 	/**
-	 * Called from the default check state listener implementation if the checked state of the
-	 * passed in model node has changed.
-	 *
-	 * @param node The model node. Must not be <code>null</code>.
-	 * @param checked <code>True</code> if the model node has been checked, <code>false</code> if
-	 *            unchecked.
-	 */
-	protected void onModelNodeCheckStateChanged(IModelNode node, boolean checked) {
-		// validate the parent page if there is one set
-		if (getParentPage() instanceof IValidatingContainer) {
-			((IValidatingContainer) getParentPage()).validate();
-		}
-	}
-
-	/**
 	 * Returns the initial input object to set to the controls tree viewer.
 	 *
 	 * @return The initial viewer input to set or <code>null</code> if none.
 	 */
-	protected Object getInitialViewerInput() {
-		return ViewRoot.getInstance();
-	}
+	protected abstract Object getInitialViewerInput();
+
+	/**
+	 * Configure content and label provider.
+	 * @param viewer The tree viewer.
+	 */
+	protected abstract void doConfigureTreeContentAndLabelProvider(TreeViewer viewer);
 
 	/**
 	 * Enables the tree control.
@@ -758,5 +810,86 @@ public class ContextSelectorControl extends AbstractDecoratedDialogPageControl i
 				listener.selectionChanged(event);
 			}
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.controls.BaseControl#isValid()
+	 */
+	@Override
+	public boolean isValid() {
+		boolean valid = super.isValid();
+
+		// If there is a last failure cause set, show that failure cause
+		valid = getLastFailureCause() == null;
+		if (!valid) {
+			setMessage(getLastFailureCause().getLocalizedMessage(), IMessageProvider.ERROR);
+		}
+
+		// The remote context selector control is only valid, if at least one
+		// element has been checked (if operating with CHECK style set)
+		if (valid && (getTreeViewerStyle() & SWT.CHECK) != 0 && requireSelection) {
+			int count = getCheckedModelContexts().length;
+			valid = count == 1 || (count > 1 && getPropertiesContainer().isProperty(PROPERTY_MULTI_CONTEXT_SELECTOR, true));
+
+			// if we are not valid here, it can only mean, that there is
+			// no connectable checked.
+			if (!valid) {
+				String messageId = "RemoteContextSelectorControl_error_noContextSelected"; //$NON-NLS-1$
+				if (getPropertiesContainer().isProperty(PROPERTY_MULTI_CONTEXT_SELECTOR, true)) {
+					messageId += "_multi"; //$NON-NLS-1$
+				}
+				else {
+					messageId += "_single"; //$NON-NLS-1$
+				}
+
+				setMessage(getMessageForId(messageId), getMessageTypeForId(messageId, IMessageProvider.ERROR));
+			}
+		}
+
+		if (getControlDecoration() != null) {
+			// Setup and show the control decoration if necessary
+			if (isEnabled() && (!valid || (getMessage() != null && getMessageType() != IMessageProvider.NONE))) {
+				// Update the control decorator
+				updateControlDecoration(getMessage(), getMessageType());
+			} else {
+				updateControlDecoration(null, IMessageProvider.NONE);
+			}
+		}
+
+
+		return valid;
+	}
+
+	/**
+	 * Returns the message text for the given message id. Subclass in case different
+	 * message text should be used for standard messages.
+	 *
+	 * @param messageId The message id. Must be not <code>null</code>.
+	 * @return The message text.
+	 */
+	protected String getMessageForId(String messageId) {
+		Assert.isNotNull(messageId);
+		return Messages.getString(messageId);
+	}
+
+	/**
+	 * Returns the message type for the given message id. Subclass in case different
+	 * message types should by used for standard messages. The default implementation
+	 * returns the proposed message type unchanged.
+	 *
+	 * @param messageId The message id. Must be not <code>null</code>.
+	 * @param proposed The proposed message type.
+	 * @return The message type for the given message id.
+	 */
+	protected int getMessageTypeForId(String messageId, int proposed) {
+		Assert.isNotNull(messageId);
+		return proposed;
+	}
+
+	/**
+	 * Configures whether a selection is required or not.
+	 */
+	public void setRequireSelection(boolean value) {
+		requireSelection = value;
 	}
 }

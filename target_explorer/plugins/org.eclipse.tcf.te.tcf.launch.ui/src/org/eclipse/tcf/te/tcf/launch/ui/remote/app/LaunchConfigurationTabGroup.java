@@ -14,20 +14,17 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
+import org.eclipse.tcf.te.launch.ui.tabs.AbstractLaunchConfigurationTabGroup;
 import org.eclipse.tcf.te.launch.ui.tabs.projects.ReferencedProjetcsTab;
 import org.eclipse.tcf.te.tcf.launch.ui.remote.app.filetransfer.FileTransferTab;
 
 /**
  * Remote application launch configuration tab group implementation.
  */
-public class LaunchConfigurationTabGroup extends org.eclipse.tcf.te.launch.ui.tabs.LaunchConfigurationTabGroup {
+public class LaunchConfigurationTabGroup extends AbstractLaunchConfigurationTabGroup {
 
-	/**
-	 * Create the context processImage tab.
-	 *
-	 * @param dialog The launch configuration dialog this tab group is contained in.
-	 * @param tabs The list of launch configuration tabs. Must not be <code>null</code>.
-	 * @param mode The mode the launch configuration dialog was opened in.
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.launch.ui.tabs.AbstractLaunchContextConfigurationTabGroup#createContextSelectorTab(org.eclipse.debug.ui.ILaunchConfigurationDialog, java.util.List, java.lang.String)
 	 */
 	@Override
 	public void createContextSelectorTab(ILaunchConfigurationDialog dialog, List<ILaunchConfigurationTab> tabs, String mode) {
@@ -37,6 +34,9 @@ public class LaunchConfigurationTabGroup extends org.eclipse.tcf.te.launch.ui.ta
 		tabs.add(tab);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.launch.ui.tabs.AbstractLaunchContextConfigurationTabGroup#createAdditionalTabs(org.eclipse.debug.ui.ILaunchConfigurationDialog, java.util.List, java.lang.String)
+	 */
 	@Override
 	public void createAdditionalTabs(ILaunchConfigurationDialog dialog, List<ILaunchConfigurationTab> tabs, String mode) {
 

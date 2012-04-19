@@ -9,11 +9,16 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.launch.ui.tabs;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
+import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.tcf.te.launch.core.lm.LaunchManager;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchManagerDelegate;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification;
@@ -42,9 +47,47 @@ public abstract class AbstractLaunchConfigurationTabGroup extends org.eclipse.de
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTabGroup#createTabs(org.eclipse.debug.ui.ILaunchConfigurationDialog, java.lang.String)
 	 */
 	@Override
-    public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
+	public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
 		this.dialog = dialog;
 		this.mode = mode;
+
+		// The list of tabs to be set to the launch tab group
+		List<ILaunchConfigurationTab> tabs = new ArrayList<ILaunchConfigurationTab>();
+
+		// Create the default launch tabs
+		createContextSelectorTab(dialog, tabs, mode);
+
+		// Create and add any additional launch tabs
+		createAdditionalTabs(dialog, tabs, mode);
+
+		// Apply the tabs
+		setTabs(tabs.toArray(new ILaunchConfigurationTab[tabs.size()]));
+	}
+
+	/**
+	 * Create the context selector tab.
+	 *
+	 * @param dialog The launch configuration dialog this tab group is contained in.
+	 * @param tabs The list of launch configuration tabs. Must not be <code>null</code>.
+	 * @param mode The mode the launch configuration dialog was opened in.
+	 */
+	public void createContextSelectorTab(ILaunchConfigurationDialog dialog, List<ILaunchConfigurationTab> tabs, String mode) {
+		Assert.isNotNull(tabs);
+	}
+
+	/**
+	 * Hook for subclasses to overwrite to add additional launch configuration tabs to the given
+	 * tab list.
+	 * <p>
+	 * Called from {@link #createTabs(ILaunchConfigurationDialog, String)} before setting the tabs list
+	 * to the launch configuration tab group.
+	 *
+	 * @param dialog The launch configuration dialog this tab group is contained in.
+	 * @param tabs The list of launch configuration tabs. Must not be <code>null</code>.
+	 * @param mode The mode the launch configuration dialog was opened in.
+	 */
+	public void createAdditionalTabs(ILaunchConfigurationDialog dialog, List<ILaunchConfigurationTab> tabs, String mode) {
+		Assert.isNotNull(tabs);
 	}
 
 	/*
@@ -101,7 +144,9 @@ public abstract class AbstractLaunchConfigurationTabGroup extends org.eclipse.de
 					ILaunchSpecification launchSpec = delegate.getLaunchSpecification(launchConfigTypeId, launchSelection);
 					// initialize the new launch configuration.
 					// ignore validation result of launch spec - init as much attributes as possible
-					if (launchSpec != null) delegate.initLaunchConfigAttributes(configuration, launchSpec);
+					if (launchSpec != null) {
+						delegate.initLaunchConfigAttributes(configuration, launchSpec);
+					}
 				}
 			}
 			catch (CoreException e) {

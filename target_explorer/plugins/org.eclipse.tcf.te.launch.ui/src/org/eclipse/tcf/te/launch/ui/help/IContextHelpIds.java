@@ -20,4 +20,9 @@ public interface IContextHelpIds {
 	 * UI plug-in common context help id prefix.
 	 */
 	public final static String PREFIX = UIPlugin.getUniqueIdentifier() + "."; //$NON-NLS-1$
+
+	/**
+	 * Launch editor page.
+	 */
+	public final static String LAUNCH_EDITOR = PREFIX + "LaunchEditor"; //$NON-NLS-1$
 }

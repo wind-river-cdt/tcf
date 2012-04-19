@@ -13,21 +13,29 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tcf.te.launch.ui.tabs.launchcontext.LaunchContextSelectorTab;
+import org.eclipse.tcf.te.launch.ui.tabs.launchcontext.AbstractContextSelectorTab;
+import org.eclipse.tcf.te.tcf.launch.ui.remote.app.launchcontext.ContextSelectorSection;
 import org.eclipse.tcf.te.ui.forms.CustomFormToolkit;
+import org.eclipse.ui.forms.IManagedForm;
 
 /**
  * Remote application main launch tab implementation.
  */
-public class LaunchConfigurationMainTab extends LaunchContextSelectorTab {
+public class LaunchConfigurationMainTab extends AbstractContextSelectorTab {
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.launch.ui.tabs.launchcontext.LaunchContextSelectorTab#doCreateFormContent(org.eclipse.swt.widgets.Composite, org.eclipse.tcf.te.ui.forms.CustomFormToolkit)
+	 * @see org.eclipse.tcf.te.launch.ui.tabs.launchcontext.AbstractContextSelectorTab#doCreateContextSelectorSection(org.eclipse.ui.forms.IManagedForm, org.eclipse.swt.widgets.Composite)
 	 */
 	@Override
-	protected void doCreateFormContent(Composite parent, CustomFormToolkit toolkit) {
-		super.doCreateFormContent(parent, toolkit);
+	protected ContextSelectorSection doCreateContextSelectorSection(IManagedForm form, Composite panel) {
+		return new ContextSelectorSection(form, panel);
+	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.launch.ui.tabs.launchcontext.AbstractContextSelectorTab#doCreateAdditionalFormContent(org.eclipse.ui.forms.IManagedForm, org.eclipse.swt.widgets.Composite, org.eclipse.tcf.te.ui.forms.CustomFormToolkit)
+	 */
+	@Override
+	protected void doCreateAdditionalFormContent(IManagedForm form, Composite parent, CustomFormToolkit toolkit) {
 		// Setup the main panel (using the table wrap layout)
 		Composite panel = toolkit.getFormToolkit().createComposite(parent);
 		GridLayout	layout = new GridLayout(1, false);
@@ -35,8 +43,8 @@ public class LaunchConfigurationMainTab extends LaunchContextSelectorTab {
 		panel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		panel.setBackground(parent.getBackground());
 
-		LaunchConfigurationMainTabSection section = new LaunchConfigurationMainTabSection(getManagedForm(), panel);
+		LaunchConfigurationMainTabSection section = new LaunchConfigurationMainTabSection(form, panel);
 		section.getSection().setLayoutData(new GridData(GridData.FILL_BOTH));
-		getManagedForm().addPart(section);
+		form.addPart(section);
 	}
 }

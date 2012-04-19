@@ -91,5 +91,7 @@ public class Messages extends NLS {
 	public static String ReferencedProjectsSection_down_button;
 	public static String ReferencedProjectsSection_addDialog_message;
 
+	public static String LaunchEditorPage_title;
+
 
 }

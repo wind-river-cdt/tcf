@@ -16,15 +16,16 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tcf.te.launch.ui.nls.Messages;
 import org.eclipse.tcf.te.launch.ui.tabs.AbstractFormsLaunchConfigurationTab;
 import org.eclipse.tcf.te.ui.forms.CustomFormToolkit;
+import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
 
 /**
- * Context selector launch configuration tab implementation.
+ * Abstract context selector launch configuration tab implementation.
  */
-public class LaunchContextSelectorTab extends AbstractFormsLaunchConfigurationTab {
+public abstract class AbstractContextSelectorTab extends AbstractFormsLaunchConfigurationTab {
 	// References to the tab sub sections
-	private LaunchContextSelectorSection selectorSection;
+	private AbstractContextSelectorSection selectorSection;
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.launch.ui.tabs.AbstractFormsLaunchConfigurationTab#dispose()
@@ -32,14 +33,14 @@ public class LaunchContextSelectorTab extends AbstractFormsLaunchConfigurationTa
 	@Override
 	public void dispose() {
 		if (selectorSection != null) { selectorSection.dispose(); selectorSection = null; }
-	    super.dispose();
+		super.dispose();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.launch.ui.tabs.AbstractFormsLaunchConfigurationTab#doCreateFormContent(org.eclipse.swt.widgets.Composite, org.eclipse.tcf.te.ui.forms.CustomFormToolkit)
 	 */
 	@Override
-	protected void doCreateFormContent(Composite parent, CustomFormToolkit toolkit) {
+	protected final void doCreateFormContent(Composite parent, CustomFormToolkit toolkit) {
 		Assert.isNotNull(parent);
 		Assert.isNotNull(toolkit);
 
@@ -52,10 +53,29 @@ public class LaunchContextSelectorTab extends AbstractFormsLaunchConfigurationTa
 		panel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		panel.setBackground(parent.getBackground());
 
-		selectorSection = new LaunchContextSelectorSection(getManagedForm(), panel);
+		selectorSection = doCreateContextSelectorSection(getManagedForm(), panel);
 		selectorSection.getSection().setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB, TableWrapData.TOP));
 		getManagedForm().addPart(selectorSection);
+
+		doCreateAdditionalFormContent(getManagedForm(), parent, toolkit);
 	}
+
+	/**
+	 * Do create additional managed form content.
+	 *
+	 * @param form The managed form.
+	 * @param parent The parent composite. Must not be <code>null</code>
+	 * @param toolkit The {@link CustomFormToolkit} instance. Must not be <code>null</code>.
+	 */
+	protected abstract void doCreateAdditionalFormContent(IManagedForm form, Composite parent, CustomFormToolkit toolkit);
+
+	/**
+	 * Create the context selector section
+	 * @param form The managed form.
+	 * @param panel The panel.
+	 * @return The context selector section.
+	 */
+	protected abstract AbstractContextSelectorSection doCreateContextSelectorSection(IManagedForm form, Composite panel);
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getName()

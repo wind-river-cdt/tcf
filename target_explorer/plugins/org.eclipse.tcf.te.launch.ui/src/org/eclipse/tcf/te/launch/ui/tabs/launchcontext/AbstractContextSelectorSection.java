@@ -34,11 +34,11 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
 /**
- * Context selector section implementation.
+ * Abstract context selector section implementation.
  */
-public class LaunchContextSelectorSection extends AbstractSection implements ILaunchConfigurationTabFormPart {
+public abstract class AbstractContextSelectorSection extends AbstractSection implements ILaunchConfigurationTabFormPart {
 	// Reference to the section sub controls
-	/* default */ LaunchContextSelectorControl selector;
+	/* default */ AbstractContextSelectorControl selector;
 
 	/**
 	 * Context selector control refresh action implementation.
@@ -71,7 +71,7 @@ public class LaunchContextSelectorSection extends AbstractSection implements ILa
 	 * @param form The parent managed form. Must not be <code>null</code>.
 	 * @param parent The parent composite. Must not be <code>null</code>.
 	 */
-	public LaunchContextSelectorSection(IManagedForm form, Composite parent) {
+	public AbstractContextSelectorSection(IManagedForm form, Composite parent) {
 		super(form, parent, ExpandableComposite.TWISTIE | ExpandableComposite.EXPANDED);
 		getSection().setBackground(parent.getBackground());
 		createClient(getSection(), form.getToolkit());
@@ -99,18 +99,16 @@ public class LaunchContextSelectorSection extends AbstractSection implements ILa
 		createSectionToolbar(section, toolkit);
 
 		// Create the section sub controls
-		selector = new LaunchContextSelectorControl(null) {
-			/* (non-Javadoc)
-			 * @see org.eclipse.tcf.te.launch.ui.tabs.launchcontext.LaunchContextSelectorControl#onModelNodeCheckStateChanged(org.eclipse.tcf.te.runtime.model.interfaces.IModelNode, boolean)
-			 */
-			@Override
-			protected void onModelNodeCheckStateChanged(IModelNode node, boolean checked) {
-				getManagedForm().dirtyStateChanged();
-			}
-		};
+		selector = doCreateContextSelector();
 		selector.setFormToolkit(toolkit);
 		selector.setupPanel(client);
 	}
+
+	/**
+	 * Create the context selector control.
+	 * @return The context selector control.
+	 */
+	protected abstract AbstractContextSelectorControl doCreateContextSelector();
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.forms.AbstractFormPart#dispose()

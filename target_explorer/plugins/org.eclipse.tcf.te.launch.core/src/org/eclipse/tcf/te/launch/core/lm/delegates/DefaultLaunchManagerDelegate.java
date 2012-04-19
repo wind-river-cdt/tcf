@@ -191,6 +191,9 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 	 */
 	@Override
 	public String getDefaultLaunchName(ILaunchSpecification launchSpec) {
+		if (launchSpec.getLaunchConfigName() != null) {
+			return launchSpec.getLaunchConfigName();
+		}
 		return Messages.DefaultLaunchManagerDelegate_defaultLaunchName;
 	}
 

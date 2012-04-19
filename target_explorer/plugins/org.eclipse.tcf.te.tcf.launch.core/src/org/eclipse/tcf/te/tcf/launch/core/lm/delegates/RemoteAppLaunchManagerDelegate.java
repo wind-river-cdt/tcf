@@ -23,6 +23,7 @@ import org.eclipse.tcf.te.launch.core.lm.interfaces.IFileTransferLaunchAttribute
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchContextLaunchAttributes;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.IReferencedProjectLaunchAttributes;
+import org.eclipse.tcf.te.launch.core.nls.Messages;
 import org.eclipse.tcf.te.launch.core.persistence.filetransfer.FileTransfersPersistenceDelegate;
 import org.eclipse.tcf.te.launch.core.persistence.launchcontext.LaunchContextsPersistenceDelegate;
 import org.eclipse.tcf.te.launch.core.persistence.projects.ReferencedProjectItem;
@@ -31,13 +32,17 @@ import org.eclipse.tcf.te.launch.core.selection.interfaces.IProjectSelectionCont
 import org.eclipse.tcf.te.launch.core.selection.interfaces.IRemoteSelectionContext;
 import org.eclipse.tcf.te.launch.core.selection.interfaces.ISelectionContext;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
+import org.eclipse.tcf.te.runtime.services.ServiceManager;
 import org.eclipse.tcf.te.runtime.services.filetransfer.FileTransferItem;
+import org.eclipse.tcf.te.runtime.services.interfaces.IPropertiesAccessService;
+import org.eclipse.tcf.te.runtime.services.interfaces.constants.IPropertiesAccessServiceConstants;
 import org.eclipse.tcf.te.runtime.services.interfaces.filetransfer.IFileTransferItem;
 import org.eclipse.tcf.te.tcf.launch.core.interfaces.IRemoteAppLaunchAttributes;
 
 /**
  * RemoteAppLaunchManagerDelegate
  */
+@SuppressWarnings("restriction")
 public class RemoteAppLaunchManagerDelegate extends DefaultLaunchManagerDelegate {
 
 	/**
@@ -76,11 +81,25 @@ public class RemoteAppLaunchManagerDelegate extends DefaultLaunchManagerDelegate
 				launchContexts.add(remoteCtx);
 				LaunchContextsPersistenceDelegate.setLaunchContexts(launchSpec, launchContexts.toArray(new IModelNode[launchContexts.size()]));
 			}
+
+			IPropertiesAccessService service = ServiceManager.getInstance().getService(remoteCtx, IPropertiesAccessService.class);
+			String ctxName = service != null ? (String)service.getTargetAddress(remoteCtx).get(IPropertiesAccessServiceConstants.PROP_ADDRESS) : null;
+
+			if (ctxName != null) {
+				if (launchSpec.getLaunchConfigName() == null ||
+								Messages.DefaultLaunchManagerDelegate_defaultLaunchName.equals(launchSpec.getLaunchConfigName())) {
+					launchSpec.setLaunchConfigName(ctxName);
+				}
+				else {
+					launchSpec.setLaunchConfigName(launchSpec.getLaunchConfigName() + " (" + ctxName + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			}
 		}
 		else if (selectionContext instanceof IProjectSelectionContext) {
 			List<IFileTransferItem> transfers = new ArrayList<IFileTransferItem>(Arrays.asList(FileTransfersPersistenceDelegate.getFileTransfers(launchSpec)));
 			List<IReferencedProjectItem> projects = new ArrayList<IReferencedProjectItem>(Arrays.asList(ReferencedProjectsPersistenceDelegate.getReferencedProjects(launchSpec)));
-			String processImage = null;
+			String processName = null;
+			String processPath = null;
 
 			boolean added = false;
 			for (Object selection : selectionContext.getSelections()) {
@@ -93,7 +112,8 @@ public class RemoteAppLaunchManagerDelegate extends DefaultLaunchManagerDelegate
 					transfer.setProperty(IFileTransferItem.PROPERTY_TARGET, new Path("/tmp/").toPortableString()); //$NON-NLS-1$
 					transfers.add(transfer);
 					if (!added) {
-						processImage = "/tmp/" + path.lastSegment(); //$NON-NLS-1$
+						processName = path.lastSegment();
+						processPath = "/tmp/" + processName; //$NON-NLS-1$
 					}
 					added = true;
 				}
@@ -108,7 +128,15 @@ public class RemoteAppLaunchManagerDelegate extends DefaultLaunchManagerDelegate
 
 			FileTransfersPersistenceDelegate.setFileTransfers(launchSpec, transfers.toArray(new IFileTransferItem[transfers.size()]));
 			ReferencedProjectsPersistenceDelegate.setReferencedProjects(launchSpec, projects.toArray(new IReferencedProjectItem[projects.size()]));
-			launchSpec.addAttribute(IRemoteAppLaunchAttributes.ATTR_PROCESS_IMAGE, processImage);
+			launchSpec.addAttribute(IRemoteAppLaunchAttributes.ATTR_PROCESS_IMAGE, processPath);
+
+			if (launchSpec.getLaunchConfigName() == null ||
+							Messages.DefaultLaunchManagerDelegate_defaultLaunchName.equals(launchSpec.getLaunchConfigName())) {
+				launchSpec.setLaunchConfigName(processName);
+			}
+			else {
+				launchSpec.setLaunchConfigName(processName + " (" + launchSpec.getLaunchConfigName() + ")");  //$NON-NLS-1$//$NON-NLS-2$
+			}
 		}
 
 		return launchSpec;
