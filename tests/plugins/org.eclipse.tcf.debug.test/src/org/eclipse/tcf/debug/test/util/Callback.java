@@ -265,22 +265,24 @@ public class Callback {
      * issued.  Even if the request was canceled.
      * </p>  
      */
-    public synchronized void done() {
-        assert Protocol.getEventQueue().isDispatchThread();
-        
-        if (fDone) {
-            throw new IllegalStateException("Callback: " + this + ", done() method called more than once");  //$NON-NLS-1$//$NON-NLS-2$
-        }
-        fDone = true;
-        
-        // This Callback is done, it can no longer be canceled.
-        // We must clear the list of cancelListeners because it causes a
-        // circular reference between parent and child Callback, which
-        // causes a memory leak.
-        fCancelListeners = null;
-        
-        if (fParentCallback != null) {
-            fParentCallback.removeCancelListener(fCanceledListener);
+    public void done() {
+        synchronized(this) {
+            assert Protocol.getEventQueue().isDispatchThread();
+            
+            if (fDone) {
+                throw new IllegalStateException("Callback: " + this + ", done() method called more than once");  //$NON-NLS-1$//$NON-NLS-2$
+            }
+            fDone = true;
+            
+            // This Callback is done, it can no longer be canceled.
+            // We must clear the list of cancelListeners because it causes a
+            // circular reference between parent and child Callback, which
+            // causes a memory leak.
+            fCancelListeners = null;
+            
+            if (fParentCallback != null) {
+                fParentCallback.removeCancelListener(fCanceledListener);
+            }
         }
         
         handleCompleted();

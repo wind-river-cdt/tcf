@@ -22,7 +22,7 @@ import org.eclipse.tcf.protocol.Protocol;
 /**
  * @since 2.2
  */
-public abstract class Transaction<V>  implements Future<V> {
+public abstract class Transaction<V>  implements Future<V>, Runnable {
 
 	/**
 	 * The exception we throw when the client transaction logic asks us to
@@ -60,7 +60,7 @@ public abstract class Transaction<V>  implements Future<V> {
         }
         fRm = rm;
         assert fRm != null;
-        execute();
+        run();
     }
 
     protected void preProcess() {}
@@ -112,7 +112,9 @@ public abstract class Transaction<V>  implements Future<V> {
      * @throws CoreException Exception indicating that one of the caches is 
      * in error state and transaction cannot be processed.
 	 */
-    abstract protected V process() throws InvalidCacheException, ExecutionException;
+    protected V process() throws InvalidCacheException, ExecutionException {
+        return null;
+    }
 
     /**
      * Can be called only while in process().
@@ -135,10 +137,16 @@ public abstract class Transaction<V>  implements Future<V> {
 	/**
 	 * Method which invokes the transaction logic and handles any exception that
 	 * may result. If that logic encounters a stale/unset cache object, then we
-	 * simply do nothing. This method will be called again once the cache
-	 * objects tell us it has obtained an updated value form the source.
+	 * simply do nothing. This method can be invoked by transaction logic when 
+	 * caches have become valid, thus unblocking transaction processing.  
 	 */
-    private void execute() {
+    public void run() {
+        // If execute is called after transaction completes (as a result of a 
+        // cancelled request completing for example), ignore it. 
+        if (fRm == null) {
+            return;
+        }
+        
         if (fRm.isCanceled()) {
             fRm.done();
             fRm = null;
@@ -156,8 +164,8 @@ public abstract class Transaction<V>  implements Future<V> {
     }
 
 	/**
-	 * Clients must call one of our validate methods prior to using (calling
-	 * getData()) on data cache object.
+	 * Clients must call one of the validate methods prior to using (calling
+	 * getData()) on data cache object.  
 	 * 
 	 * @param cache
 	 *            the object being validated
@@ -180,7 +188,7 @@ public abstract class Transaction<V>  implements Future<V> {
             cache.update(new Callback(fRm) {
                 @Override
                 protected void handleCompleted() {
-                    execute();
+                    run();
                 }
             });
             throw INVALID_CACHE_EXCEPTION;
@@ -188,15 +196,15 @@ public abstract class Transaction<V>  implements Future<V> {
     }
 
     /**
-     * See {@link #validate(RequestCache)}. This variant simply validates
+     * See {@link #validate(ICache)}. This variant simply validates
      * multiple cache objects.
      */
-    public <T> void  validate(ICache<?> ... caches) throws InvalidCacheException, ExecutionException {
+    public void  validate(ICache<?> ... caches) throws InvalidCacheException, ExecutionException {
         validate(Arrays.asList(caches));
     }
 
     /**
-     * See {@link #validate(RequestCache)}. This variant simply validates
+     * See {@link #validate(ICache)}. This variant validates
      * multiple cache objects.
      */
     public void validate(@SuppressWarnings("rawtypes") Iterable caches) throws InvalidCacheException, ExecutionException {
@@ -220,7 +228,7 @@ public abstract class Transaction<V>  implements Future<V> {
             AggregateCallback countringRm = new AggregateCallback(fRm) {
                 @Override
                 protected void handleCompleted() {
-                    execute();
+                    run();
                 }
             };
             int count = 0;
@@ -234,6 +242,81 @@ public abstract class Transaction<V>  implements Future<V> {
             countringRm.setDoneCount(count);
             throw INVALID_CACHE_EXCEPTION;
         }        
+    }
+
+    /**
+     * See {@link #validate(ICache)}.  This variant does not throw exceptions, 
+     * instead it returns <code>false</code> if the cache is not valid.  If the 
+     * given cache is valid, and this method returns <code>true</code>, clients 
+     * must still check if the cache contains an error before retrieving its 
+     * data through {@link ICache#getData()}.
+     * 
+     * @param cache the object being validated
+     * @return returns <code>false</code> if the cache is not yet valid and 
+     * transaction processing should be interrupted.
+     */
+    public boolean validateUnchecked(ICache<?> cache) {
+        if (cache.isValid()) {
+            return true;
+        } else {
+            // Just sk the cache to update itself from its source, and schedule a 
+            // re-attempt of the transaction logic to occur when the stale/unset 
+            // cache has been updated
+            cache.update(new Callback(fRm) {
+                @Override
+                protected void handleCompleted() {
+                    run();
+                }
+            });
+            return false;
+        }        
+    }
+    
+    /**
+     * See {@link #validate(ICache)}. This variant validates
+     * multiple cache objects.
+     */
+    public boolean validateUnchecked(ICache<?> ... caches) {
+        return validateUnchecked(Arrays.asList(caches));
+    }
+
+    
+    /**
+     * See {@link #validate(ICache)}. This variant validates
+     * multiple cache objects.
+     */
+    public boolean validateUnchecked(@SuppressWarnings("rawtypes") Iterable caches) {
+        // Check if all caches are valid
+        boolean allValid = true;
+        
+        for (Object cacheObj : caches) {
+            ICache<?> cache = (ICache<?>)cacheObj;
+            if (!cache.isValid()) {
+                allValid = false;
+            }
+        }
+        if (allValid) {
+            return true;
+        }
+        
+        // Just schedule a re-attempt of the transaction logic, to occur 
+        // when the stale/unset cache objects have been updated
+        AggregateCallback countringRm = new AggregateCallback(fRm) {
+            @Override
+            protected void handleCompleted() {
+                run();
+            }
+        };
+        int count = 0;
+        for (Object cacheObj : caches) {
+            ICache<?> cache = (ICache<?>)cacheObj;
+            if (!cache.isValid()) {
+                cache.update(countringRm);
+                count++;
+            }
+        }
+        countringRm.setDoneCount(count);
+        return false;
     }
 
     private synchronized Query<V> getQuery(boolean create) {

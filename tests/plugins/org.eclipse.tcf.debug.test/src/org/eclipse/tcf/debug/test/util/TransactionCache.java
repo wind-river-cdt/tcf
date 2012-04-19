@@ -87,7 +87,7 @@ public abstract class TransactionCache<V> extends Transaction<V> implements ICac
      * Can be called while in {@link #process()}
      * @param cache
      */
-    public void addDependsOn(ICache cache) {
+    public void addDependsOn(ICache<?> cache) {
         fDependsOn.add(cache);
     }
     
@@ -99,7 +99,7 @@ public abstract class TransactionCache<V> extends Transaction<V> implements ICac
     }
     
     @Override
-    public void validate(Iterable caches) throws InvalidCacheException, ExecutionException {
+    public void validate(@SuppressWarnings("rawtypes") Iterable caches) throws InvalidCacheException, ExecutionException {
         for (Object cacheObj : caches) {
             ICache<?> cache = (ICache<?>)cacheObj;
             if (cache.isValid()) {
@@ -107,5 +107,24 @@ public abstract class TransactionCache<V> extends Transaction<V> implements ICac
             }
         }
         super.validate(caches);
+    }
+    
+    @Override
+    public boolean validateUnchecked(ICache<?> cache) {
+        if (cache.isValid()) {
+            addDependsOn(cache);
+        }
+        return super.validateUnchecked(cache);
+    }
+    
+    @Override
+    public boolean validateUnchecked(@SuppressWarnings("rawtypes") Iterable caches) {
+        for (Object cacheObj : caches) {
+            ICache<?> cache = (ICache<?>)cacheObj;
+            if (cache.isValid()) {
+                addDependsOn(cache);
+            }
+        }
+        return super.validateUnchecked(caches);
     }
 }

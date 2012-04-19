@@ -17,6 +17,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 
+import org.eclipse.tcf.debug.test.services.ResetMap.IResettable;
 import org.eclipse.tcf.debug.test.util.CallbackCache;
 import org.eclipse.tcf.debug.test.util.DataCallback;
 import org.eclipse.tcf.debug.test.util.ICache;
@@ -154,7 +155,7 @@ public class RunControlCM extends AbstractCacheManager implements RunControlList
     }
 
     
-    private class ContextStateCache extends CallbackCache<ContextState> {
+    private class ContextStateCache extends CallbackCache<ContextState> implements IResettable {
         
         private class InnerContextStateCache extends TokenCache<ContextState> implements IRunControl.DoneGetState {
             private final RunControlContext fContext;
@@ -327,7 +328,7 @@ public class RunControlCM extends AbstractCacheManager implements RunControlList
             listener.containerResumed(context_ids);
         }
         
-        for (Map.Entry<Key<?>, ICache<?>> entry: fMap.entrySet()) {
+        for (Map.Entry<Key<?>, Object> entry: fMap.entrySet()) {
             if (entry.getKey() instanceof IdEventKey) {
                 IdEventKey<?> eventKey = (IdEventKey<?>)entry.getKey();
                 if ( WaitForContainerResumedCache.class.equals(eventKey.getCacheClass()) &&
@@ -361,7 +362,7 @@ public class RunControlCM extends AbstractCacheManager implements RunControlList
             listener.containerSuspended(context, pc, reason, params, suspended_ids);
         }
 
-        for (Map.Entry<Key<?>, ICache<?>> entry: fMap.entrySet()) {
+        for (Map.Entry<Key<?>, Object> entry: fMap.entrySet()) {
             if (entry.getKey() instanceof IdEventKey) {
                 IdEventKey<?> eventKey = (IdEventKey<?>)entry.getKey();
                 if ( WaitForContainerSuspendedCache.class.equals( eventKey.getCacheClass() ) &&
@@ -413,7 +414,7 @@ public class RunControlCM extends AbstractCacheManager implements RunControlList
         }
 
         // TODO: avoid iterating over all entries, use separate list for events.
-        for (Map.Entry<Key<?>, ICache<?>> entry: fMap.entrySet()) {
+        for (Map.Entry<Key<?>, Object> entry: fMap.entrySet()) {
             if (entry.getKey() instanceof IdEventKey) {
                 IdEventKey<?> eventKey = (IdEventKey<?>)entry.getKey();
                 if ( WaitForContextSuspendedCache.class.equals( eventKey.getCacheClass() ) &&
@@ -456,7 +457,7 @@ public class RunControlCM extends AbstractCacheManager implements RunControlList
         }        
         
         // TODO: avoid iterating over all entries, use separate list for events.
-        for (Map.Entry<Key<?>, ICache<?>> entry: fMap.entrySet()) {
+        for (Map.Entry<Key<?>, Object> entry: fMap.entrySet()) {
             if (entry.getKey() instanceof IdEventKey) {
                 IdEventKey<?> eventKey = (IdEventKey<?>)entry.getKey();
                 if ( WaitForContextResumedCache.class.equals( eventKey.getCacheClass() ) &&
@@ -483,7 +484,7 @@ public class RunControlCM extends AbstractCacheManager implements RunControlList
         fStateResetMap.reset(id);
         
         // TODO: avoid iterating over all entries, use separate list for events.
-        for (Map.Entry<Key<?>, ICache<?>> entry: fMap.entrySet()) {
+        for (Map.Entry<Key<?>, Object> entry: fMap.entrySet()) {
             if (entry.getKey() instanceof IdEventKey) {
                 IdEventKey<?> eventKey = (IdEventKey<?>)entry.getKey();
                 if ( WaitForContextExceptionCache.class.equals( eventKey.getCacheClass() ) &&
@@ -547,7 +548,7 @@ public class RunControlCM extends AbstractCacheManager implements RunControlList
             fChildrenResetMap.reset(parent, false, false);
         }
         
-        for (Map.Entry<Key<?>, ICache<?>> entry: fMap.entrySet()) {
+        for (Map.Entry<Key<?>, Object> entry: fMap.entrySet()) {
             if (entry.getKey() instanceof ContextEventKey) {
                 ContextEventKey<?> eventKey = (ContextEventKey<?>)entry.getKey();
                 if ( WaitForContextAddedCache.class.equals( eventKey.getCacheClass()) &&
@@ -580,7 +581,7 @@ public class RunControlCM extends AbstractCacheManager implements RunControlList
             fChildrenResetMap.reset(context.getID(), true, false);
         }
         
-        for (Map.Entry<Key<?>, ICache<?>> entry: fMap.entrySet()) {
+        for (Map.Entry<Key<?>, Object> entry: fMap.entrySet()) {
             if (entry.getKey() instanceof ContextEventKey) {
                 ContextEventKey<?> eventKey = (ContextEventKey<?>)entry.getKey();
                 if ( WaitForContextChangedCache.class.equals( eventKey.getCacheClass()) && 
@@ -614,7 +615,7 @@ public class RunControlCM extends AbstractCacheManager implements RunControlList
             fStateResetMap.reset(context_id);
         }
         
-        for (Map.Entry<Key<?>, ICache<?>> entry: fMap.entrySet()) {
+        for (Map.Entry<Key<?>, Object> entry: fMap.entrySet()) {
             if (entry.getKey() instanceof IdEventKey) {
                 IdEventKey<?> eventKey = (IdEventKey<?>)entry.getKey();
                 if ( WaitForContextRemovedCache.class.equals( eventKey.getCacheClass()) && 

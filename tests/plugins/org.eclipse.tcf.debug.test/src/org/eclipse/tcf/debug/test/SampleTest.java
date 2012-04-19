@@ -10,10 +10,13 @@ import java.util.regex.Pattern;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.VirtualItem;
 import org.eclipse.tcf.debug.test.services.IWaitForEventCache;
 import org.eclipse.tcf.debug.test.services.RunControlCM;
+import org.eclipse.tcf.debug.test.util.ICache;
+import org.eclipse.tcf.debug.test.util.RangeCache;
 import org.eclipse.tcf.debug.test.util.Transaction;
 import org.eclipse.tcf.services.ILineNumbers.CodeArea;
 import org.eclipse.tcf.services.IRunControl;
 import org.eclipse.tcf.services.IRunControl.RunControlContext;
+import org.eclipse.tcf.services.IStackTrace.StackTraceContext;
 import org.eclipse.tcf.services.ISymbols;
 import org.eclipse.tcf.services.ISymbols.Symbol;
 import org.junit.Assert;
@@ -269,6 +272,59 @@ public class SampleTest extends AbstractTcfUITest {
             }
         }.get();
     }
+
+    public void testStackTraceCMResetOnContextStateChange() throws Exception {
+        initProcessModel("tcf_test_func2");
+        
+        // Retrieve the current PC and top frame for use later
+        final String pc = new Transaction<String>() {
+            @Override
+            protected String process() throws InvalidCacheException, ExecutionException {
+                return validate(fRunControlCM.getState(fThreadId)).pc;
+            }
+        }.get();
+
+        // Retrieve data from caches (make them valid).
+        new Transaction<Object>() {
+            @Override
+            protected String process() throws InvalidCacheException, ExecutionException {
+                String[] frameIds = validate( fStackTraceCM.getChildren(fThreadId) );
+                validate (fStackTraceCM.getContexts(frameIds));
+                RangeCache<StackTraceContext> framesRange = fStackTraceCM.getContextRange(fThreadId);
+                validate( framesRange.getRange(0, frameIds.length) );
+                return null;
+            }
+        }.get();
+        
+        
+        // Execute a step.
+        resumeAndWaitForSuspend(fThreadCtx, IRunControl.RM_STEP_OUT);
+
+        // End test, check that all caches were reset and now return an error.
+        new Transaction<Object>() {
+            @Override
+            protected Object process() throws InvalidCacheException, ExecutionException {
+                ICache<String[]> frameIdsCache = fStackTraceCM.getChildren(fThreadId);
+                Assert.assertFalse("Expected cache to be reset", frameIdsCache.isValid());
+                return null;
+            }
+        }.get();
+
+        new Transaction<Object>() {
+            @Override
+            protected Object process() throws InvalidCacheException, ExecutionException {
+                String[] frameIds = validate( fStackTraceCM.getChildren(fThreadId) );
+                ICache<StackTraceContext[]> cache = fStackTraceCM.getContexts(frameIds);
+                Assert.assertFalse("Expected cache to be reset", cache.isValid());
+
+                RangeCache<StackTraceContext> framesRange = fStackTraceCM.getContextRange(fThreadId);
+                ICache<List<StackTraceContext>> framesRangeCache = framesRange.getRange(0, frameIds.length);
+                Assert.assertFalse("Expected cache to be reset", framesRangeCache.isValid());
+
+                return null;
+            }
+        }.get();
+    }
     
     public void testRunControlCMChildrenInvalidation() throws Exception {
         initProcessModel("tcf_test_func0");
@@ -323,12 +379,14 @@ public class SampleTest extends AbstractTcfUITest {
         new Transaction<String>() {
             @Override
             protected String process() throws InvalidCacheException, ExecutionException {
-                validate( fDiagnosticsCM.cancelTest(fTestId, this) );
                 // Create wait caches
+                fRunControlCM.waitForContextRemoved(fProcessId, this);
                 IWaitForEventCache<?>[] waitCaches = new IWaitForEventCache<?>[threads.length];
                 for (int i = 0; i < threads.length; i++) {
                     waitCaches[i] = fRunControlCM.waitForContextRemoved(threads[i], this); 
                 }
+                validate( fDiagnosticsCM.cancelTest(fTestId, this) );
+                validate(waitCaches);
                 validate(fRunControlCM.waitForContextRemoved(fProcessId, this));
 
                 try {
