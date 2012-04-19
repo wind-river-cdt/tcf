@@ -12,12 +12,13 @@ package org.eclipse.tcf.debug.test.util;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.eclipse.tcf.debug.test.services.ResetMap.IResettable;
 import org.eclipse.tcf.protocol.IToken;
 
 /**
  * 
  */
-public abstract class TokenCache<V> extends AbstractCache<V> {
+public abstract class TokenCache<V> extends AbstractCache<V> implements IResettable {
 
     private AtomicReference<IToken> fToken = new AtomicReference<IToken>();
     

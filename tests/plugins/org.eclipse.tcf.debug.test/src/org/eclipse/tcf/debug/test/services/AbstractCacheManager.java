@@ -3,11 +3,9 @@ package org.eclipse.tcf.debug.test.services;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.eclipse.tcf.debug.test.util.ICache;
-
 public class AbstractCacheManager {
 
-    protected Map<Key<?>, ICache<?>> fMap = new LinkedHashMap<Key<?>, ICache<?>>();
+    protected Map<Key<?>, Object> fMap = new LinkedHashMap<Key<?>, Object>();
 
     public AbstractCacheManager() {
         super();
@@ -27,7 +25,7 @@ public class AbstractCacheManager {
         V cache = (V)fMap.get(key);
         if (cache != null) return cache;
         cache = key.createCache();
-        fMap.put(key, (ICache<?>)cache);
+        fMap.put(key, cache);
         return cache;
     }
 

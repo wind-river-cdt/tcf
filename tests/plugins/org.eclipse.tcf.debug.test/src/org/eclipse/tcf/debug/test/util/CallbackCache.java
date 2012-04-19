@@ -48,7 +48,7 @@ public abstract class CallbackCache<V> extends AbstractCache<V> {
             @Override
             public boolean isCanceled() {
                 return super.isCanceled() || CallbackCache.this.isCanceled();
-            };
+            }
         }; 
         retrieve(fRm);
     }     

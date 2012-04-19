@@ -221,37 +221,45 @@ public abstract class AbstractCache<V> implements ICache<V> {
      * canceled, or if there are no clients waiting at all. 
      */    
     protected boolean isCanceled() {
-        boolean canceled;
-        List<Callback> canceledRms = null;
+        Object waitingList = null;
         synchronized (this) {
-            if (fWaitingList instanceof Callback) {
-                if ( ((Callback)fWaitingList).isCanceled() ) {
-                    canceledRms = new ArrayList<Callback>(1);
-                    canceledRms.add((Callback)fWaitingList); 
-                    canceled = true;
-                } else {
-                    canceled = false;
-                }
-            } else if(fWaitingList instanceof Callback[]) {
-                canceled = true;
-                Callback[] waitingList = (Callback[])fWaitingList;
-                for (int i = 0; i < waitingList.length; i++) {
-                    if (waitingList[i] != null) {
-                        if (waitingList[i].isCanceled()) {
-                            if (canceledRms == null) {
-                                canceledRms = new ArrayList<Callback>(1);
-                            }
-                            canceledRms.add( waitingList[i] );
-                        } else {
-                            canceled = false;
-                        }
-                    }
-                }
+            if (fWaitingList instanceof Callback[]) {
+                waitingList = new Callback[((Callback[])fWaitingList).length];
+                System.arraycopy(fWaitingList, 0, waitingList, 0, ((Callback[]) fWaitingList).length);
             } else {
-                assert fWaitingList == null;
-                canceled = true;
+                waitingList = fWaitingList;
             }
         }
+        boolean canceled;
+        List<Callback> canceledRms = null;
+        if (waitingList instanceof Callback) {
+            if ( ((Callback)waitingList).isCanceled() ) {
+                canceledRms = new ArrayList<Callback>(1);
+                canceledRms.add((Callback)waitingList); 
+                canceled = true;
+            } else {
+                canceled = false;
+            }
+        } else if(waitingList instanceof Callback[]) {
+            canceled = true;
+            Callback[] waitingListArray = (Callback[])waitingList;
+            for (int i = 0; i < waitingListArray.length; i++) {
+                if (waitingListArray[i] != null) {
+                    if (waitingListArray[i].isCanceled()) {
+                        if (canceledRms == null) {
+                            canceledRms = new ArrayList<Callback>(1);
+                        }
+                        canceledRms.add( waitingListArray[i] );
+                    } else {
+                        canceled = false;
+                    }
+                }
+            }
+        } else {
+            assert waitingList == null;
+            canceled = true;
+        }
+        
         if (canceledRms != null) {
             final List<Callback> _canceledRms = canceledRms;
             Protocol.invokeLater(new Runnable() {

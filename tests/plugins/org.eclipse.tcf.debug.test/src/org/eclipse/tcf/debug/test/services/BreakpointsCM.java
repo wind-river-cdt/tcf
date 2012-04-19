@@ -244,7 +244,7 @@ public class BreakpointsCM extends AbstractCacheManager implements IBreakpoints.
         }        
         
         // TODO: avoid iterating over all entries, use separate list for events.
-        for (Map.Entry<Key<?>, ICache<?>> entry: fMap.entrySet()) {
+        for (Map.Entry<Key<?>, Object> entry: fMap.entrySet()) {
             if (entry.getKey() instanceof IdEventKey) {
                 IdEventKey<?> eventKey = (IdEventKey<?>)entry.getKey();
                 if ( StatusChangedCache.class.equals( eventKey.getCacheClass() ) &&
@@ -286,7 +286,7 @@ public class BreakpointsCM extends AbstractCacheManager implements IBreakpoints.
         setBreakpointsProperties(bps);
         
         // TODO: avoid iterating over all entries, use separate list for events.
-        for (Map.Entry<Key<?>, ICache<?>> entry: fMap.entrySet()) {
+        for (Map.Entry<Key<?>, Object> entry: fMap.entrySet()) {
             if (entry.getKey() instanceof EventKey) {
                 EventKey<?> eventKey = (EventKey<?>)entry.getKey();
                 if ( ContextAddedCache.class.equals( eventKey.getCacheClass() ) ) {
@@ -311,7 +311,7 @@ public class BreakpointsCM extends AbstractCacheManager implements IBreakpoints.
         setBreakpointsProperties(bps);
         
         // TODO: avoid iterating over all entries, use separate list for events.
-        for (Map.Entry<Key<?>, ICache<?>> entry: fMap.entrySet()) {
+        for (Map.Entry<Key<?>, Object> entry: fMap.entrySet()) {
             if (entry.getKey() instanceof EventKey) {
                 EventKey<?> eventKey = (EventKey<?>)entry.getKey();
                 if ( ContextChangedCache.class.equals( eventKey.getCacheClass() ) ) {
@@ -344,7 +344,7 @@ public class BreakpointsCM extends AbstractCacheManager implements IBreakpoints.
         }        
 
         // TODO: avoid iterating over all entries, use separate list for events.
-        for (Map.Entry<Key<?>, ICache<?>> entry: fMap.entrySet()) {
+        for (Map.Entry<Key<?>, Object> entry: fMap.entrySet()) {
             if (entry.getKey() instanceof EventKey) {
                 EventKey<?> eventKey = (EventKey<?>)entry.getKey();
                 if ( ContextRemovedCache.class.equals( eventKey.getCacheClass() ) ) {
