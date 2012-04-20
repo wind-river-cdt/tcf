@@ -89,10 +89,7 @@ public class PeerImageDescriptor extends AbstractImageDescriptor {
 	protected void drawCompositeImage(int width, int height) {
 		drawCentered(baseImage, width, height);
 
-		if (state == IPeerModelProperties.STATE_CONNECTED) { /* connected */
-			drawBottomRight(ImageConsts.GREEN_OVR);
-		}
-		else if (state == IPeerModelProperties.STATE_NOT_REACHABLE) { /* not connected, not reachable */
+		if (state == IPeerModelProperties.STATE_NOT_REACHABLE) { /* not connected, not reachable */
 			drawBottomRight(ImageConsts.RED_OVR);
 		}
 		else if (state == IPeerModelProperties.STATE_ERROR) { /* not connected, error */
