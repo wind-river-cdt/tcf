@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITreeSelection;
@@ -74,11 +75,12 @@ public class PeerGeneralSectionContentProvider implements IStructuredContentProv
 				});
 			}
 
-			for (String name : properties.keySet()) {
+			for (Entry<String, Object> entry : properties.entrySet()) {
+				String name = entry.getKey();
 				// Check if the property is filtered
 				if (name.endsWith(".silent") || name.contains(".transient")) continue; //$NON-NLS-1$ //$NON-NLS-2$
 				// Create the properties node
-				NodePropertiesTableTableNode propertiesNode = new NodePropertiesTableTableNode(name, properties.get(name) != null ? properties.get(name).toString() : ""); //$NON-NLS-1$
+				NodePropertiesTableTableNode propertiesNode = new NodePropertiesTableTableNode(name, entry.getValue() != null ? entry.getValue().toString() : ""); //$NON-NLS-1$
 				nodes.add(propertiesNode);
 			}
 		}

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.core.runtime.Assert;
@@ -186,9 +187,9 @@ public class AttributesSection extends AbstractSection {
 			@Override
 			public void run() {
 				Map<String, String> properties = node.getPeer().getAttributes();
-				for (String key : properties.keySet()) {
-					wc.setProperty(key, properties.get(key));
-					odc.setProperty(key, properties.get(key));
+				for (Entry<String, String> entry : properties.entrySet()) {
+					wc.setProperty(entry.getKey(), entry.getValue());
+					odc.setProperty(entry.getKey(), entry.getValue());
 				}
 			}
 		});
@@ -213,8 +214,8 @@ public class AttributesSection extends AbstractSection {
 		// Make a <String, String> map out of the remaining properties
 		Map<String, String> attributes = new HashMap<String, String>();
 		Map<String, Object> properties = wc.getProperties();
-		for (String key : properties.keySet()) {
-			attributes.put(key, properties.get(key).toString());
+		for (Entry<String, Object> entry : properties.entrySet()) {
+			attributes.put(entry.getKey(), entry.getValue().toString());
 		}
 
 		// Pass on to the table part
@@ -355,8 +356,8 @@ public class AttributesSection extends AbstractSection {
 			if (attributes.size() != properties.size()) {
 				isDirty = true;
 			} else {
-				for (String key : attributes.keySet()) {
-					if (!properties.containsKey(key) || !properties.get(key).equals(attributes.get(key))) {
+				for (Entry<String, String> entry : attributes.entrySet()) {
+					if (!properties.containsKey(entry.getKey()) || !properties.get(entry.getKey()).equals(entry.getValue())) {
 						isDirty = true;
 						break;
 					}

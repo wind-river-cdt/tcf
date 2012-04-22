@@ -19,6 +19,7 @@ import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
@@ -200,9 +201,9 @@ public abstract class AbstractGsonMapPersistenceDelegate extends ExecutableExten
 		}
 
 		if (attrs != null) {
-			for (String key : attrs.keySet()) {
-				if (!key.endsWith(".transient")) { //$NON-NLS-1$
-					result.put(key, attrs.get(key));
+			for (Entry<String, Object> entry : attrs.entrySet()) {
+				if (!entry.getKey().endsWith(".transient")) { //$NON-NLS-1$
+					result.put(entry.getKey(), entry.getValue());
 				}
 			}
 		}

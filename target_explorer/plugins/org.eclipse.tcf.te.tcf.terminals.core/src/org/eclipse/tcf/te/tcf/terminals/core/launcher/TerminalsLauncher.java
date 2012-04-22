@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
@@ -809,9 +810,9 @@ public class TerminalsLauncher extends PlatformObject implements ITerminalsLaunc
 		if (env == null) return null;
 
 		List<String> envList = new ArrayList<String>();
-		for (String key : env.keySet()) {
-			String entry = key.trim() + "=" + env.get(key).trim(); //$NON-NLS-1$
-			envList.add(entry);
+		for (Entry<String, String> entry : env.entrySet()) {
+			String listEntry = entry.getKey().trim() + "=" + entry.getValue().trim(); //$NON-NLS-1$
+			envList.add(listEntry);
 		}
 
 		return envList.toArray(new String[envList.size()]);

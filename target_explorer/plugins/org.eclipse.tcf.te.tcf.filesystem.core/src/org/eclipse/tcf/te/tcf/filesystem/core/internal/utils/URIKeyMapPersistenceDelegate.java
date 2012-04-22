@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
@@ -47,27 +48,27 @@ public class URIKeyMapPersistenceDelegate extends AbstractGsonMapPersistenceDele
 		Map<URI, ?> attrs = (Map<URI, ?>) context;
 		Map<String, Object> result = new HashMap<String, Object>();
 		if (attrs != null) {
-			for (URI key : attrs.keySet()) {
-				Object object = attrs.get(key);
+			for (Entry<URI, ?> entry : attrs.entrySet()) {
+				Object object = entry.getValue();
 				if (object instanceof URI) {
 					String value = "uri:" + object.toString(); //$NON-NLS-1$
-					result.put(key.toString(), value);
+					result.put(entry.getKey().toString(), value);
 				}
 				else if (object instanceof IContentType) {
 					String value = "contenttype:" + ((IContentType) object).getId(); //$NON-NLS-1$
-					result.put(key.toString(), value);
+					result.put(entry.getKey().toString(), value);
 				}
 				else if(object instanceof FileState) {
 					Map<String, Object> value = digest2map((FileState)object);
-					result.put(key.toString(), value);
+					result.put(entry.getKey().toString(), value);
 				}
 				else if (object instanceof Map) {
 					Map<QualifiedName, String> map = (Map<QualifiedName, String>) object;
 					Map<String, Object> valueMap = qNames2Map(map);
-					result.put(key.toString(), valueMap);
+					result.put(entry.getKey().toString(), valueMap);
 				}
 				else {
-					result.put(key.toString(), object);
+					result.put(entry.getKey().toString(), object);
 				}
 			}
 		}
@@ -77,15 +78,15 @@ public class URIKeyMapPersistenceDelegate extends AbstractGsonMapPersistenceDele
 	/**
 	 * Translate the specified map whose keys are QualifiedNames to a
 	 * map whose keys are strings.
-	 * 
+	 *
 	 * @param map The map to be translated.
 	 * @return a map with string keys.
 	 */
 	private Map<String, Object> qNames2Map(Map<QualifiedName, String> map) {
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("map.type", "QNames");  //$NON-NLS-1$//$NON-NLS-2$
-		for (QualifiedName name : map.keySet()) {
-			result.put(name.toString(), map.get(name));
+		for (Entry<QualifiedName, String> entry : map.entrySet()) {
+			result.put(entry.getKey().toString(), entry.getValue());
 		}
 		return result;
 	}
@@ -101,12 +102,12 @@ public class URIKeyMapPersistenceDelegate extends AbstractGsonMapPersistenceDele
 			context = new HashMap<URI, Object>();
 		}
 		Map<URI, Object> result = (Map<URI, Object>) context;
-		for (String key : map.keySet()) {
-			Object value = map.get(key);
-			URI uri = toURI(key);
+		for (Entry<String, Object> entry : map.entrySet()) {
+			Object value = entry.getValue();
+			URI uri = toURI(entry.getKey());
 			Assert.isNotNull(uri);
 			if (value instanceof String) {
-				String string = (String) map.get(key);
+				String string = (String) value;
 				Object object = null;
 				if (string.startsWith("uri:")) { //$NON-NLS-1$
 					string = string.substring("uri:".length()); //$NON-NLS-1$
@@ -118,7 +119,7 @@ public class URIKeyMapPersistenceDelegate extends AbstractGsonMapPersistenceDele
 					string = string.substring("contenttype:".length()); //$NON-NLS-1$
 					object = Platform.getContentTypeManager().getContentType(string);
 					result.put(uri, object);
-				}				
+				}
 			}
 			else if (value instanceof Map) {
 				Map<String, ?> vMap = (Map<String, ?>) value;
@@ -137,7 +138,7 @@ public class URIKeyMapPersistenceDelegate extends AbstractGsonMapPersistenceDele
 		}
 		return result;
 	}
-	
+
 	private FileState map2digest(Map<String, Object> value) {
 		byte[] base_digest = string2digest((String) value.get("base")); //$NON-NLS-1$
 		byte[] cache_digest = string2digest((String) value.get("cache")); //$NON-NLS-1$
@@ -156,7 +157,7 @@ public class URIKeyMapPersistenceDelegate extends AbstractGsonMapPersistenceDele
 		map.put("mtime", Long.valueOf(digest.getCacheMTime())); //$NON-NLS-1$
 		return map;
     }
-	
+
 	private String digest2string(byte[] digest) {
 		if(digest != null && digest.length > 0) {
 			StringBuilder buffer = new StringBuilder();
@@ -192,29 +193,29 @@ public class URIKeyMapPersistenceDelegate extends AbstractGsonMapPersistenceDele
 	/**
 	 * Translate the specified map with string keys to a map whose keys are
 	 * qualified names.
-	 * 
+	 *
 	 * @param strMap The map with string keys.
 	 * @return A map with qualified names as keys.
 	 */
 	private Map<QualifiedName, String> toQNameMap(Map<String, String> strMap) {
 		Map<QualifiedName, String> result = new HashMap<QualifiedName, String>();
-		for (String key : strMap.keySet()) {
-			int dot = key.lastIndexOf(":"); //$NON-NLS-1$
+		for (Entry<String, String> entry : strMap.entrySet()) {
+			int dot = entry.getKey().lastIndexOf(":"); //$NON-NLS-1$
 			String qualifier = null;
-			String local = key;
+			String local = entry.getKey();
 			if(dot != -1) {
-				qualifier = key.substring(0, dot);
-				local = key.substring(dot + 1);
+				qualifier = entry.getKey().substring(0, dot);
+				local = entry.getKey().substring(dot + 1);
 			}
 			QualifiedName name = new QualifiedName(qualifier, local);
-			result.put(name,  strMap.get(key));
+			result.put(name,  strMap.get(entry.getKey()));
 		}
 		return result;
 	}
 
 	/**
 	 * Convert the string to a URI.
-	 * 
+	 *
 	 * @param string The string to be converted.
 	 * @return the URI or null if there're issues when parsing.
 	 */

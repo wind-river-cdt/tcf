@@ -12,6 +12,7 @@ package org.eclipse.tcf.te.tcf.locator.persistence;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
@@ -115,8 +116,8 @@ public class GsonPeerPersistenceDelegate extends AbstractGsonMapPersistenceDeleg
 	@Override
 	protected Object fromMap(Map<String, Object> map, Object context) throws IOException {
 		Map<String,String> attrs = new HashMap<String,String>();
-		for (String key : map.keySet()) {
-			attrs.put(key, map.get(key).toString());
+		for (Entry<String, Object> entry : map.entrySet()) {
+			attrs.put(entry.getKey(), entry.getValue().toString());
 		}
 
 		return new TransientPeer(attrs);

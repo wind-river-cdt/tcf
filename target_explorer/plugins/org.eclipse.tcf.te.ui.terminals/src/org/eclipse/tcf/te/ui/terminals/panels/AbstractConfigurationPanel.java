@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ISelection;
@@ -58,7 +59,7 @@ public abstract class AbstractConfigurationPanel extends AbstractWizardConfigura
 	public AbstractConfigurationPanel(BaseDialogPageControl parentControl) {
 		super(parentControl);
 
-		hostSettingsMap=new HashMap<String, Map<String, String>>();
+		hostSettingsMap = new HashMap<String, Map<String, String>>();
 	}
 
 	/* (non-Javadoc)
@@ -74,120 +75,127 @@ public abstract class AbstractConfigurationPanel extends AbstractWizardConfigura
 	 */
 	@Override
 	public ISelection getSelection() {
-	    return selection;
+		return selection;
 	}
 
 	/**
-     * Returns the host name or IP from the current selection.
-     *
-     * @return The host name or IP, or <code>null</code>.
-     */
-    public String getSelectionHost() {
-    	ISelection selection = getSelection();
-    	if (selection instanceof IStructuredSelection && !selection.isEmpty()) {
-    		Object element = ((IStructuredSelection) selection).getFirstElement();
-    		IPropertiesAccessService service = ServiceManager.getInstance().getService(element, IPropertiesAccessService.class);
-    		if (service != null) {
-    			Map<String, String> props = service.getTargetAddress(element);
-    			if (props != null && props.containsKey(IPropertiesAccessServiceConstants.PROP_ADDRESS)) {
-    				return props.get(IPropertiesAccessServiceConstants.PROP_ADDRESS);
-    			}
-    		}
-    	}
+	 * Returns the host name or IP from the current selection.
+	 *
+	 * @return The host name or IP, or <code>null</code>.
+	 */
+	public String getSelectionHost() {
+		ISelection selection = getSelection();
+		if (selection instanceof IStructuredSelection && !selection.isEmpty()) {
+			Object element = ((IStructuredSelection) selection).getFirstElement();
+			IPropertiesAccessService service = ServiceManager.getInstance()
+			                .getService(element, IPropertiesAccessService.class);
+			if (service != null) {
+				Map<String, String> props = service.getTargetAddress(element);
+				if (props != null && props
+				                .containsKey(IPropertiesAccessServiceConstants.PROP_ADDRESS)) {
+					return props.get(IPropertiesAccessServiceConstants.PROP_ADDRESS);
+				}
+			}
+		}
 
-    	return null;
-    }
+		return null;
+	}
 
 	@Override
-    public void doRestoreWidgetValues(IDialogSettings settings, String idPrefix) {
+	public void doRestoreWidgetValues(IDialogSettings settings, String idPrefix) {
 
-    	String[] hosts=settings.getArray(HOSTS_TAG);
-    	if(hosts!=null){
-    		for(int i=0; i<hosts.length; i++){
-    			String hostEntry=hosts[i];
-    			String[] hostString=hostEntry.split("\\|");//$NON-NLS-1$
-    			String hostName=hostString[0];
-    			if(hostString.length==2){
-    				HashMap<String, String> attr=deSerialize(hostString[1]);
-    				hostSettingsMap.put(hostName, attr);
-    			} else {
-    				hostSettingsMap.put(hostName, new HashMap<String, String>());
-    			}
-    		}
-    	}
+		String[] hosts = settings.getArray(HOSTS_TAG);
+		if (hosts != null) {
+			for (int i = 0; i < hosts.length; i++) {
+				String hostEntry = hosts[i];
+				String[] hostString = hostEntry.split("\\|");//$NON-NLS-1$
+				String hostName = hostString[0];
+				if (hostString.length == 2) {
+					HashMap<String, String> attr = deSerialize(hostString[1]);
+					hostSettingsMap.put(hostName, attr);
+				}
+				else {
+					hostSettingsMap.put(hostName, new HashMap<String, String>());
+				}
+			}
+		}
 
-    	if(!isWithoutSelection()){
-    		String host = getSelectionHost();
-    		if(host!=null){
-    			fillSettingsForHost(host);
-    		}
-    	} else {
-    		if(hostCombo!=null){
-    			fillCombo();
-    			String lastHost=settings.get(LAST_HOST_TAG);
-    			if(lastHost!=null){
-    				int index=hostCombo.indexOf(lastHost);
-    				if(index!=-1){
-    					hostCombo.select(index);
-    				} else{
-    					hostCombo.select(0);
-    				}
-    			} else {
-    				hostCombo.select(0);
-    			}
-    			fillSettingsForHost(hostCombo.getText());
-    		}
-    	}
-    }
+		if (!isWithoutSelection()) {
+			String host = getSelectionHost();
+			if (host != null) {
+				fillSettingsForHost(host);
+			}
+		}
+		else {
+			if (hostCombo != null) {
+				fillCombo();
+				String lastHost = settings.get(LAST_HOST_TAG);
+				if (lastHost != null) {
+					int index = hostCombo.indexOf(lastHost);
+					if (index != -1) {
+						hostCombo.select(index);
+					}
+					else {
+						hostCombo.select(0);
+					}
+				}
+				else {
+					hostCombo.select(0);
+				}
+				fillSettingsForHost(hostCombo.getText());
+			}
+		}
+	}
 
-	protected HashMap<String, String> deSerialize(String hostString){
-		HashMap<String, String> attr=new HashMap<String, String>();
+	protected HashMap<String, String> deSerialize(String hostString) {
+		HashMap<String, String> attr = new HashMap<String, String>();
 
-		if(hostString.length()!=0){
-			String[] hostAttrs=hostString.split("\\:");//$NON-NLS-1$
-			for(int j=0; j<hostAttrs.length; j=j+2){
-				String key=hostAttrs[j];
-				String value=hostAttrs[j+1];
+		if (hostString.length() != 0) {
+			String[] hostAttrs = hostString.split("\\:");//$NON-NLS-1$
+			for (int j = 0; j < hostAttrs.length; j = j + 2) {
+				String key = hostAttrs[j];
+				String value = hostAttrs[j + 1];
 				attr.put(key, value);
 			}
 		}
 		return attr;
 	}
 
-	protected void serialize(Map<String, String> hostEntry, StringBuffer hostString){
-		if(hostEntry.keySet().size()!=0){
-			Iterator<String> nextHostAttr=hostEntry.keySet().iterator();
-			while(nextHostAttr.hasNext()){
-				String attrKey=nextHostAttr.next();
-				String attrValue=hostEntry.get(attrKey);
-				hostString.append(attrKey+":"+attrValue+":");//$NON-NLS-1$ //$NON-NLS-2$
+	protected void serialize(Map<String, String> hostEntry, StringBuffer hostString) {
+		if (hostEntry.keySet().size() != 0) {
+			Iterator<Entry<String, String>> nextHostAttr = hostEntry.entrySet().iterator();
+			while (nextHostAttr.hasNext()) {
+				Entry<String, String> entry = nextHostAttr.next();
+				String attrKey = entry.getKey();
+				String attrValue = entry.getValue();
+				hostString.append(attrKey + ":" + attrValue + ":");//$NON-NLS-1$ //$NON-NLS-2$
 			}
-			hostString.deleteCharAt(hostString.length()-1);
+			hostString.deleteCharAt(hostString.length() - 1);
 		}
 	}
 
 	@Override
-    public void doSaveWidgetValues(IDialogSettings settings, String idPrefix) {
-    	Iterator<String> nextHost=hostSettingsMap.keySet().iterator();
-    	String[] hosts=new String[hostSettingsMap.keySet().size()];
-    	int i=0;
-    	while(nextHost.hasNext()){
-    		StringBuffer hostString=new StringBuffer();
-    		String host=nextHost.next();
-    		hostString.append(host+"|");//$NON-NLS-1$
-    		Map<String, String> hostEntry=hostSettingsMap.get(host);
-    		serialize(hostEntry, hostString);
-    		hosts[i]=hostString.toString();
-    		i=i+1;
-    	}
-    	settings.put(HOSTS_TAG, hosts);
-    	if(isWithoutSelection()){
-    		if(hostCombo!=null){
-    			String host = getHostFromSettings();
-    			if (host != null) settings.put(LAST_HOST_TAG, host);
-    		}
-    	}
-    }
+	public void doSaveWidgetValues(IDialogSettings settings, String idPrefix) {
+		Iterator<String> nextHost = hostSettingsMap.keySet().iterator();
+		String[] hosts = new String[hostSettingsMap.keySet().size()];
+		int i = 0;
+		while (nextHost.hasNext()) {
+			StringBuffer hostString = new StringBuffer();
+			String host = nextHost.next();
+			hostString.append(host + "|");//$NON-NLS-1$
+			Map<String, String> hostEntry = hostSettingsMap.get(host);
+			serialize(hostEntry, hostString);
+			hosts[i] = hostString.toString();
+			i = i + 1;
+		}
+		settings.put(HOSTS_TAG, hosts);
+		if (isWithoutSelection()) {
+			if (hostCombo != null) {
+				String host = getHostFromSettings();
+				if (host != null) settings.put(LAST_HOST_TAG, host);
+			}
+		}
+	}
 
 	protected abstract void saveSettingsForHost(boolean add);
 
@@ -199,121 +207,125 @@ public abstract class AbstractConfigurationPanel extends AbstractWizardConfigura
 		// noop by default
 	}
 
-
-	protected String getHostFromCombo(){
-		if(hostCombo!=null){
+	protected String getHostFromCombo() {
+		if (hostCombo != null) {
 			return hostCombo.getText();
 		}
 		return null;
 	}
 
 	protected void removeSettingsForHost(String host) {
-    	if(hostSettingsMap.containsKey(host)){
-    		hostSettingsMap.remove(host);
-    	}
-    }
+		if (hostSettingsMap.containsKey(host)) {
+			hostSettingsMap.remove(host);
+		}
+	}
 
 	private List<String> getHostList() {
-    	List<String> hostList=new ArrayList<String>();
-    	hostList.addAll(hostSettingsMap.keySet());
-    	return hostList;
-    }
+		List<String> hostList = new ArrayList<String>();
+		hostList.addAll(hostSettingsMap.keySet());
+		return hostList;
+	}
 
 	public void fillCombo() {
-		if(hostCombo!=null){
+		if (hostCombo != null) {
 			hostCombo.removeAll();
-			List<String> hostList=getHostList();
+			List<String> hostList = getHostList();
 			Collections.sort(hostList);
-			Iterator<String> nextHost=hostList.iterator();
-			while(nextHost.hasNext()){
-				String host=nextHost.next();
+			Iterator<String> nextHost = hostList.iterator();
+			while (nextHost.hasNext()) {
+				String host = nextHost.next();
 				hostCombo.add(host);
 			}
-			if(hostList.size()<=1){
+			if (hostList.size() <= 1) {
 				hostCombo.setEnabled(false);
-			} else{
+			}
+			else {
 				hostCombo.setEnabled(true);
 
 			}
-			if(hostList.size()==0){
+			if (hostList.size() == 0) {
 				deleteHostButton.setEnabled(false);
-			} else{
+			}
+			else {
 				deleteHostButton.setEnabled(true);
 			}
 		}
-    }
+	}
 
 	public boolean isWithoutSelection() {
-    	ISelection selection = getSelection();
-    	if(selection==null){
-    		return true;
-    	}
-    	if (selection instanceof IStructuredSelection && selection.isEmpty()) {
-    		return true;
-    	}
-    	return false;
-    }
+		ISelection selection = getSelection();
+		if (selection == null) {
+			return true;
+		}
+		if (selection instanceof IStructuredSelection && selection.isEmpty()) {
+			return true;
+		}
+		return false;
+	}
 
 	public boolean isWithHostList() {
-    	return true;
-    }
+		return true;
+	}
 
-	protected void createHostsUI(Composite parent){
-		if(isWithoutSelection() && isWithHostList()){
-			Composite comboComposite=new Composite(parent, SWT.NONE);
-	        GridLayout layout = new GridLayout(3, false);
-	        layout.marginHeight = 0; layout.marginWidth = 0;
-	        comboComposite.setLayout(layout);
-	        comboComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+	protected void createHostsUI(Composite parent) {
+		if (isWithoutSelection() && isWithHostList()) {
+			Composite comboComposite = new Composite(parent, SWT.NONE);
+			GridLayout layout = new GridLayout(3, false);
+			layout.marginHeight = 0;
+			layout.marginWidth = 0;
+			comboComposite.setLayout(layout);
+			comboComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
-	        Label label = new Label(comboComposite, SWT.HORIZONTAL);
+			Label label = new Label(comboComposite, SWT.HORIZONTAL);
 			label.setText(Messages.AbstractConfigurationPanel_hosts);
 
-			hostCombo=new Combo(comboComposite, SWT.READ_ONLY);
+			hostCombo = new Combo(comboComposite, SWT.READ_ONLY);
 			hostCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 			hostCombo.addSelectionListener(new SelectionListener() {
 
 				@Override
-                public void widgetSelected(SelectionEvent e) {
-					String host=hostCombo.getText();
+				public void widgetSelected(SelectionEvent e) {
+					String host = hostCombo.getText();
 					fillSettingsForHost(host);
-                }
+				}
 
 				@Override
-                public void widgetDefaultSelected(SelectionEvent e) {
+				public void widgetDefaultSelected(SelectionEvent e) {
 					widgetSelected(e);
-               }
+				}
 			});
 
 			deleteHostButton = new Button(comboComposite, SWT.NONE);
-//			deleteHostButton.setText(Messages.AbstractConfigurationPanel_delete);
+			// deleteHostButton.setText(Messages.AbstractConfigurationPanel_delete);
 
-			ISharedImages workbenchImages= UIPlugin.getDefault().getWorkbench().getSharedImages();
-			deleteHostButton.setImage(workbenchImages.getImageDescriptor(ISharedImages.IMG_TOOL_DELETE).createImage());
+			ISharedImages workbenchImages = UIPlugin.getDefault().getWorkbench().getSharedImages();
+			deleteHostButton.setImage(workbenchImages
+			                .getImageDescriptor(ISharedImages.IMG_TOOL_DELETE).createImage());
 
 			deleteHostButton.setToolTipText(Messages.AbstractConfigurationPanel_deleteButtonTooltip);
 			deleteHostButton.addSelectionListener(new SelectionListener() {
 
 				@Override
 				public void widgetSelected(SelectionEvent e) {
-					String host=getHostFromCombo();
-					if(host!=null && host.length()!=0){
+					String host = getHostFromCombo();
+					if (host != null && host.length() != 0) {
 						removeSettingsForHost(host);
 						removeSecurePassword(host);
 						fillCombo();
 						hostCombo.select(0);
-						host=getHostFromCombo();
-						if(host!=null && host.length()!=0){
+						host = getHostFromCombo();
+						if (host != null && host.length() != 0) {
 							fillSettingsForHost(host);
 						}
 					}
 				}
+
 				@Override
 				public void widgetDefaultSelected(SelectionEvent e) {
 					widgetSelected(e);
 				}
 			});
-			Label separator=new Label(parent, SWT.SEPARATOR|SWT.HORIZONTAL);
+			Label separator = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
 			separator.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		}
 	}

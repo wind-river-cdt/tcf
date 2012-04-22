@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
@@ -414,10 +415,10 @@ public class PeerAttributesTablePart extends TablePart implements IDisposable {
 
 		if (attributes != null && !attributes.isEmpty()) {
 			// Create the corresponding nodes for the given attributes
-			for (String key : attributes.keySet()) {
+			for (Entry<String, String> entry : attributes.entrySet()) {
 				TableNode node = new TableNode();
-				node.name = key;
-				node.value = attributes.get(key);
+				node.name = entry.getKey();
+				node.value = entry.getValue();
 				nodes.add(node);
 			}
 		}

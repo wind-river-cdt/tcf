@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -205,8 +206,8 @@ public class TransportSection extends AbstractSection {
 				if (transportTypePanelControl != null) {
 					IPropertiesContainer src = new PropertiesContainer();
 					Map<String, String> properties = node.getPeer().getAttributes();
-					for (String key : properties.keySet()) {
-						src.setProperty(key, properties.get(key));
+					for (Entry<String, String> entry : properties.entrySet()) {
+						src.setProperty(entry.getKey(), entry.getValue());
 					}
 
 					for (String id : transportTypePanelControl.getConfigurationPanelIds()) {

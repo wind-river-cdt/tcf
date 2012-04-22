@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.core.runtime.Assert;
@@ -118,11 +119,11 @@ public class LocatorModelRefreshService extends AbstractLocatorModelService impl
 		Assert.isNotNull(oldChildren);
 		Assert.isNotNull(model);
 
-		for (String peerId : peers.keySet()) {
+		for (Entry<String, IPeer> entry : peers.entrySet()) {
 			// Get the peer instance for the current peer id
-			IPeer peer = peers.get(peerId);
+			IPeer peer = entry.getValue();
 			// Try to find an existing peer node first
-			IPeerModel peerNode = model.getService(ILocatorModelLookupService.class).lkupPeerModelById(peerId);
+			IPeerModel peerNode = model.getService(ILocatorModelLookupService.class).lkupPeerModelById(entry.getKey());
 			// And create a new one if we cannot find it
 			if (peerNode == null) {
 				peerNode = new PeerModel(model, peer);
@@ -369,14 +370,14 @@ public class LocatorModelRefreshService extends AbstractLocatorModelService impl
 			}
 
 			// Scan the peers for redirected ones ... and set up the peer model association
-			for (String peerId : peers.keySet()) {
-				IPeer peer = peers.get(peerId);
+			for (Entry<String, IPeer> entry : peers.entrySet()) {
+				IPeer peer = entry.getValue();
 				if (!(peer instanceof PeerRedirector)) {
 					continue;
 				}
 
 				// Get the peers peer model object
-				IPeerModel peerModel = model.getService(ILocatorModelLookupService.class).lkupPeerModelById(peerId);
+				IPeerModel peerModel = model.getService(ILocatorModelLookupService.class).lkupPeerModelById(entry.getKey());
 				Assert.isNotNull(peerModel);
 
 				// The peer is a peer redirector -> get the proxy peer id and proxy peer model

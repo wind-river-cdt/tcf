@@ -12,6 +12,7 @@ package org.eclipse.tcf.te.launch.core.lm;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
@@ -388,21 +389,21 @@ public class LaunchManager extends PlatformObject {
 			// get the launch manager delegate for the specific type
 			ILaunchManagerDelegate delegate = getLaunchManagerDelegate(type, launchMode);
 			// get all the launch configuration attributes
-			Map<Object, Object> attributes = launchConfig.getAttributes();
+			Map<String, Object> attributes = launchConfig.getAttributes();
 			// loop over all listed attributes and copy them to the specification
-			Iterator<Object> iterator = attributes.keySet().iterator();
+			Iterator<Entry<String, Object>> iterator = attributes.entrySet().iterator();
 			while (iterator.hasNext()) {
-				String attributeKey = (String) iterator.next();
+				Entry<String, Object> entry = iterator.next();
 				if (withDefaultAttributes) {
 					// include the default attributes. So, just copy the stuff over.
-					spec.addAttribute(attributeKey, attributes.get(attributeKey));
+					spec.addAttribute(entry.getKey(), entry.getValue());
 				}
 				else {
 					// exclude the default attributes. We have to find out if the attribute is
 					// set with default value.
-					Object attributeValue = attributes.get(attributeKey);
-					if (!delegate.isDefaultAttribute(attributeKey, attributeValue, launchConfig, launchMode)) {
-						spec.addAttribute(attributeKey, attributeValue);
+					Object attributeValue = entry.getValue();
+					if (!delegate.isDefaultAttribute(entry.getKey(), attributeValue, launchConfig, launchMode)) {
+						spec.addAttribute(entry.getKey(), attributeValue);
 					}
 				}
 			}
