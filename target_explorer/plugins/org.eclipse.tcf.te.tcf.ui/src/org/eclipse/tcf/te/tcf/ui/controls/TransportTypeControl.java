@@ -16,8 +16,8 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IDialogPage;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.tcf.core.interfaces.ITransportTypes;
+import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.controls.BaseEditBrowseTextControl;
 import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
 

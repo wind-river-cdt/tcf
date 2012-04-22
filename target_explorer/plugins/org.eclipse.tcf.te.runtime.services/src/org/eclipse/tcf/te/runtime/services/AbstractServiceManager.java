@@ -72,7 +72,7 @@ public abstract class AbstractServiceManager {
 
 			// Initialize the id field by reading the <id> extension attribute.
 			// Throws an exception if the id is empty or null.
-			id = config != null ? config.getAttribute("id") : null; //$NON-NLS-1$
+			id = config.getAttribute("id"); //$NON-NLS-1$
 			if (id == null || (id != null && "".equals(id.trim()))) { //$NON-NLS-1$
 				throw new CoreException(new Status(IStatus.ERROR,
 										CoreBundleActivator.getUniqueIdentifier(),
@@ -87,6 +87,11 @@ public abstract class AbstractServiceManager {
 				if (children.length > 0) {
 					clazz = children[0].getAttribute("class"); //$NON-NLS-1$
 				}
+			}
+			if (clazz == null || (clazz != null && "".equals(clazz.trim()))) { //$NON-NLS-1$
+				throw new CoreException(new Status(IStatus.ERROR,
+										CoreBundleActivator.getUniqueIdentifier(),
+										NLS.bind(Messages.Extension_error_missingRequiredAttribute, "class", config.getContributor().getName()))); //$NON-NLS-1$
 			}
 
 			// Read the "enablement" sub element of the extension
@@ -255,10 +260,12 @@ public abstract class AbstractServiceManager {
 		}
 
 		public boolean equals(IService service) {
-			return clazz.equals(service.getClass());
+			Assert.isNotNull(service);
+			return clazz.equals(service.getClass().getCanonicalName());
 		}
 
 		public boolean equals(ServiceProxy proxy) {
+			Assert.isNotNull(proxy);
 			return clazz.equals(proxy.clazz);
 		}
 	}

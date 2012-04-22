@@ -172,7 +172,7 @@ public class ConfigureWorkingSetAction extends Action {
 	 */
 	private boolean exists(String wsname, IWorkingSet[] workingSets) {
 		for (IWorkingSet workingSet : workingSets) {
-			if (wsname.equals(workingSet)) {
+			if (wsname.equals(workingSet.getName())) {
 				return true;
 			}
 		}

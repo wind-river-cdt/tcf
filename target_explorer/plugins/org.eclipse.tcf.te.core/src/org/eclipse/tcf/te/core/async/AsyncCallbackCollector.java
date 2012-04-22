@@ -227,7 +227,7 @@ public class AsyncCallbackCollector extends AsyncCallbackHandler {
 			// leave everything as is
 		}
 		else {
-			cause = new ExecutionException(errMsg, error);
+			error = new ExecutionException(errMsg, error);
 		}
 		error.fillInStackTrace();
 		handleError(error);

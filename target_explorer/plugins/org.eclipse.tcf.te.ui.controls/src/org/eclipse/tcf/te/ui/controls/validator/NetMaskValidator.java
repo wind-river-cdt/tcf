@@ -33,7 +33,7 @@ public class NetMaskValidator extends NameOrIPValidator {
 	public boolean isValid(String netMask) {
 		if (super.isValid(netMask)) {
 			// check the netmask
-			String[] bytes = netMask.split("."); //$NON-NLS-1$
+			String[] bytes = netMask.split("\\."); //$NON-NLS-1$
 			int oldByte = 255;
 			int actByte;
 			for (int i=0; i<bytes.length; i++) {

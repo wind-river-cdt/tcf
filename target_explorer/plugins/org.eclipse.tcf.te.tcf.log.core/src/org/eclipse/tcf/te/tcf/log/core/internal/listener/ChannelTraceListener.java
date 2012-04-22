@@ -34,12 +34,12 @@ public class ChannelTraceListener implements TraceListener {
 	/**
 	 * Time format representing time with milliseconds.
 	 */
-	public static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss.SSS"); //$NON-NLS-1$
+	public final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss.SSS"); //$NON-NLS-1$
 
 	/**
 	 * Time format representing date and time with milliseconds.
 	 */
-	public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS"); //$NON-NLS-1$
+	public final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS"); //$NON-NLS-1$
 
 	// Reference to the channel
 	private final IChannel channel;

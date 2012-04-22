@@ -12,6 +12,8 @@ package org.eclipse.tcf.te.tcf.log.core.internal;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +33,6 @@ import org.eclipse.tcf.te.tcf.log.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.tcf.log.core.events.MonitorEvent;
 import org.eclipse.tcf.te.tcf.log.core.interfaces.IPreferenceKeys;
 import org.eclipse.tcf.te.tcf.log.core.internal.listener.ChannelStateChangeListener;
-import org.eclipse.tcf.te.tcf.log.core.internal.listener.ChannelTraceListener;
 import org.eclipse.tcf.te.tcf.log.core.internal.nls.Messages;
 
 
@@ -39,6 +40,11 @@ import org.eclipse.tcf.te.tcf.log.core.internal.nls.Messages;
  * TCF logging log manager implementation.
  */
 public final class LogManager implements IProtocolStateChangeListener {
+	/**
+	 * Time format representing date and time with milliseconds.
+	 */
+	public final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS"); //$NON-NLS-1$
+
 	// Reference to the channel state change listener
 	private IChannelStateChangeListener channelStateChangeListener;
 
@@ -79,7 +85,7 @@ public final class LogManager implements IProtocolStateChangeListener {
 	 */
 	public void dispose() {
 		String message = NLS.bind(Messages.ChannelTraceListener_logManagerDispose_message,
-								  ChannelTraceListener.DATE_FORMAT.format(new Date(System.currentTimeMillis())));
+								  DATE_FORMAT.format(new Date(System.currentTimeMillis())));
 		for (FileWriter writer : fileWriterMap.values()) {
 			try {
 				writer.write(message);

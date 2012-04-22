@@ -11,6 +11,8 @@ package org.eclipse.tcf.te.tcf.log.core.internal.listener;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +33,11 @@ import org.eclipse.tcf.te.tcf.log.core.internal.nls.Messages;
  * TCF logging channel trace listener manager implementation.
  */
 public class ChannelTraceListenerManager {
+	/**
+	 * Time format representing date and time with milliseconds.
+	 */
+	public final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS"); //$NON-NLS-1$
+
 	// The map of trace listeners per channel
 	private final Map<IChannel, AbstractChannel.TraceListener> listeners = new HashMap<IChannel, AbstractChannel.TraceListener>();
 
@@ -95,7 +102,7 @@ public class ChannelTraceListenerManager {
 		listeners.put(channel, traceListener);
 
 		// Log the channel opening
-		String date = ChannelTraceListener.DATE_FORMAT.format(new Date(System.currentTimeMillis()));
+		String date = DATE_FORMAT.format(new Date(System.currentTimeMillis()));
 
 		String message = NLS.bind(Messages.ChannelTraceListener_channelOpened_message,
 								  new Object[] {

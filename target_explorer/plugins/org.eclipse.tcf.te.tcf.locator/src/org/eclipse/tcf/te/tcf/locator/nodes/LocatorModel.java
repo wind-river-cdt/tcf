@@ -259,6 +259,14 @@ public class LocatorModel extends PlatformObject implements ILocatorModel {
 	}
 
 	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+	    return uniqueId.hashCode();
+	}
+
+	/* (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override

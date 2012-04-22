@@ -10,6 +10,7 @@
 package org.eclipse.tcf.te.runtime.events;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EventListener;
 import java.util.EventObject;
 import java.util.List;
@@ -167,8 +168,8 @@ public final class EventManager {
 		public String toString() {
 			return getClass().getName() + "{" + //$NON-NLS-1$
 											"listener=" + listener + //$NON-NLS-1$
-											",eventTypes=" + eventTypes + //$NON-NLS-1$
-											",eventSources=" + eventSources + //$NON-NLS-1$
+											",eventTypes=" + Arrays.deepToString(eventTypes) + //$NON-NLS-1$
+											",eventSources=" + Arrays.deepToString(eventSources) + //$NON-NLS-1$
 										  "}"; //$NON-NLS-1$
 		}
 	}
