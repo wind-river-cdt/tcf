@@ -19,10 +19,10 @@ import java.io.IOException;
  * Determine the current host environment.
  */
 public final class Host {
-	private static Boolean isWindowsHost = null;
-	private static Boolean isInteractive = null;
-	private static Boolean isHeadless = null;
-	private static Boolean isLinuxHost = null;
+	private static volatile Boolean isWindowsHost = null;
+	private static volatile Boolean isInteractive = null;
+	private static volatile Boolean isHeadless = null;
+	private static volatile Boolean isLinuxHost = null;
 
 	/**
 	 * Method looking up the current host (once) and returning a boolean indicating whether the host

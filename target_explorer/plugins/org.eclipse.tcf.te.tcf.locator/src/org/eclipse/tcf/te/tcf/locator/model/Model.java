@@ -20,7 +20,7 @@ import org.eclipse.tcf.te.tcf.locator.nodes.LocatorModel;
  */
 public final class Model {
 	// Reference to the locator model
-	/* default */ static ILocatorModel locatorModel;
+	/* default */ static volatile ILocatorModel locatorModel;
 
 	/**
 	 * Returns the shared locator model instance.

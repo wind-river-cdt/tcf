@@ -30,7 +30,7 @@ public class UIPlugin extends AbstractUIPlugin {
 	// The shared instance
 	private static UIPlugin plugin;
 	// The scoped preferences instance
-	private static ScopedEclipsePreferences scopedPreferences = null;
+	private static volatile ScopedEclipsePreferences scopedPreferences;
 	// The trace handler instance
 	private static volatile TraceHandler traceHandler;
 

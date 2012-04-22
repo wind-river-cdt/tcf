@@ -41,11 +41,11 @@ import org.eclipse.ui.XMLMemento;
  */
 public class ViewerStateManager {
 	// The single instance to provide the management.
-	private static ViewerStateManager instance;
+	private static volatile ViewerStateManager instance;
 
 	/**
 	 * Get the single instance of the manager.
-	 * 
+	 *
 	 * @return The single instance of the viewer state manager.
 	 */
 	public static ViewerStateManager getInstance() {
@@ -60,7 +60,7 @@ public class ViewerStateManager {
 
 	/**
 	 * Get the viewer state for the specified input id.
-	 * 
+	 *
 	 * @param inputId
 	 * @return
 	 */
@@ -70,7 +70,7 @@ public class ViewerStateManager {
 
 	/**
 	 * Get the filter descriptor for the specified viewer and input.
-	 * 
+	 *
 	 * @param viewerId The viewer's id.
 	 * @param input The input.
 	 * @return The enabled filter descriptors.
@@ -94,13 +94,13 @@ public class ViewerStateManager {
 		}
 		return null;
 	}
-	
+
 	/***
 	 * Get the viewer input from the input of the tree viewer.
 	 * If the input is an instance of IViewerInput, then return
 	 * the input. If the input can be adapted to a IViewerInput,
 	 * then return the adapted object.
-	 * 
+	 *
 	 * @param input The input of the tree viewer.
 	 * @return A viewer input or null.
 	 */
@@ -121,10 +121,10 @@ public class ViewerStateManager {
 		}
 		return viewerInput;
     }
-	
+
 	/**
 	 * Put the viewer state with its input id into the map.
-	 * 
+	 *
 	 * @param inputId The id of the input.
 	 * @param viewerState The viewer's state.
 	 */
@@ -169,7 +169,7 @@ public class ViewerStateManager {
 
 	/**
 	 * Load the viewer states from the memento root.
-	 * 
+	 *
 	 * @param root The memento's root.
 	 */
 	void loadViewerState(IMemento root) {
@@ -183,7 +183,7 @@ public class ViewerStateManager {
 
 	/**
 	 * Create a viewer state instance using the specified memento element.
-	 * 
+	 *
 	 * @param mViewerState The memento element.
 	 */
 	void createViewerState(IMemento mViewerState) {
@@ -195,10 +195,10 @@ public class ViewerStateManager {
 	}
 
 	/**
-	 * Get the viewer state files. The default location is a file named "viewerstates.xml" 
-	 * under the plugin's state cache. If it is not available, default it to the ".tcf" 
+	 * Get the viewer state files. The default location is a file named "viewerstates.xml"
+	 * under the plugin's state cache. If it is not available, default it to the ".tcf"
 	 * directory under the user's home.
-	 * 
+	 *
 	 * @return The viewer state file.
 	 */
 	private File getViewerStateFile() {
@@ -260,7 +260,7 @@ public class ViewerStateManager {
 
 	/**
 	 * Store the viewer's state to a memento element.
-	 * 
+	 *
 	 * @param root The memento element.
 	 */
 	void storeViewerStates(IMemento root) {
@@ -274,7 +274,7 @@ public class ViewerStateManager {
 
 	/**
 	 * Create a viewer state instance using the column descriptors and the filter descriptors specified.
-	 * 
+	 *
 	 * @param columns The column descriptors.
 	 * @param filters The filter descriptors.
 	 * @return The tree viewer state instance.

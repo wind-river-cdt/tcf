@@ -20,7 +20,7 @@ import org.eclipse.ui.console.IConsoleManager;
  */
 public class Factory implements IConsoleFactory {
 	// Reference to the console
-	private static Console console;
+	private static volatile Console console;
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.console.IConsoleFactory#openConsole()

@@ -21,7 +21,7 @@ public class CoreBundleActivator extends Plugin {
 	// The shared instance
 	private static CoreBundleActivator plugin;
 	// The scoped preferences instance
-	private static ScopedEclipsePreferences scopedPreferences = null;
+	private static volatile ScopedEclipsePreferences scopedPreferences;
 	// The trace handler instance
 	private static volatile TraceHandler traceHandler;
 
