@@ -1156,12 +1156,6 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
         return true;
     }
 
-    private void appendErrorText(StringBuffer bf, Throwable error) {
-        if (error == null) return;
-        bf.append("Exception: ");
-        bf.append(TCFModel.getErrorMessage(error, true));
-    }
-
     private boolean appendArrayValueText(StyledStringBuffer bf, int level, ISymbols.Symbol type,
             byte[] data, int offs, int size, boolean big_endian, Runnable done) {
         assert offs + size <= data.length;
@@ -1306,7 +1300,8 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
             }
             else if (e != null) {
                 bf.append("Cannot read pointed value: ", SWT.BOLD, null, rgb_error);
-                bf.append(TCFModel.getErrorMessage(e, true), SWT.ITALIC, null, rgb_error);
+                bf.append(TCFModel.getErrorMessage(e, false), SWT.ITALIC, null, rgb_error);
+                bf.append("\n");
             }
         }
         if (type_data.getSize() > 0) {
@@ -1432,12 +1427,9 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
         if (!expression.validate(done)) return false;
         if (!value.validate(done)) return false;
         int pos = bf.length();
-        appendErrorText(bf.getStringBuffer(), expression.getError());
-        if (bf.length() == pos) appendErrorText(bf.getStringBuffer(), value.getError());
-        if (bf.length() > pos) {
-            bf.append(pos, SWT.ITALIC, null, rgb_error);
-        }
-        else {
+        bf.append(expression.getError(), rgb_error);
+        if (bf.length() == pos) bf.append(value.getError(), rgb_error);
+        if (bf.length() == pos) {
             IExpressions.Value v = value.getData();
             if (v != null) {
                 byte[] data = v.getValue();

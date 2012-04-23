@@ -203,22 +203,13 @@ public class TCFNodeRegister extends TCFNode implements IElementEditor, IWatchIn
         return false;
     }
 
-    private void appendErrorText(StringBuffer bf, Throwable error) {
-        if (error == null) return;
-        bf.append("Exception: ");
-        bf.append(TCFModel.getErrorMessage(error, true));
-    }
-
     public boolean getDetailText(StyledStringBuffer bf, Runnable done) {
         if (!context.validate(done)) return false;
         if (!value.validate(done)) return false;
         int pos = bf.length();
-        appendErrorText(bf.getStringBuffer(), context.getError());
-        if (bf.length() == 0) appendErrorText(bf.getStringBuffer(), value.getError());
-        if (bf.length() > pos) {
-            bf.append(pos, 0, null, rgb_error);
-        }
-        else {
+        bf.append(context.getError(), rgb_error);
+        if (bf.length() == pos) bf.append(value.getError(), rgb_error);
+        if (bf.length() == pos) {
             IRegisters.RegistersContext ctx = context.getData();
             if (ctx != null) {
                 if (ctx.getDescription() != null) {

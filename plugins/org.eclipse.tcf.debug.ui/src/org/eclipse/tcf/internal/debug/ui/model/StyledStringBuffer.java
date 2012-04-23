@@ -13,6 +13,7 @@ package org.eclipse.tcf.internal.debug.ui.model;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 
 class StyledStringBuffer {
@@ -88,6 +89,23 @@ class StyledStringBuffer {
             styles.add(x);
         }
         bf.append(s.bf);
+        return this;
+    }
+
+    StyledStringBuffer append(Throwable x, RGB color) {
+        if (x == null) return this;
+        String[] a = ("Exception: " + TCFModel.getErrorMessage(x, true)).split("\n");
+        for (String s : a) {
+            int i = s.indexOf(':');
+            if (i >= 0) {
+                append(s.substring(0, i + 1), SWT.BOLD, null, color);
+                append(s.substring(i + 1), SWT.ITALIC, null, color);
+            }
+            else {
+                append(s, SWT.ITALIC, null, color);
+            }
+            bf.append('\n');
+        }
         return this;
     }
 
