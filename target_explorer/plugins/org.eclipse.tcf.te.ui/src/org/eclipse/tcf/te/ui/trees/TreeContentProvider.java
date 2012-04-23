@@ -109,7 +109,7 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 		this.viewer = (TreeViewer) viewer;
 		commonViewerListener = (CommonViewerListener) this.viewer.getData(KEY_CVL);
 		if (commonViewerListener == null) {
-			commonViewerListener = new CommonViewerListener(this.viewer);
+			commonViewerListener = new CommonViewerListener(this.viewer, this);
 			this.viewer.setData(KEY_CVL, commonViewerListener);
 		}
 	}

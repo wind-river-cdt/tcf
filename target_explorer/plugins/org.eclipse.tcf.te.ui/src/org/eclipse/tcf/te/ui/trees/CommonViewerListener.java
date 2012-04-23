@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -28,7 +27,6 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * CommonViewerListener listens to the property change event from the
@@ -62,10 +60,10 @@ class CommonViewerListener implements PropertyChangeListener, IPropertyChangeLis
 	 *
 	 * @param viewer The tree content provider.
 	 */
-	public CommonViewerListener(TreeViewer viewer) {
+	public CommonViewerListener(TreeViewer viewer, ITreeContentProvider contentProvider) {
 		Assert.isNotNull(viewer);
 		this.viewer = viewer;
-		this.contentProvider = (ITreeContentProvider) viewer.getContentProvider();
+		this.contentProvider = contentProvider;
 		this.task = new TimerTask(){
 			@Override
             public void run() {
@@ -173,7 +171,7 @@ class CommonViewerListener implements PropertyChangeListener, IPropertyChangeLis
 	    else {
 	    	// If there are multiple root nodes, then select NULL as the final root.
 			Object object = getCommonAncestor(objects);
-			if (object == null || getParent(object) == null) {
+			if (object == null) {
 				return NULL;
 			}
 			return object;
@@ -222,6 +220,10 @@ class CommonViewerListener implements PropertyChangeListener, IPropertyChangeLis
 		Object parent2 = getParent(object2);
 		if(parent2 != null) {
 			ancestor = getCommonAncestor(object1, parent2);
+		}
+		if(ancestor != null) return ancestor;
+		if(parent1 != null && parent2 != null) {
+			ancestor = getCommonAncestor(parent1, parent2);
 		}
 		return ancestor;
 	}
@@ -283,7 +285,7 @@ class CommonViewerListener implements PropertyChangeListener, IPropertyChangeLis
 		Object parent = getParent(object2);
 		if (parent == object1) return true;
 		return isAncestorOf(object1, parent);
-   }
+    }
 	
 	/**
 	 * Get the parent of the specified object in the display thread.
@@ -292,16 +294,7 @@ class CommonViewerListener implements PropertyChangeListener, IPropertyChangeLis
 	 * @return its parent.
 	 */
 	Object getParent(final Object object) {
-		if(Display.getCurrent() != null) {
-			return contentProvider.getParent(object);
-		}
-		final AtomicReference<Object> ref = new AtomicReference<Object>();
-		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable(){
-			@Override
-            public void run() {
-				ref.set(getParent(object));
-            }});
-		return ref.get();
+		return contentProvider.getParent(object);
 	}
 
 	/**
