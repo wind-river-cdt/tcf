@@ -57,8 +57,7 @@ public class RefreshDoneMonitorCallback extends Callback {
 	 */
 	@Override
 	protected void internalDone(Object caller, IStatus status) {
-		parentNode.childrenQueryRunning = false;
-		parentNode.childrenQueried = true;
+		parentNode.queryDone();
 		removeDead();
 		for (ProcessTreeNode node : parentNode.getChildren()) {
 			if (node.childrenQueried && !node.childrenQueryRunning) {

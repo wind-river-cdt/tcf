@@ -192,7 +192,7 @@ public class ProcessModel {
 	 */
 	public void queryChildren(ProcessTreeNode parentNode) {
 		Assert.isNotNull(parentNode);
-		parentNode.childrenQueryRunning = true;
+		parentNode.queryStarted();
 		Tcf.getChannelManager().openChannel(parentNode.peerNode.getPeer(), null, new QueryDoneOpenChannel(parentNode));
 	}
 
@@ -205,7 +205,7 @@ public class ProcessModel {
 	 */
 	public void refresh(final ProcessTreeNode parentNode, final ICallback callback) {
 		Assert.isNotNull(parentNode);
-		parentNode.childrenQueryRunning = true;
+		parentNode.queryStarted();
 		Tcf.getChannelManager().openChannel(parentNode.peerNode.getPeer(), null, new RefreshDoneOpenChannel(callback, parentNode));
 	}
 

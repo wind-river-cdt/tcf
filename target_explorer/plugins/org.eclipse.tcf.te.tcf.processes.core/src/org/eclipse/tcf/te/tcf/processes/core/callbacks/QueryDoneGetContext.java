@@ -84,7 +84,7 @@ public class QueryDoneGetContext implements ISysMonitor.DoneGetContext, IProcess
 			}
 			if (childNode != null) {
 				parentNode.addChild(childNode);
-				childNode.childrenQueryRunning = true;
+				childNode.queryStarted();
 				ISysMonitor service = channel.getRemoteService(ISysMonitor.class);
 				if (service != null) {
 					Queue<ProcessTreeNode> queue = new ConcurrentLinkedQueue<ProcessTreeNode>();

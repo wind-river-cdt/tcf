@@ -9,8 +9,6 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.ui.controls;
 
-import java.util.List;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.Viewer;
@@ -90,15 +88,16 @@ public class FSNavigatorContentProvider extends TreeContentProvider {
 			if(node.isPendingNode() || node.isFile()) {
 				return NO_ELEMENTS;
 			}
-			List<FSTreeNode> children = node.unsafeGetChildren();
 			if(!node.childrenQueried) {
 				if(!node.childrenQueryRunning) {
 					// Get the file system model root node, if already stored
 					node.queryChildren();
 				}
-				children.add(PENDING_NODE);
+				if(node.unsafeGetChildren().isEmpty()) {
+					return new Object[] {PENDING_NODE};
+				}
 			}
-			return children.toArray();
+			return node.unsafeGetChildren().toArray();
 		}
 
 		return NO_ELEMENTS;

@@ -64,8 +64,7 @@ public class QueryDoneOpenChannel implements IChannelManager.DoneOpenChannel {
 				service.getChildren(parentNode.id, new QueryDoneGetChildren(new Callback(){
 					@Override
                     protected void internalDone(Object caller, IStatus status) {
-						parentNode.childrenQueryRunning = false;
-						parentNode.childrenQueried = true;
+						parentNode.queryDone();
 						Tcf.getChannelManager().closeChannel(channel);
 						if(callback != null) {
 							callback.done(caller, status);

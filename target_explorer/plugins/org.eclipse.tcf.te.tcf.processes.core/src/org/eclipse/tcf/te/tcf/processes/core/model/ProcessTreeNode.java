@@ -382,4 +382,24 @@ public final class ProcessTreeNode extends PlatformObject implements IPeerModelP
 			firePropertyChange(new PropertyChangeEvent(this, "sContext", oldContext, context)); //$NON-NLS-1$
 		}
     }
+	
+	/**
+	 * Called when the children query is done.
+	 */
+	public void queryDone() {
+		if(isRootNode()) {
+			System.out.println();
+		}
+		childrenQueryRunning = false;
+		childrenQueried = true;
+		PropertyChangeEvent event = new PropertyChangeEvent(this, "childrenQueried", Boolean.FALSE, Boolean.TRUE); //$NON-NLS-1$
+		firePropertyChange(event);
+	}
+	
+	/**
+	 * Called when the children query is started.
+	 */
+	public void queryStarted() {
+		childrenQueryRunning = true;
+	}
 }

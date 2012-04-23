@@ -70,8 +70,7 @@ public class RefreshDoneGetChildren implements ISysMonitor.DoneGetChildren {
 					}
 				}
 			} else {
-	            parentNode.childrenQueryRunning = false;
-	            parentNode.childrenQueried = true;
+	            parentNode.queryDone();
 	            parentNode.clearChildren();
 				if (queue.isEmpty()) {
 					if(callback != null) {
@@ -83,8 +82,7 @@ public class RefreshDoneGetChildren implements ISysMonitor.DoneGetChildren {
 				}
 			}
     	} else {
-            parentNode.childrenQueryRunning = false;
-            parentNode.childrenQueried = true;
+            parentNode.queryDone();
 			if(callback != null) {
 				IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(), error.getMessage(), error);
 				callback.done(this, status);
