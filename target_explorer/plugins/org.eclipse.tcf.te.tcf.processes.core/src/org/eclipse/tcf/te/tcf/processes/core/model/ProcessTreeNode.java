@@ -387,9 +387,6 @@ public final class ProcessTreeNode extends PlatformObject implements IPeerModelP
 	 * Called when the children query is done.
 	 */
 	public void queryDone() {
-		if(isRootNode()) {
-			System.out.println();
-		}
 		childrenQueryRunning = false;
 		childrenQueried = true;
 		PropertyChangeEvent event = new PropertyChangeEvent(this, "childrenQueried", Boolean.FALSE, Boolean.TRUE); //$NON-NLS-1$
