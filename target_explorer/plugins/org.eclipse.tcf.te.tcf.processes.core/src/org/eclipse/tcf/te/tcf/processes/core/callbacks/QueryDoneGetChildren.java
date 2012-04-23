@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.processes.ui.internal.callbacks;
+package org.eclipse.tcf.te.tcf.processes.core.callbacks;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -16,8 +16,8 @@ import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
-import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
-import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
+import org.eclipse.tcf.te.tcf.processes.core.activator.CoreBundleActivator;
+import org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode;
 
 /**
  * The callback handler that handles the result of service.getChildren when querying.
@@ -67,7 +67,7 @@ public class QueryDoneGetChildren implements ISysMonitor.DoneGetChildren {
 	 		}
 		}
 		else if (callback != null) {
-			IStatus status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), error.getMessage(), error);
+			IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(), error.getMessage(), error);
 			callback.done(this, status);
 		}
     }

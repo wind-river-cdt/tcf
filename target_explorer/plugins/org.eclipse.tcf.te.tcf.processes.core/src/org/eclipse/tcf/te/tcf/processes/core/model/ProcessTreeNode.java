@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.processes.ui.model;
+package org.eclipse.tcf.te.tcf.processes.core.model;
 
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ import org.eclipse.tcf.services.ISysMonitor.SysMonitorContext;
 import org.eclipse.tcf.te.core.interfaces.IViewerInput;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
-import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
+import org.eclipse.tcf.te.tcf.processes.core.nls.Messages;
 
 /**
  * Representation of a process tree node.

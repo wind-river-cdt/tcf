@@ -10,7 +10,7 @@
 package org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed;
 
 import org.eclipse.jface.viewers.IFilter;
-import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
+import org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode;
 
 /**
  * The filter to filter out root and pending process node.

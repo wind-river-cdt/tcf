@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.processes.ui.internal.callbacks;
+package org.eclipse.tcf.te.tcf.processes.core.callbacks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
-import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
+import org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode;
 
 /**
  * The monitor's callback invoked after all the contexts of the processes have been 

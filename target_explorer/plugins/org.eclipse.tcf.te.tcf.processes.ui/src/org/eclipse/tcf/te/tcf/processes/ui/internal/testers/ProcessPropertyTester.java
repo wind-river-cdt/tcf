@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.tcf.protocol.Protocol;
-import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
+import org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode;
 
 /**
  * The property tester for a process tree node.

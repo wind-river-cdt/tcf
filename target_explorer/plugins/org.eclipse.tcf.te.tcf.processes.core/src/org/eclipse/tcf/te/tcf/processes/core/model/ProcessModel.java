@@ -7,10 +7,9 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.processes.ui.model;
+package org.eclipse.tcf.te.tcf.processes.core.model;
 
 import java.beans.PropertyChangeEvent;
-import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicReference;
@@ -18,24 +17,22 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.core.interfaces.IViewerInput;
 import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
-import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
-import org.eclipse.tcf.te.tcf.processes.ui.internal.callbacks.QueryDoneOpenChannel;
-import org.eclipse.tcf.te.tcf.processes.ui.internal.callbacks.RefreshChildrenDoneOpenChannel;
-import org.eclipse.tcf.te.tcf.processes.ui.internal.callbacks.RefreshDoneOpenChannel;
-import org.eclipse.tcf.te.tcf.processes.ui.internal.preferences.IPreferenceConsts;
+import org.eclipse.tcf.te.tcf.processes.core.activator.CoreBundleActivator;
+import org.eclipse.tcf.te.tcf.processes.core.callbacks.QueryDoneOpenChannel;
+import org.eclipse.tcf.te.tcf.processes.core.callbacks.RefreshChildrenDoneOpenChannel;
+import org.eclipse.tcf.te.tcf.processes.core.callbacks.RefreshDoneOpenChannel;
 
 /**
  * The process tree model implementation.
  */
-public class ProcessModel implements IPreferenceConsts{
-	/* default */static final String PROCESS_ROOT_KEY = UIPlugin.getUniqueIdentifier() + ".process.root"; //$NON-NLS-1$
+public class ProcessModel {
+	/* default */static final String PROCESS_ROOT_KEY = CoreBundleActivator.getUniqueIdentifier() + ".process.root"; //$NON-NLS-1$
 
 	/**
 	 * Get the process model stored in the peer model.
@@ -246,47 +243,6 @@ public class ProcessModel implements IPreferenceConsts{
 			refresh(this.root, null);
 		}
 	}
-
-	/**
-	 * Update the most recently  used interval adding
-	 * a new interval.
-	 *
-	 * @param interval The new interval.
-	 */
-	public void addMRUInterval(int interval){
-        IPreferenceStore prefStore = UIPlugin.getDefault().getPreferenceStore();
-        String mruList = prefStore.getString(PREF_INTERVAL_MRU_LIST);
-        if (mruList == null || mruList.trim().length() == 0) {
-        	mruList = "" + interval; //$NON-NLS-1$
-        }else{
-        	StringTokenizer st = new StringTokenizer(mruList, ":"); //$NON-NLS-1$
-        	int maxCount = prefStore.getInt(PREF_INTERVAL_MRU_COUNT);
-        	boolean found = false;
-        	while (st.hasMoreTokens()) {
-        		String token = st.nextToken();
-        		try {
-        			int s = Integer.parseInt(token);
-        			if(s == interval ) {
-        				found = true;
-        				break;
-        			}
-        		}
-        		catch (NumberFormatException nfe) {
-        		}
-        	}
-        	if(!found) {
-        		mruList = mruList + ":" + interval; //$NON-NLS-1$
-        		st = new StringTokenizer(mruList, ":"); //$NON-NLS-1$
-        		if(st.countTokens() > maxCount) {
-        			int comma = mruList.indexOf(":"); //$NON-NLS-1$
-        			if(comma != -1) {
-        				mruList = mruList.substring(comma+1);
-        			}
-        		}
-        	}
-        }
-        prefStore.setValue(PREF_INTERVAL_MRU_LIST, mruList);
-    }
 
 	/**
 	 * If the polling has been stopped.

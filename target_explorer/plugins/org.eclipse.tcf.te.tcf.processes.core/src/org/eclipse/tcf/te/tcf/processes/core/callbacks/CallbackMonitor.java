@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.processes.ui.internal.callbacks;
+package org.eclipse.tcf.te.tcf.processes.core.callbacks;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,8 +20,8 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
-import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
-import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
+import org.eclipse.tcf.te.tcf.processes.core.activator.CoreBundleActivator;
+import org.eclipse.tcf.te.tcf.processes.core.nls.Messages;
 
 /**
  * A helper class used to synchronize multiple threads. It is used
@@ -178,6 +178,6 @@ public class CallbackMonitor {
 			list.add(status);
 		}
 		IStatus[] children = list.toArray(new IStatus[list.size()]); 
-		return new MultiStatus(UIPlugin.getUniqueIdentifier(), 0, children, Messages.CallbackMonitor_AllTasksFinished, null);
+		return new MultiStatus(CoreBundleActivator.getUniqueIdentifier(), 0, children, Messages.CallbackMonitor_AllTasksFinished, null);
 	}
 }

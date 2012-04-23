@@ -10,12 +10,18 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.7.0",
  org.eclipse.tcf.te.runtime.services;bundle-version="1.0.0",
  org.eclipse.tcf.te.core;bundle-version="1.0.0",
  org.eclipse.tcf.core;bundle-version="1.0.0",
- org.eclipse.tcf.te.tcf.core;bundle-version="1.0.0"
+ org.eclipse.tcf.te.tcf.core;bundle-version="1.0.0",
+ org.eclipse.tcf.te.tcf.locator;bundle-version="1.0.0",
+ org.eclipse.tcf.te.runtime.model;bundle-version="1.0.0",
+ org.eclipse.tcf.te.runtime.statushandler;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: org.eclipse.tcf.te.tcf.processes.core.activator;x-internal:=true,
+ org.eclipse.tcf.te.tcf.processes.core.callbacks;x-friends:="org.eclipse.tcf.te.tcf.processes.ui",
  org.eclipse.tcf.te.tcf.processes.core.interfaces.launcher,
  org.eclipse.tcf.te.tcf.processes.core.interfaces.tracing;x-internal:=true,
  org.eclipse.tcf.te.tcf.processes.core.launcher,
+ org.eclipse.tcf.te.tcf.processes.core.model;x-friends:="org.eclipse.tcf.te.tcf.processes.ui",
+ org.eclipse.tcf.te.tcf.processes.core.model.steps;x-friends:="org.eclipse.tcf.te.tcf.processes.ui",
  org.eclipse.tcf.te.tcf.processes.core.nls

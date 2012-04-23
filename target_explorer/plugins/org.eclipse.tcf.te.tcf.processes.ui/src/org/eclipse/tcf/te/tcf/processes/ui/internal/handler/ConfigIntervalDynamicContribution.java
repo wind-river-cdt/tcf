@@ -27,9 +27,10 @@ import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.tcf.processes.core.model.ProcessModel;
 import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.processes.ui.internal.preferences.IPreferenceConsts;
-import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
+import org.eclipse.tcf.te.tcf.processes.ui.internal.preferences.PreferencesInitializer;
 import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.ISources;
@@ -110,7 +111,7 @@ public class ConfigIntervalDynamicContribution extends CompoundContributionItem 
         public void run() {
 			if (isChecked()) {
 				this.model.setInterval(seconds);
-				model.addMRUInterval(seconds);
+				PreferencesInitializer.addMRUInterval(seconds);
 			}
         }
 	}

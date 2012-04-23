@@ -12,7 +12,7 @@ package org.eclipse.tcf.te.tcf.processes.ui.internal.columns;
 import java.io.Serializable;
 import java.util.Comparator;
 
-import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
+import org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode;
 
 /**
  * The comparator for the tree column "PID".

@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.processes.ui.model;
+package org.eclipse.tcf.te.tcf.processes.ui.internal.dialogs;
 
 /**
  * The data model to contain the information of a refreshing grade including

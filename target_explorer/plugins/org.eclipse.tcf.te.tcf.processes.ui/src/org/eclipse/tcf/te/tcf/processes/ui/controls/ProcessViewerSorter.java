@@ -11,8 +11,8 @@ package org.eclipse.tcf.te.tcf.processes.ui.controls;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode;
 import org.eclipse.tcf.te.tcf.processes.ui.internal.columns.ProcessComparator;
-import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
 
 /**
  * The common sorter for the process contribution to the target explorer.

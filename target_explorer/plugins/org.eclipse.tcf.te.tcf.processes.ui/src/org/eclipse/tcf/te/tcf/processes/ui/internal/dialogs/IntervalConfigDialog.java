@@ -31,7 +31,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.processes.ui.internal.preferences.IPreferenceConsts;
-import org.eclipse.tcf.te.tcf.processes.ui.model.IntervalGrade;
 import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
 
 /**

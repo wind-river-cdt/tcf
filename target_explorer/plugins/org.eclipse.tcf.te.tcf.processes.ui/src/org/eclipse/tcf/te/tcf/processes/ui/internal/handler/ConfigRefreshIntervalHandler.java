@@ -15,8 +15,9 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.tcf.processes.core.model.ProcessModel;
 import org.eclipse.tcf.te.tcf.processes.ui.internal.dialogs.IntervalConfigDialog;
-import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessModel;
+import org.eclipse.tcf.te.tcf.processes.ui.internal.preferences.PreferencesInitializer;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.handlers.HandlerUtil;
 
@@ -44,7 +45,7 @@ public class ConfigRefreshIntervalHandler extends AbstractHandler {
 				interval = dialog.getResult();
 				ProcessModel processModel = ProcessModel.getProcessModel(peer);
 				processModel.setInterval(interval);
-				processModel.addMRUInterval(interval);
+				PreferencesInitializer.addMRUInterval(interval);
 			}
 		}
 		return null;

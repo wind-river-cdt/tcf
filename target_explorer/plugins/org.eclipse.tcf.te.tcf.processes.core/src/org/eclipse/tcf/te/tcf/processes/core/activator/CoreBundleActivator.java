@@ -9,18 +9,21 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.processes.core.activator;
 
+import org.eclipse.core.runtime.Plugin;
 import org.eclipse.tcf.te.runtime.tracing.TraceHandler;
-import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 /**
  * The activator class controls the plug-in life cycle
  */
-public class CoreBundleActivator implements BundleActivator {
+public class CoreBundleActivator extends Plugin {
 	// The bundle context
 	private static BundleContext context;
 	// The trace handler instance
 	private static volatile TraceHandler traceHandler;
+	
+	// The shared instance
+	private static CoreBundleActivator plugin;
 
 	/**
 	 * Returns the bundle context
@@ -29,6 +32,15 @@ public class CoreBundleActivator implements BundleActivator {
 	 */
 	public static BundleContext getContext() {
 		return context;
+	}
+
+	/**
+	 * Returns the shared instance
+	 *
+	 * @return the shared instance
+	 */
+	public static CoreBundleActivator getDefault() {
+		return plugin;
 	}
 
 	/**
@@ -59,6 +71,7 @@ public class CoreBundleActivator implements BundleActivator {
 	@Override
 	public void start(BundleContext bundleContext) throws Exception {
 		CoreBundleActivator.context = bundleContext;
+		plugin = this;
 	}
 
 	/* (non-Javadoc)
@@ -67,6 +80,7 @@ public class CoreBundleActivator implements BundleActivator {
 	@Override
 	public void stop(BundleContext bundleContext) throws Exception {
 		CoreBundleActivator.context = null;
+		plugin = null;
 	}
 
 }

@@ -5,7 +5,7 @@
 <!-- Adapter factory contributions -->
    <extension point="org.eclipse.core.runtime.adapters">
       <factory
-            adaptableType="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode"
+            adaptableType="org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode"
             class="org.eclipse.tcf.te.tcf.processes.ui.internal.adapters.AdapterFactory">
          <adapter type="org.eclipse.jface.viewers.ILabelProvider"/>
          <adapter type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
@@ -236,7 +236,7 @@
                         operator="and">
                      <and>
                         <instanceof
-                              value="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
+                              value="org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode">
                         </instanceof>
                         <not>
                            <test
@@ -266,7 +266,7 @@
                         operator="and">
                      <and>
                         <instanceof
-                              value="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
+                              value="org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode">
                         </instanceof>
                         <not>
                            <test
@@ -348,7 +348,7 @@
                <with variable="selection">
                   <count value="+"/>
                   <iterate operator="and" ifEmpty="false">
-                     <adapt type="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
+                     <adapt type="org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode">
                         <test property="org.eclipse.tcf.te.tcf.processes.ui.model.isAttached" value="false"/>
                      </adapt>
                   </iterate>
@@ -378,7 +378,7 @@
                <with variable="selection">
                   <count value="+"/>
                   <iterate operator="and" ifEmpty="false">
-                     <adapt type="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
+                     <adapt type="org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode">
                         <test property="org.eclipse.tcf.te.tcf.processes.ui.model.isAttached" value="true"/>
                      </adapt>
                   </iterate>
@@ -416,7 +416,7 @@
                      ifEmpty="false"
                      operator="and">
                   <adapt
-                        type="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
+                        type="org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode">
                   </adapt>
                </iterate>
             </with>
@@ -435,7 +435,7 @@
             <count value="+"/>
             <iterate operator="and" ifEmpty="false">
                <and>
-                  <instanceof value="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode"/>
+                  <instanceof value="org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode"/>
                   <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel">
                      <test
                            property="org.eclipse.tcf.te.tcf.locator.hasRemoteService"
@@ -557,7 +557,7 @@
          </triggerPoints>
          <possibleChildren>
             <instanceof
-                  value="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
+                  value="org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode">
             </instanceof>
          </possibleChildren>
          <commonSorter
@@ -670,7 +670,7 @@
          <enabledWhen>
             <and>
                <instanceof
-                     value="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
+                     value="org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode">
                </instanceof>
                <not>
                   <test
@@ -687,7 +687,7 @@
          <enabledWhen>
             <and>
                <instanceof
-                     value="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
+                     value="org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode">
                </instanceof>
                <not>
                   <test
@@ -704,7 +704,7 @@
          <enabledWhen>
             <and>
                <instanceof
-                     value="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
+                     value="org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode">
                </instanceof>
                <not>
                   <test
@@ -722,7 +722,7 @@
             id="org.eclipse.tcf.te.tcf.processes.ui.propertytester.process"
             namespace="org.eclipse.tcf.te.tcf.processes.ui.model"
             properties="isSystemRoot, isAttached"
-            type="org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode">
+            type="org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode">
       </propertyTester>
    </extension>
    

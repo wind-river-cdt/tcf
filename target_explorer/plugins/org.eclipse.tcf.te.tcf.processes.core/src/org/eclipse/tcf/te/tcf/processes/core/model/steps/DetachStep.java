@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.processes.ui.model.steps;
+package org.eclipse.tcf.te.tcf.processes.core.model.steps;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
@@ -18,6 +18,8 @@ import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.IProcesses.ProcessContext;
+import org.eclipse.tcf.services.ISysMonitor;
+import org.eclipse.tcf.services.ISysMonitor.SysMonitorContext;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
@@ -26,43 +28,46 @@ import org.eclipse.tcf.te.runtime.statushandler.interfaces.IStatusHandler;
 import org.eclipse.tcf.te.runtime.statushandler.interfaces.IStatusHandlerConstants;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
-import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
-import org.eclipse.tcf.te.tcf.processes.ui.help.IContextHelpIds;
-import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
-import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
+import org.eclipse.tcf.te.tcf.processes.core.activator.CoreBundleActivator;
+import org.eclipse.tcf.te.tcf.processes.core.interfaces.IContextHelpIds;
+import org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode;
+import org.eclipse.tcf.te.tcf.processes.core.nls.Messages;
 
 /**
- * Process context terminate step implementation.
+ * Process context detach step implementation.
  */
-public class TerminateStep {
+public class DetachStep {
 
 	/**
-	 * Terminate from the given process context.
+	 * Detach from the given process context.
 	 * <p>
 	 * <b>Note:</b> This method must be called from within the TCF dispatch thread.
 	 *
 	 * @param node The context node. Must not be <code>null</code>.
 	 * @param callback The callback to invoke once the operation completed, or <code>null</code>.
 	 */
-	public void executeTerminate(final ProcessTreeNode node, final ICallback callback) {
+	public void executeDetach(final ProcessTreeNode node, final ICallback callback) {
 		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 		Assert.isNotNull(node);
 
 		// If the context is not attached, there is nothing to do
-		if (node.pContext != null) {
+		if (node.pContext != null && node.pContext.isAttached()) {
 			if (node.peerNode != null) {
-				doTerminate(node, callback);
+				doDetach(node, callback);
 			} else {
 				onError(node, Messages.DetachStep_error_disconnect, null, callback);
 			}
-		}
-		else {
-			onError(node, Messages.DetachStep_error_disconnect, null, callback);
+		} else {
+			if (node.pContext == null) {
+				onError(node, Messages.DetachStep_error_disconnect, null, callback);
+			} else {
+				onDone(callback);
+			}
 		}
 	}
 
 	/**
-	 * Opens a channel and perform the terminate to the given context node.
+	 * Opens a channel and perform the detach to the given context node.
 	 * <p>
 	 * <b>Note:</b> This method must be called from within the TCF dispatch thread.
 	 *
@@ -70,7 +75,7 @@ public class TerminateStep {
 	 * @param node The context node. Must not be <code>null</code>.
 	 * @param callback The callback to invoke once the operation completed, or<code>null</code>.
 	 */
-	protected void doTerminate(final ProcessTreeNode node, final ICallback callback) {
+	protected void doDetach(final ProcessTreeNode node, final ICallback callback) {
 		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 		Assert.isNotNull(node);
 
@@ -85,12 +90,30 @@ public class TerminateStep {
 							@Override
 							public void doneGetContext(IToken token, Exception error, ProcessContext context) {
 								if (error == null && context != null) {
-									context.terminate(new IProcesses.DoneCommand() {
+									context.detach(new IProcesses.DoneCommand() {
 										@Override
 										public void doneCommand(IToken token, Exception error) {
 											if (error == null) {
-												// We are terminated now, trigger a refresh of the node
-												onDone(callback);
+												// We are detached now, trigger a refresh of the node
+												ISysMonitor monService = channel.getRemoteService(ISysMonitor.class);
+												if (monService != null) {
+													monService.getContext(node.id, new ISysMonitor.DoneGetContext() {
+														@Override
+														public void doneGetContext(IToken token, Exception error, SysMonitorContext context) {
+															node.updateSysMonitorContext(context);
+
+															service.getContext(node.pContext.getID(), new IProcesses.DoneGetContext() {
+																@Override
+																public void doneGetContext(IToken token, Exception error, ProcessContext context) {
+																	node.setProcessContext(context);
+																	onDone(callback);
+																}
+															});
+														}
+													});
+												} else {
+													onDone(callback);
+												}
 											} else {
 												onError(node, Messages.DetachStep_error_detach, error, callback);
 											}
@@ -134,7 +157,7 @@ public class TerminateStep {
 		else fullMessage = detailMessage;
 
 		if (fullMessage != null) {
-			IStatus status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), fullMessage, error);
+			IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(), fullMessage, error);
 
 			if (callback == null) {
 				IStatusHandler[] handlers = StatusHandlerManager.getInstance().getHandler(context);
@@ -146,7 +169,7 @@ public class TerminateStep {
 
 					handlers[0].handleStatus(status, data, null);
 				} else {
-					UIPlugin.getDefault().getLog().log(status);
+					CoreBundleActivator.getDefault().getLog().log(status);
 				}
 			}
 			else {

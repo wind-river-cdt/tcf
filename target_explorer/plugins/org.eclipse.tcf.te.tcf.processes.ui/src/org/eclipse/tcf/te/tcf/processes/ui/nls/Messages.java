@@ -39,7 +39,6 @@ public class Messages extends NLS {
 	public static String ProcessesTreeControl_column_user_label;
 
 	public static String ProcessLabelProvider_NullNameNodeLabel;
-	public static String ProcessLabelProvider_RootNodeLabel;
 
 	public static String ProcessPreferencePage_BiggerThanZero;
 	public static String ProcessPreferencePage_DefineMoreThanOne;
@@ -84,8 +83,6 @@ public class Messages extends NLS {
 	public static String BasicInformationSection_Title;
 	public static String BasicInformationSection_Type;
 	public static String BasicInformationSection_User;
-
-	public static String CallbackMonitor_AllTasksFinished;
 
 	public static String ConfigIntervalDynamicContribution_Custom;
 
@@ -171,18 +168,6 @@ public class Messages extends NLS {
 	public static String NewSpeedGradeDialog_NameLabel;
 	public static String NewSpeedGradeDialog_ValueLabel;
 
-	public static String AttachStep_error_title;
-	public static String AttachStep_error_connect;
-	public static String AttachStep_error_getContext;
-	public static String AttachStep_error_attach;
-	public static String AttachStep_error_openChannel;
-
-	public static String DetachStep_error_title;
-	public static String DetachStep_error_disconnect;
-	public static String DetachStep_error_getContext;
-	public static String DetachStep_error_detach;
-	public static String DetachStep_error_openChannel;
-
 	public static String GeneralInformationPage_InternalPID;
 
 	public static String GeneralInformationPage_InternalPPID;
@@ -199,7 +184,7 @@ public class Messages extends NLS {
 
 	public static String GeneralInformationPage_User;
 	
-	public static String PendingOperation_label;
 
 	public static String TerminateHandler_TerminationError;
+	public static String ProcessLabelProvider_RootNodeLabel;
 }

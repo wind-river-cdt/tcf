@@ -17,8 +17,8 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.tcf.protocol.Protocol;
-import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
-import org.eclipse.tcf.te.tcf.processes.ui.model.steps.DetachStep;
+import org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode;
+import org.eclipse.tcf.te.tcf.processes.core.model.steps.DetachStep;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**

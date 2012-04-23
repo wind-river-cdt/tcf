@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.processes.ui.model.steps;
+package org.eclipse.tcf.te.tcf.processes.core.model.steps;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
@@ -31,10 +31,10 @@ import org.eclipse.tcf.te.runtime.statushandler.interfaces.IStatusHandler;
 import org.eclipse.tcf.te.runtime.statushandler.interfaces.IStatusHandlerConstants;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
-import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
-import org.eclipse.tcf.te.tcf.processes.ui.help.IContextHelpIds;
-import org.eclipse.tcf.te.tcf.processes.ui.model.ProcessTreeNode;
-import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
+import org.eclipse.tcf.te.tcf.processes.core.activator.CoreBundleActivator;
+import org.eclipse.tcf.te.tcf.processes.core.interfaces.IContextHelpIds;
+import org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode;
+import org.eclipse.tcf.te.tcf.processes.core.nls.Messages;
 
 /**
  * Process attach step implementation.
@@ -180,7 +180,7 @@ public class AttachStep {
 		else fullMessage = detailMessage;
 
 		if (fullMessage != null) {
-			IStatus status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), fullMessage, error);
+			IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(), fullMessage, error);
 
 			if (callback == null) {
 				IStatusHandler[] handlers = StatusHandlerManager.getInstance().getHandler(context);
@@ -192,7 +192,7 @@ public class AttachStep {
 
 					handlers[0].handleStatus(status, data, null);
 				} else {
-					UIPlugin.getDefault().getLog().log(status);
+					CoreBundleActivator.getDefault().getLog().log(status);
 				}
 			}
 			else {
