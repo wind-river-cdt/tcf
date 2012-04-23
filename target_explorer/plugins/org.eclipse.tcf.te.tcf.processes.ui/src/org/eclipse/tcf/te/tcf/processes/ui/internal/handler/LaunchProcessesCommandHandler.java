@@ -11,16 +11,14 @@ package org.eclipse.tcf.te.tcf.processes.ui.internal.handler;
 
 import java.util.Map;
 
+import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.tcf.protocol.IChannel;
-import org.eclipse.tcf.te.tcf.processes.ui.help.IContextHelpIds;
-import org.eclipse.tcf.te.tcf.processes.ui.internal.dialogs.LaunchObjectDialog;
-import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
 import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
@@ -30,6 +28,9 @@ import org.eclipse.tcf.te.runtime.statushandler.interfaces.IStatusHandlerConstan
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.processes.core.interfaces.launcher.IProcessLauncher;
 import org.eclipse.tcf.te.tcf.processes.core.launcher.ProcessLauncher;
+import org.eclipse.tcf.te.tcf.processes.ui.help.IContextHelpIds;
+import org.eclipse.tcf.te.tcf.processes.ui.internal.dialogs.LaunchObjectDialog;
+import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -37,78 +38,79 @@ import org.eclipse.ui.handlers.HandlerUtil;
 /**
  * Launch a process on the selected peer.
  */
-public class LaunchProcessesCommandHandler extends AbstractChannelCommandHandler {
+public class LaunchProcessesCommandHandler extends AbstractHandler {
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.processes.ui.internal.handler.AbstractChannelCommandHandler#execute(org.eclipse.core.commands.ExecutionEvent, org.eclipse.tcf.protocol.IChannel, org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel, org.eclipse.tcf.te.tcf.processes.ui.internal.handler.AbstractChannelCommandHandler.DoneExecute)
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
 	 */
 	@Override
-	protected void execute(final ExecutionEvent event, final IChannel channel, final IPeerModel node, final DoneExecute callback) {
-		Assert.isNotNull(event);
-		Assert.isNotNull(channel);
-		Assert.isNotNull(node);
-		Assert.isNotNull(callback);
-
-		// Get the shell
-		Shell shell = HandlerUtil.getActiveShell(event);
-		// Get the parent editor part
-		IWorkbenchPart activePart = HandlerUtil.getActivePart(event);
-		IEditorPart editorPart = activePart != null ? (IEditorPart)activePart.getAdapter(IEditorPart.class) : null;
-		// Open the dialog
-		LaunchObjectDialog dialog = doCreateDialog(editorPart, shell);
+	public Object execute(ExecutionEvent event) throws ExecutionException {
+		LaunchObjectDialog dialog = createLaunchDialog(event);
+		IPeerModel node = getPeerNode(event);
 		dialog.setNode(node);
 		if (dialog.open() == Window.OK) {
-			// Get the new launch attributes
-			Map<String, Object> launchAttributes = dialog.getLaunchAttributes();
-			if (launchAttributes != null) {
-				// Construct the launcher object
+			Map<String, Object> attrs = dialog.getLaunchAttributes();
+			if (attrs != null) {
 				ProcessLauncher launcher = new ProcessLauncher();
-
-				// Add some additional options
-				launchAttributes.put(IProcessLauncher.PROP_PROCESS_ASSOCIATE_CONSOLE, Boolean.TRUE);
-
-				// Launch the process
-				IPropertiesContainer container = new PropertiesContainer();
-				container.setProperties(launchAttributes);
-				launcher.launch(channel.getRemotePeer(), container, new Callback() {
-					/* (non-Javadoc)
-					 * @see org.eclipse.tcf.te.runtime.callback.Callback#internalDone(java.lang.Object, org.eclipse.core.runtime.IStatus)
-					 */
+				attrs.put(IProcessLauncher.PROP_PROCESS_ASSOCIATE_CONSOLE, Boolean.TRUE);
+				IPropertiesContainer properties = new PropertiesContainer();
+				properties.setProperties(attrs);
+				launcher.launch(node.getPeer(), properties, new Callback() {
 					@Override
-					protected void internalDone(Object caller, IStatus status) {
-						if (!status.isOK() && status.getSeverity() != IStatus.CANCEL) {
-							// Launch failed, pass on to the user
-							IStatusHandler[] handler = StatusHandlerManager.getInstance().getHandler(LaunchProcessesCommandHandler.class);
-							if (handler != null && handler.length > 0) {
-								IPropertiesContainer data = new PropertiesContainer();
-								data.setProperty(IStatusHandlerConstants.PROPERTY_TITLE, Messages.LaunchProcessesCommandHandler_error_title);
-								data.setProperty(IStatusHandlerConstants.PROPERTY_CONTEXT_HELP_ID, IContextHelpIds.LAUNCH_PROCESS_ERROR_DIALOG);
-								data.setProperty(IStatusHandlerConstants.PROPERTY_CALLER, caller != null ? caller : LaunchProcessesCommandHandler.this);
-
-								// Take the first status handler in the list
-								handler[0].handleStatus(status, data, null);
-							}
-						}
-						// Invoke the outer callback
-						callback.doneExecute(Status.OK_STATUS, null);
+					public void internalDone(Object caller, IStatus status) {
+						handleStatus(status);
 					}
 				});
-				// Callback will be invoked once the launch is done
-				return;
 			}
 		}
-		// Invoke the outer callback
-		callback.doneExecute(Status.OK_STATUS, null);
+		return null;
 	}
 
 	/**
-	 * Create the dialog object.
-	 *
-	 * @param part The active editor part or <code>null</code>.
-	 * @param shell The shell or <code>null</code>.
-	 * @return The dialog.
+	 * Get the selected peer model from the execution event.
+	 * 
+	 * @param event The execution event with which the handler is invoked.
+	 * @return The peer model selected in this execution event.
+	 * @throws ExecutionException The exception when getting this peer model.
 	 */
-	protected LaunchObjectDialog doCreateDialog(IEditorPart part, Shell shell) {
-		return new LaunchObjectDialog(part, shell);
-	}
+	private IPeerModel getPeerNode(ExecutionEvent event) throws ExecutionException {
+	    IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getActiveMenuSelectionChecked(event);
+		Assert.isTrue(selection.size() == 1);
+		Object element = selection.getFirstElement();
+		Assert.isTrue(element instanceof IPeerModel);
+		return (IPeerModel) element;
+    }
+
+	/**
+	 * Create a launch dialog in which the configuration for this launch is entered.
+	 * 
+	 * @param event The execution event with which the handler is invoked.
+	 * @return The launch dialog to input the configuration.
+	 * @throws ExecutionException Exception thrown during creating the dialog
+	 */
+	private LaunchObjectDialog createLaunchDialog(ExecutionEvent event) throws ExecutionException {
+	    Shell shell = HandlerUtil.getActiveShellChecked(event);
+		IWorkbenchPart activePart = HandlerUtil.getActivePartChecked(event);
+		IEditorPart editorPart = (IEditorPart) activePart.getAdapter(IEditorPart.class);
+		return new LaunchObjectDialog(editorPart, shell);
+    }
+
+	/**
+	 * Handle the resulting status of the process launching.
+	 * 
+	 * @param status The resulting status of the process launching.
+	 */
+	protected void handleStatus(IStatus status) {
+		if (status.getSeverity() != IStatus.OK && status.getSeverity() != IStatus.CANCEL) {
+			IStatusHandler[] handlers = StatusHandlerManager.getInstance().getHandler(getClass());
+			if (handlers != null && handlers.length > 0) {
+				IPropertiesContainer data = new PropertiesContainer();
+				data.setProperty(IStatusHandlerConstants.PROPERTY_TITLE, Messages.AbstractChannelCommandHandler_statusDialog_title);
+				data.setProperty(IStatusHandlerConstants.PROPERTY_CONTEXT_HELP_ID, IContextHelpIds.CHANNEL_COMMAND_HANDLER_STATUS_DIALOG);
+				data.setProperty(IStatusHandlerConstants.PROPERTY_DONT_ASK_AGAIN_ID, null);
+				data.setProperty(IStatusHandlerConstants.PROPERTY_CALLER, this);
+				handlers[0].handleStatus(status, data, null);
+			}
+		}
+    }
 }
