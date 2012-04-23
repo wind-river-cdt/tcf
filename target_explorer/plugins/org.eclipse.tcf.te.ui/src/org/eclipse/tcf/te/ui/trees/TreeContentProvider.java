@@ -26,7 +26,6 @@ import org.eclipse.tcf.te.core.interfaces.IViewerInput;
  * The base tree content provider that defines several default methods.
  */
 public abstract class TreeContentProvider implements ITreeContentProvider {
-	private static final String KEY_CVL = "common_viewer_listener"; //$NON-NLS-1$
 
 	/**
 	 * Static reference to the return value representing no elements.
@@ -107,11 +106,7 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		Assert.isTrue(viewer instanceof TreeViewer);
 		this.viewer = (TreeViewer) viewer;
-		commonViewerListener = (CommonViewerListener) this.viewer.getData(KEY_CVL);
-		if (commonViewerListener == null) {
-			commonViewerListener = new CommonViewerListener(this.viewer, this);
-			this.viewer.setData(KEY_CVL, commonViewerListener);
-		}
+		this.commonViewerListener = new CommonViewerListener(this.viewer, this);
 	}
 	
 	/**

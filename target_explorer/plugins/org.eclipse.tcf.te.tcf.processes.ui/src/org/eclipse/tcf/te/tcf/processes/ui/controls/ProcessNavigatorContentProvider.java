@@ -9,6 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.processes.ui.controls;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
@@ -92,16 +94,15 @@ public class ProcessNavigatorContentProvider  extends TreeContentProvider implem
 			if(node.isPendingNode()) {
 				return NO_ELEMENTS;
 			}
+			List<ProcessTreeNode> children = node.getChildren();
 			if (!node.childrenQueried) {
 				if (!node.childrenQueryRunning) {
 					ProcessModel model = ProcessModel.getProcessModel(node.peerNode);
 					model.queryChildren(node);
 				}
-				if(node.getChildren().isEmpty()) {
-					return new Object[] {ProcessTreeNode.PENDING_NODE};
-				}
+				children.add(ProcessTreeNode.PENDING_NODE);
 			}
-			return node.getChildren().toArray();
+			return children.toArray();
 		}
 		return NO_ELEMENTS;
 	}
