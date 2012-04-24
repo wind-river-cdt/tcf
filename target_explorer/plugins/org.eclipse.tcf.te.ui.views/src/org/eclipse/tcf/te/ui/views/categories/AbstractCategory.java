@@ -26,6 +26,8 @@ public abstract class AbstractCategory extends ExecutableExtension implements IC
 	// The category image / image descriptor
 	private ImageDescriptor descriptor = null;
 	private Image image = null;
+	// The sorting rank
+	private int rank = -1;
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.runtime.extensions.ExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
@@ -41,6 +43,14 @@ public abstract class AbstractCategory extends ExecutableExtension implements IC
         	if (descriptor != null) {
         		image = JFaceResources.getResources().createImageWithDefault(descriptor);
         	}
+        }
+
+        // Read the rank attribute
+        String attrRank = config.getAttribute("rank"); //$NON-NLS-1$
+        if (attrRank != null) {
+        	try {
+        		rank = Integer.valueOf(attrRank).intValue();
+        	} catch (NumberFormatException e) { /* ignored on purpose */ }
         }
 	}
 
@@ -62,5 +72,13 @@ public abstract class AbstractCategory extends ExecutableExtension implements IC
 	@Override
 	public Image getImage() {
 	    return image;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.views.interfaces.ICategory#getRank()
+	 */
+	@Override
+	public int getRank() {
+	    return rank;
 	}
 }

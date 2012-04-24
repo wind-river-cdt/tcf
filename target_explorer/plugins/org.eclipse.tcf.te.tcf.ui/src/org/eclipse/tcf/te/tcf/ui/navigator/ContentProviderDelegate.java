@@ -91,13 +91,13 @@ public class ContentProviderDelegate implements ICommonContentProvider {
 							}
 						}
 					}
-					else if (IUIConstants.ID_CAT_MY_TARGETS.equals(catID)) {
+					else if (IUIConstants.ID_CAT_TARGETS.equals(catID)) {
 						for (IPeerModel peer : peers) {
 							String value = peer.getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
 							boolean isStatic = value != null && Boolean.parseBoolean(value.trim());
 
 							// If it is not a static peer, but launched by the current user,
-							// put it under "My Targets" too.
+							// put it under "Targets" too.
 							if (System.getProperty("user.name").equals(peer.getPeer().getUserName())) { //$NON-NLS-1$
 								isStatic = true;
 							}
@@ -116,7 +116,7 @@ public class ContentProviderDelegate implements ICommonContentProvider {
 							boolean isStatic = value != null && Boolean.parseBoolean(value.trim());
 
 							// If it is not a static peer, but launched by the current user,
-							// put it under "My Targets" too.
+							// put it under "Targets" too.
 							if (System.getProperty("user.name").equals(peer.getPeer().getUserName())) { //$NON-NLS-1$
 								isStatic = true;
 							}

@@ -23,4 +23,11 @@ public interface ICategory extends IExecutableExtension {
 	 * @return The category image or <code>null</code>.
 	 */
 	public Image getImage();
+
+	/**
+	 * Returns the sorting rank.
+	 *
+	 * @return The sorting rank, or a value less than -1 to fallback to alphabetical sorting.
+	 */
+	public int getRank();
 }

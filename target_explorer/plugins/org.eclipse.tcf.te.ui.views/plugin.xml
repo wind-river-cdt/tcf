@@ -103,7 +103,7 @@
                <instanceof value="org.eclipse.tcf.te.ui.views.interfaces.ICategory"/>
             </possibleChildren>
             <commonSorter
-                  class="org.eclipse.tcf.te.ui.trees.TreeViewerSorter"
+                  class="org.eclipse.tcf.te.ui.views.navigator.ViewerSorter"
                   id="org.eclipse.tcf.te.ui.views.navigator.sorter"/>
       </navigatorContent>
 
@@ -145,21 +145,24 @@
             class="org.eclipse.tcf.te.ui.views.categories.Favorites"
             icon="icons/obj16/favorites.gif"
             id="org.eclipse.tcf.te.ui.views.category.favorites"
-            label="%category.favorites.name">
+            label="%category.favorites.name"
+            rank="1">
       </category>
       
       <category
-            class="org.eclipse.tcf.te.ui.views.categories.MyTargets"
-            icon="icons/obj16/home_nav.gif"
-            id="org.eclipse.tcf.te.ui.views.category.mytargets"
-            label="%category.mytargets.name">
+            class="org.eclipse.tcf.te.ui.views.categories.Targets"
+            icon="icons/obj16/targets.gif"
+            id="org.eclipse.tcf.te.ui.views.category.targets"
+            label="%category.targets.name"
+            rank="10">
       </category>
 
       <category
             class="org.eclipse.tcf.te.ui.views.categories.Neighborhood"
             icon="icons/obj16/neighborhood.gif"
             id="org.eclipse.tcf.te.ui.views.category.neighborhood"
-            label="%category.neighborhood.name">
+            label="%category.neighborhood.name"
+            rank="20">
       </category>
    </extension>
 
@@ -500,7 +503,7 @@
             class="org.eclipse.tcf.te.ui.views.expressions.PropertyTester"
             id="org.eclipse.tcf.te.ui.views.CategortyPropertyTester"
             namespace="org.eclipse.tcf.te.ui.views"
-            properties="isCategoryID,isFavorites,isHome,isNeighborhood"
+            properties="isCategoryID,isFavorites,isTargets,isNeighborhood"
             type="org.eclipse.tcf.te.ui.views.interfaces.ICategory">
       </propertyTester>
    </extension>

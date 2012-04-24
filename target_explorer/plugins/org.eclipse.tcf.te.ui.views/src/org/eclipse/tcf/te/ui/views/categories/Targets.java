@@ -10,8 +10,8 @@
 package org.eclipse.tcf.te.ui.views.categories;
 
 /**
- * "My Targets" category implementation.
+ * "Targets" category implementation.
  */
-public class MyTargets extends AbstractCategory {
+public class Targets extends AbstractCategory {
 
 }
