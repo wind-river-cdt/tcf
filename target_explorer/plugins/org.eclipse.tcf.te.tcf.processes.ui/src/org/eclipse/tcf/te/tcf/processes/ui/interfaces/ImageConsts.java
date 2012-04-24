@@ -30,9 +30,4 @@ public interface ImageConsts {
 	public static final String OBJ_Process = "OBJ_Process"; //$NON-NLS-1$
 	
 	public static final String OBJ_Process_Root = "OBJ_Process_Root"; //$NON-NLS-1$
-
-    /**
-     * The key to access the base pending node object image.
-     */
-    public static final String PENDING = "Pending"; //$NON-NLS-1$
 }

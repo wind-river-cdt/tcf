@@ -32,10 +32,7 @@ public class DefaultImageProvider implements ImageProvider {
 	 */
 	@Override
 	public Image getImage(FSTreeNode node) {
-		if (node.isPendingNode()) {
-			return UIPlugin.getImage(ImageConsts.PENDING);
-		}
-		else if (node.isSystemRoot()) {
+		if (node.isSystemRoot()) {
 			return UIPlugin.getImage(ImageConsts.ROOT);
 		}
 		else if (node.isRoot()) {

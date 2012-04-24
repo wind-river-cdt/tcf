@@ -107,29 +107,6 @@ public final class FSModel {
 		node.name = Messages.FSTreeNodeContentProvider_rootNode_label;
 	    return node;
     }
-
-	/**
-	 * Create a pending node.
-	 * 
-	 * @return A pending node.
-	 */
-	public static FSTreeNode createPendingNode() {
-		if (Protocol.isDispatchThread()) {
-			FSTreeNode pendingNode = new FSTreeNode();
-			pendingNode.name = Messages.PendingOperation_label;
-			pendingNode.type = "FSPendingNode"; //$NON-NLS-1$
-			return pendingNode;
-		}
-		final AtomicReference<FSTreeNode> reference = new AtomicReference<FSTreeNode>();
-		Protocol.invokeAndWait(new Runnable() {
-
-			@Override
-			public void run() {
-				reference.set(createPendingNode());
-			}
-		});
-		return reference.get();
-	}
 	
 	/**
 	 * Create a file node under the folder specified folder using the new name.

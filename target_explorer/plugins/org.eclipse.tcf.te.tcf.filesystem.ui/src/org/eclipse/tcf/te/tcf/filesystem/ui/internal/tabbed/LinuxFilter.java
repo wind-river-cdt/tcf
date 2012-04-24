@@ -25,7 +25,7 @@ public class LinuxFilter implements IFilter {
 	public boolean select(Object toTest) {
 		if(toTest instanceof FSTreeNode) {
 			FSTreeNode node = (FSTreeNode) toTest;
-			return !node.isPendingNode() && !node.isSystemRoot() && !node.isWindowsNode();
+			return !node.isSystemRoot() && !node.isWindowsNode();
 		}
 		return false;
 	}

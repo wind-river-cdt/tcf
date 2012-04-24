@@ -610,9 +610,6 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 	 * @return The type label text.
 	 */
 	public String getFileType() {
-		if (isPendingNode()) {
-			return ""; //$NON-NLS-1$
-		}
 		if (isRoot()) {
 			return Messages.FSTreeNode_TypeLocalDisk;
 		}
@@ -687,15 +684,6 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 		}
 	}
 
-	/**
-	 * Return if this node is a pending node.
-	 * 
-	 * @return true if it is a pending node.
-	 */
-	public boolean isPendingNode() {
-	    return type != null && type.equals("FSPendingNode"); //$NON-NLS-1$
-    }
-
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider#getPeerModel()
@@ -764,7 +752,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 	public void queryDone() {
 		childrenQueryRunning = false;
 		childrenQueried = true;
-		PropertyChangeEvent event = new PropertyChangeEvent(this, "childrenQueried", Boolean.FALSE, Boolean.TRUE); //$NON-NLS-1$
+		PropertyChangeEvent event = new PropertyChangeEvent(this, "query_done", Boolean.FALSE, Boolean.TRUE); //$NON-NLS-1$
 		firePropertyChange(event);
 	}
 	
@@ -773,6 +761,8 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 	 */
 	public void queryStarted() {
 		childrenQueryRunning = true;
+		PropertyChangeEvent event = new PropertyChangeEvent(this, "query_started", Boolean.FALSE, Boolean.TRUE); //$NON-NLS-1$
+		firePropertyChange(event);
 	}
 	
 	/**

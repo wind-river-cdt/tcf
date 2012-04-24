@@ -28,8 +28,6 @@ public class AccessTimeLabelProvider extends LabelProvider {
 	public String getText(Object element) {
 		if (element instanceof FSTreeNode) {
 			FSTreeNode node = (FSTreeNode) element;
-			// Pending nodes does not have column texts at all
-			if(node.isPendingNode()) return ""; //$NON-NLS-1$
 			if (node.attr != null) {
 				SimpleDateFormat dateFormat = new SimpleDateFormat("M/d/yyyy h:mm aa"); //$NON-NLS-1$
 				return dateFormat.format(new Date(node.attr.atime));

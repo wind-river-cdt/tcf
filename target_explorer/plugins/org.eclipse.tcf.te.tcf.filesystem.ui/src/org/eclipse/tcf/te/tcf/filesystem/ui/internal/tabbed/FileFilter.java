@@ -25,7 +25,7 @@ public class FileFilter implements IFilter {
 	public boolean select(Object toTest) {
 		if(toTest instanceof FSTreeNode) {
 			FSTreeNode node = (FSTreeNode) toTest;
-			return !node.isPendingNode() && !node.isSystemRoot() && node.isFile();
+			return !node.isSystemRoot() && node.isFile();
 		}
 		return false;
 	}

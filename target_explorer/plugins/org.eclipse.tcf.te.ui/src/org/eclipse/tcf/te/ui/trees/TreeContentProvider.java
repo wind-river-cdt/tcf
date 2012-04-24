@@ -9,8 +9,12 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.trees;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
@@ -25,7 +29,7 @@ import org.eclipse.tcf.te.core.interfaces.IViewerInput;
 /**
  * The base tree content provider that defines several default methods.
  */
-public abstract class TreeContentProvider implements ITreeContentProvider {
+public abstract class TreeContentProvider implements ITreeContentProvider, PropertyChangeListener {
 
 	/**
 	 * Static reference to the return value representing no elements.
@@ -38,13 +42,49 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
 	private Set<IPropertyChangeProvider> providers = Collections.synchronizedSet(new HashSet<IPropertyChangeProvider>());
 	// The viewer
 	protected TreeViewer viewer;
+	// The pending nodes and their direct parents.
+	private Map<Object, Pending> pendings;
 
 	/**
 	 * Create a tree content provider.
 	 */
 	public TreeContentProvider() {
+		pendings = new HashMap<Object, Pending>();
 	}
 
+	/**
+	 * Get the pending node for the specified parent.
+	 * If it exists, then return it. If not, create one
+	 * and save it and return it.
+	 */
+	protected Pending getPending(Object parent) {
+		Pending pending = pendings.get(parent);
+		if(pending == null) {
+			pending = new Pending(viewer);
+			pendings.put(parent, pending);
+		}
+		return pending;
+	}
+	
+	@Override
+    public void propertyChange(PropertyChangeEvent evt) {
+		String property = evt.getPropertyName();
+		if(property.equals("query_started")) { //$NON-NLS-1$
+			Object source = evt.getSource();
+			Pending pending = pendings.get(source);
+			if(pending != null) {
+				pending.startAnimation();
+			}
+		}
+		else if(property.equals("query_done")) { //$NON-NLS-1$
+			Object source = evt.getSource();
+			Pending pending = pendings.remove(source);
+			if(pending != null) {
+				pending.stopAnimation();
+			}
+		}
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
@@ -53,9 +93,14 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
     public void dispose() {
 		for(IPropertyChangeProvider provider : providers) {
 			provider.removePropertyChangeListener(commonViewerListener);
+			provider.removePropertyChangeListener(this);
 		}
 		commonViewerListener.cancel();
 		providers.clear();
+		for(Pending pending : pendings.values()) {
+			pending.stopAnimation();
+		}
+		pendings.clear();
     }
 	
 	/**
@@ -117,6 +162,7 @@ public abstract class TreeContentProvider implements ITreeContentProvider {
     private void installPropertyChangeListener(IPropertyChangeProvider provider) {
 		if(provider != null && !providers.contains(provider) && commonViewerListener != null) {
 			provider.addPropertyChangeListener(commonViewerListener);
+			provider.addPropertyChangeListener(this);
 			providers.add(provider);
 		}
     }

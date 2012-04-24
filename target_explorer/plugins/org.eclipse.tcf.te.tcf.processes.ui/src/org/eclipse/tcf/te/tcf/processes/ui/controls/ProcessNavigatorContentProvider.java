@@ -9,6 +9,9 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.processes.ui.controls;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
@@ -89,19 +92,24 @@ public class ProcessNavigatorContentProvider  extends TreeContentProvider implem
 		}
 		else if (parentElement instanceof ProcessTreeNode) {
 			ProcessTreeNode node = (ProcessTreeNode) parentElement;
-			if(node.isPendingNode()) {
-				return NO_ELEMENTS;
-			}
+			List<ProcessTreeNode> current = new ArrayList<ProcessTreeNode>(node.getChildren());
+			Object[] children;
 			if (!node.childrenQueried) {
+				if(current.isEmpty()) {
+					children = new Object[] {getPending(node)};
+				}
+				else {
+					children = current.toArray();
+				}
 				if (!node.childrenQueryRunning) {
 					ProcessModel model = ProcessModel.getProcessModel(node.peerNode);
 					model.queryChildren(node);
 				}
-				if(node.getChildren().isEmpty()) {
-					return new Object[] {ProcessTreeNode.PENDING_NODE};
-				}
 			}
-			return node.getChildren().toArray();
+			else {
+				children = current.toArray();
+			}
+			return children;
 		}
 		return NO_ELEMENTS;
 	}
@@ -119,10 +127,7 @@ public class ProcessNavigatorContentProvider  extends TreeContentProvider implem
 		// No children yet and the element is a process node
 		if (element instanceof ProcessTreeNode) {
 			ProcessTreeNode node = (ProcessTreeNode) element;
-			if(node.isPendingNode()) {
-				hasChildren = false;
-			}
-			else if(node.childrenQueryRunning) {
+			if(node.childrenQueryRunning) {
 				hasChildren = !super.hasChildren(element);
 			}
 			else {

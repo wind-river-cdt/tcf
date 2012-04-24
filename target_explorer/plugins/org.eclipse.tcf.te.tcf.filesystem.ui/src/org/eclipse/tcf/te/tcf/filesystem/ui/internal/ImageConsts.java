@@ -62,11 +62,6 @@ public interface ImageConsts {
     public static final String ROOT_DRIVE_OPEN = "RootDriveOpen"; //$NON-NLS-1$
 
     /**
-     * The key to access the base pending node object image.
-     */
-    public static final String PENDING = "Pending"; //$NON-NLS-1$
-
-    /**
      * The key to access the image of compare editor.
      */
     public static final String COMPARE_EDITOR = "CompareEditor"; //$NON-NLS-1$

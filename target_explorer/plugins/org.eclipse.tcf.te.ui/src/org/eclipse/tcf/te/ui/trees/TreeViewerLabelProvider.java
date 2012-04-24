@@ -70,6 +70,12 @@ public class TreeViewerLabelProvider extends LabelProvider implements ITableLabe
 	 */
 	@Override
 	public Image getColumnImage(Object element, int columnIndex) {
+		if(element instanceof Pending) {
+			if(columnIndex == 0) {
+				return ((Pending)element).getImage();
+			}
+			return null;
+		}
 		ColumnDescriptor column = getColumn(columnIndex);
 		if (column != null) {
 			ILabelProvider labelProvider = column.getLabelProvider();
@@ -85,6 +91,10 @@ public class TreeViewerLabelProvider extends LabelProvider implements ITableLabe
 	 */
 	@Override
 	public String getColumnText(Object element, int columnIndex) {
+		if(element instanceof Pending){
+			String text = ((Pending)element).getText();
+			return columnIndex == 0 ? text : "";  //$NON-NLS-1$
+		}
 		ColumnDescriptor column = getColumn(columnIndex);
 		if (column != null) {
 			ILabelProvider labelProvider = column.getLabelProvider();

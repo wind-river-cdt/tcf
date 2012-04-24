@@ -49,6 +49,7 @@ public class Messages extends NLS {
 	public static String NodePropertiesTableControl_column_name_label;
 	public static String NodePropertiesTableControl_column_value_label;
 
+	public static String Pending_Label;
 	public static String PendingOperation_label;
 
 	public static String EditBrowseTextControl_button_label;

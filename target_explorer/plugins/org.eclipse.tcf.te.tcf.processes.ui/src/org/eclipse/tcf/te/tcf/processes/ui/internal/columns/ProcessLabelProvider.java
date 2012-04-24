@@ -17,6 +17,7 @@ import org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode;
 import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.processes.ui.interfaces.ImageConsts;
 import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
+import org.eclipse.tcf.te.ui.trees.Pending;
 
 /**
  * The label provider for the tree column "name".
@@ -40,6 +41,10 @@ public class ProcessLabelProvider extends LabelProvider {
 			if (slash != -1) name = name.substring(slash + 1);
 			return name;
 		}
+		if (element instanceof Pending) {
+			Pending pending = (Pending) element;
+			return pending.getText();
+		}
 		return super.getText(element);
 	}
 
@@ -51,13 +56,14 @@ public class ProcessLabelProvider extends LabelProvider {
 	public Image getImage(Object element) {
 		if (element instanceof ProcessTreeNode) {
 			ProcessTreeNode node = (ProcessTreeNode) element;
-			if(node.isPendingNode()) {
-				return UIPlugin.getImage(ImageConsts.PENDING);
-			}
 			if(node.isRootNode()) {
 				return UIPlugin.getImage(ImageConsts.OBJ_Process_Root);
 			}
 			return UIPlugin.getImage(ImageConsts.OBJ_Process);
+		}
+		if (element instanceof Pending) {
+			Pending pending = (Pending) element;
+			return pending.getImage();
 		}
 		return super.getImage(element);
 	}

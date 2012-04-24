@@ -9,6 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.ui.controls;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.Viewer;
@@ -23,8 +25,6 @@ import org.eclipse.tcf.te.ui.trees.TreeContentProvider;
  * File system content provider for the common navigator of Target Explorer.
  */
 public class FSNavigatorContentProvider extends TreeContentProvider {
-	// The pending node constant.
-	private static final FSTreeNode PENDING_NODE = FSModel.createPendingNode();
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
@@ -85,19 +85,25 @@ public class FSNavigatorContentProvider extends TreeContentProvider {
 			return getChildren(model.getRoot());
 		} else if (parentElement instanceof FSTreeNode) {
 			final FSTreeNode node = (FSTreeNode)parentElement;
-			if(node.isPendingNode() || node.isFile()) {
-				return NO_ELEMENTS;
-			}
-			if(!node.childrenQueried) {
-				if(!node.childrenQueryRunning) {
-					// Get the file system model root node, if already stored
-					node.queryChildren();
+			Object[] children = NO_ELEMENTS;
+			if (!node.isFile()) {
+				List<FSTreeNode> current = node.unsafeGetChildren();
+				if (!node.childrenQueried) {
+					if (current.isEmpty()) {
+						children = new Object[] { getPending(node) };
+					}
+					else {
+						children = current.toArray();
+					}
+					if (!node.childrenQueryRunning) {
+						node.queryChildren();
+					}
 				}
-				if(node.unsafeGetChildren().isEmpty()) {
-					return new Object[] {PENDING_NODE};
+				else {
+					children = current.toArray();
 				}
 			}
-			return node.unsafeGetChildren().toArray();
+			return children;
 		}
 
 		return NO_ELEMENTS;
@@ -114,9 +120,7 @@ public class FSNavigatorContentProvider extends TreeContentProvider {
 
 		if (element instanceof FSTreeNode) {
 			FSTreeNode node = (FSTreeNode)element;
-			if(node.isPendingNode()) {
-				hasChildren = false;
-			} else if(node.isFile()) {
+			if(node.isFile()) {
 				hasChildren = false;
 			} else if(node.isSystemRoot()) {
 				hasChildren = true;

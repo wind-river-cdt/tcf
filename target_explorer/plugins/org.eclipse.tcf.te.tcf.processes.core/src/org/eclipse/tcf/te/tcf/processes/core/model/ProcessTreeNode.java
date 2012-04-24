@@ -30,19 +30,6 @@ import org.eclipse.tcf.te.tcf.processes.core.nls.Messages;
  * Representation of a process tree node.
  */
 public final class ProcessTreeNode extends PlatformObject implements IPeerModelProvider{
-	public static final ProcessTreeNode PENDING_NODE = createPendingNode();
-	
-	/**
-	 * Create a pending node.
-	 * 
-	 * @return A pending node.
-	 */
-	private static ProcessTreeNode createPendingNode() {
-		ProcessTreeNode node = new ProcessTreeNode();
-		node.name = Messages.PendingOperation_label;
-		node.type = "ProcPendingNode"; //$NON-NLS-1$
-		return node;
-	}
 	
 	/**
 	 * Create a root process node.
@@ -208,15 +195,6 @@ public final class ProcessTreeNode extends PlatformObject implements IPeerModelP
 		} catch(NumberFormatException nfe) {
 			return -1;
 		}
-	}
-
-	/**
-	 * Return if this node is a pending node.
-	 * 
-	 * @return true if this node is a pending node.
-	 */
-	public boolean isPendingNode() {
-		return type != null && type.equals("ProcPendingNode"); //$NON-NLS-1$
 	}
 
 	/**
@@ -389,7 +367,7 @@ public final class ProcessTreeNode extends PlatformObject implements IPeerModelP
 	public void queryDone() {
 		childrenQueryRunning = false;
 		childrenQueried = true;
-		PropertyChangeEvent event = new PropertyChangeEvent(this, "childrenQueried", Boolean.FALSE, Boolean.TRUE); //$NON-NLS-1$
+		PropertyChangeEvent event = new PropertyChangeEvent(this, "query_done", Boolean.FALSE, Boolean.TRUE); //$NON-NLS-1$
 		firePropertyChange(event);
 	}
 	
@@ -398,5 +376,7 @@ public final class ProcessTreeNode extends PlatformObject implements IPeerModelP
 	 */
 	public void queryStarted() {
 		childrenQueryRunning = true;
+		PropertyChangeEvent event = new PropertyChangeEvent(this, "query_started", Boolean.FALSE, Boolean.TRUE); //$NON-NLS-1$
+		firePropertyChange(event);
 	}
 }

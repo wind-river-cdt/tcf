@@ -25,7 +25,7 @@ public class FolderFilter implements IFilter {
 	public boolean select(Object toTest) {
 		if(toTest instanceof FSTreeNode) {
 			FSTreeNode node = (FSTreeNode) toTest;
-			return !node.isPendingNode() && !node.isSystemRoot() && node.isDirectory();
+			return !node.isSystemRoot() && node.isDirectory();
 		}
 		return false;
 	}
