@@ -51,6 +51,7 @@ import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExecContext;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNodeLaunch;
 import org.eclipse.tcf.protocol.JSON;
 import org.eclipse.tcf.services.IBreakpoints;
+import org.eclipse.tcf.services.IMemory;
 import org.eclipse.tcf.services.IRunControl;
 import org.eclipse.tcf.util.TCFDataCache;
 import org.eclipse.tcf.util.TCFTask;
@@ -129,52 +130,57 @@ public class TCFBreakpointStatusPage extends PropertyPage {
                     String ctx_id = (String)m.get(IBreakpoints.INSTANCE_CONTEXT);
                     if (!model.createNode(ctx_id, this)) return false;
                     if (isValid()) {
+                        /* Invalid context ID, ignore */
                         reset();
+                        continue;
                     }
-                    else {
-                        StatusItem y = getNodeItem(x, model.getNode(ctx_id));
-                        if (y != null) {
-                            StatusItem z = new StatusItem();
-                            z.marker = getBreakpoint().getMarker();
-                            z.text = z.marker.getAttribute(TCFBreakpointsModel.ATTR_MESSAGE, "");
-                            String error = (String)m.get(IBreakpoints.INSTANCE_ERROR);
-                            if (error != null) z.add("Error: " + error);
-                            Number addr = (Number)m.get(IBreakpoints.INSTANCE_ADDRESS);
-                            z.planted_ok = error == null;
-                            if (addr != null) {
-                                BigInteger i = JSON.toBigInteger(addr);
-                                z.add("Address: 0x" +  i.toString(16));
+                    StatusItem y = getNodeItem(x, model.getNode(ctx_id));
+                    if (y == null) continue;
+                    StatusItem z = new StatusItem();
+                    z.marker = getBreakpoint().getMarker();
+                    z.text = z.marker.getAttribute(TCFBreakpointsModel.ATTR_MESSAGE, "");
+                    String error = (String)m.get(IBreakpoints.INSTANCE_ERROR);
+                    if (error != null) z.add("Error: " + error);
+                    Number addr = (Number)m.get(IBreakpoints.INSTANCE_ADDRESS);
+                    z.planted_ok = error == null;
+                    if (addr != null) {
+                        BigInteger i = JSON.toBigInteger(addr);
+                        z.add("Address: 0x" +  i.toString(16));
+                    }
+                    Number size = (Number)m.get(IBreakpoints.INSTANCE_SIZE);
+                    if (size != null) z.add("Size: " + size);
+                    String type = (String)m.get(IBreakpoints.INSTANCE_TYPE);
+                    if (type != null) z.add("Type: " + type);
+                    if (addr != null && y.object instanceof TCFNode) {
+                        TCFDataCache<TCFNodeExecContext> mem = model.searchMemoryContext((TCFNode)y.object);
+                        if (mem != null) {
+                            if (!mem.validate()) {
+                                pending = mem;
                             }
-                            Number size = (Number)m.get(IBreakpoints.INSTANCE_SIZE);
-                            if (size != null) z.add("Size: " + size);
-                            String type = (String)m.get(IBreakpoints.INSTANCE_TYPE);
-                            if (type != null) z.add("Type: " + type);
-                            if (addr != null && y.object instanceof TCFNode) {
-                                TCFDataCache<TCFNodeExecContext> mem = model.searchMemoryContext((TCFNode)y.object);
-                                if (mem != null) {
-                                    if (!mem.validate(this)) {
-                                        pending = mem;
-                                    }
-                                    else {
-                                        TCFNodeExecContext ctx = mem.getData();
-                                        if (ctx != null) {
-                                            BigInteger i = JSON.toBigInteger(addr);
-                                            TCFDataCache<TCFSourceRef> ln_cache = ctx.getLineInfo(i);
-                                            if (ln_cache != null) {
-                                                if (!ln_cache.validate()) {
-                                                    pending = ln_cache;
-                                                }
-                                                else {
-                                                    addLocationInfo(z, ln_cache.getData());
-                                                }
-                                            }
+                            else {
+                                TCFNodeExecContext ctx = mem.getData();
+                                if (ctx != null) {
+                                    BigInteger i = JSON.toBigInteger(addr);
+                                    TCFDataCache<TCFSourceRef> ln_cache = ctx.getLineInfo(i);
+                                    if (ln_cache != null) {
+                                        if (!ln_cache.validate()) {
+                                            pending = ln_cache;
+                                        }
+                                        else {
+                                            addLocationInfo(z, ln_cache.getData());
                                         }
                                     }
                                 }
                             }
-                            y.add(z);
                         }
                     }
+                    String mem_id = (String)m.get("MemoryContext");
+                    if (mem_id != null) {
+                        if (!model.createNode(mem_id, this)) return false;
+                        if (isValid()) reset();
+                        else addMemoryContext(z, model.getNode(mem_id));
+                    }
+                    y.add(z);
                 }
             }
             if (pending != null) {
@@ -223,6 +229,22 @@ public class TCFBreakpointStatusPage extends PropertyPage {
             text += "; line: " + line;
             if (column > 0) text += "; column: " + column;
             z.add(text);
+        }
+
+        private void addMemoryContext(StatusItem z, TCFNode node) {
+            if (node instanceof TCFNodeExecContext) {
+                TCFNodeExecContext exe_node = (TCFNodeExecContext)node;
+                TCFDataCache<IMemory.MemoryContext> ctx_cache = exe_node.getMemoryContext();
+                if (!ctx_cache.validate()) {
+                    pending = ctx_cache;
+                    return;
+                }
+                IMemory.MemoryContext ctx_data = ctx_cache.getData();
+                if (ctx_data == null) return;
+                String name = ctx_data.getName();
+                if (name == null) name = ctx_data.getID();
+                if (name != null) z.add("Memory context: " + name);
+            }
         }
 
         private StatusItem getNodeItem(StatusItem root, TCFNode node) {
