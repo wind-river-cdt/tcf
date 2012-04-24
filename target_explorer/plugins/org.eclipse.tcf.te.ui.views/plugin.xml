@@ -507,11 +507,10 @@
             type="org.eclipse.tcf.te.ui.views.interfaces.ICategory">
       </propertyTester>
    </extension>
-   <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer
-            class="org.eclipse.tcf.te.ui.views.internal.preferences.PreferencesInitializer">
-      </initializer>
+   
+<!-- Preference contributions -->
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.eclipse.tcf.te.ui.views.internal.preferences.PreferencesInitializer"/>
    </extension>
 
 </plugin>

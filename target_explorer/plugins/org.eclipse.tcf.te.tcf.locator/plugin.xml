@@ -11,10 +11,10 @@
 <!-- Eclipse core expressions property tester -->
    <extension point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
-            class="org.eclipse.tcf.te.tcf.locator.internal.MyPropertyTester"
+            class="org.eclipse.tcf.te.tcf.locator.internal.LocatorModelPropertyTester"
             id="org.eclipse.tcf.te.tcf.locator.LocatorModelPropertyTester"
             namespace="org.eclipse.tcf.te.tcf.locator"
-            properties="name,hasLocalService,hasRemoteService,isStaticPeer,isRedirected,isProxy,isValueAdd"
+            properties="name,hasLocalService,hasRemoteService,isStaticPeer,isRedirected,isProxy,isValueAdd,parentCategoryId"
             type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel">
       </propertyTester>
    </extension>

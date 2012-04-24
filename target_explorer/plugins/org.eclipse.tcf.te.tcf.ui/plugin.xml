@@ -203,6 +203,47 @@
             </visibleWhen>
          </command>
       </menuContribution>
+
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.reorder">
+         <command
+               commandId="org.eclipse.tcf.te.tcf.ui.command.addtofavorites"
+               helpContextId="org.eclipse.tcf.te.tcf.ui.command_AddToFavorites"
+               id="org.eclipse.tcf.te.tcf.ui.commands.addtofavorites"
+               label="%command.addtofavorites.label"
+               mnemonic="d"
+               style="push"
+               tooltip="%command.addtofavorites.tooltip">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <count value="+"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <and>
+                        <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                     </and>                        
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.tcf.te.tcf.ui.command.removefromfavorites"
+               helpContextId="org.eclipse.tcf.te.tcf.ui.command_RemoveFromFavorites"
+               id="org.eclipse.tcf.te.tcf.ui.commands.removefromfavorites"
+               label="%command.removefromfavorites.label"
+               mnemonic="m"
+               style="push"
+               tooltip="%command.removefromfavorites.tooltip">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <count value="+"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <and>
+                        <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                     </and>                        
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
    </extension>
 
 <!-- Command contributions -->
@@ -218,6 +259,18 @@
             helpContextId="org.eclipse.tcf.te.tcf.ui.command_ResetRedirect"
             id="org.eclipse.tcf.te.tcf.ui.command.resetredirect"
             name="%command.resetredirect.name">
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.tcf.ui.command_AddToFavorites"
+            id="org.eclipse.tcf.te.tcf.ui.command.addtofavorites"
+            name="%command.addtofavorites.name">
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.tcf.ui.command_RemoveFromFavorites"
+            id="org.eclipse.tcf.te.tcf.ui.command.removefromfavorites"
+            name="%command.removefromfavorites.name">
       </command>
    </extension>
 
@@ -264,6 +317,50 @@
                </with>
             </enabledWhen>
       </handler>
+
+      <handler
+            class="org.eclipse.tcf.te.tcf.ui.handler.AddToFavoritesCommandHandler"
+            commandId="org.eclipse.tcf.te.tcf.ui.command.addtofavorites">
+            <activeWhen>
+               <with variable="activePartId">
+                  <equals value="org.eclipse.tcf.te.ui.views.View"/>
+               </with>
+            </activeWhen>
+            <enabledWhen>
+               <with variable="selection">
+                  <count value="+"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <and>
+                        <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                        <not>
+                           <test property="org.eclipse.tcf.te.tcf.locator.parentCategoryId" value="org.eclipse.tcf.te.ui.views.category.favorites"/>
+                        </not>
+                     </and>
+                  </iterate>
+               </with>
+            </enabledWhen>
+      </handler>
+
+      <handler
+            class="org.eclipse.tcf.te.tcf.ui.handler.RemoveFromFavoritesCommandHandler"
+            commandId="org.eclipse.tcf.te.tcf.ui.command.removefromfavorites">
+            <activeWhen>
+               <with variable="activePartId">
+                  <equals value="org.eclipse.tcf.te.ui.views.View"/>
+               </with>
+            </activeWhen>
+            <enabledWhen>
+               <with variable="selection">
+                  <count value="+"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <and>
+                        <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                        <test property="org.eclipse.tcf.te.tcf.locator.parentCategoryId" value="org.eclipse.tcf.te.ui.views.category.favorites"/>
+                     </and>
+                  </iterate>
+               </with>
+            </enabledWhen>
+      </handler>
    </extension>
    
 <!-- Tabbed properties view contributions -->   
@@ -288,11 +385,10 @@
          </propertySection>
       </propertySections>
    </extension>
-   <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer
-            class="org.eclipse.tcf.te.tcf.ui.internal.preferences.PreferencesInitializer">
-      </initializer>
+   
+<!-- Preference contributions -->   
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.eclipse.tcf.te.tcf.ui.internal.preferences.PreferencesInitializer"/>
    </extension>
    
 </plugin>

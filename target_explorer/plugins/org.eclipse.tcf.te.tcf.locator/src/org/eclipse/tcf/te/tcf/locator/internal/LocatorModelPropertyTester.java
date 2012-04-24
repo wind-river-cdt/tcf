@@ -16,13 +16,14 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelPeerNodeQueryService;
 import org.eclipse.tcf.te.tcf.locator.nodes.PeerRedirector;
 
 /**
  * Locator model property tester.
  */
-public class MyPropertyTester extends PropertyTester {
+public class LocatorModelPropertyTester extends PropertyTester {
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.expressions.IPropertyTester#test(java.lang.Object, java.lang.String, java.lang.Object[], java.lang.Object)
@@ -98,6 +99,14 @@ public class MyPropertyTester extends PropertyTester {
 			String value = node.getPeer().getAttributes().get("ValueAdd"); //$NON-NLS-1$
 			boolean isValueAdd = value != null && ("1".equals(value.trim()) || Boolean.parseBoolean(value.trim())); //$NON-NLS-1$
 			if (expectedValue instanceof Boolean) return ((Boolean) expectedValue).booleanValue() == isValueAdd;
+		}
+
+		if ("parentCategoryId".equals(property)) { //$NON-NLS-1$
+			String value = node.getStringProperty(IPeerModelProperties.PROP_PARENT_CATEGORY_ID);
+			if (value == null && "NULL".equals(expectedValue)) { //$NON-NLS-1$
+				return true;
+			}
+			return value != null && value.equals(expectedValue);
 		}
 
 		return false;
