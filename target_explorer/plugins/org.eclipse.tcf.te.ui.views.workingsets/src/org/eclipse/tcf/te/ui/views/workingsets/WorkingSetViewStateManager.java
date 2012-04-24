@@ -63,8 +63,6 @@ public final class WorkingSetViewStateManager implements IMementoAware {
 	private static final String ELEMENT_WORKINGSET = "workingset"; //$NON-NLS-1$
 	/** The attribute to store name. */
 	private static final String ATTR_NAME = "name"; //$NON-NLS-1$
-	/** The attribute to store the option that if the default working set should be sorted on top. */
-	private static final String ATTR_DEFAULT_WORKINGSET_ONTOP = "defaultWorkingSetOnTop"; //$NON-NLS-1$
 
 	// The parent view instance.
 	/* default */ View view;
@@ -72,8 +70,6 @@ public final class WorkingSetViewStateManager implements IMementoAware {
 	/* default */ ILocalWorkingSetManager localWorkingSetManager;
 	// If the working set is sorted
 	private boolean sortedWorkingSet;
-	// If the default fixed working sets, including My Targets and Local Subnet, should be on top when sorting.
-	private boolean defaultWorkingSetOnTop = true;
 	// The working set comparator used to sort the working set in the order specified by end users.
 	private CustomizedOrderComparator workingSetComparator;
 	// The list of active (checked) working sets
@@ -104,14 +100,6 @@ public final class WorkingSetViewStateManager implements IMementoAware {
 	 */
 	public View getParentView() {
 		return view;
-	}
-
-	/**
-	 * If the default working sets are on top when sorting.
-	 * @return true if it is or else false.
-	 */
-	public boolean isDefaultWorkingSetOnTop() {
-		return defaultWorkingSetOnTop;
 	}
 
 	/**
@@ -271,10 +259,6 @@ public final class WorkingSetViewStateManager implements IMementoAware {
 		if (!sortedWorkingSet) {
 			restoreWorkingSetOrder(memento);
 		}
-		bool = memento.getBoolean(ATTR_DEFAULT_WORKINGSET_ONTOP);
-		if (bool != null) {
-			defaultWorkingSetOnTop = bool.booleanValue();
-		}
 
 		// The local working set manager contains only automatic generated
 		// working sets. Do not restore anything from the memento
@@ -360,7 +344,6 @@ public final class WorkingSetViewStateManager implements IMementoAware {
 				workingSetComparator.saveState(child);
 			}
 		}
-		memento.putBoolean(ATTR_DEFAULT_WORKINGSET_ONTOP, defaultWorkingSetOnTop);
 		IMemento vwsMemento = memento.createChild(WORKINGSET_VISIBLE);
 		for (IWorkingSet workingSet : visibleWorkingSets) {
 			IMemento child = vwsMemento.createChild(ELEMENT_WORKINGSET);
