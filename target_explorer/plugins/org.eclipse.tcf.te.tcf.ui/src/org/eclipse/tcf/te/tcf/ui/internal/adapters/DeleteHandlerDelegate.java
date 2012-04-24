@@ -10,11 +10,18 @@
 package org.eclipse.tcf.te.tcf.ui.internal.adapters;
 
 import java.io.IOException;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
@@ -32,11 +39,16 @@ import org.eclipse.tcf.te.tcf.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.ui.help.IContextHelpIds;
 import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.views.interfaces.handler.IDeleteHandlerDelegate;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * Peer model node delete handler delegate implementation.
  */
 public class DeleteHandlerDelegate implements IDeleteHandlerDelegate {
+
+	private static final String KEY_CONFIRMED = "confirmed"; //$NON-NLS-1$
+	private static final String KEY_SELECTION = "selection"; //$NON-NLS-1$
+	private static final String KEY_PROCESSED = "processed"; //$NON-NLS-1$
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.ui.views.interfaces.handler.IDeleteHandlerDelegate#canDelete(java.lang.Object)
@@ -75,6 +87,13 @@ public class DeleteHandlerDelegate implements IDeleteHandlerDelegate {
 		Assert.isNotNull(state);
 
 		if (canDelete(element)) {
+			boolean confirmed = confirmDelete(state);
+			if(!confirmed) {
+				if (callback != null) {
+					callback.done(this, Status.OK_STATUS);
+				}
+				return;
+			}
 			try {
 				IURIPersistenceService service = ServiceManager.getInstance().getService(IURIPersistenceService.class);
 				if (service == null) {
@@ -121,4 +140,60 @@ public class DeleteHandlerDelegate implements IDeleteHandlerDelegate {
 		}
 	}
 
+	/**
+	 * Confirm the deletion with the user.
+	 * 
+	 * @param state The state of delegation handler.
+	 * @return true if the user agrees to delete or it has confirmed previously.
+	 */
+	private boolean confirmDelete(IPropertiesContainer state) {
+	    UUID lastProcessed = (UUID) state.getProperty(KEY_PROCESSED);
+	    if (lastProcessed == null || !lastProcessed.equals(state.getUUID())) {
+	    	state.setProperty(KEY_PROCESSED, state.getUUID());
+	    	IStructuredSelection selection = (IStructuredSelection) state.getProperty(KEY_SELECTION);
+	    	if(!selection.isEmpty()) {
+	    		String question = getConfirmQuestion(selection);
+	    		Shell parent = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+	    		if (MessageDialog.openQuestion(parent, Messages.DeleteHandlerDelegate_DialogTitle, question)) {
+	    			state.setProperty(KEY_CONFIRMED, true);
+	    		}
+	    	}
+	    }
+	    boolean confirmed = state.getBooleanProperty(KEY_CONFIRMED);
+	    return confirmed;
+    }
+
+	/**
+	 * Get confirmation question displayed in the confirmation dialog.
+	 * 
+	 * @param selection The current selection selected to delete.
+	 * @return The question to ask the user.
+	 */
+	private String getConfirmQuestion(IStructuredSelection selection) {
+	    String question;
+	    if(selection.size() == 1) {
+	    	Object first = selection.getFirstElement();
+	    	if(first instanceof IPeerModel) {
+	    		IPeerModel node = (IPeerModel)first;
+	    		final IPeer peer = node.getPeer();
+	    		if(Protocol.isDispatchThread()) {
+	    			first = peer.getName();
+	    		}
+	    		else {
+	    			final AtomicReference<String> ref = new AtomicReference<String>();
+	    			Protocol.invokeAndWait(new Runnable(){
+	    				@Override
+	                    public void run() {
+	    					ref.set(peer.getName());
+	                    }});
+	    			first = ref.get();
+	    		}
+	    	}
+	    	question = NLS.bind(Messages.DeleteHandlerDelegate_MsgDeleteOnePeer, first);
+	    }
+	    else {
+	    	question = NLS.bind(Messages.DeleteHandlerDelegate_MsgDeleteMultiplePeers, Integer.valueOf(selection.size()));
+	    }
+	    return question;
+    }
 }

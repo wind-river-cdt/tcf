@@ -142,6 +142,12 @@ public class Messages extends NLS {
 	public static String DeleteHandler_error_title;
 	public static String DeleteHandler_error_deleteFailed;
 
+	public static String DeleteHandlerDelegate_DialogTitle;
+
+	public static String DeleteHandlerDelegate_MsgDeleteMultiplePeers;
+
+	public static String DeleteHandlerDelegate_MsgDeleteOnePeer;
+
 	public static String AgentSelectionDialog_dialogTitle;
 	public static String AgentSelectionDialog_title;
 	public static String AgentSelectionDialog_message;
