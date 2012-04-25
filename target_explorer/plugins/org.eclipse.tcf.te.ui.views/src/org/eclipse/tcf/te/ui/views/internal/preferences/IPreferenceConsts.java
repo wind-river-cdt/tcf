@@ -14,30 +14,35 @@ package org.eclipse.tcf.te.ui.views.internal.preferences;
  */
 public interface IPreferenceConsts {
 	/**
-	 * The default size of MRU list. 
+	 * Common prefix for all preference keys
+	 */
+	public final String PREFIX = "te.ui."; //$NON-NLS-1$
+
+	/**
+	 * The default size of MRU list.
 	 */
 	public static final int DEFAULT_MAX_MRU = 3;
 
 	/**
 	 * Preference key to access MRU filter list.
 	 */
-	public static final String PREF_FILTER_MRU_LIST = "PrefFilterMRUs"; //$NON-NLS-1$
-	
+	public static final String PREF_FILTER_MRU_LIST = PREFIX + "PrefFilterMRUs"; //$NON-NLS-1$
+
 	/**
 	 * Preference key to access max MRU filter size.
 	 */
-	public static final String PREF_MAX_FILTER_MRU = "PrefFilterMRUs.max"; //$NON-NLS-1$
-	
+	public static final String PREF_MAX_FILTER_MRU = PREFIX + "PrefFilterMRUs.max"; //$NON-NLS-1$
+
 	/**
 	 * Preference key to access MRU content list.
 	 */
-	public static final String PREF_CONTENT_MRU_LIST = "PrefContentMRUs"; //$NON-NLS-1$
-	
+	public static final String PREF_CONTENT_MRU_LIST = PREFIX + "PrefContentMRUs"; //$NON-NLS-1$
+
 	/**
 	 * Preference key to access max MRU content size.
 	 */
-	public static final String PREF_MAX_CONTENT_MRU = "PrefContentMRUs.max"; //$NON-NLS-1$
-	
+	public static final String PREF_MAX_CONTENT_MRU = PREFIX + "PrefContentMRUs.max"; //$NON-NLS-1$
+
 	/**
 	 * Preference key to access the flag to hide category content extension.
 	 */

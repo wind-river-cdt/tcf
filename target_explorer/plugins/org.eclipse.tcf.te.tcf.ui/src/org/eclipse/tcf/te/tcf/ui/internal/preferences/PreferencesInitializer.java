@@ -30,7 +30,10 @@ public class PreferencesInitializer extends AbstractPreferenceInitializer implem
 	 */
 	@Override
 	public void initializeDefaultPreferences() {
-		IPreferenceStore preferenceStore = UIPlugin.getDefault().getPreferenceStore();
-		preferenceStore.setDefault(PREF_HIDE_DYNAMIC_TARGET_DISCOVERY_EXTENSION, true);
+		IPreferenceStore store = UIPlugin.getDefault().getPreferenceStore();
+		// [Hidden] Hide dynamic target discovery navigator content extension: default on
+		store.setDefault(PREF_HIDE_DYNAMIC_TARGET_DISCOVERY_EXTENSION, true);
+		// [Hidden] Favorites category copy mode: default off
+		store.setDefault(IPreferenceConsts.PREF_FAVORITES_CATEGORY_MODE_COPY, false);
 	}
 }

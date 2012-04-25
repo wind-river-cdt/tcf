@@ -13,6 +13,22 @@
       </factory>
    </extension>   
 
+<!-- Preference contributions -->   
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.eclipse.tcf.te.tcf.ui.internal.preferences.PreferencesInitializer"/>
+   </extension>
+
+<!-- Eclipse core expressions property tester -->
+   <extension point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.eclipse.tcf.te.tcf.ui.internal.categories.CategoryPropertyTester"
+            id="org.eclipse.tcf.te.tcf.ui.categories.CategoryPropertyTester"
+            namespace="org.eclipse.tcf.te.tcf.ui"
+            properties="parentCategoryId"
+            type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel">
+      </propertyTester>
+   </extension>
+
 <!-- Event listener contributions -->
    <extension point="org.eclipse.tcf.te.runtime.eventListeners">
       <eventListener
@@ -333,7 +349,7 @@
                      <and>
                         <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
                         <not>
-                           <test property="org.eclipse.tcf.te.tcf.locator.parentCategoryId" value="org.eclipse.tcf.te.ui.views.category.favorites"/>
+                           <test property="org.eclipse.tcf.te.tcf.ui.parentCategoryId" value="org.eclipse.tcf.te.ui.views.category.favorites"/>
                         </not>
                      </and>
                   </iterate>
@@ -355,7 +371,7 @@
                   <iterate operator="and" ifEmpty="false">
                      <and>
                         <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
-                        <test property="org.eclipse.tcf.te.tcf.locator.parentCategoryId" value="org.eclipse.tcf.te.ui.views.category.favorites"/>
+                        <test property="org.eclipse.tcf.te.tcf.ui.parentCategoryId" value="org.eclipse.tcf.te.ui.views.category.favorites"/>
                      </and>
                   </iterate>
                </with>
@@ -386,10 +402,6 @@
       </propertySections>
    </extension>
    
-<!-- Preference contributions -->   
-   <extension point="org.eclipse.core.runtime.preferences">
-      <initializer class="org.eclipse.tcf.te.tcf.ui.internal.preferences.PreferencesInitializer"/>
-   </extension>
    <extension
          point="org.eclipse.ui.decorators">
       <decorator
