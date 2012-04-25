@@ -15,4 +15,5 @@ Export-Package: org.eclipse.tcf.te.runtime.statushandler,
  org.eclipse.tcf.te.runtime.statushandler.activator;x-internal:=true,
  org.eclipse.tcf.te.runtime.statushandler.interfaces,
  org.eclipse.tcf.te.runtime.statushandler.internal;x-internal:=true,
- org.eclipse.tcf.te.runtime.statushandler.nls
+ org.eclipse.tcf.te.runtime.statushandler.nls,
+ org.eclipse.tcf.te.runtime.statushandler.status

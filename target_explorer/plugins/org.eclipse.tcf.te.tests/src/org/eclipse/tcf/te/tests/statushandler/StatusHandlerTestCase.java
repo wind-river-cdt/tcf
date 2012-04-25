@@ -23,6 +23,8 @@ import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
 import org.eclipse.tcf.te.runtime.statushandler.StatusHandlerManager;
 import org.eclipse.tcf.te.runtime.statushandler.interfaces.IStatusHandler;
 import org.eclipse.tcf.te.runtime.statushandler.interfaces.IStatusHandlerConstants;
+import org.eclipse.tcf.te.runtime.statushandler.status.QuestionStatus;
+import org.eclipse.tcf.te.runtime.statushandler.status.YesNoCancelStatus;
 import org.eclipse.tcf.te.runtime.utils.Host;
 import org.eclipse.tcf.te.tests.CoreTestCase;
 import org.eclipse.tcf.te.tests.activator.UIPlugin;
@@ -139,5 +141,10 @@ public class StatusHandlerTestCase extends CoreTestCase {
 		status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), "Error"); //$NON-NLS-1$
 		handler.handleStatus(status, data, null);
 
+		status = new QuestionStatus(UIPlugin.getUniqueIdentifier(), "Question"); //$NON-NLS-1$
+		handler.handleStatus(status, data, null);
+
+		status = new YesNoCancelStatus(UIPlugin.getUniqueIdentifier(), "YesNoCancel"); //$NON-NLS-1$
+		handler.handleStatus(status, data, null);
 	}
 }

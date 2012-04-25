@@ -164,8 +164,13 @@ public class DefaultStatusHandler extends AbstractStatusHandler {
 					result = doOpenMessageDialog(shell, title, message, buttonLabel, severity, dontAskAgainId, helpContextId);
 				} else {
 					// Not interactive -> Re-pack the status and log it to the error log
-					status = new Status(severity == IStatusHandlerConstants.QUESTION ? IStatus.WARNING : severity,
-										pluginId, code, message, exception);
+					// Map any non-default status to IStatus.OK
+					int newSeverity = severity;
+					if (newSeverity != IStatus.OK && newSeverity != IStatus.INFO && newSeverity != IStatus.CANCEL
+							&& newSeverity != IStatus.WARNING && newSeverity != IStatus.ERROR) {
+						newSeverity = IStatus.OK;
+					}
+					status = new Status(newSeverity, pluginId, code, message, exception);
 					UIPlugin.getDefault().getLog().log(status);
 				}
 			}
