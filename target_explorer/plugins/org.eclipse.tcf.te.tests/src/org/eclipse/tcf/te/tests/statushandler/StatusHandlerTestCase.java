@@ -15,10 +15,17 @@ import java.util.List;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.tcf.te.runtime.interfaces.IConditionTester;
+import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
+import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
 import org.eclipse.tcf.te.runtime.statushandler.StatusHandlerManager;
 import org.eclipse.tcf.te.runtime.statushandler.interfaces.IStatusHandler;
+import org.eclipse.tcf.te.runtime.statushandler.interfaces.IStatusHandlerConstants;
+import org.eclipse.tcf.te.runtime.utils.Host;
 import org.eclipse.tcf.te.tests.CoreTestCase;
+import org.eclipse.tcf.te.tests.activator.UIPlugin;
 
 /**
  * Status handler test cases.
@@ -99,5 +106,38 @@ public class StatusHandlerTestCase extends CoreTestCase {
 
 		assertTrue("Test case enabled test status handler not active.", handlerIds.contains("org.eclipse.tcf.te.tests.handler1")); //$NON-NLS-1$ //$NON-NLS-2$
 		assertTrue("Interrupt condition enabled test status handler not active.", handlerIds.contains("org.eclipse.tcf.te.tests.handler2")); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	/**
+	 * Test the default status handler.
+	 */
+	public void testDefaultStatusHandler() {
+		assertNotNull("Unexpected return value 'null'.", StatusHandlerManager.getInstance()); //$NON-NLS-1$
+		assertFalse("Failed to toggle interactive mode.", Host.isInteractive()); //$NON-NLS-1$
+
+		IStatusHandler handler = null;
+
+		IStatusHandler[] handlers = StatusHandlerManager.getInstance().getHandlers(false);
+		for (IStatusHandler candidate : handlers) {
+			if (candidate.getId().equals("org.eclipse.tcf.te.statushandler.default")) { //$NON-NLS-1$
+				handler = candidate;
+				break;
+			}
+		}
+
+		assertNotNull("Failed to determine default status handler.", handler); //$NON-NLS-1$
+
+		IPropertiesContainer data = new PropertiesContainer();
+		data.setProperty(IStatusHandlerConstants.PROPERTY_TITLE, "Statushandler Test"); //$NON-NLS-1$
+
+		IStatus status = new Status(IStatus.INFO, UIPlugin.getUniqueIdentifier(), "Info"); //$NON-NLS-1$
+		handler.handleStatus(status, data, null);
+
+		status = new Status(IStatus.WARNING, UIPlugin.getUniqueIdentifier(), "Warning"); //$NON-NLS-1$
+		handler.handleStatus(status, data, null);
+
+		status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), "Error"); //$NON-NLS-1$
+		handler.handleStatus(status, data, null);
+
 	}
 }

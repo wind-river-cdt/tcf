@@ -10,6 +10,7 @@
 package org.eclipse.tcf.te.tests.statushandler;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.statushandler.AbstractStatusHandler;
 
@@ -19,9 +20,9 @@ import org.eclipse.tcf.te.runtime.statushandler.AbstractStatusHandler;
 public class TestStatusHandler extends AbstractStatusHandler {
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.statushandler.interfaces.IStatusHandler#handleStatus(org.eclipse.core.runtime.IStatus, org.eclipse.tcf.te.runtime.interfaces.IPropertiesContainer, org.eclipse.tcf.te.runtime.statushandler.interfaces.IStatusHandler.DoneHandleStatus)
+	 * @see org.eclipse.tcf.te.runtime.statushandler.interfaces.IStatusHandler#handleStatus(org.eclipse.core.runtime.IStatus, org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.tcf.te.runtime.interfaces.callback.ICallback)
 	 */
 	@Override
-	public void handleStatus(IStatus status, IPropertiesContainer data, DoneHandleStatus done) {
+	public void handleStatus(IStatus status, IPropertiesContainer data, ICallback done) {
 	}
 }

@@ -10,6 +10,7 @@
 package org.eclipse.tcf.te.runtime.statushandler.interfaces;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.runtime.interfaces.extensions.IExecutableExtension;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 
@@ -29,18 +30,5 @@ public interface IStatusHandler extends IExecutableExtension {
 	 * @param data The custom status data object, or <code>null</code> if none.
 	 * @param done The callback, or <code>null</code>.
 	 */
-	public void handleStatus(IStatus status, IPropertiesContainer data, DoneHandleStatus done);
-
-	/**
-	 * Client call back interface for handleStatus().
-	 */
-	interface DoneHandleStatus {
-		/**
-		 * Called when the status handling is done.
-		 *
-		 * @param error An error if failed, <code>null</code> if succeeded.
-		 * @param data The status handler custom result data object, or <code>null</code> if none.
-		 */
-		void doneHandleStatus(Throwable error, IPropertiesContainer data);
-	}
+	public void handleStatus(IStatus status, IPropertiesContainer data, ICallback done);
 }

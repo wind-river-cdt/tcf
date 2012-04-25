@@ -15,11 +15,13 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
 import org.eclipse.tcf.te.runtime.statushandler.AbstractStatusHandler;
 import org.eclipse.tcf.te.runtime.statushandler.interfaces.IStatusHandlerConstants;
 import org.eclipse.tcf.te.runtime.utils.Host;
+import org.eclipse.tcf.te.runtime.utils.StatusHelper;
 import org.eclipse.tcf.te.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.jface.dialogs.OptionalMessageDialog;
 import org.eclipse.tcf.te.ui.nls.Messages;
@@ -39,10 +41,10 @@ public class DefaultStatusHandler extends AbstractStatusHandler {
 	protected final static String INFORMATION_TITLE = Messages.DefaultStatusHandler_information_title;
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.statushandler.interfaces.IStatusHandler#handleStatus(org.eclipse.core.runtime.IStatus, org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.tcf.te.runtime.statushandler.interfaces.IStatusHandler.DoneHandleStatus)
+	 * @see org.eclipse.tcf.te.runtime.statushandler.interfaces.IStatusHandler#handleStatus(org.eclipse.core.runtime.IStatus, org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.tcf.te.runtime.interfaces.callback.ICallback)
 	 */
 	@Override
-	public void handleStatus(final IStatus status, final IPropertiesContainer data, final DoneHandleStatus done) {
+	public void handleStatus(final IStatus status, final IPropertiesContainer data, final ICallback done) {
 		Assert.isNotNull(status);
 
 		// If the platform UI is not longer running or the display does not
@@ -62,11 +64,7 @@ public class DefaultStatusHandler extends AbstractStatusHandler {
 			display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
-					doHandleStatus(status, data, done != null ? done : new DoneHandleStatus() {
-						@Override
-						public void doneHandleStatus(Throwable error, IPropertiesContainer data) {
-						}
-					});
+					doHandleStatus(status, data, done);
 				}
 			});
 		}
@@ -81,7 +79,7 @@ public class DefaultStatusHandler extends AbstractStatusHandler {
 	 * @param data The custom status data object, or <code>null</code> if none.
 	 * @param done The callback, or <code>null</code>.
 	 */
-	protected void doHandleStatus(IStatus status, IPropertiesContainer data, DoneHandleStatus done) {
+	protected void doHandleStatus(IStatus status, IPropertiesContainer data, ICallback done) {
 		Assert.isNotNull(status);
 		Assert.isTrue(Thread.currentThread().equals(PlatformUI.getWorkbench().getDisplay().getThread()));
 
@@ -179,7 +177,10 @@ public class DefaultStatusHandler extends AbstractStatusHandler {
 			error = e;
 		} finally {
 			// Invoke the callback
-			if (done != null) done.doneHandleStatus(error, data);
+			if (done != null) {
+				done.setResult(data);
+				done.done(this, StatusHelper.getStatus(error));
+			}
 		}
 
 		return;

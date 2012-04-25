@@ -10,6 +10,7 @@
 package org.eclipse.tcf.te.tests;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.text.DateFormat;
 import java.util.Date;
@@ -31,6 +32,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.te.runtime.interfaces.IConditionTester;
+import org.eclipse.tcf.te.runtime.utils.Host;
 import org.eclipse.tcf.te.tests.activator.UIPlugin;
 import org.eclipse.tcf.te.tests.interfaces.IConfigurationProperties;
 import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
@@ -237,9 +239,31 @@ public class CoreTestCase extends TestCase {
 	@Override
 	public void runBare() throws Throwable {
 		long start = printStart(getName());
+
+		boolean toggleInteractiveMode = Host.isInteractive();
+	    if (toggleInteractiveMode) {
+	    	System.setProperty("NOINTERACTIVE", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+	    	try {
+	    		Field f = Host.class.getDeclaredField("isInteractive"); //$NON-NLS-1$
+	    		f.setAccessible(true);
+	    		f.set(null, null);
+	    	}
+	    	catch (Exception e) { /* ignored on purpose */ }
+	    }
+
 		try {
 			super.runBare();
 		} finally {
+			if (toggleInteractiveMode) {
+		    	System.setProperty("NOINTERACTIVE", "false"); //$NON-NLS-1$ //$NON-NLS-2$
+		    	try {
+		    		Field f = Host.class.getDeclaredField("isInteractive"); //$NON-NLS-1$
+		    		f.setAccessible(true);
+		    		f.set(null, null);
+		    	}
+		    	catch (Exception e) { /* ignored on purpose */ }
+			}
+
 			printEnd(getName(), start);
 		}
 	}
