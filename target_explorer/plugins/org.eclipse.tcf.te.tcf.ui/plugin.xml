@@ -394,8 +394,8 @@
          point="org.eclipse.ui.decorators">
       <decorator
             class="org.eclipse.tcf.te.tcf.ui.navigator.LabelProviderDelegate"
-            id="org.eclipse.tcf.te.tcf.ui.decorator"
-            label="label decorator"
+            id="org.eclipse.tcf.te.tcf.ui.decorators.peerHost"
+            label="%peerhost.decorator.label"
             state="true">
          <enablement>
             <objectClass
