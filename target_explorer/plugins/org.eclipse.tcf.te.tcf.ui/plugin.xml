@@ -121,6 +121,21 @@
       </commonFilter>
    </extension>
 
+<!-- Decorator contributions -->   
+   <extension point="org.eclipse.ui.decorators">
+      <decorator
+            class="org.eclipse.tcf.te.tcf.ui.navigator.LabelProviderDelegate"
+            id="org.eclipse.tcf.te.tcf.ui.decorators.peerHost"
+            label="%peerhost.decorator.label"
+            state="true">
+         <enablement>
+            <objectClass
+                  name="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel">
+            </objectClass>
+         </enablement>
+      </decorator>
+   </extension>
+
 <!-- New target wizard contributions -->
    <extension point="org.eclipse.tcf.te.ui.newWizards">
       <category
@@ -401,20 +416,4 @@
          </propertySection>
       </propertySections>
    </extension>
-   
-   <extension
-         point="org.eclipse.ui.decorators">
-      <decorator
-            class="org.eclipse.tcf.te.tcf.ui.navigator.LabelProviderDelegate"
-            id="org.eclipse.tcf.te.tcf.ui.decorators.peerHost"
-            label="%peerhost.decorator.label"
-            state="true">
-         <enablement>
-            <objectClass
-                  name="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel">
-            </objectClass>
-         </enablement>
-      </decorator>
-   </extension>
-   
 </plugin>
