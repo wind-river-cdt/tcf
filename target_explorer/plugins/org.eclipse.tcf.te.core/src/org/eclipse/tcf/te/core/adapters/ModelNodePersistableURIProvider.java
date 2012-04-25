@@ -129,20 +129,18 @@ public class ModelNodePersistableURIProvider implements IPersistableURIProvider 
 		// Try the bundles state location first (not available if launched with -data @none).
 		try {
 			IPath path = Platform.getStateLocation(CoreBundleActivator.getContext().getBundle()).append(".store"); //$NON-NLS-1$
-			if (!path.toFile().exists()) {
-				path.toFile().mkdirs();
-			}
-			if (path.toFile().canRead() && path.toFile().isDirectory()) {
+			boolean exists = path.toFile().exists();
+			if (!exists) exists = path.toFile().mkdirs();
+			if (exists && path.toFile().canRead() && path.toFile().isDirectory()) {
 				location = path;
 			}
 		} catch (IllegalStateException e) {
 			// Workspace less environments (-data @none)
 			// The users local target definition persistence directory is $HOME/.tcf/.store.
 			IPath path = new Path(System.getProperty("user.home")).append(".tcf/.store"); //$NON-NLS-1$ //$NON-NLS-2$
-			if (!path.toFile().exists()) {
-				path.toFile().mkdirs();
-			}
-			if (path.toFile().canRead() && path.toFile().isDirectory()) {
+			boolean exists = path.toFile().exists();
+			if (!exists) exists = path.toFile().mkdirs();
+			if (exists && path.toFile().canRead() && path.toFile().isDirectory()) {
 				location = path;
 			}
 		}
