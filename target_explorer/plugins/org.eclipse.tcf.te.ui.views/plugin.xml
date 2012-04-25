@@ -150,10 +150,10 @@
       </category>
       
       <category
-            class="org.eclipse.tcf.te.ui.views.categories.Targets"
+            class="org.eclipse.tcf.te.ui.views.categories.MyTargets"
             icon="icons/obj16/targets.gif"
-            id="org.eclipse.tcf.te.ui.views.category.targets"
-            label="%category.targets.name"
+            id="org.eclipse.tcf.te.ui.views.category.mytargets"
+            label="%category.mytargets.name"
             rank="10">
       </category>
 
@@ -503,7 +503,7 @@
             class="org.eclipse.tcf.te.ui.views.expressions.PropertyTester"
             id="org.eclipse.tcf.te.ui.views.CategortyPropertyTester"
             namespace="org.eclipse.tcf.te.ui.views"
-            properties="isCategoryID,isFavorites,isTargets,isNeighborhood"
+            properties="isCategoryID,isFavorites,isMyTargets,isNeighborhood"
             type="org.eclipse.tcf.te.ui.views.interfaces.ICategory">
       </propertyTester>
    </extension>

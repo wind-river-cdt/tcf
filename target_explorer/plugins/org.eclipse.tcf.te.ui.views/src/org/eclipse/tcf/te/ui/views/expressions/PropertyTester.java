@@ -94,9 +94,9 @@ public class PropertyTester extends org.eclipse.core.expressions.PropertyTester 
 			return id.equals(expectedValue);
 		}
 
-		if ("isTargets".equals(property) && receiver instanceof ICategory) { //$NON-NLS-1$
+		if ("isMyTargets".equals(property) && receiver instanceof ICategory) { //$NON-NLS-1$
 			String id = ((ICategory)receiver).getId();
-			return expectedValue.equals(Boolean.valueOf(id.equals(IUIConstants.ID_CAT_TARGETS)));
+			return expectedValue.equals(Boolean.valueOf(id.equals(IUIConstants.ID_CAT_MY_TARGETS)));
 		}
 
 		if ("isFavorites".equals(property) && receiver instanceof ICategory) { //$NON-NLS-1$

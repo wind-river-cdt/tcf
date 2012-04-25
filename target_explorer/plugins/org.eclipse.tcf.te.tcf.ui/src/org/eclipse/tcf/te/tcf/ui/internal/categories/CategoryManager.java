@@ -137,12 +137,12 @@ public class CategoryManager {
 	}
 
 	/**
-	 * Adds the given peer node to the "Targets" list by creating
+	 * Adds the given peer node to the "My Targets" list by creating
 	 * a static copy of the given peer.
 	 *
 	 * @param node The peer node. Must be not <code>null</code>.
 	 */
-	public void addToTargets(final IPeerModel node) {
+	public void addToMyTargets(final IPeerModel node) {
 		Assert.isNotNull(node);
 
 		Runnable runnable = new Runnable() {
