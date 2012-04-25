@@ -17,12 +17,12 @@ import org.eclipse.tcf.te.ui.terminals.interfaces.IPreferenceKeys;
 /**
  * Terminals default preferences initializer.
  */
-public class PreferenceInitializer extends AbstractPreferenceInitializer {
+public class PreferencesInitializer extends AbstractPreferenceInitializer {
 
 	/**
 	 * Constructor.
 	 */
-	public PreferenceInitializer() {
+	public PreferencesInitializer() {
 	}
 
 	/* (non-Javadoc)

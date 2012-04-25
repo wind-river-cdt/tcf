@@ -47,7 +47,7 @@
    
 <!-- Preferences contributions -->
    <extension point="org.eclipse.core.runtime.preferences">
-      <initializer class="org.eclipse.tcf.te.ui.terminals.internal.PreferenceInitializer"/>
+      <initializer class="org.eclipse.tcf.te.ui.terminals.internal.PreferencesInitializer"/>
    </extension>
 
 <!-- Eclipse core expressions property tester -->
