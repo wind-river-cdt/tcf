@@ -12,7 +12,10 @@ package org.eclipse.tcf.te.tcf.filesystem.ui.internal.wizards;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.viewers.DecoratingStyledCellLabelProvider;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IBasicPropertyConstants;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -20,6 +23,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
@@ -31,13 +35,14 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.tcf.te.tcf.filesystem.ui.nls.Messages;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelPeerNodeQueryService;
 import org.eclipse.tcf.te.tcf.locator.model.Model;
-import org.eclipse.tcf.te.tcf.ui.navigator.LabelProvider;
+import org.eclipse.tcf.te.tcf.ui.navigator.LabelProviderDelegate;
 import org.eclipse.tcf.te.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.interfaces.IUIConstants;
 import org.eclipse.tcf.te.ui.wizards.pages.AbstractValidatingWizardPage;
-import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.dialogs.PatternFilter;
@@ -54,10 +59,6 @@ public class TargetSelectionPage extends AbstractValidatingWizardPage {
 	private FilteredTree filteredTree;
 	private PatternFilter filteredTreeFilter;
 
-	// The workbench instance as passed in by init(...)
-	private IWorkbench workbench;
-	// The selection as passed in by init(...)
-	private IStructuredSelection selection;
 	// The tree viewer to display the targets.
 	private TreeViewer treeViewer;
 
@@ -88,12 +89,33 @@ public class TargetSelectionPage extends AbstractValidatingWizardPage {
 		super(TargetSelectionPage.class.getSimpleName());
 		setTitle(getDefaultTitle());
 		setDescription(getDefaultDescription());
+		initialize();
 	}
 
+	/**
+	 * Refresh the remote services in target peers.
+	 */
+	private void initialize() {
+		// Refresh the information of remote services.
+		ILocatorModel model = Model.getModel();
+		IPeerModel[] peers = model.getPeers();
+		if(peers != null) {
+			ILocatorModelPeerNodeQueryService service = model.getService(ILocatorModelPeerNodeQueryService.class);
+			for (IPeerModel peer : peers) {
+				service.queryRemoteServices(peer);
+			}
+		}
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.WizardPage#getWizard()
+	 */
 	@Override
     public NewNodeWizard getWizard() {
 		return (NewNodeWizard) super.getWizard();
 	}
+	
 	/**
 	 * Returns the default page title.
 	 *
@@ -110,6 +132,16 @@ public class TargetSelectionPage extends AbstractValidatingWizardPage {
 	 */
 	protected String getDefaultDescription() {
 		return Messages.TargetSelectionPage_Description;
+	}
+	
+	/**
+	 * A styled label provider for the target selection list.
+	 */
+	static class TargetStyledLabelProvider extends LabelProviderDelegate implements IStyledLabelProvider {
+		@Override
+        public StyledString getStyledText(Object element) {
+	        return new StyledString(getText(element));
+        }
 	}
 
 	/*
@@ -137,7 +169,8 @@ public class TargetSelectionPage extends AbstractValidatingWizardPage {
 
 		treeViewer = filteredTree.getViewer();
 		treeViewer.setContentProvider(new TargetContentProvider());
-		treeViewer.setLabelProvider(new LabelProvider());
+		IBaseLabelProvider labelProvider = new DecoratingStyledCellLabelProvider(new TargetStyledLabelProvider(), new LabelProviderDelegate(), null);
+		treeViewer.setLabelProvider(labelProvider);
 		treeViewer.setComparator(new TargetViewerComparator());
 		ViewerFilter fsPeerFilter = new ViewerFilter() {
 			@Override
@@ -218,35 +251,6 @@ public class TargetSelectionPage extends AbstractValidatingWizardPage {
 		}
 		setPageComplete(valid);
 		setValidationInProgress(false);
-	}
-
-	/**
-	 * Initialize the page with the current workbench instance and the current workbench selection.
-	 *
-	 * @param workbench The current workbench.
-	 * @param selection The current object selection.
-	 */
-	public void init(IWorkbench workbench, IStructuredSelection selection) {
-		this.workbench = workbench;
-		this.selection = selection;
-	}
-
-	/**
-	 * Returns the current workbench.
-	 *
-	 * @return The current workbench or <code>null</code> if not set.
-	 */
-	public IWorkbench getWorkbench() {
-		return workbench;
-	}
-
-	/**
-	 * Returns the current object selection.
-	 *
-	 * @return The current object selection or <code>null</code> if not set.
-	 */
-	public IStructuredSelection getSelection() {
-		return selection;
 	}
 
 	/**
