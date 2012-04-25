@@ -10,10 +10,8 @@
 package org.eclipse.tcf.te.tcf.ui.navigator;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.ILabelDecorator;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
@@ -29,7 +27,7 @@ import org.eclipse.tcf.te.ui.jface.images.AbstractImageDescriptor;
 /**
  * Label provider delegate implementation.
  */
-public class LabelProviderDelegate extends LabelProvider implements ILabelDecorator, IStyledLabelProvider {
+public class LabelProviderDelegate extends LabelProvider implements ILabelDecorator {
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
@@ -155,13 +153,4 @@ public class LabelProviderDelegate extends LabelProvider implements ILabelDecora
 			builder.append("]"); //$NON-NLS-1$
 		}
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider#getStyledText(java.lang.Object)
-	 */
-	@Override
-    public StyledString getStyledText(Object element) {
-	    return new StyledString(getText(element));
-    }
 }
