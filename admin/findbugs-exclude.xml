@@ -23,6 +23,15 @@
 		</Or>
 	</Match>
 	
+	<!-- Ignore all inner class should be static violations -->
+	<Match>
+		<Or>
+			<Bug pattern="SIC_INNER_SHOULD_BE_STATIC"/>
+			<Bug pattern="SIC_INNER_SHOULD_BE_STATIC_ANON"/>
+			<Bug pattern="SIC_INNER_SHOULD_BE_STATIC_NEEDS_THIS"/>
+		</Or>
+	</Match>
+	
 	<!-- Ignore all ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD violations in bundle activators -->
 	<Match>
 		<Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>

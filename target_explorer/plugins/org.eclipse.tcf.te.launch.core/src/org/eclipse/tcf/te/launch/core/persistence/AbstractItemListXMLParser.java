@@ -34,8 +34,8 @@ import org.xml.sax.helpers.DefaultHandler;
  * AbstractItemListXMLParser
  */
 public abstract class AbstractItemListXMLParser<ItemType> extends DefaultHandler {
-	private final int IN_ITEMS_DEFINITION = 1;
-	private final int IN_ITEM_DEFINITION = 2;
+	private final static int IN_ITEMS_DEFINITION = 1;
+	private final static int IN_ITEM_DEFINITION = 2;
 
 	private SAXParser parser;
 

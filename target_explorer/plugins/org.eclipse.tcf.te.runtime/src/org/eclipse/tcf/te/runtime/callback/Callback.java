@@ -38,7 +38,7 @@ public class Callback extends PropertiesContainer implements ICallback {
 	 * Property: Asynchronous operations can store a result to the callback
 	 *           object they invoke once the operation has been finished.
 	 */
-	protected final String PROPERTY_RESULT = "result"; //$NON-NLS-1$
+	protected static final String PROPERTY_RESULT = "result"; //$NON-NLS-1$
 
 
 	private static final String[] PROPERTY_KEYS_NOT_TO_COPY = {
