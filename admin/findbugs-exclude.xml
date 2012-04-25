@@ -1,4 +1,28 @@
 <FindBugsFilter>
+	<!-- Ignore all I18N Internationalization bugs -->
+	<Match>
+		<Bug category="I18N"/>
+	</Match>
+	
+	<!-- Ignore all NM_SAME_SIMPLE_NAME_AS_SUPERCLASS violations -->
+	<Match>
+		<Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"/>
+	</Match>
+
+	<!-- Ignore all SF_SWITCH_NO_DEFAULT violations -->
+	<Match>
+		<Bug pattern="SF_SWITCH_NO_DEFAULT"/>
+	</Match>
+
+	<!-- Ignore all serialization violations -->
+	<Match>
+		<Or>
+			<Bug pattern="SE_BAD_FIELD"/>
+			<Bug pattern="SE_BAD_FIELD_INNER_CLASS"/>
+			<Bug pattern="SE_COMPARATOR_SHOULD_BE_SERIALIZABLE"/>
+		</Or>
+	</Match>
+	
 	<!-- Ignore all ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD violations in bundle activators -->
 	<Match>
 		<Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
@@ -8,20 +32,10 @@
 		</Or>
 	</Match>
 	
-	<!-- Ignore all NM_SAME_SIMPLE_NAME_AS_SUPERCLASS violations -->
-	<Match>
-		<Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"/>
-	</Match>
-	
 	<!-- Ignore all EI_EXPOSE_REP violations for IAdapterFactory#getAdapterList() -->
 	<Match>
 		<Bug pattern="EI_EXPOSE_REP"/>
 		<Method name="getAdapterList"/>
-	</Match>
-	
-	<!-- Ignore all I18N Internationalization bugs -->
-	<Match>
-		<Bug category="I18N"/>
 	</Match>
 	
 	<!-- Ignore LI_LAZY_INIT_UPDATE_STATIC in Model.java -->
@@ -32,4 +46,5 @@
 			<Method name="initialize"/>
 		</And>
 	</Match>
+	
 </FindBugsFilter>

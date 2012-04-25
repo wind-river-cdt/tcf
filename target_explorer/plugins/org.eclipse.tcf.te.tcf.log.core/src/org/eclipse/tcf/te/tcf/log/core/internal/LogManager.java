@@ -302,8 +302,9 @@ public final class LogManager implements IProtocolStateChangeListener {
 
 		try {
 			File file = CoreBundleActivator.getDefault().getStateLocation().append(".logs").toFile(); //$NON-NLS-1$
-			if (!file.exists()) file.mkdirs();
-			if (file.canRead() && file.isDirectory()) {
+			boolean exists = file.exists();
+			if (!exists) exists = file.mkdirs();
+			if (exists && file.canRead() && file.isDirectory()) {
 				logDir = new Path(file.toString());
 			}
 		} catch (IllegalStateException e) {
@@ -313,8 +314,9 @@ public final class LogManager implements IProtocolStateChangeListener {
 		if (logDir == null) {
 			// First fallback: ${HOME}/.tcf/.logs
 			File file = new Path(System.getProperty("user.home")).append(".tcf/.logs").toFile(); //$NON-NLS-1$ //$NON-NLS-2$
-			if (!file.exists()) file.mkdirs();
-			if (file.canRead() && file.isDirectory()) {
+			boolean exists = file.exists();
+			if (!exists) exists = file.mkdirs();
+			if (exists && file.canRead() && file.isDirectory()) {
 				logDir = new Path(file.toString());
 			}
 		}
@@ -322,8 +324,9 @@ public final class LogManager implements IProtocolStateChangeListener {
 		if (logDir == null) {
 			// Second fallback: ${TEMP}/.tcf/.logs
 			File file = new Path(System.getProperty("java.io.tmpdir")).append(".tcf/.logs").toFile(); //$NON-NLS-1$ //$NON-NLS-2$
-			if (!file.exists()) file.mkdirs();
-			if (file.canRead() && file.isDirectory()) {
+			boolean exists = file.exists();
+			if (!exists) exists = file.mkdirs();
+			if (exists && file.canRead() && file.isDirectory()) {
 				logDir = new Path(file.toString());
 			}
 		}

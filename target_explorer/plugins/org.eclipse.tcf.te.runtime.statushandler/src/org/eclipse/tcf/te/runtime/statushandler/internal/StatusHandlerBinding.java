@@ -34,7 +34,7 @@ public class StatusHandlerBinding extends ExecutableExtension {
 		// Initialize the handler id field by reading the <handler> extension attribute.
 		// Throws an exception if the id is empty or null.
 		handlerId = config != null ? config.getAttribute("handlerId") : null; //$NON-NLS-1$
-		if (handlerId == null || (handlerId != null && "".equals(handlerId.trim()))) { //$NON-NLS-1$
+		if (handlerId == null || "".equals(handlerId.trim())) { //$NON-NLS-1$
 			throw createMissingMandatoryAttributeException("handlerId", config.getContributor().getName()); //$NON-NLS-1$
 		}
 
