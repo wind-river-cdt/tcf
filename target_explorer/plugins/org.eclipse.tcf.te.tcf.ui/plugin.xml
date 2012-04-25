@@ -44,7 +44,7 @@
             contentProvider="org.eclipse.tcf.te.tcf.ui.navigator.ContentProviderDelegate"
             icon="icons/obj16/rootNode_obj.gif"
             id="org.eclipse.tcf.te.tcf.ui.navigator.content"
-            labelProvider="org.eclipse.tcf.te.tcf.ui.navigator.LabelProvider"
+            labelProvider="org.eclipse.tcf.te.tcf.ui.navigator.LabelProviderDelegate"
             name="%navigatorContent.name"
             priority="normal">
             <enablement>
@@ -389,6 +389,20 @@
 <!-- Preference contributions -->   
    <extension point="org.eclipse.core.runtime.preferences">
       <initializer class="org.eclipse.tcf.te.tcf.ui.internal.preferences.PreferencesInitializer"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.decorators">
+      <decorator
+            class="org.eclipse.tcf.te.tcf.ui.navigator.LabelProviderDelegate"
+            id="org.eclipse.tcf.te.tcf.ui.decorator"
+            label="label decorator"
+            state="true">
+         <enablement>
+            <objectClass
+                  name="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel">
+            </objectClass>
+         </enablement>
+      </decorator>
    </extension>
    
 </plugin>
