@@ -144,7 +144,19 @@ public class StatusHandlerTestCase extends CoreTestCase {
 		status = new QuestionStatus(UIPlugin.getUniqueIdentifier(), "Question"); //$NON-NLS-1$
 		handler.handleStatus(status, data, null);
 
+		status = new QuestionStatus(UIPlugin.getUniqueIdentifier(), "Question", new Throwable()); //$NON-NLS-1$
+		handler.handleStatus(status, data, null);
+
+		status = new QuestionStatus(UIPlugin.getUniqueIdentifier(), 1, "Question", new Throwable()); //$NON-NLS-1$
+		handler.handleStatus(status, data, null);
+
 		status = new YesNoCancelStatus(UIPlugin.getUniqueIdentifier(), "YesNoCancel"); //$NON-NLS-1$
+		handler.handleStatus(status, data, null);
+
+		status = new YesNoCancelStatus(UIPlugin.getUniqueIdentifier(), "YesNoCancel", new Throwable()); //$NON-NLS-1$
+		handler.handleStatus(status, data, null);
+
+		status = new YesNoCancelStatus(UIPlugin.getUniqueIdentifier(), 1, "YesNoCancel", new Throwable()); //$NON-NLS-1$
 		handler.handleStatus(status, data, null);
 	}
 }

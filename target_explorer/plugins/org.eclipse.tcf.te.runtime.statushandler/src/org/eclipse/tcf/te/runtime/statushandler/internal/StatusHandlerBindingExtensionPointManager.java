@@ -154,23 +154,4 @@ public class StatusHandlerBindingExtensionPointManager extends AbstractExtension
 
 		return contributions.toArray(new StatusHandlerBinding[contributions.size()]);
 	}
-
-	/**
-	 * Returns the status handler binding identified by its unique id. If no status
-	 * handler binding with the specified id is registered, <code>null</code> is returned.
-	 *
-	 * @param id The unique id of the status handler binding or <code>null</code>
-	 *
-	 * @return The status handler binding instance or <code>null</code>.
-	 */
-	public StatusHandlerBinding getBinding(String id) {
-		StatusHandlerBinding contribution = null;
-		if (getExtensions().containsKey(id)) {
-			ExecutableExtensionProxy<StatusHandlerBinding> proxy = getExtensions().get(id);
-			// Get the extension instance
-			contribution = proxy.getInstance();
-		}
-
-		return contribution;
-	}
 }

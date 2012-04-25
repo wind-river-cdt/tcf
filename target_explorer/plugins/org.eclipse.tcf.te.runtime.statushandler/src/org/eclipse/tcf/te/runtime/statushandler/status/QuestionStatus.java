@@ -72,5 +72,6 @@ public class QuestionStatus extends Status {
 	 */
 	@Override
 	protected final void setSeverity(int severity) {
+		if (IStatus.OK == severity) super.setSeverity(severity);
 	}
 }
