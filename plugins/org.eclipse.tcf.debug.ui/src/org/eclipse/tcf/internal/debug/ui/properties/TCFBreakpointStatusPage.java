@@ -51,7 +51,6 @@ import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExecContext;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNodeLaunch;
 import org.eclipse.tcf.protocol.JSON;
 import org.eclipse.tcf.services.IBreakpoints;
-import org.eclipse.tcf.services.IMemory;
 import org.eclipse.tcf.services.IRunControl;
 import org.eclipse.tcf.util.TCFDataCache;
 import org.eclipse.tcf.util.TCFTask;
@@ -234,16 +233,12 @@ public class TCFBreakpointStatusPage extends PropertyPage {
         private void addMemoryContext(StatusItem z, TCFNode node) {
             if (node instanceof TCFNodeExecContext) {
                 TCFNodeExecContext exe_node = (TCFNodeExecContext)node;
-                TCFDataCache<IMemory.MemoryContext> ctx_cache = exe_node.getMemoryContext();
-                if (!ctx_cache.validate()) {
-                    pending = ctx_cache;
+                TCFDataCache<String> cache = exe_node.getFullName();
+                if (!cache.validate()) {
+                    pending = cache;
                     return;
                 }
-                IMemory.MemoryContext ctx_data = ctx_cache.getData();
-                if (ctx_data == null) return;
-                String name = ctx_data.getName();
-                if (name == null) name = ctx_data.getID();
-                if (name != null) z.add("Memory context: " + name);
+                z.add("Memory context: " + cache.getData());
             }
         }
 
