@@ -23,4 +23,13 @@
 	<Match>
 		<Bug category="I18N"/>
 	</Match>
+	
+	<!-- Ignore LI_LAZY_INIT_UPDATE_STATIC in Model.java -->
+	<Match>
+		<Bug pattern="LI_LAZY_INIT_UPDATE_STATIC"/>
+		<And>
+			<Class name="org.eclipse.tcf.te.tcf.locator.model.Model"/>
+			<Method name="initialize"/>
+		</And>
+	</Match>
 </FindBugsFilter>

@@ -339,7 +339,7 @@ public abstract class AbstractServiceManager {
 			boolean isInterface = serviceType.isInterface();
 			for (ServiceProxy proxy : proxies) {
 				if (proxy.isMatching(serviceType) && proxy.isEnabled(context)) {
-					if (!isInterface && proxy.equals(serviceType)) {
+					if (!isInterface) {
 						V service = (V)proxy.getService(unique);
 						service.setId(proxy.getId());
 						return service;
