@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.ui.views.tabbed;
+package org.eclipse.tcf.te.tcf.ui.tabbed;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -43,10 +43,10 @@ public abstract class BaseTitledSection extends AbstractPropertySection implemen
 	protected Composite composite;
 
 	protected IViewerInput viewerInput;
-	
+
 	// The input node.
 	protected IPeerModelProvider provider;
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#setInput(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
@@ -72,10 +72,10 @@ public abstract class BaseTitledSection extends AbstractPropertySection implemen
 		}
 		updateInput(provider);
     }
-	
+
 	/**
 	 * Update the input node.
-	 * 
+	 *
 	 * @param input The input node.
 	 */
 	protected void updateInput(IPeerModelProvider input) {
@@ -91,7 +91,7 @@ public abstract class BaseTitledSection extends AbstractPropertySection implemen
 			this.viewerInput.removePropertyChangeListener(this);
 		}
     }
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#createControls(org.eclipse.swt.widgets.Composite, org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage)
@@ -121,10 +121,10 @@ public abstract class BaseTitledSection extends AbstractPropertySection implemen
 		data.bottom = new FormAttachment(100, 0);
 		composite.setLayoutData(data);
 	}
-	
+
 	/**
 	 * Create a label for the control using the specified text.
-	 *  
+	 *
 	 * @param control The control for which the label is created.
 	 * @param text The label text.
 	 */
@@ -136,11 +136,11 @@ public abstract class BaseTitledSection extends AbstractPropertySection implemen
 		data.top = new FormAttachment(control, 0, SWT.CENTER);
 		nameLabel.setLayoutData(data);
 	}
-	
+
 	/**
 	 * Create a text field and a label with the specified label
-	 * relative to the specified control. 
-	 * 
+	 * relative to the specified control.
+	 *
 	 * @param control The control relative to.
 	 * @param label The text of the label.
 	 * @return The new text created.
@@ -150,11 +150,11 @@ public abstract class BaseTitledSection extends AbstractPropertySection implemen
 		createLabel(text, label);
 		return text;
 	}
-	
+
 	/**
 	 * Create a wrap text field and a label with the specified label
 	 * relative to the specified control.
-	 * 
+	 *
 	 * @param control The control relative to.
 	 * @param label The text of the label.
 	 * @return The new wrap text created.
@@ -164,10 +164,10 @@ public abstract class BaseTitledSection extends AbstractPropertySection implemen
 		createLabel(text, label);
 		return text;
 	}
-	
+
 	/**
 	 * Create a text field relative to the specified control.
-	 * 
+	 *
 	 * @param control The control to layout the new text field.
 	 * @return The new text field created.
 	 */
@@ -186,10 +186,10 @@ public abstract class BaseTitledSection extends AbstractPropertySection implemen
 		text.setEditable(false);
 		return text;
 	}
-	
+
 	/**
 	 * Create a wrap text field relative to the specified control.
-	 * 
+	 *
 	 * @param control The control to layout the new wrap text field.
 	 * @return The new wrap text field created.
 	 */
@@ -209,7 +209,7 @@ public abstract class BaseTitledSection extends AbstractPropertySection implemen
 		text.setEditable(false);
 		return text;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#refresh()
@@ -239,7 +239,7 @@ public abstract class BaseTitledSection extends AbstractPropertySection implemen
 
 	/**
 	 * Get the text which is used as the title in the title bar of the section.
-	 * 
+	 *
 	 * @return A text string representing the section.
 	 */
 	protected abstract String getText();

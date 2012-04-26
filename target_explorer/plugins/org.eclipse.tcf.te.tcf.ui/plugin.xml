@@ -10,8 +10,17 @@
          <adapter type="org.eclipse.jface.viewers.ILabelProvider"/>
          <adapter type="org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate"/>
          <adapter type="org.eclipse.tcf.te.ui.views.interfaces.handler.IDeleteHandlerDelegate"/>
+         <adapter type="org.eclipse.ui.IPersistableElement"/>
       </factory>
    </extension>   
+
+<!-- Element factory contributions -->   
+   <extension point="org.eclipse.ui.elementFactories">
+      <factory
+            class="org.eclipse.tcf.te.tcf.ui.internal.adapters.PeerModelFactory"
+            id="org.eclipse.tcf.te.ui.views.peerFactory">
+      </factory>
+   </extension>
 
 <!-- Preference contributions -->   
    <extension point="org.eclipse.core.runtime.preferences">

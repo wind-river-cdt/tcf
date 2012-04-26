@@ -7,30 +7,28 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.ui.views.internal.adapters;
+package org.eclipse.tcf.te.ui.views.internal.categories;
 
-import java.util.Map;
-
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
-import org.eclipse.tcf.te.tcf.locator.model.Model;
+import org.eclipse.tcf.te.ui.views.extensions.CategoriesExtensionPointManager;
+import org.eclipse.tcf.te.ui.views.interfaces.ICategory;
 import org.eclipse.ui.IElementFactory;
 import org.eclipse.ui.IMemento;
-
 /**
- * The element factory to create IPeerModel from a memento which is read
- * from an external persistent storage.
+ * The element factory for a category.
  */
-public class PeerModelFactory implements IElementFactory {
-
+public class CategoryFactory implements IElementFactory {
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.IElementFactory#createElement(org.eclipse.ui.IMemento)
 	 */
 	@Override
 	public IAdaptable createElement(IMemento memento) {
-		String peerId = memento.getString("peerId"); //$NON-NLS-1$
-		Map<String, IPeerModel> map = (Map<String, IPeerModel>) Model.getModel().getAdapter(Map.class);
-		return map.get(peerId);
+		String id = memento.getString("id"); //$NON-NLS-1$
+		ICategory category = CategoriesExtensionPointManager.getInstance().getCategory(id, false);
+		Assert.isNotNull(category);
+		Assert.isTrue(category instanceof IAdaptable);
+		return (IAdaptable)category;
 	}
 }

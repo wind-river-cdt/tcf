@@ -15,6 +15,7 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.ui.navigator.LabelProvider;
 import org.eclipse.tcf.te.ui.views.interfaces.handler.IDeleteHandlerDelegate;
 import org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate;
+import org.eclipse.ui.IPersistableElement;
 
 /**
  * Adapter factory implementation.
@@ -31,7 +32,8 @@ public class AdapterFactory implements IAdapterFactory {
 	private Class<?>[] adapters = {
 					ILabelProvider.class,
 					IRefreshHandlerDelegate.class,
-					IDeleteHandlerDelegate.class
+					IDeleteHandlerDelegate.class,
+					IPersistableElement.class
 				};
 
 	/* (non-Javadoc)
@@ -49,6 +51,10 @@ public class AdapterFactory implements IAdapterFactory {
 			if (IDeleteHandlerDelegate.class.equals(adapterType)) {
 				return deleteDelegate;
 			}
+			if(IPersistableElement.class.equals(adapterType)) {
+				return new PersistablePeerModel((IPeerModel)adaptableObject);
+			}
+
 		}
 		return null;
 	}
