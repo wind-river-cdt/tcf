@@ -37,6 +37,7 @@
                   <insertionPoint name="group.delete"/>
                   <insertionPoint name="group.build" separator="true"/>
                   <insertionPoint name="group.refresh" separator="true"/>
+                  <insertionPoint name="group.categories" separator="true"/>
                   <insertionPoint name="group.reorganize"/>
                   <insertionPoint name="group.reorder"/>
                   <insertionPoint name="group.port"/>

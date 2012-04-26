@@ -244,7 +244,7 @@
          </command>
       </menuContribution>
 
-      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.reorder">
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.categories">
          <command
                commandId="org.eclipse.tcf.te.tcf.ui.command.addtofavorites"
                helpContextId="org.eclipse.tcf.te.tcf.ui.command_AddToFavorites"
