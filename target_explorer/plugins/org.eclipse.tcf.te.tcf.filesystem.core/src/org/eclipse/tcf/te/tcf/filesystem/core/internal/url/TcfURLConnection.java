@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.osgi.util.NLS;
@@ -104,15 +105,13 @@ public class TcfURLConnection extends URLConnection {
 	 * @param peerId The target peer's ID.
 	 * @return The peer with this ID or null if not found.
 	 */
-	private IPeer findPeer(String peerId) {
+	@SuppressWarnings("unchecked")
+    private IPeer findPeer(String peerId) {
 		IPeer peer = Protocol.getLocator().getPeers().get(peerId);
 		if(peer == null) {
-			IPeerModel[] peerModels = Model.getModel().getPeers();
-			for(IPeerModel peerModel : peerModels) {
-				if(peerId.equals(peerModel.getPeerId())) {
-					return peerModel.getPeer();
-				}
-			}
+			Map<String, IPeerModel> map = (Map<String, IPeerModel>) Model.getModel().getAdapter(Map.class);
+			IPeerModel peerNode = map.get(peerId);
+			if(peerNode != null) peer = peerNode.getPeer();
 		}
 		return peer;
 	}

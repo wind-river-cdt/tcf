@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.views.workingsets.actions;
 
+import org.eclipse.tcf.te.ui.views.interfaces.IPersistableExpandingState;
 import org.eclipse.tcf.te.ui.views.workingsets.WorkingSetsContentProvider;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IMemento;
@@ -76,6 +77,11 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 					showWorkingSets = showWorkingSetsInt == null || showWorkingSetsInt.intValue() == 1;
 					extensionStateModel.setBooleanProperty(WorkingSetsContentProvider.SHOW_TOP_LEVEL_WORKING_SETS, showWorkingSets);
 					workingSetActionGroup.setShowTopLevelWorkingSets(showWorkingSets);
+					// Restore the expanded state only after the working set mode is set!
+					IPersistableExpandingState state = (IPersistableExpandingState)viewer.getCommonNavigator().getAdapter(IPersistableExpandingState.class);
+					if(state != null) {
+						state.restoreExpandingState(memento);
+					}
 				} else {
 					showWorkingSets = false;
 
@@ -96,6 +102,11 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 		if (memento != null) {
 			int showWorkingSets = extensionStateModel.getBooleanProperty(WorkingSetsContentProvider.SHOW_TOP_LEVEL_WORKING_SETS) ? 1 : 0;
 			memento.putInteger(WorkingSetsContentProvider.SHOW_TOP_LEVEL_WORKING_SETS, showWorkingSets);
+			// Save the expanding state of the common viewer.
+			IPersistableExpandingState state = (IPersistableExpandingState)viewer.getCommonNavigator().getAdapter(IPersistableExpandingState.class);
+			if (state != null) {
+				state.saveExpandingState(memento);
+			}
 		}
 	}
 

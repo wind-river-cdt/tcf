@@ -14,6 +14,7 @@ import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.tcf.te.tcf.filesystem.ui.activator.UIPlugin;
+import org.eclipse.tcf.te.tcf.filesystem.ui.interfaces.preferences.IPreferenceKeys;
 import org.eclipse.tcf.te.tcf.filesystem.ui.nls.Messages;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -23,23 +24,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
  * the TCF File System Explorer.
  *
  */
-public class PreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
-	// The preference key to access the option of auto saving
-	public static final String PREF_AUTOSAVING = "PrefAutoSaving"; //$NON-NLS-1$
-	// The default value of the option of auto saving.
-	public static final boolean DEFAULT_AUTOSAVING = true;
-	// The preference key to access the option using in-place editor during renaming.
-	public static final String PREF_RENAMING_IN_PLACE_EDITOR = "PrefRenamingInPlaceEditor"; //$NON-NLS-1$
-	// The default value of the option using in-place editor during renaming.
-	public static final boolean DEFAULT_RENAMING_IN_PLACE_EDITOR = true;
-	// The preference key to access the option of copy permission when copying files.
-	public static final String PREF_COPY_PERMISSION = "PrefCopyPermission"; //$NON-NLS-1$
-	// The default value of the option of copy permission.
-	public static final boolean DEFAULT_COPY_PERMISSION = true;
-	// The preference key to access the option of copy ownership when copying files.
-	public static final String PREF_COPY_OWNERSHIP = "PrefCopyOwnership"; //$NON-NLS-1$
-	// The default value of the option of copy ownership
-	public static final boolean DEFAULT_COPY_OWNERSHIP = true;
+public class PreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage, IPreferenceKeys {
 
 	/***
 	 * Create a preference page for Target Explorer File System Explorer.
@@ -64,6 +49,8 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 		addField(copyPermission);
 		BooleanFieldEditor copyOwnership = new BooleanFieldEditor(PREF_COPY_OWNERSHIP, Messages.PreferencePage_CopyOwnershipText, getFieldEditorParent());
 		addField(copyOwnership);
+		BooleanFieldEditor persistExpanded = new BooleanFieldEditor(PREF_EXPANDED_PERSISTED, Messages.PreferencePage_PersistExpanded, getFieldEditorParent());
+		addField(persistExpanded);
 	}
 
 	/* (non-Javadoc)

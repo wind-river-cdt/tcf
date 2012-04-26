@@ -17,12 +17,14 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.tcf.te.runtime.extensions.ExecutableExtension;
 import org.eclipse.tcf.te.runtime.interfaces.IDisposable;
 import org.eclipse.tcf.te.ui.views.interfaces.ICategory;
+import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 /**
  * Abstract main view category node implementation.
  */
-public abstract class AbstractCategory extends ExecutableExtension implements ICategory, IDisposable {
+public abstract class AbstractCategory extends ExecutableExtension implements ICategory, IDisposable, IPersistableElement {
 	// The category image / image descriptor
 	private ImageDescriptor descriptor = null;
 	private Image image = null;
@@ -53,6 +55,36 @@ public abstract class AbstractCategory extends ExecutableExtension implements IC
         	} catch (NumberFormatException e) { /* ignored on purpose */ }
         }
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
+	 */
+	@Override
+    public Object getAdapter(Class adapter) {
+		if(adapter == IPersistableElement.class) {
+			return this;
+		}
+	    return super.getAdapter(adapter);
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.IPersistable#saveState(org.eclipse.ui.IMemento)
+	 */
+	@Override
+    public void saveState(IMemento memento) {
+		memento.putString("id", this.getId()); //$NON-NLS-1$
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.IPersistableElement#getFactoryId()
+	 */
+	@Override
+    public String getFactoryId() {
+	    return "org.eclipse.tcf.te.ui.views.categoryFactory"; //$NON-NLS-1$
+    }
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.runtime.interfaces.IDisposable#dispose()

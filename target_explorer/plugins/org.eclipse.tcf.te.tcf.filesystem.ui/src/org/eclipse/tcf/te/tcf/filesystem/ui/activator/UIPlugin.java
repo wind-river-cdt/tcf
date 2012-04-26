@@ -20,11 +20,11 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.tcf.te.tcf.filesystem.ui.interfaces.preferences.IPreferenceKeys;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.ImageConsts;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.autosave.SaveAllListener;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.autosave.SaveListener;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.FsClipboard;
-import org.eclipse.tcf.te.tcf.filesystem.ui.internal.preferences.PreferencePage;
 import org.eclipse.tcf.te.ui.jface.images.AbstractImageDescriptor;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.PlatformUI;
@@ -35,7 +35,7 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class UIPlugin extends AbstractUIPlugin {
+public class UIPlugin extends AbstractUIPlugin implements IPreferenceKeys {
 	// The shared instance of this plug-in.
 	private static UIPlugin plugin;
 	// The listener which listens to command "SAVE" and synchronize the local file with the target.
@@ -201,10 +201,21 @@ public class UIPlugin extends AbstractUIPlugin {
 	 */
 	public static boolean isAutoSaving() {
 		IPreferenceStore preferenceStore = getDefault().getPreferenceStore();
-		boolean autoSaving = preferenceStore.getBoolean(PreferencePage.PREF_AUTOSAVING);
+		boolean autoSaving = preferenceStore.getBoolean(PREF_AUTOSAVING);
 		return autoSaving;
 	}
-
+	
+	/**
+	 * If the option of "expanded_persisted" is set to on.
+	 *
+	 * @return true if the expanded state should be persisted or else false.
+	 */
+	public static boolean isExpandedPersisted() {
+		IPreferenceStore preferenceStore = getDefault().getPreferenceStore();
+		boolean persisted = preferenceStore.getBoolean(PREF_EXPANDED_PERSISTED);
+		return persisted;
+	}
+	
 	/**
 	 * If the option of "in-place editor" is set to on.
 	 *
@@ -212,7 +223,7 @@ public class UIPlugin extends AbstractUIPlugin {
 	 */
 	public static boolean isInPlaceEditor() {
 		IPreferenceStore preferenceStore = getDefault().getPreferenceStore();
-		boolean inPlaceEditor = preferenceStore.getBoolean(PreferencePage.PREF_RENAMING_IN_PLACE_EDITOR);
+		boolean inPlaceEditor = preferenceStore.getBoolean(PREF_RENAMING_IN_PLACE_EDITOR);
 		return inPlaceEditor;
 	}
 
@@ -223,7 +234,7 @@ public class UIPlugin extends AbstractUIPlugin {
 	 */
 	public static boolean isCopyPermission() {
 		IPreferenceStore preferenceStore = getDefault().getPreferenceStore();
-		boolean copyPermission = preferenceStore.getBoolean(PreferencePage.PREF_COPY_PERMISSION);
+		boolean copyPermission = preferenceStore.getBoolean(PREF_COPY_PERMISSION);
 		return copyPermission;
 	}
 
@@ -234,7 +245,7 @@ public class UIPlugin extends AbstractUIPlugin {
 	 */
 	public static boolean isCopyOwnership() {
 		IPreferenceStore preferenceStore = getDefault().getPreferenceStore();
-		boolean copyOwnership = preferenceStore.getBoolean(PreferencePage.PREF_COPY_OWNERSHIP);
+		boolean copyOwnership = preferenceStore.getBoolean(PREF_COPY_OWNERSHIP);
 		return copyOwnership;
 	}
 }

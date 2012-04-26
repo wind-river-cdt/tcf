@@ -512,5 +512,25 @@
    <extension point="org.eclipse.core.runtime.preferences">
       <initializer class="org.eclipse.tcf.te.ui.views.internal.preferences.PreferencesInitializer"/>
    </extension>
-
+   <extension
+         point="org.eclipse.ui.elementFactories">
+      <factory
+            class="org.eclipse.tcf.te.ui.views.categories.CategoryFactory"
+            id="org.eclipse.tcf.te.ui.views.categoryFactory">
+      </factory>
+      <factory
+            class="org.eclipse.tcf.te.ui.views.internal.adapters.PeerModelFactory"
+            id="org.eclipse.tcf.te.ui.views.peerFactory">
+      </factory>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"
+            class="org.eclipse.tcf.te.ui.views.internal.adapters.PeerModelAdapterFactory">
+         <adapter
+               type="org.eclipse.ui.IPersistableElement">
+         </adapter>
+      </factory>
+   </extension>
 </plugin>

@@ -289,6 +289,7 @@ public class Messages extends NLS {
 	public static String PreferencePage_AutoSavingText;
 	public static String PreferencePage_CopyOwnershipText;
 	public static String PreferencePage_CopyPermissionText;
+	public static String PreferencePage_PersistExpanded;
 	public static String PreferencePage_RenamingOptionText;
 
 	public static String TargetSelectionPage_Description;

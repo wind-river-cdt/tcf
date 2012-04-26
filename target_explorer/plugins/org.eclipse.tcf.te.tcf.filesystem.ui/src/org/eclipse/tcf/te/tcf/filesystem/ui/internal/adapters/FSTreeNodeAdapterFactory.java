@@ -17,10 +17,12 @@ import java.util.Map;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
+import org.eclipse.tcf.te.tcf.filesystem.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.columns.FSTreeElementLabelProvider;
 import org.eclipse.tcf.te.ui.views.interfaces.handler.IDeleteHandlerDelegate;
 import org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate;
 import org.eclipse.ui.IActionFilter;
+import org.eclipse.ui.IPersistableElement;
 
 /**
  * The adapter factory of <code>FSTreeNode</code> over <code>IActionFilter</code>
@@ -45,8 +47,8 @@ public class FSTreeNodeAdapterFactory implements IAdapterFactory {
 	@Override
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if(adaptableObject instanceof FSTreeNode) {
+			FSTreeNode node = (FSTreeNode) adaptableObject;
 			if(adapterType == IActionFilter.class) {
-				FSTreeNode node = (FSTreeNode) adaptableObject;
 				NodeStateFilter filter = filters.get(node);
 				if(filter == null){
 					filter = new NodeStateFilter(node);
@@ -63,6 +65,9 @@ public class FSTreeNodeAdapterFactory implements IAdapterFactory {
 			else if(adapterType == IDeleteHandlerDelegate.class) {
 				return deleteDelegate;
 			}
+			else if(adapterType == IPersistableElement.class && UIPlugin.isExpandedPersisted()) {
+				return new PersistableNode(node);
+			}
 		}
 		return null;
 	}
@@ -72,6 +77,6 @@ public class FSTreeNodeAdapterFactory implements IAdapterFactory {
 	 */
 	@Override
 	public Class[] getAdapterList() {
-		return new Class[] { IActionFilter.class, ILabelProvider.class, IRefreshHandlerDelegate.class, IDeleteHandlerDelegate.class };
+		return new Class[] { IActionFilter.class, ILabelProvider.class, IRefreshHandlerDelegate.class, IDeleteHandlerDelegate.class, IPersistableElement.class };
 	}
 }

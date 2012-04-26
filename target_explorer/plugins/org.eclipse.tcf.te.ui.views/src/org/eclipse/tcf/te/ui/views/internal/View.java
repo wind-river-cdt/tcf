@@ -29,6 +29,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tcf.te.ui.trees.TreeViewerEditorActivationStrategy;
 import org.eclipse.tcf.te.ui.views.activator.UIPlugin;
+import org.eclipse.tcf.te.ui.views.interfaces.IPersistableExpandingState;
 import org.eclipse.tcf.te.ui.views.interfaces.IRoot;
 import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
 import org.eclipse.ui.IAggregateWorkingSet;
@@ -51,7 +52,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  * <p>
  * The view is based on the Eclipse Common Navigator framework.
  */
-public class View extends CommonNavigator implements ITabbedPropertySheetPageContributor{
+public class View extends CommonNavigator implements ITabbedPropertySheetPageContributor {
 	// The view root mode
 	private int rootMode = IUIConstants.MODE_NORMAL;
 
@@ -60,6 +61,9 @@ public class View extends CommonNavigator implements ITabbedPropertySheetPageCon
 	 * working sets are selected.
 	 */
 	private String workingSetLabel;
+
+	// The state used to persisted the expanded nodes of the navigator tree.
+	private IPersistableExpandingState expandingState;
 
 	/**
 	 * Constructor.
@@ -132,6 +136,7 @@ public class View extends CommonNavigator implements ITabbedPropertySheetPageCon
 	@Override
 	protected CommonViewer createCommonViewerObject(Composite parent) {
 		ViewViewer viewer = new ViewViewer(getViewSite().getId(), parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		viewer.setComparer(new ViewViewerComparer());
 		// Define an editor activation strategy for the common viewer so as to be invoked only programmatically.
 		ColumnViewerEditorActivationStrategy activationStrategy = new TreeViewerEditorActivationStrategy(getSite().getId(), viewer);
 		TreeViewerEditor.create(viewer, null, activationStrategy, ColumnViewerEditor.DEFAULT);
@@ -247,6 +252,12 @@ public class View extends CommonNavigator implements ITabbedPropertySheetPageCon
     public Object getAdapter(Class adapter) {
 		if(adapter == IPropertySheetPage.class) {
 			return new TabbedPropertySheetPage(this);
+		}
+		else if(adapter == IPersistableExpandingState.class) {
+			if(expandingState == null) {
+				expandingState = new ViewExpandingState(getCommonViewer());
+			}
+			return expandingState;
 		}
 	    return super.getAdapter(adapter);
     }

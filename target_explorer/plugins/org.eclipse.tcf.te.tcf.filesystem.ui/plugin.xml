@@ -1669,6 +1669,16 @@
          <adapter
                type="org.eclipse.tcf.te.ui.views.interfaces.handler.IDeleteHandlerDelegate">
          </adapter>
+         <adapter
+               type="org.eclipse.ui.IPersistableElement">
+         </adapter>
+      </factory>
+      <factory
+            adaptableType="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.adapters.ViewerInputAdapterFactory">
+         <adapter
+               type="org.eclipse.tcf.te.core.interfaces.IViewerInput">
+         </adapter>
       </factory>
    </extension>
 
@@ -1863,16 +1873,6 @@
       </filterContribution>
    </extension>
    <extension
-         point="org.eclipse.core.runtime.adapters">
-      <factory
-            adaptableType="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"
-            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.adapters.ViewerInputAdapterFactory">
-         <adapter
-               type="org.eclipse.tcf.te.core.interfaces.IViewerInput">
-         </adapter>
-      </factory>
-   </extension>
-   <extension
          point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
       <propertyTabs
             contributorId="org.eclipse.tcf.te.ui">
@@ -1951,5 +1951,12 @@
                tab="org.eclipse.tcf.te.tcf.filesystem.propertytab.advanced">
          </propertySection>
       </propertySections>
+   </extension>
+   <extension
+         point="org.eclipse.ui.elementFactories">
+      <factory
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.adapters.FSTreeNodeFactory"
+            id="org.eclipse.tcf.te.tcf.filesystem.ui.nodeFactory">
+      </factory>
    </extension>   
 </plugin>

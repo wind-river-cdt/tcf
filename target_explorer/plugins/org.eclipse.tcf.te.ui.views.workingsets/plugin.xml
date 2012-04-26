@@ -15,6 +15,13 @@
             class="org.eclipse.tcf.te.ui.views.workingsets.WorkingSetElementHolderAdapterFactory">
          <adapter type="org.eclipse.tcf.te.runtime.interfaces.workingsets.IWorkingSetElement"/>
       </factory>
+      <factory
+            adaptableType="org.eclipse.ui.IWorkingSet"
+            class="org.eclipse.tcf.te.ui.views.workingsets.WorkingSetAdapterFactory">
+         <adapter
+               type="org.eclipse.jface.viewers.IElementComparer">
+         </adapter>
+      </factory>
    </extension>
    
 <!-- Common Navigator contributions -->

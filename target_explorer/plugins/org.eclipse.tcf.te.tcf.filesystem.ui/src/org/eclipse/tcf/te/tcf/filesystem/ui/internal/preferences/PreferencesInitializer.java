@@ -20,7 +20,7 @@ import org.eclipse.tcf.te.tcf.filesystem.ui.interfaces.preferences.IPreferenceKe
 /**
  * The bundle's preference initializer implementation.
  */
-public class PreferencesInitializer extends AbstractPreferenceInitializer {
+public class PreferencesInitializer extends AbstractPreferenceInitializer implements IPreferenceKeys {
 
 	/**
 	 * Constructor.
@@ -41,9 +41,10 @@ public class PreferencesInitializer extends AbstractPreferenceInitializer {
 			prefs.putBoolean(IPreferenceKeys.PREF_FEATURE_ENABLE_EDITOR_CONTENT_CONTRIBUTION, true);
 		}
 		IPreferenceStore preferenceStore = UIPlugin.getDefault().getPreferenceStore();
-		preferenceStore.setDefault(PreferencePage.PREF_AUTOSAVING, PreferencePage.DEFAULT_AUTOSAVING);
-		preferenceStore.setDefault(PreferencePage.PREF_RENAMING_IN_PLACE_EDITOR, PreferencePage.DEFAULT_RENAMING_IN_PLACE_EDITOR);
-		preferenceStore.setDefault(PreferencePage.PREF_COPY_PERMISSION, PreferencePage.DEFAULT_COPY_PERMISSION);
-		preferenceStore.setDefault(PreferencePage.PREF_COPY_OWNERSHIP, PreferencePage.DEFAULT_COPY_OWNERSHIP);
+		preferenceStore.setDefault(PREF_AUTOSAVING, DEFAULT_AUTOSAVING);
+		preferenceStore.setDefault(PREF_RENAMING_IN_PLACE_EDITOR, DEFAULT_RENAMING_IN_PLACE_EDITOR);
+		preferenceStore.setDefault(PREF_COPY_PERMISSION, DEFAULT_COPY_PERMISSION);
+		preferenceStore.setDefault(PREF_COPY_OWNERSHIP, DEFAULT_COPY_OWNERSHIP);
+		preferenceStore.setDefault(PREF_EXPANDED_PERSISTED, DEFAULT_EXPANDED_PERSISTED);
 	}
 }
