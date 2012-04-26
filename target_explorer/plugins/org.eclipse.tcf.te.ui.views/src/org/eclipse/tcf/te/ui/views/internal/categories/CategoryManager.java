@@ -15,6 +15,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,8 +30,6 @@ import org.eclipse.tcf.te.ui.views.interfaces.categories.ICategoryManager;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 
 
 /**
@@ -87,8 +87,8 @@ public class CategoryManager implements ICategoryManager {
 		File file = root.append("cat2id.json").toFile(); //$NON-NLS-1$
 		try {
 			cat2id.clear();
-			JsonReader reader = new JsonReader(new InputStreamReader(new FileInputStream(file), "UTF-8")); //$NON-NLS-1$
-			cat2id.putAll((Map<String, List<String>>)gson.fromJson(reader, Map.class));
+			Reader reader = new InputStreamReader(new FileInputStream(file), "UTF-8"); //$NON-NLS-1$
+			cat2id.putAll(gson.fromJson(reader, Map.class));
 			reader.close();
 		} catch (IOException e) {
 			/* ignored on purpose */
@@ -98,8 +98,8 @@ public class CategoryManager implements ICategoryManager {
 		file = root.append("id2cat.json").toFile(); //$NON-NLS-1$
 		try {
 			id2cat.clear();
-			JsonReader reader = new JsonReader(new InputStreamReader(new FileInputStream(file), "UTF-8")); //$NON-NLS-1$
-			id2cat.putAll((Map<String, List<String>>)gson.fromJson(reader, Map.class));
+			Reader reader = new InputStreamReader(new FileInputStream(file), "UTF-8"); //$NON-NLS-1$
+			id2cat.putAll(gson.fromJson(reader, Map.class));
 			reader.close();
 		} catch (IOException e) {
 			/* ignored on purpose */
@@ -120,7 +120,7 @@ public class CategoryManager implements ICategoryManager {
 		// The first file to write is the category to id list map
 		File file = root.append("cat2id.json").toFile(); //$NON-NLS-1$
 		try {
-			JsonWriter writer = new JsonWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8")); //$NON-NLS-1$
+			Writer writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8"); //$NON-NLS-1$
 			gson.toJson(cat2id, Map.class, writer);
 			writer.close();
 		} catch (IOException e) {
@@ -130,7 +130,7 @@ public class CategoryManager implements ICategoryManager {
 		// The second file to write is the id to category list map
 		file = root.append("id2cat.json").toFile(); //$NON-NLS-1$
 		try {
-			JsonWriter writer = new JsonWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8")); //$NON-NLS-1$
+			Writer writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8"); //$NON-NLS-1$
 			gson.toJson(id2cat, Map.class, writer);
 			writer.close();
 		} catch (IOException e) {

@@ -16,6 +16,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,8 +33,6 @@ import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 
 /**
  * AbstractGsonMapPersistenceDelegate
@@ -94,7 +94,7 @@ public abstract class AbstractGsonMapPersistenceDelegate extends ExecutableExten
 				file = path.addFileExtension(getDefaultFileExtension()).toFile();
 			}
 
-			JsonWriter writer = new JsonWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8")); //$NON-NLS-1$
+			Writer writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8"); //$NON-NLS-1$
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
 			gson.toJson(toMap(context), Map.class, writer);
 			writer.close();
@@ -133,7 +133,7 @@ public abstract class AbstractGsonMapPersistenceDelegate extends ExecutableExten
 				throw new IOException("URI must denote an absolute file path."); //$NON-NLS-1$
 			}
 
-			JsonReader reader = new JsonReader(new InputStreamReader(new FileInputStream(file), "UTF-8")); //$NON-NLS-1$
+			Reader reader = new InputStreamReader(new FileInputStream(file), "UTF-8"); //$NON-NLS-1$
 			data = gson.fromJson(reader, Map.class);
 			reader.close();
 		}
