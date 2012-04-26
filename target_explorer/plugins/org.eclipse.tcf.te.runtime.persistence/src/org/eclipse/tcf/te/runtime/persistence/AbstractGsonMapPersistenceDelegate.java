@@ -45,7 +45,7 @@ public abstract class AbstractGsonMapPersistenceDelegate extends ExecutableExten
 	 * Constructor.
 	 */
 	public AbstractGsonMapPersistenceDelegate() {
-		this("ini"); //$NON-NLS-1$
+		this("json"); //$NON-NLS-1$
 	}
 
 	/**

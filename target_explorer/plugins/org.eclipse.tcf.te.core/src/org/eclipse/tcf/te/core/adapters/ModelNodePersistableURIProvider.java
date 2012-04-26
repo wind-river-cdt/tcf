@@ -97,8 +97,8 @@ public class ModelNodePersistableURIProvider implements IPersistableURIProvider 
 			}
 
 			if (path != null) {
-				if (!"ini".equals(path.getFileExtension())) { //$NON-NLS-1$
-					path = path.addFileExtension("ini"); //$NON-NLS-1$
+				if (!"json".equals(path.getFileExtension())) { //$NON-NLS-1$
+					path = path.addFileExtension("json"); //$NON-NLS-1$
 				}
 				uri = path.toFile().toURI();
 			}

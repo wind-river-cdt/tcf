@@ -250,12 +250,12 @@ public class LocatorModelRefreshService extends AbstractLocatorModelService impl
 			List<Map<String, String>> postponed = new ArrayList<Map<String,String>>();
 			// Process the root locations
 			for (File root : roots) {
-				// List all "*.ini" files within the root location
+				// List all "*.json" files within the root location
 				File[] candidates = root.listFiles(new FileFilter() {
 					@Override
 					public boolean accept(File pathname) {
 						IPath path = new Path(pathname.getAbsolutePath());
-						return path.getFileExtension() != null && path.getFileExtension().toLowerCase().equals("ini"); //$NON-NLS-1$
+						return path.getFileExtension() != null && path.getFileExtension().toLowerCase().equals("json"); //$NON-NLS-1$
 					}
 				});
 				// If there are ini files to read, process them

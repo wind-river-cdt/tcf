@@ -36,7 +36,7 @@ public class GsonPeerPersistenceDelegate extends AbstractGsonMapPersistenceDeleg
 	 * Constructor.
 	 */
 	public GsonPeerPersistenceDelegate() {
-		super("ini"); //$NON-NLS-1$
+		super("json"); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
