@@ -24,7 +24,7 @@ public interface IPreferenceConsts {
 	public static final String PREF_HIDE_DYNAMIC_TARGET_DISCOVERY_EXTENSION = "org.eclipse.tcf.te.tcf.ui.navigator.content.hide"; //$NON-NLS-1$
 
 	/**
-	 * Preference key to control if a node is moved or copied to the Favorites category.
+	 * Preference key to control if a node is moved or linked to the Favorites category.
 	 */
-	public static final String PREF_FAVORITES_CATEGORY_MODE_COPY = PREFIX + "navigator.categories.favorites.copymode"; //$NON-NLS-1$
+	public static final String PREF_FAVORITES_CATEGORY_MODE_LINK = PREFIX + "navigator.categories.favorites.linkmode"; //$NON-NLS-1$
 }

@@ -31,7 +31,7 @@ public class DropAssistant extends CommonDropAdapterAssistant {
 		boolean valid = false;
 
 		if (LocalSelectionTransfer.getTransfer().isSupportedType(transferType)) {
-			valid = CommonDnD.validateLocalSelectionDrop(target, operation, transferType);
+			valid = CommonDnD.validateLocalSelectionDrop(getCommonDropAdapter(), target, operation, transferType);
 		}
 
 		return valid ? Status.OK_STATUS : Status.CANCEL_STATUS;
@@ -51,5 +51,4 @@ public class DropAssistant extends CommonDropAdapterAssistant {
 		}
 		return sucess ? Status.OK_STATUS : Status.CANCEL_STATUS;
 	}
-
 }

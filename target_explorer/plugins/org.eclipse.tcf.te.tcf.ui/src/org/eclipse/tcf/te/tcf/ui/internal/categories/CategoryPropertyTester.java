@@ -71,9 +71,9 @@ public class CategoryPropertyTester extends PropertyTester {
 				return true;
 			}
 
-			// In copy mode, "Favorites" is special
-			boolean isCopyMode = UIPlugin.getDefault().getPreferenceStore().getBoolean(IPreferenceConsts.PREF_FAVORITES_CATEGORY_MODE_COPY);
-			if (isCopyMode && IUIConstants.ID_CAT_FAVORITES.equals(expectedValue)) {
+			// In link mode, "Favorites" is special
+			boolean isLinkMode = UIPlugin.getDefault().getPreferenceStore().getBoolean(IPreferenceConsts.PREF_FAVORITES_CATEGORY_MODE_LINK);
+			if (isLinkMode && IUIConstants.ID_CAT_FAVORITES.equals(expectedValue)) {
 				return Managers.getCategoryManager().belongsTo(IUIConstants.ID_CAT_FAVORITES, node.getPeerId());
 			}
 

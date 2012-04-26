@@ -84,13 +84,13 @@ public class ContentProviderDelegate implements ICommonContentProvider {
 			Runnable runnable = new Runnable() {
 				@Override
 				public void run() {
-					boolean isCopyMode = UIPlugin.getDefault().getPreferenceStore().getBoolean(IPreferenceConsts.PREF_FAVORITES_CATEGORY_MODE_COPY);
+					boolean isLinkMode = UIPlugin.getDefault().getPreferenceStore().getBoolean(IPreferenceConsts.PREF_FAVORITES_CATEGORY_MODE_LINK);
 
 					if (IUIConstants.ID_CAT_FAVORITES.equals(catID)) {
 						for (IPeerModel peer : peers) {
 							boolean isFavorite = Managers.getCategoryManager().belongsTo(catID, peer.getPeerId());
 							if (isFavorite && !candidates.contains(peer)) {
-								if (!isCopyMode) peer.setProperty(IPeerModelProperties.PROP_PARENT_CATEGORY_ID, catID);
+								if (!isLinkMode) peer.setProperty(IPeerModelProperties.PROP_PARENT_CATEGORY_ID, catID);
 								candidates.add(peer);
 							}
 						}
@@ -106,7 +106,7 @@ public class ContentProviderDelegate implements ICommonContentProvider {
 								isStatic = true;
 							}
 
-							boolean isFavorite = !isCopyMode && Managers.getCategoryManager().belongsTo(IUIConstants.ID_CAT_FAVORITES, peer.getPeerId());
+							boolean isFavorite = !isLinkMode && Managers.getCategoryManager().belongsTo(IUIConstants.ID_CAT_FAVORITES, peer.getPeerId());
 
 							if (isStatic && !isFavorite && !candidates.contains(peer)) {
 								peer.setProperty(IPeerModelProperties.PROP_PARENT_CATEGORY_ID, catID);
@@ -125,7 +125,7 @@ public class ContentProviderDelegate implements ICommonContentProvider {
 								isStatic = true;
 							}
 
-							boolean isFavorite = !isCopyMode && Managers.getCategoryManager().belongsTo(IUIConstants.ID_CAT_FAVORITES, peer.getPeerId());
+							boolean isFavorite = !isLinkMode && Managers.getCategoryManager().belongsTo(IUIConstants.ID_CAT_FAVORITES, peer.getPeerId());
 
 							if (!isStatic && !isFavorite && !candidates.contains(peer)) {
 								peer.setProperty(IPeerModelProperties.PROP_PARENT_CATEGORY_ID, catID);
