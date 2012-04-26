@@ -42,5 +42,5 @@ public interface IPreferenceKeys {
 	// The preference key to access the option that if expanded nodes should be persisted
 	public static final String PREF_EXPANDED_PERSISTED = "PrefExpandedPersisted"; //$NON-NLS-1$
 	// The default value of the option that if expanded nodes should be persisted
-	public static final boolean DEFAULT_EXPANDED_PERSISTED = true;
+	public static final boolean DEFAULT_EXPANDED_PERSISTED = false;
 }
