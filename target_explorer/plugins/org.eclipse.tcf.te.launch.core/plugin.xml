@@ -32,6 +32,13 @@
             properties="launchMode,launchConfigTypeId"
             type="org.eclipse.debug.core.ILaunch">
       </propertyTester>
+      <propertyTester
+            class="org.eclipse.tcf.te.launch.core.bindings.internal.PropertyTester"
+            id="org.eclipse.tcf.te.launch.core.PropertyTester"
+            namespace="org.eclipse.tcf.te.launch.core"
+            properties="isValidLaunchConfigType"
+            type="java.lang.Object">
+      </propertyTester>
    </extension>
 
 <!-- Launch Step contributions -->

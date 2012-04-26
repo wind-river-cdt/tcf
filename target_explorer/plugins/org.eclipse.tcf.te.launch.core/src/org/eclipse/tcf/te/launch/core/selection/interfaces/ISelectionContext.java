@@ -15,6 +15,13 @@ package org.eclipse.tcf.te.launch.core.selection.interfaces;
 public interface ISelectionContext {
 
 	/**
+	 * Returns the context object of the selection.
+	 * 
+	 * @return The context object.
+	 */
+	public Object getContext();
+
+	/**
 	 * Returns all selected objects within the selected context.
 	 *
 	 * @param An array containing all selected objects, or <code>null</code>.

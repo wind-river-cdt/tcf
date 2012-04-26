@@ -24,4 +24,30 @@ public class ReferencedProjectItem extends PropertiesContainer implements IRefer
 	public ReferencedProjectItem() {
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.launch.core.interfaces.IReferencedProjectItem#isEnabled()
+	 */
+	@Override
+	public boolean isEnabled() {
+		return getBooleanProperty(PROPERTY_ENABLED);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.launch.core.interfaces.IReferencedProjectItem#getProjectName()
+	 */
+	@Override
+	public String getProjectName() {
+		return getStringProperty(PROPERTY_PROJECT_NAME);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.properties.PropertiesContainer#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof IReferencedProjectItem) {
+			return getProjectName().equals(((IReferencedProjectItem)obj).getProjectName());
+		}
+		return super.equals(obj);
+	}
 }

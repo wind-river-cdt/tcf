@@ -33,7 +33,7 @@ public class PropertyTester extends org.eclipse.core.expressions.PropertyTester 
 		if ("hasApplicableEditorBindings".equals(property)) { //$NON-NLS-1$
 			// Create a fake editor input object
 			IEditorInput input = new EditorInput(receiver);
-			return expectedValue.equals(Boolean.valueOf(EditorPageBindingExtensionPointManager.getInstance().getApplicableEditorPageBindings(input).length > 0));
+			return (expectedValue != null ? expectedValue : Boolean.TRUE).equals(Boolean.valueOf(EditorPageBindingExtensionPointManager.getInstance().getApplicableEditorPageBindings(input).length > 0));
 		}
 
 		if ("isRefreshableElement".equals(property)) { //$NON-NLS-1$
@@ -47,18 +47,22 @@ public class PropertyTester extends org.eclipse.core.expressions.PropertyTester 
 				refreshable = delegate != null;
 			}
 
-			return expectedValue.equals(Boolean.valueOf(refreshable));
+			return (expectedValue != null ? expectedValue : Boolean.TRUE).equals(Boolean.valueOf(refreshable));
 		}
 
 		if ("canRefresh".equals(property)) { //$NON-NLS-1$
 			// Test if the receiver can be refreshed
 			IRefreshHandlerDelegate delegate = receiver instanceof IRefreshHandlerDelegate ? (IRefreshHandlerDelegate)receiver : null;
-			if (delegate == null) delegate = (IRefreshHandlerDelegate)Platform.getAdapterManager().loadAdapter(receiver, IRefreshHandlerDelegate.class.getName());
+			if (delegate == null) {
+				delegate = (IRefreshHandlerDelegate)Platform.getAdapterManager().loadAdapter(receiver, IRefreshHandlerDelegate.class.getName());
+			}
 
 			boolean canRefresh = false;
-			if (delegate != null) canRefresh = delegate.canRefresh(receiver);
+			if (delegate != null) {
+				canRefresh = delegate.canRefresh(receiver);
+			}
 
-			return expectedValue.equals(Boolean.valueOf(canRefresh));
+			return (expectedValue != null ? expectedValue : Boolean.TRUE).equals(Boolean.valueOf(canRefresh));
 		}
 
 
@@ -73,18 +77,22 @@ public class PropertyTester extends org.eclipse.core.expressions.PropertyTester 
 				deletable = delegate != null;
 			}
 
-			return expectedValue.equals(Boolean.valueOf(deletable));
+			return (expectedValue != null ? expectedValue : Boolean.TRUE).equals(Boolean.valueOf(deletable));
 		}
 
 		if ("canDelete".equals(property)) { //$NON-NLS-1$
 			// Test if the receiver can be deleted
 			IDeleteHandlerDelegate delegate = receiver instanceof IDeleteHandlerDelegate ? (IDeleteHandlerDelegate)receiver : null;
-			if (delegate == null) delegate = (IDeleteHandlerDelegate)Platform.getAdapterManager().loadAdapter(receiver, IDeleteHandlerDelegate.class.getName());
+			if (delegate == null) {
+				delegate = (IDeleteHandlerDelegate)Platform.getAdapterManager().loadAdapter(receiver, IDeleteHandlerDelegate.class.getName());
+			}
 
 			boolean canDelete = false;
-			if (delegate != null) canDelete = delegate.canDelete(receiver);
+			if (delegate != null) {
+				canDelete = delegate.canDelete(receiver);
+			}
 
-			return expectedValue.equals(Boolean.valueOf(canDelete));
+			return (expectedValue != null ? expectedValue : Boolean.TRUE).equals(Boolean.valueOf(canDelete));
 		}
 
 		// ***** Categories related properties *****
@@ -96,17 +104,17 @@ public class PropertyTester extends org.eclipse.core.expressions.PropertyTester 
 
 		if ("isMyTargets".equals(property) && receiver instanceof ICategory) { //$NON-NLS-1$
 			String id = ((ICategory)receiver).getId();
-			return expectedValue.equals(Boolean.valueOf(id.equals(IUIConstants.ID_CAT_MY_TARGETS)));
+			return (expectedValue != null ? expectedValue : Boolean.TRUE).equals(Boolean.valueOf(id.equals(IUIConstants.ID_CAT_MY_TARGETS)));
 		}
 
 		if ("isFavorites".equals(property) && receiver instanceof ICategory) { //$NON-NLS-1$
 			String id = ((ICategory)receiver).getId();
-			return expectedValue.equals(Boolean.valueOf(id.equals(IUIConstants.ID_CAT_FAVORITES)));
+			return (expectedValue != null ? expectedValue : Boolean.TRUE).equals(Boolean.valueOf(id.equals(IUIConstants.ID_CAT_FAVORITES)));
 		}
 
 		if ("isNeighborhood".equals(property) && receiver instanceof ICategory) { //$NON-NLS-1$
 			String id = ((ICategory)receiver).getId();
-			return expectedValue.equals(Boolean.valueOf(id.equals(IUIConstants.ID_CAT_NEIGHBORHOOD)));
+			return (expectedValue != null ? expectedValue : Boolean.TRUE).equals(Boolean.valueOf(id.equals(IUIConstants.ID_CAT_NEIGHBORHOOD)));
 		}
 
 		return false;

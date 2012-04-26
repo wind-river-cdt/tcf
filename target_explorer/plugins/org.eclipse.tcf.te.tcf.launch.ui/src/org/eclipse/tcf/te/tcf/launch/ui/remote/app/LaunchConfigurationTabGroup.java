@@ -15,7 +15,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.tcf.te.launch.ui.tabs.AbstractLaunchConfigurationTabGroup;
-import org.eclipse.tcf.te.launch.ui.tabs.projects.ReferencedProjetcsTab;
+import org.eclipse.tcf.te.launch.ui.tabs.refprojects.RefProjetcsTab;
 import org.eclipse.tcf.te.tcf.launch.ui.remote.app.filetransfer.FileTransferTab;
 
 /**
@@ -41,6 +41,6 @@ public class LaunchConfigurationTabGroup extends AbstractLaunchConfigurationTabG
 	public void createAdditionalTabs(ILaunchConfigurationDialog dialog, List<ILaunchConfigurationTab> tabs, String mode) {
 
 		tabs.add(new FileTransferTab());
-		tabs.add(new ReferencedProjetcsTab());
+		tabs.add(new RefProjetcsTab());
 	}
 }

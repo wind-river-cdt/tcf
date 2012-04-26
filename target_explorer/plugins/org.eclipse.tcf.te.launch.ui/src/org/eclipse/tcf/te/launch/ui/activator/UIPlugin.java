@@ -17,6 +17,7 @@ import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tcf.te.launch.ui.internal.ImageConsts;
 import org.eclipse.tcf.te.runtime.tracing.TraceHandler;
+import org.eclipse.tcf.te.ui.jface.images.AbstractImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -71,7 +72,7 @@ public class UIPlugin extends AbstractUIPlugin {
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
 	@Override
-    public void start(BundleContext context) throws Exception {
+	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
 	}
@@ -80,7 +81,7 @@ public class UIPlugin extends AbstractUIPlugin {
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	@Override
-    public void stop(BundleContext context) throws Exception {
+	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		traceHandler = null;
 		super.stop(context);
@@ -98,6 +99,10 @@ public class UIPlugin extends AbstractUIPlugin {
 			url = bundle.getEntry(ImageConsts.IMAGE_DIR_ROOT + "full/" + ImageConsts.IMAGE_DIR_DLCL + "refresh_nav.gif"); //$NON-NLS-1$ //$NON-NLS-2$
 			registry.put(ImageConsts.ACTION_Refresh_Disabled, ImageDescriptor.createFromURL(url));
 		}
+		URL url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OBJ + "root.gif"); //$NON-NLS-1$
+		registry.put(ImageConsts.OBJ_Launches_Root, ImageDescriptor.createFromURL(url));
+		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OVR + "redX_ovr.gif"); //$NON-NLS-1$
+		registry.put(ImageConsts.RED_X_OVR, ImageDescriptor.createFromURL(url));
 	}
 
 	/**
@@ -120,5 +125,27 @@ public class UIPlugin extends AbstractUIPlugin {
 	 */
 	public static ImageDescriptor getImageDescriptor(String key) {
 		return getDefault().getImageRegistry().getDescriptor(key);
+	}
+
+	/**
+	 * Loads the image given by the specified image descriptor from the image
+	 * registry. If the image has been loaded ones before already, the cached
+	 * <code>Image</code> object instance is returned. Otherwise, the <code>
+	 * Image</code> object instance will be created and cached before returned.
+	 *
+	 * @param descriptor The image descriptor.
+	 * @return The corresponding <code>Image</code> object instance or <code>null</code>.
+	 */
+	public static Image getSharedImage(AbstractImageDescriptor descriptor) {
+		ImageRegistry registry = getDefault().getImageRegistry();
+
+		String imageKey = descriptor.getDecriptorKey();
+		Image image = registry.get(imageKey);
+		if (image == null) {
+			registry.put(imageKey, descriptor);
+			image = registry.get(imageKey);
+		}
+
+		return image;
 	}
 }

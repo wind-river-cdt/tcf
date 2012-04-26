@@ -15,6 +15,8 @@ import org.eclipse.tcf.te.launch.core.selection.interfaces.ISelectionContext;
  * Abstract selection context implementation.
  */
 public abstract class AbstractSelectionContext implements ISelectionContext {
+	// The context
+	protected final Object context;
 	// The selection context type
 	protected String type = null;
 	// The selected objects
@@ -25,11 +27,13 @@ public abstract class AbstractSelectionContext implements ISelectionContext {
 	/**
 	 * Constructor.
 	 *
+	 * @param The context object.
 	 * @param selections The selected objects or <code>null</code>.
 	 * @param isPreferred <code>True</code> to mark the selection context the preferred context,
 	 *            <code>false</code> otherwise.
 	 */
-	public AbstractSelectionContext(Object[] selections, boolean isPreferred) {
+	public AbstractSelectionContext(Object context, Object[] selections, boolean isPreferred) {
+		this.context = context;
 		this.selections = selections != null ? selections : new Object[0];
 		this.isPreferred = isPreferred;
 	}
@@ -37,22 +41,32 @@ public abstract class AbstractSelectionContext implements ISelectionContext {
 	/**
 	 * Constructor.
 	 *
+	 * @param The context object.
 	 * @param type The selection context type or <code>null</code>.
 	 * @param selections The selected objects or <code>null</code>.
 	 * @param isPreferred <code>True</code> to mark the selection context the preferred context,
 	 *            <code>false</code> otherwise.
 	 */
-	public AbstractSelectionContext(String type, Object[] selections, boolean isPreferred) {
+	public AbstractSelectionContext(Object context, String type, Object[] selections, boolean isPreferred) {
+		this.context = context;
 		this.type = type;
 		this.selections = selections != null ? selections : new Object[0];
 		this.isPreferred = isPreferred;
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.launch.core.selection.interfaces.ISelectionContext#getContext()
+	 */
+	@Override
+	public Object getContext() {
+		return context;
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.launch.core.selection.interfaces.ISelectionContext#getType()
 	 */
 	@Override
-    public String getType() {
+	public String getType() {
 		return type;
 	}
 
@@ -60,7 +74,7 @@ public abstract class AbstractSelectionContext implements ISelectionContext {
 	 * @see org.eclipse.tcf.te.launch.core.selection.interfaces.ISelectionContext#getSelections()
 	 */
 	@Override
-    public Object[] getSelections() {
+	public Object[] getSelections() {
 		return selections;
 	}
 
@@ -68,7 +82,7 @@ public abstract class AbstractSelectionContext implements ISelectionContext {
 	 * @see org.eclipse.tcf.te.launch.core.selection.interfaces.ISelectionContext#setIsPreferredContext(boolean)
 	 */
 	@Override
-    public void setIsPreferredContext(boolean isPreferred) {
+	public void setIsPreferredContext(boolean isPreferred) {
 		this.isPreferred = isPreferred;
 	}
 
@@ -76,7 +90,7 @@ public abstract class AbstractSelectionContext implements ISelectionContext {
 	 * @see org.eclipse.tcf.te.launch.core.selection.interfaces.ISelectionContext#isPreferredContext()
 	 */
 	@Override
-    public boolean isPreferredContext() {
+	public boolean isPreferredContext() {
 		return isPreferred;
 	}
 

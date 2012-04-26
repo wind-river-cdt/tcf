@@ -10,6 +10,8 @@
 package org.eclipse.tcf.te.launch.core.bindings.internal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.expressions.EvaluationContext;
@@ -191,8 +193,10 @@ public class LaunchConfigTypeBinding {
 		for (Expression expression : expressions) {
 			// Set the default variable and "selection" is the selection context
 			EvaluationContext evalContext = new EvaluationContext(null, context);
-			evalContext.addVariable("selection", context); //$NON-NLS-1$
-			evalContext.addVariable("mode", mode); //$NON-NLS-1$
+			evalContext.addVariable("context", context.getContext()); //$NON-NLS-1$
+			evalContext.addVariable("selection", context.getSelections() != null ? Arrays.asList(context.getSelections()) : Collections.EMPTY_LIST); //$NON-NLS-1$
+			evalContext.addVariable("type", context.getType() != null ? context.getType() : ""); //$NON-NLS-1$ //$NON-NLS-2$
+			evalContext.addVariable("mode", mode != null ? mode : ""); //$NON-NLS-1$ //$NON-NLS-2$
 			// Allow plugin activation
 			evalContext.setAllowPluginActivation(true);
 			// Evaluate the expression

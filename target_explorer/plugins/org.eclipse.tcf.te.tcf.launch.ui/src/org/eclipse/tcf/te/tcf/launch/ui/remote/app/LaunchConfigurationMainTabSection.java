@@ -99,7 +99,7 @@ public class LaunchConfigurationMainTabSection extends AbstractSection implement
 				getManagedForm().dirtyStateChanged();
 			}
 		};
-		processImage.setEditFieldLabel(Messages.ProcessImageSelectorControl_label);
+		processImage.setEditFieldLabel(Messages.LaunchConfigurationMainTabSection_processImage_label);
 		processImage.setIsGroup(false);
 		processImage.setHideBrowseButton(false);
 		processImage.setAdjustBackgroundColor(true);
@@ -187,7 +187,7 @@ public class LaunchConfigurationMainTabSection extends AbstractSection implement
 			setMessage(null, IMessageProvider.NONE);
 		}
 		else {
-			setMessage(Messages.ProcessImageSelectorControl_error_missingProcessImage, IMessageProvider.ERROR);
+			setMessage(Messages.LaunchConfigurationMainTabSection_error_missingProcessImage, IMessageProvider.ERROR);
 		}
 		processImage.updateControlDecoration(getMessage(), getMessageType());
 

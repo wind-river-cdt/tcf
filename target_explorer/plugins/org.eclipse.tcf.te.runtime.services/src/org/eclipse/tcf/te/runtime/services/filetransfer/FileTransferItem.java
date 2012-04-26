@@ -66,4 +66,18 @@ public class FileTransferItem extends PropertiesContainer implements IFileTransf
 	public String getOptions() {
 		return getStringProperty(PROPERTY_OPTIONS);
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.properties.PropertiesContainer#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof IFileTransferItem) {
+			return getHostPath().equals(((IFileTransferItem)obj).getHostPath()) &&
+							getTargetPath().equals(((IFileTransferItem)obj).getTargetPath()) &&
+							getDirection() == ((IFileTransferItem)obj).getDirection() &&
+							getOptions().equals(((IFileTransferItem)obj).getOptions());
+		}
+		return super.equals(obj);
+	}
 }

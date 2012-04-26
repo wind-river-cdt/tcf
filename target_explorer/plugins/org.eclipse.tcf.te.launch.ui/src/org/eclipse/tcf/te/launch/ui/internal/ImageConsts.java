@@ -20,35 +20,57 @@ public interface ImageConsts {
 	 * The root directory where to load the images from, relative to
 	 * the bundle directory.
 	 */
-    public final static String IMAGE_DIR_ROOT = "icons/"; //$NON-NLS-1$
+	public final static String IMAGE_DIR_ROOT = "icons/"; //$NON-NLS-1$
 
-    /**
-     * The directory where to load colored local toolbar images from,
-     * relative to the image root directory.
-     */
-    public final static String  IMAGE_DIR_CLCL = "clcl16/"; //$NON-NLS-1$
+	/**
+	 * The directory where to load colored local toolbar images from,
+	 * relative to the image root directory.
+	 */
+	public final static String  IMAGE_DIR_CLCL = "clcl16/"; //$NON-NLS-1$
 
-    /**
-     * The directory where to load disabled local toolbar images from,
-     * relative to the image root directory.
-     */
-    public final static String  IMAGE_DIR_DLCL = "dlcl16/"; //$NON-NLS-1$
+	/**
+	 * The directory where to load disabled local toolbar images from,
+	 * relative to the image root directory.
+	 */
+	public final static String  IMAGE_DIR_DLCL = "dlcl16/"; //$NON-NLS-1$
 
-    /**
-     * The directory where to load enabled local toolbar images from,
-     * relative to the image root directory.
-     */
-    public final static String  IMAGE_DIR_ELCL = "elcl16/"; //$NON-NLS-1$
+	/**
+	 * The directory where to load enabled local toolbar images from,
+	 * relative to the image root directory.
+	 */
+	public final static String  IMAGE_DIR_ELCL = "elcl16/"; //$NON-NLS-1$
 
-    // ***** The image constants *****
+	/**
+	 * The directory where to load model object images from, relative to the image root directory.
+	 */
+	public final static String IMAGE_DIR_OBJ = "obj16/"; //$NON-NLS-1$
 
-    /**
-     * The key to access the refresh action image (enabled).
-     */
-    public static final String  ACTION_Refresh_Enabled = "RefreshAction_enabled"; //$NON-NLS-1$
+	/**
+	 * The directory where to load object overlay images from,
+	 * relative to the image root directory.
+	 */
+	public final static String  IMAGE_DIR_OVR = "ovr16/"; //$NON-NLS-1$
 
-    /**
-     * The key to access the refresh action image (disabled).
-     */
-    public static final String  ACTION_Refresh_Disabled = "RefreshAction_disabled"; //$NON-NLS-1$
+
+	// ***** The image constants *****
+
+	/**
+	 * The key to access the refresh action image (enabled).
+	 */
+	public static final String  ACTION_Refresh_Enabled = "RefreshAction_enabled"; //$NON-NLS-1$
+
+	/**
+	 * The key to access the refresh action image (disabled).
+	 */
+	public static final String  ACTION_Refresh_Disabled = "RefreshAction_disabled"; //$NON-NLS-1$
+
+	/**
+	 * The key to access the launches tree root image.
+	 */
+	public static final String OBJ_Launches_Root = "OBJ_Launches_Root"; //$NON-NLS-1$
+
+	/**
+	 * The key to access the target object red X overlay image.
+	 */
+	public static final String RED_X_OVR = "RedXOverlay"; //$NON-NLS-1$
 }

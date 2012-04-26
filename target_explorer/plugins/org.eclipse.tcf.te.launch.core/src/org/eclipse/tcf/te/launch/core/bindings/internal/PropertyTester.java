@@ -9,8 +9,17 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.launch.core.bindings.internal;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.debug.core.ILaunch;
+import org.eclipse.tcf.te.launch.core.bindings.LaunchConfigTypeBindingsManager;
+import org.eclipse.tcf.te.launch.core.selection.LaunchSelection;
+import org.eclipse.tcf.te.launch.core.selection.ProjectSelectionContext;
+import org.eclipse.tcf.te.launch.core.selection.RemoteSelectionContext;
+import org.eclipse.tcf.te.launch.core.selection.interfaces.ISelectionContext;
+import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
+import org.eclipse.tcf.te.runtime.model.interfaces.IModelNodeProvider;
 
 /**
  * Launch property tester.
@@ -23,16 +32,44 @@ public class PropertyTester extends org.eclipse.core.expressions.PropertyTester 
 	@Override
 	public boolean test(final Object receiver, String property, Object[] args, Object expectedValue) {
 
-		if (receiver instanceof ILaunch) {
-			if ("launchMode".equals(property) && expectedValue instanceof String) { //$NON-NLS-1$
+		if ("launchMode".equals(property) && expectedValue instanceof String) { //$NON-NLS-1$
+			if (receiver instanceof ILaunch) {
 				return ((ILaunch)receiver).getLaunchMode().equalsIgnoreCase((String)expectedValue);
 			}
-			if ("launchConfigTypeid".equals(property) && expectedValue instanceof String) { //$NON-NLS-1$
+		}
+		else if ("launchConfigTypeid".equals(property) && expectedValue instanceof String) { //$NON-NLS-1$
+			if (receiver instanceof ILaunch) {
 				try {
 					return ((ILaunch)receiver).getLaunchConfiguration().getType().getIdentifier().equalsIgnoreCase((String)expectedValue);
 				}
 				catch (CoreException e) {
 				}
+			}
+		}
+		else if ("isValidLaunchConfigType".equals(property) && expectedValue instanceof String) { //$NON-NLS-1$
+			ISelectionContext selContext = null;
+			if (receiver instanceof IModelNodeProvider) {
+				selContext = new RemoteSelectionContext(((IModelNodeProvider)receiver).getModelNode(), true);
+			}
+			else if (receiver instanceof IProject) {
+				selContext = new ProjectSelectionContext((IProject)receiver, true);
+			}
+			else if (receiver instanceof IAdaptable) {
+				IProject project = (IProject)((IAdaptable)receiver).getAdapter(IProject.class);
+				if (project != null) {
+					selContext = new ProjectSelectionContext(project, true);
+				}
+				IModelNode modelNode = (IModelNode)((IAdaptable)receiver).getAdapter(IModelNode.class);
+				if (modelNode != null) {
+					selContext = new RemoteSelectionContext(modelNode, true);
+				}
+			}
+			if (selContext != null) {
+				return LaunchConfigTypeBindingsManager.getInstance().isValidLaunchConfigType(
+								(String)expectedValue,
+								new LaunchSelection(
+												(args != null && args.length > 0 ? args[0].toString() : null),
+												selContext));
 			}
 		}
 		return false;

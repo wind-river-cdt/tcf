@@ -31,26 +31,8 @@ public class Messages extends NLS {
 
 	public static String LaunchConfigurationMainTabSection_title;
 	public static String LaunchConfigurationMainTabSection_processArguments_label;
-
-	public static String ProcessImageSelectorControl_label;
-	public static String ProcessImageSelectorControl_error_missingProcessImage;
-
-	public static String FileTransferTab_name;
-
-	public static String FileTransferSection_title;
-	public static String FileTransferSection_description;
-	public static String FileTransferSection_host_column;
-	public static String FileTransferSection_target_column;
-	public static String FileTransferSection_options_column;
-	public static String FileTransferSection_add_button;
-	public static String FileTransferSection_edit_button;
-	public static String FileTransferSection_delete_button;
-	public static String FileTransferSection_up_button;
-	public static String FileTransferSection_down_button;
-	public static String FileTransferSection_toHost_text;
-	public static String FileTransferSection_toTarget_text;
-	public static String FileTransferSection_toHost_tooltip;
-	public static String FileTransferSection_toTarget_tooltip;
+	public static String LaunchConfigurationMainTabSection_processImage_label;
+	public static String LaunchConfigurationMainTabSection_error_missingProcessImage;
 
 	public static String AddEditFileTransferDialog_add_dialogTitle;
 	public static String AddEditFileTransferDialog_edit_dialogTitle;

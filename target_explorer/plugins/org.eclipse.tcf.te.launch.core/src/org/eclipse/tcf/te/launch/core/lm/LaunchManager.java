@@ -10,7 +10,6 @@
 package org.eclipse.tcf.te.launch.core.lm;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -34,7 +33,6 @@ import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchAttribute;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchManagerDelegate;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification;
 import org.eclipse.tcf.te.launch.core.nls.Messages;
-import org.eclipse.tcf.te.launch.core.persistence.DefaultPersistenceDelegate;
 
 /**
  * The Launch Manager is the management interface for the launch configuration storage layer.
@@ -99,7 +97,7 @@ public class LaunchManager extends PlatformObject {
 	 */
 	public ILaunchConfigurationType getLaunchConfigType(String launchConfigTypeId, String launchMode) {
 		ILaunchConfigurationType launchConfigType = DebugPlugin.getDefault().getLaunchManager()
-		                .getLaunchConfigurationType(launchConfigTypeId);
+						.getLaunchConfigurationType(launchConfigTypeId);
 		if (launchConfigType != null && !launchConfigType.supportsMode(launchMode)) {
 			launchConfigType = null;
 		}
@@ -217,38 +215,16 @@ public class LaunchManager extends PlatformObject {
 				}
 				ILaunchConfigurationWorkingCopy wc = null;
 				if (launchConfig == null || !launchConfig.getType().getIdentifier()
-				                .equals(launchConfigTypeId)) {
+								.equals(launchConfigTypeId)) {
 					try {
 						// create the launch configuration working copy instance
 						wc = launchConfigType.newInstance(null, DebugPlugin
-						                .getDefault()
-						                .getLaunchManager()
-						                .generateLaunchConfigurationName(launchSpec
-						                                .getLaunchConfigName()));
+										.getDefault()
+										.getLaunchManager()
+										.generateLaunchConfigurationName(launchSpec
+														.getLaunchConfigName()));
 						// initialize the launch configuration working copy
 						delegate.initLaunchConfigAttributes(wc, launchSpec);
-						// copy all additional attributes set in the launch spec to the working copy
-						ILaunchAttribute[] allAttributes = launchSpec.getAllAttributes();
-						for (ILaunchAttribute attribute : allAttributes) {
-							if (!wc.hasAttribute(attribute.getKey())) {
-								Object value = attribute.getValue();
-								if (value instanceof Boolean) {
-									DefaultPersistenceDelegate.setAttribute(wc, attribute.getKey(), ((Boolean) value).booleanValue());
-								}
-								else if (value instanceof Integer) {
-									DefaultPersistenceDelegate.setAttribute(wc, attribute.getKey(), ((Integer) value).intValue());
-								}
-								else if (value instanceof List<?>) {
-									DefaultPersistenceDelegate.setAttribute(wc, attribute.getKey(), (List<?>) value);
-								}
-								else if (value instanceof Map<?, ?>) {
-									DefaultPersistenceDelegate.setAttribute(wc, attribute.getKey(), (Map<?, ?>) value);
-								}
-								else if (value instanceof String) {
-									DefaultPersistenceDelegate.setAttribute(wc, attribute.getKey(), (String) value);
-								}
-							}
-						}
 						// and save the launch configuration
 						return wc.doSave();
 					}
@@ -294,7 +270,7 @@ public class LaunchManager extends PlatformObject {
 			}
 			catch (CoreException e) {
 				IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
-											Messages.LaunchManager_error_deleteLaunchConfig, e);
+								Messages.LaunchManager_error_deleteLaunchConfig, e);
 				Platform.getLog(CoreBundleActivator.getContext().getBundle()).log(status);
 			}
 		}

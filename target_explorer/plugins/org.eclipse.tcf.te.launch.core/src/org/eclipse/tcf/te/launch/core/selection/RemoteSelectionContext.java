@@ -16,8 +16,6 @@ import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
  * Step context selection context implementation.
  */
 public class RemoteSelectionContext extends AbstractSelectionContext implements IRemoteSelectionContext {
-	// The step context
-	private IModelNode remoteCtx = null;
 
 	/**
 	 * Constructor.
@@ -27,7 +25,7 @@ public class RemoteSelectionContext extends AbstractSelectionContext implements 
 	 *            <code>false</code> otherwise.
 	 */
 	public RemoteSelectionContext(IModelNode remoteCtx, boolean isPreferred) {
-		this(remoteCtx, null, isPreferred);
+		this(remoteCtx, new Object[]{remoteCtx}, isPreferred);
 	}
 
 	/**
@@ -39,8 +37,7 @@ public class RemoteSelectionContext extends AbstractSelectionContext implements 
 	 *            <code>false</code> otherwise.
 	 */
 	public RemoteSelectionContext(IModelNode remoteCtx, Object[] selections, boolean isPreferred) {
-		super(selections, isPreferred);
-		this.remoteCtx = remoteCtx;
+		super(remoteCtx, selections, isPreferred);
 	}
 
 	/* (non-Javadoc)
@@ -48,7 +45,7 @@ public class RemoteSelectionContext extends AbstractSelectionContext implements 
 	 */
 	@Override
 	public IModelNode getRemoteCtx() {
-		return remoteCtx;
+		return (IModelNode)getContext();
 	}
 
 	/* (non-Javadoc)
@@ -58,8 +55,8 @@ public class RemoteSelectionContext extends AbstractSelectionContext implements 
 	public String toString() {
 		StringBuffer toString = new StringBuffer();
 
-		if (remoteCtx != null) {
-			toString.append(remoteCtx.toString());
+		if (getContext() != null) {
+			toString.append(getContext().toString());
 		}
 		toString.append(toString.length() > 0 ? " " : ""); //$NON-NLS-1$ //$NON-NLS-2$
 		toString.append(super.toString());

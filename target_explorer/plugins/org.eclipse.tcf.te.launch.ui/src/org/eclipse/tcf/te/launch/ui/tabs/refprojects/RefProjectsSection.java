@@ -8,7 +8,7 @@
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tcf.te.launch.ui.tabs.projects;
+package org.eclipse.tcf.te.launch.ui.tabs.refprojects;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +30,6 @@ import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.ICheckStateProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -67,9 +66,9 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
 /**
- * ReferencedProjectsSection
+ * RefProjectsSection
  */
-public class ReferencedProjectsSection extends AbstractTableSection implements ILaunchConfigurationTabFormPart {
+public class RefProjectsSection extends AbstractTableSection implements ILaunchConfigurationTabFormPart {
 
 	private ControlDecoration controlDecoration;
 
@@ -80,7 +79,7 @@ public class ReferencedProjectsSection extends AbstractTableSection implements I
 	 * @param form
 	 * @param parent
 	 */
-	public ReferencedProjectsSection(IManagedForm form, Composite parent) {
+	public RefProjectsSection(IManagedForm form, Composite parent) {
 		super(form, parent, SWT.NONE, new String[]{
 						Messages.ReferencedProjectsSection_add_button,
 						Messages.ReferencedProjectsSection_delete_button,
@@ -165,20 +164,7 @@ public class ReferencedProjectsSection extends AbstractTableSection implements I
 
 		final Table table = viewer.getTable();
 
-		((CheckboxTableViewer)viewer).setCheckStateProvider(new ICheckStateProvider() {
-			@Override
-			public boolean isGrayed(Object element) {
-				return false;
-			}
-			@Override
-			public boolean isChecked(Object element) {
-				if (element instanceof IReferencedProjectItem) {
-					IReferencedProjectItem item = (IReferencedProjectItem)element;
-					return item.getBooleanProperty(IReferencedProjectItem.PROPERTY_ENABLED);
-				}
-				return false;
-			}
-		});
+		((CheckboxTableViewer)viewer).setCheckStateProvider(new RefProjectsCheckStateProvider());
 		((CheckboxTableViewer)viewer).addCheckStateListener(new ICheckStateListener() {
 			@Override
 			public void checkStateChanged(CheckStateChangedEvent event) {
@@ -202,7 +188,7 @@ public class ReferencedProjectsSection extends AbstractTableSection implements I
 
 		TableViewerColumn tvProjectCol = new TableViewerColumn(viewer, SWT.NONE);
 		final TableColumn colProject = tvProjectCol.getColumn();
-		colProject.setText(Messages.ReferencedProjectsSection_project_column);
+		colProject.setText(Messages.ReferencedProjectsSection_name_column);
 		colProject.setResizable(true);
 		tvProjectCol.setLabelProvider(new ColumnLabelProvider() {
 			@Override
@@ -268,19 +254,7 @@ public class ReferencedProjectsSection extends AbstractTableSection implements I
 			}
 		};
 
-		viewer.setContentProvider(new IStructuredContentProvider() {
-			@Override
-			public void dispose() {
-			}
-			@Override
-			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-				viewer.refresh();
-			}
-			@Override
-			public Object[] getElements(Object inputElement) {
-				return inputElement instanceof Object[] ? (Object[])inputElement : new Object[0];
-			}
-		});
+		viewer.setContentProvider(new RefProjectsContentProvider());
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {

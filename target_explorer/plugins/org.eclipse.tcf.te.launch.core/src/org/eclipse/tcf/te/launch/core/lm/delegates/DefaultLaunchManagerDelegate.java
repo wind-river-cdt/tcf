@@ -10,6 +10,7 @@
 package org.eclipse.tcf.te.launch.core.lm.delegates;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -25,18 +26,26 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.tcf.te.launch.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.launch.core.bindings.LaunchConfigTypeBindingsManager;
 import org.eclipse.tcf.te.launch.core.exceptions.LaunchServiceException;
+import org.eclipse.tcf.te.launch.core.interfaces.IReferencedProjectItem;
 import org.eclipse.tcf.te.launch.core.interfaces.tracing.ITraceIds;
 import org.eclipse.tcf.te.launch.core.lm.LaunchConfigSorter;
 import org.eclipse.tcf.te.launch.core.lm.LaunchSpecification;
+import org.eclipse.tcf.te.launch.core.lm.interfaces.IFileTransferLaunchAttributes;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchAttribute;
+import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchContextLaunchAttributes;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchManagerDelegate;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.IReferencedProjectLaunchAttributes;
 import org.eclipse.tcf.te.launch.core.nls.Messages;
+import org.eclipse.tcf.te.launch.core.persistence.filetransfer.FileTransfersPersistenceDelegate;
+import org.eclipse.tcf.te.launch.core.persistence.launchcontext.LaunchContextsPersistenceDelegate;
+import org.eclipse.tcf.te.launch.core.persistence.projects.ReferencedProjectsPersistenceDelegate;
 import org.eclipse.tcf.te.launch.core.preferences.IPreferenceKeys;
 import org.eclipse.tcf.te.launch.core.selection.interfaces.ILaunchSelection;
 import org.eclipse.tcf.te.launch.core.selection.interfaces.ISelectionContext;
 import org.eclipse.tcf.te.runtime.extensions.ExecutableExtension;
+import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
+import org.eclipse.tcf.te.runtime.services.interfaces.filetransfer.IFileTransferItem;
 
 /**
  * Default launch manager delegate implementation.
@@ -168,12 +177,14 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 				// for full validation.
 				// otherwise "not preferred" contexts are valid even if they are not for a give
 				// launch configuration type id.
+				boolean oldPref = selectionContext.isPreferredContext();
 				selectionContext.setIsPreferredContext(true);
 				if (LaunchConfigTypeBindingsManager
 								.getInstance()
 								.isValidLaunchConfigType(launchConfigTypeId, launchSelection.getLaunchMode(), selectionContext)) {
 					spec = addLaunchSpecAttributes(spec, launchConfigTypeId, selectionContext);
 				}
+				selectionContext.setIsPreferredContext(oldPref);
 			}
 
 			// If the number of selected contexts is 0, we have to call addLaunchSpecAttributes
@@ -618,17 +629,16 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 		Assert.isNotNull(specValue);
 		Assert.isNotNull(confValue);
 
-		if (IReferencedProjectLaunchAttributes.ATTR_REFERENCED_PROJECTS.equals(attributeKey)) {
+		if (ILaunchContextLaunchAttributes.ATTR_LAUNCH_CONTEXTS.equals(attributeKey)) {
 			// get match of list objects
 			int match = specValue.equals(confValue) ? FULL_MATCH : NO_MATCH;
 			// compare objects in the list when they are not already equal
-			if (match != FULL_MATCH && specValue instanceof List<?> && confValue instanceof List<?>) {
-				List<?> specProject = (List<?>) specValue;
-				List<?> confProject = (List<?>) confValue;
-				match = (specProject.isEmpty() || confProject.isEmpty()) ? PARTIAL_MATCH : NO_MATCH;
-				for (int i = 0; i < specProject.size(); i++) {
-					Object specObject = specProject.get(i);
-					if (specObject != null && confProject.contains(specObject)) {
+			if (match != FULL_MATCH) {
+				List<IModelNode> confItems = Arrays.asList(LaunchContextsPersistenceDelegate.decodeLaunchContexts(confValue.toString()));
+				IModelNode[] specItems = LaunchContextsPersistenceDelegate.decodeLaunchContexts(specValue.toString());
+				int i = 0;
+				for (IModelNode item : specItems) {
+					if (confItems.contains(item)) {
 						// spec object can be found in the configuration
 						if (match == NO_MATCH) {
 							// full match on first element in the spec list,
@@ -640,10 +650,75 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 						// reduce full to partial match when spec object wasn't found
 						match = PARTIAL_MATCH;
 					}
+					i++;
 				}
 				// reduce full to partial match when list size is not equal
 				// but all spec values where found in the configuration project list
-				if (match == FULL_MATCH && specProject.size() != confProject.size()) {
+				if (match == FULL_MATCH && specItems.length != confItems.size()) {
+					match = PARTIAL_MATCH;
+				}
+			}
+			return match;
+		}
+
+		if (IFileTransferLaunchAttributes.ATTR_FILE_TRANSFERS.equals(attributeKey)) {
+			// get match of list objects
+			int match = specValue.equals(confValue) ? FULL_MATCH : NO_MATCH;
+			// compare objects in the list when they are not already equal
+			if (match != FULL_MATCH) {
+				List<IFileTransferItem> confItems = Arrays.asList(FileTransfersPersistenceDelegate.decodeFileTransferItems(confValue.toString()));
+				IFileTransferItem[] specItems = FileTransfersPersistenceDelegate.decodeFileTransferItems(specValue.toString());
+				int i = 0;
+				for (IFileTransferItem item : specItems) {
+					if (confItems.contains(item)) {
+						// spec object can be found in the configuration
+						if (match == NO_MATCH) {
+							// full match on first element in the spec list,
+							// otherwise partial match
+							match = (i == 0) ? FULL_MATCH : PARTIAL_MATCH;
+						}
+					}
+					else if (match == FULL_MATCH) {
+						// reduce full to partial match when spec object wasn't found
+						match = PARTIAL_MATCH;
+					}
+					i++;
+				}
+				// reduce full to partial match when list size is not equal
+				// but all spec values where found in the configuration project list
+				if (match == FULL_MATCH && specItems.length != confItems.size()) {
+					match = PARTIAL_MATCH;
+				}
+			}
+			return match;
+		}
+
+		if (IReferencedProjectLaunchAttributes.ATTR_REFERENCED_PROJECTS.equals(attributeKey)) {
+			// get match of list objects
+			int match = specValue.equals(confValue) ? FULL_MATCH : NO_MATCH;
+			// compare objects in the list when they are not already equal
+			if (match != FULL_MATCH) {
+				List<IReferencedProjectItem> confItems = Arrays.asList(ReferencedProjectsPersistenceDelegate.decodeReferencedProjectItems(confValue.toString()));
+				IReferencedProjectItem[] specItems = ReferencedProjectsPersistenceDelegate.decodeReferencedProjectItems(specValue.toString());
+				int i = 0;
+				for (IReferencedProjectItem item : specItems) {
+					if (confItems.contains(item)) {
+						// spec object can be found in the configuration
+						if (match == NO_MATCH) {
+							// full match on first element in the spec list,
+							// otherwise partial match
+							match = (i == 0) ? FULL_MATCH : PARTIAL_MATCH;
+						}
+					}
+					else if (match == FULL_MATCH) {
+						// reduce full to partial match when spec object wasn't found
+						match = PARTIAL_MATCH;
+					}
+					i++;
+				}
+				// reduce full to partial match when list size is not equal
+				// but all spec values where found in the configuration project list
+				if (match == FULL_MATCH && specItems.length != confItems.size()) {
 					match = PARTIAL_MATCH;
 				}
 			}

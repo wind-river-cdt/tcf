@@ -73,9 +73,13 @@ public class Messages extends NLS {
 
 	public static String ContextSelectorControl_toolbar_refresh_tooltip;
 
+	public static String LaunchConfigType_title;
+	public static String LaunchConfigType_label;
+
 	public static String LaunchContextSelectorTab_name;
 
 	public static String ContextSelectorSection_title;
+	public static String ContextSelectorSection_label;
 
 	public static String RemoteContextSelectorControl_error_noContextSelected_single;
 	public static String RemoteContextSelectorControl_error_noContextSelected_multi;
@@ -84,14 +88,32 @@ public class Messages extends NLS {
 
 	public static String ReferencedProjectsSection_title;
 	public static String ReferencedProjectsSection_description;
-	public static String ReferencedProjectsSection_project_column;
+	public static String ReferencedProjectsSection_name_column;
 	public static String ReferencedProjectsSection_add_button;
 	public static String ReferencedProjectsSection_delete_button;
 	public static String ReferencedProjectsSection_up_button;
 	public static String ReferencedProjectsSection_down_button;
 	public static String ReferencedProjectsSection_addDialog_message;
 
+	public static String FileTransferTab_name;
+
+	public static String FileTransferSection_title;
+	public static String FileTransferSection_description;
+	public static String FileTransferSection_host_column;
+	public static String FileTransferSection_target_column;
+	public static String FileTransferSection_options_column;
+	public static String FileTransferSection_add_button;
+	public static String FileTransferSection_edit_button;
+	public static String FileTransferSection_delete_button;
+	public static String FileTransferSection_up_button;
+	public static String FileTransferSection_down_button;
+	public static String FileTransferSection_toHost_text;
+	public static String FileTransferSection_toTarget_text;
+	public static String FileTransferSection_toHost_tooltip;
+	public static String FileTransferSection_toTarget_tooltip;
+
 	public static String LaunchEditorPage_title;
 
-
+	public static String DeleteHandlerDelegate_question_title;
+	public static String DeleteHandlerDelegate_question_message;
 }

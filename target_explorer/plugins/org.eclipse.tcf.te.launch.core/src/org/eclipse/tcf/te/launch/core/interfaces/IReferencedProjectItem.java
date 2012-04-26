@@ -19,4 +19,14 @@ public interface IReferencedProjectItem extends IPropertiesContainer {
 
 	public static final String PROPERTY_ENABLED = "enabled"; //$NON-NLS-1$
 	public static final String PROPERTY_PROJECT_NAME = "project_name"; //$NON-NLS-1$
+
+	/**
+	 * Return <code>true</code> if the item is enabled.
+	 */
+	public boolean isEnabled();
+
+	/**
+	 * Return the project name.
+	 */
+	public String getProjectName();
 }

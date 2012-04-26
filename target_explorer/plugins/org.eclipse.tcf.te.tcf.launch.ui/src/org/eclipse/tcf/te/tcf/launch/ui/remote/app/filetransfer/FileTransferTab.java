@@ -9,59 +9,21 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.launch.ui.remote.app.filetransfer;
 
-import org.eclipse.core.runtime.Assert;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tcf.te.launch.ui.tabs.AbstractFormsLaunchConfigurationTab;
-import org.eclipse.tcf.te.tcf.launch.ui.nls.Messages;
-import org.eclipse.tcf.te.ui.forms.CustomFormToolkit;
-import org.eclipse.ui.forms.widgets.TableWrapData;
-import org.eclipse.ui.forms.widgets.TableWrapLayout;
+import org.eclipse.tcf.te.launch.ui.tabs.filetransfers.AbstractFileTransferSection;
+import org.eclipse.tcf.te.launch.ui.tabs.filetransfers.AbstractFileTransferTab;
+import org.eclipse.ui.forms.IManagedForm;
 
 /**
  * File transfer launch configuration tab implementation.
  */
-public class FileTransferTab extends AbstractFormsLaunchConfigurationTab {
-	// References to the tab sub sections
-	private FileTransferSection section;
+public class FileTransferTab extends AbstractFileTransferTab {
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.launch.ui.tabs.AbstractFormsLaunchConfigurationTab#dispose()
+	 * @see org.eclipse.tcf.te.launch.ui.tabs.filetransfers.AbstractFileTransferTab#createFileTransferSection(org.eclipse.ui.forms.IManagedForm, org.eclipse.swt.widgets.Composite)
 	 */
 	@Override
-	public void dispose() {
-		if (section != null) { section.dispose(); section = null; }
-		super.dispose();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.launch.ui.tabs.AbstractFormsLaunchConfigurationTab#doCreateFormContent(org.eclipse.swt.widgets.Composite, org.eclipse.tcf.te.ui.forms.CustomFormToolkit)
-	 */
-	@Override
-	protected void doCreateFormContent(Composite parent, CustomFormToolkit toolkit) {
-		Assert.isNotNull(parent);
-		Assert.isNotNull(toolkit);
-
-		// Setup the main panel (using the table wrap layout)
-		Composite panel = toolkit.getFormToolkit().createComposite(parent);
-		TableWrapLayout layout = new TableWrapLayout();
-		layout.makeColumnsEqualWidth = true;
-		layout.numColumns = 1;
-		panel.setLayout(layout);
-		panel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		panel.setBackground(parent.getBackground());
-
-		section = new FileTransferSection(getManagedForm(), panel);
-		section.getSection().setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB, TableWrapData.TOP));
-		getManagedForm().addPart(section);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getName()
-	 */
-	@Override
-	public String getName() {
-		return Messages.FileTransferTab_name;
+	protected AbstractFileTransferSection createFileTransferSection(IManagedForm form, Composite panel) {
+		return new FileTransferSection(getManagedForm(), panel);
 	}
 }

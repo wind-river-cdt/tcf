@@ -37,6 +37,7 @@ import org.eclipse.tcf.te.launch.core.selection.RemoteSelectionContext;
 import org.eclipse.tcf.te.launch.core.selection.interfaces.ILaunchSelection;
 import org.eclipse.tcf.te.launch.core.selection.interfaces.ISelectionContext;
 import org.eclipse.tcf.te.launch.ui.activator.UIPlugin;
+import org.eclipse.tcf.te.launch.ui.model.LaunchNode;
 import org.eclipse.tcf.te.launch.ui.nls.Messages;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNodeProvider;
@@ -144,7 +145,10 @@ public class LaunchSelectionManager {
 				IModelNode remoteCtx = null;
 				IModelNode node = null;
 
-				if (sel instanceof IModelNodeProvider) {
+				if (sel instanceof LaunchNode) {
+					node = ((LaunchNode)sel).getRootModelNode();
+				}
+				else if (sel instanceof IModelNodeProvider) {
 					node = ((IModelNodeProvider)sel).getModelNode();
 				} else if (sel instanceof IModelNode) {
 					node = (IModelNode)sel;

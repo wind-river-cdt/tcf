@@ -100,7 +100,7 @@ public class LaunchConfigTypeBindingsManager {
 		ILaunchConfigurationType launchConfigType = DebugPlugin.getDefault().getLaunchManager().getLaunchConfigurationType(typeId);
 		return (launchConfigType != null && launchConfigType.isPublic() &&
 						(selection.getLaunchMode() == null || launchConfigType.supportsMode(selection.getLaunchMode())) &&
-						binding != null && binding.validate(selection) != EvaluationResult.FALSE);
+						binding != null && binding.validate(selection) == EvaluationResult.TRUE);
 	}
 
 	/**

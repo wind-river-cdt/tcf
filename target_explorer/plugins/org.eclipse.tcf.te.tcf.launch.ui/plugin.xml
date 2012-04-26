@@ -2,6 +2,15 @@
 <?eclipse version="3.4"?>
 <plugin>
 
+<!-- Adapter factory contributions -->
+   <extension point="org.eclipse.core.runtime.adapters">
+      <factory
+            class=""
+            adaptableType="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel">
+         <adapter type="org.eclipse.debug.ui.actions.ILaunchable"/>
+      </factory>
+   </extension>
+
 <!-- Launch configuration type contributions -->
    <extension point="org.eclipse.debug.ui.launchConfigurationTypeImages">
       <launchConfigurationTypeImage
@@ -11,6 +20,7 @@
       </launchConfigurationTypeImage>
    </extension>
 
+<!-- Launch configuration tab group contributions -->
    <extension point="org.eclipse.debug.ui.launchConfigurationTabGroups">
       <launchConfigurationTabGroup
             class="org.eclipse.tcf.te.tcf.launch.ui.remote.app.LaunchConfigurationTabGroup"
@@ -18,13 +28,62 @@
             type="org.eclipse.tcf.te.tcf.launch.type.remote.app">
       </launchConfigurationTabGroup>
    </extension>
+   
+ <!-- Launch shortcut contributions -->
+   <extension point="org.eclipse.debug.ui.launchShortcuts">
+      <shortcut
+            class="org.eclipse.tcf.te.tcf.launch.ui.remote.app.LaunchShortcut"
+            id="org.eclipse.tcf.te.tcf.launch.ui.launchshortcut.remote.app.run"
+            label="%LaunchShortcut.Remote.App.name"
+            icon="icons/obj16/remote_app.gif"
+            modes="run">
+         <contextualLaunch>
+            <enablement>
+               <with variable="selection">
+                  <count value="1"/>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <test 
+                           forcePluginActivation="true"
+                           property="org.eclipse.tcf.te.launch.core.isValidLaunchConfigType"
+                           value="org.eclipse.tcf.te.tcf.launch.type.remote.app"
+                           args="run"/>
+                  </iterate>
+               </with>
+            </enablement>
+         </contextualLaunch>
+      </shortcut>
+      <shortcut
+            class="org.eclipse.tcf.te.tcf.launch.ui.remote.app.LaunchShortcut"
+            id="org.eclipse.tcf.te.tcf.launch.ui.launchshortcut.remote.app.debug"
+            label="%LaunchShortcut.Remote.App.name"
+            icon="icons/obj16/remote_app.gif"
+            modes="debug">
+         <contextualLaunch>
+            <enablement>
+               <with variable="selection">
+                  <count value="1"/>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <test 
+                           property="org.eclipse.tcf.te.launch.core.isValidLaunchConfigType"
+                           value="org.eclipse.tcf.te.tcf.launch.type.remote.app"
+                           args="debug"/>
+                  </iterate>
+               </with>
+            </enablement>
+         </contextualLaunch>
+      </shortcut>
+   </extension>
 
 <!-- Editor page binding contributions -->
-<!--
    <extension point="org.eclipse.tcf.te.ui.views.editorPageBindings">
       <editorPageBinding
-            id="org.eclispe.tcf.te.tcf.launch.ui.editor.LaunchEditorPage"
-            pageId="org.eclipse.tcf.te.launch.ui.editor.LaunchEditorPage"
+            id="org.eclipse.tcf.te.tcf.launch.ui.binding.LaunchEditorPage"
+            pageId="org.eclipse.tcf.te.launch.ui.LaunchEditorPage"
+            insertBefore="org.eclipse.tcf.te.tcf.filesystem.FSExplorerEditorPage"
             insertAfter="org.eclipse.tcf.te.tcf.ui.OverviewEditorPage">
          <enablement>
             <with variable="activeEditorInput">
@@ -33,6 +92,51 @@
          </enablement>
       </editorPageBinding>
    </extension>
--->
+
+<!-- Navigator viewer contributions -->
+   <extension point="org.eclipse.ui.navigator.viewer">
+      <viewerContentBinding viewerId="org.eclipse.tcf.te.ui.views.View">
+         <includes>
+            <contentExtension 
+                  pattern="org.eclipse.tcf.te.tcf.launch.ui.navigator.*"
+                  isRoot="false"/>
+         </includes>
+      </viewerContentBinding>
+   </extension>
+   
+<!-- Navigator content contributions -->
+   <extension point="org.eclipse.ui.navigator.navigatorContent">
+      <navigatorContent
+            id="org.eclipse.tcf.te.tcf.launch.ui.navigator.content"
+            name="%LauchTree.name"
+            activeByDefault="false"
+            contentProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchNavigatorContentProvider"
+            labelProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchTreeLabelProvider"
+            priority="normal">
+         <triggerPoints>
+               <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+         </triggerPoints>
+         <possibleChildren>
+               <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
+         </possibleChildren>
+         <commonSorter
+               class="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchTreeViewerSorter">
+         </commonSorter>
+      </navigatorContent>
+   </extension>
+
+<!-- Property section contributions -->
+   <extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+      <propertySections contributorId="org.eclipse.tcf.te.ui">
+         <propertySection
+               id="org.eclipse.tcf.te.tcf.launch.ui.propertytab.remote.app"
+               class="org.eclipse.tcf.te.tcf.launch.ui.remote.app.RemoteAppPropertiesSection"
+               enablesFor="1"
+               afterSection="org.eclipse.tcf.te.launch.ui.launchcontext"
+               filter="org.eclipse.tcf.te.tcf.launch.ui.remote.app.RemoteAppFilter"
+               tab="org.eclipse.tcf.te.launch.ui.propertytab.general">
+         </propertySection>
+      </propertySections>
+   </extension>
 
 </plugin>

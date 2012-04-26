@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.launch.ui.tabs.projects;
+package org.eclipse.tcf.te.launch.ui.tabs.filetransfers;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
@@ -16,15 +16,16 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tcf.te.launch.ui.nls.Messages;
 import org.eclipse.tcf.te.launch.ui.tabs.AbstractFormsLaunchConfigurationTab;
 import org.eclipse.tcf.te.ui.forms.CustomFormToolkit;
+import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
 
 /**
- * Referenced projetcs launch configuration tab implementation.
+ * File transfer launch configuration tab implementation.
  */
-public class ReferencedProjetcsTab extends AbstractFormsLaunchConfigurationTab {
+public abstract class AbstractFileTransferTab extends AbstractFormsLaunchConfigurationTab {
 	// References to the tab sub sections
-	private ReferencedProjectsSection section;
+	private AbstractFileTransferSection section;
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.launch.ui.tabs.AbstractFormsLaunchConfigurationTab#dispose()
@@ -52,16 +53,24 @@ public class ReferencedProjetcsTab extends AbstractFormsLaunchConfigurationTab {
 		panel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		panel.setBackground(parent.getBackground());
 
-		section = new ReferencedProjectsSection(getManagedForm(), panel);
+		section = createFileTransferSection(getManagedForm(), panel);
 		section.getSection().setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB, TableWrapData.TOP));
 		getManagedForm().addPart(section);
 	}
+
+	/**
+	 * Create the transfer section.
+	 * @param form
+	 * @param panel
+	 * @return
+	 */
+	protected abstract AbstractFileTransferSection createFileTransferSection(IManagedForm form, Composite panel);
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getName()
 	 */
 	@Override
 	public String getName() {
-		return Messages.ReferencedProjectsTab_name;
+		return Messages.FileTransferTab_name;
 	}
 }

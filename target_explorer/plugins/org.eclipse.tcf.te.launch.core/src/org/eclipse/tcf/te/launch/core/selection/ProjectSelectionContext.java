@@ -14,10 +14,8 @@ import org.eclipse.tcf.te.launch.core.selection.interfaces.IProjectSelectionCont
 
 /**
  * Project launch selection context implementation.
-*/
+ */
 public class ProjectSelectionContext extends AbstractSelectionContext implements IProjectSelectionContext {
-	// The projectCtx context
-	private IProject projectCtx;
 
 	/**
 	 * Constructor.
@@ -27,7 +25,7 @@ public class ProjectSelectionContext extends AbstractSelectionContext implements
 	 *            <code>false</code> otherwise.
 	 */
 	public ProjectSelectionContext(IProject project, boolean isPreferred) {
-		this(project, null, isPreferred);
+		this(project, new Object[]{project}, isPreferred);
 	}
 
 	/**
@@ -39,8 +37,7 @@ public class ProjectSelectionContext extends AbstractSelectionContext implements
 	 *            <code>false</code> otherwise.
 	 */
 	public ProjectSelectionContext(IProject project, Object[] selections, boolean isPreferred) {
-		super(selections, isPreferred);
-		this.projectCtx = project;
+		super(project, selections, isPreferred);
 	}
 
 	/* (non-Javadoc)
@@ -48,7 +45,7 @@ public class ProjectSelectionContext extends AbstractSelectionContext implements
 	 */
 	@Override
 	public IProject getProjectCtx() {
-		return projectCtx;
+		return (IProject)getContext();
 	}
 
 	/* (non-Javadoc)
@@ -58,8 +55,8 @@ public class ProjectSelectionContext extends AbstractSelectionContext implements
 	public String toString() {
 		StringBuffer toString = new StringBuffer();
 
-		if (projectCtx != null) {
-			toString.append(projectCtx.getName());
+		if (getProjectCtx() != null) {
+			toString.append(getProjectCtx().getName());
 		}
 		toString.append(toString.length() > 0 ? " " : ""); //$NON-NLS-1$ //$NON-NLS-2$
 		toString.append(super.toString());
