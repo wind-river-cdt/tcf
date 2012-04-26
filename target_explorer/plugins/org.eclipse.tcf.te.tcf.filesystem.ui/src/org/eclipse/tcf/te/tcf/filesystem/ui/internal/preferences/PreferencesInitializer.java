@@ -38,7 +38,7 @@ public class PreferencesInitializer extends AbstractPreferenceInitializer implem
 		IEclipsePreferences prefs = DefaultScope.INSTANCE.getNode(UIPlugin.getUniqueIdentifier());
 		if (prefs != null) {
 			// [Hidden] Editor content contribution: default on
-			prefs.putBoolean(IPreferenceKeys.PREF_FEATURE_ENABLE_EDITOR_CONTENT_CONTRIBUTION, true);
+			prefs.putBoolean(PREF_FEATURE_ENABLE_EDITOR_CONTENT_CONTRIBUTION, DEFAULT_FEATURE_ENABLE_EDITOR_CONTENT_CONTRIBUTION);
 		}
 		IPreferenceStore preferenceStore = UIPlugin.getDefault().getPreferenceStore();
 		preferenceStore.setDefault(PREF_AUTOSAVING, DEFAULT_AUTOSAVING);

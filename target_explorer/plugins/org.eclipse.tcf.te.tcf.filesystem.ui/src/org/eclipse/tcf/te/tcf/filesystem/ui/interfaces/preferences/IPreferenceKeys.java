@@ -22,7 +22,9 @@ public interface IPreferenceKeys {
 	 * If set to <code>true</code>, the file system content contribution to the target
 	 * explorer details editor will be activated and visible to the user.
 	 */
-	public final String PREF_FEATURE_ENABLE_EDITOR_CONTENT_CONTRIBUTION = PREFIX + "feature.editor.content.enable"; //$NON-NLS-1$
+	public static final String PREF_FEATURE_ENABLE_EDITOR_CONTENT_CONTRIBUTION = PREFIX + "feature.editor.content.enable"; //$NON-NLS-1$
+	// The default value for editor content contribution
+	public static final boolean DEFAULT_FEATURE_ENABLE_EDITOR_CONTENT_CONTRIBUTION = true; 
 	// The preference key to access the option of auto saving
 	public static final String PREF_AUTOSAVING = "PrefAutoSaving"; //$NON-NLS-1$
 	// The default value of the option of auto saving.
