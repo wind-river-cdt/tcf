@@ -27,7 +27,7 @@ public class ViewerSorter extends TreeViewerSorter {
 			int rank1 = ((ICategory)node1).getRank();
 			int rank2 = ((ICategory)node2).getRank();
 
-			if (rank1 != -1 && rank2 != -1) {
+			if (rank1 != -1 && rank2 != -1 && rank1 != rank2) {
 				return (rank1 - rank2) * inverter;
 			}
 		}

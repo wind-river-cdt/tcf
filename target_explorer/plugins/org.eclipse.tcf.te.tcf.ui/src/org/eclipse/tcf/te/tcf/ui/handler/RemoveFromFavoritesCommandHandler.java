@@ -17,7 +17,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
-import org.eclipse.tcf.te.tcf.ui.internal.categories.CategoryManager;
+import org.eclipse.tcf.te.ui.views.Managers;
 import org.eclipse.tcf.te.ui.views.ViewsUtil;
 import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -41,8 +41,8 @@ public class RemoveFromFavoritesCommandHandler extends AbstractHandler {
 				Object element = iterator.next();
 				if (element instanceof IPeerModel) {
 					String peerId = ((IPeerModel)element).getPeerId();
-					if (CategoryManager.getInstance().isFavorite(peerId)) {
-						CategoryManager.getInstance().removeFromFavorites(peerId);
+					if (Managers.getCategoryManager().belongsTo(IUIConstants.ID_CAT_FAVORITES, peerId)) {
+						Managers.getCategoryManager().remove(IUIConstants.ID_CAT_FAVORITES, peerId);
 						refresh = true;
 					}
 				}

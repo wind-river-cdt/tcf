@@ -142,7 +142,7 @@
 <!-- View categories contributions -->
    <extension point="org.eclipse.tcf.te.ui.views.categories">
       <category
-            class="org.eclipse.tcf.te.ui.views.categories.Favorites"
+            class="org.eclipse.tcf.te.ui.views.categories.Category"
             icon="icons/obj16/favorites.gif"
             id="org.eclipse.tcf.te.ui.views.category.favorites"
             label="%category.favorites.name"
@@ -150,7 +150,7 @@
       </category>
       
       <category
-            class="org.eclipse.tcf.te.ui.views.categories.MyTargets"
+            class="org.eclipse.tcf.te.ui.views.categories.Category"
             icon="icons/obj16/targets.gif"
             id="org.eclipse.tcf.te.ui.views.category.mytargets"
             label="%category.mytargets.name"
@@ -158,7 +158,7 @@
       </category>
 
       <category
-            class="org.eclipse.tcf.te.ui.views.categories.Neighborhood"
+            class="org.eclipse.tcf.te.ui.views.categories.Category"
             icon="icons/obj16/neighborhood.gif"
             id="org.eclipse.tcf.te.ui.views.category.neighborhood"
             label="%category.neighborhood.name"

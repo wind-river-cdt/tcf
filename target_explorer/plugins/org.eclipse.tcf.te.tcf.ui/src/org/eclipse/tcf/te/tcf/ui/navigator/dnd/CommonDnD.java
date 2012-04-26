@@ -17,6 +17,7 @@ import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.ui.internal.categories.CategoryManager;
+import org.eclipse.tcf.te.ui.views.Managers;
 import org.eclipse.tcf.te.ui.views.ViewsUtil;
 import org.eclipse.tcf.te.ui.views.interfaces.ICategory;
 import org.eclipse.tcf.te.ui.views.interfaces.IRoot;
@@ -74,7 +75,7 @@ public class CommonDnD {
 					while (iterator.hasNext()) {
 						Object element = iterator.next();
 						if (!(element instanceof IPeerModel)) continue;
-						CategoryManager.getInstance().addToFavorites(((IPeerModel)element).getPeerId());
+						Managers.getCategoryManager().add(hovered.getId(), ((IPeerModel)element).getPeerId());
 					}
 					// Fire a refresh of the view
 					ViewsUtil.refresh(IUIConstants.ID_EXPLORER);
@@ -96,7 +97,7 @@ public class CommonDnD {
 				while (iterator.hasNext()) {
 					Object element = iterator.next();
 					if (!(element instanceof IPeerModel)) continue;
-					CategoryManager.getInstance().removeFromFavorites(((IPeerModel)element).getPeerId());
+					Managers.getCategoryManager().remove(IUIConstants.ID_CAT_FAVORITES, ((IPeerModel)element).getPeerId());
 				}
 				// Fire a refresh of the view
 				ViewsUtil.refresh(IUIConstants.ID_EXPLORER);
@@ -139,7 +140,7 @@ public class CommonDnD {
 						allow = false;
 						break;
 					}
-					if (!CategoryManager.getInstance().isFavorite(((IPeerModel)element).getPeerId())) {
+					if (!Managers.getCategoryManager().belongsTo(IUIConstants.ID_CAT_FAVORITES, ((IPeerModel)element).getPeerId())) {
 						allow = false;
 						break;
 					}

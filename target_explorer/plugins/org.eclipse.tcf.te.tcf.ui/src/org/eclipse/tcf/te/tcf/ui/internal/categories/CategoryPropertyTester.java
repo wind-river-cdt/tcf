@@ -18,6 +18,7 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
 import org.eclipse.tcf.te.tcf.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.ui.internal.preferences.IPreferenceConsts;
+import org.eclipse.tcf.te.ui.views.Managers;
 import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
 
 /**
@@ -73,7 +74,7 @@ public class CategoryPropertyTester extends PropertyTester {
 			// In copy mode, "Favorites" is special
 			boolean isCopyMode = UIPlugin.getDefault().getPreferenceStore().getBoolean(IPreferenceConsts.PREF_FAVORITES_CATEGORY_MODE_COPY);
 			if (isCopyMode && IUIConstants.ID_CAT_FAVORITES.equals(expectedValue)) {
-				return CategoryManager.getInstance().isFavorite(node.getPeerId());
+				return Managers.getCategoryManager().belongsTo(IUIConstants.ID_CAT_FAVORITES, node.getPeerId());
 			}
 
 			return value != null && value.equals(expectedValue);

@@ -22,9 +22,9 @@ import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 /**
- * Abstract main view category node implementation.
+ * Default category implementation.
  */
-public abstract class AbstractCategory extends ExecutableExtension implements ICategory, IDisposable, IPersistableElement {
+public class Category extends ExecutableExtension implements ICategory, IDisposable, IPersistableElement {
 	// The category image / image descriptor
 	private ImageDescriptor descriptor = null;
 	private Image image = null;

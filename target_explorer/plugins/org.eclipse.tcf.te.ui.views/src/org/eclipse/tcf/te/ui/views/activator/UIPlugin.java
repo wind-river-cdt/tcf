@@ -15,6 +15,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tcf.te.runtime.tracing.TraceHandler;
+import org.eclipse.tcf.te.ui.views.Managers;
 import org.eclipse.tcf.te.ui.views.interfaces.ImageConsts;
 import org.eclipse.tcf.te.ui.views.listeners.WorkbenchWindowListener;
 import org.eclipse.ui.IWindowListener;
@@ -95,6 +96,8 @@ public class UIPlugin extends AbstractUIPlugin {
 			PlatformUI.getWorkbench().removeWindowListener(windowListener);
 			windowListener = null;
 		}
+
+		Managers.dispose();
 
 		plugin = null;
 		traceHandler = null;
