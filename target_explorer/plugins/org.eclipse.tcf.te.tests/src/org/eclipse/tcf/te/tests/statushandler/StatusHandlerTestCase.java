@@ -21,17 +21,21 @@ import org.eclipse.tcf.te.runtime.interfaces.IConditionTester;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
 import org.eclipse.tcf.te.runtime.statushandler.StatusHandlerManager;
+import org.eclipse.tcf.te.runtime.statushandler.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.runtime.statushandler.interfaces.IStatusHandler;
 import org.eclipse.tcf.te.runtime.statushandler.interfaces.IStatusHandlerConstants;
+import org.eclipse.tcf.te.runtime.statushandler.nls.Messages;
 import org.eclipse.tcf.te.runtime.statushandler.status.QuestionStatus;
 import org.eclipse.tcf.te.runtime.statushandler.status.YesNoCancelStatus;
 import org.eclipse.tcf.te.runtime.utils.Host;
 import org.eclipse.tcf.te.tests.CoreTestCase;
 import org.eclipse.tcf.te.tests.activator.UIPlugin;
+import org.osgi.framework.BundleContext;
 
 /**
  * Status handler test cases.
  */
+@SuppressWarnings("restriction")
 public class StatusHandlerTestCase extends CoreTestCase {
 
 	/**
@@ -65,6 +69,9 @@ public class StatusHandlerTestCase extends CoreTestCase {
 		}
 
 		assertEquals("Unexpected number of contributed test status handler.", 2, testHandlerCount); //$NON-NLS-1$
+
+		IStatusHandler[] handlers2 = StatusHandlerManager.getInstance().getHandlers(true);
+		assertEquals("Unexpected number of status handler returned.", handlers.length, handlers2.length); //$NON-NLS-1$
 	}
 
 	/**
@@ -117,17 +124,10 @@ public class StatusHandlerTestCase extends CoreTestCase {
 		assertNotNull("Unexpected return value 'null'.", StatusHandlerManager.getInstance()); //$NON-NLS-1$
 		assertFalse("Failed to toggle interactive mode.", Host.isInteractive()); //$NON-NLS-1$
 
-		IStatusHandler handler = null;
-
-		IStatusHandler[] handlers = StatusHandlerManager.getInstance().getHandlers(false);
-		for (IStatusHandler candidate : handlers) {
-			if (candidate.getId().equals("org.eclipse.tcf.te.statushandler.default")) { //$NON-NLS-1$
-				handler = candidate;
-				break;
-			}
-		}
-
+		IStatusHandler handler = StatusHandlerManager.getInstance().getHandler("org.eclipse.tcf.te.statushandler.default", false); //$NON-NLS-1$
 		assertNotNull("Failed to determine default status handler.", handler); //$NON-NLS-1$
+		IStatusHandler handler2 = StatusHandlerManager.getInstance().getHandler("org.eclipse.tcf.te.statushandler.default", true); //$NON-NLS-1$
+		assertNotSame("Failed to get unique instance of the default status handler.", handler, handler2); //$NON-NLS-1$
 
 		IPropertiesContainer data = new PropertiesContainer();
 		data.setProperty(IStatusHandlerConstants.PROPERTY_TITLE, "Statushandler Test"); //$NON-NLS-1$
@@ -158,5 +158,20 @@ public class StatusHandlerTestCase extends CoreTestCase {
 
 		status = new YesNoCancelStatus(UIPlugin.getUniqueIdentifier(), 1, "YesNoCancel", new Throwable()); //$NON-NLS-1$
 		handler.handleStatus(status, data, null);
+	}
+
+	/**
+	 * More status handler tests.
+	 */
+    public void testStatusHandler() {
+		Messages m = new Messages();
+		assertNotNull("Failed to instantiate message bundle.", m); //$NON-NLS-1$
+
+		BundleContext context = CoreBundleActivator.getContext();
+		assertNotNull("Failed to get status handler bundle context.", context); //$NON-NLS-1$
+
+		String id = CoreBundleActivator.getUniqueIdentifier();
+		assertNotNull("Failed to get status handler bundle id.", id); //$NON-NLS-1$
+
 	}
 }
