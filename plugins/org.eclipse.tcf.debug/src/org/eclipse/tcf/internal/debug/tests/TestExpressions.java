@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2011 Wind River Systems, Inc. and others.
+ * Copyright (c) 2008, 2012 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -133,6 +133,7 @@ class TestExpressions implements ITCFTest,
         "sizeof tcf_cpp_test_class::s_int == sizeof signed",
         "tcf_cpp_test_class::tcf_cpp_test_class_nested::s_int == 2",
         "tcf_cpp_test_class_extension::tcf_cpp_test_class_nested::s_int == 2",
+        "enum_val1 == 1 && enum_val2 == 2 && enum_val3 == 3",
     };
 
     @SuppressWarnings("unused")
@@ -543,6 +544,7 @@ class TestExpressions implements ITCFTest,
                 if (txt.indexOf("test_struct") >= 0) continue;
                 if (txt.indexOf("tcf_test_array") >= 0) continue;
                 if (txt.indexOf("(char *)") >= 0) continue;
+                if (txt.indexOf("enum_val") >= 0) continue;
             }
             if (local_var_expr_ids.length == 0 || no_cpp) {
                 // Agent is not build with C++ compiler
