@@ -501,19 +501,11 @@
       </propertyTester>
 
       <propertyTester
-            class="org.eclipse.tcf.te.ui.views.expressions.PropertyTester"
-            id="org.eclipse.tcf.te.ui.views.CategortyPropertyTester"
-            namespace="org.eclipse.tcf.te.ui.views"
-            properties="isCategoryID,isFavorites,isMyTargets,isNeighborhood"
-            type="org.eclipse.tcf.te.ui.views.interfaces.ICategory">
-      </propertyTester>
-
-      <propertyTester
             class="org.eclipse.tcf.te.ui.views.internal.categories.CategoryPropertyTester"
             id="org.eclipse.tcf.te.ui.views.categories.CategoryPropertyTester"
             namespace="org.eclipse.tcf.te.ui.views"
-            properties="parentCategoryId"
-            type="org.eclipse.jface.viewers.IStructuredSelection">
+            properties="isCategoryID,parentCategoryId,belongsTo"
+            type="java.lang.Object">
       </propertyTester>
    </extension>
    

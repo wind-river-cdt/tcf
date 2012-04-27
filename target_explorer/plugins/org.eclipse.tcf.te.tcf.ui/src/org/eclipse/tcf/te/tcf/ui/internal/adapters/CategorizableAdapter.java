@@ -11,15 +11,15 @@ package org.eclipse.tcf.te.tcf.ui.internal.adapters;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
-import org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizableElementAdapter;
+import org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizable;
 
 /**
  * Categorizable element adapter implementation
  */
-public class CategorizableAdapter implements ICategorizableElementAdapter {
+public class CategorizableAdapter implements ICategorizable {
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizableElementAdapter#getId(java.lang.Object)
+	 * @see org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizable#getId(java.lang.Object)
 	 */
 	@Override
 	public String getId(Object element) {

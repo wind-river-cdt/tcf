@@ -34,6 +34,6 @@ public class PreferencesInitializer extends AbstractPreferenceInitializer implem
 		// [Hidden] Hide dynamic target discovery navigator content extension: default on
 		store.setDefault(PREF_HIDE_DYNAMIC_TARGET_DISCOVERY_EXTENSION, true);
 		// [Hidden] Favorites category link mode: default off
-		store.setDefault(IPreferenceConsts.PREF_FAVORITES_CATEGORY_MODE_LINK, false);
+		store.setDefault(IPreferenceConsts.PREF_FAVORITES_CATEGORY_MODE_LINK, true);
 	}
 }

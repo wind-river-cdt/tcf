@@ -11,7 +11,7 @@
          <adapter type="org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate"/>
          <adapter type="org.eclipse.tcf.te.ui.views.interfaces.handler.IDeleteHandlerDelegate"/>
          <adapter type="org.eclipse.ui.IPersistableElement"/>
-         <adapter type="org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizableElementAdapter"/>
+         <adapter type="org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizable"/>
       </factory>
    </extension>   
 
@@ -364,7 +364,12 @@
                         <test property="org.eclipse.tcf.te.ui.views.parentCategoryId" value="org.eclipse.tcf.te.ui.views.category.favorites"/>
                      </not>
                      <iterate operator="and" ifEmpty="false">
-                        <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                        <and>
+                           <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                           <not>
+                              <test property="org.eclipse.tcf.te.ui.views.belongsTo" value="org.eclipse.tcf.te.ui.views.category.favorites"/>
+                           </not>
+                        </and>
                      </iterate>
                   </and>
                </with>

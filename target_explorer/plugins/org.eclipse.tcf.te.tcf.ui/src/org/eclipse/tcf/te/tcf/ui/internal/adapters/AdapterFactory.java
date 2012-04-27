@@ -13,7 +13,7 @@ import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.ui.navigator.LabelProviderDelegate;
-import org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizableElementAdapter;
+import org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizable;
 import org.eclipse.tcf.te.ui.views.interfaces.handler.IDeleteHandlerDelegate;
 import org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate;
 import org.eclipse.ui.IPersistableElement;
@@ -29,7 +29,7 @@ public class AdapterFactory implements IAdapterFactory {
 	// The delete handler delegate adapter
 	private final IDeleteHandlerDelegate deleteDelegate = new DeleteHandlerDelegate();
 	// The categorizable element adapter
-	private final ICategorizableElementAdapter categorizableAdapter = new CategorizableAdapter();
+	private final ICategorizable categorizableAdapter = new CategorizableAdapter();
 
 	// The adapter class.
 	private Class<?>[] adapters = {
@@ -37,7 +37,7 @@ public class AdapterFactory implements IAdapterFactory {
 					IRefreshHandlerDelegate.class,
 					IDeleteHandlerDelegate.class,
 					IPersistableElement.class,
-					ICategorizableElementAdapter.class
+					ICategorizable.class
 				};
 
 	/* (non-Javadoc)
@@ -58,7 +58,7 @@ public class AdapterFactory implements IAdapterFactory {
 			if (IPersistableElement.class.equals(adapterType)) {
 				return new PersistablePeerModel((IPeerModel)adaptableObject);
 			}
-			if (ICategorizableElementAdapter.class.equals(adapterType)) {
+			if (ICategorizable.class.equals(adapterType)) {
 				return categorizableAdapter;
 			}
 

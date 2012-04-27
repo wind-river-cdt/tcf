@@ -12,8 +12,6 @@ package org.eclipse.tcf.te.ui.views.expressions;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.tcf.te.ui.views.editor.EditorInput;
 import org.eclipse.tcf.te.ui.views.extensions.EditorPageBindingExtensionPointManager;
-import org.eclipse.tcf.te.ui.views.interfaces.ICategory;
-import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
 import org.eclipse.tcf.te.ui.views.interfaces.handler.IDeleteHandlerDelegate;
 import org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate;
 import org.eclipse.ui.IEditorInput;
@@ -93,28 +91,6 @@ public class PropertyTester extends org.eclipse.core.expressions.PropertyTester 
 			}
 
 			return (expectedValue != null ? expectedValue : Boolean.TRUE).equals(Boolean.valueOf(canDelete));
-		}
-
-		// ***** Categories related properties *****
-
-		if ("isCategoryID".equals(property) && receiver instanceof ICategory) { //$NON-NLS-1$
-			String id = ((ICategory)receiver).getId();
-			return id.equals(expectedValue);
-		}
-
-		if ("isMyTargets".equals(property) && receiver instanceof ICategory) { //$NON-NLS-1$
-			String id = ((ICategory)receiver).getId();
-			return (expectedValue != null ? expectedValue : Boolean.TRUE).equals(Boolean.valueOf(id.equals(IUIConstants.ID_CAT_MY_TARGETS)));
-		}
-
-		if ("isFavorites".equals(property) && receiver instanceof ICategory) { //$NON-NLS-1$
-			String id = ((ICategory)receiver).getId();
-			return (expectedValue != null ? expectedValue : Boolean.TRUE).equals(Boolean.valueOf(id.equals(IUIConstants.ID_CAT_FAVORITES)));
-		}
-
-		if ("isNeighborhood".equals(property) && receiver instanceof ICategory) { //$NON-NLS-1$
-			String id = ((ICategory)receiver).getId();
-			return (expectedValue != null ? expectedValue : Boolean.TRUE).equals(Boolean.valueOf(id.equals(IUIConstants.ID_CAT_NEIGHBORHOOD)));
 		}
 
 		return false;

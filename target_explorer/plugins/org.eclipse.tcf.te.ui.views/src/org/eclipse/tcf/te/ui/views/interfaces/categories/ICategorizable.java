@@ -12,7 +12,7 @@ package org.eclipse.tcf.te.ui.views.interfaces.categories;
 /**
  * Interface to be implemented by categorizable element adapters.
  */
-public interface ICategorizableElementAdapter {
+public interface ICategorizable {
 
 	/**
 	 * Returns the unique categorizable id for the given element. The id
