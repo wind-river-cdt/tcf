@@ -136,8 +136,6 @@ public class UIPlugin extends AbstractUIPlugin implements IPreferenceKeys {
 		registry.put(ImageConsts.ROOT, ImageDescriptor.createFromURL(url));
 		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OBJ + "rootdrive.gif"); //$NON-NLS-1$
 		registry.put(ImageConsts.ROOT_DRIVE, ImageDescriptor.createFromURL(url));
-		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OBJ + "rootdriveopen.gif"); //$NON-NLS-1$
-		registry.put(ImageConsts.ROOT_DRIVE_OPEN, ImageDescriptor.createFromURL(url));
 		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OBJ + "synch_synch.gif"); //$NON-NLS-1$
 		registry.put(ImageConsts.COMPARE_EDITOR, ImageDescriptor.createFromURL(url));
 		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OBJ32 + "replace_confirm.png"); //$NON-NLS-1$
