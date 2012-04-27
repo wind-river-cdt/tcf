@@ -25,7 +25,7 @@ import org.eclipse.tcf.te.ui.jface.images.AbstractImageDescriptor;
 
 
 /**
- * Label provider delegate implementation.
+ * Label provider implementation.
  */
 public class LabelProviderDelegate extends LabelProvider implements ILabelDecorator {
 

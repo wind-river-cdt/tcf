@@ -12,7 +12,7 @@ package org.eclipse.tcf.te.tcf.ui.internal.adapters;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
-import org.eclipse.tcf.te.tcf.ui.navigator.LabelProvider;
+import org.eclipse.tcf.te.tcf.ui.navigator.LabelProviderDelegate;
 import org.eclipse.tcf.te.ui.views.interfaces.handler.IDeleteHandlerDelegate;
 import org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate;
 import org.eclipse.ui.IPersistableElement;
@@ -22,7 +22,7 @@ import org.eclipse.ui.IPersistableElement;
  */
 public class AdapterFactory implements IAdapterFactory {
 	// The adapter for ILabelProvider.class
-	private LabelProvider labelProvider = new LabelProvider();
+	private LabelProviderDelegate labelProvider = new LabelProviderDelegate();
 	// The refresh handler delegate adapter
 	private IRefreshHandlerDelegate refreshDelegate = new RefreshHandlerDelegate();
 	// The delete handler delegate adapter
