@@ -44,16 +44,11 @@ public class FSDropTargetListener extends ViewerDropAdapter {
 	 */
 	@Override
     public void dragEnter(DropTargetEvent event) {
-	    super.dragEnter(event);
-	    // Force the operation of file transfer from external application to DROP_COPY
-		for (int i = 0; i < event.dataTypes.length; i++) {
-			if (FileTransfer.getInstance().isSupportedType(event.dataTypes[i])) {
-				event.currentDataType = event.dataTypes[i];
-				event.detail = DND.DROP_COPY; 
-				super.dragEnter(event);
-				break;
-			}
+		if (FileTransfer.getInstance().isSupportedType(event.currentDataType)) {
+			// Force the operation of file transfer from external application to DROP_COPY
+			event.detail = DND.DROP_COPY;
 		}
+		super.dragEnter(event);
 	}
 
 	/*

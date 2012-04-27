@@ -21,6 +21,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DragSourceEvent;
 import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.graphics.Image;
@@ -36,6 +37,7 @@ import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpCopy;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpMove;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpRefresh;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpUpload;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.CacheManager;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.activator.UIPlugin;
@@ -377,5 +379,30 @@ public class CommonDnD implements IConfirmCallback {
 			}
 		});
 		return results[0];
+    }
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.swt.dnd.DragSourceListener#dragSetData(org.eclipse.swt.dnd.DragSourceEvent)
+	 */
+	public boolean setDragData(DragSourceEvent anEvent) {
+	    if (LocalSelectionTransfer.getTransfer().isSupportedType(anEvent.dataType)) {
+			anEvent.data = LocalSelectionTransfer.getTransfer().getSelection();
+			return true;
+		} 
+		else if (FileTransfer.getInstance().isSupportedType(anEvent.dataType)) {
+			IStructuredSelection selection = (IStructuredSelection) LocalSelectionTransfer.getTransfer().getSelection();
+			List<FSTreeNode> nodes = selection.toList();
+			List<String> paths = new ArrayList<String>();
+			for(FSTreeNode node : nodes) {
+				File file = CacheManager.getCacheFile(node);
+				if(file.exists()) {
+					paths.add(file.getAbsolutePath());
+				}
+			}
+			if (!paths.isEmpty()) anEvent.data = paths.toArray(new String[paths.size()]);
+			return !paths.isEmpty();
+		}
+		return false;
     }
 }

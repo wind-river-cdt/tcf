@@ -51,9 +51,7 @@ public class FSDragSourceListener implements DragSourceListener {
 	 */
 	@Override
 	public void dragSetData(DragSourceEvent event) {
-		if (LocalSelectionTransfer.getTransfer().isSupportedType(event.dataType)) {
-			event.data = LocalSelectionTransfer.getTransfer().getSelection();
-		}
+		event.doit = dnd.setDragData(event);
 	}
 
 	/*

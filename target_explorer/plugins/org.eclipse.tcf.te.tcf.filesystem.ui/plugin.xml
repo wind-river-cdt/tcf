@@ -1766,6 +1766,9 @@
              </operations>
              <transferTypes>
              	<transferType name ="LocalSelectionTransfer" />
+              <transferType
+                    name="FileTransfer">
+              </transferType>
 			 </transferTypes>
           </dragSupport>
           <dropSupport
