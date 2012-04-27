@@ -15,7 +15,7 @@
                   class="org.eclipse.tcf.te.runtime.concurrent.executors.SingleThreadedExecutorService">
                <parameter
                      name="threadPoolNamePrefix"
-                     value="Target Explorer Single Thread Executor">
+                     value="Single Thread Executor">
                </parameter>
             </class>
       </executorService>
