@@ -112,11 +112,11 @@ public interface IBreakpoints extends IService {
      * Breakpoint status field names.
      */
     static final String
-        STATUS_INSTANCES = "Instances", // Array of Map<String,Object>
-        STATUS_ERROR = "Error",         // String
-        STATUS_FILE = "File",           // String
-        STATUS_LINE = "Line",           // Number
-        STATUS_COLUMN = "Column";       // Number
+        STATUS_INSTANCES = "Instances",         // Array of Map<String,Object>
+        STATUS_ERROR = "Error",                 // String
+        STATUS_FILE = "File",                   // String
+        STATUS_LINE = "Line",                   // Number
+        STATUS_COLUMN = "Column";               // Number
 
     /**
      * Breakpoint instance field names.
@@ -126,7 +126,9 @@ public interface IBreakpoints extends IService {
         INSTANCE_CONTEXT = "LocationContext",   // String
         INSTANCE_ADDRESS = "Address",           // Number
         INSTANCE_SIZE = "Size",                 // Number
-        INSTANCE_TYPE = "BreakpointType";       // String
+        INSTANCE_TYPE = "BreakpointType",       // String
+        INSTANCE_MEMORY_CONTEXT = "MemoryContext",// String
+        INSTANCE_HIT_COUNT = "HitCount";         // Number
 
     /**
      * Breakpoint service capabilities.

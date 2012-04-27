@@ -173,12 +173,14 @@ public class TCFBreakpointStatusPage extends PropertyPage {
                             }
                         }
                     }
-                    String mem_id = (String)m.get("MemoryContext");
+                    String mem_id = (String)m.get(IBreakpoints.INSTANCE_MEMORY_CONTEXT);
                     if (mem_id != null) {
                         if (!model.createNode(mem_id, this)) return false;
                         if (isValid()) reset();
                         else addMemoryContext(z, model.getNode(mem_id));
                     }
+                    Number hit_count = (Number)m.get(IBreakpoints.INSTANCE_HIT_COUNT);
+                    if (hit_count != null) z.add("Hit count: " + hit_count);
                     y.add(z);
                 }
             }
