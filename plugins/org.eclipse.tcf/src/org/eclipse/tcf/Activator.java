@@ -10,16 +10,20 @@
  *******************************************************************************/
 package org.eclipse.tcf;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.tcf.internal.extensions.TcfServiceProvidersExtensionPointManager;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.core.ChannelTCP;
+import org.eclipse.tcf.internal.nls.TcfPluginMessages;
 import org.eclipse.tcf.protocol.ILogger;
+import org.eclipse.tcf.protocol.IServiceProvider;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.ssl.TCFSecurityManager;
 import org.osgi.framework.Bundle;
@@ -154,6 +158,27 @@ public class Activator extends Plugin {
         }
 
         // Register service providers contributed via Eclipse extension point
-        TcfServiceProvidersExtensionPointManager.getInstance().registerServiceProviders();
+        IExtensionRegistry registry = Platform.getExtensionRegistry();
+        IExtensionPoint point = registry.getExtensionPoint("org.eclipse.tcf.serviceProviders"); //$NON-NLS-1$
+        if (point != null) {
+            IExtension[] extensions = point.getExtensions();
+            for (IExtension extension : extensions) {
+                IConfigurationElement[] elements = extension.getConfigurationElements();
+                for (IConfigurationElement element : elements) {
+                    if ("serviceProvider".equals(element.getName())) { //$NON-NLS-1$
+                        try {
+                            // Create the service provider instance
+                            IServiceProvider provider = (IServiceProvider)element.createExecutableExtension("class"); //$NON-NLS-1$
+                            if (provider != null) Protocol.addServiceProvider(provider);
+                        } catch (CoreException e) {
+                            IStatus status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                                                        NLS.bind(TcfPluginMessages.Extension_error_invalidExtensionPoint, element.getDeclaringExtension().getUniqueIdentifier()),
+                                                        e);
+                            Activator.getDefault().getLog().log(status);
+                        }
+                    }
+                }
+            }
+        }
     }
 }

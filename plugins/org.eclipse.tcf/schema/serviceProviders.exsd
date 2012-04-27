@@ -54,11 +54,14 @@
          </documentation>
       </annotation>
       <complexType>
-         <attribute name="id" type="string" use="required">
+         <attribute name="id" type="string">
             <annotation>
                <documentation>
-                  The unique id of the service provider.
+                  The unique id of the service provider (deprecated).
                </documentation>
+               <appInfo>
+                  <meta.attribute deprecated="true"/>
+               </appInfo>
             </annotation>
          </attribute>
          <attribute name="class" type="string" use="required">
