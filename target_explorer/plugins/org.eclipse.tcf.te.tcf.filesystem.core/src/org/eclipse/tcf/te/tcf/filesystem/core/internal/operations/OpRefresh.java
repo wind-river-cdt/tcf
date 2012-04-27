@@ -59,7 +59,7 @@ public class OpRefresh extends Operation {
 						refresh(node, service);
 					}
 					else {
-						String message = NLS.bind(Messages.FSOperation_NoFileSystemError, node.peerNode.getPeerId());
+						String message = NLS.bind(Messages.Operation_NoFileSystemError, node.peerNode.getPeerId());
 						throw new TCFFileSystemException(message);
 					}
 				}
@@ -152,7 +152,7 @@ public class OpRefresh extends Operation {
 	 */
 	@Override
     public String getName() {
-	    return NLS.bind(Messages.RefreshDirectoryHandler_RefreshJobTitle, node == null ? "" : node.name); //$NON-NLS-1$
+	    return NLS.bind(Messages.OpRefresh_RefreshJobTitle, node == null ? "" : node.name); //$NON-NLS-1$
     }
 
 	/*

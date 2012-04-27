@@ -76,7 +76,7 @@ public abstract class OpCreate extends Operation {
 				monitor.worked(1);
 			}
 			else {
-				String message = NLS.bind(Messages.FSOperation_NoFileSystemError, folder.peerNode.getPeerId());
+				String message = NLS.bind(Messages.Operation_NoFileSystemError, folder.peerNode.getPeerId());
 				throw new TCFFileSystemException(message);
 			}
 		}
@@ -174,7 +174,7 @@ public abstract class OpCreate extends Operation {
 	 */
 	@Override
     public String getName() {
-	    return NLS.bind(Messages.FSCreate_TaskName, name);
+	    return NLS.bind(Messages.OpCreate_TaskName, name);
     }
 
 	/*

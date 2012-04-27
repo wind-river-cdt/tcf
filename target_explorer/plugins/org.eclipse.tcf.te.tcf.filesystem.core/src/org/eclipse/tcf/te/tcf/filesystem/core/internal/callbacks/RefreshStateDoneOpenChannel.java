@@ -61,7 +61,7 @@ public class RefreshStateDoneOpenChannel extends CallbackBase implements IChanne
 			}
 			else {
 				Tcf.getChannelManager().closeChannel(channel);
-				String message = NLS.bind(Messages.StateManager_TCFNotProvideFSMessage, peer.getID());
+				String message = NLS.bind(Messages.Operation_NoFileSystemError, peer.getID());
 				IStatus status = new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), message, new TCFFileSystemException(message));
 				invokeCallback(status);
 			}

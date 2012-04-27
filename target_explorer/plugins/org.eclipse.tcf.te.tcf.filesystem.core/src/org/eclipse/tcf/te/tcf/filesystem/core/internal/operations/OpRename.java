@@ -64,7 +64,7 @@ public class OpRename extends Operation {
 					renameNode(service);
 				}
 				else {
-					String message = NLS.bind(Messages.FSOperation_NoFileSystemError, node.peerNode.getPeerId());
+					String message = NLS.bind(Messages.Operation_NoFileSystemError, node.peerNode.getPeerId());
 					throw new TCFFileSystemException(message);
 				}
 			}
@@ -95,7 +95,7 @@ public class OpRename extends Operation {
 			@Override
 			public void doneRename(IToken token, FileSystemException error) {
 				if (error != null) {
-					String message = NLS.bind(Messages.FSRename_CannotRename, node.name, error);
+					String message = NLS.bind(Messages.OpRename_CannotRename, node.name, error);
 					errors[0] = new TCFFileSystemException(message, error);
 				}
 				else {
@@ -119,6 +119,6 @@ public class OpRename extends Operation {
 	 */
 	@Override
     public String getName() {
-	    return Messages.RenameFilesHandler_TitleRename;
+	    return Messages.OpRename_TitleRename;
     }
 }

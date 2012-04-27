@@ -91,7 +91,7 @@ public class OpCopy extends Operation {
 					}
 				}
 				else {
-					String message = NLS.bind(Messages.FSOperation_NoFileSystemError, head.peerNode.getPeerId());
+					String message = NLS.bind(Messages.Operation_NoFileSystemError, head.peerNode.getPeerId());
 					throw new TCFFileSystemException(message);
 				}
 			}
@@ -183,7 +183,7 @@ public class OpCopy extends Operation {
 	 */
 	private void copyFile(IFileSystem service, FSTreeNode node, FSTreeNode dest) throws TCFFileSystemException, InterruptedException {
 		if (monitor.isCanceled()) throw new InterruptedException();
-		monitor.subTask(NLS.bind(Messages.FSCopy_Copying, node.name));
+		monitor.subTask(NLS.bind(Messages.OpCopy_Copying, node.name));
 		// Create the copy target file
 		final FSTreeNode copy = createCopyDestination(service, node, dest);
 		String src_path = node.getLocation(true);
@@ -194,7 +194,7 @@ public class OpCopy extends Operation {
 			@Override
 			public void doneCopy(IToken token, FileSystemException error) {
 				if (error != null) {
-					String message = NLS.bind(Messages.FSCopy_CannotCopyFile, copy.name, error);
+					String message = NLS.bind(Messages.OpCopy_CannotCopyFile, copy.name, error);
 					errors[0] = new TCFFileSystemException(message, error);
 				}
 			}
@@ -212,7 +212,7 @@ public class OpCopy extends Operation {
 	 */
 	@Override
     public String getName() {
-	    return Messages.FSCopy_CopyingFile;
+	    return Messages.OpCopy_CopyingFile;
     }
 
 	/*
@@ -240,7 +240,7 @@ public class OpCopy extends Operation {
 								ref.set(Integer.valueOf(count(service, nodes)));
 							}
 							else {
-								String message = NLS.bind(Messages.FSOperation_NoFileSystemError, head.peerNode.getPeerId());
+								String message = NLS.bind(Messages.Operation_NoFileSystemError, head.peerNode.getPeerId());
 								throw new TCFFileSystemException(message);
 							}
 						}

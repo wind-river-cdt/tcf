@@ -66,7 +66,7 @@ public class OpDelete extends Operation {
 					}
 				}
 				else {
-					String message = NLS.bind(Messages.FSOperation_NoFileSystemError, head.peerNode.getPeerId());
+					String message = NLS.bind(Messages.Operation_NoFileSystemError, head.peerNode.getPeerId());
 					throw new TCFFileSystemException(message);
 				}
 			}
@@ -116,7 +116,7 @@ public class OpDelete extends Operation {
 				remove(child, service);
 			}
 		}
-		monitor.subTask(NLS.bind(Messages.FSDelete_RemovingFileFolder, node.name));
+		monitor.subTask(NLS.bind(Messages.OpDelete_RemovingFileFolder, node.name));
 		super.removeFolder(node, service);
 		monitor.worked(1);
 	}
@@ -131,7 +131,7 @@ public class OpDelete extends Operation {
 	 */
 	protected void removeFile(final FSTreeNode node, IFileSystem service) throws TCFFileSystemException, InterruptedException {
 		if (monitor.isCanceled()) throw new InterruptedException();
-		monitor.subTask(NLS.bind(Messages.FSDelete_RemovingFileFolder, node.name));
+		monitor.subTask(NLS.bind(Messages.OpDelete_RemovingFileFolder, node.name));
 		// If the file is read only on windows or not writable on unix, then make it deletable.
 		if (confirmCallback != null && confirmCallback.requires(node)) {
 			if (!yes2All) {
@@ -187,7 +187,7 @@ public class OpDelete extends Operation {
 	 */
 	@Override
     public String getName() {
-	    return Messages.FSDelete_Deleting;
+	    return Messages.OpDelete_Deleting;
     }
 
 	/*
@@ -215,7 +215,7 @@ public class OpDelete extends Operation {
 								ref.set(Integer.valueOf(count(service, nodes)));
 							}
 							else {
-								String message = NLS.bind(Messages.FSOperation_NoFileSystemError, head.peerNode.getPeerId());
+								String message = NLS.bind(Messages.Operation_NoFileSystemError, head.peerNode.getPeerId());
 								throw new TCFFileSystemException(message);
 							}
 						}

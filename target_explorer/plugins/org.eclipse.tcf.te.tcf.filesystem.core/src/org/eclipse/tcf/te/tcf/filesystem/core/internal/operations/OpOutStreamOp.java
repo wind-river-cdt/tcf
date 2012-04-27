@@ -75,7 +75,7 @@ public class OpOutStreamOp extends OpStreamOp {
 						monitor.worked(percent - percentRead);
 						percentRead = percent; // Remember the percentage.
 						// Report the progress.
-						monitor.subTask(NLS.bind(Messages.CacheManager_DownloadingProgress, formatSize(bytesRead), total_size));
+						monitor.subTask(NLS.bind(Messages.OpOutStreamOp_DownloadingProgress, formatSize(bytesRead), total_size));
 					}
 				}
 			}

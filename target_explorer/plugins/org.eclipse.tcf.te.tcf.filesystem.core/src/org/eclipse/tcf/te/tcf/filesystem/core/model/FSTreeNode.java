@@ -625,7 +625,7 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 		}
 		int lastDot = name.lastIndexOf("."); //$NON-NLS-1$
 		if (lastDot == -1) {
-			return Messages.GeneralInformationPage_UnknownFileType;
+			return Messages.FSTreeNode_TypeUnknownFile;
 		}
 		return name.substring(lastDot + 1).toUpperCase() + " " + Messages.FSTreeNode_TypeFile; //$NON-NLS-1$
     }

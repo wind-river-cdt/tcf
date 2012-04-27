@@ -120,7 +120,7 @@ public class OpUser extends Operation {
 			}
 			return accounts[0];
 		}
-		String message = NLS.bind(Messages.UserManager_TCFNotProvideFSMessage, channel.getRemotePeer().getID());
+		String message = NLS.bind(Messages.Operation_NoFileSystemError, channel.getRemotePeer().getID());
 		throw new TCFFileSystemException(message);
 	}
 

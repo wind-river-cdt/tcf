@@ -88,7 +88,7 @@ public class CacheManager {
 				@Override
                 public void run() throws Exception {
 					if (!file.delete()) {
-						throw new Exception(NLS.bind(Messages.FSOperation_DeletingFileFailed, file.getAbsolutePath()));
+						throw new Exception(NLS.bind(Messages.Operation_DeletingFileFailed, file.getAbsolutePath()));
 					}
                 }
 
@@ -111,7 +111,7 @@ public class CacheManager {
 				@Override
                 public void run() throws Exception {
 					if (!file.setReadOnly()) {
-						throw new Exception(NLS.bind(Messages.CacheManager_SetReadOnlyFailed, file.getAbsolutePath()));
+						throw new Exception(NLS.bind(Messages.OpStreamOp_SetReadOnlyFailed, file.getAbsolutePath()));
 					}
                 }
 

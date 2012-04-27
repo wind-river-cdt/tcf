@@ -81,7 +81,7 @@ public class QueryDoneOpenChannel extends CallbackBase implements DoneOpenChanne
 						service.opendir(absPath, new QueryDoneOpen(proxy, channel, service, parentNode));
 					}
 				} else {
-					Status status = new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), Messages.QueryDoneOpenChannel_NoFService, null);
+					Status status = new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), Messages.Operation_NoFileSystemError, null);
 					proxy.done(this, status);
 				}
 			}

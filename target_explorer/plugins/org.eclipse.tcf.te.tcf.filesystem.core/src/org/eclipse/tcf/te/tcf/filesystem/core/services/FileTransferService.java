@@ -337,11 +337,11 @@ public class FileTransferService {
 			public void doneOpenChannel(Throwable error, IChannel channel) {
 				if (error != null) {
 					if (error instanceof ConnectException) {
-						String message = NLS.bind(Messages.FSOperation_NotResponding, peer.getID());
+						String message = NLS.bind(Messages.Operation_NotResponding, peer.getID());
 						errors[0] = new TCFChannelException(message);
 					}
 					else {
-						String message = NLS.bind(Messages.OpeningChannelFailureMessage, peer.getID(), error.getMessage());
+						String message = NLS.bind(Messages.Operation_OpeningChannelFailureMessage, peer.getID(), error.getMessage());
 						errors[0] = new TCFChannelException(message, error);
 					}
 				}

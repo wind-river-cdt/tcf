@@ -139,7 +139,7 @@ public class Operation implements IOperation {
 				@Override
                 public void run() throws Exception {
 					if (!file.delete()) {
-						throw new Exception(NLS.bind(Messages.FSOperation_DeletingFileFailed, file.getAbsolutePath()));
+						throw new Exception(NLS.bind(Messages.Operation_DeletingFileFailed, file.getAbsolutePath()));
 					}
                 }
 
@@ -180,11 +180,11 @@ public class Operation implements IOperation {
 			public void doneOpenChannel(Throwable error, IChannel channel) {
 				if (error != null) {
 					if (error instanceof ConnectException) {
-						String message = NLS.bind(Messages.FSOperation_NotResponding, peer.getID());
+						String message = NLS.bind(Messages.Operation_NotResponding, peer.getID());
 						errors[0] = new TCFChannelException(message);
 					}
 					else {
-						String message = NLS.bind(Messages.OpeningChannelFailureMessage, peer.getID(), error.getMessage());
+						String message = NLS.bind(Messages.Operation_OpeningChannelFailureMessage, peer.getID(), error.getMessage());
 						errors[0] = new TCFChannelException(message, error);
 					}
 				}
@@ -284,7 +284,7 @@ public class Operation implements IOperation {
 			if (service != null) {
 				return getChildren(node, service);
 			}
-			String message = NLS.bind(Messages.FSOperation_NoFileSystemError, node.peerNode.getPeerId());
+			String message = NLS.bind(Messages.Operation_NoFileSystemError, node.peerNode.getPeerId());
 			throw new TCFFileSystemException(message);
 		}
 		finally {
@@ -323,7 +323,7 @@ public class Operation implements IOperation {
 				@Override
 				public void doneOpen(IToken token, FileSystemException error, IFileHandle handle) {
 					if (error != null) {
-						String message = NLS.bind(Messages.FSOperation_CannotOpenDir, node.name, error);
+						String message = NLS.bind(Messages.Operation_CannotOpenDir, node.name, error);
 						errors[0] = new TCFFileSystemException(message, error);
 					}
 					else {
@@ -445,10 +445,10 @@ public class Operation implements IOperation {
 		FSTreeNode possibleChild = findChild(service, dest, name);
 		for (int n = 0; possibleChild != null; n++) {
 			if (n > 0) {
-				name = NLS.bind(Messages.FSOperation_CopyNOfFile, Integer.valueOf(n), node.name);
+				name = NLS.bind(Messages.Operation_CopyNOfFile, Integer.valueOf(n), node.name);
 			}
 			else {
-				name = NLS.bind(Messages.FSOperation_CopyOfFile, node.name);
+				name = NLS.bind(Messages.Operation_CopyOfFile, node.name);
 			}
 			possibleChild = findChild(service, dest, name);
 		}
@@ -472,7 +472,7 @@ public class Operation implements IOperation {
 			public void doneMkDir(IToken token, FileSystemException error) {
 				if (error != null) {
 					String message = NLS
-					                .bind(Messages.FSOperation_CannotCreateDirectory, new Object[] { node.name, error });
+					                .bind(Messages.Operation_CannotCreateDirectory, new Object[] { node.name, error });
 					errors[0] = new TCFFileSystemException(message, error);
 				}
 			}

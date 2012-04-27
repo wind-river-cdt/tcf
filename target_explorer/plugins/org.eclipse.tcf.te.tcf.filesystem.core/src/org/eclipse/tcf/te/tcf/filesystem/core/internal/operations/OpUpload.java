@@ -197,7 +197,7 @@ public class OpUpload extends OpStreamOp {
 							percentRead = percent; // Remember the percentage.
 							// Report the progress.
 							monitor.subTask(NLS
-							                .bind(Messages.CacheManager_UploadingProgress, new Object[] { file
+							                .bind(Messages.OpUpload_UploadingProgress, new Object[] { file
 							                                .getName(), formatSize(bytesRead), formatSize(file
 							                                .length()) }));
 						}
@@ -243,7 +243,7 @@ public class OpUpload extends OpStreamOp {
 							monitor.worked(percent - percentRead);
 							percentRead = percent; // Remember the percentage.
 							// Report the progress.
-							monitor.subTask(NLS.bind(Messages.CacheManager_UploadingProgress, new Object[]{file.getName(), formatSize(bytesRead), fileLength}));
+							monitor.subTask(NLS.bind(Messages.OpUpload_UploadingProgress, new Object[]{file.getName(), formatSize(bytesRead), fileLength}));
 						}
 					}
 				}
@@ -414,9 +414,9 @@ public class OpUpload extends OpStreamOp {
     public String getName() {
 		String message;
 		if(srcFiles.length==1)
-			message = NLS.bind(Messages.CacheManager_UploadSingleFile, srcFiles[0].getName());
+			message = NLS.bind(Messages.OpUpload_UploadSingleFile, srcFiles[0].getName());
 		else
-			message = NLS.bind(Messages.CacheManager_UploadNFiles, Long.valueOf(srcFiles.length));
+			message = NLS.bind(Messages.OpUpload_UploadNFiles, Long.valueOf(srcFiles.length));
 		return message;
     }
 

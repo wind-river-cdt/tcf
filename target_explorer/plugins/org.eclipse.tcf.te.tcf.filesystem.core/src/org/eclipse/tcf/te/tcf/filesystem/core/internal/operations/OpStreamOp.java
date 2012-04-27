@@ -39,7 +39,7 @@ public abstract class OpStreamOp extends Operation {
 				@Override
                 public void run() throws Exception {
 					if (!file.setReadOnly()) {
-						throw new Exception(NLS.bind(Messages.CacheManager_SetReadOnlyFailed, file.getAbsolutePath()));
+						throw new Exception(NLS.bind(Messages.OpStreamOp_SetReadOnlyFailed, file.getAbsolutePath()));
 					}
                 }
 
@@ -64,11 +64,11 @@ public abstract class OpStreamOp extends Operation {
 	protected String formatSize(long size) {
 		double kbSize = size / 1024.0;
 		if (kbSize < 1.0) {
-			return SIZE_FORMAT.format(size) + Messages.CacheManager_Bytes;
+			return SIZE_FORMAT.format(size) + Messages.OpStreamOp_Bytes;
 		}
 		double mbSize = kbSize / 1024.0;
 		if (mbSize < 1.0)
-			return SIZE_FORMAT.format(kbSize) + Messages.CacheManager_KBs;
-		return SIZE_FORMAT.format(mbSize) + Messages.CacheManager_MBs;
+			return SIZE_FORMAT.format(kbSize) + Messages.OpStreamOp_KBs;
+		return SIZE_FORMAT.format(mbSize) + Messages.OpStreamOp_MBs;
 	}		
 }

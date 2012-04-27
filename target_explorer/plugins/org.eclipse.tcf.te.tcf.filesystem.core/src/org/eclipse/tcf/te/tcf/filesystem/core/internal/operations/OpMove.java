@@ -85,7 +85,7 @@ public class OpMove extends Operation {
 						}
 					}
 					else {
-						String message = NLS.bind(Messages.FSOperation_NoFileSystemError, head.peerNode.getPeerId());
+						String message = NLS.bind(Messages.Operation_NoFileSystemError, head.peerNode.getPeerId());
 						throw new TCFFileSystemException(message);
 					}
 				}
@@ -112,7 +112,7 @@ public class OpMove extends Operation {
 	 */
 	void moveNode(IFileSystem service, final FSTreeNode node, FSTreeNode dest) throws TCFFileSystemException, InterruptedException {
 		if (monitor.isCanceled()) throw new InterruptedException();
-		monitor.subTask(NLS.bind(Messages.FSMove_Moving, node.name));
+		monitor.subTask(NLS.bind(Messages.OpMove_Moving, node.name));
 		FSTreeNode copy = findChild(service, dest, node.name);
 		if (copy == null || !copy.equals(node) && confirmReplace(node, confirmCallback)) {
 			if (copy != null && copy.isDirectory() && node.isDirectory()) {
@@ -124,11 +124,11 @@ public class OpMove extends Operation {
 				monitor.worked(1);
 			}
 			else if (copy != null && copy.isFile() && node.isDirectory()) {
-				String error = NLS.bind(Messages.FSMove_FileExistsError, copy.name);
+				String error = NLS.bind(Messages.OpMove_FileExistsError, copy.name);
 				throw new TCFFileSystemException(error);
 			}
 			else if (copy != null && copy.isDirectory() && node.isFile()) {
-				String error = NLS.bind(Messages.FSMove_FolderExistsError, copy.name);
+				String error = NLS.bind(Messages.OpMove_FolderExistsError, copy.name);
 				throw new TCFFileSystemException(error);
 			}
 			else {
@@ -147,7 +147,7 @@ public class OpMove extends Operation {
 					@Override
 					public void doneRename(IToken token, FileSystemException error) {
 						if (error != null) {
-							String message = NLS.bind(Messages.FSMove_CannotMove, node.name, error);
+							String message = NLS.bind(Messages.OpMove_CannotMove, node.name, error);
 							errors[0] = new TCFFileSystemException(message, error);
 						}
 						else {
@@ -190,7 +190,7 @@ public class OpMove extends Operation {
 	 */
 	@Override
     public String getName() {
-	    return Messages.FSMove_MovingFile;
+	    return Messages.OpMove_MovingFile;
     }
 
 	/*

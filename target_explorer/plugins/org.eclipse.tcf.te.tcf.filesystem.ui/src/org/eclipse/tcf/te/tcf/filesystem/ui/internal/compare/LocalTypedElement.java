@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.CacheManager;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.activator.UIPlugin;
@@ -263,7 +264,7 @@ public class LocalTypedElement extends MergeTypedElement implements
 	 */
 	public void store2Cache(IProgressMonitor monitor) throws CoreException {
 		File cacheFile = CacheManager.getCacheFile(node);
-		monitor.beginTask(Messages.LocalTypedElement_SavingFile + cacheFile.getName(), 100);
+		monitor.beginTask(NLS.bind(Messages.LocalTypedElement_SavingFile, cacheFile.getName()), 100);
 		InputStream is = getContents();
 		BufferedOutputStream bos = null;
 		try {

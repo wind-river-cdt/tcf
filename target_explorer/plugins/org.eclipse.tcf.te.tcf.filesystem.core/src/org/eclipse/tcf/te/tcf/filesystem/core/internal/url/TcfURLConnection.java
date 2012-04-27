@@ -194,7 +194,7 @@ public class TcfURLConnection extends URLConnection {
 					throw new IOException(Messages.TcfURLConnection_NoFileHandleReturned);
 				}
 			} else {
-				throw new IOException(Messages.TcfURLConnection_NoFSServiceAvailable);
+				throw new IOException(Messages.Operation_NoFileSystemError);
 			}
 		}
 	}

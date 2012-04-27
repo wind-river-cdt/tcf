@@ -78,7 +78,7 @@ public class RemoteTypedElement extends MergeTypedElement {
 	 */
 	public void cacheContents(IProgressMonitor monitor)
 			throws InvocationTargetException, InterruptedException {
-		monitor.beginTask(NLS.bind(Messages.CacheManager_DowloadingFile, node.name), 100);
+		monitor.beginTask(NLS.bind(Messages.RemoteTypedElement_DowloadingFile, node.name), 100);
 		OutputStream output = null;
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		output = new BufferedOutputStream(baos);

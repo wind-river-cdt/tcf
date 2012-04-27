@@ -69,7 +69,7 @@ public class OpCommitAttr extends Operation {
 						throw errors[0];
 					}
 				} else {
-					String message = NLS.bind(Messages.StateManager_TCFNotProvideFSMessage2, node.peerNode.getPeerId());
+					String message = NLS.bind(Messages.Operation_NoFileSystemError, node.peerNode.getPeerId());
 					throw new TCFFileSystemException(message);
 				}
 			}
