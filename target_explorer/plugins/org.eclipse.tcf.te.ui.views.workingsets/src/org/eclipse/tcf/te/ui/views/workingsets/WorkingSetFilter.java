@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.tcf.te.runtime.interfaces.workingsets.IWorkingSetElement;
+import org.eclipse.tcf.te.ui.views.workingsets.interfaces.IWorkingSetElement;
 import org.eclipse.ui.IContainmentAdapter;
 import org.eclipse.ui.IWorkingSet;
 

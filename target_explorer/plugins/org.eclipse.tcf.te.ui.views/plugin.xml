@@ -507,6 +507,14 @@
             properties="isCategoryID,isFavorites,isMyTargets,isNeighborhood"
             type="org.eclipse.tcf.te.ui.views.interfaces.ICategory">
       </propertyTester>
+
+      <propertyTester
+            class="org.eclipse.tcf.te.ui.views.internal.categories.CategoryPropertyTester"
+            id="org.eclipse.tcf.te.ui.views.categories.CategoryPropertyTester"
+            namespace="org.eclipse.tcf.te.ui.views"
+            properties="parentCategoryId"
+            type="org.eclipse.jface.viewers.IStructuredSelection">
+      </propertyTester>
    </extension>
    
 <!-- Preference contributions -->

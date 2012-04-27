@@ -10,8 +10,8 @@
 package org.eclipse.tcf.te.ui.views.workingsets;
 
 import org.eclipse.core.runtime.PlatformObject;
-import org.eclipse.tcf.te.runtime.interfaces.workingsets.IWorkingSetElement;
 import org.eclipse.tcf.te.ui.views.interfaces.workingsets.IWorkingSetNameIDs;
+import org.eclipse.tcf.te.ui.views.workingsets.interfaces.IWorkingSetElement;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPersistableElement;
 

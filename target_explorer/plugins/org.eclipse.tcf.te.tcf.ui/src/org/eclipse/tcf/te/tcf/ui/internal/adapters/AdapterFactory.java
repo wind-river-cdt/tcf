@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.ui.navigator.LabelProviderDelegate;
+import org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizableElementAdapter;
 import org.eclipse.tcf.te.ui.views.interfaces.handler.IDeleteHandlerDelegate;
 import org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate;
 import org.eclipse.ui.IPersistableElement;
@@ -22,18 +23,21 @@ import org.eclipse.ui.IPersistableElement;
  */
 public class AdapterFactory implements IAdapterFactory {
 	// The adapter for ILabelProvider.class
-	private LabelProviderDelegate labelProvider = new LabelProviderDelegate();
+	private final LabelProviderDelegate labelProvider = new LabelProviderDelegate();
 	// The refresh handler delegate adapter
-	private IRefreshHandlerDelegate refreshDelegate = new RefreshHandlerDelegate();
+	private final IRefreshHandlerDelegate refreshDelegate = new RefreshHandlerDelegate();
 	// The delete handler delegate adapter
-	private IDeleteHandlerDelegate deleteDelegate = new DeleteHandlerDelegate();
+	private final IDeleteHandlerDelegate deleteDelegate = new DeleteHandlerDelegate();
+	// The categorizable element adapter
+	private final ICategorizableElementAdapter categorizableAdapter = new CategorizableAdapter();
 
 	// The adapter class.
 	private Class<?>[] adapters = {
 					ILabelProvider.class,
 					IRefreshHandlerDelegate.class,
 					IDeleteHandlerDelegate.class,
-					IPersistableElement.class
+					IPersistableElement.class,
+					ICategorizableElementAdapter.class
 				};
 
 	/* (non-Javadoc)
@@ -51,8 +55,11 @@ public class AdapterFactory implements IAdapterFactory {
 			if (IDeleteHandlerDelegate.class.equals(adapterType)) {
 				return deleteDelegate;
 			}
-			if(IPersistableElement.class.equals(adapterType)) {
+			if (IPersistableElement.class.equals(adapterType)) {
 				return new PersistablePeerModel((IPeerModel)adaptableObject);
+			}
+			if (ICategorizableElementAdapter.class.equals(adapterType)) {
+				return categorizableAdapter;
 			}
 
 		}

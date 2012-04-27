@@ -11,6 +11,7 @@
          <adapter type="org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate"/>
          <adapter type="org.eclipse.tcf.te.ui.views.interfaces.handler.IDeleteHandlerDelegate"/>
          <adapter type="org.eclipse.ui.IPersistableElement"/>
+         <adapter type="org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizableElementAdapter"/>
       </factory>
    </extension>   
 
@@ -25,17 +26,6 @@
 <!-- Preference contributions -->   
    <extension point="org.eclipse.core.runtime.preferences">
       <initializer class="org.eclipse.tcf.te.tcf.ui.internal.preferences.PreferencesInitializer"/>
-   </extension>
-
-<!-- Eclipse core expressions property tester -->
-   <extension point="org.eclipse.core.expressions.propertyTesters">
-      <propertyTester
-            class="org.eclipse.tcf.te.tcf.ui.internal.categories.CategoryPropertyTester"
-            id="org.eclipse.tcf.te.tcf.ui.categories.CategoryPropertyTester"
-            namespace="org.eclipse.tcf.te.tcf.ui"
-            properties="parentCategoryId"
-            type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel">
-      </propertyTester>
    </extension>
 
 <!-- Event listener contributions -->
@@ -255,7 +245,7 @@
                tooltip="%command.addtofavorites.tooltip">
             <visibleWhen checkEnabled="false">
                <with variable="selection">
-                  <count value="+"/>
+                  <count value="1"/>
                   <iterate operator="and" ifEmpty="false">
                      <and>
                         <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
@@ -274,7 +264,7 @@
                tooltip="%command.removefromfavorites.tooltip">
             <visibleWhen checkEnabled="false">
                <with variable="selection">
-                  <count value="+"/>
+                  <count value="1"/>
                   <iterate operator="and" ifEmpty="false">
                      <and>
                         <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
@@ -368,15 +358,15 @@
             </activeWhen>
             <enabledWhen>
                <with variable="selection">
-                  <count value="+"/>
-                  <iterate operator="and" ifEmpty="false">
-                     <and>
+                  <and>
+                     <count value="1"/>
+                     <not>
+                        <test property="org.eclipse.tcf.te.ui.views.parentCategoryId" value="org.eclipse.tcf.te.ui.views.category.favorites"/>
+                     </not>
+                     <iterate operator="and" ifEmpty="false">
                         <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
-                        <not>
-                           <test property="org.eclipse.tcf.te.tcf.ui.parentCategoryId" value="org.eclipse.tcf.te.ui.views.category.favorites"/>
-                        </not>
-                     </and>
-                  </iterate>
+                     </iterate>
+                  </and>
                </with>
             </enabledWhen>
       </handler>
@@ -391,13 +381,13 @@
             </activeWhen>
             <enabledWhen>
                <with variable="selection">
-                  <count value="+"/>
-                  <iterate operator="and" ifEmpty="false">
-                     <and>
+                  <and>
+                     <count value="1"/>
+                     <test property="org.eclipse.tcf.te.ui.views.parentCategoryId" value="org.eclipse.tcf.te.ui.views.category.favorites"/>
+                     <iterate operator="and" ifEmpty="false">
                         <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
-                        <test property="org.eclipse.tcf.te.tcf.ui.parentCategoryId" value="org.eclipse.tcf.te.ui.views.category.favorites"/>
-                     </and>
-                  </iterate>
+                     </iterate>
+                  </and>
                </with>
             </enabledWhen>
       </handler>

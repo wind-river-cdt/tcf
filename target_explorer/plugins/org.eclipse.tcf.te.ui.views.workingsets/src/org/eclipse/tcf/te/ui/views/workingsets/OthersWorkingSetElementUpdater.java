@@ -17,10 +17,10 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.tcf.te.runtime.interfaces.workingsets.IWorkingSetElement;
 import org.eclipse.tcf.te.ui.views.interfaces.ICategory;
 import org.eclipse.tcf.te.ui.views.internal.ViewRoot;
 import org.eclipse.tcf.te.ui.views.internal.ViewViewer;
+import org.eclipse.tcf.te.ui.views.workingsets.interfaces.IWorkingSetElement;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.navigator.CommonViewer;
 

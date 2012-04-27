@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.runtime.interfaces.workingsets;
+package org.eclipse.tcf.te.ui.views.workingsets.interfaces;
 
 import org.eclipse.core.runtime.IAdaptable;
 

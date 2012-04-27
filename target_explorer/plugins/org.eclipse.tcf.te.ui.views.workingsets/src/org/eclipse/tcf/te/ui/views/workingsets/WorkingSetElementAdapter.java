@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.tcf.te.runtime.interfaces.workingsets.IWorkingSetElement;
+import org.eclipse.tcf.te.ui.views.workingsets.interfaces.IWorkingSetElement;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.IWorkingSetElementAdapter;
 

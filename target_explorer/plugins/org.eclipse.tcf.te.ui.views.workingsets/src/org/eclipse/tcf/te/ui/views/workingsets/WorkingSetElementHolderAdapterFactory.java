@@ -10,7 +10,7 @@
 package org.eclipse.tcf.te.ui.views.workingsets;
 
 import org.eclipse.core.runtime.IAdapterFactory;
-import org.eclipse.tcf.te.runtime.interfaces.workingsets.IWorkingSetElement;
+import org.eclipse.tcf.te.ui.views.workingsets.interfaces.IWorkingSetElement;
 
 /**
  * The adapter factory to adapt a working set element holder to a working set element.

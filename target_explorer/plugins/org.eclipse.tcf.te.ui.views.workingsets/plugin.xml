@@ -13,7 +13,7 @@
       <factory
             adaptableType="org.eclipse.tcf.te.ui.views.workingsets.WorkingSetElementHolder"
             class="org.eclipse.tcf.te.ui.views.workingsets.WorkingSetElementHolderAdapterFactory">
-         <adapter type="org.eclipse.tcf.te.runtime.interfaces.workingsets.IWorkingSetElement"/>
+         <adapter type="org.eclipse.tcf.te.ui.views.workingsets.interfaces.IWorkingSetElement"/>
       </factory>
       <factory
             adaptableType="org.eclipse.ui.IWorkingSet"
@@ -85,7 +85,7 @@
                <instanceof value="org.eclipse.ui.IWorkingSet"/>
                <instanceof value="org.eclipse.tcf.te.ui.views.workingsets.WorkingSetElementHolder"/>
                <instanceof
-                     value="org.eclipse.tcf.te.runtime.interfaces.workingsets.IWorkingSetElement">
+                     value="org.eclipse.tcf.te.ui.views.workingsets.interfaces.IWorkingSetElement">
                </instanceof>
             </or>
          </possibleChildren>

@@ -15,7 +15,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
-import org.eclipse.tcf.te.runtime.interfaces.workingsets.IWorkingSetElement;
 import org.eclipse.tcf.te.runtime.model.ContainerModelNode;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
@@ -25,7 +24,7 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
 /**
  * Default peer model implementation.
  */
-public class PeerModel extends ContainerModelNode implements IPeerModel, IWorkingSetElement {
+public class PeerModel extends ContainerModelNode implements IPeerModel {
 	// Reference to the parent locator model
 	private final ILocatorModel model;
 	// Reference to the peer id (cached for performance optimization)
@@ -86,14 +85,6 @@ public class PeerModel extends ContainerModelNode implements IPeerModel, IWorkin
 	@Override
 	public IPeer getPeer() {
 		return (IPeer)getAdapter(IPeer.class);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.interfaces.workingsets.IWorkingSetElement#getElementId()
-	 */
-	@Override
-	public String getElementId() {
-		return peerId;
 	}
 
 	/* (non-Javadoc)
