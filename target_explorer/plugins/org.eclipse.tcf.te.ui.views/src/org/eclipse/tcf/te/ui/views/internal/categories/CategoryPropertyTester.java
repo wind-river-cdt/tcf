@@ -28,7 +28,7 @@ public class CategoryPropertyTester extends PropertyTester {
 	public boolean test(final Object receiver, final String property, final Object[] args, final Object expectedValue) {
 		if (receiver instanceof IStructuredSelection) {
 			// Analyze the selection
-			testSelection((IStructuredSelection)receiver, property, args, expectedValue);
+			return testSelection((IStructuredSelection)receiver, property, args, expectedValue);
 		}
 		return false;
 	}
