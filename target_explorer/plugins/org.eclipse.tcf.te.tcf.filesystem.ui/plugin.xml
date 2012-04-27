@@ -20,7 +20,7 @@
       <navigatorContent
             activeByDefault="false"
             contentProvider="org.eclipse.tcf.te.tcf.filesystem.ui.controls.FSNavigatorContentProvider"
-            icon="icons/obj16/rootdrive.gif"
+            icon="icons/obj16/root.gif"
             id="org.eclipse.tcf.te.tcf.filesystem.navigator.content"
             labelProvider="org.eclipse.tcf.te.tcf.filesystem.ui.internal.columns.FSTreeElementLabelProvider"
             name="%navigatorContent.name"
