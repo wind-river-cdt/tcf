@@ -33,7 +33,5 @@ public class PreferencesInitializer extends AbstractPreferenceInitializer implem
 		IPreferenceStore store = UIPlugin.getDefault().getPreferenceStore();
 		// [Hidden] Hide dynamic target discovery navigator content extension: default on
 		store.setDefault(PREF_HIDE_DYNAMIC_TARGET_DISCOVERY_EXTENSION, true);
-		// [Hidden] Favorites category link mode: default off
-		store.setDefault(IPreferenceConsts.PREF_FAVORITES_CATEGORY_MODE_LINK, true);
 	}
 }

@@ -29,8 +29,6 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerRedirector;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelLookupService;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelRefreshService;
 import org.eclipse.tcf.te.tcf.locator.model.Model;
-import org.eclipse.tcf.te.tcf.ui.activator.UIPlugin;
-import org.eclipse.tcf.te.tcf.ui.internal.preferences.IPreferenceConsts;
 import org.eclipse.tcf.te.tcf.ui.navigator.nodes.PeerRedirectorGroupNode;
 import org.eclipse.tcf.te.ui.swt.DisplayUtil;
 import org.eclipse.tcf.te.ui.views.Managers;
@@ -86,13 +84,10 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 			Runnable runnable = new Runnable() {
 				@Override
 				public void run() {
-					boolean isLinkMode = UIPlugin.getDefault().getPreferenceStore().getBoolean(IPreferenceConsts.PREF_FAVORITES_CATEGORY_MODE_LINK);
-
 					if (IUIConstants.ID_CAT_FAVORITES.equals(catID)) {
 						for (IPeerModel peer : peers) {
 							boolean isFavorite = Managers.getCategoryManager().belongsTo(catID, peer.getPeerId());
 							if (isFavorite && !candidates.contains(peer)) {
-								if (!isLinkMode) peer.setProperty(IPeerModelProperties.PROP_PARENT_CATEGORY_ID, catID);
 								candidates.add(peer);
 							}
 						}
@@ -108,9 +103,7 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 								isStatic = true;
 							}
 
-							boolean isFavorite = !isLinkMode && Managers.getCategoryManager().belongsTo(IUIConstants.ID_CAT_FAVORITES, peer.getPeerId());
-
-							if (isStatic && !isFavorite && !candidates.contains(peer)) {
+							if (isStatic && !candidates.contains(peer)) {
 								peer.setProperty(IPeerModelProperties.PROP_PARENT_CATEGORY_ID, catID);
 								candidates.add(peer);
 							}
@@ -127,9 +120,7 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 								isStatic = true;
 							}
 
-							boolean isFavorite = !isLinkMode && Managers.getCategoryManager().belongsTo(IUIConstants.ID_CAT_FAVORITES, peer.getPeerId());
-
-							if (!isStatic && !isFavorite && !candidates.contains(peer)) {
+							if (!isStatic && !candidates.contains(peer)) {
 								peer.setProperty(IPeerModelProperties.PROP_PARENT_CATEGORY_ID, catID);
 								candidates.add(peer);
 							}
@@ -234,9 +225,7 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 		List<TreePath> pathes = new ArrayList<TreePath>();
 
 		if (element instanceof IPeerModel) {
-			boolean isLinkMode = UIPlugin.getDefault().getPreferenceStore().getBoolean(IPreferenceConsts.PREF_FAVORITES_CATEGORY_MODE_LINK);
-
-			if (isLinkMode && Managers.getCategoryManager().belongsTo(IUIConstants.ID_CAT_FAVORITES, ((IPeerModel)element).getPeerId())) {
+			if (Managers.getCategoryManager().belongsTo(IUIConstants.ID_CAT_FAVORITES, ((IPeerModel)element).getPeerId())) {
 				// Get the "Favorites" category
 				ICategory favCategory = CategoriesExtensionPointManager.getInstance().getCategory(IUIConstants.ID_CAT_FAVORITES, false);
 				if (favCategory != null) pathes.add(new TreePath(new Object[] { favCategory }));

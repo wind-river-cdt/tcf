@@ -16,9 +16,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
-import org.eclipse.tcf.te.tcf.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.ui.internal.categories.CategoryManager;
-import org.eclipse.tcf.te.tcf.ui.internal.preferences.IPreferenceConsts;
 import org.eclipse.tcf.te.ui.views.Managers;
 import org.eclipse.tcf.te.ui.views.ViewsUtil;
 import org.eclipse.tcf.te.ui.views.interfaces.ICategory;
@@ -119,13 +117,11 @@ public class CommonDnD {
 	 * @return true if it is valid for dropping.
 	 */
 	public static boolean validateLocalSelectionDrop(CommonDropAdapter dropAdapter, Object target, int operation, TransferData transferType) {
-		boolean isLinkMode = UIPlugin.getDefault().getPreferenceStore().getBoolean(IPreferenceConsts.PREF_FAVORITES_CATEGORY_MODE_LINK);
-
 		int overrideOperation = -1;
 		boolean valid = false;
 
-		// If not in copy mode, the operation should be always "DROP_MOVE"
-		if (!isLinkMode && (operation & DND.DROP_MOVE) == 0) {
+		// The default operation should be always "DROP_MOVE"
+		if ((operation & DND.DROP_MOVE) == 0) {
 			overrideOperation = DND.DROP_MOVE;
 		}
 
@@ -139,9 +135,8 @@ public class CommonDnD {
 			if (!IUIConstants.ID_CAT_NEIGHBORHOOD.equals(hovered.getId())) {
 				valid = true;
 
-				// If the target is the "Favorites" category and copy mode is on,
-				// force DROP_LINK operation
-				if (isLinkMode && IUIConstants.ID_CAT_FAVORITES.equals(hovered.getId())
+				// If the target is the "Favorites" category, force DROP_LINK operation
+				if (IUIConstants.ID_CAT_FAVORITES.equals(hovered.getId())
 						&& (operation & DND.DROP_LINK) == 0) {
 					overrideOperation = DND.DROP_LINK;
 				}
