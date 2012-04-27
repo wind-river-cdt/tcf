@@ -62,7 +62,15 @@ public class ViewViewerComparer implements IElementComparer {
 	 */
 	@Override
     public int hashCode(Object element) {
-		if(element != null) return element.hashCode();
+		if (element != null) {
+			if(byDefault)
+				return element.hashCode();
+			IElementComparer comparer = (IElementComparer) Platform.getAdapterManager().getAdapter(element, IElementComparer.class);
+			if(comparer != null) {
+				return comparer.hashCode(element);
+			}
+			return element.hashCode();
+		}
 	    return 0;
     }
 }
