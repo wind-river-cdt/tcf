@@ -32,6 +32,9 @@ import org.eclipse.tcf.internal.debug.Activator;
 import org.eclipse.tcf.internal.debug.model.ITCFConstants;
 import org.eclipse.tcf.internal.debug.model.TCFLaunch;
 import org.eclipse.tcf.internal.debug.model.TCFMemoryRegion;
+import org.eclipse.tcf.osgi.OSGIServices;
+import org.eclipse.tcf.osgi.services.IValueAddService;
+import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.JSON;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IMemoryMap;
@@ -71,6 +74,7 @@ public class TCFLaunchDelegate extends LaunchConfigurationDelegate {
             super(props);
         }
 
+        @Override
         public String toString() {
             StringBuffer bf = new StringBuffer();
             Map<String,Object> props = getProperties();
@@ -280,6 +284,7 @@ public class TCFLaunchDelegate extends LaunchConfigurationDelegate {
      * Create new TCF launch object.
      * @return new TCFLaunch object
      */
+    @Override
     public ILaunch getLaunch(final ILaunchConfiguration configuration, final String mode) throws CoreException {
         return new TCFTask<ILaunch>() {
             int cnt;
@@ -315,14 +320,31 @@ public class TCFLaunchDelegate extends LaunchConfigurationDelegate {
                     null));
         }
         if (monitor != null) monitor.beginTask("Launching TCF debugger session", task_cnt); //$NON-NLS-1$
-        final String id =
-            configuration.getAttribute(ATTR_USE_LOCAL_AGENT, true) ?
-                    local_id : configuration.getAttribute(ATTR_PEER_ID, "");
-        Protocol.invokeLater(new Runnable() {
+        final String id = configuration.getAttribute(ATTR_USE_LOCAL_AGENT, true) ? local_id : configuration.getAttribute(ATTR_PEER_ID, "");
+
+        Runnable runnable = new Runnable() {
             public void run() {
                 ((TCFLaunch)launch).launchTCF(mode, id);
                 if (monitor != null) monitor.done();
             }
-        });
+        };
+
+        // If the id is not a redirection path of itself, and a value-add service is registered,
+        // ask the value-add service for the redirection path
+        if (id.indexOf('/') <= 0 && OSGIServices.getValueAddService() != null) {
+            IPeer peer = Protocol.getLocator().getPeers().get(id);
+            if (peer == null) {
+                Protocol.invokeLater(runnable);
+            } else {
+                OSGIServices.getValueAddService().getRedirectionPath(peer, new IValueAddService.DoneGetRedirectionPath() {
+                    public void doneGetRedirectionPath(Throwable error, String redirectionPath) {
+                        ((TCFLaunch)launch).launchTCF(mode, error == null ? redirectionPath : id);
+                        if (monitor != null) monitor.done();
+                    }
+                });
+            }
+        } else {
+            Protocol.invokeLater(runnable);
+        }
     }
 }
