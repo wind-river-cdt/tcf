@@ -110,9 +110,9 @@ The editor page implementation class must be specified either by the class attri
          &lt;pre&gt;
    &lt;extension point=&quot;org.eclipse.tcf.te.ui.views.editorPages&quot;&gt;
       &lt;editorPage
-            class=&quot;org.eclipse.tcf.te.tcf.ui.internal.TcfPeerPropertiesPage&quot;
-            id=&quot;org.eclipse.tcf.te.tcf.ui.TcfPeerPropertiesPage&quot;
-            label=&quot;TCF Peer Properties Editor Page&quot;&gt;
+            class=&quot;org.eclipse.tcf.te.tcf.ui.internal.TcfTargetPropertiesPage&quot;
+            id=&quot;org.eclipse.tcf.te.tcf.ui.TcfTargetPropertiesPage&quot;
+            label=&quot;TCF Target Properties Editor Page&quot;&gt;
       &lt;/editorPage&gt;
    &lt;/extension&gt;
 &lt;/pre&gt;
@@ -134,7 +134,7 @@ The editor page implementation class must be specified either by the class attri
          <meta.section type="copyright"/>
       </appinfo>
       <documentation>
-         Copyright (c) 2011 Wind River Systems, Inc. and others.
+         Copyright (c) 2011, 2012 Wind River Systems, Inc. and others.
 
 All rights reserved.
 
