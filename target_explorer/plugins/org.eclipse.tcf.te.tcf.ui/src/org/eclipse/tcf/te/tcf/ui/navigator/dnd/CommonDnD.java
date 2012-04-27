@@ -69,43 +69,42 @@ public class CommonDnD {
 	 * @return true if the dropping is successful.
 	 */
 	public static boolean dropLocalSelection(Object target, int operations, IStructuredSelection selection) {
-		if ((operations & DND.DROP_MOVE) != 0) {
-			if (target instanceof ICategory) {
-				ICategory hovered = (ICategory) target;
-				if (IUIConstants.ID_CAT_FAVORITES.equals(hovered.getId())) {
-					// Mark the peer nodes as favorite
-					Iterator<?> iterator = selection.iterator();
-					while (iterator.hasNext()) {
-						Object element = iterator.next();
-						if (!(element instanceof IPeerModel)) continue;
-						Managers.getCategoryManager().add(hovered.getId(), ((IPeerModel)element).getPeerId());
-					}
-					// Fire a refresh of the view
-					ViewsUtil.refresh(IUIConstants.ID_EXPLORER);
-				}
-				else if (IUIConstants.ID_CAT_MY_TARGETS.equals(hovered.getId())) {
-					// Create a static copy of the dropped peer node
-					Iterator<?> iterator = selection.iterator();
-					while (iterator.hasNext()) {
-						Object element = iterator.next();
-						if (!(element instanceof IPeerModel)) continue;
-						CategoryManager.getInstance().addToMyTargets((IPeerModel)element);
-					}
-					// Fire a refresh of the view
-					ViewsUtil.refresh(IUIConstants.ID_EXPLORER);
-				}
-			} else if (target instanceof IRoot) {
-				// Remove the peer nodes from the favorites list
+		if (target instanceof ICategory) {
+			ICategory hovered = (ICategory) target;
+			if (IUIConstants.ID_CAT_FAVORITES.equals(hovered.getId())) {
+				// Mark the peer nodes as favorite
 				Iterator<?> iterator = selection.iterator();
 				while (iterator.hasNext()) {
 					Object element = iterator.next();
 					if (!(element instanceof IPeerModel)) continue;
-					Managers.getCategoryManager().remove(IUIConstants.ID_CAT_FAVORITES, ((IPeerModel)element).getPeerId());
+					Managers.getCategoryManager().add(hovered.getId(), ((IPeerModel)element).getPeerId());
 				}
 				// Fire a refresh of the view
 				ViewsUtil.refresh(IUIConstants.ID_EXPLORER);
 			}
+			else if (IUIConstants.ID_CAT_MY_TARGETS.equals(hovered.getId())) {
+				// Create a static copy of the dropped peer node
+				Iterator<?> iterator = selection.iterator();
+				while (iterator.hasNext()) {
+					Object element = iterator.next();
+					if (!(element instanceof IPeerModel)) continue;
+					CategoryManager.getInstance().addToMyTargets((IPeerModel)element);
+				}
+				// Fire a refresh of the view
+				ViewsUtil.refresh(IUIConstants.ID_EXPLORER);
+			}
+		} else if (target instanceof IRoot) {
+			// Remove the peer nodes from the favorites list
+			Iterator<?> iterator = selection.iterator();
+			while (iterator.hasNext()) {
+				Object element = iterator.next();
+				if (!(element instanceof IPeerModel)) continue;
+				Managers.getCategoryManager().remove(IUIConstants.ID_CAT_FAVORITES, ((IPeerModel)element).getPeerId());
+			}
+			// Fire a refresh of the view
+			ViewsUtil.refresh(IUIConstants.ID_EXPLORER);
 		}
+
 		return false;
 	}
 

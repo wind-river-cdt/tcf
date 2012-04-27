@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.viewers.ITreePathContentProvider;
+import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
@@ -49,7 +51,7 @@ import org.eclipse.ui.navigator.INavigatorFilterService;
  * Content provider delegate implementation.
  */
 @SuppressWarnings("restriction")
-public class ContentProviderDelegate implements ICommonContentProvider {
+public class ContentProviderDelegate implements ICommonContentProvider, ITreePathContentProvider {
 	private final static Object[] NO_ELEMENTS = new Object[0];
 
 	// The "Redirected Peers" filter id
@@ -169,6 +171,15 @@ public class ContentProviderDelegate implements ICommonContentProvider {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ITreePathContentProvider#getChildren(org.eclipse.jface.viewers.TreePath)
+	 */
+    @Override
+    public Object[] getChildren(TreePath parentPath) {
+    	// getChildren is independent of the elements tree path
+    	return parentPath != null ? getChildren(parentPath.getLastSegment()) : NO_ELEMENTS;
+    }
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
 	 */
 	@Override
@@ -214,6 +225,32 @@ public class ContentProviderDelegate implements ICommonContentProvider {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ITreePathContentProvider#getParents(java.lang.Object)
+	 */
+    @Override
+    public TreePath[] getParents(Object element) {
+		// Not sure if we ever have to calculate the _full_ tree path. The parent NavigatorContentServiceContentProvider
+		// is consuming only the last segment.
+		List<TreePath> pathes = new ArrayList<TreePath>();
+
+		if (element instanceof IPeerModel) {
+			boolean isLinkMode = UIPlugin.getDefault().getPreferenceStore().getBoolean(IPreferenceConsts.PREF_FAVORITES_CATEGORY_MODE_LINK);
+
+			if (isLinkMode && Managers.getCategoryManager().belongsTo(IUIConstants.ID_CAT_FAVORITES, ((IPeerModel)element).getPeerId())) {
+				// Get the "Favorites" category
+				ICategory favCategory = CategoriesExtensionPointManager.getInstance().getCategory(IUIConstants.ID_CAT_FAVORITES, false);
+				if (favCategory != null) pathes.add(new TreePath(new Object[] { favCategory }));
+			}
+
+			// Determine the default parent
+			Object parent = getParent(element);
+			if (parent != null) pathes.add(new TreePath(new Object[] { parent }));
+    	}
+
+		return pathes.toArray(new TreePath[pathes.size()]);
+    }
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
 	 */
 	@Override
@@ -238,6 +275,15 @@ public class ContentProviderDelegate implements ICommonContentProvider {
 
 		return hasChildren;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ITreePathContentProvider#hasChildren(org.eclipse.jface.viewers.TreePath)
+	 */
+    @Override
+    public boolean hasChildren(TreePath path) {
+    	// hasChildren is independent of the elements tree path
+    	return path != null ? hasChildren(path.getLastSegment()) : false;
+    }
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
