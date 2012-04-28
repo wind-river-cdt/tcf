@@ -24,7 +24,6 @@ import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.tcf.locator.interfaces.IModelListener;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
-import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerRedirector;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelLookupService;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelRefreshService;
@@ -97,14 +96,17 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 							String value = peer.getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
 							boolean isStatic = value != null && Boolean.parseBoolean(value.trim());
 
-							// If it is not a static peer, but launched by the current user,
-							// put it under "MyTargets" too.
 							if (System.getProperty("user.name").equals(peer.getPeer().getUserName())) { //$NON-NLS-1$
 								isStatic = true;
 							}
 
-							if (isStatic && !candidates.contains(peer)) {
-								peer.setProperty(IPeerModelProperties.PROP_PARENT_CATEGORY_ID, catID);
+							boolean isMyTargets = Managers.getCategoryManager().belongsTo(catID, peer.getPeerId());
+							if (!isMyTargets && isStatic) {
+								Managers.getCategoryManager().add(catID, peer.getPeerId());
+								isMyTargets = true;
+							}
+
+							if (isMyTargets && !candidates.contains(peer)) {
 								candidates.add(peer);
 							}
 						}
@@ -114,14 +116,17 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 							String value = peer.getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
 							boolean isStatic = value != null && Boolean.parseBoolean(value.trim());
 
-							// If it is not a static peer, but launched by the current user,
-							// put it under "MyTargets" too.
 							if (System.getProperty("user.name").equals(peer.getPeer().getUserName())) { //$NON-NLS-1$
 								isStatic = true;
 							}
 
-							if (!isStatic && !candidates.contains(peer)) {
-								peer.setProperty(IPeerModelProperties.PROP_PARENT_CATEGORY_ID, catID);
+							boolean isNeighborhood = Managers.getCategoryManager().belongsTo(catID, peer.getPeerId());
+							if (!isNeighborhood && !isStatic) {
+								Managers.getCategoryManager().add(catID, peer.getPeerId());
+								isNeighborhood = true;
+							}
+
+							if (isNeighborhood && !candidates.contains(peer)) {
 								candidates.add(peer);
 							}
 						}
@@ -186,17 +191,14 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 			}
 
 			// Determine the parent category node
-			final AtomicReference<String> parentCatID = new AtomicReference<String>();
-			Runnable runnable = new Runnable() {
-				@Override
-				public void run() {
-					parentCatID.set(((IPeerModel)element).getStringProperty(IPeerModelProperties.PROP_PARENT_CATEGORY_ID));
-				}
-			};
-			if (Protocol.isDispatchThread()) runnable.run();
-			else Protocol.invokeAndWait(runnable);
+			ICategory category = null;
+			String[] categoryIds = Managers.getCategoryManager().getCategoryIds(((IPeerModel)element).getPeerId());
+			// If we have more than one, take the first one as parent category.
+			// To get all parents, the getParents(Object) method must be called
+			if (categoryIds != null && categoryIds.length > 0) {
+				category = CategoriesExtensionPointManager.getInstance().getCategory(categoryIds[0], false);
+			}
 
-			ICategory category = parentCatID.get() != null ? CategoriesExtensionPointManager.getInstance().getCategory(parentCatID.get(), false) : null;
 			return category != null ? category : ((IPeerModel)element).getModel();
 		} else if (element instanceof PeerRedirectorGroupNode) {
 			// Return the parent peer model node

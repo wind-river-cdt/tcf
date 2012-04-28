@@ -76,9 +76,4 @@ public interface IPeerModelProperties {
 	 * Property: The last error the scanner encounter trying to open a channel to this peer.
 	 */
 	public static String PROP_LAST_SCANNER_ERROR = "lastScannerError"; //$NON-NLS-1$
-
-	/**
-	 * Property: The parent category id.
-	 */
-	public static String PROP_PARENT_CATEGORY_ID = "parentCategoryId.silent"; //$NON-NLS-1$
 }
