@@ -104,4 +104,9 @@ public interface ImageConsts {
      * The key to access the base run action image.
      */
     public static final String RUN_DISABLED = "RunDisabled"; //$NON-NLS-1$
+
+    /**
+     * The key to access the peer object link overlay image.
+     */
+    public static final String LINK_OVR = "LinkOverlay"; //$NON-NLS-1$
 }
