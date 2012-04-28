@@ -7,12 +7,15 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.ui.internal.categories;
+package org.eclipse.tcf.te.tcf.ui.handler;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -28,30 +31,17 @@ import org.eclipse.tcf.te.tcf.locator.model.Model;
 import org.eclipse.tcf.te.tcf.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 
-
 /**
- * Category manager implementation.
+ *
  */
-public class CategoryManager {
-	/*
-	 * Thread save singleton instance creation.
-	 */
-	private static class LazyInstance {
-		public static CategoryManager instance = new CategoryManager();
-	}
+public class AlwaysAvailableOfflineCommandHandler extends AbstractHandler {
 
-	/**
-	 * Constructor.
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
 	 */
-	/* default */ CategoryManager() {
-		super();
-	}
-
-	/**
-	 * Returns the singleton instance.
-	 */
-	public static CategoryManager getInstance() {
-		return LazyInstance.instance;
+	@Override
+	public Object execute(ExecutionEvent event) throws ExecutionException {
+		return null;
 	}
 
 	/**

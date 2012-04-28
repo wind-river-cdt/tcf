@@ -13,10 +13,11 @@ import java.util.Iterator;
 
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.TreePath;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
-import org.eclipse.tcf.te.tcf.ui.internal.categories.CategoryManager;
 import org.eclipse.tcf.te.ui.views.Managers;
 import org.eclipse.tcf.te.ui.views.ViewsUtil;
 import org.eclipse.tcf.te.ui.views.interfaces.ICategory;
@@ -61,16 +62,17 @@ public class CommonDnD {
 	/**
 	 * Perform the drop operation over dragged selection.
 	 *
+	 * @param dropAdapter The common drop adapter.
 	 * @param target The target Object to be moved to.
 	 * @param operations The current DnD operation.
 	 * @param selection The local selection being dropped.
 	 * @return true if the dropping is successful.
 	 */
-	public static boolean dropLocalSelection(Object target, int operations, IStructuredSelection selection) {
+	public static boolean dropLocalSelection(CommonDropAdapter dropAdapter, Object target, int operations, IStructuredSelection selection) {
 		if (target instanceof ICategory) {
 			ICategory hovered = (ICategory) target;
-			if (IUIConstants.ID_CAT_FAVORITES.equals(hovered.getId())) {
-				// Mark the peer nodes as favorite
+			if (IUIConstants.ID_CAT_FAVORITES.equals(hovered.getId())
+					|| IUIConstants.ID_CAT_MY_TARGETS.equals(hovered.getId())) {
 				Iterator<?> iterator = selection.iterator();
 				while (iterator.hasNext()) {
 					Object element = iterator.next();
@@ -80,25 +82,33 @@ public class CommonDnD {
 				// Fire a refresh of the view
 				ViewsUtil.refresh(IUIConstants.ID_EXPLORER);
 			}
-			else if (IUIConstants.ID_CAT_MY_TARGETS.equals(hovered.getId())) {
-				// Create a static copy of the dropped peer node
-				Iterator<?> iterator = selection.iterator();
-				while (iterator.hasNext()) {
-					Object element = iterator.next();
-					if (!(element instanceof IPeerModel)) continue;
-					CategoryManager.getInstance().addToMyTargets((IPeerModel)element);
-				}
-				// Fire a refresh of the view
-				ViewsUtil.refresh(IUIConstants.ID_EXPLORER);
-			}
 		} else if (target instanceof IRoot) {
-			// Remove the peer nodes from the favorites list
 			Iterator<?> iterator = selection.iterator();
 			while (iterator.hasNext()) {
 				Object element = iterator.next();
 				if (!(element instanceof IPeerModel)) continue;
-				Managers.getCategoryManager().remove(IUIConstants.ID_CAT_FAVORITES, ((IPeerModel)element).getPeerId());
+
+				// To determine the parent category, we have to look at the tree path
+				TreePath[] pathes = selection instanceof TreeSelection ? ((TreeSelection)selection).getPathsFor(element) : null;
+				if (pathes != null && pathes.length > 0) {
+					for (TreePath path : pathes) {
+						ICategory category = null;
+						TreePath parentPath = path.getParentPath();
+						while (parentPath != null) {
+							if (parentPath.getLastSegment() instanceof ICategory) {
+								category = (ICategory)parentPath.getLastSegment();
+								break;
+							}
+							parentPath = parentPath.getParentPath();
+						}
+
+						if (category != null) {
+							Managers.getCategoryManager().remove(category.getId(), ((IPeerModel)element).getPeerId());
+						}
+					}
+				}
 			}
+
 			// Fire a refresh of the view
 			ViewsUtil.refresh(IUIConstants.ID_EXPLORER);
 		}
@@ -135,14 +145,16 @@ public class CommonDnD {
 			if (!IUIConstants.ID_CAT_NEIGHBORHOOD.equals(hovered.getId())) {
 				valid = true;
 
-				// If the target is the "Favorites" category, force DROP_LINK operation
-				if (IUIConstants.ID_CAT_FAVORITES.equals(hovered.getId())
+				// If the target is the "Favorites" or the "My Targets" category,
+				// force DROP_LINK operation
+				if ((IUIConstants.ID_CAT_FAVORITES.equals(hovered.getId()) || IUIConstants.ID_CAT_MY_TARGETS.equals(hovered.getId()))
 						&& (operation & DND.DROP_LINK) == 0) {
 					overrideOperation = DND.DROP_LINK;
 				}
 			}
 		} else if (target instanceof IRoot) {
-			// Allow to drag into empty space from favorite nodes only
+			// Allow to drag into empty space either from "Favorites"
+			// or "My Targets" category only
 			boolean allow = true;
 			Iterator<?> iterator = selection.iterator();
 			while (iterator.hasNext()) {
@@ -151,7 +163,8 @@ public class CommonDnD {
 					allow = false;
 					break;
 				}
-				if (!Managers.getCategoryManager().belongsTo(IUIConstants.ID_CAT_FAVORITES, ((IPeerModel)element).getPeerId())) {
+				if (!Managers.getCategoryManager().belongsTo(IUIConstants.ID_CAT_FAVORITES, ((IPeerModel)element).getPeerId())
+						&& !Managers.getCategoryManager().belongsTo(IUIConstants.ID_CAT_MY_TARGETS, ((IPeerModel)element).getPeerId())) {
 					allow = false;
 					break;
 				}

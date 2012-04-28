@@ -47,7 +47,7 @@ public class DropAssistant extends CommonDropAdapterAssistant {
 		if (LocalSelectionTransfer.getTransfer().isSupportedType(transferType)) {
 			IStructuredSelection selection = (IStructuredSelection) event.data;
 			int operations = adapter.getCurrentOperation();
-			sucess = CommonDnD.dropLocalSelection(target, operations, selection);
+			sucess = CommonDnD.dropLocalSelection(adapter, target, operations, selection);
 		}
 		return sucess ? Status.OK_STATUS : Status.CANCEL_STATUS;
 	}
