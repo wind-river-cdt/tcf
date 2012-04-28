@@ -54,7 +54,6 @@
 		<module>target_explorer/plugins/org.eclipse.tcf.te.ui.terminals.ssh</module>
 		<module>target_explorer/plugins/org.eclipse.tcf.te.ui.terminals.telnet</module>
 		<module>target_explorer/plugins/org.eclipse.tcf.te.ui.views</module>
-		<module>target_explorer/plugins/org.eclipse.tcf.te.ui.views.workingsets</module>
 		<module>target_explorer/plugins/org.eclipse.tcf.te.tcf.core</module>
 		<module>target_explorer/plugins/org.eclipse.tcf.te.tcf.core.model</module>
 		<module>target_explorer/plugins/org.eclipse.tcf.te.tcf.core.scripting</module>

@@ -441,15 +441,6 @@
 											</sourcefiles>
 										</group>
 										
-										<group name="org.eclipse.tcf.te.ui.views.workingsets">
-											<classfiles>
-												<fileset dir="${basedir}/../org.eclipse.tcf.te.ui.views.workingsets/target/classes"/>
-											</classfiles>
-											<sourcefiles>
-												<fileset dir="${basedir}/../org.eclipse.tcf.te.ui.views.workingsets/src"/>
-											</sourcefiles>
-										</group>
-										
 									</structure>
 								
 									<html destdir="${project.build.directory}/coverage"
