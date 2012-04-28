@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.core.AbstractPeer;
 import org.eclipse.tcf.core.TransientPeer;
+import org.eclipse.tcf.osgi.services.IValueAddService;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
@@ -397,6 +398,59 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager#getRedirectionPath(org.eclipse.tcf.protocol.IPeer, org.eclipse.tcf.osgi.services.IValueAddService.DoneGetRedirectionPath)
+	 */
+	@Override
+	public void getRedirectionPath(final IPeer peer, final IValueAddService.DoneGetRedirectionPath done) {
+		Runnable runnable = new Runnable() {
+			@Override
+            public void run() {
+				Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+				internalGetRedirectionPath(peer, done);
+			}
+		};
+		if (Protocol.isDispatchThread()) runnable.run();
+		else Protocol.invokeLater(runnable);
+	}
+
+	/**
+	 * Returns the redirection path for the given peer. If needed, the required
+	 * value-add's are launched.
+	 *
+	 * @param peer The peer. Must not be <code>null</code>.
+	 * @param done The client callback. Must not be <code>null</code>.
+	 */
+	/* default */ void internalGetRedirectionPath(final IPeer peer, final IValueAddService.DoneGetRedirectionPath done) {
+		Assert.isNotNull(peer);
+		Assert.isNotNull(done);
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+
+		internalHandleValueAdds(peer, new DoneHandleValueAdds() {
+			@Override
+			public void doneHandleValueAdds(final Throwable error, final IValueAdd[] valueAdds) {
+				StringBuilder redirectionPath = new StringBuilder();
+				String peerId = peer.getID();
+
+				// If the error is null, continue and open the channel
+				if (error == null && valueAdds != null && valueAdds.length > 0) {
+					for (IValueAdd valueAdd : valueAdds) {
+						if (redirectionPath.length() > 0) redirectionPath.append("/"); //$NON-NLS-1$
+						redirectionPath.append(valueAdd.getPeer(peerId).getID());
+					}
+				}
+
+				// Append target peer
+				if (redirectionPath.length() > 0) redirectionPath.append("/"); //$NON-NLS-1$
+				redirectionPath.append(peerId);
+
+				// Invoke the callback
+				done.doneGetRedirectionPath(error, redirectionPath.toString());
+			}
+		});
+	}
+
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager#closeChannel(org.eclipse.tcf.protocol.IChannel)
 	 */
 	@Override
@@ -560,14 +614,12 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 		void doneHandleValueAdds(Throwable error, IValueAdd[] valueAdds);
 	}
 
-	/* default */ final Map<IPeer, List<DoneHandleValueAdds>> inProgress = new HashMap<IPeer, List<DoneHandleValueAdds>>();
-
 	/**
 	 * Check on the value-adds for the given peer. Launch the value-adds
 	 * if necessary.
 	 *
-	 * @param id The peer id. Must not be <code>null</code>.
 	 * @param peer The peer. Must not be <code>null</code>.
+	 * @param flags Map containing the flags to parameterize the channel opening, or <code>null</code>.
 	 * @param done The client callback. Must not be <code>null</code>.
 	 */
 	/* default */ void internalHandleValueAdds(final IPeer peer, final Map<String, Boolean> flags, final DoneHandleValueAdds done) {
@@ -596,6 +648,26 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 			done.doneHandleValueAdds(null, null);
 			return;
 		}
+
+		internalHandleValueAdds(peer, done);
+	}
+
+	/* default */ final Map<IPeer, List<DoneHandleValueAdds>> inProgress = new HashMap<IPeer, List<DoneHandleValueAdds>>();
+
+	/**
+	 * Check on the value-adds for the given peer. Launch the value-adds
+	 * if necessary.
+	 *
+	 * @param peer The peer. Must not be <code>null</code>.
+	 * @param done The client callback. Must not be <code>null</code>.
+	 */
+	/* default */ void internalHandleValueAdds(final IPeer peer, final DoneHandleValueAdds done) {
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+		Assert.isNotNull(peer);
+		Assert.isNotNull(done);
+
+		// Get the peer id
+		final String id = peer.getID();
 
 		// If a launch for the same value add is in progress already, attach the new done to
 		// the list to call and drop out
