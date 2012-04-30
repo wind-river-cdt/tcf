@@ -130,6 +130,7 @@ class ChannelProxy {
                 public void onChannelClosed(Throwable error) {
                     ch_y.removeChannelListener(this);
                     if (error == null) error = new Exception("Channel closed");
+                    ch_x.terminate(error);
                 }
 
                 public void onChannelOpened() {

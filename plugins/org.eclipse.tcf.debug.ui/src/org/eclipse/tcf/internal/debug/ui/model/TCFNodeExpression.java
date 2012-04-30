@@ -972,7 +972,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
                 break;
             }
         }
-        if (s == null) s = "N/A";
+        assert s != null;
         return s;
     }
 
@@ -1648,6 +1648,8 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
                                     switch(eval.getTypeClass()) {
                                     case real:
                                         is_float = true;
+                                        signed = true;
+                                        break;
                                     case integer:
                                         signed = true;
                                         break;

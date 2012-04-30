@@ -610,7 +610,7 @@ public abstract class AbstractChannel implements IChannel {
         synchronized (out_queue) {
             out_queue.clear();
             out_queue.add(null);
-            out_queue.notify();
+            out_queue.notifyAll();
         }
         out_thread.join(timeout);
     }
@@ -657,6 +657,7 @@ public abstract class AbstractChannel implements IChannel {
                     else if (error != null) x = new Exception(error);
                     else x = new IOException("Channel is closed");
                     for (Message msg : out_tokens.values()) {
+                        assert msg.token != null;
                         try {
                             String s = msg.toString();
                             if (s.length() > 72) s = s.substring(0, 72) + "...]";
@@ -773,7 +774,7 @@ public abstract class AbstractChannel implements IChannel {
         msg.trace = trace_listeners;
         synchronized (out_queue) {
             out_queue.add(msg);
-            out_queue.notify();
+            out_queue.notifyAll();
         }
     }
 
@@ -788,13 +789,14 @@ public abstract class AbstractChannel implements IChannel {
         Token token = new Token(listener) {
             @Override
             public boolean cancel() {
+                assert msg.token == this;
                 assert Protocol.isDispatchThread();
                 if (state != STATE_OPEN) return false;
                 synchronized (out_queue) {
                     if (msg.is_sent) return false;
                     msg.is_canceled = true;
                 }
-                out_tokens.remove(msg.token.getID());
+                out_tokens.remove(getID());
                 return true;
             }
         };
@@ -877,6 +879,8 @@ public abstract class AbstractChannel implements IChannel {
             }
             switch (msg.type) {
             case 'C':
+                assert msg.service != null;
+                assert msg.name != null;
                 if (state == STATE_OPENING) {
                     throw new IOException("Received command " + msg.service + "." + msg.name + " before Hello message");
                 }
@@ -915,6 +919,8 @@ public abstract class AbstractChannel implements IChannel {
                 }
                 break;
             case 'E':
+                assert msg.service != null;
+                assert msg.name != null;
                 boolean hello = msg.service.equals(ILocator.NAME) && msg.name.equals("Hello");
                 if (hello) {
                     remote_service_by_name.clear();

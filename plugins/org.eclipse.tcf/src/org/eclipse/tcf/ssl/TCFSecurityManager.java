@@ -43,7 +43,7 @@ import org.eclipse.tcf.protocol.Protocol;
  */
 public class TCFSecurityManager {
 
-    public static File getCertificatesDirectory() {
+    public static File getCertificatesDirectory() throws IOException {
         File certs;
         try {
             certs = Activator.getDefault().getStateLocation().append("certificates").toFile(); //$NON-NLS-1$
@@ -53,7 +53,7 @@ public class TCFSecurityManager {
             certs = new File(System.getProperty("user.home"), ".tcf");
             certs = new File(certs, "certificates");
         }
-        if (!certs.exists()) certs.mkdirs();
+        if (!certs.exists() && !certs.mkdirs()) throw new IOException("Cannot create directory: " + certs);
         return certs;
     }
 
@@ -61,10 +61,12 @@ public class TCFSecurityManager {
         File file = null;
         String osname = System.getProperty("os.name", "");
         if (osname.startsWith("Windows")) {
+            Process prs = null;
+            BufferedReader inp = null;
             try {
                 String sys_root = "SystemRoot";
-                Process prs = Runtime.getRuntime().exec(new String[]{ "cmd", "/c", "set", sys_root }, null);
-                BufferedReader inp = new BufferedReader(new InputStreamReader(prs.getInputStream()));
+                prs = Runtime.getRuntime().exec(new String[]{ "cmd", "/c", "set", sys_root }, null);
+                inp = new BufferedReader(new InputStreamReader(prs.getInputStream()));
                 for (;;) {
                     String s = inp.readLine();
                     if (s == null) break;
@@ -83,10 +85,21 @@ public class TCFSecurityManager {
                     inp.close();
                 }
                 catch (IOException x) {
+                    Protocol.log("Cannot close child process I/O streams", x); //$NON-NLS-1$
                 }
                 prs.waitFor();
             }
             catch (Throwable x) {
+                Protocol.log("Cannot get system directory name", x); //$NON-NLS-1$
+                try {
+                    if (prs != null) {
+                        prs.getErrorStream().close();
+                        prs.getOutputStream().close();
+                    }
+                    if (inp != null) inp.close();
+                }
+                catch (IOException y) {
+                }
             }
         }
         else {
@@ -118,7 +131,7 @@ public class TCFSecurityManager {
                         inp.close();
                         return new X509Certificate[] { cert };
                     }
-                    catch (Exception x) {
+                    catch (Throwable x) {
                         Protocol.log("Cannot read certificate: " + f, x); //$NON-NLS-1$
                         try {
                             if (inp != null) inp.close();

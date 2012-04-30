@@ -320,7 +320,6 @@ public class TCFBreakpointsModel {
         String id = (String)marker.getAttributes().get(ATTR_ID);
         if (id != null) return id;
         id = marker.getResource().getLocationURI().toString();
-        if (id == null) return null;
         return id + ':' + marker.getId();
     }
 
@@ -539,7 +538,7 @@ public class TCFBreakpointsModel {
         }
         Number line = (Number)p.get(IBreakpoints.PROP_LINE);
         if (line != null) {
-            m.put(ATTR_LINE, new Integer(line.intValue()));
+            m.put(ATTR_LINE, Integer.valueOf(line.intValue()));
             Number column = (Number)p.get(IBreakpoints.PROP_COLUMN);
             if (column != null) {
                 m.put(IMarker.CHAR_START, new Integer(column.intValue()));
@@ -623,7 +622,7 @@ public class TCFBreakpointsModel {
             Integer line = (Integer)p.get(ATTR_REQESTED_LINE);
             if (line == null || line < 0) line = (Integer)p.get(ATTR_LINE);
             if (line != null && line >= 0) {
-                m.put(IBreakpoints.PROP_LINE, new Integer(line.intValue()));
+                m.put(IBreakpoints.PROP_LINE, Integer.valueOf(line.intValue()));
                 Integer column = (Integer)p.get(ATTR_REQESTED_CHAR);
                 if (column == null || column < 0) column = (Integer)p.get(ATTR_CHAR);
                 if (column != null && column >= 0) m.put(IBreakpoints.PROP_COLUMN, column);

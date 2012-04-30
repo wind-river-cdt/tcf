@@ -187,9 +187,11 @@ public class TraceView extends ViewPart implements Protocol.ChannelOpenListener 
             catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            tab2page.remove(tab);
-            tab.dispose();
-            tab = null;
+            if (tab != null) {
+                tab2page.remove(tab);
+                tab.dispose();
+                tab = null;
+            }
             text = null;
             if (tab2page.isEmpty()) hideTabs();
         }

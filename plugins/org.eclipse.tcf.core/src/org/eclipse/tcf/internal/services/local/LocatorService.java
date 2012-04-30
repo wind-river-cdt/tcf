@@ -408,8 +408,8 @@ public class LocatorService implements ILocator {
 
     private Map<String,Object> makeErrorReport(int code, String msg) {
         Map<String,Object> err = new HashMap<String,Object>();
-        err.put(IErrorReport.ERROR_TIME, new Long(System.currentTimeMillis()));
-        err.put(IErrorReport.ERROR_CODE, new Integer(code));
+        err.put(IErrorReport.ERROR_TIME, Long.valueOf(System.currentTimeMillis()));
+        err.put(IErrorReport.ERROR_CODE, Integer.valueOf(code));
         err.put(IErrorReport.ERROR_FORMAT, msg);
         return err;
     }

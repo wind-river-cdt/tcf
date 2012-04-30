@@ -208,10 +208,10 @@ public abstract class Command implements IChannel.ICommandListener {
             bf.append('\n');
             bf.append("Severity: ");
             switch (severity.intValue()) {
-            case IErrorReport.SEVERITY_ERROR: bf.append("Error");
-            case IErrorReport.SEVERITY_FATAL: bf.append("Fatal");
-            case IErrorReport.SEVERITY_WARNING: bf.append("Warning");
-            default: bf.append("Unknown");
+            case IErrorReport.SEVERITY_ERROR: bf.append("Error"); break;
+            case IErrorReport.SEVERITY_FATAL: bf.append("Fatal"); break;
+            case IErrorReport.SEVERITY_WARNING: bf.append("Warning"); break;
+            default: bf.append("Unknown"); break;
             }
         }
         bf.append('\n');

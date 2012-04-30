@@ -11,7 +11,6 @@
 package org.eclipse.tcf.core;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.eclipse.tcf.internal.core.RemotePeer;
@@ -63,24 +62,9 @@ public class AbstractPeer extends TransientPeer {
     }
 
     public void updateAttributes(Map<String,String> attrs) {
-        boolean equ = true;
-        assert attrs.get(ATTR_ID).equals(rw_attrs.get(ATTR_ID));
-        for (Iterator<String> i = rw_attrs.keySet().iterator(); i.hasNext();) {
-            String key = i.next();
-            if (!rw_attrs.get(key).equals(attrs.get(key))) {
-                equ = false;
-                break;
-            }
-        }
-        for (Iterator<String> i = attrs.keySet().iterator(); i.hasNext();) {
-            String key = i.next();
-            if (!attrs.get(key).equals(rw_attrs.get(key))) {
-                equ = false;
-                break;
-            }
-        }
         long time = System.currentTimeMillis();
-        if (!equ) {
+        if (!attrs.equals(ro_attrs)) {
+            assert attrs.get(ATTR_ID).equals(rw_attrs.get(ATTR_ID));
             rw_attrs.clear();
             rw_attrs.putAll(attrs);
             for (LocatorListener l : LocatorService.getListeners()) {

@@ -378,8 +378,8 @@ public class TCFNodeStackFrame extends TCFNode {
                                 if (!sym.getFlag(ISymbols.SYM_FLAG_PARAMETER)) continue;
                                 if (cnt > 0) bf.append(',');
                                 if (show_arg_names) {
-                                    String name = "?";
-                                    if (sym != null && sym.getName() != null) name = sym.getName();
+                                    String name = sym.getName();
+                                    if (name == null) name = "?";
                                     bf.append(name);
                                     if (show_arg_values) bf.append('=');
                                 }

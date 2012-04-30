@@ -55,5 +55,37 @@
 			<Method name="initialize"/>
 		</And>
 	</Match>
+
+	<!-- Filters for org.eclipse.tcf bundle -->
+	<Match>
+		<Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+		<And>
+			<Class name="org.eclipse.tcf.Activator"/>
+			<Method name="initialize"/>
+		</And>
+	</Match>
+
+	<!-- Filters for org.eclipse.tcf.core bundle -->
+	<Match>
+		<Bug pattern="EI_EXPOSE_REP2"/>
+		<And>
+			<Class name="org.eclipse.tcf.core.Command"/>
+			<Method name="initialize"/>
+		</And>
+	</Match>
+	<Match>
+		<Bug pattern="STCAL_INVOKE_ON_STATIC_DATE_FORMAT_INSTANCE"/>
+		<And>
+			<Class name="org.eclipse.tcf.core.Command"/>
+			<Method name="appendErrorProps"/>
+		</And>
+	</Match>
+
 	
+	<!-- Filters for org.eclipse.tcf.debug.ui bundle -->
+	<Match>
+		<Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+		<Class name="org.eclipse.tcf.internal.debug.ui.model.TCFNodeSymbol"/>
+	</Match>
+
 </FindBugsFilter>

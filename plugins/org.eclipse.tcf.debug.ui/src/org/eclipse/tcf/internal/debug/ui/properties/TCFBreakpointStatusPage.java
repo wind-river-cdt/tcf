@@ -93,6 +93,14 @@ public class TCFBreakpointStatusPage extends PropertyPage {
             if (n.object instanceof TCFNode) return -1;
             return 0;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof StatusItem) {
+                return compareTo((StatusItem)o) == 0;
+            }
+            return false;
+        }
     }
 
     private class StatusCache extends TCFDataCache<StatusItem> {
@@ -293,7 +301,7 @@ public class TCFBreakpointStatusPage extends PropertyPage {
 
         public Object[] getChildren(Object parent) {
             StatusItem x = (StatusItem)parent;
-            if (x.children == null) return null;
+            if (x.children == null) return new Object[0];
             Object[] arr = x.children.toArray(new StatusItem[x.children.size()]);
             Arrays.sort(arr);
             return arr;
@@ -411,7 +419,6 @@ public class TCFBreakpointStatusPage extends PropertyPage {
 
     @SuppressWarnings("unchecked")
     private Object[] toObjectArray(Object o) {
-        if (o == null) return null;
         Collection<Object> c = (Collection<Object>)o;
         return (Object[])c.toArray(new Object[c.size()]);
     }

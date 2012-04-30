@@ -36,4 +36,12 @@ public class TCFMemoryRegion extends org.eclipse.tcf.util.TCFMemoryRegion implem
         if (r.addr == null) return +1;
         return addr.compareTo(r.addr);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof TCFMemoryRegion) {
+            return compareTo((TCFMemoryRegion)o) == 0;
+        }
+        return false;
+    }
 }
