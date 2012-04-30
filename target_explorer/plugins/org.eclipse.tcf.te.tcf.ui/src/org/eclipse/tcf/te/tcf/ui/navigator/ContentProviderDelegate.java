@@ -96,12 +96,10 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 							String value = peer.getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
 							boolean isStatic = value != null && Boolean.parseBoolean(value.trim());
 
-							if (System.getProperty("user.name").equals(peer.getPeer().getUserName())) { //$NON-NLS-1$
-								isStatic = true;
-							}
-
+							// Static peers, or if launched by current user -> add automatically to "My Targets"
+							boolean startedByCurrentUser = System.getProperty("user.name").equals(peer.getPeer().getUserName()); //$NON-NLS-1$
 							boolean isMyTargets = Managers.getCategoryManager().belongsTo(catID, peer.getPeerId());
-							if (!isMyTargets && isStatic) {
+							if (!isMyTargets && (isStatic || startedByCurrentUser)) {
 								Managers.getCategoryManager().add(catID, peer.getPeerId());
 								isMyTargets = true;
 							}
@@ -116,17 +114,13 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 							String value = peer.getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
 							boolean isStatic = value != null && Boolean.parseBoolean(value.trim());
 
-							if (System.getProperty("user.name").equals(peer.getPeer().getUserName())) { //$NON-NLS-1$
-								isStatic = true;
-							}
-
 							boolean isNeighborhood = Managers.getCategoryManager().belongsTo(catID, peer.getPeerId());
 							if (!isNeighborhood && !isStatic) {
 								Managers.getCategoryManager().add(catID, peer.getPeerId());
 								isNeighborhood = true;
 							}
 
-							if (isNeighborhood && !candidates.contains(peer)) {
+							if ((isNeighborhood || !isStatic) && !candidates.contains(peer)) {
 								candidates.add(peer);
 							}
 						}

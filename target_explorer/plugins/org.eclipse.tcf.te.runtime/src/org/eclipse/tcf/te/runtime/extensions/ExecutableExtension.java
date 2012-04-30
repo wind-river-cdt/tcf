@@ -133,4 +133,23 @@ public class ExecutableExtension extends PlatformObject implements IExecutableEx
 	public String getDescription() {
 		return description != null ? description.trim() : ""; //$NON-NLS-1$
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof ExecutableExtension) {
+			return id.equals(((ExecutableExtension)obj).id);
+		}
+	    return super.equals(obj);
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+	    return id.hashCode();
+	}
 }

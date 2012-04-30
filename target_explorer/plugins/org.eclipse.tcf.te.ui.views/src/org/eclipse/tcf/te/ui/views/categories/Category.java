@@ -113,4 +113,18 @@ public class Category extends ExecutableExtension implements ICategory, IDisposa
 	public int getRank() {
 	    return rank;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuffer buffer = new StringBuffer(getLabel());
+		buffer.append(" ["); //$NON-NLS-1$
+		buffer.append(getId());
+		buffer.append("] {rank="); //$NON-NLS-1$
+		buffer.append(getRank());
+		buffer.append("}"); //$NON-NLS-1$
+	    return buffer.toString();
+	}
 }

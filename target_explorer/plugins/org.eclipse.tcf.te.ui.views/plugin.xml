@@ -287,8 +287,8 @@
             <visibleWhen checkEnabled="true"/>
          </menu>
       </menuContribution>
-      <menuContribution
-            locationURI="menu:org.eclipse.tcf.te.ui.views.View?after=additions">
+      
+      <menuContribution locationURI="menu:org.eclipse.tcf.te.ui.views.View?after=additions">
          <separator
                name="group.filters"
                visible="true">
@@ -320,6 +320,39 @@
                style="push">
          </command>
       </menuContribution>
+      
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.categories">
+         <menu
+               id="org.eclipse.tcf.te.ui.views.menu.categories.add"
+               label="%menu.categories.addto.label">
+               <dynamic
+                     id="org.eclipse.tcf.te.ui.views.dynamic.categories.add.multi"
+                     class="org.eclipse.tcf.te.ui.views.internal.categories.CategoryAddToContributionItem">
+                     <visibleWhen checkEnabled="false">
+                        <with variable="selection">
+                           <test property="org.eclipse.tcf.te.ui.views.validAddToCategoriesCount" value="(1-"/>
+                           <iterate operator="and" ifEmpty="false">
+                              <adapt type="org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizable"/>
+                           </iterate>
+                        </with>
+                     </visibleWhen>
+               </dynamic>
+         </menu>
+
+         <dynamic
+               id="org.eclipse.tcf.te.ui.views.dynamic.categories.add.single"
+               class="org.eclipse.tcf.te.ui.views.internal.categories.CategoryAddToContributionItem">
+               <visibleWhen checkEnabled="false">
+                  <with variable="selection">
+                     <test property="org.eclipse.tcf.te.ui.views.validAddToCategoriesCount" value="1"/>
+                     <iterate operator="and" ifEmpty="false">
+                        <adapt type="org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizable"/>
+                     </iterate>
+                  </with>
+               </visibleWhen>
+         </dynamic>
+      </menuContribution>
+
    </extension>
 
 <!-- Command contributions -->
@@ -504,9 +537,26 @@
             class="org.eclipse.tcf.te.ui.views.internal.categories.CategoryPropertyTester"
             id="org.eclipse.tcf.te.ui.views.categories.CategoryPropertyTester"
             namespace="org.eclipse.tcf.te.ui.views"
-            properties="isCategoryID,parentCategoryId,belongsTo"
-            type="java.lang.Object">
+            properties="isCategoryID,belongsTo"
+            type="org.eclipse.tcf.te.ui.views.interfaces.ICategory">
       </propertyTester>
+
+      <propertyTester
+            class="org.eclipse.tcf.te.ui.views.internal.categories.CategoryPropertyTester"
+            id="org.eclipse.tcf.te.ui.views.categories.CategoryPropertyTester"
+            namespace="org.eclipse.tcf.te.ui.views"
+            properties="belongsTo"
+            type="org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizable">
+      </propertyTester>
+
+      <propertyTester
+            class="org.eclipse.tcf.te.ui.views.internal.categories.CategoryPropertyTester"
+            id="org.eclipse.tcf.te.ui.views.categories.CategoryPropertyTester"
+            namespace="org.eclipse.tcf.te.ui.views"
+            properties="parentCategoryId,validAddToCategoriesCount"
+            type="org.eclipse.jface.viewers.ISelection">
+      </propertyTester>
+      
    </extension>
    
 <!-- Preference contributions -->

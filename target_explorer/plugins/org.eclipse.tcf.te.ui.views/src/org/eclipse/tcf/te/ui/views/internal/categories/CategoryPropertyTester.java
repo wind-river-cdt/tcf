@@ -9,8 +9,14 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.views.internal.categories;
 
+import org.eclipse.core.expressions.EvaluationContext;
+import org.eclipse.core.expressions.EvaluationResult;
+import org.eclipse.core.expressions.ICountable;
+import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.expressions.PropertyTester;
+import org.eclipse.core.internal.expressions.CountExpression;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -23,6 +29,7 @@ import org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizable;
 /**
  * Category property tester.
  */
+@SuppressWarnings("restriction")
 public class CategoryPropertyTester extends PropertyTester {
 
 	/* (non-Javadoc)
@@ -49,7 +56,7 @@ public class CategoryPropertyTester extends PropertyTester {
 	 * @return <code>True</code> if the property to test has the expected value, <code>false</code>
 	 *         otherwise.
 	 */
-	protected boolean testSelection(IStructuredSelection selection, String property, Object[] args, Object expectedValue) {
+    protected boolean testSelection(IStructuredSelection selection, String property, Object[] args, Object expectedValue) {
 		Assert.isNotNull(selection);
 
 		if ("parentCategoryId".equals(property) && !selection.isEmpty()) { //$NON-NLS-1$
@@ -73,6 +80,34 @@ public class CategoryPropertyTester extends PropertyTester {
 			}
 		}
 
+		if ("validAddToCategoriesCount".equals(property)) { //$NON-NLS-1$
+			// Determine the number of valid "Add To" Categories
+			AbstractCategoryContributionItem item = new CategoryAddToContributionItem();
+			ICategory[] categories = item.getCategories(selection, true);
+			final int count = categories.length;
+
+			// Re-use the count expression to allow the same value syntax
+			String value = expectedValue instanceof String ? (String)expectedValue : expectedValue != null ? expectedValue.toString() : null;
+			if (value != null) {
+				CountExpression expression =  new CountExpression(value);
+				IEvaluationContext context = new EvaluationContext(null, new ICountable() {
+					@Override
+					public int count() {
+						return count;
+					}
+				});
+
+				EvaluationResult result = EvaluationResult.FALSE;
+				try {
+					result = expression.evaluate(context);
+				} catch (CoreException e) {
+					if (Platform.inDebugMode()) e.printStackTrace();
+				}
+
+				return result.equals(EvaluationResult.TRUE);
+			}
+		}
+
 		return false;
 	}
 
@@ -80,11 +115,11 @@ public class CategoryPropertyTester extends PropertyTester {
 	 * Internal helper to {@link #test(Object, String, Object[], Object)}.
 	 */
 	protected boolean internalTest(Object receiver, String property, Object[] args, Object expectedValue) {
-		ICategorizable adapter = receiver instanceof IAdaptable ? (ICategorizable)((IAdaptable)receiver).getAdapter(ICategorizable.class) : null;
-		if (adapter == null) adapter = (ICategorizable)Platform.getAdapterManager().getAdapter(receiver, ICategorizable.class);
+		ICategorizable categorizable = receiver instanceof IAdaptable ? (ICategorizable)((IAdaptable)receiver).getAdapter(ICategorizable.class) : null;
+		if (categorizable == null) categorizable = (ICategorizable)Platform.getAdapterManager().getAdapter(receiver, ICategorizable.class);
 
-		if ("belongsTo".equals(property) && adapter != null) { //$NON-NLS-1$
-			String id = adapter.getId(receiver);
+		if ("belongsTo".equals(property) && categorizable != null) { //$NON-NLS-1$
+			String id = categorizable.getId();
 			if (id != null && expectedValue instanceof String) {
 				return Managers.getCategoryManager().belongsTo((String)expectedValue, id);
 			}

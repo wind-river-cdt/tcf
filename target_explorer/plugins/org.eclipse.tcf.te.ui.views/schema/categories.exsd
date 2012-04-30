@@ -65,7 +65,7 @@
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="label" type="string">
+         <attribute name="label" type="string" use="required">
             <annotation>
                <documentation>
                   The label representing the category within the UI.

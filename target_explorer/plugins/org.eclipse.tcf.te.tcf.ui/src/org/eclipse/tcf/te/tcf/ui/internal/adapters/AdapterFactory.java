@@ -28,8 +28,6 @@ public class AdapterFactory implements IAdapterFactory {
 	private final IRefreshHandlerDelegate refreshDelegate = new RefreshHandlerDelegate();
 	// The delete handler delegate adapter
 	private final IDeleteHandlerDelegate deleteDelegate = new DeleteHandlerDelegate();
-	// The categorizable element adapter
-	private final ICategorizable categorizableAdapter = new CategorizableAdapter();
 
 	// The adapter class.
 	private Class<?>[] adapters = {
@@ -59,7 +57,7 @@ public class AdapterFactory implements IAdapterFactory {
 				return new PersistablePeerModel((IPeerModel)adaptableObject);
 			}
 			if (ICategorizable.class.equals(adapterType)) {
-				return categorizableAdapter;
+				return new CategorizableAdapter(adaptableObject);
 			}
 
 		}
