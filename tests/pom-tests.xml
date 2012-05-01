@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.eclipse.tcf</groupId>
+		<artifactId>org.eclipse.tcf.maven-build</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../admin/pom-build.xml</relativePath>
+	</parent>
+
+	<groupId>org.eclipse.tcf</groupId>
+	<artifactId>tcf-tests.maven-master</artifactId>
+	<version>1.0.0-SNAPSHOT</version> 
+	<packaging>pom</packaging>
+	<name>TCF Unit Tests, Master</name>
+
+	<modules>
+		<!-- List the modules where we need the class files to create the report -->
+		<module>plugins/org.eclipse.tcf</module>
+		<module>plugins/org.eclipse.tcf.core</module>
+		<module>plugins/org.eclipse.tcf.debug</module>
+		<module>plugins/org.eclipse.tcf.debug.ui</module>
+		<module>plugins/org.eclipse.tcf.cdt.ui</module>
+
+		<module>features/org.eclipse.tcf.feature</module>
+		<module>features/org.eclipse.tcf.sdk.feature</module>
+		<module>features/org.eclipse.tcf.cdt.feature</module>
+		<module>features/org.eclipse.tcf.cdt.sdk.feature</module>
+
+		<!-- The test module executing the tests -->
+		<module>tests/plugins/org.eclipse.tcf.debug.tests</module>
+	</modules>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+						<configuration>
+							<includes>
+								<include>org.eclipse.tcf*</include>
+							</includes>
+							<excludes>
+								<exclude>org.eclipse.tcf.debug.tests*</exclude>
+								<exclude>org.eclipse.tcf.te.*</exclude>
+							</excludes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
