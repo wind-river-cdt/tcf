@@ -31,7 +31,7 @@
 		<module>../features/org.eclipse.tcf.cdt.sdk.feature</module>
 
 		<!-- The test module executing the tests -->
-		<module>plugins/org.eclipse.tcf.debug.tests</module>
+		<module>plugins/org.eclipse.tcf.debug.test</module>
 	</modules>
 
 	<build>
@@ -49,7 +49,7 @@
 								<include>org.eclipse.tcf*</include>
 							</includes>
 							<excludes>
-								<exclude>org.eclipse.tcf.debug.tests*</exclude>
+								<exclude>org.eclipse.tcf.debug.test*</exclude>
 								<exclude>org.eclipse.tcf.te.*</exclude>
 							</excludes>
 						</configuration>
