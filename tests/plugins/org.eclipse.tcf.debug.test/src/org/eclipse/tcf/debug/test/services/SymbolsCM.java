@@ -250,6 +250,60 @@ public class SymbolsCM extends AbstractCacheManager {
         return mapCache(new ContextCacheKey(id));
     }
 
+    private class LocationInfoCache extends SymbolCache<Map<String,Object>> {
+        public LocationInfoCache(InnerLocationInfoCache inner) {
+            super(inner);
+        }
+        @Override
+        protected String getSymbolId() {
+            return ((InnerLocationInfoCache)fInner).fId;
+        }
+    }
+
+    class InnerLocationInfoCache extends TokenCache<Map<String,Object>> implements ISymbols.DoneGetLocationInfo {
+        final String fId;
+        
+        public InnerLocationInfoCache(String id) {
+            fId = id;
+        }
+        @Override
+        protected IToken retrieveToken() {
+            return fService.getLocationInfo(fId, this);
+        }
+        
+        public void doneGetLocationInfo(IToken token, Exception error, Map<String,Object> props) {
+            set(token, props, error);
+        }
+        
+        public void resetContext() {
+            if (isValid()) reset();
+        }
+    }
+    
+    private class LocationInfoCacheKey extends IdKey<LocationInfoCache> {
+        public LocationInfoCacheKey(String id) {
+            super(LocationInfoCache.class, id);
+        }
+        @Override LocationInfoCache createCache() { return new LocationInfoCache( new InnerLocationInfoCache(fId)); }        
+    }
+
+    public ICache<Map<String, Object>> getLocationInfo(String symbol_id) {
+        return mapCache(new LocationInfoCacheKey(symbol_id));        
+    }
+
+    /**
+     * Client call back interface for getLocationInfo().
+     */
+    interface DoneGetLocationInfo {
+        /**
+         * Called when location information retrieval is done.
+         * @param token - command handle.
+         * @param error � error description if operation failed, null if succeeded.
+         * @param props - symbol location properties, see LOC_*.
+         */
+        void doneGetLocationInfo(IToken token, Exception error, Map<String,Object> props);
+    }
+
     private class FindCache extends SymbolCache<String> {
         public FindCache(InnerFindCache inner) {
             super(inner);

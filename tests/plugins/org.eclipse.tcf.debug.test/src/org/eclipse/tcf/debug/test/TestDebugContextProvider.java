@@ -17,6 +17,7 @@ import org.eclipse.debug.internal.ui.viewers.model.provisional.IModelDelta;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IModelDeltaVisitor;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IModelProxy;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.ITreeModelViewer;
+import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.contexts.AbstractDebugContextProvider;
 import org.eclipse.debug.ui.contexts.DebugContextEvent;
 import org.eclipse.jface.viewers.ISelection;
@@ -26,6 +27,8 @@ import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * Copied from org.eclipse.debug.internal.ui.views.launch.LaunchView class.
@@ -36,6 +39,7 @@ import org.eclipse.swt.widgets.Display;
 @SuppressWarnings("restriction")
 public class TestDebugContextProvider extends AbstractDebugContextProvider implements IModelChangedListener, ISelectionChangedListener{
     
+    private IWorkbenchWindow fWindow = null;
     private ISelection fContext = null;
     private ITreeModelViewer fViewer = null;
     private Visitor fVisitor = new Visitor();
@@ -82,9 +86,16 @@ public class TestDebugContextProvider extends AbstractDebugContextProvider imple
         fViewer = viewer;
         fViewer.addModelChangedListener(this);
         fViewer.addSelectionChangedListener(this);
+        fWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        if (fWindow != null) {
+            DebugUITools.getDebugContextManager().getContextService(fWindow).addDebugContextProvider(this);
+        }
     }
     
     protected void dispose() { 
+        if (fWindow != null) {
+            DebugUITools.getDebugContextManager().getContextService(fWindow).removeDebugContextProvider(this);
+        }
         fContext = null;
         fViewer.removeModelChangedListener(this);
         fViewer.removeSelectionChangedListener(this);
