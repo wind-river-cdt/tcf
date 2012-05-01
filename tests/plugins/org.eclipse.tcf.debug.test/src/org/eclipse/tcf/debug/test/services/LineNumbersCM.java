@@ -13,11 +13,8 @@ package org.eclipse.tcf.debug.test.services;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import org.eclipse.tcf.debug.test.util.CallbackCache;
-import org.eclipse.tcf.debug.test.util.DataCallback;
 import org.eclipse.tcf.debug.test.util.ICache;
 import org.eclipse.tcf.debug.test.util.TokenCache;
-import org.eclipse.tcf.debug.test.util.Transaction;
 import org.eclipse.tcf.debug.test.util.TransactionCache;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.ILineNumbers;

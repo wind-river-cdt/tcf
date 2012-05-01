@@ -36,7 +36,6 @@ public class SampleTest extends AbstractTcfUITest {
 
         VirtualItem threadItem = fDebugViewListener.findElement(processItem, new Pattern[] { Pattern.compile(".*" + fThreadId + ".*") }  );
         Assert.assertTrue(threadItem != null);
-
         VirtualItem frameItem = fDebugViewListener.findElement(threadItem, new Pattern[] { Pattern.compile(".*tcf_test_func0.*")});
         Assert.assertTrue(frameItem != null);
     }
@@ -86,6 +85,51 @@ public class SampleTest extends AbstractTcfUITest {
             Assert.assertTrue(!topFrameLabel.equals(previousThreadLabel));
             previousThreadLabel = topFrameLabel;
         }
+    }
+
+    public void testSteppingSourceDisplay() throws Exception {
+        initProcessModel("tcf_test_func0");
+        
+        // Execute step loop
+        String previousThreadLabel = null;
+        for (int stepNum = 0; stepNum < 100; stepNum++) {
+            fDebugViewListener.reset();
+            fSourceDisplayListener.reset();
+            
+            resumeAndWaitForSuspend(fThreadCtx, IRunControl.RM_STEP_INTO_LINE);
+            CodeArea area = calcPCCodeArea();
+            if (area != null) {
+                fSourceDisplayListener.setCodeArea(calcPCCodeArea());
+            }
+
+            fDebugViewListener.waitTillFinished(MODEL_CHANGED_COMPLETE | CONTENT_SEQUENCE_COMPLETE | LABEL_UPDATES_RUNNING);
+            if (area != null) {
+                fSourceDisplayListener.waitTillFinished();
+            }
+            
+            VirtualItem topFrameItem = fDebugViewListener.findElement(
+                new Pattern[] { Pattern.compile(".*"), Pattern.compile(".*"), Pattern.compile(".*" + fProcessId + ".*\\(Step.*"), Pattern.compile(".*")});
+            Assert.assertTrue(topFrameItem != null);
+            String topFrameLabel = ((String[])topFrameItem.getData(VirtualItem.LABEL_KEY))[0];
+            Assert.assertTrue(!topFrameLabel.equals(previousThreadLabel));
+            previousThreadLabel = topFrameLabel;
+        }
+    }
+
+    private CodeArea calcPCCodeArea() throws ExecutionException, InterruptedException {
+        return new Transaction<CodeArea>() {
+            @Override
+            protected CodeArea process() throws Transaction.InvalidCacheException ,ExecutionException {
+                String pc = validate(fRunControlCM.getState(fThreadId)).pc;
+                BigInteger pcNumber = new BigInteger(pc);
+                BigInteger pcNumberPlusOne = pcNumber.add(BigInteger.valueOf(1));
+                CodeArea[] areas = validate(fLineNumbersCM.mapToSource(fThreadId, pcNumber, pcNumberPlusOne));
+                if (areas.length >= 1) {
+                    return areas[0]; 
+                }
+                return null;
+            }
+        }.get();
     }
     
     public void testSymbolsCMResetOnContextRemove() throws Exception {

@@ -96,6 +96,8 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
     protected VirtualViewerUpdatesListener fVariablesViewListener;
     protected VariablesVirtualTreeModelViewer fRegistersViewViewer;
     protected VirtualViewerUpdatesListener fRegistersViewListener;
+    protected TestSourceDisplayService fSourceDisplayService;
+    protected SourceDisplayListener fSourceDisplayListener;
 
     protected Object fTestRunKey;
 
@@ -286,6 +288,8 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
                 fVariablesViewListener = new VirtualViewerUpdatesListener(fVariablesViewViewer);
                 fRegistersViewViewer = new VariablesVirtualTreeModelViewer(IDebugUIConstants.ID_REGISTER_VIEW, fDebugContextProvider);
                 fRegistersViewListener = new VirtualViewerUpdatesListener(fRegistersViewViewer);
+                fSourceDisplayService = new TestSourceDisplayService(fDebugContextProvider);
+                fSourceDisplayListener = new SourceDisplayListener();
             }
         });
     }
@@ -294,6 +298,8 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
         final Display display = Display.getDefault();
         display.syncExec(new Runnable() {
             public void run() {
+                fSourceDisplayListener.dispose();
+                fSourceDisplayService.dispose();
                 fDebugViewListener.dispose();
                 fDebugContextProvider.dispose();
                 fDebugViewViewer.dispose();
