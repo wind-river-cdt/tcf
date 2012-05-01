@@ -53,7 +53,6 @@ public class CategorizableAdapter implements ICategorizable {
     @Override
     public boolean isValid(OPERATION operation, ICategory parentCategory, ICategory category) {
     	Assert.isNotNull(operation);
-    	Assert.isNotNull(parentCategory);
     	Assert.isNotNull(category);
 
     	if (element instanceof IPeerModel) {
