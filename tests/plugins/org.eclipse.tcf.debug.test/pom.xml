@@ -19,7 +19,7 @@
 		<jacoco.append>true</jacoco.append>
 		
 		<sdk-version>3.8.0</sdk-version>
-		<tcf-version>1.0.0</te-version>
+		<tcf-version>1.0.0</tcf-version>
 		
 		<ui.test.vmargs>-Xmx512m -XX:MaxPermSize=256m</ui.test.vmargs>
 	</properties>
