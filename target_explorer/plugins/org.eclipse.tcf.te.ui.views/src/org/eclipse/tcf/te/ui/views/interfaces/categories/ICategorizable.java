@@ -34,7 +34,7 @@ public interface ICategorizable {
 	 * category and destination category.
 	 *
 	 * @param operation The operation. Must not be <code>null</code>.
-	 * @param parentCategory The parent category. Must not be <code>null</code>.
+	 * @param parentCategory The parent category or <code>null</code>.
 	 * @param category The destination category. Must not be <code>null</code>.
 	 *
 	 * @return <code>True</code> if the operation is valid, <code>false</code> otherwise.
