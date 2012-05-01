@@ -19,19 +19,19 @@
 
 	<modules>
 		<!-- List the modules where we need the class files to create the report -->
-		<module>plugins/org.eclipse.tcf</module>
-		<module>plugins/org.eclipse.tcf.core</module>
-		<module>plugins/org.eclipse.tcf.debug</module>
-		<module>plugins/org.eclipse.tcf.debug.ui</module>
-		<module>plugins/org.eclipse.tcf.cdt.ui</module>
+		<module>../plugins/org.eclipse.tcf</module>
+		<module>../plugins/org.eclipse.tcf.core</module>
+		<module>../plugins/org.eclipse.tcf.debug</module>
+		<module>../plugins/org.eclipse.tcf.debug.ui</module>
+		<module>../plugins/org.eclipse.tcf.cdt.ui</module>
 
-		<module>features/org.eclipse.tcf.feature</module>
-		<module>features/org.eclipse.tcf.sdk.feature</module>
-		<module>features/org.eclipse.tcf.cdt.feature</module>
-		<module>features/org.eclipse.tcf.cdt.sdk.feature</module>
+		<module>../features/org.eclipse.tcf.feature</module>
+		<module>../features/org.eclipse.tcf.sdk.feature</module>
+		<module>../features/org.eclipse.tcf.cdt.feature</module>
+		<module>../features/org.eclipse.tcf.cdt.sdk.feature</module>
 
 		<!-- The test module executing the tests -->
-		<module>tests/plugins/org.eclipse.tcf.debug.tests</module>
+		<module>plugins/org.eclipse.tcf.debug.tests</module>
 	</modules>
 
 	<build>
