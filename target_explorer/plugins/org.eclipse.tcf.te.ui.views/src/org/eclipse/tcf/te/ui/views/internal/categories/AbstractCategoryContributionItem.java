@@ -192,6 +192,8 @@ public abstract class AbstractCategoryContributionItem extends CompoundContribut
 		Iterator<?> iterator = selection.iterator();
 		while (iterator.hasNext()) {
 			Object element = iterator.next();
+			if (getCategorizable(element) == null) continue;
+
 			ICategory parentCategory = getParentCategory(element, selection);
 
 			List<ICategory> candidates = new ArrayList<ICategory>();
@@ -237,7 +239,7 @@ public abstract class AbstractCategoryContributionItem extends CompoundContribut
 	 * Tests if the given combination is valid. If not valid, the combination
 	 * will not be added to the menu.
 	 *
-	 * @param parentCategory The parent category. Must not be <code>null</code>.
+	 * @param parentCategory The parent category or <code>null</code>.
 	 * @param element The element. Must not be <code>null</code>.
 	 * @param category The category. Must not be <code>null</code>.
 	 *
@@ -281,6 +283,7 @@ public abstract class AbstractCategoryContributionItem extends CompoundContribut
 					}
 					parentPath = parentPath.getParentPath();
 				}
+				if (parent != null) break;
 			}
 		}
 

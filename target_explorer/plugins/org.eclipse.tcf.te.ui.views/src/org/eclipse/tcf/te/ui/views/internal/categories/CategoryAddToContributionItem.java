@@ -88,7 +88,6 @@ public class CategoryAddToContributionItem extends AbstractCategoryContributionI
 	 */
 	@Override
 	protected boolean isValid(ICategory parentCategory, Object element, ICategory category) {
-		Assert.isNotNull(parentCategory);
 		Assert.isNotNull(element);
 		Assert.isNotNull(category);
 
