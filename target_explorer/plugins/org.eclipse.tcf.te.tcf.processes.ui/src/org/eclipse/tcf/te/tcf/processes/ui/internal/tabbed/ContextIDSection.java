@@ -70,7 +70,6 @@ public class ContextIDSection extends BaseTitledSection {
     protected void updateInput(IPeerModelProvider input) {
         Assert.isTrue(input instanceof ProcessTreeNode);
         ProcessTreeNode node = (ProcessTreeNode) input;
-        Assert.isNotNull(node.context);
         context = node.context;
     }
 
@@ -80,15 +79,15 @@ public class ContextIDSection extends BaseTitledSection {
 	 */
 	@Override
     public void refresh() {
-		this.idText.setText(context.getID() != null ? "" : context.getID()); //$NON-NLS-1$
-		this.parentIdText.setText(context.getParentID()==null?"":context.getParentID()); //$NON-NLS-1$
-		this.pgrpText.setText(""+context.getPGRP()); //$NON-NLS-1$
-		this.pidText.setText(""+context.getPID()); //$NON-NLS-1$
-		this.ppidText.setText(""+context.getPPID()); //$NON-NLS-1$
-		this.tgidText.setText(""+context.getTGID()); //$NON-NLS-1$
-		this.tracerPidText.setText(""+context.getTracerPID()); //$NON-NLS-1$
-		this.uidText.setText(""+context.getUID()); //$NON-NLS-1$
-		this.ugidText.setText("" +context.getUGID()); //$NON-NLS-1$
+		this.idText.setText(context == null ? "" : (context.getID() != null ? "" : context.getID())); //$NON-NLS-1$ //$NON-NLS-2$
+		this.parentIdText.setText(context == null ? "" : (context.getParentID()==null?"":context.getParentID())); //$NON-NLS-1$ //$NON-NLS-2$
+		this.pgrpText.setText(context == null ? "" : (""+context.getPGRP())); //$NON-NLS-1$ //$NON-NLS-2$
+		this.pidText.setText(context == null ? "" : (""+context.getPID())); //$NON-NLS-1$ //$NON-NLS-2$
+		this.ppidText.setText(context == null ? "" : (""+context.getPPID())); //$NON-NLS-1$ //$NON-NLS-2$
+		this.tgidText.setText(context == null ? "" : (""+context.getTGID())); //$NON-NLS-1$ //$NON-NLS-2$
+		this.tracerPidText.setText(context == null ? "" : (""+context.getTracerPID())); //$NON-NLS-1$ //$NON-NLS-2$
+		this.uidText.setText(context == null ? "" : (""+context.getUID())); //$NON-NLS-1$ //$NON-NLS-2$
+		this.ugidText.setText(context == null ? "" : ("" +context.getUGID())); //$NON-NLS-1$ //$NON-NLS-2$
 		super.refresh();
     }
 

@@ -45,6 +45,6 @@ public class MapContentProvider implements IStructuredContentProvider {
 			Map<?, ?> map = (Map<?, ?>) inputElement;
 			return map.entrySet().toArray();
 		}
-		return null;
+		return new Object[0];
 	}
 }

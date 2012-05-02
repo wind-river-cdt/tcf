@@ -61,7 +61,6 @@ public class BasicContextSection extends BaseTitledSection {
     protected void updateInput(IPeerModelProvider input) {
         Assert.isTrue(input instanceof ProcessTreeNode);
         ProcessTreeNode node = (ProcessTreeNode) input;
-        Assert.isNotNull(node.context);
         context = node.context;
     }
 
@@ -71,12 +70,12 @@ public class BasicContextSection extends BaseTitledSection {
 	 */
 	@Override
     public void refresh() {
-		fileText.setText(context.getFile() == null ? "" : context.getFile()); //$NON-NLS-1$
-		workDirText.setText(context.getCurrentWorkingDirectory() == null ? "" : context.getCurrentWorkingDirectory()); //$NON-NLS-1$
-		rootText.setText(context.getRoot() == null ? "" : context.getRoot()); //$NON-NLS-1$
-		stateText.setText(context.getState() == null ? "" : context.getState()); //$NON-NLS-1$
-		userText.setText(context.getUserName() == null ? "" : context.getUserName()); //$NON-NLS-1$
-		groupText.setText(context.getGroupName() == null ? "" : context.getGroupName()); //$NON-NLS-1$
+		fileText.setText(context == null ? "" : (context.getFile() == null ? "" : context.getFile())); //$NON-NLS-1$ //$NON-NLS-2$
+		workDirText.setText(context == null ? "" : (context.getCurrentWorkingDirectory() == null ? "" : context.getCurrentWorkingDirectory())); //$NON-NLS-1$ //$NON-NLS-2$
+		rootText.setText(context == null ? "" : (context.getRoot() == null ? "" : context.getRoot())); //$NON-NLS-1$ //$NON-NLS-2$
+		stateText.setText(context == null ? "" : (context.getState() == null ? "" : context.getState())); //$NON-NLS-1$ //$NON-NLS-2$
+		userText.setText(context == null ? "" : (context.getUserName() == null ? "" : context.getUserName())); //$NON-NLS-1$ //$NON-NLS-2$
+		groupText.setText(context == null ? "" : (context.getGroupName() == null ? "" : context.getGroupName())); //$NON-NLS-1$ //$NON-NLS-2$
 		super.refresh();
     }
 

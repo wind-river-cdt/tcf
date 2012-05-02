@@ -30,11 +30,6 @@ import org.eclipse.ui.dialogs.PropertyPage;
  * The property page to display the advanced properties of a process context.
  */
 public class AdvancedPropertiesPage extends PropertyPage {
-	// The properties map.
-	private Map<String, Object> properties;
-
-	// The table control to display the properties.
-	private TableViewer viewer;
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
@@ -45,7 +40,10 @@ public class AdvancedPropertiesPage extends PropertyPage {
 		Assert.isTrue(element instanceof ProcessTreeNode);
 
 		ProcessTreeNode node = (ProcessTreeNode) element;
-		properties = node.context.getProperties();
+		Map<String, Object> properties = null;
+		if(node.context != null) {
+			properties = node.context.getProperties();
+		}
         
 		Composite page = new Composite(parent, SWT.NONE);
 		FillLayout layout = new FillLayout();
@@ -53,7 +51,7 @@ public class AdvancedPropertiesPage extends PropertyPage {
 		layout.marginWidth = 10;
 		page.setLayout(layout);
 		
-		viewer = new TableViewer(page, SWT.FULL_SELECTION | SWT.MULTI | SWT.BORDER);
+		TableViewer viewer = new TableViewer(page, SWT.FULL_SELECTION | SWT.MULTI | SWT.BORDER);
 		Table table = viewer.getTable();
 		TableColumn column = new TableColumn(table, SWT.LEFT);
 		column.setText(Messages.AdvancedPropertiesSection_Name);
@@ -65,7 +63,9 @@ public class AdvancedPropertiesPage extends PropertyPage {
 		table.setLinesVisible(true);
 	    viewer.setContentProvider(new MapContentProvider());
 	    viewer.setLabelProvider(new MapEntryLabelProvider());
-	    viewer.setInput(properties);
+	    if(properties != null) {
+	    	viewer.setInput(properties);
+	    }
 	    
 		return page;
 	}

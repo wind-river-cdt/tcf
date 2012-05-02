@@ -77,8 +77,12 @@ public class AdvancedPropertiesSection extends AbstractPropertySection {
         Object input = ((IStructuredSelection) selection).getFirstElement();
         Assert.isTrue(input instanceof ProcessTreeNode);
         ProcessTreeNode node = (ProcessTreeNode) input;
-        Assert.isNotNull(node.context);
-        properties = node.context.getProperties();
+        if(node.context != null) {
+        	properties = node.context.getProperties();
+        }
+        else {
+        	properties = null;
+        }
     }
 
 	/*

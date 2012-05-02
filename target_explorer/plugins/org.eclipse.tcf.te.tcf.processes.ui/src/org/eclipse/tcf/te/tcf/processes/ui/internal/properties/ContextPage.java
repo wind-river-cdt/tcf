@@ -28,8 +28,6 @@ import org.eclipse.ui.dialogs.PropertyPage;
  */
 public class ContextPage extends PropertyPage {
 
-	private SysMonitorContext context;
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
 	 */
@@ -43,26 +41,26 @@ public class ContextPage extends PropertyPage {
 		GridLayout gridLayout = new GridLayout(2, false);
 		page.setLayout(gridLayout);
 		
-		context = node.context;
-		createField(Messages.ContextPage_File, context.getFile(), page); 
-		createField(Messages.ContextPage_WorkHome, context.getCurrentWorkingDirectory(), page); 
-		createField(Messages.ContextPage_Root, context.getRoot(), page); 
-		createField(Messages.ContextPage_State, context.getState(), page); 
-		createField(Messages.ContextPage_Group, context.getGroupName(), page); 
+		SysMonitorContext context = node.context;
+		createField(Messages.ContextPage_File, context == null ? null : context.getFile(), page); 
+		createField(Messages.ContextPage_WorkHome, context == null ? null : context.getCurrentWorkingDirectory(), page); 
+		createField(Messages.ContextPage_Root, context == null ? null : context.getRoot(), page); 
+		createField(Messages.ContextPage_State, context == null ? null : context.getState(), page); 
+		createField(Messages.ContextPage_Group, context == null ? null : context.getGroupName(), page); 
 		createSeparator(page);
-		createField(Messages.ContextPage_ID, context.getID(), page); 
-		createField(Messages.ContextPage_ParentID, context.getParentID(), page); 
-		createField(Messages.ContextPage_GroupID, Long.valueOf(context.getPGRP()), page); 
-		createField(Messages.ContextPage_PID, Long.valueOf(context.getPID()), page); 
-		createField(Messages.ContextPage_PPID, Long.valueOf(context.getPPID()), page); 
-		createField(Messages.ContextPage_TTYGRPID, Long.valueOf(context.getTGID()), page); 
-		createField(Messages.ContextPage_TracerPID, Long.valueOf(context.getTracerPID()), page); 
-		createField(Messages.ContextPage_UserID, Long.valueOf(context.getUID()), page); 
-		createField(Messages.ContextPage_UserGRPID, Long.valueOf(context.getUGID()), page); 
+		createField(Messages.ContextPage_ID, context == null ? null : context.getID(), page); 
+		createField(Messages.ContextPage_ParentID, context == null ? null : context.getParentID(), page); 
+		createField(Messages.ContextPage_GroupID, context == null ? null : Long.valueOf(context.getPGRP()), page); 
+		createField(Messages.ContextPage_PID, context == null ? null : Long.valueOf(context.getPID()), page); 
+		createField(Messages.ContextPage_PPID, context == null ? null : Long.valueOf(context.getPPID()), page); 
+		createField(Messages.ContextPage_TTYGRPID, context == null ? null : Long.valueOf(context.getTGID()), page); 
+		createField(Messages.ContextPage_TracerPID, context == null ? null : Long.valueOf(context.getTracerPID()), page); 
+		createField(Messages.ContextPage_UserID, context == null ? null : Long.valueOf(context.getUID()), page); 
+		createField(Messages.ContextPage_UserGRPID, context == null ? null : Long.valueOf(context.getUGID()), page); 
 		createSeparator(page);
-		createField(Messages.ContextPage_Virtual, Long.valueOf(context.getVSize()), page); 
-		createField(Messages.ContextPage_Pages, Long.valueOf(context.getPSize()), page); 
-		createField(Messages.ContextPage_Resident, Long.valueOf(context.getRSS()), page); 
+		createField(Messages.ContextPage_Virtual, context == null ? null : Long.valueOf(context.getVSize()), page); 
+		createField(Messages.ContextPage_Pages, context == null ? null : Long.valueOf(context.getPSize()), page); 
+		createField(Messages.ContextPage_Resident, context == null ? null : Long.valueOf(context.getRSS()), page); 
 
 		return page;
 	}

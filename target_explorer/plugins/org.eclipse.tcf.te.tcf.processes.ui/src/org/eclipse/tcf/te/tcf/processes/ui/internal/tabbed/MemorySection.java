@@ -61,7 +61,6 @@ public class MemorySection extends BaseTitledSection {
     protected void updateInput(IPeerModelProvider input) {
 		Assert.isTrue(input instanceof ProcessTreeNode);
 		ProcessTreeNode node = (ProcessTreeNode) input;
-		Assert.isNotNull(node.context);
 		context = node.context;
 	}
 
@@ -71,9 +70,9 @@ public class MemorySection extends BaseTitledSection {
 	 */
 	@Override
 	public void refresh() {
-		vsizeText.setText("" + context.getVSize()); //$NON-NLS-1$
-		psizeText.setText("" + context.getPSize()); //$NON-NLS-1$
-		rssText.setText("" + context.getRSS()); //$NON-NLS-1$
+		vsizeText.setText(context == null ? "" : "" + context.getVSize()); //$NON-NLS-1$ //$NON-NLS-2$
+		psizeText.setText(context == null ? "" : "" + context.getPSize()); //$NON-NLS-1$ //$NON-NLS-2$
+		rssText.setText(context == null ? "" : "" + context.getRSS()); //$NON-NLS-1$ //$NON-NLS-2$
 		super.refresh();
 	}
 }
