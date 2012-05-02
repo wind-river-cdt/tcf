@@ -442,7 +442,7 @@ public class PeerAttributesTablePart extends TablePart implements IDisposable {
 	 * @return The list of banned names or <code>null</code>.
 	 */
 	public final String[] getBannedNames() {
-		return bannedNames != null ? bannedNames.toArray(new String[bannedNames.size()]) : null;
+		return bannedNames != null ? bannedNames.toArray(new String[bannedNames.size()]) : new String[0];
 	}
 
 	/**

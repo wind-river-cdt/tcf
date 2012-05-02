@@ -47,6 +47,15 @@ public class ContextServiceAdapter implements IContextService, IDisposable {
 		delegates.clear();
 	}
 
+	/**
+	 * Returns the associated peer instance.
+	 *
+	 * @return The associated peer instance.
+	 */
+	public IPeer getPeer() {
+		return peer;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.tcf.services.contexts.interfaces.IContextService#getDelegate(java.lang.String)
 	 */
