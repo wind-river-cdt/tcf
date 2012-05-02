@@ -16,6 +16,7 @@ import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -32,12 +33,35 @@ import org.eclipse.tcf.te.core.interfaces.IViewerInput;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.CacheManager;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.activator.UIPlugin;
+import org.eclipse.tcf.te.tcf.filesystem.ui.internal.ImageConsts;
 
 /**
  * The background daemon that updates the images of the file system using
  * images retrieved by FileSystemView from Swing.
  */
 public class LabelProviderUpdateDaemon extends Thread {
+	private static String[][] os_drives = {
+		{"windows xp", "xp_rootdrive.png"}, //$NON-NLS-1$ //$NON-NLS-2$
+		{"windows 7", "win7_rootdrive.png"},  //$NON-NLS-1$//$NON-NLS-2$
+		{"windows 8", "win8_rootdrive.png"}  //$NON-NLS-1$//$NON-NLS-2$
+	};
+	private static String root_drive = createRootImage(getOSEntry());
+	
+	private static int getOSEntry() {
+		String osName = System.getProperty("os.name").toLowerCase(); //$NON-NLS-1$
+		for(int i = 0; i < os_drives.length;i++) {
+			if(os_drives[i][0].equals(osName)) return i;
+		}
+		return 0;
+	}
+	
+	private static String createRootImage(int i) {
+		UIPlugin plugin = UIPlugin.getDefault();
+		URL url = plugin.getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OBJ + os_drives[i][1]);
+		plugin.getImageRegistry().put(os_drives[i][0], ImageDescriptor.createFromURL(url));
+		return os_drives[i][0];
+	}
+	
 	// The dummy AWT component used to render the icon.
 	Component dummyComponent = new JComponent(){private static final long serialVersionUID = 5926798769323111209L;};
 	//The queue that caches the current file nodes to be updated.
@@ -177,17 +201,7 @@ public class LabelProviderUpdateDaemon extends Thread {
 	 * @return The disk driver image.
 	 */
 	public Image getDiskImage() {
-		String key = "SWING_ROOT_DRIVER_IMAGE"; //$NON-NLS-1$
-        ImageDescriptor imgDesc = UIPlugin.getImageDescriptor(key);
-        if (imgDesc == null) {
-        	File[] roots = File.listRoots();
-        	File mirror;
-			if (roots.length > 1) mirror = roots[1];
-			else mirror = roots[0];
-        	File imgFile = getTempImg("_disk_drive_"); //$NON-NLS-1$
-        	createImage(key, mirror, imgFile);
-        }
-        return UIPlugin.getImage(key);
+		return UIPlugin.getImage(root_drive);
 	}
 	
 	/**

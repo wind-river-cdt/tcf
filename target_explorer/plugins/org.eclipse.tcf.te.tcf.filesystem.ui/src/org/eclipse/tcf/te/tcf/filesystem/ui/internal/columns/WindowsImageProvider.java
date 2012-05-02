@@ -31,7 +31,7 @@ public class WindowsImageProvider extends DefaultImageProvider {
 	@Override
     public Image getImage(FSTreeNode node) {
 		if (node.isRoot()) {
-            return updateDaemon.getDiskImage();
+            return node.isWindowsNode() ? updateDaemon.getDiskImage() : super.getImage(node);
 		}
 		else if (node.isDirectory()) {
 			return updateDaemon.getFolderImage();
