@@ -6,7 +6,7 @@
          <meta.schema plugin="org.eclipse.tcf.te.ui.views" id="categories" name="Categories Extension Point"/>
       </appinfo>
       <documentation>
-         This extension point is used to contribute new categories to the System Management view.
+         This extension point is used to contribute new categories to the Target Explorer view.
       </documentation>
    </annotation>
 
