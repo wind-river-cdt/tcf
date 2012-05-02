@@ -29,10 +29,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tcf.te.ui.trees.TreeViewerEditorActivationStrategy;
 import org.eclipse.tcf.te.ui.views.activator.UIPlugin;
-import org.eclipse.tcf.te.ui.views.interfaces.IPersistableExpandingState;
 import org.eclipse.tcf.te.ui.views.interfaces.IRoot;
 import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
 import org.eclipse.ui.IAggregateWorkingSet;
+import org.eclipse.ui.IMemento;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PlatformUI;
@@ -42,6 +42,7 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.navigator.ICommonActionConstants;
+import org.eclipse.ui.navigator.IMementoAware;
 import org.eclipse.ui.views.properties.IPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
@@ -63,7 +64,7 @@ public class View extends CommonNavigator implements ITabbedPropertySheetPageCon
 	private String workingSetLabel;
 
 	// The state used to persisted the expanded nodes of the navigator tree.
-	private IPersistableExpandingState expandingState;
+	IMementoAware expandingState;
 
 	/**
 	 * Constructor.
@@ -152,6 +153,12 @@ public class View extends CommonNavigator implements ITabbedPropertySheetPageCon
 
 		// Add the additional custom toolbar groups
 		addCustomToolbarGroups();
+		
+		// Restore expanding state of the common viewer.
+		expandingState = new ViewExpandingState(getCommonViewer());
+		if (getMemento() != null) {
+			expandingState.restoreState(getMemento());
+		}
 	}
 
 	/**
@@ -171,6 +178,20 @@ public class View extends CommonNavigator implements ITabbedPropertySheetPageCon
 			}
 		}
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.navigator.CommonNavigator#saveState(org.eclipse.ui.IMemento)
+	 */
+	@Override
+    public void saveState(IMemento aMemento) {
+	    super.saveState(aMemento);
+	    
+		// Save expanding state of the common viewer.
+		if (expandingState != null && aMemento != null) {
+			expandingState.saveState(aMemento);
+		}
+    }
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.navigator.CommonNavigator#handleDoubleClick(org.eclipse.jface.viewers.DoubleClickEvent)
@@ -252,12 +273,6 @@ public class View extends CommonNavigator implements ITabbedPropertySheetPageCon
     public Object getAdapter(Class adapter) {
 		if(adapter == IPropertySheetPage.class) {
 			return new TabbedPropertySheetPage(this);
-		}
-		else if(adapter == IPersistableExpandingState.class) {
-			if(expandingState == null) {
-				expandingState = new ViewExpandingState(getCommonViewer());
-			}
-			return expandingState;
 		}
 	    return super.getAdapter(adapter);
     }

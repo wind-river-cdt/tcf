@@ -15,18 +15,18 @@ import java.util.List;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.IElementComparer;
-import org.eclipse.tcf.te.ui.views.interfaces.IPersistableExpandingState;
 import org.eclipse.ui.IElementFactory;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.navigator.CommonViewer;
+import org.eclipse.ui.navigator.IMementoAware;
 
 /**
  * The class used to save and restore the expanding states of
  * a common viewer in a navigator.
  */
-public class ViewExpandingState implements IPersistableExpandingState {
+public class ViewExpandingState implements IMementoAware {
 	// The common viewer whose expanding state is to be persisted.
 	private CommonViewer viewer;
 	/**
@@ -35,13 +35,13 @@ public class ViewExpandingState implements IPersistableExpandingState {
 	public ViewExpandingState(CommonViewer viewer) {
 		this.viewer = viewer;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.views.interfaces.IPersistableState#restoreExpandingState(org.eclipse.ui.IMemento)
+	 * @see org.eclipse.ui.navigator.IMementoAware#restoreState(org.eclipse.ui.IMemento)
 	 */
 	@Override
-    public void restoreExpandingState(IMemento memento) {
+    public void restoreState(IMemento memento) {
 		IMemento memExpand = memento.getChild("expanded-elements"); //$NON-NLS-1$
 		if(memExpand != null) {
 			IMemento[] memElements = memExpand.getChildren("element"); //$NON-NLS-1$
@@ -62,12 +62,13 @@ public class ViewExpandingState implements IPersistableExpandingState {
 			}
 		}
 	}
+	
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.views.interfaces.IPersistableState#saveExpandingState(org.eclipse.ui.IMemento)
+	 * @see org.eclipse.ui.navigator.IMementoAware#saveState(org.eclipse.ui.IMemento)
 	 */
 	@Override
-    public void saveExpandingState(IMemento memento) {
+    public void saveState(IMemento memento) {
 		Object[] elements = viewer.getVisibleExpandedElements(); // Do not remember invisible expanded elements.
 		if(elements != null && elements.length > 0) {
 			IMemento memExpand = memento.createChild("expanded-elements"); //$NON-NLS-1$
