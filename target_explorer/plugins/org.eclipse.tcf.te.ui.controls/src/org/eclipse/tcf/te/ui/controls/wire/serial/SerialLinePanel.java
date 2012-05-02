@@ -22,6 +22,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IInputValidator;
@@ -510,6 +511,13 @@ public class SerialLinePanel extends AbstractWizardConfigurationPanel implements
 	 * Query the list of serial devices via RXTX.
 	 */
 	protected void queryAvailableSerialDevices() {
+		// Avoid printing the library version output to stdout if the platform
+		// is not in debug mode.
+		String prop = System.getProperty("gnu.io.rxtx.NoVersionOutput"); //$NON-NLS-1$
+		if (prop == null && !Platform.inDebugMode()) {
+			System.setProperty("gnu.io.rxtx.NoVersionOutput", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
 		// java.lang.UnsatisfiedLinkError: ../plugins/gnu.io.rxtx.solaris.sparc_2.1.7.200702281917/os/solaris/sparc/librxtxSerial.so:
 		//       Can't load Sparc 32-bit .so on a Sparc 32-bit platform
 		// May happen in CommPortIdentifier static constructor!
