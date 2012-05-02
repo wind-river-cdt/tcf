@@ -47,6 +47,15 @@
 		<Method name="getAdapterList"/>
 	</Match>
 	
+	<!-- Ignore EI_EXPOSE_REP2 -->
+	<Match>
+		<Bug pattern="EI_EXPOSE_REP2"/>
+		<Or>
+			<Class name="org.eclipse.tcf.te.ui.views.handler.UpdateActiveExtensionsOperation"/>
+			<Class name="org.eclipse.tcf.te.ui.views.handler.UpdateActiveFiltersOperation"/>
+		</Or>
+	</Match>
+	
 	<!-- Ignore LI_LAZY_INIT_UPDATE_STATIC in Model.java -->
 	<Match>
 		<Bug pattern="LI_LAZY_INIT_UPDATE_STATIC"/>
