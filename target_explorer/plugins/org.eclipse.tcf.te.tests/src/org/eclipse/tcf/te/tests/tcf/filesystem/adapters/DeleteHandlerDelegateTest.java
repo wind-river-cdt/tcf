@@ -9,20 +9,18 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tests.tcf.filesystem.adapters;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IConfirmCallback;
-import org.eclipse.tcf.te.tcf.filesystem.ui.internal.adapters.DeleteHandlerDelegate;
+import org.eclipse.tcf.te.tcf.filesystem.ui.internal.handlers.DeleteHandler;
 import org.eclipse.tcf.te.tests.tcf.filesystem.FSPeerTestCase;
-import org.eclipse.tcf.te.ui.views.interfaces.handler.IDeleteHandlerDelegate;
 
 @SuppressWarnings("restriction")
 public class DeleteHandlerDelegateTest extends FSPeerTestCase {
-	private IDeleteHandlerDelegate delegate;
+	private DeleteHandler delegate;
 
     @Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		delegate = (IDeleteHandlerDelegate) Platform.getAdapterManager().getAdapter(test11File, IDeleteHandlerDelegate.class);
+		delegate = new DeleteHandler();
 		assertNotNull(delegate);
 		IConfirmCallback confirmCallback = new IConfirmCallback() {
 			@Override
@@ -36,7 +34,7 @@ public class DeleteHandlerDelegateTest extends FSPeerTestCase {
 				return 0;
 			}
 		};
-		((DeleteHandlerDelegate) delegate).setConfirmCallback(confirmCallback);
+		delegate.setConfirmCallback(confirmCallback);
 	}
 
 	public void testCanDelete() {

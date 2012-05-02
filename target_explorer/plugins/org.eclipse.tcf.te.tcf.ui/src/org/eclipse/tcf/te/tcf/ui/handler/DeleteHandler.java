@@ -7,22 +7,29 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.ui.internal.adapters;
+package org.eclipse.tcf.te.tcf.ui.handler;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.persistence.interfaces.IURIPersistenceService;
@@ -38,22 +45,80 @@ import org.eclipse.tcf.te.tcf.locator.model.Model;
 import org.eclipse.tcf.te.tcf.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.ui.help.IContextHelpIds;
 import org.eclipse.tcf.te.tcf.ui.nls.Messages;
-import org.eclipse.tcf.te.ui.views.interfaces.handler.IDeleteHandlerDelegate;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.ui.navigator.CommonViewer;
 
 /**
- * Peer model node delete handler delegate implementation.
+ * Delete handler implementation.
  */
-public class DeleteHandlerDelegate implements IDeleteHandlerDelegate {
+public class DeleteHandler extends AbstractHandler {
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 */
+	@Override
+	public Object execute(ExecutionEvent event) throws ExecutionException {
+		// Get the current selection
+		ISelection selection = HandlerUtil.getCurrentSelection(event);
+		if (selection instanceof IStructuredSelection && !selection.isEmpty()) {
+			// Determine the active part
+			final IWorkbenchPart part = HandlerUtil.getActivePart(event);
+			// Create the delete state properties container
+			final IPropertiesContainer state = new PropertiesContainer();
+			// Store the selection to the state as reference
+			state.setProperty("selection", selection); //$NON-NLS-1$
+
+			// Loop over the selection and delete the elements providing an IDeleteHandlerDelegate
+			Iterator<?> iterator = ((IStructuredSelection)selection).iterator();
+			while (iterator.hasNext()) {
+				final Object element = iterator.next();
+
+				// Delete the element if there is a valid delegate
+				if (canDelete(element)) {
+					// Determine the elements parent element
+					Object parentElement = null;
+					CommonViewer viewer = (CommonViewer)part.getAdapter(CommonViewer.class);
+					if (viewer != null && viewer.getContentProvider() instanceof ITreeContentProvider) {
+						ITreeContentProvider cp = (ITreeContentProvider)viewer.getContentProvider();
+						parentElement = cp.getParent(element);
+					}
+					final Object finParentElement = parentElement;
+
+					// Delete the element and refresh the parent element
+					delete(element, state, new Callback() {
+						@Override
+						protected void internalDone(Object caller, IStatus status) {
+							PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+								@Override
+								public void run() {
+									CommonViewer viewer = (CommonViewer)part.getAdapter(CommonViewer.class);
+									if (viewer != null) {
+										if (finParentElement != null) {
+											viewer.refresh(finParentElement, true);
+										} else {
+											viewer.refresh(true);
+										}
+									}
+								}
+							});
+						}
+					});
+				}
+			}
+		}
+
+		return null;
+	}
+
+	// ***** DeleteHandlerDelegate content. Clean up. *****
 
 	private static final String KEY_CONFIRMED = "confirmed"; //$NON-NLS-1$
 	private static final String KEY_SELECTION = "selection"; //$NON-NLS-1$
 	private static final String KEY_PROCESSED = "processed"; //$NON-NLS-1$
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.views.interfaces.handler.IDeleteHandlerDelegate#canDelete(java.lang.Object)
-	 */
-	@Override
+	@Deprecated
 	public boolean canDelete(final Object element) {
 		if (element instanceof IPeerModel) {
 			final AtomicBoolean canDelete = new AtomicBoolean();
@@ -78,10 +143,7 @@ public class DeleteHandlerDelegate implements IDeleteHandlerDelegate {
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.views.interfaces.handler.IDeleteHandlerDelegate#delete(java.lang.Object, org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.tcf.te.runtime.interfaces.callback.ICallback)
-	 */
-	@Override
+	@Deprecated
 	public void delete(Object element, IPropertiesContainer state, ICallback callback) {
 		Assert.isNotNull(element);
 		Assert.isNotNull(state);
@@ -142,7 +204,7 @@ public class DeleteHandlerDelegate implements IDeleteHandlerDelegate {
 
 	/**
 	 * Confirm the deletion with the user.
-	 * 
+	 *
 	 * @param state The state of delegation handler.
 	 * @return true if the user agrees to delete or it has confirmed previously.
 	 */
@@ -165,7 +227,7 @@ public class DeleteHandlerDelegate implements IDeleteHandlerDelegate {
 
 	/**
 	 * Get confirmation question displayed in the confirmation dialog.
-	 * 
+	 *
 	 * @param selection The current selection selected to delete.
 	 * @return The question to ask the user.
 	 */
@@ -196,4 +258,6 @@ public class DeleteHandlerDelegate implements IDeleteHandlerDelegate {
 	    }
 	    return question;
     }
+
+
 }

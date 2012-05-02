@@ -7,22 +7,29 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.ui.views.handler;
+package org.eclipse.tcf.te.launch.ui.internal.handler;
 
 import java.util.Iterator;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.tcf.te.launch.ui.activator.UIPlugin;
+import org.eclipse.tcf.te.launch.ui.model.LaunchNode;
+import org.eclipse.tcf.te.launch.ui.nls.Messages;
 import org.eclipse.tcf.te.runtime.callback.Callback;
+import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
-import org.eclipse.tcf.te.ui.views.interfaces.handler.IDeleteHandlerDelegate;
+import org.eclipse.tcf.te.runtime.utils.StatusHelper;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -53,12 +60,8 @@ public class DeleteHandler extends AbstractHandler {
 			while (iterator.hasNext()) {
 				final Object element = iterator.next();
 
-				// Determine the delete handler delegate for the selected element
-				IDeleteHandlerDelegate delegate = element instanceof IDeleteHandlerDelegate ? (IDeleteHandlerDelegate)element : null;
-				if (delegate == null) delegate = (IDeleteHandlerDelegate)Platform.getAdapterManager().loadAdapter(element, IDeleteHandlerDelegate.class.getName());
-
 				// Delete the element if there is a valid delegate
-				if (delegate != null && delegate.canDelete(element)) {
+				if (canDelete(element)) {
 					// Determine the elements parent element
 					Object parentElement = null;
 					CommonViewer viewer = (CommonViewer)part.getAdapter(CommonViewer.class);
@@ -69,7 +72,7 @@ public class DeleteHandler extends AbstractHandler {
 					final Object finParentElement = parentElement;
 
 					// Delete the element and refresh the parent element
-					delegate.delete(element, state, new Callback() {
+					delete(element, state, new Callback() {
 						@Override
 						protected void internalDone(Object caller, IStatus status) {
 							PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
@@ -92,5 +95,46 @@ public class DeleteHandler extends AbstractHandler {
 		}
 
 		return null;
+	}
+
+	// ***** DeleteHandlerDelegate content. Clean up. *****
+
+	@Deprecated
+	public boolean canDelete(Object element) {
+		if (element instanceof LaunchNode) {
+			LaunchNode node = (LaunchNode)element;
+			return LaunchNode.TYPE_LAUNCH_CONFIG.equals(node.getType()) && !node.getLaunchConfiguration().isReadOnly();
+		}
+		return false;
+	}
+
+	@Deprecated
+	public void delete(Object element, IPropertiesContainer state, final ICallback callback) {
+		Assert.isNotNull(element);
+		Assert.isNotNull(state);
+
+		if (element instanceof LaunchNode) {
+			final LaunchNode node = (LaunchNode)element;
+			try {
+				if (MessageDialog.openQuestion(
+								UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getShell(),
+								Messages.DeleteHandlerDelegate_question_title, NLS.bind(Messages.DeleteHandlerDelegate_question_message, node.getLaunchConfiguration().getName()))) {
+					node.getLaunchConfiguration().delete();
+					if (callback != null) {
+						callback.done(this, Status.OK_STATUS);
+					}
+				}
+				else {
+					if (callback != null) {
+						callback.done(this, Status.CANCEL_STATUS);
+					}
+				}
+			}
+			catch (Exception e) {
+				if (callback != null) {
+					callback.done(this, StatusHelper.getStatus(e));
+				}
+			}
+		}
 	}
 }

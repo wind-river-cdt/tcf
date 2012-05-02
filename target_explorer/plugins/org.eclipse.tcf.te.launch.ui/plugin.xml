@@ -8,7 +8,6 @@
             adaptableType="org.eclipse.tcf.te.launch.ui.model.LaunchNode"
             class="org.eclipse.tcf.te.launch.ui.internal.adapters.AdapterFactory">
          <adapter type="org.eclipse.jface.viewers.ILabelProvider"/>
-         <adapter type="org.eclipse.tcf.te.ui.views.interfaces.handler.IDeleteHandlerDelegate"/>
          <adapter type="org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate"/>
       </factory>
    </extension>
@@ -19,7 +18,7 @@
             class="org.eclipse.tcf.te.launch.ui.internal.LaunchNodePropertyTester"
             id="org.eclipse.tcf.te.launch.ui.propertytester.launchNode"
             namespace="org.eclipse.tcf.te.launch.ui.model"
-            properties="isLaunchConfig, isLaunchConfigType"
+            properties="isLaunchConfig,isLaunchConfigType,canDelete"
             type="org.eclipse.tcf.te.launch.ui.model.LaunchNode">
       </propertyTester>
    </extension>
@@ -223,7 +222,7 @@
                   <iterate
                         ifEmpty="false"
                         operator="and">
-                     <test property="org.eclipse.tcf.te.ui.views.isDeletableElement"/>
+                     <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
                   </iterate>
                </with>
             </visibleWhen>
@@ -328,6 +327,27 @@
                </with>
             </visibleWhen>
          </menu>
+      </menuContribution>
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.delete">
+         <command
+               commandId="org.eclipse.ui.edit.delete"
+               disabledIcon="platform:/plugin/org.eclipse.ui/icons/full/dtool16/delete.gif"
+               helpContextId="org.eclipse.tcf.te.ui.command_Delete"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/delete.gif"
+               id="org.eclipse.tcf.te.ui.commands.delete"
+               label="%command.delete.label"
+               mnemonic="D"
+               style="push"
+               tooltip="%command.delete.description">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <count value="+"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
       </menuContribution>
 
    <!-- Launches editor page menu contributions -->
@@ -457,7 +477,7 @@
                   <iterate
                         ifEmpty="false"
                         operator="and">
-                     <test property="org.eclipse.tcf.te.ui.views.isDeletableElement"/>
+                     <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
                   </iterate>
                </with>
             </visibleWhen>
@@ -526,7 +546,34 @@
 <!-- Handler contributions -->
    <extension point="org.eclipse.ui.handlers">
       <handler
-            class="org.eclipse.tcf.te.ui.views.handler.DeleteHandler"
+            commandId="org.eclipse.ui.edit.delete"
+            class="org.eclipse.tcf.te.launch.ui.internal.handler.DeleteHandler">
+            <activeWhen>
+               <and>
+                  <with variable="activePartId">
+                     <or>
+                        <equals value="org.eclipse.tcf.te.ui.views.View"/>
+                        <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
+                     </or>
+                  </with>
+                  <with variable="selection">
+                     <iterate operator="and" ifEmpty="false">
+                        <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
+                     </iterate>
+                  </with>
+               </and>
+            </activeWhen>
+            <enabledWhen>
+               <with variable="selection">
+                  <iterate operator="and" ifEmpty="false">
+                     <test property="org.eclipse.tcf.te.launch.ui.model.canDelete" value="true"/>
+                  </iterate>
+               </with>
+            </enabledWhen>
+      </handler>
+   
+      <handler
+            class="org.eclipse.tcf.te.launch.ui.internal.handler.DeleteHandler"
             commandId="org.eclipse.ui.edit.delete">
          <activeWhen>
             <and>

@@ -7,20 +7,29 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.filesystem.ui.internal.adapters;
+package org.eclipse.tcf.te.tcf.filesystem.ui.internal.handlers;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
+import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
 import org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IConfirmCallback;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.IOpExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpDelete;
@@ -29,61 +38,106 @@ import org.eclipse.tcf.te.tcf.filesystem.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.ImageConsts;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.operations.UiExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.ui.nls.Messages;
-import org.eclipse.tcf.te.ui.views.interfaces.handler.IDeleteHandlerDelegate;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.ui.navigator.CommonViewer;
 
 /**
- * File System tree node delete handler delegate implementation.
+ * Delete handler implementation.
  */
-public class DeleteHandlerDelegate implements IDeleteHandlerDelegate {
+public class DeleteHandler extends AbstractHandler {
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 */
+	@Override
+	public Object execute(ExecutionEvent event) throws ExecutionException {
+		// Get the current selection
+		ISelection selection = HandlerUtil.getCurrentSelection(event);
+		if (selection instanceof IStructuredSelection && !selection.isEmpty()) {
+			// Determine the active part
+			final IWorkbenchPart part = HandlerUtil.getActivePart(event);
+			// Create the delete state properties container
+			final IPropertiesContainer state = new PropertiesContainer();
+			// Store the selection to the state as reference
+			state.setProperty("selection", selection); //$NON-NLS-1$
+
+			// Loop over the selection and delete the elements providing an IDeleteHandlerDelegate
+			Iterator<?> iterator = ((IStructuredSelection)selection).iterator();
+			while (iterator.hasNext()) {
+				final Object element = iterator.next();
+
+				// Delete the element if there is a valid delegate
+				if (canDelete(element)) {
+					// Determine the elements parent element
+					Object parentElement = null;
+					CommonViewer viewer = (CommonViewer)part.getAdapter(CommonViewer.class);
+					if (viewer != null && viewer.getContentProvider() instanceof ITreeContentProvider) {
+						ITreeContentProvider cp = (ITreeContentProvider)viewer.getContentProvider();
+						parentElement = cp.getParent(element);
+					}
+					final Object finParentElement = parentElement;
+
+					// Delete the element and refresh the parent element
+					delete(element, state, new Callback() {
+						@Override
+						protected void internalDone(Object caller, IStatus status) {
+							PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+								@Override
+								public void run() {
+									CommonViewer viewer = (CommonViewer)part.getAdapter(CommonViewer.class);
+									if (viewer != null) {
+										if (finParentElement != null) {
+											viewer.refresh(finParentElement, true);
+										} else {
+											viewer.refresh(true);
+										}
+									}
+								}
+							});
+						}
+					});
+				}
+			}
+		}
+
+		return null;
+	}
+
+	// ***** DeleteHandlerDelegate content. Clean up. *****
 
 	// The key to access the selection in the state.
 	private static final String KEY_SELECTION = "selection"; //$NON-NLS-1$
 	// The key to access the processed state in the state.
 	private static final String KEY_PROCESSED = "processed"; //$NON-NLS-1$
 	// The deletion confirmation callback
-	private IConfirmCallback confirmCallback;
+	private IConfirmCallback confirmCallback = new DeletionConfirmCallback();
 	// The confirmation call for read only files.
-	private IConfirmCallback readonlyCallback;
-	
-	/**
-	 * Constructor
-	 */
-	public DeleteHandlerDelegate() {
-		confirmCallback = new DeletionConfirmCallback();
-		readonlyCallback = new ReadOnlyConfirmCallback();
-	}
-	
+	private IConfirmCallback readonlyCallback = new ReadOnlyConfirmCallback();
+
 	/**
 	 * Set the confirmation callback
-	 * 
+	 *
 	 * @param confirmCallback The confirmation callback
 	 */
 	public void setConfirmCallback(IConfirmCallback confirmCallback) {
 		this.confirmCallback = confirmCallback;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.views.interfaces.handler.IDeleteHandlerDelegate#canDelete(java.lang.Object)
-	 */
-	@Override
+	@Deprecated
 	public boolean canDelete(Object element) {
 		if (element instanceof FSTreeNode) {
 			FSTreeNode node = (FSTreeNode) element;
 			if (!node.isSystemRoot() && !node.isRoot()) {
-				return node.isWindowsNode() && !node.isReadOnly() 
+				return node.isWindowsNode() && !node.isReadOnly()
 								|| !node.isWindowsNode() && node.isWritable();
 			}
 		}
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.views.interfaces.handler.IDeleteHandlerDelegate#delete(java.lang.Object, org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.tcf.te.runtime.interfaces.callback.ICallback)
-	 */
-	@Override
+	@Deprecated
 	public void delete(Object element, IPropertiesContainer state, ICallback callback) {
 		Assert.isNotNull(element);
 		Assert.isNotNull(state);
@@ -143,9 +197,9 @@ public class DeleteHandlerDelegate implements IDeleteHandlerDelegate {
 			});
 			return results[0];
         }
-		
+
 	}
-	
+
 	static class DeletionConfirmCallback implements IConfirmCallback {
 		/*
 		 * (non-Javadoc)
@@ -155,7 +209,7 @@ public class DeleteHandlerDelegate implements IDeleteHandlerDelegate {
 	    public boolean requires(Object object) {
 		    return true;
 	    }
-	
+
 		/*
 		 * (non-Javadoc)
 		 * @see org.eclipse.tcf.te.tcf.filesystem.interfaces.IConfirmCallback#confirms(java.lang.Object)
@@ -163,7 +217,7 @@ public class DeleteHandlerDelegate implements IDeleteHandlerDelegate {
 		@Override
 	    public int confirms(Object object) {
 			IStructuredSelection selection = (IStructuredSelection) object;
-			List<FSTreeNode> nodes = selection.toList();			
+			List<FSTreeNode> nodes = selection.toList();
 			String question;
 			if (nodes.size() == 1) {
 				FSTreeNode node = nodes.get(0);
@@ -173,7 +227,7 @@ public class DeleteHandlerDelegate implements IDeleteHandlerDelegate {
 				question = NLS.bind(Messages.DeleteFilesHandler_DeleteMultipleFilesConfirmation, Integer.valueOf(nodes.size()));
 			}
 			Shell parent = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-			if (MessageDialog.openQuestion(parent, Messages.DeleteFilesHandler_ConfirmDialogTitle, question)) { 
+			if (MessageDialog.openQuestion(parent, Messages.DeleteFilesHandler_ConfirmDialogTitle, question)) {
 				return IConfirmCallback.YES;
 			}
 			return IConfirmCallback.NO;

@@ -10,12 +10,14 @@
 package org.eclipse.tcf.te.launch.ui.internal;
 
 import org.eclipse.core.expressions.PropertyTester;
+import org.eclipse.tcf.te.launch.ui.internal.handler.DeleteHandler;
 import org.eclipse.tcf.te.launch.ui.model.LaunchNode;
 
 /**
  * The property tester for a launch tree node.
  */
 public class LaunchNodePropertyTester extends PropertyTester {
+	private final DeleteHandler deleteHandler = new DeleteHandler();
 
 	/*
 	 * (non-Javadoc)
@@ -33,6 +35,9 @@ public class LaunchNodePropertyTester extends PropertyTester {
 			}
 			else if (property.equals("isLaunchConfig")) { //$NON-NLS-1$
 				return LaunchNode.TYPE_LAUNCH_CONFIG.equals(node.getType());
+			}
+			else if (property.equals("canDelete")) { //$NON-NLS-1$
+				return deleteHandler.canDelete(receiver);
 			}
 		}
 		return false;

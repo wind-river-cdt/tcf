@@ -9,7 +9,6 @@
             class="org.eclipse.tcf.te.tcf.ui.internal.adapters.AdapterFactory">
          <adapter type="org.eclipse.jface.viewers.ILabelProvider"/>
          <adapter type="org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate"/>
-         <adapter type="org.eclipse.tcf.te.ui.views.interfaces.handler.IDeleteHandlerDelegate"/>
          <adapter type="org.eclipse.ui.IPersistableElement"/>
          <adapter type="org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizable"/>
       </factory>
@@ -233,6 +232,29 @@
             </visibleWhen>
          </command>
       </menuContribution>
+      
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.delete">
+         <command
+               commandId="org.eclipse.ui.edit.delete"
+               disabledIcon="platform:/plugin/org.eclipse.ui/icons/full/dtool16/delete.gif"
+               helpContextId="org.eclipse.tcf.te.ui.command_Delete"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/delete.gif"
+               id="org.eclipse.tcf.te.ui.commands.delete"
+               label="%command.delete.label"
+               mnemonic="D"
+               style="push"
+               tooltip="%command.delete.description">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <count value="+"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+ 
    </extension>
 
 <!-- Command contributions -->
@@ -294,6 +316,37 @@
                </with>
             </enabledWhen>
       </handler>
+
+      <handler
+            commandId="org.eclipse.ui.edit.delete"
+            class="org.eclipse.tcf.te.tcf.ui.handler.DeleteHandler">
+            <activeWhen>
+               <and>
+                  <with variable="activePartId">
+                     <or>
+                        <equals value="org.eclipse.tcf.te.ui.views.View"/>
+                        <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
+                     </or>
+                  </with>
+                  <with variable="selection">
+                     <iterate operator="and" ifEmpty="false">
+                        <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                     </iterate>
+                  </with>
+               </and>
+            </activeWhen>
+            <enabledWhen>
+               <with variable="selection">
+                  <iterate operator="and" ifEmpty="false">
+                     <and>
+                        <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                        <test property="org.eclipse.tcf.te.tcf.locator.isStaticPeer" value="true"/>
+                     </and>
+                  </iterate>
+               </with>
+            </enabledWhen>
+      </handler>
+
    </extension>
    
 <!-- Tabbed properties view contributions -->   

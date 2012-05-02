@@ -229,31 +229,7 @@
             </visibleWhen>
          </command>
       </menuContribution>
-
-      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.delete">
-         <command
-               commandId="org.eclipse.ui.edit.delete"
-               disabledIcon="platform:/plugin/org.eclipse.ui/icons/full/dtool16/delete.gif"
-               helpContextId="org.eclipse.tcf.te.ui.command_Delete"
-               icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/delete.gif"
-               id="org.eclipse.tcf.te.ui.commands.delete"
-               label="%command.delete.label"
-               mnemonic="D"
-               style="push"
-               tooltip="%command.delete.description">
-            <visibleWhen checkEnabled="false">
-               <with variable="selection">
-                  <count value="+"/>
-                  <iterate operator="and" ifEmpty="false">
-                     <test
-                           property="org.eclipse.tcf.te.ui.views.isDeletableElement"
-                           value="true"/>
-                  </iterate>
-               </with>
-            </visibleWhen>
-         </command>
-      </menuContribution>
-   
+  
       <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.properties">
          <command
                commandId="org.eclipse.ui.file.properties"
@@ -468,36 +444,6 @@
       </handler>
       
       <handler
-            commandId="org.eclipse.ui.edit.delete"
-            class="org.eclipse.tcf.te.ui.views.handler.DeleteHandler">
-            <activeWhen>
-               <and>
-                  <with variable="activePartId">
-                     <or>
-                        <equals value="org.eclipse.tcf.te.ui.views.View"/>
-                        <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
-                     </or>
-                  </with>
-                  <with variable="selection">
-                     <iterate operator="and" ifEmpty="false">
-                        <test
-                              property="org.eclipse.tcf.te.ui.views.isDeletableElement"
-                              value="true"/>
-                     </iterate>
-                  </with>
-               </and>
-            </activeWhen>
-            <enabledWhen>
-               <with variable="selection">
-                  <iterate operator="and" ifEmpty="false">
-                     <test
-                           property="org.eclipse.tcf.te.ui.views.canDelete"
-                           value="true"/>
-                  </iterate>
-               </with>
-            </enabledWhen>
-      </handler>
-      <handler
             class="org.eclipse.tcf.te.ui.views.handler.ConfigFiltersHandler"
             commandId="org.eclipse.tcf.te.ui.views.command.filters">
          <activeWhen>
@@ -529,7 +475,7 @@
             class="org.eclipse.tcf.te.ui.views.expressions.PropertyTester"
             id="org.eclipse.tcf.te.ui.views.PropertyTester"
             namespace="org.eclipse.tcf.te.ui.views"
-            properties="hasApplicableEditorBindings,isRefreshableElement,canRefresh,isDeletableElement,canDelete"
+            properties="hasApplicableEditorBindings,isRefreshableElement,canRefresh"
             type="java.lang.Object">
       </propertyTester>
 

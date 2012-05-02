@@ -362,10 +362,9 @@
                   <iterate
                         ifEmpty="false"
                         operator="and">
-                     <test
-                           property="org.eclipse.tcf.te.ui.views.isDeletableElement"
-                           value="true">
-                     </test>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
+                     </instanceof>
                   </iterate>
                </with>
             </visibleWhen>
@@ -549,6 +548,28 @@
                </visibleWhen>
          </command>
       </menuContribution>
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.delete">
+         <command
+               commandId="org.eclipse.ui.edit.delete"
+               disabledIcon="platform:/plugin/org.eclipse.ui/icons/full/dtool16/delete.gif"
+               helpContextId="org.eclipse.tcf.te.ui.command_Delete"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/delete.gif"
+               id="org.eclipse.tcf.te.ui.commands.delete"
+               label="%command.delete.label"
+               mnemonic="D"
+               style="push"
+               tooltip="%command.delete.description">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <count value="+"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <instanceof value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      
       <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.properties">
          <command
                commandId="org.eclipse.ui.file.properties"
@@ -935,6 +956,13 @@
             namespace="org.eclipse.tcf.te.tcf.filesystem.propertytester.event"
             properties="isEditorActivation"
             type="org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent">
+      </propertyTester>
+      <propertyTester
+            id="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode"
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.testers.TreeNodePropertyTester"
+            namespace="org.eclipse.tcf.te.tcf.filesystem"
+            properties="canDelete"
+            type="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
       </propertyTester>
    </extension>
    
@@ -1565,6 +1593,37 @@
             class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.handlers.RefreshViewerHandler"
             commandId="org.eclipse.tcf.te.tcf.filesystem.commands.refreshViewer">
       </handler>
+
+      <handler
+            commandId="org.eclipse.ui.edit.delete"
+            class="org.eclipse.tcf.te.tcf.ui.handler.DeleteHandler">
+            <activeWhen>
+               <and>
+                  <with variable="activePartId">
+                     <or>
+                        <equals value="org.eclipse.tcf.te.ui.views.View"/>
+                        <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
+                     </or>
+                  </with>
+                  <with variable="selection">
+                     <iterate operator="and" ifEmpty="false">
+                        <instanceof value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode"/>
+                     </iterate>
+                  </with>
+               </and>
+            </activeWhen>
+            <enabledWhen>
+               <with variable="selection">
+                  <iterate operator="and" ifEmpty="false">
+                     <test
+                           property="org.eclipse.tcf.te.tcf.filesystem.canDelete"
+                           value="true">
+                     </test>
+                  </iterate>
+               </with>
+            </enabledWhen>
+      </handler>
+
    </extension>
    
 <!-- Decorator contributions -->
@@ -1665,9 +1724,6 @@
          </adapter>
          <adapter
                type="org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate">
-         </adapter>
-         <adapter
-               type="org.eclipse.tcf.te.ui.views.interfaces.handler.IDeleteHandlerDelegate">
          </adapter>
          <adapter
                type="org.eclipse.ui.IPersistableElement">
