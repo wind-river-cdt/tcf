@@ -32,6 +32,12 @@
 		</Or>
 	</Match>
 	
+	<!-- Ignore all EQ_DOESNT_OVERRIDE_EQUALS -->
+	<Match>
+		<Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS"/>
+		<Package name="~org\.eclipse\.tcf\.te\..*"/>
+	</Match>
+	
 	<!-- Ignore all ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD violations in bundle activators -->
 	<Match>
 		<Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
