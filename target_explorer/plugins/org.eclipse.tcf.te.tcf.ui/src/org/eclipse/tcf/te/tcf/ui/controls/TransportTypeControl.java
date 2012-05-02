@@ -10,6 +10,7 @@
 package org.eclipse.tcf.te.tcf.ui.controls;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -26,12 +27,12 @@ import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
  */
 public class TransportTypeControl extends BaseEditBrowseTextControl {
 
-	public final static String[] TRANSPORT_TYPES = new String[] {
-																	ITransportTypes.TRANSPORT_TYPE_TCP,
-																	ITransportTypes.TRANSPORT_TYPE_SSL,
-																	ITransportTypes.TRANSPORT_TYPE_PIPE,
-																	ITransportTypes.TRANSPORT_TYPE_CUSTOM
-																};
+	private final static List<String> TRANSPORT_TYPES = Arrays.asList(new String[] {
+																		ITransportTypes.TRANSPORT_TYPE_TCP,
+																		ITransportTypes.TRANSPORT_TYPE_SSL,
+																		ITransportTypes.TRANSPORT_TYPE_PIPE,
+																		ITransportTypes.TRANSPORT_TYPE_CUSTOM
+															});
 
 	/**
 	 * Constructor.
@@ -46,6 +47,15 @@ public class TransportTypeControl extends BaseEditBrowseTextControl {
 		setHideBrowseButton(true);
 		setEditFieldLabel(Messages.TransportTypeControl_label);
 		setAdjustBackgroundColor(parentPage != null);
+	}
+
+	/**
+	 * Returns the list of transport types supported by this control.
+	 *
+	 * @return The list of supported transport types.
+	 */
+	public String[] getTransportTypes() {
+		return TRANSPORT_TYPES.toArray(new String[TRANSPORT_TYPES.size()]);
 	}
 
 	/* (non-Javadoc)

@@ -216,7 +216,9 @@ public abstract class BaseTitledSection extends AbstractPropertySection implemen
 	 */
 	@Override
     public void refresh() {
-		composite.layout();
+		if (composite != null) {
+			composite.layout();
+		}
 	}
 
 	/*

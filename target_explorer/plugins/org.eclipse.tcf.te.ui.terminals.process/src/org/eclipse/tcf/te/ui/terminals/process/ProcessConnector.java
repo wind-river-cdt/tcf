@@ -35,14 +35,14 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.service.environment.Constants;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.tcf.te.runtime.services.interfaces.constants.ILineSeparatorConstants;
 import org.eclipse.tcf.te.ui.terminals.process.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.terminals.process.nls.Messages;
+import org.eclipse.tcf.te.ui.terminals.streams.AbstractStreamsConnector;
 import org.eclipse.tm.internal.terminal.provisional.api.ISettingsPage;
 import org.eclipse.tm.internal.terminal.provisional.api.ISettingsStore;
 import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
-import org.eclipse.tcf.te.runtime.services.interfaces.constants.ILineSeparatorConstants;
-import org.eclipse.tcf.te.ui.terminals.streams.AbstractStreamsConnector;
 
 /**
  * Process connector implementation.
@@ -179,7 +179,7 @@ public class ProcessConnector extends AbstractStreamsConnector {
 			// Create the process monitor
 			monitor = new ProcessMonitor(this);
 			monitor.startMonitoring();
-		} catch (Exception e) {
+		} catch (IOException e) {
 			IStatus status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(),
 			                            NLS.bind(Messages.ProcessConnector_error_creatingProcess, e.getLocalizedMessage()), e);
 			UIPlugin.getDefault().getLog().log(status);
@@ -364,9 +364,13 @@ public class ProcessConnector extends AbstractStreamsConnector {
 				// read piped data on Win 95, 98, and ME
 				Properties p = new Properties();
 				File file = new File(fileName);
-				InputStream stream = new BufferedInputStream(new FileInputStream(file));
-				p.load(stream);
-				stream.close();
+				InputStream stream = null;
+				try {
+					stream = new BufferedInputStream(new FileInputStream(file));
+					p.load(stream);
+				} finally {
+					if (stream != null) stream.close();
+				}
 				if (!file.delete()) {
 					file.deleteOnExit(); // if delete() fails try again on VM close
 				}
@@ -384,53 +388,58 @@ public class ProcessConnector extends AbstractStreamsConnector {
 				InputStream stream = process.getInputStream();
 				InputStreamReader isreader = new InputStreamReader(stream);
 				BufferedReader reader = new BufferedReader(isreader);
-				String line = reader.readLine();
-				String key = null;
-				String value = null;
-				while (line != null) {
-					int func = line.indexOf("=()"); //$NON-NLS-1$
-					if (func > 0) {
-						key = line.substring(0, func);
-						// scan until we find the closing '}' with no following chars
-						value = line.substring(func + 1);
-						while (line != null && !line.equals("}")) { //$NON-NLS-1$
-							line = reader.readLine();
-							if (line != null) {
-								value += line;
-							}
-						}
-						line = reader.readLine();
-					} else {
-						int separator = line.indexOf('=');
-						if (separator > 0) {
-							key = line.substring(0, separator);
-							value = line.substring(separator + 1);
-							line = reader.readLine();
-							if (line != null) {
-								// this line has a '=' read ahead to check next line for '=', might be broken on more
-								// than one line
-								separator = line.indexOf('=');
-								while (separator < 0) {
-									value += line.trim();
-									line = reader.readLine();
-									if (line == null) {
-										// if next line read is the end of the file quit the loop
-										break;
-									}
-									separator = line.indexOf('=');
+				try {
+					String line = reader.readLine();
+					String key = null;
+					String value = null;
+					while (line != null) {
+						int func = line.indexOf("=()"); //$NON-NLS-1$
+						if (func > 0) {
+							key = line.substring(0, func);
+							// scan until we find the closing '}' with no following chars
+							value = line.substring(func + 1);
+							while (line != null && !line.equals("}")) { //$NON-NLS-1$
+								line = reader.readLine();
+								if (line != null) {
+									value += line;
 								}
 							}
+							line = reader.readLine();
+						} else {
+							int separator = line.indexOf('=');
+							if (separator > 0) {
+								key = line.substring(0, separator);
+								value = line.substring(separator + 1);
+								StringBuilder bufValue = new StringBuilder(value);
+								line = reader.readLine();
+								if (line != null) {
+									// this line has a '=' read ahead to check next line for '=', might be broken on more
+									// than one line
+									separator = line.indexOf('=');
+									while (separator < 0) {
+										bufValue.append(line.trim());
+										line = reader.readLine();
+										if (line == null) {
+											// if next line read is the end of the file quit the loop
+											break;
+										}
+										separator = line.indexOf('=');
+									}
+								}
+								value = bufValue.toString();
+							}
+						}
+						if (key != null) {
+							cache.put(key, value);
+							key = null;
+							value = null;
+						} else {
+							line = reader.readLine();
 						}
 					}
-					if (key != null) {
-						cache.put(key, value);
-						key = null;
-						value = null;
-					} else {
-						line = reader.readLine();
-					}
+				} finally {
+					reader.close();
 				}
-				reader.close();
 			}
 		} catch (IOException e) {
 			// Native environment-fetching code failed.

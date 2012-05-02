@@ -155,7 +155,7 @@ public class ServicesSection extends AbstractSection {
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
-				Map<String, Object> properties = node.getProperties();
+				Map<String, Object> properties = od.getProperties();
 				odc.setProperties(properties);
 			}
 		});

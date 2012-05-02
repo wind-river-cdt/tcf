@@ -59,7 +59,7 @@ public class PeerAttributesTablePart extends TablePart implements IDisposable {
 	/* default */ final List<TableNode> nodes = new ArrayList<TableNode>();
 
 	// A list of names which are banned from using
-	private String[] bannedNames;
+	private List<String> bannedNames;
 
 	// A flag to mark the table part "read-only"
 	/* default */ boolean readOnly;
@@ -266,8 +266,8 @@ public class PeerAttributesTablePart extends TablePart implements IDisposable {
 			ISelection selection = getTableViewer().getSelection();
 			if (selection instanceof IStructuredSelection && !selection.isEmpty()) {
 				Object element = ((IStructuredSelection)selection).getFirstElement();
-				if (element instanceof TableNode) {
-					banned = Arrays.asList(bannedNames).contains(((TableNode)element).name);
+				if (element instanceof TableNode && bannedNames != null) {
+					banned = bannedNames.contains(((TableNode)element).name);
 				}
 			}
 		}
@@ -433,7 +433,7 @@ public class PeerAttributesTablePart extends TablePart implements IDisposable {
 	 * @param bannedNames The list of banned names or <code>null</code>.
 	 */
 	public final void setBannedNames(String[] bannedNames) {
-		this.bannedNames = bannedNames;
+		this.bannedNames = bannedNames != null ? Arrays.asList(bannedNames) : null;
 	}
 
 	/**
@@ -442,7 +442,7 @@ public class PeerAttributesTablePart extends TablePart implements IDisposable {
 	 * @return The list of banned names or <code>null</code>.
 	 */
 	public final String[] getBannedNames() {
-		return bannedNames;
+		return bannedNames != null ? bannedNames.toArray(new String[bannedNames.size()]) : null;
 	}
 
 	/**

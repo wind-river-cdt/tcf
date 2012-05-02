@@ -179,8 +179,12 @@ public class PreferencesPage extends FieldEditorPreferencePage implements IWorkb
 	public void propertyChange(PropertyChangeEvent event) {
 		super.propertyChange(event);
 		// Update the enablement
-		consoleWidth.setEnabled(fixedConsoleWidth.getBooleanValue(), getFieldEditorParent());
-		consoleBufferSize.setEnabled(limitConsoleOutput.getBooleanValue(), getFieldEditorParent());
+		if (consoleWidth != null && fixedConsoleWidth != null) {
+			consoleWidth.setEnabled(fixedConsoleWidth.getBooleanValue(), getFieldEditorParent());
+		}
+		if (consoleBufferSize != null && limitConsoleOutput != null) {
+			consoleBufferSize.setEnabled(limitConsoleOutput.getBooleanValue(), getFieldEditorParent());
+		}
 	}
 
 	/* (non-Javadoc)

@@ -157,8 +157,10 @@ public class CustomTransportPanel extends AbstractWizardConfigurationPanel imple
 		boolean valid = super.isValid();
 		if (!valid) return false;
 
-		valid = customTransportNameControl.isValid();
-		setMessage(customTransportNameControl.getMessage(), customTransportNameControl.getMessageType());
+		if (customTransportNameControl != null) {
+			valid = customTransportNameControl.isValid();
+			setMessage(customTransportNameControl.getMessage(), customTransportNameControl.getMessageType());
+		}
 
 		return valid;
 	}

@@ -563,7 +563,7 @@ public class ScriptPad extends ViewPart implements ISelectionProvider, Selection
 				}
 				text.setText(buffer.toString());
 				markDirty(false);
-			} catch (Exception e) {
+			} catch (IOException e) {
 				IStatus status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(),
 											NLS.bind(Messages.ScriptPad_error_openFile, file, e.getLocalizedMessage()), e);
 

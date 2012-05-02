@@ -45,8 +45,8 @@ public class AbstractConsole extends MessageConsole implements IConsoleListener,
 	 * Immutable buffered console line.
 	 */
 	protected static final class ConsoleBufferLine {
-		protected final String message;
-		protected final char messageType;
+		public final String message;
+		public final char messageType;
 
 		/**
 		 * Constructor.
@@ -342,7 +342,7 @@ public class AbstractConsole extends MessageConsole implements IConsoleListener,
 						MessageConsoleStream stream = streams.get(streamType);
 						stream.setColor(newColor);
 						// Dispose the old color
-						oldColor.dispose();
+						if (oldColor != null) oldColor.dispose();
 						// and update the stream color map
 						streamColors.put(streamType, newColor);
 					}

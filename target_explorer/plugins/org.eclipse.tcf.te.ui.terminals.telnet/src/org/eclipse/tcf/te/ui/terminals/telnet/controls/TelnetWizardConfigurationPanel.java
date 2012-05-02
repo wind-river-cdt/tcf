@@ -59,7 +59,7 @@ public class TelnetWizardConfigurationPanel extends AbstractConfigurationPanel i
 		panel.setLayoutData(data);
 
 		if(isWithoutSelection()){
-			createHostsUI(panel);			
+			createHostsUI(panel);
 		}
 
 		TelnetConnector conn = new TelnetConnector();
@@ -69,7 +69,7 @@ public class TelnetWizardConfigurationPanel extends AbstractConfigurationPanel i
 		telnetSettings.setHost(getSelectionHost());
 		// MWE otherwise we don't get a valid default selection of the combo
 		telnetSettings.setNetworkPort(NetworkPortMap.PROP_VALUETELNET);
-		
+
 		setControl(panel);
 	}
 
@@ -142,13 +142,13 @@ public class TelnetWizardConfigurationPanel extends AbstractConfigurationPanel i
 			if(hostSettingsMap.containsKey(host)){
 				Map<String, String> hostSettings=hostSettingsMap.get(host);
 				hostSettings.put(ITerminalsConnectorConstants.PROP_IP_HOST, telnetSettings.getHost());
-				hostSettings.put(ITerminalsConnectorConstants.PROP_IP_PORT, new Integer(telnetSettings.getNetworkPort()).toString());
-				hostSettings.put(ITerminalsConnectorConstants.PROP_TIMEOUT, new Integer(telnetSettings.getTimeout()).toString());
+				hostSettings.put(ITerminalsConnectorConstants.PROP_IP_PORT, Integer.toString(telnetSettings.getNetworkPort()));
+				hostSettings.put(ITerminalsConnectorConstants.PROP_TIMEOUT, Integer.toString(telnetSettings.getTimeout()));
 			} else if(add){
 				Map<String, String> hostSettings=new HashMap<String, String>();
 				hostSettings.put(ITerminalsConnectorConstants.PROP_IP_HOST, telnetSettings.getHost());
-				hostSettings.put(ITerminalsConnectorConstants.PROP_IP_PORT, new Integer(telnetSettings.getNetworkPort()).toString());
-				hostSettings.put(ITerminalsConnectorConstants.PROP_TIMEOUT, new Integer(telnetSettings.getTimeout()).toString());
+				hostSettings.put(ITerminalsConnectorConstants.PROP_IP_PORT, Integer.toString(telnetSettings.getNetworkPort()));
+				hostSettings.put(ITerminalsConnectorConstants.PROP_TIMEOUT, Integer.toString(telnetSettings.getTimeout()));
 				hostSettingsMap.put(host, hostSettings);
 			}
 		}

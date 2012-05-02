@@ -57,8 +57,11 @@ public class CategoryManager implements ICategoryManager {
 	private IPath getRoot() {
 		try {
 			File file = UIPlugin.getDefault().getStateLocation().toFile();
-			if (!file.exists()) file.mkdirs();
-			if (file.canRead() && file.isDirectory()) {
+			boolean exists = file.exists();
+			if (!exists) {
+				exists = file.mkdirs();
+			}
+			if (exists && file.canRead() && file.isDirectory()) {
 				return new Path(file.toString());
 			}
 		} catch (IllegalStateException e) {
@@ -87,9 +90,13 @@ public class CategoryManager implements ICategoryManager {
 		File file = root.append("cat2id.json").toFile(); //$NON-NLS-1$
 		try {
 			cat2id.clear();
-			Reader reader = new InputStreamReader(new FileInputStream(file), "UTF-8"); //$NON-NLS-1$
-			cat2id.putAll(gson.fromJson(reader, Map.class));
-			reader.close();
+			Reader reader = null;
+			try {
+				reader = new InputStreamReader(new FileInputStream(file), "UTF-8"); //$NON-NLS-1$
+				cat2id.putAll(gson.fromJson(reader, Map.class));
+			} finally {
+				if (reader != null) reader.close();
+			}
 		} catch (IOException e) {
 			/* ignored on purpose */
 		}
@@ -98,9 +105,13 @@ public class CategoryManager implements ICategoryManager {
 		file = root.append("id2cat.json").toFile(); //$NON-NLS-1$
 		try {
 			id2cat.clear();
-			Reader reader = new InputStreamReader(new FileInputStream(file), "UTF-8"); //$NON-NLS-1$
-			id2cat.putAll(gson.fromJson(reader, Map.class));
-			reader.close();
+			Reader reader = null;
+			try {
+				reader = new InputStreamReader(new FileInputStream(file), "UTF-8"); //$NON-NLS-1$
+				id2cat.putAll(gson.fromJson(reader, Map.class));
+			} finally {
+				if (reader != null) reader.close();
+			}
 		} catch (IOException e) {
 			/* ignored on purpose */
 		}
@@ -120,9 +131,13 @@ public class CategoryManager implements ICategoryManager {
 		// The first file to write is the category to id list map
 		File file = root.append("cat2id.json").toFile(); //$NON-NLS-1$
 		try {
-			Writer writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8"); //$NON-NLS-1$
-			gson.toJson(cat2id, Map.class, writer);
-			writer.close();
+			Writer writer = null;
+			try {
+				writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8"); //$NON-NLS-1$
+				gson.toJson(cat2id, Map.class, writer);
+			} finally {
+				if (writer != null) writer.close();
+			}
 		} catch (IOException e) {
 			/* ignored on purpose */
 		}
@@ -130,9 +145,13 @@ public class CategoryManager implements ICategoryManager {
 		// The second file to write is the id to category list map
 		file = root.append("id2cat.json").toFile(); //$NON-NLS-1$
 		try {
-			Writer writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8"); //$NON-NLS-1$
-			gson.toJson(id2cat, Map.class, writer);
-			writer.close();
+			Writer writer = null;
+			try {
+				writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8"); //$NON-NLS-1$
+				gson.toJson(id2cat, Map.class, writer);
+			} finally {
+				if (writer != null) writer.close();
+			}
 		} catch (IOException e) {
 			/* ignored on purpose */
 		}

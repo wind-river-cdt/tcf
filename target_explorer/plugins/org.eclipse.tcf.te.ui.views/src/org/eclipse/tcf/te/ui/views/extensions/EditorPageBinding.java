@@ -38,7 +38,7 @@ public class EditorPageBinding extends ExecutableExtension {
 		// Initialize the page id field by reading the <pageId> extension attribute.
 		// Throws an exception if the id is empty or null.
 		pageId = config != null ? config.getAttribute("pageId") : null; //$NON-NLS-1$
-		if (pageId == null || (pageId != null && "".equals(pageId.trim()))) { //$NON-NLS-1$
+		if (pageId == null || "".equals(pageId.trim())) { //$NON-NLS-1$
 			throw createMissingMandatoryAttributeException("pageId", config.getContributor().getName()); //$NON-NLS-1$
 		}
 

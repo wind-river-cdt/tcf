@@ -62,7 +62,7 @@ public class SshWizardConfigurationPanel extends AbstractConfigurationPanel impl
 		panel.setLayoutData(data);
 
 		if(isWithoutSelection()){
-			createHostsUI(panel);			
+			createHostsUI(panel);
 		}
 
 		SshConnector conn = new SshConnector();
@@ -71,7 +71,7 @@ public class SshWizardConfigurationPanel extends AbstractConfigurationPanel impl
 		sshSettings.setUser(getDefaultUser());
 		sshSettingsPage = conn.makeSettingsPage();
 		sshSettingsPage.createControl(panel);
-		
+
 		setControl(panel);
 	}
 
@@ -171,9 +171,9 @@ public class SshWizardConfigurationPanel extends AbstractConfigurationPanel impl
 			if(hostSettingsMap.containsKey(host)){
 				Map<String, String> hostSettings=hostSettingsMap.get(host);
 				hostSettings.put(ITerminalsConnectorConstants.PROP_IP_HOST, sshSettings.getHost());
-				hostSettings.put(ITerminalsConnectorConstants.PROP_IP_PORT, new Integer(sshSettings.getPort()).toString());
-				hostSettings.put(ITerminalsConnectorConstants.PROP_TIMEOUT, new Integer(sshSettings.getTimeout()).toString());
-				hostSettings.put(ITerminalsConnectorConstants.PROP_SSH_KEEP_ALIVE, new Integer(sshSettings.getKeepalive()).toString());
+				hostSettings.put(ITerminalsConnectorConstants.PROP_IP_PORT, Integer.toString(sshSettings.getPort()));
+				hostSettings.put(ITerminalsConnectorConstants.PROP_TIMEOUT, Integer.toString(sshSettings.getTimeout()));
+				hostSettings.put(ITerminalsConnectorConstants.PROP_SSH_KEEP_ALIVE, Integer.toString(sshSettings.getKeepalive()));
 				hostSettings.put(ITerminalsConnectorConstants.PROP_SSH_USER, sshSettings.getUser());
 
 				if(sshSettings.getPassword()!=null && sshSettings.getPassword().length()!=0){
@@ -182,9 +182,9 @@ public class SshWizardConfigurationPanel extends AbstractConfigurationPanel impl
 			} else if(add){
 				Map<String, String> hostSettings=new HashMap<String, String>();
 				hostSettings.put(ITerminalsConnectorConstants.PROP_IP_HOST, sshSettings.getHost());
-				hostSettings.put(ITerminalsConnectorConstants.PROP_IP_PORT, new Integer(sshSettings.getPort()).toString());
-				hostSettings.put(ITerminalsConnectorConstants.PROP_TIMEOUT, new Integer(sshSettings.getTimeout()).toString());
-				hostSettings.put(ITerminalsConnectorConstants.PROP_SSH_KEEP_ALIVE, new Integer(sshSettings.getKeepalive()).toString());
+				hostSettings.put(ITerminalsConnectorConstants.PROP_IP_PORT, Integer.toString(sshSettings.getPort()));
+				hostSettings.put(ITerminalsConnectorConstants.PROP_TIMEOUT, Integer.toString(sshSettings.getTimeout()));
+				hostSettings.put(ITerminalsConnectorConstants.PROP_SSH_KEEP_ALIVE, Integer.toString(sshSettings.getKeepalive()));
 				hostSettings.put(ITerminalsConnectorConstants.PROP_SSH_USER, sshSettings.getUser());
 				hostSettingsMap.put(host, hostSettings);
 

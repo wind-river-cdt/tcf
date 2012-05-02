@@ -22,8 +22,6 @@ import org.eclipse.ui.IViewPart;
  * Clear script action implementation.
  */
 public class ClearAction extends Action implements IViewActionDelegate, IActionDelegate2 {
-	// Reference to the action proxy
-	/* default */ IAction actionProxy;
 	// Parent view part
 	/* default */ IViewPart view;
 
@@ -47,7 +45,6 @@ public class ClearAction extends Action implements IViewActionDelegate, IActionD
 	 */
 	@Override
 	public void init(IAction action) {
-    	this.actionProxy = action;
 	}
 
 	/* (non-Javadoc)

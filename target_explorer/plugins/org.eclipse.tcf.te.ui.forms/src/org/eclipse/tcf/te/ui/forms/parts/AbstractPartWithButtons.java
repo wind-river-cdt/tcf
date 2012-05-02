@@ -10,6 +10,7 @@
 package org.eclipse.tcf.te.ui.forms.parts;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -30,7 +31,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
  */
 public abstract class AbstractPartWithButtons extends AbstractPart {
 	// The button labels
-	private final String[] labels;
+	private final List<String> labels;
 	// The buttons list
 	private Button[] buttons = null;
 
@@ -41,7 +42,8 @@ public abstract class AbstractPartWithButtons extends AbstractPart {
 	 */
 	public AbstractPartWithButtons(String[] labels) {
 		super();
-		this.labels = labels;
+		Assert.isNotNull(labels);
+		this.labels = Arrays.asList(labels);
 	}
 
 	/* (non-Javadoc)
@@ -51,7 +53,7 @@ public abstract class AbstractPartWithButtons extends AbstractPart {
 	public void createControl(Composite parent, int style, int span, FormToolkit toolkit) {
 		Assert.isNotNull(parent);
 		createMainLabel(parent, span, toolkit);
-		createMainControl(parent, style, span - ((labels != null && labels.length > 0) ? 1 : 0), toolkit);
+		createMainControl(parent, style, span - ((labels != null && labels.size() > 0) ? 1 : 0), toolkit);
 		createButtonsPanel(parent, toolkit);
 	}
 
@@ -85,11 +87,11 @@ public abstract class AbstractPartWithButtons extends AbstractPart {
 	 * @return The buttons panel composite or <code>null</code>.
 	 */
 	protected Composite createButtonsPanel(Composite parent, FormToolkit toolkit) {
-		if (labels == null || labels.length == 0) {
+		if (labels == null || labels.size() == 0) {
 			return null;
 		}
 
-		buttons = new Button[labels.length];
+		buttons = new Button[labels.size()];
 
 		Composite panel = createComposite(parent, toolkit);
 		GridLayout layout = new GridLayout();
@@ -106,13 +108,13 @@ public abstract class AbstractPartWithButtons extends AbstractPart {
 			}
 		};
 
-		for (int i = 0; i < labels.length; i++) {
-			if (labels[i] != null) {
+		for (int i = 0; i < labels.size(); i++) {
+			if (labels.get(i) != null) {
 				Button button = toolkit != null ? toolkit.createButton(panel, null, SWT.PUSH) : new Button(panel, SWT.PUSH);
 				Assert.isNotNull(button);
 
 				button.setFont(JFaceResources.getDialogFont());
-				button.setText(labels[i]);
+				button.setText(labels.get(i));
 				button.setData(Integer.valueOf(i));
 				button.setBackground(panel.getBackground());
 				button.addSelectionListener(listener);
@@ -178,7 +180,7 @@ public abstract class AbstractPartWithButtons extends AbstractPart {
 		if (labels == null) {
 			throw new ArrayIndexOutOfBoundsException();
 		}
-		return getButton(Arrays.asList(labels).indexOf(label));
+		return getButton(labels.indexOf(label));
 	}
 
 	/**

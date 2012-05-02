@@ -123,7 +123,11 @@ public class PeerGeneralSectionContentProvider implements IStructuredContentProv
 		if (sectionTitle == null || "".equals(sectionTitle.trim())) sectionTitle = org.eclipse.tcf.te.ui.nls.Messages.NodePropertiesTableControl_section_title_noSelection; //$NON-NLS-1$
 		// Stretch to a length of 40 characters to make sure the title can be changed
 		// to hold and show text up to this length
-		while (sectionTitle.length() < 40) sectionTitle += " "; //$NON-NLS-1$
+		if (sectionTitle.length() < 40) {
+			StringBuilder buffer = new StringBuilder(sectionTitle);
+			while (buffer.length() < 40) buffer.append(" "); //$NON-NLS-1$
+			sectionTitle = buffer.toString();
+		}
 
 		// Find the parent section the node properties tables is embedded in
 		Control control = viewer.getControl();

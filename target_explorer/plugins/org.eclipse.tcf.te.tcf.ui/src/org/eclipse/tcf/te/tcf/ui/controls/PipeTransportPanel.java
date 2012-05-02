@@ -156,8 +156,10 @@ public class PipeTransportPanel extends AbstractWizardConfigurationPanel impleme
 		boolean valid = super.isValid();
 		if (!valid) return false;
 
-		valid = pipeNameControl.isValid();
-		setMessage(pipeNameControl.getMessage(), pipeNameControl.getMessageType());
+		if (pipeNameControl != null) {
+			valid = pipeNameControl.isValid();
+			setMessage(pipeNameControl.getMessage(), pipeNameControl.getMessageType());
+		}
 
 		return valid;
 	}

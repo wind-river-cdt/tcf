@@ -71,7 +71,7 @@ public abstract class AbstractCheckBoxCellPaintListener extends AbstractCellPain
 			// Check which image to paint
 			int state = getCheckBoxState(item.getData(), columnIndex);
 			if (state >= 0) {
-				return SWTControlUtil.getCheckBoxImage((state & CHECKED) > 0, (state & TRISTATE) > 0, (state & ENABLED) > 0);
+				return SWTControlUtil.getCheckBoxImage((state & CHECKED) != 0, (state & TRISTATE) != 0, (state & ENABLED) != 0);
 			}
 		}
 

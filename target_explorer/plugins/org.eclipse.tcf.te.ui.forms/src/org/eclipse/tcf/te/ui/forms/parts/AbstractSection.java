@@ -10,6 +10,8 @@
 package org.eclipse.tcf.te.ui.forms.parts;
 
 import java.lang.reflect.Field;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
@@ -188,8 +190,14 @@ public abstract class AbstractSection extends SectionPart implements IAdaptable,
 			// Plus, refresh() might be overwritten to refresh the widget content
 			// from the data itself, what will trigger an stack overflow after all.
 			try {
-				Field f = AbstractFormPart.class.getDeclaredField("dirty"); //$NON-NLS-1$
-				f.setAccessible(true);
+				final Field f = AbstractFormPart.class.getDeclaredField("dirty"); //$NON-NLS-1$
+				AccessController.doPrivileged(new PrivilegedAction<Object>() {
+					@Override
+					public Object run() {
+						f.setAccessible(true);
+						return null;
+					}
+				});
 				f.setBoolean(this, dirty);
 				getManagedForm().dirtyStateChanged();
 			} catch (Exception e) { /* ignored on purpose */ }

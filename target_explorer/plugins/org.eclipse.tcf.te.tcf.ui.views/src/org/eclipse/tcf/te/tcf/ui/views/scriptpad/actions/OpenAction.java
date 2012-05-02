@@ -24,8 +24,6 @@ import org.eclipse.ui.IViewPart;
  * Open script action implementation.
  */
 public class OpenAction extends Action implements IViewActionDelegate, IActionDelegate2 {
-	// Reference to the action proxy
-	/* default */ IAction actionProxy;
 	// Parent view part
 	/* default */ IViewPart view;
 
@@ -52,7 +50,6 @@ public class OpenAction extends Action implements IViewActionDelegate, IActionDe
 	 */
 	@Override
 	public void init(IAction action) {
-    	this.actionProxy = action;
 	}
 
 	/* (non-Javadoc)

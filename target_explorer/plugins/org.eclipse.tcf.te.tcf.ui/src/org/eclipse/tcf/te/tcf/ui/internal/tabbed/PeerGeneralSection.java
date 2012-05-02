@@ -90,7 +90,9 @@ public class PeerGeneralSection extends AbstractPropertySection {
 	 */
 	@Override
     public void refresh() {
-		tableControl.getViewer().setInput(peer);
+		if (tableControl != null) {
+			tableControl.getViewer().setInput(peer);
+		}
     }
 
 }

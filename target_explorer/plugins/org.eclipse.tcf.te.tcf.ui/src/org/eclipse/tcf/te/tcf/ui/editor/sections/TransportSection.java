@@ -41,7 +41,6 @@ import org.eclipse.tcf.te.tcf.locator.nodes.PeerRedirector;
 import org.eclipse.tcf.te.tcf.ui.controls.CustomTransportPanel;
 import org.eclipse.tcf.te.tcf.ui.controls.PipeTransportPanel;
 import org.eclipse.tcf.te.tcf.ui.controls.TcpTransportPanel;
-import org.eclipse.tcf.te.tcf.ui.controls.TransportTypeControl;
 import org.eclipse.tcf.te.tcf.ui.editor.controls.TransportSectionTypeControl;
 import org.eclipse.tcf.te.tcf.ui.editor.controls.TransportSectionTypePanelControl;
 import org.eclipse.tcf.te.tcf.ui.nls.Messages;
@@ -142,7 +141,7 @@ public class TransportSection extends AbstractSection {
 		transportTypePanelControl.addConfigurationPanel(ITransportTypes.TRANSPORT_TYPE_CUSTOM, new CustomTransportPanel(transportTypePanelControl));
 
 		// Setup the panel control
-		transportTypePanelControl.setupPanel(client, TransportTypeControl.TRANSPORT_TYPES, toolkit);
+		transportTypePanelControl.setupPanel(client, transportTypeControl.getTransportTypes(), toolkit);
 		GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
 		layoutData.horizontalSpan = 2;
 		transportTypePanelControl.getPanel().setLayoutData(layoutData);
