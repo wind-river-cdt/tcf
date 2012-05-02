@@ -12,63 +12,60 @@ package org.eclipse.tcf.te.launch.ui.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationListener;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.tcf.te.launch.core.bindings.LaunchConfigTypeBindingsManager;
+import org.eclipse.tcf.te.launch.core.interfaces.IReferencedProjectItem;
 import org.eclipse.tcf.te.launch.core.persistence.launchcontext.LaunchContextsPersistenceDelegate;
+import org.eclipse.tcf.te.launch.core.persistence.projects.ReferencedProjectItem;
+import org.eclipse.tcf.te.launch.core.persistence.projects.ReferencedProjectsPersistenceDelegate;
 import org.eclipse.tcf.te.launch.core.selection.LaunchSelection;
+import org.eclipse.tcf.te.launch.core.selection.ProjectSelectionContext;
 import org.eclipse.tcf.te.launch.core.selection.RemoteSelectionContext;
-import org.eclipse.tcf.te.launch.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.runtime.events.ChangeEvent;
 import org.eclipse.tcf.te.runtime.events.EventManager;
 import org.eclipse.tcf.te.runtime.model.interfaces.IContainerModelNode;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
-import org.eclipse.tcf.te.runtime.services.ServiceManager;
-import org.eclipse.tcf.te.runtime.services.interfaces.IPropertiesAccessService;
 
 /**
  * LaunchModel
  */
 public final class LaunchModel {
 
-	/* default */static final String LAUNCH_MODEL_KEY = UIPlugin.getUniqueIdentifier() + ".launch.root"; //$NON-NLS-1$
+	private static final Map<Object,LaunchModel> models = new HashMap<Object, LaunchModel>();
 
 	/**
-	 * Get the file system model of the peer model. If it does not
-	 * exist yet, create a new instance and store it.
+	 * Get the launch model of the rootNode.
+	 * If it does not exist yet, create a new instance and store it.
 	 *
-	 * @param peerModel The peer model
-	 * @return The file system model connected this peer model.
+	 * @param rootNode The rootNode of the model.
+	 * @return The launch model.
 	 */
-	public static LaunchModel getLaunchModel(final IModelNode modelNode) {
-		if (modelNode != null) {
-			IPropertiesAccessService service = ServiceManager.getInstance().getService(modelNode, IPropertiesAccessService.class);
-			LaunchModel model = service != null ? (LaunchModel)service.getProperty(modelNode, LAUNCH_MODEL_KEY) : (LaunchModel)modelNode.getProperty(LAUNCH_MODEL_KEY);
-			if (model == null) {
-				model = new LaunchModel(modelNode);
-				if (service != null) {
-					service.setProperty(modelNode, LAUNCH_MODEL_KEY, model);
-				}
-				else {
-					modelNode.setProperty(LAUNCH_MODEL_KEY, model);
-				}
-			}
-			return model;
+	public static LaunchModel getLaunchModel(final Object modelRoot) {
+		LaunchModel model = models.get(modelRoot);
+		if (model == null) {
+			model = new LaunchModel(modelRoot);
+			models.put(modelRoot, model);
 		}
-		return null;
+		return model;
 	}
 
-	private final LaunchNode root;
+	private final LaunchNode rootNode;
+	private final Object modelRoot;
 
 	/**
 	 * Constructor.
 	 */
-	private LaunchModel(IModelNode node) {
-		root = new LaunchNode(node);
+	private LaunchModel(Object modelRoot) {
+		this.modelRoot = modelRoot;
+		rootNode = new LaunchNode(this);
 		refresh();
 		DebugPlugin.getDefault().getLaunchManager().addLaunchConfigurationListener(new ILaunchConfigurationListener() {
 			@Override
@@ -97,16 +94,27 @@ public final class LaunchModel {
 		});
 	}
 
-	public LaunchNode getRoot() {
-		return root;
+	public LaunchNode getRootNode() {
+		return rootNode;
+	}
+
+	public Object getModelRoot() {
+		return modelRoot;
 	}
 
 	public boolean refresh() {
 		boolean changed = false;
-		IModelNode parent = root.getRootModelNode();
-		String[] typeIds = LaunchConfigTypeBindingsManager.getInstance().getValidLaunchConfigTypes(
-						new LaunchSelection(null, new RemoteSelectionContext(parent, true)));
-		List<IModelNode> typeNodes = new ArrayList<IModelNode>(Arrays.asList(root.getChildren()));
+		Object parent = rootNode.getModel().getModelRoot();
+		String[] typeIds = new String[0];
+		if (parent instanceof IProject) {
+			typeIds = LaunchConfigTypeBindingsManager.getInstance().getValidLaunchConfigTypes(
+							new LaunchSelection(null, new ProjectSelectionContext((IProject)parent, true)));
+		}
+		else if (parent instanceof IModelNode) {
+			typeIds = LaunchConfigTypeBindingsManager.getInstance().getValidLaunchConfigTypes(
+							new LaunchSelection(null, new RemoteSelectionContext((IModelNode)parent, true)));
+		}
+		List<IModelNode> typeNodes = new ArrayList<IModelNode>(Arrays.asList(rootNode.getChildren()));
 		for (String typeId : typeIds) {
 			ILaunchConfigurationType type = DebugPlugin.getDefault().getLaunchManager().getLaunchConfigurationType(typeId);
 			if (type.isPublic()) {
@@ -116,7 +124,7 @@ public final class LaunchModel {
 				}
 				else {
 					typeNode = new LaunchNode(type);
-					root.add(typeNode);
+					rootNode.add(typeNode);
 					changed = true;
 				}
 
@@ -130,16 +138,34 @@ public final class LaunchModel {
 
 				List<IModelNode> configNodes = new ArrayList<IModelNode>(Arrays.asList(((IContainerModelNode)typeNode).getChildren()));
 				for (ILaunchConfiguration config : configs) {
-					IModelNode[] contexts = LaunchContextsPersistenceDelegate.getLaunchContexts(config);
-					if (parent != null && (contexts == null || Arrays.asList(contexts).contains(parent))) {
-						IModelNode configNode = find(config, configNodes);
-						if (configNode != null) {
-							configNodes.remove(configNode);
+					if (parent instanceof IModelNode) {
+						IModelNode[] contexts = LaunchContextsPersistenceDelegate.getLaunchContexts(config);
+						if (contexts == null || contexts.length == 0 || Arrays.asList(contexts).contains(parent)) {
+							IModelNode configNode = find(config, configNodes);
+							if (configNode != null) {
+								configNodes.remove(configNode);
+							}
+							else {
+								configNode = new LaunchNode(config);
+								((IContainerModelNode)typeNode).add(configNode);
+								changed = true;
+							}
 						}
-						else {
-							configNode = new LaunchNode(config);
-							((IContainerModelNode)typeNode).add(configNode);
-							changed = true;
+					}
+					else if (parent instanceof IProject) {
+						IReferencedProjectItem[] projects = ReferencedProjectsPersistenceDelegate.getReferencedProjects(config);
+						IReferencedProjectItem project = new ReferencedProjectItem();
+						project.setProperty(IReferencedProjectItem.PROPERTY_PROJECT_NAME, ((IProject)parent).getName());
+						if (projects != null && Arrays.asList(projects).contains(project)) {
+							IModelNode configNode = find(config, configNodes);
+							if (configNode != null) {
+								configNodes.remove(configNode);
+							}
+							else {
+								configNode = new LaunchNode(config);
+								((IContainerModelNode)typeNode).add(configNode);
+								changed = true;
+							}
 						}
 					}
 				}
@@ -149,7 +175,7 @@ public final class LaunchModel {
 				}
 			}
 			for (IModelNode typeToDelete : typeNodes) {
-				root.remove(typeToDelete, true);
+				rootNode.remove(typeToDelete, true);
 				changed = true;
 			}
 		}

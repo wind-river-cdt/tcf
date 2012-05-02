@@ -24,6 +24,8 @@ public class FileTransferItem extends PropertiesContainer implements IFileTransf
 	 * Constructor.
 	 */
 	public FileTransferItem() {
+		setProperty(PROPERTY_ENABLED, true);
+		setProperty(PROPERTY_DIRECTION, HOST_TO_TARGET);
 	}
 
 	/* (non-Javadoc)

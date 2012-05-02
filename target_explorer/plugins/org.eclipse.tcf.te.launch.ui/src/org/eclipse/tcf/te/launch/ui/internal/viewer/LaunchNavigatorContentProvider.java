@@ -20,7 +20,6 @@ import org.eclipse.tcf.te.launch.ui.model.LaunchNode;
 import org.eclipse.tcf.te.runtime.events.ChangeEvent;
 import org.eclipse.tcf.te.runtime.events.EventManager;
 import org.eclipse.tcf.te.runtime.interfaces.events.IEventListener;
-import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
 import org.eclipse.tcf.te.ui.trees.TreeContentProvider;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.navigator.ICommonContentExtensionSite;
@@ -38,14 +37,14 @@ public class LaunchNavigatorContentProvider extends TreeContentProvider implemen
 	public Object getParent(Object element) {
 		if (element instanceof LaunchNode) {
 			LaunchNode node = (LaunchNode)element;
-			if (LaunchNode.TYPE_ROOT.equals(node.getType())) {
-				return node.getRootModelNode();
+			if (node.getParent() == null || LaunchNode.TYPE_ROOT.equals(node.getType())) {
+				return node.getModel().getModelRoot();
 			}
 
 			if (!isRootNodeVisible() && LaunchNode.TYPE_LAUNCH_CONFIG_TYPE.equals(node.getType())) {
-				return node.getRootModelNode();
+				return node.getModel().getModelRoot();
 			}
-			return ((LaunchNode)element).getParent();
+			return node.getParent();
 		}
 		return null;
 	}
@@ -83,11 +82,13 @@ public class LaunchNavigatorContentProvider extends TreeContentProvider implemen
 		if (element instanceof LaunchNode) {
 			return ((LaunchNode)element).getChildren();
 		}
-		else if (element instanceof IModelNode) {
+
+		LaunchModel model = LaunchModel.getLaunchModel(element);
+		if (model != null) {
 			if (isRootNodeVisible()) {
-				return new Object[]{LaunchModel.getLaunchModel((IModelNode)element).getRoot()};
+				return new Object[]{model.getRootNode()};
 			}
-			return LaunchModel.getLaunchModel((IModelNode)element).getRoot().getChildren();
+			return model.getRootNode().getChildren();
 		}
 		return NO_ELEMENTS;
 	}
@@ -101,8 +102,9 @@ public class LaunchNavigatorContentProvider extends TreeContentProvider implemen
 		if (element instanceof LaunchNode) {
 			return ((LaunchNode)element).hasChildren();
 		}
-		else if (element instanceof IModelNode) {
-			return LaunchModel.getLaunchModel((IModelNode)element).getRoot().hasChildren();
+		LaunchModel model = LaunchModel.getLaunchModel(element);
+		if (model != null) {
+			return model.getRootNode().hasChildren();
 		}
 		return false;
 	}

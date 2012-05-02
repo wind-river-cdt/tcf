@@ -111,21 +111,34 @@ public class LaunchSelectionManager {
 		List<ISelectionContext> contexts = new ArrayList<ISelectionContext>();
 
 		// Get the selected remote contexts
-		Map<IModelNode, Set<IModelNode>> remoteCtxSelections = getRemoteCtxSelections(getPartSelection(PART_ID_TE_VIEW));
-
-		for (IModelNode remoteCtx : remoteCtxSelections.keySet()) {
-			contexts.add(new RemoteSelectionContext(remoteCtx, remoteCtxSelections.get(remoteCtx).toArray(),
-							PART_ID_TE_VIEW.equalsIgnoreCase(preferredPartId)));
-		}
+		contexts.addAll(getSelectionContextsFor(PART_ID_TE_VIEW, type, mode, PART_ID_TE_VIEW.equalsIgnoreCase(preferredPartId)));
 
 		// Get the selected project contexts
-		Map<IProject, Set<IPath>> projectSelections = getProjectSelections(getPartSelection(PART_ID_PROJECT_VIEW), true);
-		for (IProject prj : projectSelections.keySet()) {
-			contexts.add(new ProjectSelectionContext(prj, projectSelections.get(prj).toArray(),
-							PART_ID_PROJECT_VIEW.equalsIgnoreCase(preferredPartId)));
-		}
+		contexts.addAll(getSelectionContextsFor(PART_ID_PROJECT_VIEW, type, mode, PART_ID_PROJECT_VIEW.equalsIgnoreCase(preferredPartId)));
 
 		return contexts.toArray(new ISelectionContext[contexts.size()]);
+	}
+
+	public List<ISelectionContext> getSelectionContextsFor(String partId, ILaunchConfigurationType type, String mode, boolean preferedPart) {
+		List<ISelectionContext> contexts = new ArrayList<ISelectionContext>();
+
+		if (PART_ID_TE_VIEW.equalsIgnoreCase(partId)) {
+			// Get the selected remote contexts
+			Map<IModelNode, Set<IModelNode>> remoteCtxSelections = getRemoteCtxSelections(getPartSelection(PART_ID_TE_VIEW));
+			for (IModelNode remoteCtx : remoteCtxSelections.keySet()) {
+				contexts.add(new RemoteSelectionContext(remoteCtx, remoteCtxSelections.get(remoteCtx).toArray(), preferedPart));
+			}
+		}
+		else if (PART_ID_PROJECT_VIEW.equalsIgnoreCase(partId)) {
+
+			// Get the selected project contexts
+			Map<IProject, Set<IPath>> projectSelections = getProjectSelections(getPartSelection(PART_ID_PROJECT_VIEW), true);
+			for (IProject prj : projectSelections.keySet()) {
+				contexts.add(new ProjectSelectionContext(prj, projectSelections.get(prj).toArray(), preferedPart));
+			}
+		}
+
+		return contexts;
 	}
 
 	/**
@@ -145,8 +158,8 @@ public class LaunchSelectionManager {
 				IModelNode remoteCtx = null;
 				IModelNode node = null;
 
-				if (sel instanceof LaunchNode) {
-					node = ((LaunchNode)sel).getRootModelNode();
+				if (sel instanceof LaunchNode && ((LaunchNode)sel).getModel().getModelRoot() instanceof IModelNode) {
+					node = (IModelNode)((LaunchNode)sel).getModel().getModelRoot();
 				}
 				else if (sel instanceof IModelNodeProvider) {
 					node = ((IModelNodeProvider)sel).getModelNode();
@@ -203,11 +216,16 @@ public class LaunchSelectionManager {
 				IProject prj = null;
 				IResource resource = null;
 
+				if (sel instanceof LaunchNode && ((LaunchNode)sel).getModel().getModelRoot() instanceof IResource) {
+					sel = ((LaunchNode)sel).getModel().getModelRoot();
+				}
+
 				// If the selection is not an IResource itself, try to adapt to it.
 				// This will possibly trigger an plugin activation on loadAdapter(...).
 				if (sel instanceof IResource) {
 					resource = (IResource)sel;
-				} else {
+				}
+				else {
 					resource = (IResource)Platform.getAdapterManager().loadAdapter(sel, IResource.class.getName());
 				}
 
@@ -251,7 +269,10 @@ public class LaunchSelectionManager {
 				IProject prj = null;
 				IPath location = null;
 
-				if (sel instanceof IProject) {
+				if (sel instanceof LaunchNode && ((LaunchNode)sel).getModel().getModelRoot() instanceof IProject) {
+					prj = (IProject)((LaunchNode)sel).getModel().getModelRoot();
+				}
+				else if (sel instanceof IProject) {
 					prj = (IProject)sel;
 				}
 				else if (sel instanceof IFile) {

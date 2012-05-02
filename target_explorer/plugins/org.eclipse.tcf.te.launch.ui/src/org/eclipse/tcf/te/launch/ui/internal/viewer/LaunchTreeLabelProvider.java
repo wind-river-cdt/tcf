@@ -9,8 +9,6 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.launch.ui.internal.viewer;
 
-import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jface.viewers.ILabelDecorator;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -19,11 +17,12 @@ import org.eclipse.tcf.te.launch.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.launch.ui.internal.ImageConsts;
 import org.eclipse.tcf.te.launch.ui.model.LaunchNode;
 import org.eclipse.tcf.te.ui.jface.images.AbstractImageDescriptor;
+import org.eclipse.ui.navigator.IDescriptionProvider;
 
 /**
  * The label provider for the tree column "launchConfigurations".
  */
-public class LaunchTreeLabelProvider extends LabelProvider implements ILabelDecorator {
+public class LaunchTreeLabelProvider extends LabelProvider implements ILabelDecorator, IDescriptionProvider {
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
@@ -32,12 +31,6 @@ public class LaunchTreeLabelProvider extends LabelProvider implements ILabelDeco
 	public String getText(Object element) {
 		if (element instanceof LaunchNode) {
 			return ((LaunchNode)element).getName();
-		}
-		else if (element instanceof ILaunchConfigurationType) {
-			return ((ILaunchConfigurationType)element).getName();
-		}
-		else if (element instanceof ILaunchConfiguration) {
-			return ((ILaunchConfiguration)element).getName();
 		}
 		return super.getText(element);
 	}
@@ -93,5 +86,13 @@ public class LaunchTreeLabelProvider extends LabelProvider implements ILabelDeco
 	@Override
 	public String decorateText(final String text, final Object element) {
 		return text;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.navigator.IDescriptionProvider#getDescription(java.lang.Object)
+	 */
+	@Override
+	public String getDescription(Object element) {
+		return getText(element);
 	}
 }

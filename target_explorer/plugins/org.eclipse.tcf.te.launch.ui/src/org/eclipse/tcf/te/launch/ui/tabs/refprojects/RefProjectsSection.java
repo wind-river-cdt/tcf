@@ -380,7 +380,7 @@ public class RefProjectsSection extends AbstractTableSection implements ILaunchC
 	private boolean contains(List<IReferencedProjectItem> list, IProject project) {
 		for (IReferencedProjectItem item : list) {
 			if (item.isProperty(IReferencedProjectItem.PROPERTY_PROJECT_NAME, project.getName())) {
-				return false;
+				return true;
 			}
 		}
 		return false;

@@ -43,7 +43,7 @@ public class RefreshHandlerDelegate implements IRefreshHandlerDelegate {
 
 		if (canRefresh(element)) {
 			LaunchNode node = (LaunchNode) element;
-			LaunchModel model = LaunchModel.getLaunchModel(node.getRootModelNode());
+			LaunchModel model = node.getModel();
 			model.refresh();
 		}
 		if (callback != null) {

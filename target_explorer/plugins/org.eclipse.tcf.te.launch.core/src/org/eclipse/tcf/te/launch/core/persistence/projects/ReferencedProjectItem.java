@@ -22,6 +22,7 @@ public class ReferencedProjectItem extends PropertiesContainer implements IRefer
 	 * Constructor.
 	 */
 	public ReferencedProjectItem() {
+		setProperty(PROPERTY_ENABLED, true);
 	}
 
 	/* (non-Javadoc)

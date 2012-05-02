@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.tcf.te.launch.core.lm.LaunchConfigHelper;
@@ -31,16 +32,16 @@ public class LaunchNode extends ContainerModelNode {
 	public static final String TYPE_LAUNCH_CONFIG_TYPE = "launchConfigType"; //$NON-NLS-1$
 	public static final String TYPE_LAUNCH_CONFIG = "launchConfig"; //$NON-NLS-1$
 
-	private static final String PROPERTY_ROOT_MODEL_NODE = "modelNode"; //$NON-NLS-1$
+	private static final String PROPERTY_MODEL = "model"; //$NON-NLS-1$
 
 	private LaunchNode(String type) {
 		super();
 		setProperty(IModelNode.PROPERTY_TYPE, type);
 	}
 
-	public LaunchNode(IModelNode modelNode) {
+	public LaunchNode(LaunchModel model) {
 		this(TYPE_ROOT);
-		setProperty(PROPERTY_ROOT_MODEL_NODE, modelNode);
+		setProperty(PROPERTY_MODEL, model);
 	}
 
 	public LaunchNode(ILaunchConfiguration config) {
@@ -57,12 +58,17 @@ public class LaunchNode extends ContainerModelNode {
 		return getStringProperty(IModelNode.PROPERTY_TYPE);
 	}
 
-	public IModelNode getRootModelNode() {
-		IModelNode node = (IModelNode)getProperty(PROPERTY_ROOT_MODEL_NODE);
-		if (node == null && getParent() instanceof LaunchNode) {
-			return ((LaunchNode)getParent()).getRootModelNode();
+	public LaunchModel getModel() {
+		LaunchModel model = (LaunchModel)getProperty(PROPERTY_MODEL);
+		IModelNode parent = getParent();
+
+		while (model == null && parent != null) {
+			model = (LaunchModel)parent.getProperty(PROPERTY_MODEL);
+			parent = parent.getParent();
 		}
-		return node;
+
+		Assert.isNotNull(model);
+		return model;
 	}
 
 	public ILaunchConfiguration getLaunchConfiguration() {

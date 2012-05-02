@@ -5,7 +5,7 @@
 <!-- Adapter factory contributions -->
    <extension point="org.eclipse.core.runtime.adapters">
       <factory
-            class=""
+            class="org.eclipse.tcf.te.tcf.launch.ui.internal.adapters.AdapterFactory"
             adaptableType="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel">
          <adapter type="org.eclipse.debug.ui.actions.ILaunchable"/>
       </factory>
@@ -109,6 +109,7 @@
       <navigatorContent
             id="org.eclipse.tcf.te.tcf.launch.ui.navigator.content"
             name="%LauchTree.name"
+      		icon="icons/obj16/root.gif"
             activeByDefault="false"
             contentProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchNavigatorContentProvider"
             labelProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchTreeLabelProvider"
