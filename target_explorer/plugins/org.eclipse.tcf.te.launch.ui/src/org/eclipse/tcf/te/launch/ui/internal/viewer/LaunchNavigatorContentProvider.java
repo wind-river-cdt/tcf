@@ -85,7 +85,7 @@ public class LaunchNavigatorContentProvider extends TreeContentProvider implemen
 
 		LaunchModel model = LaunchModel.getLaunchModel(element);
 		if (model != null) {
-			if (isRootNodeVisible()) {
+			if (isRootNodeVisible() && model.getRootNode().hasChildren()) {
 				return new Object[]{model.getRootNode()};
 			}
 			return model.getRootNode().getChildren();

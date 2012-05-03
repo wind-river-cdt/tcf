@@ -11,6 +11,7 @@ package org.eclipse.tcf.te.launch.ui.internal;
 
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.tcf.te.launch.ui.internal.handler.DeleteHandler;
+import org.eclipse.tcf.te.launch.ui.internal.handler.RefreshHandler;
 import org.eclipse.tcf.te.launch.ui.model.LaunchNode;
 
 /**
@@ -18,6 +19,7 @@ import org.eclipse.tcf.te.launch.ui.model.LaunchNode;
  */
 public class LaunchNodePropertyTester extends PropertyTester {
 	private final DeleteHandler deleteHandler = new DeleteHandler();
+	private final RefreshHandler refreshHandler = new RefreshHandler();
 
 	/*
 	 * (non-Javadoc)
@@ -38,6 +40,9 @@ public class LaunchNodePropertyTester extends PropertyTester {
 			}
 			else if (property.equals("canDelete")) { //$NON-NLS-1$
 				return deleteHandler.canDelete(receiver);
+			}
+			else if (property.equals("canRefresh")) { //$NON-NLS-1$
+				return refreshHandler.canRefresh(receiver);
 			}
 		}
 		return false;

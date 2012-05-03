@@ -8,7 +8,6 @@
             adaptableType="org.eclipse.tcf.te.launch.ui.model.LaunchNode"
             class="org.eclipse.tcf.te.launch.ui.internal.adapters.AdapterFactory">
          <adapter type="org.eclipse.jface.viewers.ILabelProvider"/>
-         <adapter type="org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate"/>
       </factory>
    </extension>
 
@@ -18,7 +17,7 @@
             class="org.eclipse.tcf.te.launch.ui.internal.LaunchNodePropertyTester"
             id="org.eclipse.tcf.te.launch.ui.propertytester.launchNode"
             namespace="org.eclipse.tcf.te.launch.ui.model"
-            properties="isLaunchConfig,isLaunchConfigType,canDelete"
+            properties="isLaunchConfig,isLaunchConfigType,canDelete,canRefresh"
             type="org.eclipse.tcf.te.launch.ui.model.LaunchNode">
       </propertyTester>
    </extension>
@@ -243,7 +242,7 @@
                   <iterate
                         ifEmpty="false"
                         operator="and">
-                     <test property="org.eclipse.tcf.te.ui.views.isRefreshableElement"/>
+                     <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
                   </iterate>
                </with>
             </visibleWhen>
@@ -336,7 +335,7 @@
                icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/delete.gif"
                id="org.eclipse.tcf.te.ui.commands.delete"
                label="%command.delete.label"
-               mnemonic="D"
+               mnemonic="%Delete.menu.mnemonic"
                style="push"
                tooltip="%command.delete.description">
             <visibleWhen checkEnabled="false">
@@ -344,6 +343,25 @@
                   <count value="+"/>
                   <iterate operator="and" ifEmpty="false">
                      <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.refresh">
+         <command
+               commandId="org.eclipse.tcf.te.ui.command.refresh"
+               id="org.eclipse.tcf.te.launch.ui.views.project.commands.refresh"
+               label="%Refresh.menu.name"
+               mnemonic="%Refresh.menu.mnemonic"
+               style="push">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <count value="1"/>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
                   </iterate>
                </with>
             </visibleWhen>
@@ -498,7 +516,7 @@
                   <iterate
                         ifEmpty="false"
                         operator="and">
-                     <test property="org.eclipse.tcf.te.ui.views.isRefreshableElement"/>
+                     <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
                   </iterate>
                </with>
             </visibleWhen>
@@ -548,56 +566,45 @@
       <handler
             commandId="org.eclipse.ui.edit.delete"
             class="org.eclipse.tcf.te.launch.ui.internal.handler.DeleteHandler">
-            <activeWhen>
-               <and>
-                  <with variable="activePartId">
-                     <or>
-                        <equals value="org.eclipse.tcf.te.ui.views.View"/>
-                        <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
-                     </or>
-                  </with>
-                  <with variable="selection">
-                     <iterate operator="and" ifEmpty="false">
-                        <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
-                     </iterate>
-                  </with>
-               </and>
-            </activeWhen>
-            <enabledWhen>
-               <with variable="selection">
-                  <iterate operator="and" ifEmpty="false">
-                     <test property="org.eclipse.tcf.te.launch.ui.model.canDelete" value="true"/>
-                  </iterate>
-               </with>
-            </enabledWhen>
-      </handler>
-   
-      <handler
-            class="org.eclipse.tcf.te.launch.ui.internal.handler.DeleteHandler"
-            commandId="org.eclipse.ui.edit.delete">
          <activeWhen>
             <and>
                <with variable="activePartId">
-                  <equals value="org.eclipse.ui.navigator.ProjectExplorer"/>
+                  <or>
+                     <equals value="org.eclipse.tcf.te.ui.views.View"/>
+                     <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
+                     <equals value="org.eclipse.ui.navigator.ProjectExplorer"/>
+                  </or>
                </with>
                <with variable="selection">
-                  <count value="1"/>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
+                  <iterate 
+                        operator="and" 
+                        ifEmpty="false">
                      <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
                   </iterate>
                </with>
             </and>
          </activeWhen>
+         <enabledWhen>
+            <with variable="selection">
+               <iterate 
+                     operator="and" 
+                     ifEmpty="false">
+                  <test property="org.eclipse.tcf.te.launch.ui.model.canDelete"/>
+               </iterate>
+            </with>
+         </enabledWhen>
       </handler>
       <handler
-            class="org.eclipse.tcf.te.ui.views.handler.RefreshHandler"
-            commandId="org.eclipse.tcf.te.ui.command.refresh">
+            commandId="org.eclipse.tcf.te.ui.command.refresh"
+            class="org.eclipse.tcf.te.launch.ui.internal.handler.RefreshHandler">
          <activeWhen>
             <and>
                <with variable="activePartId">
-                  <equals value="org.eclipse.ui.navigator.ProjectExplorer"/>
+                  <or>
+                     <equals value="org.eclipse.tcf.te.ui.views.View"/>
+                     <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
+                     <equals value="org.eclipse.ui.navigator.ProjectExplorer"/>
+                  </or>
                </with>
                <with variable="selection">
                   <count value="1"/>
@@ -609,10 +616,19 @@
                </with>
             </and>
          </activeWhen>
+         <enabledWhen>
+            <with variable="selection">
+               <iterate 
+                     operator="and" 
+                     ifEmpty="false">
+                  <test property="org.eclipse.tcf.te.launch.ui.model.canRefresh"/>
+               </iterate>
+            </with>
+         </enabledWhen>
       </handler>
       <handler
-            class="org.eclipse.tcf.te.ui.views.handler.ShowInPropertiesHandler"
-            commandId="org.eclipse.tcf.te.ui.views.command.ShowInProperties">
+            commandId="org.eclipse.tcf.te.ui.views.command.ShowInProperties"
+            class="org.eclipse.tcf.te.ui.views.handler.ShowInPropertiesHandler">
          <activeWhen>
             <and>
                <with variable="activePartId">

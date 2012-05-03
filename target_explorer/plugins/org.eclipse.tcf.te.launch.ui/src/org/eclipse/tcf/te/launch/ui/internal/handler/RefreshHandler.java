@@ -15,23 +15,20 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.osgi.util.NLS;
-import org.eclipse.tcf.te.launch.ui.activator.UIPlugin;
+import org.eclipse.tcf.te.launch.ui.model.LaunchModel;
 import org.eclipse.tcf.te.launch.ui.model.LaunchNode;
-import org.eclipse.tcf.te.launch.ui.nls.Messages;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.navigator.CommonViewer;
 
 /**
- * Delete handler implementation.
+ * Refresh handler implementation.
  */
-public class DeleteHandler extends AbstractHandler {
+public class RefreshHandler extends AbstractHandler {
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
@@ -44,13 +41,13 @@ public class DeleteHandler extends AbstractHandler {
 			// Determine the active part
 			final IWorkbenchPart part = HandlerUtil.getActivePart(event);
 
-			// Loop over the selection and delete the elements providing
+			// Loop over the selection and refresh the elements
 			Iterator<?> iterator = ((IStructuredSelection)selection).iterator();
 			while (iterator.hasNext()) {
 				final Object element = iterator.next();
 
-				// Delete the element if there is a valid delegate
-				if (canDelete(element)) {
+				// Refresh the element if there is a valid delegate
+				if (canRefresh(element)) {
 					// Determine the elements parent element
 					Object parentElement = null;
 					CommonViewer viewer = (CommonViewer)part.getAdapter(CommonViewer.class);
@@ -60,8 +57,8 @@ public class DeleteHandler extends AbstractHandler {
 					}
 					final Object finParentElement = parentElement;
 
-					// Delete the element and refresh the tree
-					if (delete(element)) {
+					// Refresh the element and the tree
+					if (refresh(element)) {
 						PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
 							@Override
 							public void run() {
@@ -84,34 +81,22 @@ public class DeleteHandler extends AbstractHandler {
 	}
 
 	/**
-	 * Check if an element can be deleted.
+	 * Check if an element can be refreshed.
 	 * @param element The element to check.
 	 * @return
 	 */
-	public boolean canDelete(Object element) {
+	public boolean canRefresh(Object element) {
 		if (element instanceof LaunchNode) {
-			LaunchNode node = (LaunchNode)element;
-			return LaunchNode.TYPE_LAUNCH_CONFIG.equals(node.getType()) && !node.getLaunchConfiguration().isReadOnly();
+			return true;
 		}
 		return false;
 	}
 
-	private boolean delete(Object element) {
+	private boolean refresh(Object element) {
 		Assert.isNotNull(element);
 
-		if (element instanceof LaunchNode) {
-			final LaunchNode node = (LaunchNode)element;
-			if (MessageDialog.openQuestion(
-							UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getShell(),
-							Messages.DeleteHandlerDelegate_question_title, NLS.bind(Messages.DeleteHandlerDelegate_question_message, node.getLaunchConfiguration().getName()))) {
-				try {
-					node.getLaunchConfiguration().delete();
-					return true;
-				}
-				catch (Exception e) {
-				}
-			}
-		}
-		return false;
+		LaunchNode node = (LaunchNode) element;
+		LaunchModel model = node.getModel();
+		return model.refresh();
 	}
 }

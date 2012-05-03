@@ -140,4 +140,16 @@
       </propertySections>
    </extension>
 
+   <extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+      <propertySections contributorId="org.eclipse.ui.navigator.ProjectExplorer">
+         <propertySection
+               id="org.eclipse.tcf.te.tcf.launch.ui.project.propertytab.remote.app"
+               class="org.eclipse.tcf.te.tcf.launch.ui.remote.app.RemoteAppPropertiesSection"
+               enablesFor="1"
+               afterSection="org.eclipse.tcf.te.launch.ui.project.launchcontext"
+               filter="org.eclipse.tcf.te.tcf.launch.ui.remote.app.RemoteAppFilter"
+               tab="org.eclipse.tcf.te.launch.ui.project.propertytab.general">
+         </propertySection>
+      </propertySections>
+   </extension>
 </plugin>

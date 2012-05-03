@@ -13,7 +13,6 @@ import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchTreeLabelProvider;
 import org.eclipse.tcf.te.launch.ui.model.LaunchNode;
-import org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate;
 
 /**
  * Adapter factory implementation.
@@ -21,8 +20,6 @@ import org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate;
 public class AdapterFactory implements IAdapterFactory {
 	// The adapter for ILabelProvider.class
 	private ILabelProvider labelProvider = new LaunchTreeLabelProvider();
-	// The refresh handler delegate adapter
-	private IRefreshHandlerDelegate refreshDelegate = new RefreshHandlerDelegate();
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
@@ -32,9 +29,6 @@ public class AdapterFactory implements IAdapterFactory {
 		if (adaptableObject instanceof LaunchNode) {
 			if (ILabelProvider.class.equals(adapterType)) {
 				return labelProvider;
-			}
-			if (IRefreshHandlerDelegate.class.equals(adapterType)) {
-				return refreshDelegate;
 			}
 		}
 		return null;
@@ -46,8 +40,7 @@ public class AdapterFactory implements IAdapterFactory {
 	@Override
 	public Class[] getAdapterList() {
 		return new Class<?>[] {
-						ILabelProvider.class,
-						IRefreshHandlerDelegate.class
+						ILabelProvider.class
 		};
 	}
 
