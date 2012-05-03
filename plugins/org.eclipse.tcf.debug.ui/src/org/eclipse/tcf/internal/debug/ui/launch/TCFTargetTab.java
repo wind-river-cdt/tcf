@@ -97,6 +97,7 @@ public class TCFTargetTab extends AbstractLaunchConfigurationTab {
         IChannel channel;
         ILocator locator;
         LocatorListener listener;
+        Runnable item_update;
     }
 
     private class LocatorListener implements ILocator.LocatorListener {
@@ -785,78 +786,91 @@ public class TCFTargetTab extends AbstractLaunchConfigurationTab {
     private void updateItems(final PeerInfo parent) {
         if (display == null) return;
         assert Thread.currentThread() == display.getThread();
-        TreeItem[] items = null;
-        boolean expanded = true;
-        if (parent.children == null || parent.children_error != null) {
-            if (parent == peer_info) {
-                peer_tree.setItemCount(1);
-                items = peer_tree.getItems();
-            }
-            else {
-                TreeItem item = findItem(parent);
-                if (item == null) return;
-                expanded = item.getExpanded();
-                item.setItemCount(1);
-                items = item.getItems();
-            }
-            assert items.length == 1;
-            if (parent.children_pending) {
-                items[0].setForeground(display.getSystemColor(SWT.COLOR_LIST_FOREGROUND));
-                fillItem(items[0], "Connecting...");
-            }
-            else if (parent.children_error != null) {
-                String msg = parent.children_error.getMessage();
-                if (msg == null) msg = parent.children_error.getClass().getName();
-                else msg = msg.replace('\n', ' ');
-                items[0].setForeground(display.getSystemColor(SWT.COLOR_RED));
-                fillItem(items[0], msg);
-            }
-            else if (expanded) {
-                loadChildren(parent);
-                items[0].setForeground(display.getSystemColor(SWT.COLOR_LIST_FOREGROUND));
-                fillItem(items[0], "Connecting...");
-            }
-            else {
-                Protocol.invokeAndWait(new Runnable() {
-                    public void run() {
-                        disconnectPeer(parent);
+        parent.item_update = new Runnable() {
+            public void run() {
+                if (display == null) return;
+                if (parent.item_update != this) return;
+                if (Thread.currentThread() != display.getThread()) {
+                    display.asyncExec(this);
+                    return;
+                }
+                parent.item_update = null;
+                TreeItem[] items = null;
+                boolean expanded = true;
+                if (parent.children == null || parent.children_error != null) {
+                    if (parent == peer_info) {
+                        peer_tree.setItemCount(1);
+                        items = peer_tree.getItems();
                     }
-                });
-                fillItem(items[0], "");
-            }
-        }
-        else {
-            ArrayList<PeerInfo> lst = null;
-            if (parent == peer_info) {
-                lst = filterPeerList(parent, expanded);
-                peer_tree.setItemCount(lst.size() > 0 ? lst.size() : 1);
-                items = peer_tree.getItems();
-            }
-            else {
-                TreeItem item = findItem(parent);
-                if (item == null) return;
-                expanded = item.getExpanded();
-                lst = filterPeerList(parent, expanded);
-                item.setItemCount(expanded && lst.size() > 0 ? lst.size() : 1);
-                items = item.getItems();
-            }
-            if (expanded && lst.size() > 0) {
-                assert items.length == lst.size();
-                for (int i = 0; i < items.length; i++) fillItem(items[i], lst.get(i));
-            }
-            else if (expanded) {
-                fillItem(items[0], "No peers");
-            }
-            else {
-                Protocol.invokeAndWait(new Runnable() {
-                    public void run() {
-                        disconnectPeer(parent);
+                    else {
+                        TreeItem item = findItem(parent);
+                        if (item == null) return;
+                        expanded = item.getExpanded();
+                        item.setItemCount(1);
+                        items = item.getItems();
                     }
-                });
-                fillItem(items[0], "");
+                    assert items.length == 1;
+                    if (parent.children_pending) {
+                        items[0].setForeground(display.getSystemColor(SWT.COLOR_LIST_FOREGROUND));
+                        fillItem(items[0], "Connecting...");
+                    }
+                    else if (parent.children_error != null) {
+                        String msg = parent.children_error.getMessage();
+                        if (msg == null) msg = parent.children_error.getClass().getName();
+                        else msg = msg.replace('\n', ' ');
+                        items[0].setForeground(display.getSystemColor(SWT.COLOR_RED));
+                        fillItem(items[0], msg);
+                    }
+                    else if (expanded) {
+                        loadChildren(parent);
+                        items[0].setForeground(display.getSystemColor(SWT.COLOR_LIST_FOREGROUND));
+                        fillItem(items[0], "Connecting...");
+                    }
+                    else {
+                        Protocol.invokeAndWait(new Runnable() {
+                            public void run() {
+                                disconnectPeer(parent);
+                            }
+                        });
+                        fillItem(items[0], "");
+                    }
+                }
+                else {
+                    ArrayList<PeerInfo> lst = null;
+                    if (parent == peer_info) {
+                        lst = filterPeerList(parent, expanded);
+                        peer_tree.setItemCount(lst.size() > 0 ? lst.size() : 1);
+                        items = peer_tree.getItems();
+                    }
+                    else {
+                        TreeItem item = findItem(parent);
+                        if (item == null) return;
+                        expanded = item.getExpanded();
+                        lst = filterPeerList(parent, expanded);
+                        item.setItemCount(expanded && lst.size() > 0 ? lst.size() : 1);
+                        items = item.getItems();
+                    }
+                    if (expanded && lst.size() > 0) {
+                        assert items.length == lst.size();
+                        for (int i = 0; i < items.length; i++) fillItem(items[i], lst.get(i));
+                    }
+                    else if (expanded) {
+                        fillItem(items[0], "No peers");
+                    }
+                    else {
+                        Protocol.invokeAndWait(new Runnable() {
+                            public void run() {
+                                disconnectPeer(parent);
+                            }
+                        });
+                        fillItem(items[0], "");
+                    }
+                }
+                updateLaunchConfigurationDialog();
             }
-        }
-        updateLaunchConfigurationDialog();
+        };
+        if (parent.children_pending) parent.item_update.run();
+        else Protocol.invokeLater(200, parent.item_update);
     }
 
     private TreeItem findItem(String path) {
@@ -1078,6 +1092,7 @@ public class TCFTargetTab extends AbstractLaunchConfigurationTab {
 
     private void fillItem(TreeItem item, String text) {
         item.setText(text);
+        item.setData("TCFPeerInfo", null);
         int n = peer_tree.getColumnCount();
         for (int i = 1; i < n; i++) item.setText(i, "");
         item.setImage((Image)null);
