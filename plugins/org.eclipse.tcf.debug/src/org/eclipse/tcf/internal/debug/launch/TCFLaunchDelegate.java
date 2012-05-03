@@ -319,32 +319,31 @@ public class TCFLaunchDelegate extends LaunchConfigurationDelegate {
                     "Cannot find TCF agent on the local host",
                     null));
         }
+
         if (monitor != null) monitor.beginTask("Launching TCF debugger session", task_cnt); //$NON-NLS-1$
         final String id = configuration.getAttribute(ATTR_USE_LOCAL_AGENT, true) ? local_id : configuration.getAttribute(ATTR_PEER_ID, "");
+        final IValueAddService value_add_service = OSGIServices.getValueAddService();
 
-        Runnable runnable = new Runnable() {
+        Protocol.invokeLater(new Runnable() {
             public void run() {
+                // If the id is not a redirection path of itself, and a value-add service is registered,
+                // ask the value-add service for the redirection path
+                if (value_add_service != null && id.indexOf('/') < 0) {
+                    IPeer peer = Protocol.getLocator().getPeers().get(id);
+                    if (peer != null) {
+                        value_add_service.getRedirectionPath(peer, new IValueAddService.DoneGetRedirectionPath() {
+                            public void doneGetRedirectionPath(Throwable error, String redirection_path) {
+                                if (error != null || redirection_path == null) redirection_path = id;
+                                ((TCFLaunch)launch).launchTCF(mode, redirection_path);
+                                if (monitor != null) monitor.done();
+                            }
+                        });
+                        return;
+                    }
+                }
                 ((TCFLaunch)launch).launchTCF(mode, id);
                 if (monitor != null) monitor.done();
             }
-        };
-
-        // If the id is not a redirection path of itself, and a value-add service is registered,
-        // ask the value-add service for the redirection path
-        if (id.indexOf('/') <= 0 && OSGIServices.getValueAddService() != null) {
-            IPeer peer = Protocol.getLocator().getPeers().get(id);
-            if (peer == null) {
-                Protocol.invokeLater(runnable);
-            } else {
-                OSGIServices.getValueAddService().getRedirectionPath(peer, new IValueAddService.DoneGetRedirectionPath() {
-                    public void doneGetRedirectionPath(Throwable error, String redirectionPath) {
-                        ((TCFLaunch)launch).launchTCF(mode, error == null ? redirectionPath : id);
-                        if (monitor != null) monitor.done();
-                    }
-                });
-            }
-        } else {
-            Protocol.invokeLater(runnable);
-        }
+        });
     }
 }
