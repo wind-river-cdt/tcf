@@ -9,7 +9,6 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.processes.ui.controls;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -92,8 +91,8 @@ public class ProcessNavigatorContentProvider  extends TreeContentProvider implem
 		}
 		else if (parentElement instanceof ProcessTreeNode) {
 			ProcessTreeNode node = (ProcessTreeNode) parentElement;
-			List<ProcessTreeNode> current = new ArrayList<ProcessTreeNode>(node.getChildren());
 			Object[] children;
+			List<ProcessTreeNode> current = node.getChildren();
 			if (!node.childrenQueried) {
 				if(current.isEmpty()) {
 					children = new Object[] {getPending(node)};
@@ -127,8 +126,8 @@ public class ProcessNavigatorContentProvider  extends TreeContentProvider implem
 		// No children yet and the element is a process node
 		if (element instanceof ProcessTreeNode) {
 			ProcessTreeNode node = (ProcessTreeNode) element;
-			if(node.childrenQueryRunning) {
-				hasChildren = !super.hasChildren(element);
+			if(node.isRootNode()) {
+				hasChildren = true;
 			}
 			else {
 				hasChildren = !node.childrenQueried || super.hasChildren(element);

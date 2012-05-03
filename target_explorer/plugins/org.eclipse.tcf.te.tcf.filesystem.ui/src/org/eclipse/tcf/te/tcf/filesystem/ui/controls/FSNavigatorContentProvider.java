@@ -125,12 +125,7 @@ public class FSNavigatorContentProvider extends TreeContentProvider {
 			} else if(node.isSystemRoot()) {
 				hasChildren = true;
 			} else if (node.isDirectory()) {
-				if(node.childrenQueryRunning) {
-					hasChildren = !super.hasChildren(element);
-				}
-				else {
-					hasChildren = !node.childrenQueried || super.hasChildren(element);
-				}
+				hasChildren = !node.childrenQueried || super.hasChildren(element);
 			}
 		}
 		else if (element instanceof IPeerModel) {
