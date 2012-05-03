@@ -64,7 +64,7 @@ public class OpCopy extends Operation {
 	 */
 	public OpCopy(List<FSTreeNode> nodes, FSTreeNode dest, boolean cpPerm, boolean cpOwn, IConfirmCallback confirmCallback) {
 		super();
-		this.nodes = getTopNodes(nodes);
+		this.nodes = getAncestors(nodes);
 		this.dest = dest;
 		this.cpOwnership = cpOwn;
 		this.cpPermission = cpPerm;

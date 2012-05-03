@@ -33,6 +33,7 @@ import org.eclipse.tcf.services.IFileSystem.DoneReadDir;
 import org.eclipse.tcf.services.IFileSystem.DoneRemove;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.services.IFileSystem.IFileHandle;
+import org.eclipse.tcf.te.core.utils.Ancestor;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.core.concurrent.BlockingCallProxy;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
@@ -51,7 +52,7 @@ import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
  * Operation is the base class of file system operation classes.
  * @see IOperation
  */
-public class Operation implements IOperation {
+public class Operation extends Ancestor<FSTreeNode> implements IOperation {
 	// The flag indicating if the following action should be executed without asking.
 	protected boolean yes2All = false;
 	
@@ -63,25 +64,7 @@ public class Operation implements IOperation {
 	 */
 	public Operation() {
 	}
-
-	/**
-	 * Get the top most nodes of the specified node list, removing those nodes whose ancestors are
-	 * one of the other nodes in the list. This method is used to remove those children or grand
-	 * children of the nodes that are cut, copied, moved or deleted.
-	 *
-	 * @param nodes The original node list.
-	 * @return The top most nodes.
-	 */
-	protected List<FSTreeNode> getTopNodes(List<FSTreeNode> nodes) {
-		List<FSTreeNode> result = new ArrayList<FSTreeNode>();
-		for (FSTreeNode node : nodes) {
-			if (!hasAncestor(node, nodes)) {
-				result.add(node);
-			}
-		}
-		return result;
-	}
-
+	
 	/**
 	 * Create a TCFFileSystemException from a FileSystemException.
 	 * 
@@ -96,22 +79,6 @@ public class Operation implements IOperation {
 	    }
 	    return new TCFFileSystemException(message, error);
     }	
-	
-	/**
-	 * If the target node has ancestor in the specified node list.
-	 *
-	 * @param target The node to be tested.
-	 * @param nodes The node list to search in.
-	 * @return true if the target node has an ancestor in the node list.
-	 */
-	private boolean hasAncestor(FSTreeNode target, List<FSTreeNode> nodes) {
-		for (FSTreeNode node : nodes) {
-			if (node.isAncestorOf(target)) {
-				return true;
-			}
-		}
-		return false;
-	}
 
 	/**
 	 * Clean up the folder node after moving, deleting or copying.
@@ -625,5 +592,14 @@ public class Operation implements IOperation {
 	@Override
     public int getTotalWork() {
 	    return IProgressMonitor.UNKNOWN;
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.core.utils.Ancestor#getParent(java.lang.Object)
+	 */
+	@Override
+    protected FSTreeNode getParent(FSTreeNode element) {
+	    return element.parent;
     }
 }

@@ -18,7 +18,6 @@ public class AdaptersTests {
 		suite.addTestSuite(FSTreeNodeAdapterFactoryTest.class);
 		suite.addTestSuite(NodeStateFilterTest.class);
 		suite.addTestSuite(PeerModelViewerInputTest.class);
-		suite.addTestSuite(RefreshHandlerDelegateTest.class);
 		suite.addTestSuite(ViewerInputAdapterFactoryTest.class);
 		return suite;
 	}

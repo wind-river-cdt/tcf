@@ -27,12 +27,13 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.tcf.te.core.utils.Ancestor;
 
 /**
  * CommonViewerListener listens to the property change event from the
  *  tree and update the viewer accordingly.
  */
-class CommonViewerListener implements PropertyChangeListener, IPropertyChangeListener {
+class CommonViewerListener extends Ancestor<Object> implements PropertyChangeListener, IPropertyChangeListener {
 	// The timer that process the property events periodically.
 	private static Timer viewerTimer;
 	static {
@@ -46,12 +47,12 @@ class CommonViewerListener implements PropertyChangeListener, IPropertyChangeLis
 	private static final Object NULL = new Object();
 	// The tree viewer
 	private TreeViewer viewer;
-	// The content provider
-	private ITreeContentProvider contentProvider;
 	// The current queued property event sources.
 	private List<Object> queue;
 	// The timer task to process the property events periodically.
 	private TimerTask task;
+	// The content provider
+	ITreeContentProvider contentProvider;
 	// The time of last run.
 	long lastRun;
 
@@ -72,7 +73,16 @@ class CommonViewerListener implements PropertyChangeListener, IPropertyChangeLis
 		viewerTimer.schedule(this.task, INTERVAL, INTERVAL);
 		this.queue = Collections.synchronizedList(new ArrayList<Object>());
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.core.utils.Ancestor#getParent(java.lang.Object)
+	 */
+	@Override
+    protected Object getParent(Object element) {
+		return contentProvider.getParent(element);
+    }
+	
 	/*
 	 * (non-Javadoc)
 	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
@@ -163,14 +173,14 @@ class CommonViewerListener implements PropertyChangeListener, IPropertyChangeLis
 	    }
 	    else if (objects.size() == 1) {
 	    	Object object = objects.get(0);
-	    	if (getParent(object) == null) {
+	    	if (contentProvider.getParent(object) == null) {
 	    		return NULL;
 	    	}
 	    	return object;
 	    }
 	    else {
 	    	// If there are multiple root nodes, then select NULL as the final root.
-			Object object = getCommonAncestor(objects);
+	    	Object object = getAncestor(objects);
 			if (object == null) {
 				return NULL;
 			}
@@ -179,66 +189,16 @@ class CommonViewerListener implements PropertyChangeListener, IPropertyChangeLis
     }
 
 	/**
-	 * Get a object which is the common ancestor of the specified objects.
-	 *
-	 * @param objects The object list.
-	 * @return The common ancestor.
-	 */
-	private Object getCommonAncestor(List<Object> objects) {
-		Assert.isTrue(objects.size() > 1);
-		Object object1 = objects.get(0);
-		for (int i = 1; i < objects.size(); i++) {
-			Object object2 = objects.get(i);
-			object1 = getCommonAncestor(object1, object2);
-			if (object1 == null) return null;
-		}
-		return object1;
-	}
-
-	/**
-	 * Get the common ancestor of the specified two objects.
-	 *
-	 * @param object1 The first object.
-	 * @param object2 The second object.
-	 * @return The common ancestor.
-	 */
-	private Object getCommonAncestor(Object object1, Object object2) {
-		Assert.isNotNull(object1);
-		Assert.isNotNull(object2);
-		if (isAncestorOf(object1, object2)) {
-			return object1;
-		}
-		if (isAncestorOf(object2, object1)) {
-			return object2;
-		}
-		Object ancestor = null;
-		Object parent1 = getParent(object1);
-		if(parent1 != null) {
-			ancestor = getCommonAncestor(parent1, object2);
-		}
-		if(ancestor != null) return ancestor;
-		Object parent2 = getParent(object2);
-		if(parent2 != null) {
-			ancestor = getCommonAncestor(object1, parent2);
-		}
-		if(ancestor != null) return ancestor;
-		if(parent1 != null && parent2 != null) {
-			ancestor = getCommonAncestor(parent1, parent2);
-		}
-		return ancestor;
-	}
-
-	/**
 	 * Merge the current objects into an ancestor object.
 	 *
 	 * @param objects The objects to be merged.
 	 * @return NULL or a list presenting the top objects.
 	 */
 	private List<Object> mergeObjects(Object[] objects) {
-		// If one object is NULL, then return NULL
-		List<Object> result = new ArrayList<Object>();
 		for (Object object : objects) {
 			if (object == NULL) {
+				// If one object is NULL, then return NULL
+				List<Object> result = new ArrayList<Object>();
 				result.add(NULL);
 				return result;
 			}
@@ -247,54 +207,8 @@ class CommonViewerListener implements PropertyChangeListener, IPropertyChangeLis
 		List<Object> list = Arrays.asList(objects);
 		Set<Object> set = new HashSet<Object>(list);
 		objects = set.toArray();
-
 		list = Arrays.asList(objects);
-		for (Object object : list) {
-			if (!hasAncestor(object, list)) {
-				result.add(object);
-			}
-		}
-		return result;
-	}
-
-	/**
-	 * If the target node has ancestor in the specified node list.
-	 *
-	 * @param target The node to be tested.
-	 * @param nodes The node list to search in.
-	 * @return true if the target node has an ancestor in the node list.
-	 */
-	private boolean hasAncestor(Object target, List<Object> nodes) {
-		for (Object node : nodes) {
-			if (isAncestorOf(node, target)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * Judges if the object1 is an ancestor of the object2.
-	 *
-	 * @param object1 The first object to be tested.
-	 * @param object2 The second object to be tested.
-	 * @return true if the first object is the ancestor of the second object2.
-	 */
-	private boolean isAncestorOf(Object object1, Object object2) {
-		if (object2 == null) return false;
-		Object parent = getParent(object2);
-		if (parent == object1) return true;
-		return isAncestorOf(object1, parent);
-    }
-	
-	/**
-	 * Get the parent of the specified object in the display thread.
-	 * 
-	 * @param object The object
-	 * @return its parent.
-	 */
-	Object getParent(final Object object) {
-		return contentProvider.getParent(object);
+		return getAncestors(list);
 	}
 
 	/**

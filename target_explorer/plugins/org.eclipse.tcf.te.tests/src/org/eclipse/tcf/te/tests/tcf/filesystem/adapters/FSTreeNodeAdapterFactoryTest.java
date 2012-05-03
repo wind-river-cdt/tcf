@@ -12,7 +12,6 @@ package org.eclipse.tcf.te.tests.tcf.filesystem.adapters;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.tcf.te.tests.tcf.filesystem.FSPeerTestCase;
-import org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate;
 import org.eclipse.ui.IActionFilter;
 
 public class FSTreeNodeAdapterFactoryTest extends FSPeerTestCase {
@@ -25,10 +24,4 @@ public class FSTreeNodeAdapterFactoryTest extends FSPeerTestCase {
 		ILabelProvider labelProvider = (ILabelProvider) Platform.getAdapterManager().getAdapter(testFile, ILabelProvider.class);
 		assertNotNull(labelProvider);
 	}
-
-	public void testRefreshHandlerDelegateAdapter() {
-		IRefreshHandlerDelegate delegate = (IRefreshHandlerDelegate) Platform.getAdapterManager().getAdapter(testFolder, IRefreshHandlerDelegate.class);
-		assertNotNull(delegate);
-	}
-
 }

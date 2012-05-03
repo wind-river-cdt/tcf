@@ -9,7 +9,6 @@
             class="org.eclipse.tcf.te.tcf.processes.ui.internal.adapters.AdapterFactory">
          <adapter type="org.eclipse.jface.viewers.ILabelProvider"/>
          <adapter type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
-         <adapter type="org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate"/>
       </factory>
    </extension>
 
@@ -209,10 +208,9 @@
                   <iterate
                         ifEmpty="false"
                         operator="and">
-                     <test
-                           property="org.eclipse.tcf.te.ui.views.isRefreshableElement"
-                           value="true">
-                     </test>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode">
+                     </instanceof>
                   </iterate>
                </with>
             </visibleWhen>
@@ -274,6 +272,33 @@
                            </test>
                         </not>
                      </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.refresh">
+         <command
+               commandId="org.eclipse.tcf.te.ui.command.refresh"
+               id="org.eclipse.tcf.te.ui.commands.refresh"
+               label="%command.refresh.label.1"
+               mnemonic="f"
+               style="push"
+               tooltip="%command.refresh.tooltip.1">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="+">
+                  </count>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode">
+                     </instanceof>
                   </iterate>
                </with>
             </visibleWhen>
@@ -418,6 +443,50 @@
                   <adapt
                         type="org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode">
                   </adapt>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tcf.te.tcf.processes.ui.internal.handler.RefreshHandler"
+            commandId="org.eclipse.tcf.te.ui.command.refresh">
+         <activeWhen>
+            <and>
+               <with
+                     variable="activePartId">
+                  <or>
+                     <equals
+                           value="org.eclipse.tcf.te.ui.views.View">
+                     </equals>
+                     <equals
+                           value="org.eclipse.tcf.te.ui.views.Editor">
+                     </equals>
+                  </or>
+               </with>
+               <with
+                     variable="selection">
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </and>
+         </activeWhen>
+         <enabledWhen>
+            <with
+                  variable="selection">
+               <count
+                     value="+">
+               </count>
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
+                  <instanceof
+                        value="org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode">
+                  </instanceof>
                </iterate>
             </with>
          </enabledWhen>

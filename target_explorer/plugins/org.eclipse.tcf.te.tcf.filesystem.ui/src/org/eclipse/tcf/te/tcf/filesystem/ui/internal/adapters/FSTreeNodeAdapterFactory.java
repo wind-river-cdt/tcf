@@ -19,7 +19,6 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.columns.FSTreeElementLabelProvider;
-import org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate;
 import org.eclipse.ui.IActionFilter;
 import org.eclipse.ui.IPersistableElement;
 
@@ -28,7 +27,6 @@ import org.eclipse.ui.IPersistableElement;
  */
 public class FSTreeNodeAdapterFactory implements IAdapterFactory {
 	private static ILabelProvider nodeLabelProvider = new FSTreeElementLabelProvider();
-	private static IRefreshHandlerDelegate refreshDelegate = new RefreshHandlerDelegate();
 	// The fFilters map caching fFilters for FS nodes.
 	private Map<FSTreeNode, NodeStateFilter> filters;
 
@@ -57,9 +55,6 @@ public class FSTreeNodeAdapterFactory implements IAdapterFactory {
 			else if(adapterType == ILabelProvider.class) {
 				return nodeLabelProvider;
 			}
-			else if(adapterType == IRefreshHandlerDelegate.class) {
-				return refreshDelegate;
-			}
 			else if(adapterType == IPersistableElement.class && UIPlugin.isExpandedPersisted()) {
 				return new PersistableNode(node);
 			}
@@ -72,6 +67,6 @@ public class FSTreeNodeAdapterFactory implements IAdapterFactory {
 	 */
 	@Override
 	public Class[] getAdapterList() {
-		return new Class[] { IActionFilter.class, ILabelProvider.class, IRefreshHandlerDelegate.class, IPersistableElement.class };
+		return new Class[] { IActionFilter.class, ILabelProvider.class, IPersistableElement.class };
 	}
 }

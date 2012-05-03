@@ -57,7 +57,7 @@ public class OpMove extends Operation {
 	 */
 	public OpMove(List<FSTreeNode> nodes, FSTreeNode dest, IConfirmCallback confirmCallback) {
 		super();
-		this.nodes = getTopNodes(nodes);
+		this.nodes = getAncestors(nodes);
 		this.dest = dest;
 		this.confirmCallback = confirmCallback;
 	}

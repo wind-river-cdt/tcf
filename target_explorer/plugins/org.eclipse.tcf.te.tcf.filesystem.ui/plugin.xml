@@ -390,10 +390,9 @@
                   <iterate
                         ifEmpty="false"
                         operator="and">
-                     <test
-                           property="org.eclipse.tcf.te.ui.views.isRefreshableElement"
-                           value="true">
-                     </test>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
+                     </instanceof>
                   </iterate>
                </with>
             </visibleWhen>
@@ -909,6 +908,33 @@
                label="%command.refreshViewer.label"
                style="push"
                tooltip="%command.refreshViewer.tooltip">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.refresh">
+         <command
+               commandId="org.eclipse.tcf.te.ui.command.refresh"
+               id="org.eclipse.tcf.te.ui.commands.refresh"
+               label="%fsmenu.refresh.label"
+               mnemonic="f"
+               style="push"
+               tooltip="%command.refresh.tooltip">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="+">
+                  </count>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
          </command>
       </menuContribution>
    </extension>
@@ -1650,6 +1676,64 @@
                </with>
             </enabledWhen>
       </handler>
+      <handler
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.handlers.RefreshHandler"
+            commandId="org.eclipse.tcf.te.ui.command.refresh">
+         <activeWhen>
+            <and>
+               <with
+                     variable="activePartId">
+                  <or>
+                     <equals
+                           value="org.eclipse.tcf.te.ui.views.View">
+                     </equals>
+                     <equals
+                           value="org.eclipse.tcf.te.ui.views.Editor">
+                     </equals>
+                  </or>
+               </with>
+               <with
+                     variable="selection">
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </and>
+         </activeWhen>
+         <enabledWhen>
+            <with
+                  variable="selection">
+               <count
+                     value="+">
+               </count>
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
+                  <instanceof
+                        value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
+                  </instanceof>
+                  <or>
+                     <test
+                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isSystemRoot">
+                     </test>
+                     <test
+                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isRoot">
+                     </test>
+                     <test
+                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isDirectory">
+                     </test>
+                     <test
+                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isFile">
+                     </test>
+                  </or>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
 
    </extension>
    
@@ -1748,9 +1832,6 @@
          </adapter>
          <adapter
                type="org.eclipse.jface.viewers.ILabelProvider">
-         </adapter>
-         <adapter
-               type="org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate">
          </adapter>
          <adapter
                type="org.eclipse.ui.IPersistableElement">

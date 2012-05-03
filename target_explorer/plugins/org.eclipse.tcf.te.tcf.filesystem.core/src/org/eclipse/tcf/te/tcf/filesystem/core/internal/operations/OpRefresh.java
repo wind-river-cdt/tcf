@@ -9,7 +9,6 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.core.internal.operations;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +20,6 @@ import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.exceptions.TCFFileSystemException;
-import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.CacheManager;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
 
@@ -36,10 +34,18 @@ public class OpRefresh extends Operation {
 	 * Create an FSRefresh to refresh the specified node and its descendants.
 	 *
 	 * @param node The root node to be refreshed.
-	 * @param callback The callback
 	 */
 	public OpRefresh(FSTreeNode node) {
 		this.node = node;
+	}
+	
+	/**
+	 * Create an FSRefresh to refresh the specified nodes and its descendants.
+	 *
+	 * @param nodes The node list to be refreshed.
+	 */
+	public OpRefresh(List<FSTreeNode> nodes) {
+		this.node = getAncestor(nodes);
 	}
 
 	/*
@@ -49,7 +55,7 @@ public class OpRefresh extends Operation {
 	@Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 		super.run(monitor);
-		if (node.childrenQueried) {
+		if (node.childrenQueried || node.isFile()) {
 			IChannel channel = null;
 			try {
 				channel = openChannel(node.peerNode.getPeer());
@@ -97,10 +103,7 @@ public class OpRefresh extends Operation {
 			}
 		}
 		else if(node.isFile()) {
-			File file = CacheManager.getCacheFile(node);
-			if(file.exists()) {
-				node.refreshState();
-			}
+			node.refreshState();
 		}
 	}
 

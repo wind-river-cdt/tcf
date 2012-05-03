@@ -43,7 +43,7 @@ public class OpDelete extends Operation {
 	 * @param nodes The nodes to be deleted.
 	 */
 	public OpDelete(List<FSTreeNode> nodes, IConfirmCallback confirmCallback) {
-		this.nodes = getTopNodes(nodes);
+		this.nodes = getAncestors(nodes);
 		this.confirmCallback = confirmCallback;
 	}
 
