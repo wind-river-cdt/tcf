@@ -779,4 +779,9 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 	public boolean useDefaultConnection() {
 		return true;
 	}
+
+	@Override
+	public String getDescription(ILaunchConfiguration config) {
+		return config.getName();
+	}
 }

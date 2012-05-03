@@ -11,9 +11,7 @@ package org.eclipse.tcf.te.launch.ui.internal.viewer;
 
 import java.util.EventObject;
 
-import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.viewers.ITreeViewerListener;
-import org.eclipse.jface.viewers.TreeExpansionEvent;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.tcf.te.launch.ui.model.LaunchModel;
 import org.eclipse.tcf.te.launch.ui.model.LaunchNode;
@@ -21,14 +19,20 @@ import org.eclipse.tcf.te.runtime.events.ChangeEvent;
 import org.eclipse.tcf.te.runtime.events.EventManager;
 import org.eclipse.tcf.te.runtime.interfaces.events.IEventListener;
 import org.eclipse.tcf.te.ui.trees.TreeContentProvider;
-import org.eclipse.ui.IMemento;
-import org.eclipse.ui.navigator.ICommonContentExtensionSite;
-import org.eclipse.ui.navigator.ICommonContentProvider;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * Launches content provider for the common navigator of Target Explorer.
  */
-public class LaunchNavigatorContentProvider extends TreeContentProvider implements ICommonContentProvider, ITreeViewerListener, IEventListener {
+public class LaunchNavigatorContentProvider extends TreeContentProvider implements IEventListener {
+
+	/**
+	 * Constructor.
+	 */
+	public LaunchNavigatorContentProvider() {
+		super();
+		EventManager.getInstance().addEventListener(this, ChangeEvent.class);
+	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
@@ -56,8 +60,6 @@ public class LaunchNavigatorContentProvider extends TreeContentProvider implemen
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		super.inputChanged(viewer, oldInput, newInput);
-		EventManager.getInstance().addEventListener(this, ChangeEvent.class);
-		this.viewer.addTreeListener(this);
 	}
 
 	/*
@@ -68,7 +70,6 @@ public class LaunchNavigatorContentProvider extends TreeContentProvider implemen
 	public void dispose() {
 		super.dispose();
 		EventManager.getInstance().removeEventListener(this);
-		this.viewer.removeTreeListener(this);
 	}
 
 	/*
@@ -109,44 +110,6 @@ public class LaunchNavigatorContentProvider extends TreeContentProvider implemen
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.navigator.ICommonContentProvider#init(org.eclipse.ui.navigator.ICommonContentExtensionSite)
-	 */
-	@Override
-	public void init(ICommonContentExtensionSite config) {
-		Assert.isNotNull(config);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.navigator.IMementoAware#restoreState(org.eclipse.ui.IMemento)
-	 */
-	@Override
-	public void restoreState(IMemento aMemento) {
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.navigator.IMementoAware#saveState(org.eclipse.ui.IMemento)
-	 */
-	@Override
-	public void saveState(IMemento aMemento) {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreeViewerListener#treeCollapsed(org.eclipse.jface.viewers.TreeExpansionEvent)
-	 */
-	@Override
-	public void treeCollapsed(TreeExpansionEvent event) {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreeViewerListener#treeExpanded(org.eclipse.jface.viewers.TreeExpansionEvent)
-	 */
-	@Override
-	public void treeExpanded(TreeExpansionEvent event) {
-	}
-
 	/**
 	 * If the root node of the tree is visible.
 	 * 
@@ -156,10 +119,19 @@ public class LaunchNavigatorContentProvider extends TreeContentProvider implemen
 		return true;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.interfaces.events.IEventListener#eventFired(java.util.EventObject)
+	 */
 	@Override
 	public void eventFired(EventObject event) {
+		final TreeViewer viewer = this.viewer;
 		if (event.getSource() instanceof LaunchModel) {
-			this.viewer.refresh(true);
+			PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					viewer.refresh(true);
+				}
+			});
 		}
 	}
 }

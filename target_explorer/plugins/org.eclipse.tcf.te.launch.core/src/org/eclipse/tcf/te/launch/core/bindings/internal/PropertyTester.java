@@ -10,7 +10,6 @@
 package org.eclipse.tcf.te.launch.core.bindings.internal;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.tcf.te.launch.core.bindings.LaunchConfigTypeBindingsManager;
@@ -35,15 +34,6 @@ public class PropertyTester extends org.eclipse.core.expressions.PropertyTester 
 		if ("launchMode".equals(property) && expectedValue instanceof String) { //$NON-NLS-1$
 			if (receiver instanceof ILaunch) {
 				return ((ILaunch)receiver).getLaunchMode().equalsIgnoreCase((String)expectedValue);
-			}
-		}
-		else if ("launchConfigTypeid".equals(property) && expectedValue instanceof String) { //$NON-NLS-1$
-			if (receiver instanceof ILaunch) {
-				try {
-					return ((ILaunch)receiver).getLaunchConfiguration().getType().getIdentifier().equalsIgnoreCase((String)expectedValue);
-				}
-				catch (CoreException e) {
-				}
 			}
 		}
 		else if ("isValidLaunchConfigType".equals(property) && expectedValue instanceof String) { //$NON-NLS-1$

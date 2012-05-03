@@ -99,9 +99,9 @@ public class UIPlugin extends AbstractUIPlugin {
 			url = bundle.getEntry(ImageConsts.IMAGE_DIR_ROOT + "full/" + ImageConsts.IMAGE_DIR_DLCL + "refresh_nav.gif"); //$NON-NLS-1$ //$NON-NLS-2$
 			registry.put(ImageConsts.ACTION_Refresh_Disabled, ImageDescriptor.createFromURL(url));
 		}
-		URL url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OBJ + "root.gif"); //$NON-NLS-1$
+		URL url = getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OBJ + "launches_root.gif"); //$NON-NLS-1$
 		registry.put(ImageConsts.OBJ_Launches_Root, ImageDescriptor.createFromURL(url));
-		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OVR + "redX_ovr.gif"); //$NON-NLS-1$
+		url = getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OVR + "redX_ovr.gif"); //$NON-NLS-1$
 		registry.put(ImageConsts.RED_X_OVR, ImageDescriptor.createFromURL(url));
 	}
 

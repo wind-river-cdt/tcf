@@ -116,4 +116,7 @@ public class Messages extends NLS {
 
 	public static String DeleteHandlerDelegate_question_title;
 	public static String DeleteHandlerDelegate_question_message;
+
+	public static String LaunchDialogHandler_dialog_title;
+	public static String LaunchDialogHandler_dialog_message;
 }

@@ -15,6 +15,13 @@ package org.eclipse.tcf.te.launch.ui.internal.viewer;
  */
 public class LaunchTreeContentProvider extends LaunchNavigatorContentProvider {
 
+	/**
+	 * Constructor.
+	 */
+	public LaunchTreeContentProvider() {
+		super();
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.tcf.launch.ui.controls.LaunchNavigatorContentProvider#isRootNodeVisible()
 	 */

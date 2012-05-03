@@ -9,22 +9,25 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.launch.ui.internal.handler;
 
-import java.util.Iterator;
-
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.runtime.Assert;
+import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.tcf.te.launch.ui.model.LaunchModel;
 import org.eclipse.tcf.te.launch.ui.model.LaunchNode;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
- * Refresh handler implementation.
+ * Launch handler implementation.
  */
-public class RefreshHandler extends AbstractHandler {
+public class LaunchHandler extends AbstractHandler {
+
+	private String mode;
+
+	public LaunchHandler(String mode) {
+		this.mode = mode;
+	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
@@ -33,42 +36,15 @@ public class RefreshHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		// Get the current selection
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
-		if (selection instanceof IStructuredSelection && !selection.isEmpty()) {
-			// Loop over the selection and refresh the elements
-			Iterator<?> iterator = ((IStructuredSelection)selection).iterator();
-			while (iterator.hasNext()) {
-				final Object element = iterator.next();
-
-				// Refresh the element if there is a valid delegate
-				if (canRefresh(element)) {
-					// Refresh the element and the tree
-					refresh(element);
+		if (selection instanceof IStructuredSelection && ((IStructuredSelection) selection).size() == 1) {
+			Object element = ((IStructuredSelection)selection).getFirstElement();
+			if (element instanceof LaunchNode) {
+				LaunchNode node = (LaunchNode)element;
+				if (node.getLaunchConfiguration() != null) {
+					DebugUITools.launch(node.getLaunchConfiguration(), mode);
 				}
 			}
 		}
-
 		return null;
-	}
-
-	/**
-	 * Check if an element can be refreshed.
-	 * @param element The element to check.
-	 * @return
-	 */
-	public boolean canRefresh(Object element) {
-		if (element instanceof LaunchNode) {
-			return true;
-		}
-		return false;
-	}
-
-	private void refresh(Object element) {
-		Assert.isNotNull(element);
-
-		if (element instanceof LaunchNode) {
-			LaunchNode node = (LaunchNode)element;
-			LaunchModel model = node.getModel();
-			model.refresh();
-		}
 	}
 }

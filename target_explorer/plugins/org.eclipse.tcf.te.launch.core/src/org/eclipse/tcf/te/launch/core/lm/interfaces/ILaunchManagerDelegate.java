@@ -174,4 +174,11 @@ public interface ILaunchManagerDelegate extends IExecutableExtension {
 	 * Return <code>true</code> if a default connection should be used when the connection selection is empty.
 	 */
 	public boolean useDefaultConnection();
+
+	/**
+	 * Get a short description for the given launch configuration.
+	 * @param config The launch configuration.
+	 * @return The description.
+	 */
+	public String getDescription(ILaunchConfiguration config);
 }

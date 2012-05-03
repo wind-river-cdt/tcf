@@ -29,7 +29,7 @@
             class="org.eclipse.tcf.te.launch.core.bindings.internal.PropertyTester"
             id="org.eclipse.tcf.te.launch.core.PropertyTester"
             namespace="org.eclipse.tcf.te.launch.core"
-            properties="launchMode,launchConfigTypeId"
+            properties="launchMode"
             type="org.eclipse.debug.core.ILaunch">
       </propertyTester>
       <propertyTester

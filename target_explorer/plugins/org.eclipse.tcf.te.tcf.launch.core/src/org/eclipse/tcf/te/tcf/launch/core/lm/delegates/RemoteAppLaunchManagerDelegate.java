@@ -26,6 +26,7 @@ import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchContextLaunchAttribut
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.IReferencedProjectLaunchAttributes;
 import org.eclipse.tcf.te.launch.core.nls.Messages;
+import org.eclipse.tcf.te.launch.core.persistence.DefaultPersistenceDelegate;
 import org.eclipse.tcf.te.launch.core.persistence.filetransfer.FileTransfersPersistenceDelegate;
 import org.eclipse.tcf.te.launch.core.persistence.launchcontext.LaunchContextsPersistenceDelegate;
 import org.eclipse.tcf.te.launch.core.persistence.projects.ReferencedProjectItem;
@@ -234,5 +235,15 @@ public class RemoteAppLaunchManagerDelegate extends DefaultLaunchManagerDelegate
 	@Override
 	protected int getFullMatchRanking() {
 		return 1;
+	}
+
+	@Override
+	public String getDescription(ILaunchConfiguration config) {
+		String image = DefaultPersistenceDelegate.getAttribute(config, IRemoteAppLaunchAttributes.ATTR_PROCESS_IMAGE, (String)null);
+		String args = DefaultPersistenceDelegate.getAttribute(config, IRemoteAppLaunchAttributes.ATTR_PROCESS_ARGUMENTS, ""); //$NON-NLS-1$
+		if (image != null) {
+			return new Path(image).toPortableString() + " " + args; //$NON-NLS-1$
+		}
+		return ""; //$NON-NLS-1$
 	}
 }

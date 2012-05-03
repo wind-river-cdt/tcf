@@ -16,8 +16,7 @@
       <launchConfigurationTypeImage
             configTypeID="org.eclipse.tcf.te.tcf.launch.type.remote.app"
             icon="icons/obj16/remote_app.gif"
-            id="org.eclipse.tcf.te.tcf.launch.type.remote.app.image">
-      </launchConfigurationTypeImage>
+            id="org.eclipse.tcf.te.tcf.launch.type.remote.app.image"/>
    </extension>
 
 <!-- Launch configuration tab group contributions -->
@@ -25,8 +24,7 @@
       <launchConfigurationTabGroup
             class="org.eclipse.tcf.te.tcf.launch.ui.remote.app.LaunchConfigurationTabGroup"
             id="org.eclipse.tcf.te.tcf.launch.type.remote.app.tabgroup"
-            type="org.eclipse.tcf.te.tcf.launch.type.remote.app">
-      </launchConfigurationTabGroup>
+            type="org.eclipse.tcf.te.tcf.launch.type.remote.app"/>
    </extension>
    
  <!-- Launch shortcut contributions -->
@@ -109,20 +107,18 @@
       <navigatorContent
             id="org.eclipse.tcf.te.tcf.launch.ui.navigator.content"
             name="%LauchTree.name"
-      		icon="icons/obj16/root.gif"
+      		icon="icons/obj16/launches_root.gif"
             activeByDefault="false"
             contentProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchNavigatorContentProvider"
             labelProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchTreeLabelProvider"
             priority="normal">
          <triggerPoints>
-               <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+            <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
          </triggerPoints>
          <possibleChildren>
-               <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
+            <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
          </possibleChildren>
-         <commonSorter
-               class="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchTreeViewerSorter">
-         </commonSorter>
+         <commonSorter class="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchTreeViewerSorter"/>
       </navigatorContent>
    </extension>
 
@@ -135,8 +131,7 @@
                enablesFor="1"
                afterSection="org.eclipse.tcf.te.launch.ui.launchcontext"
                filter="org.eclipse.tcf.te.tcf.launch.ui.remote.app.RemoteAppFilter"
-               tab="org.eclipse.tcf.te.launch.ui.propertytab.general">
-         </propertySection>
+               tab="org.eclipse.tcf.te.launch.ui.propertytab.general"/>
       </propertySections>
    </extension>
 
@@ -148,8 +143,7 @@
                enablesFor="1"
                afterSection="org.eclipse.tcf.te.launch.ui.project.launchcontext"
                filter="org.eclipse.tcf.te.tcf.launch.ui.remote.app.RemoteAppFilter"
-               tab="org.eclipse.tcf.te.launch.ui.project.propertytab.general">
-         </propertySection>
+               tab="org.eclipse.tcf.te.launch.ui.project.propertytab.general"/>
       </propertySections>
    </extension>
 </plugin>

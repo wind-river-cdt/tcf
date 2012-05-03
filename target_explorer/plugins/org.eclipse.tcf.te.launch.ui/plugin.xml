@@ -17,7 +17,7 @@
             class="org.eclipse.tcf.te.launch.ui.internal.LaunchNodePropertyTester"
             id="org.eclipse.tcf.te.launch.ui.propertytester.launchNode"
             namespace="org.eclipse.tcf.te.launch.ui.model"
-            properties="isLaunchConfig,isLaunchConfigType,canDelete,canRefresh"
+            properties="isLaunchConfig,isLaunchConfigType,canDelete,canRefresh,hasLaunchMode,isValidLaunchConfig"
             type="org.eclipse.tcf.te.launch.ui.model.LaunchNode">
       </propertyTester>
    </extension>
@@ -27,6 +27,7 @@
       <editorPage
             class="org.eclipse.tcf.te.ui.views.editor.pages.TreeViewerExplorerEditorPage:org.eclipse.tcf.te.launch.ui.viewer.launches:Launches"
             name="%LauchEditorPage.name"
+            icon="icons/obj16/launches_root.gif"
             id="org.eclipse.tcf.te.launch.ui.LaunchEditorPage">
       </editorPage>
    </extension>
@@ -47,7 +48,7 @@
       <navigatorContent
             id="org.eclipse.tcf.te.launch.ui.navigator.project.content"
             name="%LauchTree.name"
-      		icon="icons/obj16/root.gif"
+      		icon="icons/obj16/launches_root.gif"
             activeByDefault="false"
             contentProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchNavigatorContentProvider"
             labelProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchTreeLabelProvider"
@@ -70,6 +71,7 @@
             id="org.eclipse.tcf.te.launch.ui.viewer.launches"
             autoExpandLevel="2"
             contentProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchTreeContentProvider"
+            doubleClickCommand="org.eclipse.ui.navigator.Open"
             helpId="org.eclipse.tcf.te.launch.ui.LaunchEditorPage"
             menuId="org.eclipse.tcf.te.launch.ui.editor.menu.launches">
          <creation>
@@ -84,6 +86,18 @@
                name="%LauchEditorPage.column.name"
                width="400">
          </column>
+         <column
+               id="description"
+               labelProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.DescriptionColumnLabelProvider"
+               name="%LauchEditorPage.column.description"
+               width="400">
+         </column>
+         <column
+               id="lastLaunched"
+               labelProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LastLaunchedColumnLabelProvider"
+               name="%LauchEditorPage.column.lastLaunched"
+               width="100">
+         </column>
       </columnContribution>
    </extension>
 
@@ -94,8 +108,7 @@
       <menuContribution locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu">
          <separator
                name="group.new"
-               visible="true">
-         </separator>
+               visible="true"/>
          <menu 
                id="org.eclipse.tcf.te.launch.ui.views.project.menu.new"
                label="%New.menu.name">
@@ -103,24 +116,13 @@
                   id="org.eclipse.tcf.te.launch.ui.views.project.dynamic.new"
                   class="org.eclipse.tcf.te.launch.ui.internal.handler.NewLaunchConfigurationContributionItem">
                <visibleWhen>
-                  <with variable="selection">
-                     <count value="1"/>
-                     <iterate
-                           ifEmpty="false"
-                           operator="and">
-                        <or>
-                           <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
-                           <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfigType"/>
-                        </or>
-                     </iterate>
-                  </with>
+                  <reference definitionId="launch.expressions.isSingleLaunchConfigOrType"/>
                </visibleWhen>
             </dynamic>
          </menu>
          <separator
                name="group.showIn"
-               visible="true">
-         </separator>
+               visible="true"/>
          <menu
                id="org.eclipse.tcf.te.launch.ui.views.project.menu.showIn"
                label="%ShowIn.menu.name">
@@ -131,62 +133,37 @@
                   label="%Properties.menu.name"
                   style="push">
                <visibleWhen>
-                  <with variable="selection">
-                     <count value="1"/>
-                     <iterate
-                           ifEmpty="false"
-                           operator="and">
-                        <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
-                     </iterate>
-                  </with>
+                  <reference definitionId="launch.expressions.isSingleLaunchConfig"/>
                </visibleWhen>
             </command>
             <visibleWhen checkEnabled="true"/>
          </menu>
          <separator
                name="group.launch"
-               visible="true">
-         </separator>
+               visible="true"/>
          <dynamic
                id="org.eclipse.tcf.te.launch.ui.views.project.dynamic.launch"
                class="org.eclipse.tcf.te.launch.ui.internal.handler.LaunchLaunchConfigurationContributionItem">
             <visibleWhen>
-               <with variable="selection">
-                  <count value="1"/>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
-                  </iterate>
-               </with>
+               <reference definitionId="launch.expressions.isSingleLaunchConfig"/>
             </visibleWhen>
          </dynamic>
          <separator
                name="group.open"
-               visible="true">
-         </separator>
+               visible="true"/>
          <menu 
                id="org.eclipse.tcf.te.launch.ui.views.project.menu.open"
                label="%Open.menu.name">
             <dynamic
                   id="org.eclipse.tcf.te.launch.ui.views.project.dynamic.open"
-                  class="org.eclipse.tcf.te.launch.ui.internal.handler.OpenLaunchConfigurationContributionItem">
-            </dynamic>
+                  class="org.eclipse.tcf.te.launch.ui.internal.handler.OpenLaunchConfigurationContributionItem"/>
             <visibleWhen>
-               <with variable="selection">
-                  <count value="1"/>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfigType"/>
-                  </iterate>
-               </with>
+               <reference definitionId="launch.expressions.isSingleLaunchConfigType"/>
             </visibleWhen>
          </menu>
          <separator
                name="group.openAs"
-               visible="true">
-         </separator>
+               visible="true"/>
          <menu 
                id="org.eclipse.tcf.te.launch.ui.views.project.menu.openAs"
                label="%OpenAs.menu.name">
@@ -195,20 +172,12 @@
                   class="org.eclipse.tcf.te.launch.ui.internal.handler.OpenLaunchConfigurationContributionItem">
             </dynamic>
             <visibleWhen>
-               <with variable="selection">
-                  <count value="1"/>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
-                  </iterate>
-               </with>
+               <reference definitionId="launch.expressions.isSingleLaunchConfig"/>
             </visibleWhen>
          </menu>
          <separator
                name="group.delete"
-               visible="false">
-         </separator>
+               visible="false"/>
          <command
                commandId="org.eclipse.ui.edit.delete"
                id="org.eclipse.tcf.te.launch.ui.views.project.commands.delete"
@@ -216,14 +185,7 @@
                mnemonic="%Delete.menu.mnemonic"
                style="push">
             <visibleWhen checkEnabled="false">
-               <with variable="selection">
-                  <count value="1"/>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
-                  </iterate>
-               </with>
+               <reference definitionId="launch.expressions.isMultiLaunchConfig"/>
             </visibleWhen>
          </command>
          <separator
@@ -237,14 +199,7 @@
                mnemonic="%Refresh.menu.mnemonic"
                style="push">
             <visibleWhen checkEnabled="false">
-               <with variable="selection">
-                  <count value="1"/>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
-                  </iterate>
-               </with>
+               <reference definitionId="launch.expressions.isSingleLaunchNode"/>
             </visibleWhen>
          </command>
       </menuContribution>
@@ -258,17 +213,7 @@
                   id="org.eclipse.tcf.te.launch.ui.views.target.dynamic.new"
                   class="org.eclipse.tcf.te.launch.ui.internal.handler.NewLaunchConfigurationContributionItem">
                <visibleWhen>
-                  <with variable="selection">
-                     <count value="1"/>
-                     <iterate
-                           ifEmpty="false"
-                           operator="and">
-                        <or>
-                           <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
-                           <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfigType"/>
-                        </or>
-                     </iterate>
-                  </with>
+                  <reference definitionId="launch.expressions.isSingleLaunchConfigOrType"/>
                </visibleWhen>
             </dynamic>
          </menu>
@@ -278,14 +223,7 @@
                id="org.eclipse.tcf.te.launch.ui.views.target.dynamic.launch"
                class="org.eclipse.tcf.te.launch.ui.internal.handler.LaunchLaunchConfigurationContributionItem">
             <visibleWhen>
-               <with variable="selection">
-                  <count value="1"/>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
-                  </iterate>
-               </with>
+               <reference definitionId="launch.expressions.isSingleLaunchConfig"/>
             </visibleWhen>
          </dynamic>
       </menuContribution>
@@ -295,17 +233,9 @@
                label="%Open.menu.name">
             <dynamic
                   id="org.eclipse.tcf.te.launch.ui.views.target.dynamic.open"
-                  class="org.eclipse.tcf.te.launch.ui.internal.handler.OpenLaunchConfigurationContributionItem">
-            </dynamic>
+                  class="org.eclipse.tcf.te.launch.ui.internal.handler.OpenLaunchConfigurationContributionItem"/>
             <visibleWhen>
-               <with variable="selection">
-                  <count value="1"/>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfigType"/>
-                  </iterate>
-               </with>
+               <reference definitionId="launch.expressions.isSingleLaunchConfigType"/>
             </visibleWhen>
          </menu>
          <menu 
@@ -313,17 +243,9 @@
                label="%OpenAs.menu.name">
             <dynamic
                   id="org.eclipse.tcf.te.launch.ui.views.target.dynamic.openAs"
-                  class="org.eclipse.tcf.te.launch.ui.internal.handler.OpenLaunchConfigurationContributionItem">
-            </dynamic>
+                  class="org.eclipse.tcf.te.launch.ui.internal.handler.OpenLaunchConfigurationContributionItem"/>
             <visibleWhen>
-               <with variable="selection">
-                  <count value="1"/>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
-                  </iterate>
-               </with>
+               <reference definitionId="launch.expressions.isSingleLaunchConfig"/>
             </visibleWhen>
          </menu>
       </menuContribution>
@@ -339,12 +261,7 @@
                style="push"
                tooltip="%command.delete.description">
             <visibleWhen checkEnabled="false">
-               <with variable="selection">
-                  <count value="+"/>
-                  <iterate operator="and" ifEmpty="false">
-                     <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
-                  </iterate>
-               </with>
+               <reference definitionId="launch.expressions.isMultiLaunchConfig"/>
             </visibleWhen>
          </command>
       </menuContribution>
@@ -356,14 +273,7 @@
                mnemonic="%Refresh.menu.mnemonic"
                style="push">
             <visibleWhen checkEnabled="false">
-               <with variable="selection">
-                  <count value="1"/>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
-                  </iterate>
-               </with>
+               <reference definitionId="launch.expressions.isSingleLaunchNode"/>
             </visibleWhen>
          </command>
       </menuContribution>
@@ -372,8 +282,7 @@
       <menuContribution locationURI="popup:org.eclipse.tcf.te.launch.ui.editor.menu.launches">
          <separator
                name="group.new"
-               visible="true">
-         </separator>
+               visible="true"/>
          <menu 
                id="org.eclipse.tcf.te.launch.ui.editor.menu.new"
                label="%New.menu.name">
@@ -381,24 +290,13 @@
                   id="org.eclipse.tcf.te.launch.ui.editor.dynamic.new"
                   class="org.eclipse.tcf.te.launch.ui.internal.handler.NewLaunchConfigurationContributionItem">
                <visibleWhen>
-                  <with variable="selection">
-                     <count value="1"/>
-                     <iterate
-                           ifEmpty="false"
-                           operator="and">
-                        <or>
-                           <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
-                           <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfigType"/>
-                        </or>
-                     </iterate>
-                  </with>
+                  <reference definitionId="launch.expressions.isSingleLaunchConfigOrType"/>
                </visibleWhen>
             </dynamic>
          </menu>
          <separator
                name="group.showIn"
-               visible="true">
-         </separator>
+               visible="true"/>
          <menu
                id="org.eclipse.tcf.te.launch.ui.editor.menu.showIn"
                label="%ShowIn.menu.name">
@@ -409,56 +307,32 @@
                   label="%Properties.menu.name"
                   style="push">
                <visibleWhen>
-                  <with variable="selection">
-                     <count value="1"/>
-                     <iterate
-                           ifEmpty="false"
-                           operator="and">
-                        <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
-                     </iterate>
-                  </with>
+                  <reference definitionId="launch.expressions.isSingleLaunchConfig"/>
                </visibleWhen>
             </command>
             <visibleWhen checkEnabled="true"/>
          </menu>
          <separator
                name="group.launch"
-               visible="true">
-         </separator>
+               visible="true"/>
          <dynamic
                id="org.eclipse.tcf.te.launch.ui.editor.dynamic.launch"
                class="org.eclipse.tcf.te.launch.ui.internal.handler.LaunchLaunchConfigurationContributionItem">
             <visibleWhen>
-               <with variable="selection">
-                  <count value="1"/>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
-                  </iterate>
-               </with>
+               <reference definitionId="launch.expressions.isSingleLaunchConfig"/>
             </visibleWhen>
          </dynamic>
          <separator
                name="group.edit"
-               visible="true">
-         </separator>
+               visible="true"/>
          <menu 
                id="org.eclipse.tcf.te.launch.ui.editor.menu.open"
                label="%Open.menu.name">
             <dynamic
                   id="org.eclipse.tcf.te.launch.ui.editor.dynamic.open"
-                  class="org.eclipse.tcf.te.launch.ui.internal.handler.OpenLaunchConfigurationContributionItem">
-            </dynamic>
+                  class="org.eclipse.tcf.te.launch.ui.internal.handler.OpenLaunchConfigurationContributionItem"/>
             <visibleWhen>
-               <with variable="selection">
-                  <count value="1"/>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfigType"/>
-                  </iterate>
-               </with>
+               <reference definitionId="launch.expressions.isSingleLaunchConfigType"/>
             </visibleWhen>
          </menu>
          <menu 
@@ -469,20 +343,12 @@
                   class="org.eclipse.tcf.te.launch.ui.internal.handler.OpenLaunchConfigurationContributionItem">
             </dynamic>
             <visibleWhen>
-               <with variable="selection">
-                  <count value="1"/>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
-                  </iterate>
-               </with>
+               <reference definitionId="launch.expressions.isSingleLaunchConfig"/>
             </visibleWhen>
          </menu>
          <separator
                name="group.delete"
-               visible="true">
-         </separator>
+               visible="true"/>
          <command
                commandId="org.eclipse.ui.edit.delete"
                id="org.eclipse.tcf.te.launch.ui.editor.commands.delete"
@@ -490,20 +356,12 @@
                mnemonic="%Delete.menu.mnemonic"
                style="push">
             <visibleWhen checkEnabled="false">
-               <with variable="selection">
-                  <count value="1"/>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
-                  </iterate>
-               </with>
+               <reference definitionId="launch.expressions.isMultiLaunchConfig"/>
             </visibleWhen>
          </command>
          <separator
                name="group.refresh"
-               visible="true">
-         </separator>
+               visible="true"/>
          <command
                commandId="org.eclipse.tcf.te.ui.command.refresh"
                id="org.eclipse.tcf.te.launch.ui.editor.commands.refresh"
@@ -511,17 +369,50 @@
                mnemonic="%Refresh.menu.mnemonic"
                style="push">
             <visibleWhen checkEnabled="false">
-               <with variable="selection">
-                  <count value="1"/>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
-                  </iterate>
-               </with>
+               <reference definitionId="launch.expressions.isSingleLaunchNode"/>
             </visibleWhen>
          </command>
       </menuContribution>
+      
+   <!-- Launches editor page toolbar contributions -->
+      <menuContribution locationURI="toolbar:org.eclipse.tcf.te.launch.ui.editor.menu.launches">
+         <separator
+               name="group.run"
+               visible="false"/>
+         <command
+               commandId="org.eclipse.tcf.te.ui.launch.command.run"
+               id="org.eclipse.tcf.te.launch.ui.editor.toolbar.commands.run"
+               label="%Run.menu.name"
+               style="push"/>
+         <separator
+               name="group.debug"
+               visible="false"/>
+         <command
+               commandId="org.eclipse.tcf.te.ui.launch.command.debug"
+               id="org.eclipse.tcf.te.launch.ui.editor.toolbar.commands.debug"
+               label="%Debug.menu.name"
+               style="push"/>
+         <separator
+               name="group.launch"
+               visible="false"/>
+         <separator
+               name="group.delete"
+               visible="true"/>
+         <command
+               commandId="org.eclipse.ui.edit.delete"
+               id="org.eclipse.tcf.te.launch.ui.editor.toolbar.commands.delete"
+               label="%Delete.menu.name"
+               style="push"/>
+         <separator
+               name="group.refresh"
+               visible="false"/>
+         <command
+               commandId="org.eclipse.tcf.te.ui.command.refresh"
+               id="org.eclipse.tcf.te.launch.ui.editor.toolbar.commands.refresh"
+               label="%Refresh.menu.name"
+               style="push"/>
+      </menuContribution>
+      
    </extension>
 
 <!-- Command contributions -->
@@ -544,10 +435,26 @@
             helpContextId="org.eclipse.tcf.te.launch.command_Detach"
             id="org.eclipse.tcf.te.launch.command.detach"
             name="%command.detach.name"/>
+      <command
+            helpContextId="org.eclipse.tcf.te.ui.launch.command_Run"
+            id="org.eclipse.tcf.te.ui.launch.command.run"
+            name="%Run.menu.name"/>
+      <command
+            helpContextId="org.eclipse.tcf.te.ui.launch.command_Debug"
+            id="org.eclipse.tcf.te.ui.launch.command.debug"
+            name="%Debug.menu.name"/>
    </extension>
    
 <!-- Command image contributions -->
    <extension point="org.eclipse.ui.commandImages">
+      <image
+            commandId="org.eclipse.tcf.te.ui.launch.command.run"
+            icon="platform:/plugin/org.eclipse.debug.ui/icons/full/etool16/run_exc.gif"
+            disabledIcon="platform:/plugin/org.eclipse.debug.ui/icons/full/dtool16/run_exc.gif"/>
+      <image
+            commandId="org.eclipse.tcf.te.ui.launch.command.debug"
+            icon="platform:/plugin/org.eclipse.debug.ui/icons/full/etool16/debug_exc.gif"
+            disabledIcon="platform:/plugin/org.eclipse.debug.ui/icons/full/dtool16/debug_exc.gif"/>
       <image
             commandId="org.eclipse.tcf.te.launch.command.showInDebugView"
             icon="platform:/plugin/org.eclipse.debug.ui/icons/full/eview16/debug_view.gif"/>
@@ -564,6 +471,31 @@
 <!-- Handler contributions -->
    <extension point="org.eclipse.ui.handlers">
       <handler
+            commandId="org.eclipse.ui.navigator.Open"
+            class="org.eclipse.tcf.te.launch.ui.internal.handler.LaunchDialogHandler">
+         <activeWhen>
+            <and>
+               <with variable="activePartId">
+                  <or>
+                     <equals value="org.eclipse.tcf.te.ui.views.View"/>
+                     <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
+                     <equals value="org.eclipse.ui.navigator.ProjectExplorer"/>
+                  </or>
+               </with>
+               <reference definitionId="launch.expressions.isSingleLaunchConfig"/>
+            </and>
+         </activeWhen>
+         <enabledWhen>
+            <with variable="selection">
+               <iterate 
+                     operator="and" 
+                     ifEmpty="false">
+                  <test property="org.eclipse.tcf.te.launch.ui.model.isValidLaunchConfig"/>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
+      <handler
             commandId="org.eclipse.ui.edit.delete"
             class="org.eclipse.tcf.te.launch.ui.internal.handler.DeleteHandler">
          <activeWhen>
@@ -575,13 +507,7 @@
                      <equals value="org.eclipse.ui.navigator.ProjectExplorer"/>
                   </or>
                </with>
-               <with variable="selection">
-                  <iterate 
-                        operator="and" 
-                        ifEmpty="false">
-                     <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
-                  </iterate>
-               </with>
+               <reference definitionId="launch.expressions.isMultiLaunchConfig"/>
             </and>
          </activeWhen>
          <enabledWhen>
@@ -606,14 +532,7 @@
                      <equals value="org.eclipse.ui.navigator.ProjectExplorer"/>
                   </or>
                </with>
-               <with variable="selection">
-                  <count value="1"/>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
-                  </iterate>
-               </with>
+               <reference definitionId="launch.expressions.isSingleLaunchNode"/>
             </and>
          </activeWhen>
          <enabledWhen>
@@ -637,19 +556,55 @@
                      <equals value="org.eclipse.ui.navigator.ProjectExplorer"/>
                   </or>
                </with>
-               <with variable="selection">
-                  <count value="1"/>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <or>
-                        <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfigType"/>
-                        <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
-                     </or>
-                  </iterate>
+               <reference definitionId="launch.expressions.isSingleLaunchConfigOrType"/>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            commandId="org.eclipse.tcf.te.ui.launch.command.run"
+            class="org.eclipse.tcf.te.launch.ui.internal.handler.RunHandler">
+         <activeWhen>
+            <and>
+               <with variable="activePartId">
+                  <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
                </with>
             </and>
          </activeWhen>
+         <enabledWhen>
+            <with variable="selection">
+               <iterate 
+                     operator="and" 
+                     ifEmpty="false">
+                  <and>
+                     <test property="org.eclipse.tcf.te.launch.ui.model.hasLaunchMode" value="run"/>
+                     <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
+                  </and>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
+      <handler
+            commandId="org.eclipse.tcf.te.ui.launch.command.debug"
+            class="org.eclipse.tcf.te.launch.ui.internal.handler.DebugHandler">
+         <activeWhen>
+            <and>
+               <with variable="activePartId">
+                  <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
+               </with>
+            </and>
+         </activeWhen>
+         <enabledWhen>
+            <with variable="selection">
+               <iterate 
+                     operator="and" 
+                     ifEmpty="false">
+                  <and>
+                     <test property="org.eclipse.tcf.te.launch.ui.model.hasLaunchMode" value="debug"/>
+                     <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
+                  </and>
+               </iterate>
+            </with>
+         </enabledWhen>
       </handler>
    </extension>
 
@@ -746,4 +701,61 @@
                tab="org.eclipse.tcf.te.launch.ui.project.propertytab.filetransfers"/>
       </propertySections>
    </extension>
+
+<!-- Reusable core expression fragments -->   
+   <extension point="org.eclipse.core.expressions.definitions">
+      <definition id="launch.expressions.isSingleLaunchConfigOrType">
+	      <with variable="selection">
+	         <count value="1"/>
+	         <iterate
+	               ifEmpty="false"
+	               operator="and">
+	            <or>
+	               <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
+	               <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfigType"/>
+	            </or>
+	         </iterate>
+	      </with>
+      </definition>
+      <definition id="launch.expressions.isSingleLaunchConfig">
+          <with variable="selection">
+             <count value="1"/>
+             <iterate
+                   ifEmpty="false"
+                   operator="and">
+                <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
+             </iterate>
+          </with>
+      </definition>
+      <definition id="launch.expressions.isMultiLaunchConfig">
+          <with variable="selection">
+             <iterate
+                   ifEmpty="false"
+                   operator="and">
+                <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
+             </iterate>
+          </with>
+      </definition>
+      <definition id="launch.expressions.isSingleLaunchConfigType">
+          <with variable="selection">
+             <count value="1"/>
+             <iterate
+                   ifEmpty="false"
+                   operator="and">
+                <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfigType"/>
+             </iterate>
+          </with>
+      </definition>
+      <definition id="launch.expressions.isSingleLaunchNode">
+          <with variable="selection">
+             <count value="1"/>
+             <iterate
+                   ifEmpty="false"
+                   operator="and">
+                <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
+             </iterate>
+          </with>
+      </definition>
+   </extension>
+
 </plugin>

@@ -18,15 +18,11 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.te.launch.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.launch.ui.model.LaunchNode;
 import org.eclipse.tcf.te.launch.ui.nls.Messages;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.eclipse.ui.navigator.CommonViewer;
 
 /**
  * Delete handler implementation.
@@ -41,9 +37,6 @@ public class DeleteHandler extends AbstractHandler {
 		// Get the current selection
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
 		if (selection instanceof IStructuredSelection && !selection.isEmpty()) {
-			// Determine the active part
-			final IWorkbenchPart part = HandlerUtil.getActivePart(event);
-
 			// Loop over the selection and delete the elements providing
 			Iterator<?> iterator = ((IStructuredSelection)selection).iterator();
 			while (iterator.hasNext()) {
@@ -51,31 +44,8 @@ public class DeleteHandler extends AbstractHandler {
 
 				// Delete the element if there is a valid delegate
 				if (canDelete(element)) {
-					// Determine the elements parent element
-					Object parentElement = null;
-					CommonViewer viewer = (CommonViewer)part.getAdapter(CommonViewer.class);
-					if (viewer != null && viewer.getContentProvider() instanceof ITreeContentProvider) {
-						ITreeContentProvider cp = (ITreeContentProvider)viewer.getContentProvider();
-						parentElement = cp.getParent(element);
-					}
-					final Object finParentElement = parentElement;
-
 					// Delete the element and refresh the tree
-					if (delete(element)) {
-						PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-							@Override
-							public void run() {
-								CommonViewer viewer = (CommonViewer)part.getAdapter(CommonViewer.class);
-								if (viewer != null) {
-									if (finParentElement != null) {
-										viewer.refresh(finParentElement, true);
-									} else {
-										viewer.refresh(true);
-									}
-								}
-							}
-						});
-					}
+					delete(element);
 				}
 			}
 		}
@@ -96,22 +66,20 @@ public class DeleteHandler extends AbstractHandler {
 		return false;
 	}
 
-	private boolean delete(Object element) {
+	private void delete(Object element) {
 		Assert.isNotNull(element);
 
 		if (element instanceof LaunchNode) {
-			final LaunchNode node = (LaunchNode)element;
+			LaunchNode node = (LaunchNode)element;
 			if (MessageDialog.openQuestion(
 							UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getShell(),
 							Messages.DeleteHandlerDelegate_question_title, NLS.bind(Messages.DeleteHandlerDelegate_question_message, node.getLaunchConfiguration().getName()))) {
 				try {
 					node.getLaunchConfiguration().delete();
-					return true;
 				}
 				catch (Exception e) {
 				}
 			}
 		}
-		return false;
 	}
 }
