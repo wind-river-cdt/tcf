@@ -159,7 +159,7 @@ public abstract class AbstractCategoryContributionItem extends CompoundContribut
 		IStructuredSelection iss = (IStructuredSelection)selection;
 
 		List<IContributionItem> items = new ArrayList<IContributionItem>();
-		ICategory[] categories = getCategories(iss, false);
+		ICategory[] categories = getCategories(iss, true);
 
 		// Generate the action contribution items
 		for (ICategory category : categories) {
