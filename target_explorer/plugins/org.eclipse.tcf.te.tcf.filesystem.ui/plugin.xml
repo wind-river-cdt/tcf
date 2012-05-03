@@ -957,13 +957,6 @@
             properties="isEditorActivation"
             type="org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent">
       </propertyTester>
-      <propertyTester
-            id="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode"
-            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.testers.TreeNodePropertyTester"
-            namespace="org.eclipse.tcf.te.tcf.filesystem"
-            properties="canDelete"
-            type="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
-      </propertyTester>
    </extension>
    
 <!-- Command contributions -->
@@ -1596,7 +1589,7 @@
 
       <handler
             commandId="org.eclipse.ui.edit.delete"
-            class="org.eclipse.tcf.te.tcf.ui.handler.DeleteHandler">
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.handlers.DeleteHandler">
             <activeWhen>
                <and>
                   <with variable="activePartId">
@@ -1614,11 +1607,45 @@
             </activeWhen>
             <enabledWhen>
                <with variable="selection">
+                  <count
+                        value="+">
+                  </count>
                   <iterate operator="and" ifEmpty="false">
-                     <test
-                           property="org.eclipse.tcf.te.tcf.filesystem.canDelete"
-                           value="true">
-                     </test>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
+                     </instanceof>
+                     <not>
+                        <test
+                              property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isSystemRoot">
+                        </test>
+                     </not>
+                     <not>
+                        <test
+                              property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isRoot">
+                        </test>
+                     </not>
+                     <or>
+                        <and>
+                           <test
+                                 property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isWindows">
+                           </test>
+                           <not>
+                              <test
+                                    property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isReadOnly">
+                              </test>
+                           </not>
+                        </and>
+                        <and>
+                           <not>
+                              <test
+                                    property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isWindows">
+                              </test>
+                           </not>
+                           <test
+                                 property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isWritable">
+                           </test>
+                        </and>
+                     </or>
                   </iterate>
                </with>
             </enabledWhen>

@@ -15,7 +15,6 @@ import junit.framework.TestSuite;
 public class AdaptersTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("File System: Adapters Tests"); //$NON-NLS-1$
-		suite.addTestSuite(DeleteHandlerDelegateTest.class);
 		suite.addTestSuite(FSTreeNodeAdapterFactoryTest.class);
 		suite.addTestSuite(NodeStateFilterTest.class);
 		suite.addTestSuite(PeerModelViewerInputTest.class);
