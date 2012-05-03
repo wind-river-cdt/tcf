@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.ITreePathContentProvider;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.Viewer;
@@ -35,6 +36,7 @@ import org.eclipse.tcf.te.ui.views.extensions.CategoriesExtensionPointManager;
 import org.eclipse.tcf.te.ui.views.interfaces.ICategory;
 import org.eclipse.tcf.te.ui.views.interfaces.IRoot;
 import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
+import org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizable;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.internal.navigator.NavigatorFilterService;
 import org.eclipse.ui.navigator.CommonViewer;
@@ -85,7 +87,11 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 				public void run() {
 					if (IUIConstants.ID_CAT_FAVORITES.equals(catID)) {
 						for (IPeerModel peer : peers) {
-							boolean isFavorite = Managers.getCategoryManager().belongsTo(catID, peer.getPeerId());
+			        	    ICategorizable categorizable = (ICategorizable)peer.getAdapter(ICategorizable.class);
+			            	if (categorizable == null) categorizable = (ICategorizable)Platform.getAdapterManager().getAdapter(peer, ICategorizable.class);
+			            	Assert.isNotNull(categorizable);
+
+							boolean isFavorite = Managers.getCategoryManager().belongsTo(catID, categorizable.getId());
 							if (isFavorite && !candidates.contains(peer)) {
 								candidates.add(peer);
 							}
@@ -93,14 +99,28 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 					}
 					else if (IUIConstants.ID_CAT_MY_TARGETS.equals(catID)) {
 						for (IPeerModel peer : peers) {
+			        	    ICategorizable categorizable = (ICategorizable)peer.getAdapter(ICategorizable.class);
+			            	if (categorizable == null) categorizable = (ICategorizable)Platform.getAdapterManager().getAdapter(peer, ICategorizable.class);
+			            	Assert.isNotNull(categorizable);
+
 							String value = peer.getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
 							boolean isStatic = value != null && Boolean.parseBoolean(value.trim());
 
+							boolean isProxy = peer.getPeer().getAttributes().containsKey("Proxy"); //$NON-NLS-1$
+
+							value = peer.getPeer().getAttributes().get("ValueAdd"); //$NON-NLS-1$
+							boolean isValueAdd = value != null && ("1".equals(value.trim()) || Boolean.parseBoolean(value.trim())); //$NON-NLS-1$
+
 							// Static peers, or if launched by current user -> add automatically to "My Targets"
 							boolean startedByCurrentUser = System.getProperty("user.name").equals(peer.getPeer().getUserName()); //$NON-NLS-1$
-							boolean isMyTargets = Managers.getCategoryManager().belongsTo(catID, peer.getPeerId());
+							boolean isMyTargets = Managers.getCategoryManager().belongsTo(catID, categorizable.getId());
 							if (!isMyTargets && (isStatic || startedByCurrentUser)) {
-								Managers.getCategoryManager().add(catID, peer.getPeerId());
+								// "Value-add's" are not saved to the category persistence automatically
+								if (isProxy || isValueAdd) {
+									Managers.getCategoryManager().addTransient(catID, categorizable.getId());
+								} else {
+									Managers.getCategoryManager().add(catID, categorizable.getId());
+								}
 								isMyTargets = true;
 							}
 
@@ -111,12 +131,26 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 					}
 					else if (IUIConstants.ID_CAT_NEIGHBORHOOD.equals(catID)) {
 						for (IPeerModel peer : peers) {
-							String value = peer.getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
+			        	    ICategorizable categorizable = (ICategorizable)peer.getAdapter(ICategorizable.class);
+			            	if (categorizable == null) categorizable = (ICategorizable)Platform.getAdapterManager().getAdapter(peer, ICategorizable.class);
+			            	Assert.isNotNull(categorizable);
+
+			            	String value = peer.getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
 							boolean isStatic = value != null && Boolean.parseBoolean(value.trim());
 
-							boolean isNeighborhood = Managers.getCategoryManager().belongsTo(catID, peer.getPeerId());
+							boolean isProxy = peer.getPeer().getAttributes().containsKey("Proxy"); //$NON-NLS-1$
+
+							value = peer.getPeer().getAttributes().get("ValueAdd"); //$NON-NLS-1$
+							boolean isValueAdd = value != null && ("1".equals(value.trim()) || Boolean.parseBoolean(value.trim())); //$NON-NLS-1$
+
+							boolean isNeighborhood = Managers.getCategoryManager().belongsTo(catID, categorizable.getId());
 							if (!isNeighborhood && !isStatic) {
-								Managers.getCategoryManager().add(catID, peer.getPeerId());
+								// "Value-add's" are not saved to the category persistence automatically
+								if (isProxy || isValueAdd) {
+									Managers.getCategoryManager().addTransient(catID, categorizable.getId());
+								} else {
+									Managers.getCategoryManager().add(catID, categorizable.getId());
+								}
 								isNeighborhood = true;
 							}
 

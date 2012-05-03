@@ -20,6 +20,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -43,6 +44,9 @@ import org.eclipse.tcf.te.tcf.locator.model.Model;
 import org.eclipse.tcf.te.tcf.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.ui.help.IContextHelpIds;
 import org.eclipse.tcf.te.tcf.ui.nls.Messages;
+import org.eclipse.tcf.te.ui.views.Managers;
+import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
+import org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizable;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
@@ -201,7 +205,12 @@ public class OfflineCommandHandler extends AbstractHandler {
 							}
 							service.write(new TransientPeer(attrs), null);
 
-							Model.getModel().getService(ILocatorModelRefreshService.class).refresh();
+							// Remove the node from the "Neighborhood" category
+			        	    ICategorizable categorizable = (ICategorizable)node.getAdapter(ICategorizable.class);
+			            	if (categorizable == null) categorizable = (ICategorizable)Platform.getAdapterManager().getAdapter(node, ICategorizable.class);
+			            	Assert.isNotNull(categorizable);
+
+							Managers.getCategoryManager().remove(IUIConstants.ID_CAT_NEIGHBORHOOD, categorizable.getId());
 						} catch (IOException e) {
 							status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(),
 											   NLS.bind(Messages.OfflineCommandHandler_error_makeOffline_failed, node.getName(), e.getLocalizedMessage()), e);

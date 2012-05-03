@@ -41,6 +41,11 @@ public class CategoryManager implements ICategoryManager {
 	// The map maintaining the category id list per id
 	private final Map<String, List<String>> id2cat = new HashMap<String, List<String>>();
 
+	// The map maintaining the transient id list per category id
+	private final Map<String, List<String>> _t_cat2id = new HashMap<String, List<String>>();
+	// The map maintaining the transient category id list per id
+	private final Map<String, List<String>> _t_id2cat = new HashMap<String, List<String>>();
+
 	/**
 	 * Constructor.
 	 */
@@ -82,6 +87,10 @@ public class CategoryManager implements ICategoryManager {
 	private void initialize() {
 		IPath root = getRoot();
 		if (root == null) return;
+
+		// Clear out the transient maps
+		_t_cat2id.clear();
+		_t_id2cat.clear();
 
 		// Create the Gson instance
 		Gson gson = new GsonBuilder().create();
@@ -187,6 +196,33 @@ public class CategoryManager implements ICategoryManager {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.views.interfaces.categories.ICategoryManager#addTransient(java.lang.String, java.lang.String)
+	 */
+	@Override
+	public boolean addTransient(String categoryId, String id) {
+		Assert.isNotNull(categoryId);
+		Assert.isNotNull(id);
+
+		boolean added = false;
+
+		List<String> ids = _t_cat2id.get(categoryId);
+		if (ids == null) {
+			ids = new ArrayList<String>();
+			_t_cat2id.put(categoryId, ids);
+		}
+		if (!ids.contains(id)) added |= ids.add(id);
+
+		List<String> cats = _t_id2cat.get(id);
+		if (cats == null) {
+			cats = new ArrayList<String>();
+			_t_id2cat.put(id, cats);
+		}
+		if (!cats.contains(categoryId)) added |= cats.add(categoryId);
+
+		return added;
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.ui.views.categories.ICategoryManager#remove(java.lang.String, java.lang.String)
 	 */
 	@Override
@@ -201,11 +237,21 @@ public class CategoryManager implements ICategoryManager {
 			removed |= ids.remove(id);
 			if (ids.isEmpty()) cat2id.remove(categoryId);
 		}
+		ids = _t_cat2id.get(categoryId);
+		if (ids != null) {
+			removed |= ids.remove(id);
+			if (ids.isEmpty()) _t_cat2id.remove(categoryId);
+		}
 
 		List<String> cats = id2cat.get(id);
 		if (cats != null) {
 			removed |= cats.remove(categoryId);
 			if (cats.isEmpty()) id2cat.remove(id);
+		}
+		cats = _t_id2cat.get(id);
+		if (cats != null) {
+			removed |= cats.remove(categoryId);
+			if (cats.isEmpty()) _t_id2cat.remove(id);
 		}
 
 		if (removed) flush();
@@ -221,8 +267,19 @@ public class CategoryManager implements ICategoryManager {
 		Assert.isNotNull(categoryId);
 		Assert.isNotNull(id);
 
+		boolean belongsTo = false;
+
 		List<String> ids = cat2id.get(categoryId);
-		return ids != null && ids.contains(id);
+		if (ids != null && ids.contains(id)) {
+			belongsTo = true;
+		} else {
+			ids = _t_cat2id.get(categoryId);
+			if (ids != null && ids.contains(id)) {
+				belongsTo = true;
+			}
+		}
+
+		return belongsTo;
 	}
 
 	/* (non-Javadoc)
@@ -232,7 +289,20 @@ public class CategoryManager implements ICategoryManager {
     public String[] getCategoryIds(String id) {
 		Assert.isNotNull(id);
 
+		List<String> allCategories = new ArrayList<String>();
+
 		List<String> cats = id2cat.get(id);
-		return cats != null ? cats.toArray(new String[cats.size()]) : new String[0];
+		if (cats != null) allCategories.addAll(cats);
+
+		cats = _t_id2cat.get(id);
+		if (cats != null) {
+			for (String cat : cats) {
+				if (!allCategories.contains(cat)) {
+					allCategories.add(cat);
+				}
+			}
+		}
+
+		return allCategories.toArray(new String[allCategories.size()]);
 	}
 }

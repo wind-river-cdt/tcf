@@ -30,6 +30,19 @@ public interface ICategoryManager {
 	public boolean add(String categoryId, String id);
 
 	/**
+	 * Adds the given id to the given category.
+	 * <p>
+	 * <b>Note:</b> The category association is no persisted, the association is
+	 * transient and is lost when the category manager is disposed.
+	 *
+	 * @param categoryId The category id. Must not be <code>null</code>.
+	 * @param id The id. Must not be <code>null</code>.
+	 *
+	 * @return <code>True</code> if the id has been added to the category, <code>false</code> if not.
+	 */
+	public boolean addTransient(String categoryId, String id);
+
+	/**
 	 * Removes the given id from the given category.
 	 *
 	 * @param categoryId The category id. Must not be <code>null</code>.
