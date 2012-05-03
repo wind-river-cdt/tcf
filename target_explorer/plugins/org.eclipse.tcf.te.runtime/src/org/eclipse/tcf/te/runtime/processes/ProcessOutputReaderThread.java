@@ -41,7 +41,7 @@ public class ProcessOutputReaderThread extends Thread {
 	 * Monitor multiple streams in one.
 	 *
 	 * @param prefix A <code>String</code> prefixing every line of might be produced output, or <code>null</code>.
-	 * @param streams The <code>InputStream</code>'s to monitor. Must be not <code>null</code>!
+	 * @param streams The <code>InputStream</code>'s to monitor. Must not be <code>null</code>!
 	 */
 	public ProcessOutputReaderThread(String prefix, InputStream[] streams) {
 		super("ProcessOutputReader-" + (prefix == null ? "" : prefix)); //$NON-NLS-1$ //$NON-NLS-2$

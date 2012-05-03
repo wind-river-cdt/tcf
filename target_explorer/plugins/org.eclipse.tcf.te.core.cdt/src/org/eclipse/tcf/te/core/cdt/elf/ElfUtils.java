@@ -23,7 +23,7 @@ public final class ElfUtils {
 	/**
 	 * Returns the ELF image type if the specified file is an ELF file at all.
 	 *
-	 * @param file The file representation of the physical file to test. Must be not <code>null</code>!
+	 * @param file The file representation of the physical file to test. Must not be <code>null</code>!
 	 * @return The ELF image type as defined within <code>org.eclipse.cdt.utils.elf.Elf.Attribute</code>, or <code>-1</code> if invalid or not detectable.
 	 */
 	public static int getELFType(File file) throws IOException {
@@ -48,7 +48,7 @@ public final class ElfUtils {
 	/**
 	 * Returns the ELF address class if the specified file is an ELF file at all.
 	 *
-	 * @param file The file representation of the physical file to test. Must be not <code>null</code>!
+	 * @param file The file representation of the physical file to test. Must not be <code>null</code>!
 	 * @return The ELF address class as defined within <code>org.eclipse.cdt.utils.elf.Elf.ELFhdr.ELFCLASS*</code>. <code>ELFCLASSNONE</code> (0) if the ELF address class is not set.
 	 */
 	public static int getELFClass(File file) throws IOException {

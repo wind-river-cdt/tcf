@@ -355,7 +355,7 @@ public class LaunchSelectionManager {
 	 * <p>
 	 * <b>Note:</b> This method will return null if called from a non-UI thread!
 	 *
-	 * @param partId The part id. Must be not <code>null</code>.
+	 * @param partId The part id. Must not be <code>null</code>.
 	 * @return The structured selection if the workbench part or <code>null</code>.
 	 */
 	public static IStructuredSelection getPartSelection(String partId) {

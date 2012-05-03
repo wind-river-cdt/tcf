@@ -65,8 +65,8 @@ public abstract class AbstractLaunchConfigurationTab extends org.eclipse.debug.u
 	 * has changed compared to the already stored value under the given attribute id or
 	 * if the attribute id has not been stored yet.
 	 *
-	 * @param wc The launch configuration working copy instance to apply the attribute to. Must be not <code>null</code>.
-	 * @param attributeId The attribute id to store the attribute value under. Must be not <code>null</code>.
+	 * @param wc The launch configuration working copy instance to apply the attribute to. Must not be <code>null</code>.
+	 * @param attributeId The attribute id to store the attribute value under. Must not be <code>null</code>.
 	 * @param attributeValue The attribute value to store under the given attribute id.
 	 *
 	 * @see DefaultPersistenceDelegate
@@ -81,8 +81,8 @@ public abstract class AbstractLaunchConfigurationTab extends org.eclipse.debug.u
 	 * has changed compared to the already stored value under the given attribute id or
 	 * if the attribute id has not been stored yet.
 	 *
-	 * @param wc The launch configuration working copy instance to apply the attribute to. Must be not <code>null</code>.
-	 * @param attributeId The attribute id to store the attribute value under. Must be not <code>null</code>.
+	 * @param wc The launch configuration working copy instance to apply the attribute to. Must not be <code>null</code>.
+	 * @param attributeId The attribute id to store the attribute value under. Must not be <code>null</code>.
 	 * @param attributeValue The attribute value to store under the given attribute id.
 	 *
 	 * @see DefaultPersistenceDelegate
@@ -98,8 +98,8 @@ public abstract class AbstractLaunchConfigurationTab extends org.eclipse.debug.u
 	 * if the attribute id has not been stored yet. If the attribute value is <code>null</code>,
 	 * the attribute id will be removed from the given launch configuration working copy.
 	 *
-	 * @param wc The launch configuration working copy instance to apply the attribute to. Must be not <code>null</code>.
-	 * @param attributeId The attribute id to store the attribute value under. Must be not <code>null</code>.
+	 * @param wc The launch configuration working copy instance to apply the attribute to. Must not be <code>null</code>.
+	 * @param attributeId The attribute id to store the attribute value under. Must not be <code>null</code>.
 	 * @param attributeValue The attribute value to store under the given attribute id.
 	 *
 	 * @see DefaultPersistenceDelegate
@@ -115,8 +115,8 @@ public abstract class AbstractLaunchConfigurationTab extends org.eclipse.debug.u
 	 * if the attribute id has not been stored yet. If the attribute value is <code>null</code>,
 	 * the attribute id will be removed from the given launch configuration working copy.
 	 *
-	 * @param wc The launch configuration working copy instance to apply the attribute to. Must be not <code>null</code>.
-	 * @param attributeId The attribute id to store the attribute value under. Must be not <code>null</code>.
+	 * @param wc The launch configuration working copy instance to apply the attribute to. Must not be <code>null</code>.
+	 * @param attributeId The attribute id to store the attribute value under. Must not be <code>null</code>.
 	 * @param attributeValue The attribute value to store under the given attribute id.
 	 *
 	 * @see DefaultPersistenceDelegate
@@ -132,8 +132,8 @@ public abstract class AbstractLaunchConfigurationTab extends org.eclipse.debug.u
 	 * if the attribute id has not been stored yet. If the attribute value is <code>null</code>,
 	 * the attribute id will be removed from the given launch configuration working copy.
 	 *
-	 * @param wc The launch configuration working copy instance to apply the attribute to. Must be not <code>null</code>.
-	 * @param attributeId The attribute id to store the attribute value under. Must be not <code>null</code>.
+	 * @param wc The launch configuration working copy instance to apply the attribute to. Must not be <code>null</code>.
+	 * @param attributeId The attribute id to store the attribute value under. Must not be <code>null</code>.
 	 * @param attributeValue The attribute value to store under the given attribute id.
 	 *
 	 * @see DefaultPersistenceDelegate

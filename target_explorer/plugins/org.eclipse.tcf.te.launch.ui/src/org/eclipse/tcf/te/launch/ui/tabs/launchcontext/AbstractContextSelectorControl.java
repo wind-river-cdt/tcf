@@ -864,7 +864,7 @@ public abstract class AbstractContextSelectorControl extends AbstractDecoratedDi
 	 * Returns the message text for the given message id. Subclass in case different
 	 * message text should be used for standard messages.
 	 *
-	 * @param messageId The message id. Must be not <code>null</code>.
+	 * @param messageId The message id. Must not be <code>null</code>.
 	 * @return The message text.
 	 */
 	protected String getMessageForId(String messageId) {
@@ -877,7 +877,7 @@ public abstract class AbstractContextSelectorControl extends AbstractDecoratedDi
 	 * message types should by used for standard messages. The default implementation
 	 * returns the proposed message type unchanged.
 	 *
-	 * @param messageId The message id. Must be not <code>null</code>.
+	 * @param messageId The message id. Must not be <code>null</code>.
 	 * @param proposed The proposed message type.
 	 * @return The message type for the given message id.
 	 */

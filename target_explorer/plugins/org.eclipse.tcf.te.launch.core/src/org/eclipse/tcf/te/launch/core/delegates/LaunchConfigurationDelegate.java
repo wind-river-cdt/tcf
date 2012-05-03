@@ -234,7 +234,7 @@ public class LaunchConfigurationDelegate extends AbstractLaunchConfigurationDele
 	 * Lookup the corresponding project resource for the given project name.
 	 * If the referenced project cannot be found or is closed, a {@link CoreException} will be thrown.
 	 *
-	 * @param projectName The project name. Must be not <code>null</code>.
+	 * @param projectName The project name. Must not be <code>null</code>.
 	 * @return The project resource or <code>null</code>.
 	 */
 	protected IProject findProjectResource(String projectName) throws CoreException {
@@ -258,7 +258,7 @@ public class LaunchConfigurationDelegate extends AbstractLaunchConfigurationDele
 	 * Check for duplicates and sub projects in the given list of project
 	 * resources.
 	 *
-	 * @param projects The list of project resources. Must be not <code>null</code>.
+	 * @param projects The list of project resources. Must not be <code>null</code>.
 	 */
 	protected void checkForDuplicatesAndSubProjects(List<IProject> projects) {
 		Assert.isNotNull(projects);
