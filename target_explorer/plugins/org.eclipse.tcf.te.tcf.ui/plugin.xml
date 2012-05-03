@@ -28,7 +28,7 @@
             class="org.eclipse.tcf.te.tcf.ui.internal.PropertyTester"
             id="org.eclipse.tcf.te.tcf.ui.propertyTester"
             namespace="org.eclipse.tcf.te.tcf.ui"
-            properties="canDelete"
+            properties="canDelete,canMakeAvailableOffline"
             type="org.eclipse.jface.viewers.ISelection">
       </propertyTester>
    </extension>
@@ -265,6 +265,19 @@
             </visibleWhen>
          </command>
       </menuContribution>
+
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.categories">
+         <command
+               commandId="org.eclipse.tcf.te.tcf.ui.command.offline"
+               helpContextId="org.eclipse.tcf.te.tcf.ui.command_Offline"
+               id="org.eclipse.tcf.te.tcf.ui.commands.offline"
+               label="%command.offline.label"
+               mnemonic="f"
+               style="push"
+               tooltip="%command.offline.tooltip">
+            <visibleWhen checkEnabled="true"/>
+         </command>
+      </menuContribution>
  
    </extension>
 
@@ -281,6 +294,12 @@
             helpContextId="org.eclipse.tcf.te.tcf.ui.command_ResetRedirect"
             id="org.eclipse.tcf.te.tcf.ui.command.resetredirect"
             name="%command.resetredirect.name">
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.tcf.ui.command_Offline"
+            id="org.eclipse.tcf.te.tcf.ui.command.offline"
+            name="%command.offline.name">
       </command>
    </extension>
 
@@ -353,6 +372,20 @@
             </enabledWhen>
       </handler>
 
+      <handler
+            class="org.eclipse.tcf.te.tcf.ui.handler.OfflineCommandHandler"
+            commandId="org.eclipse.tcf.te.tcf.ui.command.offline">
+            <activeWhen>
+               <with variable="activePartId">
+                  <equals value="org.eclipse.tcf.te.ui.views.View"/>
+               </with>
+            </activeWhen>
+            <enabledWhen>
+               <with variable="selection">
+                  <test property="org.eclipse.tcf.te.tcf.ui.canMakeAvailableOffline" value="true"/>
+               </with>
+            </enabledWhen>
+      </handler>
    </extension>
    
 <!-- Tabbed properties view contributions -->   

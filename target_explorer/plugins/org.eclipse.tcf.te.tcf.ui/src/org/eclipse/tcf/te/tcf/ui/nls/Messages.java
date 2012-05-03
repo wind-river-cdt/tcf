@@ -144,6 +144,9 @@ public class Messages extends NLS {
 	public static String ResetRedirectHandler_error_title;
 	public static String ResetRedirectHandler_error_resetRedirectFailed;
 
+	public static String OfflineCommandHandler_error_title;
+	public static String OfflineCommandHandler_error_makeOffline_failed;
+
 	public static String CategoryManager_dnd_failed;
 
 	public static String LoggingPreferencePage_label;

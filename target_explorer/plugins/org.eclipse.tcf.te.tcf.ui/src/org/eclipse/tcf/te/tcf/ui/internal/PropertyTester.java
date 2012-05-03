@@ -12,6 +12,7 @@ package org.eclipse.tcf.te.tcf.ui.internal;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.tcf.te.tcf.ui.handler.DeleteHandler;
+import org.eclipse.tcf.te.tcf.ui.handler.OfflineCommandHandler;
 
 
 
@@ -21,6 +22,8 @@ import org.eclipse.tcf.te.tcf.ui.handler.DeleteHandler;
 public class PropertyTester extends org.eclipse.core.expressions.PropertyTester {
 	// Reference to the peer model delete handler (to determine "canDelete")
 	private final DeleteHandler deleteHandler = new DeleteHandler();
+	// Reference to the peer model offline handler (to determine "canMakeAvailableOffline")
+	private final OfflineCommandHandler offlineHandler = new OfflineCommandHandler();
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.expressions.IPropertyTester#test(java.lang.Object, java.lang.String, java.lang.Object[], java.lang.Object)
@@ -50,6 +53,10 @@ public class PropertyTester extends org.eclipse.core.expressions.PropertyTester 
 
 		if ("canDelete".equals(property)) { //$NON-NLS-1$
 			return deleteHandler.canDelete(selection);
+		}
+
+		if ("canMakeAvailableOffline".equals(property)) { //$NON-NLS-1$
+			return offlineHandler.canMakeAvailableOffline(selection);
 		}
 
 		return false;
