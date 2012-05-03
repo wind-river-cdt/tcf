@@ -22,6 +22,17 @@
       </factory>
    </extension>
 
+<!-- Eclipse core expressions property tester -->
+   <extension point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.eclipse.tcf.te.tcf.ui.internal.PropertyTester"
+            id="org.eclipse.tcf.te.tcf.ui.propertyTester"
+            namespace="org.eclipse.tcf.te.tcf.ui"
+            properties="canDelete"
+            type="org.eclipse.jface.viewers.ISelection">
+      </propertyTester>
+   </extension>
+
 <!-- Preference contributions -->   
    <extension point="org.eclipse.core.runtime.preferences">
       <initializer class="org.eclipse.tcf.te.tcf.ui.internal.preferences.PreferencesInitializer"/>
@@ -337,12 +348,7 @@
             </activeWhen>
             <enabledWhen>
                <with variable="selection">
-                  <iterate operator="and" ifEmpty="false">
-                     <and>
-                        <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
-                        <test property="org.eclipse.tcf.te.tcf.locator.isStaticPeer" value="true"/>
-                     </and>
-                  </iterate>
+                  <test property="org.eclipse.tcf.te.tcf.ui.canDelete" value="true"/>
                </with>
             </enabledWhen>
       </handler>
