@@ -1888,7 +1888,7 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
                 new ISuspendTriggerListener[suspend_trigger_listeners.size()]);
 
         final int generation = ++suspend_trigger_generation;
-        if (wait_for_pc_update_after_step || wait_for_views_update_after_step) {
+        if (wait_for_views_update_after_step) {
             launch.addPendingClient(suspend_trigger_listeners);
         }
         display.asyncExec(new Runnable() {
