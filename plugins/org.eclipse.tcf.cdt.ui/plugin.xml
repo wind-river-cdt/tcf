@@ -345,4 +345,12 @@
             name="%editor.sourceNotFound.name">
       </editor>
    </extension>
+   <extension
+         point="org.eclipse.debug.ui.breakpointOrganizers">
+      <breakpointOrganizer
+            class="org.eclipse.tcf.internal.cdt.ui.breakpoints.BreakpointScopeOrganizer"
+            id="org.eclipse.tcf.cdt.ui.breakpointScopeGroup"
+            label="Scope">
+      </breakpointOrganizer>
+   </extension>
 </plugin>
