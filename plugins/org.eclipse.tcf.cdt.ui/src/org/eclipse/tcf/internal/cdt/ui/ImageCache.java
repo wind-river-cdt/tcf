@@ -25,6 +25,9 @@ public class ImageCache {
 
     public static final String
         IMG_TARGET_TAB = "icons/target_tab.gif";
+    
+    public static final String
+        IMG_BREAKPOINT_SCOPE = "icons/bp_scope.gif";
 
     private static final Map<String,ImageDescriptor> desc_cache = new HashMap<String,ImageDescriptor>();
     private static final Map<ImageDescriptor,Image> image_cache = new HashMap<ImageDescriptor,Image>();
