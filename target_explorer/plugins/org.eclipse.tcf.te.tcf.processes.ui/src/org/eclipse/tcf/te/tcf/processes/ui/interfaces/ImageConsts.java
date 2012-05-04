@@ -30,4 +30,6 @@ public interface ImageConsts {
 	public static final String OBJ_Process = "OBJ_Process"; //$NON-NLS-1$
 	
 	public static final String OBJ_Process_Root = "OBJ_Process_Root"; //$NON-NLS-1$
+	
+	public static final String OBJ_Thread = "OBJ_Thread"; //$NON-NLS-1$
 }

@@ -610,7 +610,7 @@
       <navigatorContent
             activeByDefault="false"
             contentProvider="org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessNavigatorContentProvider"
-            icon="icons/obj16/process_root.png"
+            icon="icons/obj16/process_root.gif"
             id="org.eclipse.tcf.te.tcf.processes.ui.navigator.content"
             labelProvider="org.eclipse.tcf.te.tcf.processes.ui.internal.columns.ProcessLabelProvider"
             name="%navigatorContent.name"

@@ -59,7 +59,11 @@ public class ProcessLabelProvider extends LabelProvider {
 			if(node.isSystemRoot()) {
 				return UIPlugin.getImage(ImageConsts.OBJ_Process_Root);
 			}
-			return UIPlugin.getImage(ImageConsts.OBJ_Process);
+			ProcessTreeNode parent = node.getParent();
+            if(parent.isSystemRoot()) {
+            	return UIPlugin.getImage(ImageConsts.OBJ_Process);
+            }
+            return UIPlugin.getImage(ImageConsts.OBJ_Thread);
 		}
 		if (element instanceof Pending) {
 			Pending pending = (Pending) element;
