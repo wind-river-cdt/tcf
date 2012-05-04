@@ -185,6 +185,9 @@
                </with>
             </visibleWhen>
          </command>
+         <separator
+               name="group.openWith">
+         </separator>
          <menu
                label="%menu.label.openwith">
             <visibleWhen
@@ -291,56 +294,7 @@
             </visibleWhen>
          </command>
          <separator
-               name="group.move"
-               visible="true">
-         </separator>
-         <command
-               commandId="org.eclipse.ui.edit.rename"
-               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Rename"
-               id="rename"
-               label="%command.label.rename"
-               mnemonic="R"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <with
-                     variable="selection">
-                  <count
-                        value="1">
-                  </count>
-                  <iterate>
-                     <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
-                     </instanceof>
-                  </iterate>
-               </with>
-            </visibleWhen>
-         </command>
-         <command
-               commandId="org.eclipse.ui.edit.move"
-               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Move"
-               id="move"
-               label="%command.label.move"
-               mnemonic="M"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <with
-                     variable="selection">
-                  <count
-                        value="+">
-                  </count>
-                  <iterate>
-                     <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
-                     </instanceof>
-                  </iterate>
-               </with>
-            </visibleWhen>
-         </command>
-         <separator
-               name="group.delete"
-               visible="true">
+               name="group.delete">
          </separator>
          <command
                commandId="org.eclipse.ui.edit.delete"
@@ -370,7 +324,7 @@
             </visibleWhen>
          </command>
          <separator
-               name="group.state"
+               name="group.refresh"
                visible="true">
          </separator>
          <command
@@ -397,6 +351,10 @@
                </with>
             </visibleWhen>
          </command>
+         <separator
+               name="group.syncop"
+               visible="true">
+         </separator>
          <command
                commandId="org.eclipse.tcf.te.tcf.filesystem.commands.update"
                helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Update"
@@ -521,55 +479,55 @@
                </and>
             </visibleWhen>
          </command>
-         <separator name="group.properties" visible="true"/>
+         <separator
+               name="group.operations"
+               visible="true">
+         </separator>
          <command
-               commandId="org.eclipse.ui.file.properties"
-               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Properties"
-               id="properties"
-               label="%PropertiesAction.label"
-               tooltip="%PropertiesAction.tooltip">
-               <visibleWhen>
-                  <with variable="selection">
-                     <count value="1"/>
-                     <iterate operator="and" ifEmpty="false">
-                        <and>
-                           <instanceof
-                                 value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
-                           </instanceof>
-                           <not>
-                              <test
-                                    property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isSystemRoot">
-                              </test>
-                           </not>
-                        </and>
-                     </iterate>
-                  </with>
-               </visibleWhen>
-         </command>
-      </menuContribution>
-      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.delete">
-         <command
-               commandId="org.eclipse.ui.edit.delete"
-               disabledIcon="platform:/plugin/org.eclipse.ui/icons/full/dtool16/delete.gif"
-               helpContextId="org.eclipse.tcf.te.ui.command_Delete"
-               icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/delete.gif"
-               id="org.eclipse.tcf.te.ui.commands.delete"
-               label="%command.delete.label"
-               mnemonic="D"
-               style="push"
-               tooltip="%command.delete.description">
-            <visibleWhen checkEnabled="false">
-               <with variable="selection">
-                  <count value="+"/>
-                  <iterate operator="and" ifEmpty="false">
-                     <instanceof value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode"/>
+               commandId="org.eclipse.ui.edit.rename"
+               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Rename"
+               id="rename"
+               label="%command.label.rename"
+               mnemonic="R"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
+                     </instanceof>
                   </iterate>
                </with>
             </visibleWhen>
          </command>
-      </menuContribution>
-      
-      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.properties">
+         <command
+               commandId="org.eclipse.ui.edit.move"
+               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Move"
+               id="move"
+               label="%command.label.move"
+               mnemonic="M"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="+">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <separator name="group.properties" visible="true"/>
          <command
                commandId="org.eclipse.ui.file.properties"
                helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Properties"
@@ -618,6 +576,9 @@
                </with>
             </visibleWhen>
          </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.openWith">
          <menu
                label="%menu.label.openwith">
             <visibleWhen
@@ -650,10 +611,9 @@
                   id="openWithMenu">
             </dynamic>
          </menu>
-         <separator
-               name="file.group.edit"
-               visible="true">
-         </separator>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.edit">
          <command
                commandId="org.eclipse.ui.edit.cut"
                helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Cut"
@@ -723,39 +683,37 @@
                </with>
             </visibleWhen>
          </command>
-         <separator
-               name="group.move"
-               visible="true">
-         </separator>
+      </menuContribution>
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.delete">
          <command
-               commandId="org.eclipse.ui.edit.rename"
-               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Rename"
-               id="rename"
-               label="%command.label.rename.1"
-               mnemonic="R"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <with
-                     variable="selection">
-                  <count
-                        value="1">
-                  </count>
-                  <iterate>
-                     <instanceof
-                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
-                     </instanceof>
+               commandId="org.eclipse.ui.edit.delete"
+               disabledIcon="platform:/plugin/org.eclipse.ui/icons/full/dtool16/delete.gif"
+               helpContextId="org.eclipse.tcf.te.ui.command_Delete"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/delete.gif"
+               id="org.eclipse.tcf.te.ui.commands.delete"
+               label="%command.delete.label"
+               mnemonic="D"
+               style="push"
+               tooltip="%command.delete.description">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <count value="+"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <instanceof value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode"/>
                   </iterate>
                </with>
             </visibleWhen>
          </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.refresh">
          <command
-               commandId="org.eclipse.ui.edit.move"
-               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Move"
-               id="move"
-               label="%command.label.move.1"
-               mnemonic="M"
-               style="push">
+               commandId="org.eclipse.tcf.te.ui.command.refresh"
+               id="org.eclipse.tcf.te.ui.commands.refresh"
+               label="%fsmenu.refresh.label"
+               mnemonic="f"
+               style="push"
+               tooltip="%command.refresh.tooltip">
             <visibleWhen
                   checkEnabled="false">
                <with
@@ -763,7 +721,9 @@
                   <count
                         value="+">
                   </count>
-                  <iterate>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
                      <instanceof
                            value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                      </instanceof>
@@ -771,10 +731,9 @@
                </with>
             </visibleWhen>
          </command>
-         <separator
-               name="group.state"
-               visible="true">
-         </separator>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.syncop">
          <command
                commandId="org.eclipse.tcf.te.tcf.filesystem.commands.update"
                helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Update"
@@ -901,24 +860,36 @@
          </command>
       </menuContribution>
       <menuContribution
-            locationURI="toolbar:org.eclipse.tcf.te.ui.controls.menu.fs?after=additions">
+            locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.operations">
          <command
-               commandId="org.eclipse.tcf.te.tcf.filesystem.commands.refreshViewer"
-               icon="icons/obj16/refresh.gif"
-               label="%command.refreshViewer.label"
-               style="push"
-               tooltip="%command.refreshViewer.tooltip">
+               commandId="org.eclipse.ui.edit.rename"
+               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Rename"
+               id="rename"
+               label="%command.label.rename.1"
+               mnemonic="R"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
          </command>
-      </menuContribution>
-      <menuContribution
-            locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.refresh">
          <command
-               commandId="org.eclipse.tcf.te.ui.command.refresh"
-               id="org.eclipse.tcf.te.ui.commands.refresh"
-               label="%fsmenu.refresh.label"
-               mnemonic="f"
-               style="push"
-               tooltip="%command.refresh.tooltip">
+               commandId="org.eclipse.ui.edit.move"
+               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Move"
+               id="move"
+               label="%command.label.move.1"
+               mnemonic="M"
+               style="push">
             <visibleWhen
                   checkEnabled="false">
                <with
@@ -926,15 +897,50 @@
                   <count
                         value="+">
                   </count>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
+                  <iterate>
                      <instanceof
                            value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                      </instanceof>
                   </iterate>
                </with>
             </visibleWhen>
+         </command>
+      </menuContribution>
+      
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.properties">
+         <command
+               commandId="org.eclipse.ui.file.properties"
+               helpContextId="org.eclipse.tcf.te.tcf.filesystem.command_Properties"
+               id="properties"
+               label="%PropertiesAction.label"
+               tooltip="%PropertiesAction.tooltip">
+               <visibleWhen>
+                  <with variable="selection">
+                     <count value="1"/>
+                     <iterate operator="and" ifEmpty="false">
+                        <and>
+                           <instanceof
+                                 value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
+                           </instanceof>
+                           <not>
+                              <test
+                                    property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isSystemRoot">
+                              </test>
+                           </not>
+                        </and>
+                     </iterate>
+                  </with>
+               </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:org.eclipse.tcf.te.ui.controls.menu.fs?after=additions">
+         <command
+               commandId="org.eclipse.tcf.te.tcf.filesystem.commands.refreshViewer"
+               icon="icons/obj16/refresh.gif"
+               label="%command.refreshViewer.label"
+               style="push"
+               tooltip="%command.refreshViewer.tooltip">
          </command>
       </menuContribution>
    </extension>
