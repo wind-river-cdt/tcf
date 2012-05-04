@@ -9,6 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.ui.navigator;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ILabelDecorator;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -65,9 +67,22 @@ public class LabelProviderDelegate extends LabelProvider implements ILabelDecora
 	 * @see org.eclipse.jface.viewers.LabelProvider#getImage(java.lang.Object)
 	 */
 	@Override
-	public Image getImage(Object element) {
+	public Image getImage(final Object element) {
 		if (element instanceof IPeerModel) {
-			return UIPlugin.getImage(ImageConsts.PEER);
+			final AtomicBoolean isStatic = new AtomicBoolean();
+
+			Runnable runnable = new Runnable() {
+				@Override
+				public void run() {
+					String value = ((IPeerModel)element).getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
+					isStatic.set(value != null && Boolean.parseBoolean(value.trim()));
+				}
+			};
+
+			if (Protocol.isDispatchThread()) runnable.run();
+			else Protocol.invokeAndWait(runnable);
+
+			return isStatic.get() ? UIPlugin.getImage(ImageConsts.PEER) : UIPlugin.getImage(ImageConsts.PEER_DISCOVERED);
 		}
 		if (element instanceof PeerRedirectorGroupNode) {
 			return UIPlugin.getImage(ImageConsts.DISCOVERY_ROOT);
