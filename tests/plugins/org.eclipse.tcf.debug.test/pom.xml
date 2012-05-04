@@ -32,7 +32,9 @@
 				<version>${tycho-version}</version>
 				<configuration>
  					<includes>
+					<!--
  						<include>**/BreakpointsTest.*</include>
+					-->
  						<include>**/CacheTests.*</include>
  						<include>**/QueryTests.*</include>
  						<include>**/TransactionTests.*</include>
