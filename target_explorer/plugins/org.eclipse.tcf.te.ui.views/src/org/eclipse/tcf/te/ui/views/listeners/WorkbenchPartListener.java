@@ -21,7 +21,7 @@ import org.eclipse.ui.contexts.IContextService;
 
 /**
  * The part listener implementation. Takes care of
- *                  activation and deactivation of key binding contexts.
+ * activation and deactivation of key binding contexts.
  */
 public class WorkbenchPartListener implements IPartListener2 {
 

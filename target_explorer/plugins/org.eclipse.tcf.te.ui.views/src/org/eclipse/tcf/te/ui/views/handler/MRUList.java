@@ -15,7 +15,7 @@ import java.util.StringTokenizer;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.tcf.te.ui.views.activator.UIPlugin;
-import org.eclipse.tcf.te.ui.views.internal.preferences.IPreferenceConsts;
+import org.eclipse.tcf.te.ui.views.internal.preferences.IPreferenceKeys;
 
 /**
  * The list implementation for MRU items for a specified preference key which is used 
@@ -61,7 +61,7 @@ public class MRUList extends ArrayList<String> {
 		}
 		IPreferenceStore prefStore = UIPlugin.getDefault().getPreferenceStore();
 		int max = prefStore.getInt(prefKey+".max"); //$NON-NLS-1$
-		if(max == 0) max = IPreferenceConsts.DEFAULT_MAX_MRU;
+		if(max == 0) max = IPreferenceKeys.DEFAULT_MAX_MRU;
 		int length = size();
 		List<String> newList = this;
 		if(length>max) {

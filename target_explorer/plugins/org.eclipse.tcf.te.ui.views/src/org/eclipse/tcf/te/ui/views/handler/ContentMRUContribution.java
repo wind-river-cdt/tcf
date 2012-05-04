@@ -19,7 +19,7 @@ import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.tcf.te.ui.views.ViewsUtil;
 import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
-import org.eclipse.tcf.te.ui.views.internal.preferences.IPreferenceConsts;
+import org.eclipse.tcf.te.ui.views.internal.preferences.IPreferenceKeys;
 import org.eclipse.ui.actions.CompoundContributionItem;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
@@ -85,7 +85,7 @@ public class ContentMRUContribution extends CompoundContributionItem {
 
 		INavigatorContentService contentService = navigator.getNavigatorContentService();
 		List<IContributionItem> items = new ArrayList<IContributionItem>();
-		List<String> extensionSet = new MRUList(IPreferenceConsts.PREF_CONTENT_MRU_LIST);
+		List<String> extensionSet = new MRUList(IPreferenceKeys.PREF_CONTENT_MRU_LIST);
 		CommonViewer commonViewer = navigator.getCommonViewer();
 		for (int i = 0; i < extensionSet.size(); i++) {
 			String extensionId = extensionSet.get(i);

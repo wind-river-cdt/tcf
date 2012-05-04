@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.tcf.te.ui.views.internal.preferences.IPreferenceConsts;
+import org.eclipse.tcf.te.ui.views.internal.preferences.IPreferenceKeys;
 import org.eclipse.tcf.te.ui.views.nls.Messages;
 import org.eclipse.ui.internal.navigator.NavigatorFilterService;
 import org.eclipse.ui.navigator.CommonViewer;
@@ -99,7 +99,7 @@ public class UpdateActiveFiltersOperation extends AbstractOperation {
 		}
 		
 		filterService.activateFilterIdsAndUpdateViewer(filterIdsToActivate);
-		MRUList mru = new MRUList(IPreferenceConsts.PREF_FILTER_MRU_LIST);
+		MRUList mru = new MRUList(IPreferenceKeys.PREF_FILTER_MRU_LIST);
 		mru.updateMRUList(deltaList);
 		return Status.OK_STATUS;
 	}

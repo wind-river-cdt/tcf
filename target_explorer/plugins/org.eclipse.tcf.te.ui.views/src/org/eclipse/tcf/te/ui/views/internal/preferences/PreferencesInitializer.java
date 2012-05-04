@@ -10,14 +10,14 @@
 package org.eclipse.tcf.te.ui.views.internal.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.tcf.te.runtime.preferences.ScopedEclipsePreferences;
 import org.eclipse.tcf.te.ui.views.activator.UIPlugin;
 
 
 /**
  * The bundle's preference initializer implementation.
  */
-public class PreferencesInitializer extends AbstractPreferenceInitializer implements IPreferenceConsts {
+public class PreferencesInitializer extends AbstractPreferenceInitializer {
 	/**
 	 * Constructor.
 	 */
@@ -30,11 +30,19 @@ public class PreferencesInitializer extends AbstractPreferenceInitializer implem
 	 */
 	@Override
 	public void initializeDefaultPreferences() {
-		IPreferenceStore preferenceStore = UIPlugin.getDefault().getPreferenceStore();
-		preferenceStore.setDefault(PREF_MAX_FILTER_MRU, DEFAULT_MAX_MRU);
-		preferenceStore.setDefault(PREF_MAX_CONTENT_MRU, DEFAULT_MAX_MRU);
-		preferenceStore.setDefault(PREF_FILTER_MRU_LIST, ""); //$NON-NLS-1$
-		preferenceStore.setDefault(PREF_CONTENT_MRU_LIST, ""); //$NON-NLS-1$
-		preferenceStore.setDefault(PREF_HIDE_CATEGORY_EXTENSION, true);
+		ScopedEclipsePreferences store = UIPlugin.getScopedPreferences();
+
+		// Maximum MRU list size "Filter": default IPreferenceKeys.DEFAULT_MAX_MRU
+		store.putDefaultInt(IPreferenceKeys.PREF_MAX_FILTER_MRU, IPreferenceKeys.DEFAULT_MAX_MRU);
+		// Maximum MRU list size "Content": default IPreferenceKeys.DEFAULT_MAX_MRU
+		store.putDefaultInt(IPreferenceKeys.PREF_MAX_CONTENT_MRU, IPreferenceKeys.DEFAULT_MAX_MRU);
+		// "Filter" MRU list: default empty
+		store.putDefaultString(IPreferenceKeys.PREF_FILTER_MRU_LIST, ""); //$NON-NLS-1$
+		// "Content" MRU list: default empty
+		store.putDefaultString(IPreferenceKeys.PREF_CONTENT_MRU_LIST, ""); //$NON-NLS-1$
+		// [Hidden] Hide categories navigator content extension: default on
+		store.putDefaultBoolean(IPreferenceKeys.PREF_HIDE_CATEGORY_EXTENSION, true);
+		// [Hidden] System management mode: default off
+		store.putDefaultBoolean(IPreferenceKeys.PREF_SYSTEM_MANAGMENT_MODE, false);
 	}
 }

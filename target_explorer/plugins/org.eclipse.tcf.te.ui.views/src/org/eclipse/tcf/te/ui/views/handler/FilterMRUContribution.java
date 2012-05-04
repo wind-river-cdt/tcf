@@ -21,7 +21,7 @@ import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.tcf.te.ui.views.ViewsUtil;
 import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
-import org.eclipse.tcf.te.ui.views.internal.preferences.IPreferenceConsts;
+import org.eclipse.tcf.te.ui.views.internal.preferences.IPreferenceKeys;
 import org.eclipse.ui.actions.CompoundContributionItem;
 import org.eclipse.ui.internal.navigator.NavigatorFilterService;
 import org.eclipse.ui.navigator.CommonNavigator;
@@ -94,7 +94,7 @@ public class FilterMRUContribution extends CompoundContributionItem {
 			fdMap.put(filterDescriptor.getId(), filterDescriptor);
 		}
 		List<IContributionItem> items = new ArrayList<IContributionItem>();
-		List<String> filterSet = new MRUList(IPreferenceConsts.PREF_FILTER_MRU_LIST);
+		List<String> filterSet = new MRUList(IPreferenceKeys.PREF_FILTER_MRU_LIST);
 		CommonViewer commonViewer = navigator.getCommonViewer();
 		for (int i = 0; i < filterSet.size(); i++) {
 	    	String filterId = filterSet.get(i);

@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.tcf.te.ui.views.internal.preferences.IPreferenceConsts;
+import org.eclipse.tcf.te.ui.views.internal.preferences.IPreferenceKeys;
 import org.eclipse.tcf.te.ui.views.nls.Messages;
 import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.navigator.INavigatorContentDescriptor;
@@ -133,7 +133,7 @@ public class UpdateActiveExtensionsOperation extends AbstractOperation {
 
 				IStructuredSelection newSelection = new StructuredSelection(originalObjects);
 				commonViewer.setSelection(newSelection, true);
-				MRUList mru = new MRUList(IPreferenceConsts.PREF_CONTENT_MRU_LIST);
+				MRUList mru = new MRUList(IPreferenceKeys.PREF_CONTENT_MRU_LIST);
 				mru.updateMRUList(deltaList);
 			}
 

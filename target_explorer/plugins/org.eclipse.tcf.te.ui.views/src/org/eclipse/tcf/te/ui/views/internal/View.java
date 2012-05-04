@@ -13,7 +13,6 @@ import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -29,16 +28,15 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tcf.te.ui.trees.TreeViewerEditorActivationStrategy;
 import org.eclipse.tcf.te.ui.views.activator.UIPlugin;
-import org.eclipse.tcf.te.ui.views.interfaces.IRoot;
 import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
-import org.eclipse.ui.IAggregateWorkingSet;
+import org.eclipse.tcf.te.ui.views.internal.preferences.IPreferenceKeys;
+import org.eclipse.tcf.te.ui.views.nls.Messages;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.IHandlerService;
-import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.navigator.ICommonActionConstants;
@@ -151,9 +149,14 @@ public class View extends CommonNavigator implements ITabbedPropertySheetPageCon
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
 
+		// "Fix" the view title
+		if (UIPlugin.getScopedPreferences().getBoolean(IPreferenceKeys.PREF_SYSTEM_MANAGMENT_MODE)) {
+			setPartName(Messages.View_title_systemManagement);
+		}
+
 		// Add the additional custom toolbar groups
 		addCustomToolbarGroups();
-		
+
 		// Restore expanding state of the common viewer.
 		expandingState = new ViewExpandingState(getCommonViewer());
 		if (getMemento() != null) {
@@ -186,7 +189,7 @@ public class View extends CommonNavigator implements ITabbedPropertySheetPageCon
 	@Override
     public void saveState(IMemento aMemento) {
 	    super.saveState(aMemento);
-	    
+
 		// Save expanding state of the common viewer.
 		if (expandingState != null && aMemento != null) {
 			expandingState.saveState(aMemento);
@@ -235,36 +238,6 @@ public class View extends CommonNavigator implements ITabbedPropertySheetPageCon
 			super.handleDoubleClick(dblClickEvent);
 		}
 	}
-
-	/**
-	 * The superclass does not deal with the content description, handle it here.
-	 *
-	 * @noreference
-	 */
-	@Override
-    public void updateTitle() {
-		super.updateTitle();
-
-		// Get the input from the common viewer
-		Object input = getCommonViewer().getInput();
-
-		// The content description to set
-		String contentDescription = null;
-
-		if (input instanceof IAdaptable) {
-			IWorkbenchAdapter adapter = (IWorkbenchAdapter) ((IAdaptable) input).getAdapter(IWorkbenchAdapter.class);
-			if (adapter != null) contentDescription = adapter.getLabel(input);
-		}
-		else if (input instanceof IRoot || (input != null && "WorkingSetViewStateManager".equals(input.getClass().getSimpleName()))) { //$NON-NLS-1$
-			// The root node does not have a content description
-		}
-		else if (input != null && !(input instanceof IAggregateWorkingSet)) {
-			contentDescription = input.toString();
-		}
-
-		setContentDescription(contentDescription != null ? contentDescription : ""); //$NON-NLS-1$
-	}
-
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.navigator.CommonNavigator#getAdapter(java.lang.Class)
