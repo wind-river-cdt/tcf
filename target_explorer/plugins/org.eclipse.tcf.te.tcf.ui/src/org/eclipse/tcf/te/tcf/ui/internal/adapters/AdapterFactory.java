@@ -14,7 +14,6 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.ui.navigator.LabelProviderDelegate;
 import org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizable;
-import org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate;
 import org.eclipse.ui.IPersistableElement;
 
 /**
@@ -23,13 +22,10 @@ import org.eclipse.ui.IPersistableElement;
 public class AdapterFactory implements IAdapterFactory {
 	// The adapter for ILabelProvider.class
 	private final LabelProviderDelegate labelProvider = new LabelProviderDelegate();
-	// The refresh handler delegate adapter
-	private final IRefreshHandlerDelegate refreshDelegate = new RefreshHandlerDelegate();
 
 	// The adapter class.
 	private Class<?>[] adapters = {
 					ILabelProvider.class,
-					IRefreshHandlerDelegate.class,
 					IPersistableElement.class,
 					ICategorizable.class
 				};
@@ -42,9 +38,6 @@ public class AdapterFactory implements IAdapterFactory {
 		if (adaptableObject instanceof IPeerModel) {
 			if (ILabelProvider.class.equals(adapterType)) {
 				return labelProvider;
-			}
-			if (IRefreshHandlerDelegate.class.equals(adapterType)) {
-				return refreshDelegate;
 			}
 			if (IPersistableElement.class.equals(adapterType)) {
 				return new PersistablePeerModel((IPeerModel)adaptableObject);

@@ -9,10 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.views.expressions;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.tcf.te.ui.views.editor.EditorInput;
 import org.eclipse.tcf.te.ui.views.extensions.EditorPageBindingExtensionPointManager;
-import org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate;
 import org.eclipse.ui.IEditorInput;
 
 
@@ -31,35 +29,6 @@ public class PropertyTester extends org.eclipse.core.expressions.PropertyTester 
 			// Create a fake editor input object
 			IEditorInput input = new EditorInput(receiver);
 			return (expectedValue != null ? expectedValue : Boolean.TRUE).equals(Boolean.valueOf(EditorPageBindingExtensionPointManager.getInstance().getApplicableEditorPageBindings(input).length > 0));
-		}
-
-		if ("isRefreshableElement".equals(property)) { //$NON-NLS-1$
-			// An element is refreshable if it implements or adapt to IRefreshHandlerDelegate
-			//
-			// Note: This test will force the load of the adapter.
-
-			boolean refreshable = receiver instanceof IRefreshHandlerDelegate;
-			if (!refreshable) {
-				IRefreshHandlerDelegate delegate = (IRefreshHandlerDelegate)Platform.getAdapterManager().loadAdapter(receiver, IRefreshHandlerDelegate.class.getName());
-				refreshable = delegate != null;
-			}
-
-			return (expectedValue != null ? expectedValue : Boolean.TRUE).equals(Boolean.valueOf(refreshable));
-		}
-
-		if ("canRefresh".equals(property)) { //$NON-NLS-1$
-			// Test if the receiver can be refreshed
-			IRefreshHandlerDelegate delegate = receiver instanceof IRefreshHandlerDelegate ? (IRefreshHandlerDelegate)receiver : null;
-			if (delegate == null) {
-				delegate = (IRefreshHandlerDelegate)Platform.getAdapterManager().loadAdapter(receiver, IRefreshHandlerDelegate.class.getName());
-			}
-
-			boolean canRefresh = false;
-			if (delegate != null) {
-				canRefresh = delegate.canRefresh(receiver);
-			}
-
-			return (expectedValue != null ? expectedValue : Boolean.TRUE).equals(Boolean.valueOf(canRefresh));
 		}
 
 		return false;

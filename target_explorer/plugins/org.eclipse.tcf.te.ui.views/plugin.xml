@@ -210,27 +210,6 @@
 
 <!-- Menu contributions -->
    <extension point="org.eclipse.ui.menus">
-      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.refresh">
-         <command
-               commandId="org.eclipse.tcf.te.ui.command.refresh"
-               id="org.eclipse.tcf.te.ui.commands.refresh"
-               label="%command.refresh.label"
-               mnemonic="f"
-               style="push"
-               tooltip="%command.refresh.description">
-            <visibleWhen checkEnabled="false">
-               <with variable="selection">
-                  <count value="+"/>
-                  <iterate operator="and" ifEmpty="false">
-                     <test
-                           property="org.eclipse.tcf.te.ui.views.isRefreshableElement"
-                           value="true"/>
-                  </iterate>
-               </with>
-            </visibleWhen>
-         </command>
-      </menuContribution>
-  
       <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.properties">
          <command
                commandId="org.eclipse.ui.file.properties"
@@ -421,37 +400,6 @@
       </handler>
       
       <handler
-            commandId="org.eclipse.tcf.te.ui.command.refresh"
-            class="org.eclipse.tcf.te.ui.views.handler.RefreshHandler">
-            <activeWhen>
-               <and>
-                  <with variable="activePartId">
-                     <or>
-                        <equals value="org.eclipse.tcf.te.ui.views.View"/>
-                        <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
-                     </or>
-                  </with>
-                  <with variable="selection">
-                     <iterate operator="and" ifEmpty="false">
-                        <test
-                              property="org.eclipse.tcf.te.ui.views.isRefreshableElement"
-                              value="true"/>
-                     </iterate>
-                  </with>
-               </and>
-            </activeWhen>
-            <enabledWhen>
-               <with variable="selection">
-                  <iterate operator="and" ifEmpty="false">
-                     <test
-                           property="org.eclipse.tcf.te.ui.views.canRefresh"
-                           value="true"/>
-                  </iterate>
-               </with>
-            </enabledWhen>
-      </handler>
-      
-      <handler
             class="org.eclipse.tcf.te.ui.views.handler.ConfigFiltersHandler"
             commandId="org.eclipse.tcf.te.ui.views.command.filters">
          <activeWhen>
@@ -483,7 +431,7 @@
             class="org.eclipse.tcf.te.ui.views.expressions.PropertyTester"
             id="org.eclipse.tcf.te.ui.views.PropertyTester"
             namespace="org.eclipse.tcf.te.ui.views"
-            properties="hasApplicableEditorBindings,isRefreshableElement,canRefresh"
+            properties="hasApplicableEditorBindings"
             type="java.lang.Object">
       </propertyTester>
 

@@ -8,7 +8,6 @@
             adaptableType="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"
             class="org.eclipse.tcf.te.tcf.ui.internal.adapters.AdapterFactory">
          <adapter type="org.eclipse.jface.viewers.ILabelProvider"/>
-         <adapter type="org.eclipse.tcf.te.ui.views.interfaces.handler.IRefreshHandlerDelegate"/>
          <adapter type="org.eclipse.ui.IPersistableElement"/>
          <adapter type="org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizable"/>
       </factory>
@@ -279,6 +278,24 @@
          </command>
       </menuContribution>
  
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.refresh">
+         <command
+               commandId="org.eclipse.tcf.te.ui.command.refresh"
+               id="org.eclipse.tcf.te.ui.commands.refresh"
+               label="%command.refresh.label"
+               mnemonic="f"
+               style="push"
+               tooltip="%command.refresh.description">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <count value="+"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
    </extension>
 
 <!-- Command contributions -->
@@ -383,6 +400,36 @@
             <enabledWhen>
                <with variable="selection">
                   <test property="org.eclipse.tcf.te.tcf.ui.canMakeAvailableOffline" value="true"/>
+               </with>
+            </enabledWhen>
+      </handler>
+
+      <handler
+            commandId="org.eclipse.tcf.te.ui.command.refresh"
+            class="org.eclipse.tcf.te.tcf.ui.handler.RefreshHandler">
+            <activeWhen>
+               <and>
+                  <with variable="activePartId">
+                     <or>
+                        <equals value="org.eclipse.tcf.te.ui.views.View"/>
+                        <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
+                     </or>
+                  </with>
+                  <with variable="selection">
+                     <iterate operator="and" ifEmpty="false">
+                        <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                     </iterate>
+                  </with>
+               </and>
+            </activeWhen>
+            <enabledWhen>
+               <with variable="selection">
+                  <iterate operator="and" ifEmpty="false">
+                     <and>
+                        <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                        <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel"/>
+                     </and>
+                  </iterate>
                </with>
             </enabledWhen>
       </handler>

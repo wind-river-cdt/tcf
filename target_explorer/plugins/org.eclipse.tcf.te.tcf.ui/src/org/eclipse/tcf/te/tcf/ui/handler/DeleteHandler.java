@@ -91,7 +91,7 @@ public class DeleteHandler extends AbstractHandler {
 	 * selection.
 	 *
 	 * @param selection The selection. Must not be <code>null</code>.
-	 * @return
+	 * @return <code>True</code> if the selection can be deleted by this handler, <code>false</code> otherwise.
 	 */
 	public boolean canDelete(ISelection selection) {
 		Assert.isNotNull(selection);
@@ -290,7 +290,7 @@ public class DeleteHandler extends AbstractHandler {
 		Assert.isNotNull(selection);
 		Assert.isNotNull(callback);
 
-		// The callback needs to be removed in any case. However, if called
+		// The callback needs to be invoked in any case. However, if called
 		// from an asynchronous callback, set this flag to false.
 		boolean invokeCallback = true;
 
