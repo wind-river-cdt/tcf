@@ -29,8 +29,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tcf.te.ui.trees.TreeViewerEditorActivationStrategy;
 import org.eclipse.tcf.te.ui.views.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
-import org.eclipse.tcf.te.ui.views.internal.preferences.IPreferenceKeys;
-import org.eclipse.tcf.te.ui.views.nls.Messages;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -148,11 +146,6 @@ public class View extends CommonNavigator implements ITabbedPropertySheetPageCon
 	@Override
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
-
-		// "Fix" the view title
-		if (UIPlugin.getScopedPreferences().getBoolean(IPreferenceKeys.PREF_SYSTEM_MANAGMENT_MODE)) {
-			setPartName(Messages.View_title_systemManagement);
-		}
 
 		// Add the additional custom toolbar groups
 		addCustomToolbarGroups();
