@@ -252,6 +252,7 @@
       
       <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.showIn">
          <menu
+               commandId="org.eclipse.tcf.te.ui.views.command.ShowInGroup"
                id="org.eclipse.tcf.te.ui.views.View.showIn"
                label="%menu.showIn.label">
             <command
@@ -342,6 +343,12 @@
             helpContextId="org.eclipse.ui.navigator.Open"
             id="org.eclipse.ui.navigator.Open"
             name="%command.open.name">
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.ui.views.command_ShowInGroup"
+            id="org.eclipse.tcf.te.ui.views.command.ShowInGroup"
+            name="Show In Group">
       </command>
       
       <command
@@ -517,6 +524,15 @@
             class="org.eclipse.tcf.te.ui.views.internal.categories.CategoryFactory"
             id="org.eclipse.tcf.te.ui.views.categoryFactory">
       </factory>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="org.eclipse.tcf.te.ui.views.command.ShowInGroup"
+            contextId="org.eclipse.tcf.te.ui.views.View"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M3+M2+W">
+      </key>
    </extension>
    
 </plugin>
