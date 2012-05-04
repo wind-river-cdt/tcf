@@ -88,7 +88,7 @@ public class Operation extends Ancestor<FSTreeNode> implements IOperation {
 	protected void cleanUpFolder(FSTreeNode node) {
 		File file = CacheManager.getCacheFile(node);
 		deleteFileChecked(file);
-		FSTreeNode parent = node.parent;
+		FSTreeNode parent = node.getParent();
 		if (parent != null) {
 			parent.removeChild(node);
 		}
@@ -126,7 +126,7 @@ public class Operation extends Ancestor<FSTreeNode> implements IOperation {
 		final File file = CacheManager.getCacheFile(node);
 		deleteFileChecked(file);
 		PersistenceManager.getInstance().removeFileDigest(node.getLocationURI());
-		FSTreeNode parent = node.parent;
+		FSTreeNode parent = node.getParent();
 		if (parent != null) {
 			parent.removeChild(node);
 		}
@@ -227,7 +227,7 @@ public class Operation extends Ancestor<FSTreeNode> implements IOperation {
 	 */
 	protected List<FSTreeNode> getChildren(final FSTreeNode node, final IFileSystem service) throws TCFFileSystemException, InterruptedException {
 		if (node.childrenQueried) {
-			return node.unsafeGetChildren();
+			return node.getChildren();
 		}
 		loadChildren(node, service);
 		return getChildren(node, service);
@@ -242,7 +242,7 @@ public class Operation extends Ancestor<FSTreeNode> implements IOperation {
 	 */
 	public List<FSTreeNode> getChildren(final FSTreeNode node) throws TCFException, InterruptedException {
 		if(node.childrenQueried) {
-			return node.unsafeGetChildren();
+			return node.getChildren();
 		}
 		IChannel channel = null;
 		try {
@@ -354,7 +354,7 @@ public class Operation extends Ancestor<FSTreeNode> implements IOperation {
 				loadChildren(folder, service);
 			}
 			folder.removeChild(child);
-			child.parent = null;
+			child.setParent(null);
 		}
 		else {
 			final TCFFileSystemException[] errors = new TCFFileSystemException[1];
@@ -485,7 +485,7 @@ public class Operation extends Ancestor<FSTreeNode> implements IOperation {
 			if (!folder.childrenQueried) {
 				loadChildren(folder, service);
 			}
-			child.parent = folder;
+			child.setParent(folder);
 			folder.addChild(child);
 		}
 		else {
@@ -600,6 +600,6 @@ public class Operation extends Ancestor<FSTreeNode> implements IOperation {
 	 */
 	@Override
     protected FSTreeNode getParent(FSTreeNode element) {
-	    return element.parent;
+	    return element.getParent();
     }
 }

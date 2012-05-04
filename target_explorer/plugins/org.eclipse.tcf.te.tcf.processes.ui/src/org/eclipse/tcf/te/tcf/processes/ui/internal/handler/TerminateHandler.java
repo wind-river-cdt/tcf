@@ -71,7 +71,7 @@ public class TerminateHandler extends AbstractHandler {
 		@Override
         protected void internalDone(Object caller, final IStatus status) {
 			if (status.isOK()) {
-				node.parent.removeChild(node);
+				node.getParent().removeChild(node);
 			}
 			else {
 				PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable(){

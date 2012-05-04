@@ -69,7 +69,7 @@ public class OperationTestBase extends FSPeerTestCase {
 		printDebugMessage("Rename " + node.name + " to " + newName); //$NON-NLS-1$ //$NON-NLS-2$
 		OpRename fsmove = new OpRename(node, newName);
 		fsmove.run(new NullProgressMonitor());
-		String newPath = node.parent.getLocation()+getPathSep()+newName;
+		String newPath = node.getParent().getLocation()+getPathSep()+newName;
 		return getFSNode(newPath);
 	}
 

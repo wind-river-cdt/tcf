@@ -55,13 +55,13 @@ public class ClipboardPropertyTester extends PropertyTester {
 						hovered = node;
 					}
 					else {
-						hovered = node.parent;
+						hovered = node.getParent();
 					}
 				}
 				else {
 					for (FSTreeNode node : selection) {
-						if (hovered == null) hovered = node.parent;
-						else if (hovered != node.parent) return false;
+						if (hovered == null) hovered = node.getParent();
+						else if (hovered != node.getParent()) return false;
 					}
 				}
 				if (hovered != null && hovered.isDirectory() && hovered.isWritable() && (moving || copying)) {
@@ -70,7 +70,7 @@ public class ClipboardPropertyTester extends PropertyTester {
 					String tid = hovered.peerNode.getPeerId();
 					if (hid.equals(tid)) {
 						for (FSTreeNode node : nodes) {
-							if (moving && node.parent == hovered || node.isAncestorOf(hovered)) {
+							if (moving && node.getParent() == hovered || node.isAncestorOf(hovered)) {
 								return false;
 							}
 						}
@@ -88,7 +88,7 @@ public class ClipboardPropertyTester extends PropertyTester {
 					if (selection.size() == 1) {
 						FSTreeNode node = selection.get(0);
 						if (node.isFile()) {
-							hovered = node.parent;
+							hovered = node.getParent();
 						}
 						else {
 							hovered = node;
@@ -96,8 +96,8 @@ public class ClipboardPropertyTester extends PropertyTester {
 					}
 					else {
 						for (FSTreeNode node : selection) {
-							if (hovered == null) hovered = node.parent;
-							else if (hovered != node.parent) return false;
+							if (hovered == null) hovered = node.getParent();
+							else if (hovered != node.getParent()) return false;
 						}
 					}
 					if (hovered != null && hovered.isDirectory() && hovered.isWritable()) {

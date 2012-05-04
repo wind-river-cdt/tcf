@@ -119,7 +119,7 @@ public class RenameFilesHandler extends AbstractHandler {
 	 */
 	private String[] getUsedNames(FSTreeNode folder) {
 		List<String> usedNames = new ArrayList<String>();
-		List<FSTreeNode> nodes = folder.parent.unsafeGetChildren();
+		List<FSTreeNode> nodes = folder.getParent().getChildren();
 		for (FSTreeNode node : nodes) {
 			usedNames.add(node.name);
 		}

@@ -68,7 +68,7 @@ public abstract class NewNodeWizard extends AbstractWizard implements INewWizard
 				folder = (FSTreeNode) element;
 				if (folder.isFile()) {
 					// If the selected is a file, then create the node in the parent folder.
-					folder = folder.parent;
+					folder = folder.getParent();
 				}
 				peer = folder.peerNode;
 			}

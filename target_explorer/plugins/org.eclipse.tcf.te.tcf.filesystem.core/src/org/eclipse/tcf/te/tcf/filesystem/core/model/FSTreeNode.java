@@ -20,28 +20,24 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.DirEntry;
 import org.eclipse.tcf.services.IFileSystem.FileAttrs;
-import org.eclipse.tcf.te.core.interfaces.IViewerInput;
 import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
-import org.eclipse.tcf.te.tcf.core.Tcf;
+import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel;
 import org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IWindowsFileAttributes;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.UserAccount;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.callbacks.QueryDoneOpenChannel;
@@ -57,7 +53,6 @@ import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.FileState;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.PersistenceManager;
 import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
-import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
 
 /**
  * Representation of a file system tree node.
@@ -65,51 +60,14 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
  * <b>Note:</b> Node construction and child list access is limited to the TCF
  * event dispatch thread.
  */
-public final class FSTreeNode extends PlatformObject implements Cloneable, IPeerModelProvider {
+public final class FSTreeNode extends AbstractTreeNode implements Cloneable {
 	// The constant to access the Windows Attributes.
 	private static final String KEY_WIN32_ATTRS = "Win32Attrs"; //$NON-NLS-1$
-
-	private final UUID uniqueId = UUID.randomUUID();
-
-	/**
-	 * The tree node name.
-	 */
-	public String name = null;
-
-	/**
-	 * The tree node type.
-	 */
-	public String type = null;
 
 	/**
 	 * The tree node file system attributes
 	 */
 	public IFileSystem.FileAttrs attr = null;
-
-	/**
-	 * The peer node the file system tree node is associated with.
-	 */
-	public IPeerModel peerNode = null;
-
-	/**
-	 * The tree node parent.
-	 */
-	public FSTreeNode parent = null;
-	
-	/**
-	 * The tree node children.
-	 */
-	private List<FSTreeNode> children;
-
-	/**
-	 * Flag to mark once the children of the node got queried
-	 */
-	public boolean childrenQueried = false;
-
-	/**
-	 * Flag to mark once the children query is running
-	 */
-	public boolean childrenQueryRunning = false;
 
 	/**
 	 * Create a folder node using the specified parent node, the directory entry
@@ -121,7 +79,6 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 	 */
 	public FSTreeNode(FSTreeNode parentNode, DirEntry entry, boolean entryIsRootNode) {
 		Assert.isNotNull(entry);
-		children = Collections.synchronizedList(new ArrayList<FSTreeNode>());
 		IFileSystem.FileAttrs attrs = entry.attrs;
 
 		this.attr = attrs;
@@ -140,8 +97,6 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 	 * Constructor.
 	 */
 	public FSTreeNode() {
-		super();
-		children = Collections.synchronizedList(new ArrayList<FSTreeNode>());
 		Assert.isTrue(Protocol.isDispatchThread());
 	}
 
@@ -217,65 +172,20 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 	public void setPermissions(int permissions) {
 		attr = new IFileSystem.FileAttrs(attr.flags, attr.size, attr.uid, attr.gid, permissions, attr.atime, attr.mtime, attr.attributes);
     }
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public final int hashCode() {
-		return uniqueId.hashCode();
-	}
-
-	/**
-	 * Returns the children list storage object.
-	 * <p>
-	 * <b>Note:</b> This method must be called from within the TCF event
-	 * dispatch thread only!
-	 *
-	 * @return The children list storage object.
-	 */
-	public final List<FSTreeNode> getChildren() {
-		Assert.isTrue(Protocol.isDispatchThread());
-		return children;
-	}
 	
 	/**
 	 * Returns the children outside of TCF thread.
 	 * 
 	 * @return The children list.
 	 */
-	public List<FSTreeNode> unsafeGetChildren() {
-		return new ArrayList<FSTreeNode>(children);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public final boolean equals(Object obj) {
-		if(this == obj)
-			return true;
-		if (obj instanceof FSTreeNode) {
-			return uniqueId.equals(((FSTreeNode) obj).uniqueId);
-		}
-		return super.equals(obj);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		StringBuilder buffer = new StringBuilder(getClass().getSimpleName());
-		buffer.append(": name=" + (name != null ? name : super.toString())); //$NON-NLS-1$
-		buffer.append(", UUID=" + uniqueId.toString()); //$NON-NLS-1$
-		return buffer.toString();
+	public List<FSTreeNode> getChildren() {
+	    List<FSTreeNode> result = new ArrayList<FSTreeNode>();
+	    synchronized(children) {
+	    	for(AbstractTreeNode child : children) {
+	    		result.add((FSTreeNode)child);
+	    	}
+	    }
+	    return result;
 	}
 
 	/**
@@ -293,8 +203,11 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 				return OSName.startsWith("Windows"); //$NON-NLS-1$
 			}
 		}
-		if (!children.isEmpty()) {
-			return children.get(0).isWindowsNode();
+		synchronized (children) {
+			if (!children.isEmpty()) {
+				FSTreeNode node = (FSTreeNode) children.get(0);
+				return node.isWindowsNode();
+			}
 		}
 		return false;
 	}
@@ -418,8 +331,8 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 			}
 			return name;
 		}
-		String pLoc = parent.getLocation(cross);
-		if(parent.isRoot()) {
+		String pLoc = getParent().getLocation(cross);
+		if(getParent().isRoot()) {
 			return pLoc + name;
 		}
 		String pathSep = (!cross && isWindowsNode()) ? "\\" : "/"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -490,8 +403,8 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 				ref.set(URLEncoder.encode(name, "UTF-8")); //$NON-NLS-1$
             }});
 		String segment = ref.get();
-		String pLoc = parent.getEncodedURIPath();
-		if(parent.isRoot()) {
+		String pLoc = getParent().getEncodedURIPath();
+		if(getParent().isRoot()) {
 			return pLoc + segment;
 		}
 		return pLoc + "/" + segment; //$NON-NLS-1$
@@ -586,16 +499,6 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 	}
 
 	/**
-	 * If this node is ancestor of the specified node.
-	 * @return true if it is.
-	 */
-	public boolean isAncestorOf(FSTreeNode node) {
-		if (node == null) return false;
-		if (node.parent == this) return true;
-		return isAncestorOf(node.parent);
-	}
-
-	/**
 	 * Test if this file is a windows system file.
 	 *
 	 * @return true if it is a windows system file.
@@ -656,20 +559,6 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 		FileState digest = PersistenceManager.getInstance().getFileDigest(this);
 		return digest.getCacheState();
 	}
-	
-	/**
-	 * Fire a property change event to notify one of the node's property has changed.
-	 * 
-	 * @param event The property change event.
-	 */
-	public void firePropertyChange(PropertyChangeEvent event) {
-		if(peerNode != null) {
-			IViewerInput viewerInput = (IViewerInput) peerNode.getAdapter(IViewerInput.class);
-			viewerInput.firePropertyChange(event);
-		} else if(parent != null) {
-			parent.firePropertyChange(event);
-		}
-    }
 
 	/**
 	 * Set the file's new name and trigger property change event.
@@ -686,100 +575,10 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider#getPeerModel()
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.model.AbstractTreeNode#doCreateRefreshDoneOpenChannel(org.eclipse.tcf.te.runtime.interfaces.callback.ICallback)
 	 */
 	@Override
-    public IPeerModel getPeerModel() {
-	    return peerNode;
-    }
-
-	/**
-	 * Add the specified nodes to the children list.
-	 * 
-	 * @param nodes The nodes to be added.
-	 */
-	public void addChidren(List<FSTreeNode> nodes) {
-		children.addAll(nodes);
-		PropertyChangeEvent event = new PropertyChangeEvent(this, "addChildren", null, null); //$NON-NLS-1$
-		firePropertyChange(event);
-    }
-
-	/**
-	 * Remove the specified nodes from the children list.
-	 * 
-	 * @param nodes The nodes to be removed.
-	 */
-	public void removeChildren(List<FSTreeNode> nodes) {
-		children.removeAll(nodes);
-		PropertyChangeEvent event = new PropertyChangeEvent(this, "removeChildren", null, null); //$NON-NLS-1$
-		firePropertyChange(event);
-    }
-
-	/**
-	 * Add the specified the node to the children list.
-	 * 
-	 * @param node The child node to be added.
-	 */
-	public void addChild(FSTreeNode node) {
-		children.add(node);
-		PropertyChangeEvent event = new PropertyChangeEvent(this, "addChild", null, null); //$NON-NLS-1$
-		firePropertyChange(event);
-    }
-
-	/**
-	 * Remove the specified child node from its children list.
-	 * 
-	 * @param node The child node to be removed.
-	 */
-	public void removeChild(FSTreeNode node) {
-		children.remove(node);
-		PropertyChangeEvent event = new PropertyChangeEvent(this, "removeChild", null, null); //$NON-NLS-1$
-		firePropertyChange(event);
-    }
-
-	/**
-	 * Clear the children of this folder.
-	 */
-	public void clearChildren() {
-		children.clear();
-		PropertyChangeEvent event = new PropertyChangeEvent(this, "clearChildren", null, null); //$NON-NLS-1$
-		firePropertyChange(event);
-    }
-	
-	/**
-	 * Called when the children query is done.
-	 */
-	public void queryDone() {
-		childrenQueryRunning = false;
-		childrenQueried = true;
-		PropertyChangeEvent event = new PropertyChangeEvent(this, "query_done", Boolean.FALSE, Boolean.TRUE); //$NON-NLS-1$
-		firePropertyChange(event);
-	}
-	
-	/**
-	 * Called when the children query is started.
-	 */
-	public void queryStarted() {
-		childrenQueryRunning = true;
-		PropertyChangeEvent event = new PropertyChangeEvent(this, "query_started", Boolean.FALSE, Boolean.TRUE); //$NON-NLS-1$
-		firePropertyChange(event);
-	}
-	
-	/**
-	 * Refresh the state of the specified node.
-	 */
-	public void refreshState() {
-		refreshState(null);
-	}
-
-	/**
-	 * Refresh the state of the specified node. This method is invoked
-	 * asynchronously with a callback invoked when the state is refreshed.
-	 *
-	 * @param updateTargetDigest If the target digest should be updated. 
-	 * @param node The tree node whose state is going to be refreshed.
-	 */
-	public void refreshState(final ICallback callback) {
+    protected DoneOpenChannel doCreateRefreshDoneOpenChannel(final ICallback callback) {
 		final FileState digest = PersistenceManager.getInstance().getFileDigest(this);
 		ICallback cb = new Callback(){
 			@Override
@@ -790,14 +589,24 @@ public final class FSTreeNode extends PlatformObject implements Cloneable, IPeer
 				if (callback != null) callback.done(caller, status);
             }
 		};
-		Tcf.getChannelManager().openChannel(peerNode.getPeer(), null, new RefreshStateDoneOpenChannel(this, cb));
-	}
-	
-	/**
-	 * Query the children of this file system node.
-	 */
-	public void queryChildren() {
-		queryStarted();
-		Tcf.getChannelManager().openChannel(peerNode.getPeer(), null, new QueryDoneOpenChannel(this));
+		return new RefreshStateDoneOpenChannel(this, cb);
     }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.model.AbstractTreeNode#doCreateQueryDoneOpenChannel()
+	 */
+	@Override
+    protected DoneOpenChannel doCreateQueryDoneOpenChannel() {
+	    return new QueryDoneOpenChannel(this);
+    }
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.model.AbstractTreeNode#getParent()
+	 */
+	@Override
+	public FSTreeNode getParent() {
+		return (FSTreeNode) parent;
+	}
 }

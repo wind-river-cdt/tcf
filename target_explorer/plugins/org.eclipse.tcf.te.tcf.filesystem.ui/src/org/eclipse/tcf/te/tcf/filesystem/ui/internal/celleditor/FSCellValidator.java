@@ -70,7 +70,7 @@ public class FSCellValidator implements ICellEditorValidator {
 	 * @return true if it has a child with the name.
 	 */
 	private boolean hasChild(FSTreeNode folder, String name) {
-		List<FSTreeNode> nodes = folder.parent.unsafeGetChildren();
+		List<FSTreeNode> nodes = folder.getParent().getChildren();
 		for (FSTreeNode node : nodes) {
 			if (node.isWindowsNode()) {
 				if (node.name.equalsIgnoreCase(name)) return true;

@@ -44,7 +44,7 @@ public class ProcessNavigatorContentProvider  extends TreeContentProvider implem
 	public Object getParent(Object element) {
 		if (element instanceof ProcessTreeNode) {
 			ProcessTreeNode node = (ProcessTreeNode) element;
-			return node.parent != null ? node.parent : node.peerNode;
+			return node.getParent() != null ? node.getParent() : node.peerNode;
 		}
 		return null;
 	}
@@ -216,9 +216,10 @@ public class ProcessNavigatorContentProvider  extends TreeContentProvider implem
 	 */
 	private void refreshChildren(Object object) {
 	    if(object instanceof ProcessTreeNode) {
-			final ProcessTreeNode parent = (ProcessTreeNode) object;
+			ProcessTreeNode parent = (ProcessTreeNode) object;
 			if (parent.childrenQueried && !parent.childrenQueryRunning) {
-				parent.refreshChildren();
+				ProcessModel pModel = ProcessModel.getProcessModel(parent.peerNode);
+				pModel.refreshChildren(parent);
 			}
 		}
     }

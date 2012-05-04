@@ -171,8 +171,8 @@ public class CacheManager {
 	 * @return The path to the node.
 	 */
 	private static IPath appendNodePath(IPath path, FSTreeNode node) {
-		if (!node.isRoot() && node.parent!=null) {
-			path = appendNodePath(path, node.parent);
+		if (!node.isRoot() && node.getParent()!=null) {
+			path = appendNodePath(path, node.getParent());
 			return appendPathSegment(node, path, node.name);
 		}
 		if (node.isWindowsNode()) {

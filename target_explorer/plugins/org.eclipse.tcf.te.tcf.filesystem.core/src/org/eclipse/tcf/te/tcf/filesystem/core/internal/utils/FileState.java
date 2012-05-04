@@ -149,7 +149,7 @@ public class FileState {
 		}
 		if (!target_digest_running && target_digest == null) {
 			target_digest_running = true;
-			node.refreshState();
+			node.refresh();
 		}
 		if (cache_digest == null || target_digest == null) return CacheState.consistent;
 		if(isUnchanged(target_digest, cache_digest)) {

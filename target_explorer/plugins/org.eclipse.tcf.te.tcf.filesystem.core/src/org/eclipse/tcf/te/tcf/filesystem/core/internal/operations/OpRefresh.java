@@ -97,13 +97,13 @@ public class OpRefresh extends Operation {
 				updateChildren(node, service);
 			}
 			monitor.worked(1);
-			List<FSTreeNode> children = node.unsafeGetChildren();
+			List<FSTreeNode> children = node.getChildren();
 			for (FSTreeNode child : children) {
 				refresh(child, service);
 			}
 		}
 		else if(node.isFile()) {
-			node.refreshState();
+			node.refresh();
 		}
 	}
 
@@ -117,7 +117,7 @@ public class OpRefresh extends Operation {
 	 */
 	protected void updateChildren(final FSTreeNode node, final IFileSystem service) throws TCFFileSystemException, InterruptedException {
 		if(monitor.isCanceled()) throw new InterruptedException();
-		List<FSTreeNode> current = node.unsafeGetChildren();
+		List<FSTreeNode> current = node.getChildren();
 		List<FSTreeNode> latest = queryChildren(node, service);
 		List<FSTreeNode> newNodes = diff(latest, current);
 		List<FSTreeNode> deleted = diff(current, latest);
@@ -177,7 +177,7 @@ public class OpRefresh extends Operation {
 	private int count(FSTreeNode node) {
 		if ((node.isSystemRoot() || node.isDirectory()) && node.childrenQueried) {
 			int total = 1;
-			List<FSTreeNode> children = node.unsafeGetChildren();
+			List<FSTreeNode> children = node.getChildren();
 			for (FSTreeNode child : children) {
 				total += count(child);
 			}

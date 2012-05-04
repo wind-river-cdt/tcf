@@ -176,10 +176,10 @@ public class OpMove extends Operation {
 		}
 		else if (node.isDirectory()) {
 			super.cleanUpFolder(node);
-			List<FSTreeNode> children = node.unsafeGetChildren();
+			List<FSTreeNode> children = node.getChildren();
 			copyNode.addChidren(children);
 			for (FSTreeNode child : children) {
-				child.parent = copyNode;
+				child.setParent(copyNode);
 			}
 		}
 	}

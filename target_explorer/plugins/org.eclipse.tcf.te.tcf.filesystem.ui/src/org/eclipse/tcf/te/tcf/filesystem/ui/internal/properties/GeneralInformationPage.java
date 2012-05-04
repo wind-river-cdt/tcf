@@ -342,7 +342,7 @@ public class GeneralInformationPage extends PropertyPage {
 				if (!node.isRoot()) {
 					// Refresh the parent so that the filters work!
 					executor = new JobExecutor();
-					executor.execute(new OpRefresh(node.parent));
+					executor.execute(new OpRefresh(node.getParent()));
 				}
 				return status;
 			}

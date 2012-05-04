@@ -100,12 +100,12 @@ public class PasteFilesHandler extends AbstractHandler {
 	 */
 	private FSTreeNode getCopyDestination(FSTreeNode hovered, List<FSTreeNode> nodes) {
 		if (hovered.isFile()) {
-			return hovered.parent;
+			return hovered.getParent();
 		}
 		else if (hovered.isDirectory()) {
 			for (FSTreeNode node : nodes) {
 				if (node == hovered) {
-					return hovered.parent;
+					return hovered.getParent();
 				}
 			}
 		}

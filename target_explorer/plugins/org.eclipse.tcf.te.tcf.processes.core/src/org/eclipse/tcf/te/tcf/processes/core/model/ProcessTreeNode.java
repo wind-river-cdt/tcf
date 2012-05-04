@@ -12,40 +12,23 @@ package org.eclipse.tcf.te.tcf.processes.core.model;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.IProcesses.ProcessContext;
 import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.services.ISysMonitor.SysMonitorContext;
-import org.eclipse.tcf.te.core.interfaces.IViewerInput;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
-import org.eclipse.tcf.te.tcf.core.Tcf;
-import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
-import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
+import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel;
+import org.eclipse.tcf.te.tcf.filesystem.core.model.AbstractTreeNode;
 import org.eclipse.tcf.te.tcf.processes.core.callbacks.QueryDoneOpenChannel;
-import org.eclipse.tcf.te.tcf.processes.core.callbacks.RefreshChildrenDoneOpenChannel;
 import org.eclipse.tcf.te.tcf.processes.core.callbacks.RefreshDoneOpenChannel;
 
 /**
  * Representation of a process tree node.
  */
-public final class ProcessTreeNode extends PlatformObject implements IPeerModelProvider{
-	private final UUID uuid = UUID.randomUUID();
-
-	/**
-	 * The tree node name.
-	 */
-	public String name = null;
-
-	/**
-	 * The tree node type.
-	 */
-	public String type = null;
-
+public final class ProcessTreeNode extends AbstractTreeNode {
 	/**
 	 * The system monitor context object
 	 */
@@ -85,31 +68,6 @@ public final class ProcessTreeNode extends PlatformObject implements IPeerModelP
 	 * The process owner/creator
 	 */
 	public String username = null;
-
-	/**
-	 * The tree node parent.
-	 */
-	public ProcessTreeNode parent = null;
-
-	/**
-	 * The tree node children.
-	 */
-	private List<ProcessTreeNode> children = new ArrayList<ProcessTreeNode>();
-
-	/**
-	 * Flag to mark once the children of the node got queried
-	 */
-	public boolean childrenQueried = false;
-
-	/**
-	 * Flag to mark once the children query is running
-	 */
-	public boolean childrenQueryRunning = false;
-
-	/**
-	 * The peer node the process node is associated with.
-	 */
-	public IPeerModel peerNode;
 
 	/**
 	 * Create a pending node.
@@ -185,6 +143,21 @@ public final class ProcessTreeNode extends PlatformObject implements IPeerModelP
 			return -1;
 		}
 	}
+	
+	/**
+	 * Get the children process list.
+	 * 
+	 * @return The children process list.
+	 */
+	public List<ProcessTreeNode> getChildren() {
+	    List<ProcessTreeNode> result = new ArrayList<ProcessTreeNode>();
+	    synchronized(children) {
+	    	for(AbstractTreeNode child : children) {
+	    		result.add((ProcessTreeNode)child);
+	    	}
+	    }
+	    return result;
+    }
 
 	/**
 	 * Return if this node is a root node.
@@ -232,36 +205,6 @@ public final class ProcessTreeNode extends PlatformObject implements IPeerModelP
 			firePropertyChange(new PropertyChangeEvent(this, "pContext", oldContext, aContext)); //$NON-NLS-1$
 		}
     }
-	
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public final int hashCode() {
-		return uuid.hashCode();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public final boolean equals(Object obj) {
-		if (obj instanceof ProcessTreeNode) {
-			return uuid.equals(((ProcessTreeNode) obj).uuid);
-		}
-		return super.equals(obj);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return name != null ? name : super.toString();
-	}
 
 	/**
 	 * Set the process context.
@@ -277,69 +220,6 @@ public final class ProcessTreeNode extends PlatformObject implements IPeerModelP
 	}
 
 	/**
-	 * Fire a property change event to notify one of the node's property has changed.
-	 * 
-	 * @param event The property change event.
-	 */
-	protected void firePropertyChange(PropertyChangeEvent event) {
-		if(peerNode != null) {
-			IViewerInput viewerInput = (IViewerInput) peerNode.getAdapter(IViewerInput.class);
-			viewerInput.firePropertyChange(event);
-		} else if(parent != null) {
-			parent.firePropertyChange(event);
-		}
-    }
-
-	/**
-	 * Add the specified the node to the children list.
-	 * 
-	 * @param node The child node to be added.
-	 */
-	public void addChild(ProcessTreeNode child) {
-		children.add(child);
-		PropertyChangeEvent event = new PropertyChangeEvent(this, "state", null, null); //$NON-NLS-1$
-		firePropertyChange(event);
-    }
-
-	/**
-	 * Remove the specified child node from its children list.
-	 * 
-	 * @param node The child node to be removed.
-	 */
-	public void removeChild(ProcessTreeNode child) {
-		children.remove(child);
-		PropertyChangeEvent event = new PropertyChangeEvent(this, "state", null, null); //$NON-NLS-1$
-		firePropertyChange(event);
-    }
-
-	/**
-	 * Clear the children of this folder.
-	 */
-	public void clearChildren() {
-		children.clear();
-		PropertyChangeEvent event = new PropertyChangeEvent(this, "state", null, null); //$NON-NLS-1$
-		firePropertyChange(event);
-    }
-	
-	/**
-	 * Get the children process list.
-	 * 
-	 * @return The children process list.
-	 */
-	public List<ProcessTreeNode> getChildren() {
-	    return children;
-    }
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider#getPeerModel()
-	 */
-	@Override
-    public IPeerModel getPeerModel() {
-	    return peerNode;
-    }
-
-	/**
 	 * Set the system monitor context and fire a property change event.
 	 */
 	public void setSysMonitorContext(SysMonitorContext sContext) {
@@ -349,58 +229,31 @@ public final class ProcessTreeNode extends PlatformObject implements IPeerModelP
 			firePropertyChange(new PropertyChangeEvent(this, "sContext", oldContext, context)); //$NON-NLS-1$
 		}
     }
-	
-	/**
-	 * Called when the children query is done.
-	 */
-	public void queryDone() {
-		childrenQueryRunning = false;
-		childrenQueried = true;
-		PropertyChangeEvent event = new PropertyChangeEvent(this, "query_done", Boolean.FALSE, Boolean.TRUE); //$NON-NLS-1$
-		firePropertyChange(event);
-	}
-	
-	/**
-	 * Called when the children query is started.
-	 */
-	public void queryStarted() {
-		childrenQueryRunning = true;
-		PropertyChangeEvent event = new PropertyChangeEvent(this, "query_started", Boolean.FALSE, Boolean.TRUE); //$NON-NLS-1$
-		firePropertyChange(event);
-	}
 
-	/**
-	 * Query the children of the given process context.
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.model.AbstractTreeNode#doCreateRefreshDoneOpenChannel(org.eclipse.tcf.te.runtime.interfaces.callback.ICallback)
 	 */
-	public void queryChildren() {
-		queryStarted();
-		Tcf.getChannelManager().openChannel(peerNode.getPeer(), null, new QueryDoneOpenChannel(this));
-	}
-
-	/**
-	 * Refresh the children without refreshing itself.
-	 */
-	public void refreshChildren() {
-		Tcf.getChannelManager().openChannel(peerNode.getPeer(), null, new RefreshChildrenDoneOpenChannel(this));
+	@Override
+    protected DoneOpenChannel doCreateRefreshDoneOpenChannel(ICallback callback) {
+	    return new RefreshDoneOpenChannel(callback, this);
     }
 
-	/**
-	 * Recursively refresh the children of the given process context with a callback, which is
-	 * called when whole process is finished.
-	 *
-	 * @param callback The callback object, or <code>null</code> when callback is not needed.
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.model.AbstractTreeNode#doCreateQueryDoneOpenChannel()
 	 */
-	public void refresh(ICallback callback) {
-		queryStarted();
-		Tcf.getChannelManager().openChannel(peerNode.getPeer(), null, new RefreshDoneOpenChannel(callback, this));
-	}
+	@Override
+    protected DoneOpenChannel doCreateQueryDoneOpenChannel() {
+	    return new QueryDoneOpenChannel(this);
+    }
 
-	/**
-	 * Recursively refresh the children of the given process context.
-	 *
-	 * @param parentNode The process context node. Must not be <code>null</code>.
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.model.AbstractTreeNode#getParent()
 	 */
-	public void refresh() {
-		refresh(null);
+	@Override
+    public ProcessTreeNode getParent() {
+		return (ProcessTreeNode) parent;
 	}
 }

@@ -184,7 +184,7 @@ public class CommonDnD implements IConfirmCallback {
 			protected void internalDone(Object caller, IStatus status) {
 				if(status.isOK()) {
 					List<FSTreeNode> nodes = new ArrayList<FSTreeNode>();
-					List<FSTreeNode> children = target.unsafeGetChildren();
+					List<FSTreeNode> children = target.getChildren();
 					for (String path : paths) {
 						File file = new File(path);
 						String name = file.getName();
@@ -272,12 +272,12 @@ public class CommonDnD implements IConfirmCallback {
 	 */
 	private FSTreeNode getCopyDestination(FSTreeNode hovered, List<FSTreeNode> nodes) {
 		if (hovered.isFile()) {
-			return hovered.parent;
+			return hovered.getParent();
 		}
 		else if (hovered.isDirectory()) {
 			for (FSTreeNode node : nodes) {
 				if (node == hovered) {
-					return hovered.parent;
+					return hovered.getParent();
 				}
 			}
 		}
@@ -300,7 +300,7 @@ public class CommonDnD implements IConfirmCallback {
 			boolean copying = (operation & DND.DROP_COPY) != 0;
 			FSTreeNode hovered = (FSTreeNode) target;
 			if (hovered.isFile() && copying) {
-				hovered = hovered.parent;
+				hovered = hovered.getParent();
 			}
 			return hovered.isDirectory() && hovered.isWritable() && (moving || copying);
 		}
@@ -336,7 +336,7 @@ public class CommonDnD implements IConfirmCallback {
 			}
 		}
 		else if (hovered.isFile() && copying) {
-			hovered = hovered.parent;
+			hovered = hovered.getParent();
 			return validateLocalSelectionDrop(hovered, operation, transferType);
 		}
 		return false;

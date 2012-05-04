@@ -33,7 +33,7 @@ public class FSNavigatorContentProvider extends TreeContentProvider {
 	public Object getParent(Object element) {
 		if (element instanceof FSTreeNode) {
 			FSTreeNode node = (FSTreeNode) element;
-			return node.parent != null ? node.parent : node.peerNode;
+			return node.getParent() != null ? node.getParent() : node.peerNode;
 		}
 		return null;
 	}
@@ -87,7 +87,7 @@ public class FSNavigatorContentProvider extends TreeContentProvider {
 			final FSTreeNode node = (FSTreeNode)parentElement;
 			Object[] children = NO_ELEMENTS;
 			if (!node.isFile()) {
-				List<FSTreeNode> current = node.unsafeGetChildren();
+				List<FSTreeNode> current = node.getChildren();
 				if (!node.childrenQueried) {
 					if (current.isEmpty()) {
 						children = new Object[] { getPending(node) };

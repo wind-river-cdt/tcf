@@ -49,7 +49,7 @@ public class StateManagerTest extends UtilsTestBase {
 	    OpCacheUpdate update = new OpCacheUpdate(testFile);
 	    update.run(new NullProgressMonitor());
 		writeFileContent("hello,world!"); //$NON-NLS-1$
-		testFile.refreshState();
+		testFile.refresh();
 		CacheState cacheState = testFile.getCacheState();
 		assertEquals(CacheState.outdated, cacheState);
 	}
@@ -58,7 +58,7 @@ public class StateManagerTest extends UtilsTestBase {
 	    OpCacheUpdate update = new OpCacheUpdate(testFile);
 	    update.run(new NullProgressMonitor());
 		writeFileContent("hello,world!"); //$NON-NLS-1$
-		testFile.refreshState();
+		testFile.refresh();
 	    File file = CacheManager.getCacheFile(testFile);
 	    BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 	    writer.write("hello, world"); //$NON-NLS-1$

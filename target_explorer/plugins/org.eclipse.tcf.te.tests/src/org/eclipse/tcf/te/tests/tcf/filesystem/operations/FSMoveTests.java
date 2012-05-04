@@ -16,7 +16,7 @@ public class FSMoveTests extends OperationTestBase {
 	protected FSTreeNode originalFolder;
 
 	public void testMove() throws Exception {
-		originalFolder = test22File.parent;
+		originalFolder = test22File.getParent();
 		test22File = move(test22File, test1Folder);
 		String origPath = originalFolder.getLocation() + getPathSep() + test22File.name;
 		assertFalse(pathExists(origPath));

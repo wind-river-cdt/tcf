@@ -126,7 +126,7 @@ public class OpParsePath extends Operation {
 			if (!root.childrenQueried) {
 				new NullOpExecutor().execute(new OpRefreshRoots(root));
 			}
-			Object[] elements = root.unsafeGetChildren().toArray();
+			Object[] elements = root.getChildren().toArray();
 			if (elements != null && elements.length != 0 && path.length() != 0) {
 				final FSTreeNode[] children = new FSTreeNode[elements.length];
 				System.arraycopy(elements, 0, children, 0, elements.length);

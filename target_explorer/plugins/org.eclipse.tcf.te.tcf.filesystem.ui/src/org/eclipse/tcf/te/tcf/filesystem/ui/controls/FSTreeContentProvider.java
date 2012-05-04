@@ -25,7 +25,7 @@ public class FSTreeContentProvider extends FSNavigatorContentProvider {
 	@Override
 	public Object getParent(Object element) {
 		if (element instanceof FSTreeNode) {
-			FSTreeNode parent = ((FSTreeNode) element).parent;
+			FSTreeNode parent = ((FSTreeNode) element).getParent();
 			return parent != null && !parent.isSystemRoot() ? parent : null;
 		}
 		return null;

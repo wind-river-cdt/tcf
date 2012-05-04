@@ -111,6 +111,6 @@ public class FSTreeNodePropertyTester extends PropertyTester {
 		String arg = (String) args[0];
 		Object[] newArgs = new Object[args.length -1];
 		System.arraycopy(args, 1, newArgs, 0, args.length - 1);
-	    return test(node.parent, arg, newArgs, expectedValue);
+	    return test(node.getParent(), arg, newArgs, expectedValue);
     }
 }
