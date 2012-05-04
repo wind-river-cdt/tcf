@@ -348,7 +348,7 @@
             categoryId="org.eclipse.tcf.te.ui.commands.category"
             helpContextId="org.eclipse.tcf.te.ui.views.command_ShowInGroup"
             id="org.eclipse.tcf.te.ui.views.command.ShowInGroup"
-            name="Show In Group">
+            name="%command.showin.name">
       </command>
       
       <command
