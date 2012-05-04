@@ -13,8 +13,6 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.ISafeRunnable;
-import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
@@ -25,6 +23,7 @@ import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.core.activator.CorePlugin;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.UserAccount;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.exceptions.TCFFileSystemException;
 import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
@@ -68,25 +67,20 @@ public class OpUser extends Operation {
 			result = getUserFromPeer(peerNode);
 			if (result == null) {
 				final UserAccount[] accounts = new UserAccount[1];
-				SafeRunner.run(new ISafeRunnable(){
-					@Override
-                    public void handleException(Throwable e) {
-						// Just ignore it.
-                    }
-					@Override
-                    public void run() throws Exception {
-						IChannel channel = null;
-						try {
-							channel = Operation.openChannel(peerNode.getPeer());
-							if (channel != null) {
-								accounts[0] = getUserByChannel(channel);
-								if (accounts[0] != null) setUserToPeer(peerNode, accounts[0]);
-							}
-						}
-						finally {
-							if (channel != null) Tcf.getChannelManager().closeChannel(channel);
-						}
-                    }});
+				IChannel channel = null;
+				try {
+					channel = Operation.openChannel(peerNode.getPeer());
+					if (channel != null) {
+						accounts[0] = getUserByChannel(channel);
+						if (accounts[0] != null) setUserToPeer(peerNode, accounts[0]);
+					}
+				}
+                catch (TCFException e) {
+                	throw new InvocationTargetException(e);
+                }
+				finally {
+					if (channel != null) Tcf.getChannelManager().closeChannel(channel);
+				}
 				result = accounts[0];
 			}
 		}
