@@ -178,6 +178,7 @@ public final class FSTreeNode extends AbstractTreeNode implements Cloneable {
 	 * 
 	 * @return The children list.
 	 */
+	@Override
 	public List<FSTreeNode> getChildren() {
 	    List<FSTreeNode> result = new ArrayList<FSTreeNode>();
 	    synchronized(children) {
@@ -424,6 +425,7 @@ public final class FSTreeNode extends AbstractTreeNode implements Cloneable {
 	 *
 	 * @return true if this node is the system root.
 	 */
+	@Override
 	public boolean isSystemRoot() {
 		return type != null && type.equals("FSRootNode"); //$NON-NLS-1$
 	}

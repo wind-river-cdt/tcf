@@ -12,7 +12,6 @@ package org.eclipse.tcf.te.tcf.processes.ui.controls;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.processes.core.model.ProcessModel;
-import org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode;
 
 
 /**
@@ -21,18 +20,6 @@ import org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode;
 public class ProcessTreeContentProvider extends ProcessNavigatorContentProvider {
 	// The target's peer model.
 	private IPeerModel peerModel;
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
-	 */
-	@Override
-	public Object getParent(Object element) {
-		if (element instanceof ProcessTreeNode) {
-			ProcessTreeNode parent = ((ProcessTreeNode) element).getParent();
-			return parent != null && !parent.isRootNode() ? parent : null;
-		}
-		return null;
-	}
 
 	/*
 	 * (non-Javadoc)

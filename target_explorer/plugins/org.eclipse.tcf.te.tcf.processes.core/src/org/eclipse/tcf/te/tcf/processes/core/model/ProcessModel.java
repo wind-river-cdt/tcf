@@ -22,6 +22,7 @@ import org.eclipse.tcf.te.core.interfaces.IViewerInput;
 import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.core.Tcf;
+import org.eclipse.tcf.te.tcf.filesystem.core.model.ITreeNodeModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.processes.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.tcf.processes.core.callbacks.RefreshChildrenDoneOpenChannel;
@@ -30,7 +31,7 @@ import org.eclipse.tcf.te.tcf.processes.core.nls.Messages;
 /**
  * The process tree model implementation.
  */
-public class ProcessModel {
+public class ProcessModel implements ITreeNodeModel{
 	/* default */static final String PROCESS_ROOT_KEY = CoreBundleActivator.getUniqueIdentifier() + ".process.root"; //$NON-NLS-1$
 
 	/**
@@ -112,7 +113,11 @@ public class ProcessModel {
 	 *
 	 * @return The root node.
 	 */
-	public ProcessTreeNode getRoot() {
+	@Override
+    public ProcessTreeNode getRoot() {
+		if(root == null) {
+			root = createRoot();
+		}
 		return root;
 	}
 
@@ -121,8 +126,8 @@ public class ProcessModel {
 	 *
 	 * @param root The root node
 	 */
-	public void createRoot(IPeerModel peerModel ) {
-		this.root = createRootNode(peerModel);
+	ProcessTreeNode createRoot() {
+		return createRootNode(peerModel);
 	}
 
 	/**

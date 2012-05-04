@@ -9,27 +9,10 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.ui.controls;
 
-import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
-
-
-
-
 /**
  * File system tree content provider implementation.
  */
 public class FSTreeContentProvider extends FSNavigatorContentProvider {
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
-	 */
-	@Override
-	public Object getParent(Object element) {
-		if (element instanceof FSTreeNode) {
-			FSTreeNode parent = ((FSTreeNode) element).getParent();
-			return parent != null && !parent.isSystemRoot() ? parent : null;
-		}
-		return null;
-	}
 	
 	/*
 	 * (non-Javadoc)

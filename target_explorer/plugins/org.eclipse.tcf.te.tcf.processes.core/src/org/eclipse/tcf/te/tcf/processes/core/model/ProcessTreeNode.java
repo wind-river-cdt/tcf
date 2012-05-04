@@ -149,7 +149,8 @@ public final class ProcessTreeNode extends AbstractTreeNode {
 	 * 
 	 * @return The children process list.
 	 */
-	public List<ProcessTreeNode> getChildren() {
+	@Override
+    public List<ProcessTreeNode> getChildren() {
 	    List<ProcessTreeNode> result = new ArrayList<ProcessTreeNode>();
 	    synchronized(children) {
 	    	for(AbstractTreeNode child : children) {
@@ -164,7 +165,8 @@ public final class ProcessTreeNode extends AbstractTreeNode {
 	 * 
 	 * @return true if it is a root node.
 	 */
-	public boolean isRootNode() {
+	@Override
+    public boolean isSystemRoot() {
 		return type != null && type.equals("ProcRootNode"); //$NON-NLS-1$
 	}
 

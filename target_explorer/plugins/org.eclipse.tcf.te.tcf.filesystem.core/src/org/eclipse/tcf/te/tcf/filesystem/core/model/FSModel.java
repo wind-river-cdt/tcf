@@ -19,7 +19,7 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 /**
  * The file system model implementation.
  */
-public final class FSModel {
+public final class FSModel implements ITreeNodeModel {
 	/* default */static final String FSMODEL_KEY = CorePlugin.getUniqueIdentifier() + ".file.system"; //$NON-NLS-1$
 
 	/**
@@ -66,6 +66,7 @@ public final class FSModel {
 	 *
 	 * @return The root node.
 	 */
+	@Override
 	public FSTreeNode getRoot() {
 		if(root == null) {
 			root = createRoot();

@@ -9,17 +9,16 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.processes.ui.controls;
 
-import java.util.List;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.tcf.te.tcf.filesystem.core.model.ITreeNodeModel;
+import org.eclipse.tcf.te.tcf.filesystem.ui.controls.NavigatorContentProvider;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.processes.core.model.ProcessModel;
 import org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode;
-import org.eclipse.tcf.te.ui.trees.TreeContentProvider;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.navigator.NavigatorFilterService;
@@ -33,21 +32,9 @@ import org.eclipse.ui.navigator.INavigatorFilterService;
  * Processes content provider for the common navigator of Target Explorer.
  */
 @SuppressWarnings("restriction")
-public class ProcessNavigatorContentProvider  extends TreeContentProvider implements ICommonContentProvider, ITreeViewerListener {
+public class ProcessNavigatorContentProvider  extends NavigatorContentProvider implements ICommonContentProvider, ITreeViewerListener {
 	// The "Single Thread" filter id
 	private final static String SINGLE_THREAD_FILTER_ID = "org.eclipse.tcf.te.tcf.processes.ui.navigator.filter.singleThread"; //$NON-NLS-1$
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
-	 */
-	@Override
-	public Object getParent(Object element) {
-		if (element instanceof ProcessTreeNode) {
-			ProcessTreeNode node = (ProcessTreeNode) element;
-			return node.getParent() != null ? node.getParent() : node.peerNode;
-		}
-		return null;
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -72,86 +59,11 @@ public class ProcessNavigatorContentProvider  extends TreeContentProvider implem
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.ui.controls.NavigatorContentProvider#doGetModel(org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel)
 	 */
 	@Override
-	public Object[] getChildren(Object parentElement) {
-		super.getChildren(parentElement);
-
-		if (parentElement instanceof IPeerModel) {
-			IPeerModel peerModel = (IPeerModel) parentElement;
-			ProcessModel model = ProcessModel.getProcessModel(peerModel);
-			if(model.getRoot() == null) {
-				model.createRoot(peerModel);
-			}
-			if (isRootNodeVisible()) {
-				return new Object[] { model.getRoot() };
-			}
-			return getChildren(model.getRoot());
-		}
-		else if (parentElement instanceof ProcessTreeNode) {
-			ProcessTreeNode node = (ProcessTreeNode) parentElement;
-			Object[] children;
-			List<ProcessTreeNode> current = node.getChildren();
-			if (!node.childrenQueried) {
-				if(current.isEmpty()) {
-					children = new Object[] {getPending(node)};
-				}
-				else {
-					children = current.toArray();
-				}
-				if (!node.childrenQueryRunning) {
-					node.queryChildren();
-				}
-			}
-			else {
-				children = current.toArray();
-			}
-			return children;
-		}
-		return NO_ELEMENTS;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
-	 */
-	@Override
-	public boolean hasChildren(Object element) {
-		Assert.isNotNull(element);
-
-		boolean hasChildren = false;
-
-		// No children yet and the element is a process node
-		if (element instanceof ProcessTreeNode) {
-			ProcessTreeNode node = (ProcessTreeNode) element;
-			if(node.isRootNode()) {
-				hasChildren = true;
-			}
-			else {
-				hasChildren = !node.childrenQueried || super.hasChildren(element);
-			}
-		}
-		else if (element instanceof IPeerModel) {
-			// Get the root node for this peer model object.
-			// If null, true is returned as it means that the file system
-			// model hasn't been created yet and have to treat is as children
-			// not queried yet.
-			IPeerModel peerModel = (IPeerModel) element;
-			ProcessModel model = ProcessModel.getProcessModel(peerModel);
-			ProcessTreeNode root = model.getRoot();
-			hasChildren = root != null ? hasChildren(root) : true;
-		}
-		return hasChildren;
-	}
-
-	/**
-	 * If the root node of the tree is visible.
-	 *
-	 * @return true if it is visible.
-	 */
-	protected boolean isRootNodeVisible() {
-		return true;
+    protected ITreeNodeModel doGetModel(IPeerModel peerNode) {
+		return ProcessModel.getProcessModel(peerNode);
 	}
 
 	/* (non-Javadoc)

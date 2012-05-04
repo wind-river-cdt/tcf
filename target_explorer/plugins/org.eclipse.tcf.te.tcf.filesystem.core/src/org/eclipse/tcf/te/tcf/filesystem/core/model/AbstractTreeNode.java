@@ -269,4 +269,20 @@ public abstract class AbstractTreeNode extends PlatformObject implements IPeerMo
 	 * @return The callback object.
 	 */
 	protected abstract DoneOpenChannel doCreateQueryDoneOpenChannel();
+	
+	/**
+	 * Return if this node is the system root.
+	 * 
+	 * @return true if it is.
+	 */
+	public abstract boolean isSystemRoot();
+
+	/**
+	 * Get the children of this tree node.
+	 * 
+	 * @return The list of the children.
+	 */
+	public List<? extends AbstractTreeNode> getChildren() {
+		return new ArrayList<AbstractTreeNode>(children);
+	}
 }
