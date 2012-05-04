@@ -22,29 +22,18 @@ import org.eclipse.tcf.services.IProcesses.ProcessContext;
 import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.services.ISysMonitor.SysMonitorContext;
 import org.eclipse.tcf.te.core.interfaces.IViewerInput;
+import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
+import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
-import org.eclipse.tcf.te.tcf.processes.core.nls.Messages;
+import org.eclipse.tcf.te.tcf.processes.core.callbacks.QueryDoneOpenChannel;
+import org.eclipse.tcf.te.tcf.processes.core.callbacks.RefreshChildrenDoneOpenChannel;
+import org.eclipse.tcf.te.tcf.processes.core.callbacks.RefreshDoneOpenChannel;
 
 /**
  * Representation of a process tree node.
  */
 public final class ProcessTreeNode extends PlatformObject implements IPeerModelProvider{
-	
-	/**
-	 * Create a root process node.
-	 * 
-	 * @param peerModel The peer model which this process belongs to.
-	 * @return The root process node.
-	 */
-	public static ProcessTreeNode createRootNode(IPeerModel peerModel) {
-		ProcessTreeNode node = new ProcessTreeNode();
-		node.type = "ProcRootNode"; //$NON-NLS-1$
-		node.peerNode = peerModel;
-		node.name = Messages.ProcessLabelProvider_RootNodeLabel;
-		return node;
-	}
-	
 	private final UUID uuid = UUID.randomUUID();
 
 	/**
@@ -378,5 +367,40 @@ public final class ProcessTreeNode extends PlatformObject implements IPeerModelP
 		childrenQueryRunning = true;
 		PropertyChangeEvent event = new PropertyChangeEvent(this, "query_started", Boolean.FALSE, Boolean.TRUE); //$NON-NLS-1$
 		firePropertyChange(event);
+	}
+
+	/**
+	 * Query the children of the given process context.
+	 */
+	public void queryChildren() {
+		queryStarted();
+		Tcf.getChannelManager().openChannel(peerNode.getPeer(), null, new QueryDoneOpenChannel(this));
+	}
+
+	/**
+	 * Refresh the children without refreshing itself.
+	 */
+	public void refreshChildren() {
+		Tcf.getChannelManager().openChannel(peerNode.getPeer(), null, new RefreshChildrenDoneOpenChannel(this));
+    }
+
+	/**
+	 * Recursively refresh the children of the given process context with a callback, which is
+	 * called when whole process is finished.
+	 *
+	 * @param callback The callback object, or <code>null</code> when callback is not needed.
+	 */
+	public void refresh(ICallback callback) {
+		queryStarted();
+		Tcf.getChannelManager().openChannel(peerNode.getPeer(), null, new RefreshDoneOpenChannel(callback, this));
+	}
+
+	/**
+	 * Recursively refresh the children of the given process context.
+	 *
+	 * @param parentNode The process context node. Must not be <code>null</code>.
+	 */
+	public void refresh() {
+		refresh(null);
 	}
 }

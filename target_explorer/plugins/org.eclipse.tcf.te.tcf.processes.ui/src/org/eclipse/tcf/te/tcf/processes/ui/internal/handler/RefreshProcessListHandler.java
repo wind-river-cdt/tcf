@@ -14,6 +14,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.processes.core.model.ProcessModel;
+import org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.handlers.HandlerUtil;
 
@@ -32,7 +33,8 @@ public class RefreshProcessListHandler extends AbstractHandler {
 		IPeerModel peer = (IPeerModel) editorInput.getAdapter(IPeerModel.class);
 		if (peer != null) {
 			ProcessModel processModel = ProcessModel.getProcessModel(peer);
-			processModel.refresh();
+			ProcessTreeNode root = processModel.getRoot();
+			root.refresh();
 		}
 		return null;
 	}

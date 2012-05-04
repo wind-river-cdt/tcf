@@ -101,8 +101,7 @@ public class ProcessNavigatorContentProvider  extends TreeContentProvider implem
 					children = current.toArray();
 				}
 				if (!node.childrenQueryRunning) {
-					ProcessModel model = ProcessModel.getProcessModel(node.peerNode);
-					model.queryChildren(node);
+					node.queryChildren();
 				}
 			}
 			else {
@@ -219,8 +218,7 @@ public class ProcessNavigatorContentProvider  extends TreeContentProvider implem
 	    if(object instanceof ProcessTreeNode) {
 			final ProcessTreeNode parent = (ProcessTreeNode) object;
 			if (parent.childrenQueried && !parent.childrenQueryRunning) {
-				final ProcessModel model = ProcessModel.getProcessModel(parent.peerNode);
-				model.refreshChildren(parent);
+				parent.refreshChildren();
 			}
 		}
     }

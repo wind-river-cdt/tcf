@@ -21,12 +21,9 @@ import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.core.interfaces.IViewerInput;
 import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
-import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.processes.core.activator.CoreBundleActivator;
-import org.eclipse.tcf.te.tcf.processes.core.callbacks.QueryDoneOpenChannel;
-import org.eclipse.tcf.te.tcf.processes.core.callbacks.RefreshChildrenDoneOpenChannel;
-import org.eclipse.tcf.te.tcf.processes.core.callbacks.RefreshDoneOpenChannel;
+import org.eclipse.tcf.te.tcf.processes.core.nls.Messages;
 
 /**
  * The process tree model implementation.
@@ -62,23 +59,50 @@ public class ProcessModel {
 		}
 		return null;
 	}
+	
+	/**
+	 * Create a root process node.
+	 * 
+	 * @param peerModel The peer model which this process belongs to.
+	 * @return The root process node.
+	 */
+	static ProcessTreeNode createRootNode(IPeerModel peerModel) {
+		ProcessTreeNode node = new ProcessTreeNode();
+		node.type = "ProcRootNode"; //$NON-NLS-1$
+		node.peerNode = peerModel;
+		node.name = Messages.ProcessLabelProvider_RootNodeLabel;
+		return node;
+	}
 
 	// The root node of the peer model
-	private ProcessTreeNode root;
+	ProcessTreeNode root;
 	// The polling interval in seconds. If it is zero, then stop polling periodically.
 	/* default */int interval;
 	// The timer to schedule polling task.
 	/* default */Timer pollingTimer;
 	// The flag to indicate if the polling has been stopped.
 	/* default */boolean stopped;
-	private IPeerModel peerModel;
-
+	IPeerModel peerModel;
+	// The periodic refreshing callback.
+	ICallback refreshCallback;
 	/**
 	 * Create a File System Model.
 	 */
 	ProcessModel(IPeerModel peerModel) {
 		this.peerModel = peerModel;
 		this.stopped = true;
+		this.refreshCallback = new Callback() {
+			@Override
+			protected void internalDone(Object caller, IStatus status) {
+				if (!stopped) {
+					scheduleRefreshing();
+				}
+				else {
+					pollingTimer.cancel();
+					pollingTimer = null;
+				}
+			}
+		};
 	}
 
 	/**
@@ -96,7 +120,7 @@ public class ProcessModel {
 	 * @param root The root node
 	 */
 	public void createRoot(IPeerModel peerModel ) {
-		this.root = ProcessTreeNode.createRootNode(peerModel);
+		this.root = createRootNode(peerModel);
 	}
 
 	/**
@@ -105,7 +129,7 @@ public class ProcessModel {
 	void startPolling() {
 	    setStopped(false);
 	    pollingTimer = new Timer();
-		schedulePolling();
+		scheduleRefreshing();
     }
 
 	/**
@@ -134,24 +158,18 @@ public class ProcessModel {
 	}
 
 	/**
-	 * Schedule the periodical polling.
+	 * Schedule the periodical refreshing.
 	 */
-	void schedulePolling() {
-	    TimerTask pollingTask = new TimerTask(){
+	void scheduleRefreshing() {
+		TimerTask pollingTask = new TimerTask(){
 			@Override
 	        public void run() {
-				refresh(new Callback() {
-					@Override
-					protected void internalDone(Object caller, IStatus status) {
-						if (!stopped) {
-							schedulePolling();
-						}
-						else {
-							pollingTimer.cancel();
-							pollingTimer = null;
-						}
-					}
-				});
+				if (root.childrenQueried && !root.childrenQueryRunning) {
+					root.refresh(refreshCallback);
+				}
+				else {
+					refreshCallback.done(this, Status.OK_STATUS);
+				}
 	        }};
         pollingTimer.schedule(pollingTask, interval * 1000L);
     }
@@ -186,90 +204,12 @@ public class ProcessModel {
 	}
 
 	/**
-	 * Query the children of the given process context.
-	 *
-	 * @param parentNode The process context node. Must not be <code>null</code>.
-	 */
-	public void queryChildren(ProcessTreeNode parentNode) {
-		Assert.isNotNull(parentNode);
-		parentNode.queryStarted();
-		Tcf.getChannelManager().openChannel(parentNode.peerNode.getPeer(), null, new QueryDoneOpenChannel(parentNode));
-	}
-
-	/**
-	 * Recursively refresh the children of the given process context with a callback, which is
-	 * called when whole process is finished.
-	 *
-	 * @param parentNode The process context node. Must not be <code>null</code>.
-	 * @param callback The callback object, or <code>null</code> when callback is not needed.
-	 */
-	public void refresh(final ProcessTreeNode parentNode, final ICallback callback) {
-		Assert.isNotNull(parentNode);
-		parentNode.queryStarted();
-		Tcf.getChannelManager().openChannel(parentNode.peerNode.getPeer(), null, new RefreshDoneOpenChannel(callback, parentNode));
-	}
-
-	/**
-	 * Recursively refresh the children of the given process context.
-	 *
-	 * @param parentNode The process context node. Must not be <code>null</code>.
-	 */
-	public void refresh(final ProcessTreeNode parentNode) {
-		refresh(parentNode, null);
-	}
-
-	/**
-	 * Recursively refresh the tree from the root node with a callback, which
-	 * is called when the whole process is finished.
-	 *
-	 * @param callback The callback object or <code>null</code> when callback is not needed.
-	 */
-	public void refresh(ICallback callback) {
-		if (this.root.childrenQueried && !this.root.childrenQueryRunning) {
-			refresh(this.root, callback);
-		}
-		else {
-			if (callback != null) {
-				callback.done(this, Status.OK_STATUS);
-			}
-		}
-	}
-
-	/**
-	 * Recursively refresh the tree from the root node.
-	 */
-	public void refresh() {
-		if(this.root.childrenQueried && !this.root.childrenQueryRunning) {
-			refresh(this.root, null);
-		}
-	}
-
-	/**
 	 * If the polling has been stopped.
 	 *
 	 * @return true if it is stopped.
 	 */
 	public boolean isRefreshStopped() {
 	    return stopped;
-    }
-
-	/**
-	 * Get the peer model associated with this model.
-	 *
-	 * @return The peer model.
-	 */
-	IPeerModel getPeerModel() {
-		return peerModel;
-	}
-
-	/**
-	 * Refresh the children without refreshing itself.
-	 *
-	 * @param parentNode The parent whose children are to be refreshed.
-	 */
-	public void refreshChildren(ProcessTreeNode parentNode) {
-		Assert.isNotNull(parentNode);
-		Tcf.getChannelManager().openChannel(parentNode.peerNode.getPeer(), null, new RefreshChildrenDoneOpenChannel(parentNode));
     }
 }
 
