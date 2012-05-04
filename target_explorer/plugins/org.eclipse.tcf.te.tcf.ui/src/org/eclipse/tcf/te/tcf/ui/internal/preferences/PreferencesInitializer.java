@@ -17,7 +17,7 @@ import org.eclipse.tcf.te.tcf.ui.activator.UIPlugin;
 /**
  * The bundle's preference initializer implementation.
  */
-public class PreferencesInitializer extends AbstractPreferenceInitializer implements IPreferenceConsts {
+public class PreferencesInitializer extends AbstractPreferenceInitializer {
 	/**
 	 * Constructor.
 	 */
@@ -32,6 +32,6 @@ public class PreferencesInitializer extends AbstractPreferenceInitializer implem
 	public void initializeDefaultPreferences() {
 		IPreferenceStore store = UIPlugin.getDefault().getPreferenceStore();
 		// [Hidden] Hide dynamic target discovery navigator content extension: default on
-		store.setDefault(PREF_HIDE_DYNAMIC_TARGET_DISCOVERY_EXTENSION, true);
+		store.setDefault(IPreferenceKeys.PREF_HIDE_DYNAMIC_TARGET_DISCOVERY_EXTENSION, true);
 	}
 }

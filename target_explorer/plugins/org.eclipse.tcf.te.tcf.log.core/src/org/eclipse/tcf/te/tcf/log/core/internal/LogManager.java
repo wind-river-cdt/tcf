@@ -300,6 +300,10 @@ public final class LogManager implements IProtocolStateChangeListener {
 	public IPath getLogDir() {
 		IPath logDir = null;
 
+		// In some rare cases, we end up here with an NPE on shutdown.
+		// So it does not hurt to check it.
+		if (CoreBundleActivator.getDefault() == null) return logDir;
+
 		try {
 			File file = CoreBundleActivator.getDefault().getStateLocation().append(".logs").toFile(); //$NON-NLS-1$
 			boolean exists = file.exists();

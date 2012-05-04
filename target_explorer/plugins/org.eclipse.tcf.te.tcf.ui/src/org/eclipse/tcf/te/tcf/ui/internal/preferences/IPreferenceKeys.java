@@ -12,7 +12,7 @@ package org.eclipse.tcf.te.tcf.ui.internal.preferences;
 /**
  * The constants for the preferences.
  */
-public interface IPreferenceConsts {
+public interface IPreferenceKeys {
 	/**
 	 * Common prefix for all preference keys
 	 */
