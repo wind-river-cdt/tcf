@@ -102,13 +102,22 @@ Cached context data should by flushed when parent thread is resumed.</p>
     - process ID.
 
     <li><code><b><font face="Courier New" size=2 color=#333399>"Name" : <i>&lt;string&gt;</i></font></b></code>
-    - context name if context is a stack
+    - context name if context is a stack.
+	
+    <li><code><b><font face="Courier New" size=2 color=#333399>"TopFrame" : <i>&lt;boolean&gt;</i></font></b></code>
+    - true if the frame is top frame on a stack.
+
+    <li><code><b><font face="Courier New" size=2 color=#333399>"Level" : <i>&lt;number&gt;</i></font></b></code>
+    - frame level. Bottom most (oldest) frame is level 0.
 
     <li><code><b><font face="Courier New" size=2 color=#333399>"FP" : <i>&lt;number&gt;</i></font></b></code>
-    - frame pointer - memory address of stack frame
+    - frame pointer - memory address of stack frame.
 
-    <li><code><b><font face="Courier New" size=2 color=#333399>"PC" : <i>&lt;number&gt;</i></font></b></code>
-    - program counter - memory address of instruction that will be executed when thread returns from this stack frame.
+    <li><code><b><font face="Courier New" size=2 color=#333399>"RP" : <i>&lt;number&gt;</i></font></b></code>
+    - return pointer - return address.
+
+    <li><code><b><font face="Courier New" size=2 color=#333399>"IP" : <i>&lt;number&gt;</i></font></b></code>
+    - instruction pointer - memory address of current instruction.
 
     <li><code><b><font face="Courier New" size=2 color=#333399>"ArgsCnt" : <i>&lt;number&gt;</i></font></b></code>
     - function arguments count
@@ -116,8 +125,7 @@ Cached context data should by flushed when parent thread is resumed.</p>
     <li><code><b><font face="Courier New" size=2 color=#333399>"ArgsAddr" : <i>&lt;number&gt;</i></font></b></code>
     - memory address of function arguments
 
-    <li><code><b><font face="Courier New" size=2 color=#333399>"Level" : <i>&lt;number&gt;</i></font></b></code>
-    - frame level. Bottom most (oldest) frame is level 0.
+
 </ul>
 
 <h3><a name='CmdGetChildren'>Get Children</a></h3>
@@ -167,15 +175,17 @@ R &bull; <i>&lt;token&gt;</i> &bull; <i>&lt;error report&gt;</i> &bull; <i>&lt;a
      * Context property names.
      */</font>
     <font color=#7F0055>static final</font> String
-        PROP_ID = "ID",
-        PROP_PARENT_ID = "ParentID",
-        PROP_PROCESS_ID = "ProcessID",
-        PROP_NAME = "Name",
-        PROP_FRAME_ADDRESS = "FP",
-        PROP_PROGRAM_COUNTER = "PC",
-        PROP_ARGUMENTS_COUNT = "ArgsCnt",
-        PROP_ARGUMENTS_ADDRESS = "ArgsAddr",
-        PROP_LEVEL = "Level";
+        PROP_ID = "ID",                         <font color=#3F5FBF>/** String, stack frame ID */</font>
+        PROP_PARENT_ID = "ParentID",            <font color=#3F5FBF>/** String, stack frame parent ID */</font>
+        PROP_PROCESS_ID = "ProcessID",          <font color=#3F5FBF>/** String, stack frame process ID */</font>
+        PROP_NAME = "Name",                     <font color=#3F5FBF>/** String, human readable name */</font>
+        PROP_TOP_FRAME = "TopFrame",            <font color=#3F5FBF>/** Boolean, true if the frame is top frame on a stack */</font>
+        PROP_LEVEL = "Level",                   <font color=#3F5FBF>/** Integer, stack frame level, starting from stack bottom */</font>
+        PROP_FRAME_ADDRESS = "FP",              <font color=#3F5FBF>/** Number, stack frame memory address */</font>
+        PROP_RETURN_ADDRESS = "RP",             <font color=#3F5FBF>/** Number, return address */</font>
+        PROP_INSTRUCTION_ADDRESS = "IP",        <font color=#3F5FBF>/** Number, instruction pointer */</font>
+        PROP_ARGUMENTS_COUNT = "ArgsCnt",       <font color=#3F5FBF>/** Integer, number of function arguments */</font>
+        PROP_ARGUMENTS_ADDRESS = "ArgsAddr";    <font color=#3F5FBF>/** Number, memory address of function arguments */</font>
 
     <font color=#3F5FBF>/**
      * Retrieve context info for given context IDs.
@@ -260,9 +270,17 @@ R &bull; <i>&lt;token&gt;</i> &bull; <i>&lt;error report&gt;</i> &bull; <i>&lt;a
         <font color=#3F5FBF>/**
          * Get program counter saved in this stack frame -
          * it is address of instruction to be executed when the function returns.
-         * <font color=#7F9FBF>@return</font> program counter or null if not a stack frame.
+         * <font color=#7F9FBF>@return</font> return address or null if not a stack frame.
          */</font>
-        Number getProgramCounter();
+        Number getReturnAddress();
+
+        <font color=#3F5FBF>/**
+         * Get address of the next instruction to be executed in this stack frame.
+         * For top frame it is same as PC register value.
+         * For other frames it is same as return address of the next frame.
+         * <font color=#7F9FBF>@return</font> instruction address or null if not a stack frame.
+         */</font>
+        Number getInstructionAddress();
 
         <font color=#3F5FBF>/**
          * Get number of function arguments for this frame.
@@ -275,12 +293,6 @@ R &bull; <i>&lt;token&gt;</i> &bull; <i>&lt;error report&gt;</i> &bull; <i>&lt;a
          * <font color=#7F9FBF>@return</font> function arguments address or null if not available.
          */</font>
         Number getArgumentsAddress();
-
-        <font color=#3F5FBF>/**
-         * Get stack frame level.
-         * <font color=#7F9FBF>@return</font> frame level or 0 if not a stack frame.
-         */</font>
-        <font color=#7F0055>int</font> getLevel();
 
         <font color=#3F5FBF>/**
          * Get complete map of context properties.
