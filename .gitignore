@@ -149,12 +149,8 @@ tests/plugins/org.eclipse.tcf.debug.test/bin
 /target_explorer/plugins/org.eclipse.tcf.te.ui.views/bin
 /target_explorer/features/org.eclipse.tcf.te.feature/target
 /target_explorer/features/org.eclipse.tcf.te.feature/bin
-/target_explorer/features/org.eclipse.tcf.te.cdt.feature/target
-/target_explorer/features/org.eclipse.tcf.te.cdt.feature/bin
 /target_explorer/features/org.eclipse.tcf.te.sdk.feature/target
 /target_explorer/features/org.eclipse.tcf.te.sdk.feature/bin
-/target_explorer/features/org.eclipse.tcf.te.cdt.sdk.feature/target
-/target_explorer/features/org.eclipse.tcf.te.cdt.sdk.feature/bin
 /target_explorer/features/org.eclipse.tcf.te.tcf.feature/target
 /target_explorer/features/org.eclipse.tcf.te.tcf.feature/bin
 /target_explorer/features/org.eclipse.tcf.te.tcf.sdk.feature/target

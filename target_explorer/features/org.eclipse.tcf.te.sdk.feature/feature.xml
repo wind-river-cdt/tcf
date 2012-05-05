@@ -29,6 +29,13 @@
          unpack="false"/>
 
    <plugin
+         id="org.eclipse.tcf.te.core.cdt.source"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
          id="org.eclipse.tcf.te.launch.core.source"
          download-size="0"
          install-size="0"
@@ -128,6 +135,13 @@
 
    <plugin
          id="org.eclipse.tcf.te.ui.terminals.source"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.tcf.te.ui.terminals.process.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
