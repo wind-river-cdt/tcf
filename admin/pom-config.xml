@@ -90,6 +90,10 @@
 
 	<pluginRepositories>
 		<pluginRepository>
+			<id>maven.eclipse.org</id>
+			<url>http://mavem.eclipse.org/nexus/content/groups/public/</url>
+		</pluginRepository>
+		<pluginRepository>
 			<id>sonatype</id>
 			<url>https://repository.sonatype.org/content/repositories/public</url>
   			<snapshots>
