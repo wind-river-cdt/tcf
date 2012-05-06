@@ -96,8 +96,11 @@
 											<fileset dir="${tcf-install}">
 												<include name="**" />
 											</fileset>
+											<fileset dir="target">
+												<include name="${tcf-zipfile}"/>
+											</fileset>
 										</delete>
-										<zip destfile="${tcf-install}/${tcf-zipfile}">
+										<zip destfile="target/${tcf-zipfile}">
 											<fileset dir="target/checksumFix">
 												<include name="**" />
 											</fileset>
@@ -105,6 +108,9 @@
 										<copy includeemptydirs="false" todir="${tcf-install}">
 											<fileset dir="target/checksumFix">
 												<include name="**" />
+											</fileset>
+											<fileset dir="target">
+												<include name="${tcf-zipfile}"/>
 											</fileset>
 										</copy>
 										<chmod perm="g+w">
