@@ -21,34 +21,43 @@
 		<tcf-install>/home/data/httpd/download.eclipse.org/tools/tcf/builds/${tcf-stream}/nightly</tcf-install>
 		<jacoco.skip>true</jacoco.skip>
 	</properties>
-	
+
 	<pluginRepositories>
-   		<pluginRepository>
+		<pluginRepository>
 			<id>maven.eclipse.org</id>
      		<url>http://maven.eclipse.org/nexus/content/repositories/public</url>
+  			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
     	</pluginRepository>
-  	</pluginRepositories>
+	</pluginRepositories>
 
+	<!-- Packaging and signing -->
 	<profiles>
 		<profile>
-			<id>production</id>
+			<id>sign</id>
 			<build>
 				<plugins>
 					<plugin>
 						<groupId>org.eclipse.dash.maven</groupId>
 						<artifactId>eclipse-signing-maven-plugin</artifactId>
-						<version>1.0.3</version>
+						<version>1.0.5</version>
 						<executions>
+							<!-- Pack the p2 repository. -->
 							<execution>
 								<id>pack</id>
+								<phase>package</phase>
 								<configuration>
 									<inputFile>${project.build.directory}/${tcf-zipfile}</inputFile>
 								</configuration>
-								<phase>package</phase>
 								<goals>
 									<goal>pack</goal>
 								</goals>
 							</execution>
+							<!-- Sign the p2 repository -->
 							<execution>
 								<id>sign</id>
 								<configuration>
@@ -60,16 +69,19 @@
 									<goal>sign</goal>
 								</goals>
 							</execution>
+							<!-- Repack the p2 repository -->
 							<execution>
 								<id>repack</id>
 								<configuration>
-									<inputFile>${project.build.directory}/signed/site_assembly.zip</inputFile>
+									<!-- this is output from signer mojo -->
+									<inputFile>${project.build.directory}/signed/site_assembly.zip</inputFile> 
 								</configuration>
 								<phase>package</phase>
 								<goals>
 									<goal>pack</goal>
 								</goals>
 							</execution>
+							<!-- Signing and packing alters checksums so fix them -->
 							<execution>
 								<id>fixCheckSums</id>
 								<phase>package</phase>
@@ -79,6 +91,9 @@
 							</execution>
 						</executions>
 					</plugin>
+					<!--
+					This is what I use to deploy a p2 repository someplace to test from before manually making active.        
+					-->
 					<plugin>
 						<artifactId>maven-antrun-plugin</artifactId>
 						<executions>
@@ -111,6 +126,7 @@
 											</fileset>
 										</chmod>
 									</tasks>
+									
 								</configuration>
 							</execution>
 						</executions>
