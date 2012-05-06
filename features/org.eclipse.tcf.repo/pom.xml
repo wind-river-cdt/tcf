@@ -91,7 +91,7 @@
 									<goal>run</goal>
 								</goals>
 								<configuration>
-									<tasks>
+									<target>
 										<delete includeemptydirs="false">
 											<fileset dir="${tcf-install}">
 												<include name="**" />
@@ -115,7 +115,7 @@
 												<include name="**"/>
 											</fileset>
 										</chmod>
-									</tasks>
+									</target>
 									
 								</configuration>
 							</execution>
