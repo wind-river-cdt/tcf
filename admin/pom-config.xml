@@ -83,6 +83,16 @@
 
 	<pluginRepositories>
 		<pluginRepository>
+			<id>maven.eclipse.org</id>
+     		<url>http://maven.eclipse.org/nexus/content/repositories/public</url>
+  			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+    	</pluginRepository>
+		<pluginRepository>
 			<id>sonatype</id>
 			<url>https://repository.sonatype.org/content/repositories/public</url>
   			<snapshots>

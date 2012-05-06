@@ -22,19 +22,6 @@
 		<jacoco.skip>true</jacoco.skip>
 	</properties>
 
-	<pluginRepositories>
-		<pluginRepository>
-			<id>maven.eclipse.org</id>
-     		<url>http://maven.eclipse.org/nexus/content/repositories/public</url>
-  			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-    	</pluginRepository>
-	</pluginRepositories>
-
 	<!-- Packaging and signing -->
 	<profiles>
 		<profile>
