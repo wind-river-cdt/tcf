@@ -109,9 +109,6 @@
 											<fileset dir="target/checksumFix">
 												<include name="**" />
 											</fileset>
-											<fileset dir="target">
-												<include name="${tcf-zipfile}"/>
-											</fileset>
 										</copy>
 										<chmod perm="g+w">
 											<fileset dir="${tcf-install}">
