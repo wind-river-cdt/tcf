@@ -55,6 +55,7 @@ import org.eclipse.tcf.debug.test.util.Query;
 import org.eclipse.tcf.debug.test.util.Task;
 import org.eclipse.tcf.debug.test.util.Transaction;
 import org.eclipse.tcf.debug.ui.ITCFObject;
+import org.eclipse.tcf.internal.debug.launch.TCFLaunchDelegate;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
@@ -68,6 +69,9 @@ import org.eclipse.tcf.services.IRunControl;
 import org.eclipse.tcf.services.IRunControl.RunControlContext;
 import org.eclipse.tcf.services.IStackTrace;
 import org.eclipse.tcf.services.ISymbols;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.tests.tcf.AgentLauncher;
+import org.eclipse.tcf.te.tests.tcf.TcfTestCase;
 import org.junit.Assert;
 
 /**
@@ -78,6 +82,7 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
 
     private final static int NUM_CHANNELS = 1;
 
+    protected AgentLauncher launcher;
     
     protected IChannel[] channels;
     
@@ -161,24 +166,12 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
     protected void setUp() throws Exception {
         fTestRunKey = new Object();
         
+        launcher = TcfTestCase.getlauncher();
+        IPeerModel peerModel = TcfTestCase.getPeerModel(launcher);
+        peer = peerModel.getPeer();
+        
         createDebugViewViewer();
         createLaunch();
-        
-        // Command line should contain peer description string, for example:
-        // "ID=Test:TransportName=TCP:Host=127.0.0.1:Port=1534"
-        final String[] args = new String[] { "TransportName=TCP:Host=127.0.0.1:Port=1534" };
-        if (args.length < 1) {
-            System.err.println("Missing command line argument - peer identification string");
-            System.exit(4);
-        }
-    
-        peer = new Query<IPeer>() {
-            @Override
-            protected void execute(DataCallback<IPeer> callback) {
-                callback.setData(getPeer(args));
-                callback.done();
-            }
-        }.get();
         
         channels = new IChannel[NUM_CHANNELS];
         
@@ -237,6 +230,8 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
                 closeChannels(callback);
             }
         }.get();
+        
+        launcher.dispose();
     }
 
     protected String getDiagnosticsTestName() {
@@ -298,6 +293,8 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
         ILaunchManager lManager = DebugPlugin.getDefault().getLaunchManager();
         ILaunchConfigurationType lcType = lManager.getLaunchConfigurationType("org.eclipse.tcf.debug.LaunchConfigurationType");
         ILaunchConfigurationWorkingCopy lcWc = lcType.newInstance(null, "test");
+//        lcWc.setAttribute(TCFLaunchDelegate.ATTR_USE_LOCAL_AGENT, false);
+//        lcWc.setAttribute(TCFLaunchDelegate.ATTR_PEER_ID, peer.getID());
         lcWc.doSave();
         fDebugViewListener.reset();
         fDebugViewListener.setDelayContentUntilProxyInstall(true);
@@ -559,25 +556,41 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
     }
     
     private boolean runToTestEntry(final String testFunc) throws InterruptedException, ExecutionException {
-        return new Transaction<Boolean>() {
-            Object fWaitForSuspendKey = new Object();
+        return new Transaction<Boolean>() {            
+            Object fWaitForResumeKey;
+            Object fWaitForSuspendKey;
             boolean fSuspendEventReceived = false;
             protected Boolean process() throws Transaction.InvalidCacheException ,ExecutionException {
                 ISymbol sym_func0 = validate( fDiagnosticsCM.getSymbol(fProcessId, testFunc) );
                 String sym_func0_value = sym_func0.getValue().toString();
                 ContextState state = validate (fRunControlCM.getState(fThreadId));
-                if (state.suspended) {
-                    if ( !new BigInteger(state.pc).equals(new BigInteger(sym_func0_value)) ) {
+                
+                while (!state.suspended || !new BigInteger(state.pc).equals(new BigInteger(sym_func0_value))) {
+                    if (state.suspended && fWaitForSuspendKey == null) {
                         fSuspendEventReceived = true;
                         // We are not at test entry.  Create a new suspend wait cache.
+                        fWaitForResumeKey = new Object();
+                        fWaitForSuspendKey = new Object();
+                        ICache<Object> waitForResume = fRunControlCM.waitForContextResumed(fThreadId, fWaitForResumeKey);
+                        
+                        // Issue resume command.
+                        validate( fRunControlCM.resume(fThreadCtx, fWaitForResumeKey, IRunControl.RM_RESUME, 1) );
+                        
+                        // Wait until we receive the resume event.
+                        validate(waitForResume);
                         fWaitForSuspendKey = new Object();
                         fRunControlCM.waitForContextSuspended(fThreadId, fWaitForSuspendKey);
-                        // Run to entry point.
-                        validate( fRunControlCM.resume(fThreadCtx, fWaitForSuspendKey, IRunControl.RM_RESUME, 1) );
+                    } else {
+                        if (fWaitForResumeKey != null) {
+                            // Validate resume command
+                            validate( fRunControlCM.resume(fThreadCtx, fWaitForResumeKey, IRunControl.RM_RESUME, 1) );
+                            fWaitForResumeKey = null;
+                            
+                        }
+                        // Wait until we suspend.
+                        validate( fRunControlCM.waitForContextSuspended(fThreadId, fWaitForSuspendKey) );
+                        fWaitForSuspendKey = null;
                     }
-                } else {
-                    // Wait until we suspend.
-                    validate( fRunControlCM.waitForContextSuspended(fThreadId, fWaitForSuspendKey) );
                 }
                 
                 return fSuspendEventReceived;

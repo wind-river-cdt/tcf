@@ -457,7 +457,7 @@ public class CoreTestCase extends TestCase {
 	 *
 	 * @return The view reference instance to the view or <code>null</code> if not available.
 	 */
-	public final IViewReference findView(String viewId, String perspectiveId) {
+	public static IViewReference findView(String viewId, String perspectiveId) {
 		Assert.isNotNull(viewId);
 		Assert.isNotNull(perspectiveId);
 
@@ -488,7 +488,7 @@ public class CoreTestCase extends TestCase {
 	 *
 	 * @return The view part instance to the view or <code>null</code> if it cannot be shown.
 	 */
-	public final IViewPart showView(String viewId, String perspectiveId) {
+	public static IViewPart showView(String viewId, String perspectiveId) {
 		Assert.isNotNull(viewId);
 		Assert.isNotNull(perspectiveId);
 
@@ -526,7 +526,7 @@ public class CoreTestCase extends TestCase {
 	 * @param viewId The view id. Must not be <code>null</code>.
 	 * @param perspectiveId The perspective id. Must not be <code>null</code>.
 	 */
-	public final void hideView(String viewId, String perspectiveId) {
+	public static void hideView(String viewId, String perspectiveId) {
 		Assert.isNotNull(viewId);
 		Assert.isNotNull(perspectiveId);
 
@@ -545,7 +545,7 @@ public class CoreTestCase extends TestCase {
 	 * @return <code>True</code> if the method returned because of the timeout, <code>false</code> if the
 	 *         method returned because of the condition became true.
 	 */
-	public boolean waitAndDispatch(long timeout) {
+	public static boolean waitAndDispatch(long timeout) {
 		Assert.isTrue(timeout > 0);
 		return waitAndDispatch(timeout, null);
 	}
@@ -565,7 +565,7 @@ public class CoreTestCase extends TestCase {
 	 * @return <code>True</code> if the method returned because of the timeout, <code>false</code> if the
 	 *         method returned because of the condition became true.
 	 */
-	public boolean waitAndDispatch(long timeout, IConditionTester condition) {
+	public static boolean waitAndDispatch(long timeout, IConditionTester condition) {
 		Assert.isTrue(timeout >= 0);
 		if (timeout == 0) Assert.isNotNull(condition);
 
@@ -617,7 +617,7 @@ public class CoreTestCase extends TestCase {
 	 *
 	 * @return The absolute path to the data location or <code>null</code>.
 	 */
-	protected final IPath getDataLocation(String path, boolean hostSpecific, boolean archSpecific) {
+	public static IPath getDataLocation(String path, boolean hostSpecific, boolean archSpecific) {
 		Assert.isNotNull(path);
 		IPath root = null;
 

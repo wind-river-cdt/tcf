@@ -65,6 +65,12 @@ public class TcfTestCase extends CoreTestCase {
 	 * Launches a TCF agent at local host.
 	 */
 	protected void launchAgent() {
+		launcher = getlauncher();
+		peerModel = getPeerModel(launcher);
+		peer = peerModel.getPeer();
+	}
+
+	public static AgentLauncher getlauncher() {
 		// Get the agent location
 		IPath path = getAgentLocation();
 		assertNotNull("Cannot determine TCF agent location.", path); //$NON-NLS-1$
@@ -93,7 +99,7 @@ public class TcfTestCase extends CoreTestCase {
 		assertTrue("Agent should be executable but is not.", path.toFile().canExecute()); //$NON-NLS-1$
 
 		// Create the agent launcher
-		launcher = new AgentLauncher(path);
+		AgentLauncher launcher = new AgentLauncher(path);
 		try {
 			launcher.launch();
 		} catch (Throwable e) {
@@ -138,23 +144,36 @@ public class TcfTestCase extends CoreTestCase {
 		// Strip away "Server-Properties:"
 		output = output.replace("Server-Properties:", " "); //$NON-NLS-1$ //$NON-NLS-2$
 		output = output.trim();
+		parseOne(output);
+		return launcher;
+	}
+	
+	public static IPeerModel getPeerModel(AgentLauncher launcher) {
+		// The agent is started with "-S" to write out the peer attributes in JSON format.
+		String output = null;
+		int counter = 10;
+		while (counter > 0 && output == null) {
+			// Try to read in the output
+			output = launcher.getOutputReader().getOutput();
+			if ("".equals(output)) { //$NON-NLS-1$
+				output = null;
+				waitAndDispatch(200);
+			}
+			counter--;
+		}
+		assertNotNull("Failed to read output from agent.", output); //$NON-NLS-1$
+
+		// Strip away "Server-Properties:"
+		output = output.replace("Server-Properties:", " "); //$NON-NLS-1$ //$NON-NLS-2$
+		output = output.trim();
 
 		// Read into an object
-		Object object = null;
-		try {
-			object = JSON.parseOne(output.getBytes("UTF-8")); //$NON-NLS-1$
-		} catch (IOException e) {
-			error = e;
-			message = e.getLocalizedMessage();
-		}
-		assertNull("Failed to parse server properties: " + message, error); //$NON-NLS-1$
-		assertTrue("Server properties object is not of expected type Map.", object instanceof Map); //$NON-NLS-1$
+		
+		
+		Object object = parseOne(output);
 
 		@SuppressWarnings("unchecked")
         final Map<String, String> attrs = new HashMap<String, String>((Map<String, String>)object);
-
-		error = null;
-		message = null;
 
 		// Lookup the corresponding peer object
 		final ILocatorModel model = Model.getModel();
@@ -165,12 +184,13 @@ public class TcfTestCase extends CoreTestCase {
 		assertNotNull("Unexpected return value 'null'.", transport); //$NON-NLS-1$
 		String port = attrs.get(IPeer.ATTR_IP_PORT);
 		assertNotNull("Unexpected return value 'null'.", port); //$NON-NLS-1$
-		String ip = IPAddressUtil.getInstance().getCanonicalAddress();
+		final String ip = IPAddressUtil.getInstance().getCanonicalAddress();
 		assertNotNull("Unexpected return value 'null'.", ip); //$NON-NLS-1$
 
 		final String id = transport + ":" + ip + ":" + port; //$NON-NLS-1$ //$NON-NLS-2$
 		final AtomicReference<IPeerModel> node = new AtomicReference<IPeerModel>();
 
+		final IPeerModel[] peerModel = new IPeerModel[1]; 
 		Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
@@ -182,30 +202,54 @@ public class TcfTestCase extends CoreTestCase {
 					IPeerModel[] candidates = model.getService(ILocatorModelLookupService.class).lkupPeerModelByAgentId(agentID);
 					if (candidates != null && candidates.length > 0) node.set(candidates[0]);
 				}
+				
+				// If the peer model is still not found, we create a transient peer
+				IPeer peer = null;
+				if (node.get() == null) {
+					attrs.put(IPeer.ATTR_ID, id);
+					attrs.put(IPeer.ATTR_IP_HOST, ip);
+					peer = new TransientPeer(attrs);
+					peerModel[0] = new PeerModel(model, peer);
+				} else {
+					peerModel[0] = node.get();
+					peer = peerModel[0].getPeer();
+				}
+				assertNotNull("Failed to determine the peer to use for the tests.", peer); //$NON-NLS-1$
 			}
 		};
 		assertFalse("Test is running in TCF dispatch thread.", Protocol.isDispatchThread()); //$NON-NLS-1$
 		Protocol.invokeAndWait(runnable);
 
-		// If the peer model is still not found, we create a transient peer
-		if (node.get() == null) {
-			attrs.put(IPeer.ATTR_ID, id);
-			attrs.put(IPeer.ATTR_IP_HOST, ip);
-			peer = new TransientPeer(attrs);
-			peerModel = new PeerModel(model, peer);
-		} else {
-			peerModel = node.get();
-			peer = peerModel.getPeer();
-		}
-		assertNotNull("Failed to determine the peer to use for the tests.", peer); //$NON-NLS-1$
+		return peerModel[0];
 	}
-
+	
+	private static Object parseOne(final String _output) {
+		final Object[] _object = new Object[1];
+		final String[] _message = new String[1];
+		final Throwable[] _error = new Throwable[1];
+		
+		Protocol.invokeAndWait(new Runnable() {
+			@Override
+			public void run() {
+				try {
+				_object[0] = JSON.parseOne(_output.getBytes("UTF-8")); //$NON-NLS-1$
+				} catch (IOException e) {
+					_error[0] = e;
+					_message[0] = e.getLocalizedMessage();
+				}
+			}
+		});
+		assertNull("Failed to parse server properties: " + _message[0], _error[0]); //$NON-NLS-1$
+		assertTrue("Server properties object is not of expected type Map.", _object[0] instanceof Map); //$NON-NLS-1$
+		return _object[0];
+	}
+	
 	/**
 	 * Returns the agent location.
 	 *
 	 * @return The agent location or <code>null</code> if not found.
 	 */
-	protected IPath getAgentLocation() {
+	public static IPath getAgentLocation() {
 		return getDataLocation("agent", true, true); //$NON-NLS-1$
 	}
 }
