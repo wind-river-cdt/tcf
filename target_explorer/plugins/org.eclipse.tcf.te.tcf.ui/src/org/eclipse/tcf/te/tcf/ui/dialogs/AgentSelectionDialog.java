@@ -31,7 +31,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelLookupService;
@@ -142,12 +141,7 @@ public class AgentSelectionDialog extends CustomTitleAreaDialog {
 	    final ILocatorModelLookupService service = getModel().getService(ILocatorModelLookupService.class);
 	    final List<IPeerModel> nodes = new ArrayList<IPeerModel>();
 	    if (service != null) {
-	    	Protocol.invokeAndWait(new Runnable() {
-	    		@Override
-	    		public void run() {
-	    			nodes.addAll(Arrays.asList(service.lkupPeerModelBySupportedServices(null, services)));
-	    		}
-	    	});
+	    	nodes.addAll(Arrays.asList(service.lkupPeerModelBySupportedServices(null, services)));
 	    }
 	    viewer.setInput(nodes.size() > 0 ? nodes.toArray(new IPeerModel[nodes.size()]) : null);
 
