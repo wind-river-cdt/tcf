@@ -69,6 +69,11 @@ public interface ImageConsts {
     public static final String  VIEWER_FILTER_CONFIG_ENABLED = "ViewerFilterConfig_enabled"; //$NON-NLS-1$
 
     /**
+     * The key to access the viewer filter configuration image (enabled).
+     */
+    public static final String  VIEWER_COLLAPSE_ALL = "ViewerCollapseAll_enabled"; //$NON-NLS-1$
+    
+    /**
      * The key to access the viewer filter configuration image (disabled).
      */
     public static final String  VIEWER_FILTER_CONFIG_DISABLED = "ViewerFilterConfig_disabled"; //$NON-NLS-1$

@@ -10,8 +10,8 @@
 package org.eclipse.tcf.te.ui.trees;
 
 
-import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -721,6 +721,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	protected void createToolBarItems(ToolBarManager toolbarManager) {
 		Assert.isNotNull(toolbarManager);
 		toolbarManager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+		toolbarManager.add(new CollapseAllAction(this));
 		toolbarManager.add(configFilterAction = new ConfigFilterAction(this));
 		Action action = new Action(null, IAction.AS_PUSH_BUTTON){
 			@Override

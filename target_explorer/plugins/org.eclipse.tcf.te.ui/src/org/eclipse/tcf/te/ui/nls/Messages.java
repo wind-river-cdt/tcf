@@ -29,6 +29,7 @@ public class Messages extends NLS {
 
 	// **** Declare externalized string id's down here *****
 
+	public static String CollapseAllAction_Tooltip;
 	public static String ConfigFilterAction_PromptMessage;
 	public static String ConfigFilterAction_Title;
 	public static String ConfigFilterAction_TooltipText;

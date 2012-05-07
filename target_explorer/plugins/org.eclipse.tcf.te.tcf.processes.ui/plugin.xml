@@ -66,7 +66,7 @@
          </command>
       </menuContribution>
       
-      <menuContribution locationURI="toolbar:org.eclipse.tcf.te.ui.controls.menu.processes?after=additions">
+      <menuContribution locationURI="toolbar:org.eclipse.tcf.te.ui.controls.menu.processes?before=additions">
          <command
                commandId="org.eclipse.tcf.te.tcf.processes.ui.command.refreshViewer"
                icon="icons/obj16/refresh.gif"
@@ -82,10 +82,6 @@
                style="pulldown"
                tooltip="%command.configure.tooltip">
          </command>
-         <separator
-               name="refreshing_group"
-               visible="true">
-         </separator>
       </menuContribution>
 
       <menuContribution locationURI="menu:org.eclipse.tcf.te.tcf.processes.ui.menu.refreshInterval">

@@ -110,6 +110,8 @@ public class UIPlugin extends AbstractUIPlugin {
 		registry.put(ImageConsts.VIEWER_FILTER_CONFIG_ENABLED, ImageDescriptor.createFromURL(url));
 		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_ELCL + "help.gif"); //$NON-NLS-1$
 		registry.put(ImageConsts.VIEWER_HELP, ImageDescriptor.createFromURL(url));
+		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_ELCL + "collapseall.gif"); //$NON-NLS-1$
+		registry.put(ImageConsts.VIEWER_COLLAPSE_ALL, ImageDescriptor.createFromURL(url));
 
 		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OVR + "gold_ovr.gif"); //$NON-NLS-1$
 		registry.put(ImageConsts.GOLD_OVR, ImageDescriptor.createFromURL(url));

@@ -934,7 +934,7 @@
          </command>
       </menuContribution>
       <menuContribution
-            locationURI="toolbar:org.eclipse.tcf.te.ui.controls.menu.fs?after=additions">
+            locationURI="toolbar:org.eclipse.tcf.te.ui.controls.menu.fs?before=additions">
          <command
                commandId="org.eclipse.tcf.te.tcf.filesystem.commands.refreshViewer"
                icon="icons/obj16/refresh.gif"
