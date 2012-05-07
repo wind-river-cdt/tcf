@@ -19,7 +19,8 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
-Export-Package: org.eclipse.tcf.te.tcf.filesystem.core.interfaces,
+Export-Package: org.eclipse.tcf.te.tcf.filesystem.core.activator;x-internal:=true,
+ org.eclipse.tcf.te.tcf.filesystem.core.interfaces,
  org.eclipse.tcf.te.tcf.filesystem.core.internal;x-friends:="org.eclipse.tcf.te.tests",
  org.eclipse.tcf.te.tcf.filesystem.core.internal.callbacks;x-friends:="org.eclipse.tcf.te.tests",
  org.eclipse.tcf.te.tcf.filesystem.core.internal.exceptions;x-friends:="org.eclipse.tcf.te.tcf.filesystem.ui,org.eclipse.tcf.te.tests",
@@ -28,4 +29,5 @@ Export-Package: org.eclipse.tcf.te.tcf.filesystem.core.interfaces,
  org.eclipse.tcf.te.tcf.filesystem.core.internal.url;x-friends:="org.eclipse.tcf.te.tests",
  org.eclipse.tcf.te.tcf.filesystem.core.internal.utils;x-friends:="org.eclipse.tcf.te.tcf.filesystem.ui,org.eclipse.tcf.te.tests",
  org.eclipse.tcf.te.tcf.filesystem.core.model,
+ org.eclipse.tcf.te.tcf.filesystem.core.nls;x-internal:=true,
  org.eclipse.tcf.te.tcf.filesystem.core.services
