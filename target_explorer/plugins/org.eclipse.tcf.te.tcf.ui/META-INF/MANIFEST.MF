@@ -50,4 +50,5 @@ Export-Package: org.eclipse.tcf.te.tcf.ui.activator;x-internal:=true,
  org.eclipse.tcf.te.tcf.ui.nls,
  org.eclipse.tcf.te.tcf.ui.preferences,
  org.eclipse.tcf.te.tcf.ui.tabbed,
- org.eclipse.tcf.te.tcf.ui.wizards
+ org.eclipse.tcf.te.tcf.ui.wizards,
+ org.eclipse.tcf.te.tcf.ui.wizards.pages

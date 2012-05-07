@@ -19,6 +19,7 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.core.TransientPeer;
@@ -32,6 +33,7 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelLookupSer
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelRefreshService;
 import org.eclipse.tcf.te.tcf.locator.model.Model;
 import org.eclipse.tcf.te.tcf.ui.nls.Messages;
+import org.eclipse.tcf.te.tcf.ui.wizards.pages.NewTargetWizardPage;
 import org.eclipse.tcf.te.ui.views.ViewsUtil;
 import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
 import org.eclipse.tcf.te.ui.wizards.AbstractWizard;
@@ -55,22 +57,42 @@ public class NewTargetWizard extends AbstractWizard implements INewWizard {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.Wizard#addPages()
+	 */
+	@Override
+	public void addPages() {
+		addPage(new NewTargetWizardPage());
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.jface.wizard.Wizard#performFinish()
 	 */
 	@Override
 	public boolean performFinish() {
-		// Create the minimum set of peer attributes to create a new peer
+		// Create the peer attributes map
 		final Map<String, String> peerAttributes = new HashMap<String, String>();
-		peerAttributes.put(IPeer.ATTR_ID, UUID.randomUUID().toString());
-		peerAttributes.put(IPeer.ATTR_NAME, NLS.bind(Messages.NewTargetWizard_newPeer_name, Integer.valueOf(counter.incrementAndGet())));
+
+		// Get the NewTargetWizardPage and extract the attributes from it
+		IWizardPage page = getPage(NewTargetWizardPage.class.getName());
+		if (page instanceof NewTargetWizardPage) {
+			((NewTargetWizardPage)page).extractData(peerAttributes);
+		}
+
+		// Fill in the minimum set of peer attributes to create a new peer
+		if (!peerAttributes.containsKey(IPeer.ATTR_ID)) {
+			peerAttributes.put(IPeer.ATTR_ID, UUID.randomUUID().toString());
+		}
+		if (!peerAttributes.containsKey(IPeer.ATTR_NAME)) {
+			peerAttributes.put(IPeer.ATTR_NAME, NLS.bind(Messages.NewTargetWizard_newPeer_name, Integer.valueOf(counter.incrementAndGet())));
+		}
 
 		try {
 			// Save the new peer
-			IURIPersistenceService uRIPersistenceService = ServiceManager.getInstance().getService(IURIPersistenceService.class);
-			if (uRIPersistenceService == null) {
+			IURIPersistenceService persistenceService = ServiceManager.getInstance().getService(IURIPersistenceService.class);
+			if (persistenceService == null) {
 				throw new IOException("Persistence service instance unavailable."); //$NON-NLS-1$
 			}
-			uRIPersistenceService.write(new TransientPeer(peerAttributes), null);
+			persistenceService.write(new TransientPeer(peerAttributes), null);
 
 			// Get the locator model
 			final ILocatorModel model = Model.getModel();
