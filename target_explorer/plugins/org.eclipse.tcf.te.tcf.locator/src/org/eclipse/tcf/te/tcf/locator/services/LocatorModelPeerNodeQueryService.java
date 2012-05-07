@@ -10,7 +10,7 @@
 package org.eclipse.tcf.te.tcf.locator.services;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -229,12 +229,16 @@ public class LocatorModelPeerNodeQueryService extends AbstractLocatorModelServic
 					innerDone.doneQueryServices(error);
 				} else {
 					// Get the local service
-					Collection<String> localServices = new ArrayList<String>(channel.getLocalServices());
+					List<String> localServices = new ArrayList<String>(channel.getLocalServices());
 					// Get the remote services
-					Collection<String> remoteServices = new ArrayList<String>(channel.getRemoteServices());
+					List<String> remoteServices = new ArrayList<String>(channel.getRemoteServices());
 
 					// Close the channel
 					Tcf.getChannelManager().closeChannel(channel);
+
+					// Sort the service lists
+					Collections.sort(localServices);
+					Collections.sort(remoteServices);
 
 					// Update the services
 					ILocatorModelUpdateService updateService = node.getModel().getService(ILocatorModelUpdateService.class);
