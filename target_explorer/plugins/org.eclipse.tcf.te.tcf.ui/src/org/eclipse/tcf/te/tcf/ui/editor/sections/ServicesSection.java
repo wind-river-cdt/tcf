@@ -30,6 +30,7 @@ import org.eclipse.tcf.te.ui.forms.parts.AbstractSection;
 import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
 import org.eclipse.tcf.te.ui.views.editor.pages.AbstractEditorPage;
 import org.eclipse.ui.forms.IManagedForm;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
@@ -53,7 +54,7 @@ public class ServicesSection extends AbstractSection {
 	 * @param parent The parent composite. Must not be <code>null</code>.
 	 */
 	public ServicesSection(IManagedForm form, Composite parent) {
-		super(form, parent, Section.DESCRIPTION);
+		super(form, parent, Section.DESCRIPTION | ExpandableComposite.TWISTIE);
 		createClient(getSection(), form.getToolkit());
 	}
 
