@@ -206,11 +206,26 @@ public final class FSTreeNode extends AbstractTreeNode implements Cloneable {
 		}
 		synchronized (children) {
 			if (!children.isEmpty()) {
-				FSTreeNode node = (FSTreeNode) children.get(0);
-				return node.isWindowsNode();
+				for (AbstractTreeNode treeNode : children) {
+					FSTreeNode node = (FSTreeNode) treeNode;
+					if(node.hasOSInfo()) return node.isWindowsNode();
+				}
 			}
 		}
+		if(parent != null) {
+			return ((FSTreeNode)parent).isWindowsNode();
+		}
 		return false;
+	}
+	
+	/**
+	 * If this node has OS information.
+	 * 
+	 * @return true if it has.
+	 */
+	private boolean hasOSInfo() {
+		return attr != null && attr.attributes != null || 
+				peerNode != null && TargetPropertyTester.getOSName(peerNode)!= null;
 	}
 
 	/**
