@@ -209,18 +209,18 @@ public class NewTargetWizardPage extends AbstractValidatingWizardPage {
 		client.setBackground(parent.getBackground());
 
 		// Add the controls
+		peerNameControl = new PeerNameControl(this);
+		peerNameControl.setFormToolkit(toolkit);
+		peerNameControl.setParentControlIsInnerPanel(true);
+		peerNameControl.setupPanel(client);
+		peerNameControl.getEditFieldControl().setFocus();
+
 		peerIdControl = new PeerIdControl(this);
 		peerIdControl.setFormToolkit(toolkit);
 		peerIdControl.setParentControlIsInnerPanel(true);
 		peerIdControl.setupPanel(client);
 		peerIdControl.getEditFieldControl().setEnabled(false);
 		peerIdControl.setEditFieldControlText(UUID.randomUUID().toString());
-
-		peerNameControl = new PeerNameControl(this);
-		peerNameControl.setFormToolkit(toolkit);
-		peerNameControl.setParentControlIsInnerPanel(true);
-		peerNameControl.setupPanel(client);
-		peerNameControl.getEditFieldControl().setFocus();
 
 		createEmptySpace(client, 5, 2, toolkit);
 

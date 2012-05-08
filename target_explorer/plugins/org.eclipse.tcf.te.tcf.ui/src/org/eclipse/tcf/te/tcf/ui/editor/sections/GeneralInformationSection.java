@@ -118,17 +118,17 @@ public class GeneralInformationSection extends AbstractSection {
 		Assert.isNotNull(client);
 		section.setClient(client);
 
-		// Create the peer id control
-		idControl = new InfoSectionPeerIdControl(this);
-		idControl.setFormToolkit(toolkit);
-		idControl.setParentControlIsInnerPanel(true);
-		idControl.setupPanel(client);
-
 		// Create the peer name control
 		nameControl = new InfoSectionPeerNameControl(this);
 		nameControl.setFormToolkit(toolkit);
 		nameControl.setParentControlIsInnerPanel(true);
 		nameControl.setupPanel(client);
+
+		// Create the peer id control
+		idControl = new InfoSectionPeerIdControl(this);
+		idControl.setFormToolkit(toolkit);
+		idControl.setParentControlIsInnerPanel(true);
+		idControl.setupPanel(client);
 
 		// Create the peer link state control
 		Label label = new Label(client, SWT.HORIZONTAL);
