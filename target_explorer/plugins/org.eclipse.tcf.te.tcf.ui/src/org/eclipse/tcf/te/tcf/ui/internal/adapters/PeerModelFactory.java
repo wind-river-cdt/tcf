@@ -12,7 +12,9 @@ package org.eclipse.tcf.te.tcf.ui.internal.adapters;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelPeerNodeQueryService;
 import org.eclipse.tcf.te.tcf.locator.model.Model;
 import org.eclipse.ui.IElementFactory;
 import org.eclipse.ui.IMemento;
@@ -31,6 +33,12 @@ public class PeerModelFactory implements IElementFactory {
 	public IAdaptable createElement(IMemento memento) {
 		String peerId = memento.getString("peerId"); //$NON-NLS-1$
 		Map<String, IPeerModel> map = (Map<String, IPeerModel>) Model.getModel().getAdapter(Map.class);
-		return map.get(peerId);
+		IPeerModel node = map.get(peerId);
+		// Make sure the remote services are up to date so 
+		// that content extension could correctly activated!
+		ILocatorModel model = node.getModel();
+		ILocatorModelPeerNodeQueryService queryService = model.getService(ILocatorModelPeerNodeQueryService.class);
+		queryService.queryRemoteServices(node);
+		return node;
 	}
 }

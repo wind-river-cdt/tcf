@@ -9,20 +9,15 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.views.internal;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.TreePath;
-import org.eclipse.ui.IElementFactory;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPersistableElement;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.navigator.IMementoAware;
 
@@ -46,33 +41,9 @@ public class ViewExpandingState implements IMementoAware {
 	 */
 	@Override
     public void restoreState(IMemento memento) {
-		IMemento memExpand = memento.getChild("expanded-elements"); //$NON-NLS-1$
-		if(memExpand != null) {
-			IMemento[] memElements = memExpand.getChildren("element"); //$NON-NLS-1$
-			Map<UUID, Object> elements = new HashMap<UUID, Object>();
-			for(IMemento memElement : memElements) {
-				restoreElement(memElement, elements);
-			}
-			IMemento pathsElement = memento.getChild("expanded-paths"); //$NON-NLS-1$
-			if(pathsElement != null) {
-				IMemento[] pathElements = pathsElement.getChildren("path"); //$NON-NLS-1$
-				List<TreePath> paths = new ArrayList<TreePath>();
-				for(IMemento pathElement : pathElements) {
-					TreePath path = restorePath(pathElement, elements);
-					if(path != null) {
-						paths.add(path);
-					}
-				}
-				IElementComparer comparer = viewer.getComparer();
-				if(comparer instanceof ViewViewerComparer) {
-					((ViewViewerComparer)comparer).setByDefault(false);
-				}
-				viewer.setExpandedTreePaths(paths.toArray(new TreePath[paths.size()]));
-				if(comparer instanceof ViewViewerComparer) {
-					((ViewViewerComparer)comparer).setByDefault(true);
-				}
-			}
-		}
+		RestoreJob job = new RestoreJob(memento);
+		job.addJobChangeListener(new RestoreDone(viewer));
+		job.schedule();
 	}
 
 	/*
@@ -123,60 +94,6 @@ public class ViewExpandingState implements IMementoAware {
 		}
 		return true;
     }
-	
-	/**
-	 * Restore the path from the path element of the memento, using the
-	 * restored elements stored in the map.
-	 * 
-	 * @param pathElement The path element to restore the path from.
-	 * @param elements The element map restored.
-	 * @return a tree path restored.
-	 */
-	private TreePath restorePath(IMemento pathElement, Map<UUID, Object> elements) {
-		List<Object> list = new ArrayList<Object>();
-		IMemento[] children = pathElement.getChildren("element"); //$NON-NLS-1$
-		for (IMemento child : children) {
-			String id = child.getID();
-			try {
-				UUID uuid = UUID.fromString(id);
-				Object element = elements.get(uuid);
-				if (element != null) {
-					list.add(element);
-				}
-			}
-			catch (IllegalArgumentException e) {
-				e.printStackTrace();
-				return null;
-			}
-		}
-	    return new TreePath(list.toArray());
-    }
-
-	/**
-	 * Restore an element from the element memento, and save the restored
-	 * element to the map with its uuid as its key.
-	 * 
-	 * @param memElement The element memento.
-	 * @param elements The map to store the retored element and its uuid.
-	 */
-	private void restoreElement(IMemento memElement, Map<UUID, Object> elements) {
-		String factoryId = memElement.getString("factoryId"); //$NON-NLS-1$
-		if(factoryId != null) {
-			IElementFactory eFactory = PlatformUI.getWorkbench().getElementFactory(factoryId);
-			if(eFactory != null) {
-				Object element = eFactory.createElement(memElement);
-				if(element != null) {
-					String id = memElement.getID();
-					try {
-						UUID uuid = UUID.fromString(id);
-						elements.put(uuid, element);
-					}catch(IllegalArgumentException e){
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-	}
 	
 	/**
 	 * Save the path under the specified memento using the element map to find

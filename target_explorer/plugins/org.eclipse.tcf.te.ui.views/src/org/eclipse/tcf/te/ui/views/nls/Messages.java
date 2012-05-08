@@ -37,6 +37,10 @@ public class Messages extends NLS {
 
 	public static String AddToCategoryAction_single_text;
 	public static String RemoveFromCategoryAction_single_text;
+	public static String RestoreJob_JobName;
+	public static String RestoreJob_MainTask;
+	public static String RestoreJob_Task1Name;
+	public static String RestoreJob_Task2Name;
 
 	public static String AbstractCustomFormToolkitEditorPage_HelpAction_label;
 	public static String AbstractCustomFormToolkitEditorPage_HelpAction_tooltip;
