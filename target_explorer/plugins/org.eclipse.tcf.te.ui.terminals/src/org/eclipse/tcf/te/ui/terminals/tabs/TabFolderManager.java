@@ -323,7 +323,7 @@ public class TabFolderManager extends PlatformObject implements ISelectionProvid
 			tabFolder.getParent().layout(true);
 
 			// Create the terminal control
-			ITerminalViewControl terminal = TerminalViewControlFactory.makeControl(doCreateTerminalTabTerminalListener(item), composite, new ITerminalConnector[] { connector });
+			ITerminalViewControl terminal = TerminalViewControlFactory.makeControl(doCreateTerminalTabTerminalListener(item), composite, new ITerminalConnector[] { connector }, true);
 			// Add the "selection" listener to the terminal control
 			new TerminalControlSelectionListener(terminal);
 			// Use the default Eclipse IDE encoding setting to configure the terminals encoding
