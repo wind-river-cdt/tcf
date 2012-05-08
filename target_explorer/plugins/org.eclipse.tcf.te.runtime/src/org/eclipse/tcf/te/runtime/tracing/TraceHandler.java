@@ -12,6 +12,7 @@ package org.eclipse.tcf.te.runtime.tracing;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.tcf.te.runtime.activator.CoreBundleActivator;
 
 /**
  * Helper class to handle tracing using the platforms debug capabilities.
@@ -178,11 +179,11 @@ public class TraceHandler {
 	 * <p>
 	 * Initializes the tracing handler with the given bundle identifier.
 	 *
-	 * @param identifier The bundle identifier. Must not be <code>null</code>.
+	 * @param identifier The bundle identifier or <code>null</code>.
 	 */
 	public TraceHandler(String identifier) {
-		Assert.isNotNull(identifier);
-		this.identifier = identifier;
+		this.identifier = identifier != null ? identifier : CoreBundleActivator.getUniqueIdentifier();
+		Assert.isNotNull(this.identifier);
 	}
 
 	/**
