@@ -17,6 +17,7 @@ import java.util.UUID;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.TreePath;
@@ -34,14 +35,14 @@ public class RestoreJob extends Job {
 
 	/**
 	 * Create an job to restore the expanding state of the specified tree viewer.
-	 * 
+	 *
 	 * @param memento The memento to restore the expanding state.
 	 */
 	public RestoreJob(IMemento memento) {
 		super(Messages.RestoreJob_JobName);
 		this.memento = memento;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
@@ -53,7 +54,7 @@ public class RestoreJob extends Job {
 			monitor.beginTask(Messages.RestoreJob_MainTask, work);
 			IMemento memExpand = memento.getChild("expanded-elements"); //$NON-NLS-1$
 			if (memExpand != null) {
-				monitor.subTask(Messages.RestoreJob_Task1Name);				
+				monitor.subTask(Messages.RestoreJob_Task1Name);
 				IMemento[] memElements = memExpand.getChildren("element"); //$NON-NLS-1$
 				Map<UUID, Object> elements = new HashMap<UUID, Object>();
 				for (IMemento memElement : memElements) {
@@ -80,10 +81,10 @@ public class RestoreJob extends Job {
 		monitor.done();
 		return Status.CANCEL_STATUS;
     }
-	
+
 	/**
 	 * Get the total work amount of this job.
-	 * 
+	 *
 	 * @return the toal work amount.
 	 */
 	private int getTotalWork() {
@@ -100,11 +101,11 @@ public class RestoreJob extends Job {
 		}
 		return work;
 	}
-	
+
 	/**
 	 * Restore the path from the path element of the memento, using the
 	 * restored elements stored in the map.
-	 * 
+	 *
 	 * @param pathElement The path element to restore the path from.
 	 * @param elements The element map restored.
 	 * @return a tree path restored.
@@ -122,7 +123,7 @@ public class RestoreJob extends Job {
 				}
 			}
 			catch (IllegalArgumentException e) {
-				e.printStackTrace();
+				if (Platform.inDebugMode()) e.printStackTrace();
 				return null;
 			}
 		}
@@ -132,7 +133,7 @@ public class RestoreJob extends Job {
 	/**
 	 * Restore an element from the element memento, and save the restored
 	 * element to the map with its uuid as its key.
-	 * 
+	 *
 	 * @param memElement The element memento.
 	 * @param elements The map to store the retored element and its uuid.
 	 */
@@ -148,7 +149,7 @@ public class RestoreJob extends Job {
 						UUID uuid = UUID.fromString(id);
 						elements.put(uuid, element);
 					}catch(IllegalArgumentException e){
-						e.printStackTrace();
+						if (Platform.inDebugMode()) e.printStackTrace();
 					}
 				}
 			}
