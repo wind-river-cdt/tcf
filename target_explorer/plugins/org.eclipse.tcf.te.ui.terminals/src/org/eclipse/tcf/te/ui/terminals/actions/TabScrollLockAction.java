@@ -12,7 +12,7 @@ package org.eclipse.tcf.te.ui.terminals.actions;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.tcf.te.ui.terminals.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.terminals.interfaces.ImageConsts;
-import org.eclipse.tm.internal.terminal.actions.ActionMessages;
+import org.eclipse.tcf.te.ui.terminals.nls.Messages;
 import org.eclipse.tm.internal.terminal.control.ITerminalViewControl;
 import org.eclipse.tm.internal.terminal.control.actions.AbstractTerminalAction;
 
@@ -28,8 +28,8 @@ public class TabScrollLockAction extends AbstractTerminalAction {
 	public TabScrollLockAction() {
 		super(null, TabScrollLockAction.class.getName(), IAction.AS_RADIO_BUTTON);
 
-        setupAction(ActionMessages.SCROLL_LOCK_0,
-                    ActionMessages.SCROLL_LOCK_1,
+        setupAction(Messages.TabScrollLockAction_text,
+                    Messages.TabScrollLockAction_tooltip,
                     UIPlugin.getImageDescriptor(ImageConsts.ACTION_ScrollLock_Hover),
                     UIPlugin.getImageDescriptor(ImageConsts.ACTION_ScrollLock_Enabled),
                     UIPlugin.getImageDescriptor(ImageConsts.ACTION_ScrollLock_Disabled),

@@ -57,4 +57,12 @@ public class Messages extends NLS {
 	public static String LaunchTerminalSettingsDialog_title;
 	public static String LaunchTerminalSettingsDialog_combo_label;
 	public static String LaunchTerminalSettingsDialog_group_label;
+
+    public static String  TabScrollLockAction_text;
+    public static String  TabScrollLockAction_tooltip;
+
+    public static String LaunchTerminalSettingsDialog_error_title;
+	public static String LaunchTerminalSettingsDialog_error_invalidSettings;
+
+
 }

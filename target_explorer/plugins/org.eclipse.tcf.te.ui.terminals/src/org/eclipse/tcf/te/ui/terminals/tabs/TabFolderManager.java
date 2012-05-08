@@ -17,10 +17,6 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.PlatformObject;
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.Preferences.PropertyChangeEvent;
-import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -53,15 +49,13 @@ import org.eclipse.tm.internal.terminal.emulator.VT100TerminalControl;
 import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
 import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
-import org.eclipse.tm.internal.terminal.view.TerminalPreferencePage;
-import org.eclipse.tm.internal.terminal.view.TerminalViewPlugin;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDEEncoding;
 
 /**
  * Terminals tab folder manager.
  */
-@SuppressWarnings({ "restriction", "deprecation" })
+@SuppressWarnings({ "restriction" })
 public class TabFolderManager extends PlatformObject implements ISelectionProvider {
 	// Reference to the parent terminal consoles view
 	private final ITerminalsView parentView;
@@ -520,54 +514,11 @@ public class TabFolderManager extends PlatformObject implements ISelectionProvid
 		Assert.isNotNull(item);
 
 		// Create and associate the disposal listener
-		DisposeListener disposeListener=doCreateTerminalTabDisposeListener(this);
+		DisposeListener disposeListener = doCreateTerminalTabDisposeListener(this);
 
 		// store the listener to make access easier e.g. needed in DnD
 		item.setData("disposeListener", disposeListener); //$NON-NLS-1$
 		item.addDisposeListener(disposeListener);
-
-		// Create and register the property change listener
-		final IPropertyChangeListener propertyChangeListener = doCreateTerminalTabPropertyChangeListener(item);
-		// Register to the JFace font registry
-		JFaceResources.getFontRegistry().addListener(propertyChangeListener);
-
-		// Create and register the Terminal view plugin preferences property change listener
-		final Preferences.IPropertyChangeListener prefsPropertyChangeListener = new Preferences.IPropertyChangeListener() {
-
-			/* (non-Javadoc)
-			 * @see org.eclipse.core.runtime.Preferences.IPropertyChangeListener#propertyChange(org.eclipse.core.runtime.Preferences.PropertyChangeEvent)
-			 */
-			@Override
-            public void propertyChange(PropertyChangeEvent event) {
-				if (item.isDisposed()) return;
-
-				if(event.getProperty().equals(TerminalPreferencePage.PREF_BUFFERLINES)
-						|| event.getProperty().equals(TerminalPreferencePage.PREF_INVERT_COLORS)) {
-					Preferences preferences = TerminalViewPlugin.getDefault().getPluginPreferences();
-					int bufferLineLimit = preferences.getInt(TerminalPreferencePage.PREF_BUFFERLINES);
-					boolean invert = preferences.getBoolean(TerminalPreferencePage.PREF_INVERT_COLORS);
-
-					// Get the terminal control from the tab item
-					if (item.getData() instanceof ITerminalViewControl) {
-						ITerminalViewControl terminal = (ITerminalViewControl)item.getData();
-						terminal.setBufferLineLimit(bufferLineLimit);
-						terminal.setInvertedColors(invert);
-					}
-				}
-			}
-		};
-
-		// Register to the Terminal view plugin preferences
-		TerminalViewPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(prefsPropertyChangeListener);
-
-		// Remove the listener from the JFace font registry if the tab gets disposed
-		item.addDisposeListener(new DisposeListener() {
-			@Override
-            public void widgetDisposed(DisposeEvent e) {
-				JFaceResources.getFontRegistry().removeListener(propertyChangeListener);
-				TerminalViewPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(prefsPropertyChangeListener);
-			}
-		});
 	}
 
 	/**
@@ -590,17 +541,6 @@ public class TabFolderManager extends PlatformObject implements ISelectionProvid
 	protected DisposeListener doCreateTerminalTabDisposeListener(TabFolderManager parent) {
 		Assert.isNotNull(parent);
 		return new TabDisposeListener(parent);
-	}
-
-	/**
-	 * Creates a new terminal console tab property change listener instance.
-	 *
-	 * @param item The tab item. Must not be <code>null</code>.
-	 * @return The property change listener instance.
-	 */
-	protected IPropertyChangeListener doCreateTerminalTabPropertyChangeListener(CTabItem item) {
-		Assert.isNotNull(item);
-		return new TabPropertyChangeListener(item);
 	}
 
 	/**

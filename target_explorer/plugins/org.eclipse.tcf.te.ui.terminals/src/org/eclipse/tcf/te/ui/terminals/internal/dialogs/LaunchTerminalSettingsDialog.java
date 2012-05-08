@@ -48,13 +48,11 @@ import org.eclipse.tcf.te.ui.terminals.interfaces.ILauncherDelegate;
 import org.eclipse.tcf.te.ui.terminals.launcher.LauncherDelegateManager;
 import org.eclipse.tcf.te.ui.terminals.nls.Messages;
 import org.eclipse.tcf.te.ui.terminals.panels.AbstractConfigurationPanel;
-import org.eclipse.tm.internal.terminal.view.ViewMessages;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
  * Launch terminal settings dialog implementation.
  */
-@SuppressWarnings("restriction")
 public class LaunchTerminalSettingsDialog extends CustomTrayDialog {
 	// The parent selection
 	private ISelection selection = null;
@@ -337,10 +335,10 @@ public class LaunchTerminalSettingsDialog extends CustomTrayDialog {
     	IWizardConfigurationPanel panel = this.settings.getConfigurationPanel(terminals.getText());
 
     	if(!panel.isValid()){
-			String strTitle = ViewMessages.TERMINALSETTINGS;
+			String strTitle = Messages.LaunchTerminalSettingsDialog_error_title;
 			MessageBox mb = new MessageBox(getShell(), SWT.ICON_ERROR | SWT.OK);
 			mb.setText(strTitle);
-			mb.setMessage(ViewMessages.INVALID_SETTINGS);
+			mb.setMessage(Messages.LaunchTerminalSettingsDialog_error_invalidSettings);
 			mb.open();
 			return;
     	}
