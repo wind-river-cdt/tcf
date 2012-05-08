@@ -16,8 +16,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.te.core.utils.text.StringUtil;
 import org.eclipse.tcf.te.launch.core.persistence.DefaultPersistenceDelegate;
+import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
@@ -62,7 +65,7 @@ public class LaunchProcessStep extends AbstractTcfLaunchStep {
 	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStep#execute(org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext, org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId, org.eclipse.core.runtime.IProgressMonitor, org.eclipse.tcf.te.runtime.interfaces.callback.ICallback)
 	 */
 	@Override
-	public void execute(IStepContext context, IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor, final ICallback callback) {
+	public void execute(IStepContext context, final IPropertiesContainer data, final IFullQualifiedId fullQualifiedId, IProgressMonitor monitor, final ICallback callback) {
 		// Construct the launcher object
 		ProcessLauncher launcher = new ProcessLauncher();
 
@@ -76,10 +79,22 @@ public class LaunchProcessStep extends AbstractTcfLaunchStep {
 
 		launchAttributes.put(ITerminalsConnectorConstants.PROP_LOCAL_ECHO, Boolean.FALSE);
 		launchAttributes.put(IProcessLauncher.PROP_PROCESS_ASSOCIATE_CONSOLE, Boolean.TRUE);
+		if (ILaunchManager.DEBUG_MODE.equals(getLaunchMode(context))) {
+			launchAttributes.put(IProcessLauncher.PROP_PROCESS_ATTACH, Boolean.TRUE);
+		}
 
 		// Launch the process
 		IPropertiesContainer container = new PropertiesContainer();
 		container.setProperties(launchAttributes);
-		launcher.launch(getActivePeerModel(data).getPeer(), container, callback);
+		launcher.launch(getActivePeerModel(data).getPeer(), container, new Callback(callback) {
+			@Override
+			protected void internalDone(Object caller, IStatus status) {
+				Object result = getResult();
+				if (status.isOK() && result instanceof IProcesses.ProcessContext) {
+					StepperAttributeUtil.setProperty(IRemoteAppLaunchAttributes.ATTR_PROCESS_CONTEXT, fullQualifiedId.getParentId(), data, result);
+				}
+				super.internalDone(caller, status);
+			}
+		});
 	}
 }

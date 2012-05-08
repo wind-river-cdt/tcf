@@ -86,15 +86,14 @@
             <reference id="org.eclipse.tcf.te.tcf.launch.core.fileTransferStepGroup"/>
             <reference id="org.eclipse.tcf.te.tcf.launch.core.launchProcessStep"/>
             <reference id="org.eclipse.tcf.te.tcf.launch.core.closeChannelStep"/>
-            <reference id="org.eclipse.tcf.te.launch.core.removeLaunchStep">
+            <reference id="org.eclipse.tcf.te.tcf.launch.core.attachDebuggerStep">
                <enablement>
                   <with variable="context">
-                     <not>
-                        <test property="org.eclipse.tcf.te.launch.core.launchMode" value="debug"/>
-                     </not>
+                     <test property="org.eclipse.tcf.te.launch.core.launchMode" value="debug"/>
                   </with>
                </enablement>
             </reference>
+            <reference id="org.eclipse.tcf.te.launch.core.removeLaunchStep"/>
          </references>
       </stepGroup>
       <stepGroup
@@ -127,6 +126,14 @@
             id="org.eclipse.tcf.te.tcf.launch.core.launchProcessStep"
             class="org.eclipse.tcf.te.tcf.launch.core.steps.LaunchProcessStep"
             label="%LaunchStep.LaunchProcess.name">
+         <requires
+               id="org.eclipse.tcf.te.tcf.launch.core.openChannelStep">
+         </requires>
+      </step>
+      <step
+            id="org.eclipse.tcf.te.tcf.launch.core.attachDebuggerStep"
+            class="org.eclipse.tcf.te.tcf.launch.core.steps.AttachDebuggerStep"
+            label="%LaunchStep.AttachDebugger.name">
          <requires
                id="org.eclipse.tcf.te.tcf.launch.core.openChannelStep">
          </requires>

@@ -586,7 +586,7 @@
                      ifEmpty="false">
                   <and>
                      <test property="org.eclipse.tcf.te.launch.ui.model.hasLaunchMode" value="run"/>
-                     <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
+                     <test property="org.eclipse.tcf.te.launch.ui.model.isValidLaunchConfig" value="run"/>
                   </and>
                </iterate>
             </with>
@@ -610,7 +610,7 @@
                      ifEmpty="false">
                   <and>
                      <test property="org.eclipse.tcf.te.launch.ui.model.hasLaunchMode" value="debug"/>
-                     <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
+                     <test property="org.eclipse.tcf.te.launch.ui.model.isValidLaunchConfig" value="debug"/>
                   </and>
                </iterate>
             </with>

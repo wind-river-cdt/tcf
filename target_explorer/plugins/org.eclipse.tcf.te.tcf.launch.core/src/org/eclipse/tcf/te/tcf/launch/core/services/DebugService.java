@@ -107,10 +107,14 @@ public class DebugService extends AbstractService implements IDebugService {
 						break;
 					}
 				}
-				if (lc != null) break;
+				if (lc != null) {
+					break;
+				}
 			}
 			// If there is none with an active launch, take the first one
-			if (lc == null) lc = configs[0];
+			if (lc == null) {
+				lc = configs[0];
+			}
 		} else {
 			// No existing launch configuration -> create a new one
 			lc = createNewConfig(peer);
@@ -120,7 +124,7 @@ public class DebugService extends AbstractService implements IDebugService {
 			try {
 				// Attach the launch listener to wait firing the callback until
 				// the TCFLaunch got connect
-				TCFLaunch.addListener(new TCFLaunch.LaunchListener() {
+				final TCFLaunch.LaunchListener listener = new TCFLaunch.LaunchListener() {
 					@Override
 					public void onProcessStreamError(TCFLaunch launch, String process_id, int stream_id, Exception error, int lost_size) {}
 					@Override
@@ -139,7 +143,18 @@ public class DebugService extends AbstractService implements IDebugService {
 							callback.done(DebugService.this, Status.OK_STATUS);
 						}
 					}
-				});
+				};
+				if (Protocol.isDispatchThread()) {
+					TCFLaunch.addListener(listener);
+				}
+				else {
+					Protocol.invokeAndWait(new Runnable() {
+						@Override
+						public void run() {
+							TCFLaunch.addListener(listener);
+						}
+					});
+				}
 
 				// Execute the launch configuration
 				l = lc.launch(ILaunchManager.DEBUG_MODE, new NullProgressMonitor(), false, true);
@@ -178,8 +193,12 @@ public class DebugService extends AbstractService implements IDebugService {
 				peerId.set(peer.getID());
 			}
 		};
-		if (Protocol.isDispatchThread()) runnable.run();
-		else Protocol.invokeAndWait(runnable);
+		if (Protocol.isDispatchThread()) {
+			runnable.run();
+		}
+		else {
+			Protocol.invokeAndWait(runnable);
+		}
 
 		// Get the launch manager
 		ILaunchManager lm = DebugPlugin.getDefault().getLaunchManager();
@@ -198,7 +217,9 @@ public class DebugService extends AbstractService implements IDebugService {
 				// Save the working copy
 				lc = wc.doSave();
 			} catch (CoreException e) {
-				if (Platform.inDebugMode()) e.printStackTrace();
+				if (Platform.inDebugMode()) {
+					e.printStackTrace();
+				}
 			}
 		}
 
@@ -226,8 +247,12 @@ public class DebugService extends AbstractService implements IDebugService {
 				peerId.set(peer.getID());
 			}
 		};
-		if (Protocol.isDispatchThread()) runnable.run();
-		else Protocol.invokeAndWait(runnable);
+		if (Protocol.isDispatchThread()) {
+			runnable.run();
+		}
+		else {
+			Protocol.invokeAndWait(runnable);
+		}
 
 		// Get the launch manager
 		ILaunchManager lm = DebugPlugin.getDefault().getLaunchManager();
@@ -239,13 +264,15 @@ public class DebugService extends AbstractService implements IDebugService {
 				ILaunchConfiguration[] candidates = lm.getLaunchConfigurations(lct);
 				for (ILaunchConfiguration candidate : candidates) {
 					// If the peer id is matching, it is a valid candidate
-                    String lcPeerId = candidate.getAttribute(TCFLaunchDelegate.ATTR_PEER_ID, (String)null);
-                    if (lcPeerId != null && lcPeerId.equals(peerId.get())) {
-                    	configs.add(candidate);
-                    }
+					String lcPeerId = candidate.getAttribute(TCFLaunchDelegate.ATTR_PEER_ID, (String)null);
+					if (lcPeerId != null && lcPeerId.equals(peerId.get())) {
+						configs.add(candidate);
+					}
 				}
 			} catch (CoreException e) {
-				if (Platform.inDebugMode()) e.printStackTrace();
+				if (Platform.inDebugMode()) {
+					e.printStackTrace();
+				}
 			}
 		}
 

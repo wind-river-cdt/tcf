@@ -31,8 +31,7 @@ public class LaunchNodePropertyTester extends PropertyTester {
 			LaunchNode node = (LaunchNode)receiver;
 			if (property.equals("isLaunchConfigType")) { //$NON-NLS-1$
 				if (LaunchNode.TYPE_LAUNCH_CONFIG_TYPE.equals(node.getType())) {
-					boolean isValue = expectedValue == null || expectedValue.equals(node.getLaunchConfigurationType().getIdentifier());
-					return isValue;
+					return expectedValue == null || expectedValue.equals(node.getLaunchConfigurationType().getIdentifier());
 				}
 			}
 			else if (property.equals("isLaunchConfig")) { //$NON-NLS-1$
@@ -50,7 +49,10 @@ public class LaunchNodePropertyTester extends PropertyTester {
 				}
 			}
 			else if (property.equals("isValidLaunchConfig")) { //$NON-NLS-1$
-				return true;
+				if (expectedValue instanceof String) {
+					return node.isValidFor((String)expectedValue);
+				}
+				return node.isValidFor(null);
 			}
 		}
 		return false;

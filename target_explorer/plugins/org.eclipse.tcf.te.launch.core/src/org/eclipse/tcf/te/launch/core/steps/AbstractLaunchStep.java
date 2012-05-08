@@ -35,6 +35,17 @@ public abstract class AbstractLaunchStep extends AbstractStep {
 	}
 
 	/**
+	 * Returns the current launch mode.
+	 * 
+	 * @param context The step context.
+	 * @return The launch mode or <code>null</code>.
+	 */
+	protected String getLaunchMode(IStepContext context) {
+		ILaunch launch = getLaunch(context);
+		return launch != null ? launch.getLaunchMode() : null;
+	}
+
+	/**
 	 * Returns the active launch context model node that is currently used.
 	 *
 	 * @param data The data giving object. Must not be <code>null</code>.

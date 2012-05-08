@@ -30,4 +30,6 @@ public interface IRemoteAppLaunchAttributes {
 	 * Launch configuration attribute: The process arguments.
 	 */
 	public static final String ATTR_PROCESS_ARGUMENTS = ICommonLaunchAttributes.ATTR_PREFIX + ".process_arguments"; //$NON-NLS-1$
+
+	public static final String ATTR_PROCESS_CONTEXT = ICommonLaunchAttributes.ATTR_PREFIX + ".process_context"; //$NON-NLS-1$
 }
