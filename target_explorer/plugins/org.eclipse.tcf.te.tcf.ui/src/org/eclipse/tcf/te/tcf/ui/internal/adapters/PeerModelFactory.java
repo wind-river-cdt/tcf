@@ -36,9 +36,11 @@ public class PeerModelFactory implements IElementFactory {
 		IPeerModel node = map.get(peerId);
 		// Make sure the remote services are up to date so 
 		// that content extension could correctly activated!
-		ILocatorModel model = node.getModel();
-		ILocatorModelPeerNodeQueryService queryService = model.getService(ILocatorModelPeerNodeQueryService.class);
-		queryService.queryRemoteServices(node);
+		if (node != null) {
+			ILocatorModel model = node.getModel();
+			ILocatorModelPeerNodeQueryService queryService = model.getService(ILocatorModelPeerNodeQueryService.class);
+			queryService.queryRemoteServices(node);
+		}
 		return node;
 	}
 }
