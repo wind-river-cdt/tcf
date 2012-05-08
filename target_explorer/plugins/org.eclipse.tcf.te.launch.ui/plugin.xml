@@ -62,6 +62,14 @@
          <commonSorter
                class="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchTreeViewerSorter">
          </commonSorter>
+         <actionProvider
+               class="org.eclipse.tcf.te.launch.ui.internal.handler.OpenActionProvider"
+               id="org.eclipse.tcf.te.launch.ui.actions.open"
+               overrides="org.eclipse.ui.navigator.resources.OpenActions">
+	        <enablement>
+               <reference definitionId="launch.expressions.isSingleLaunchConfig"/>
+            </enablement>
+         </actionProvider>
       </navigatorContent>
    </extension>
 
@@ -560,9 +568,10 @@
             </and>
          </activeWhen>
       </handler>
-      <handler
-            commandId="org.eclipse.tcf.te.ui.launch.command.run"
-            class="org.eclipse.tcf.te.launch.ui.internal.handler.RunHandler">
+      <handler commandId="org.eclipse.tcf.te.ui.launch.command.run">
+         <class class="org.eclipse.tcf.te.launch.ui.internal.handler.LaunchHandler">
+            <parameter name="mode" value="run"/>
+         </class>
          <activeWhen>
             <and>
                <with variable="activePartId">
@@ -583,9 +592,10 @@
             </with>
          </enabledWhen>
       </handler>
-      <handler
-            commandId="org.eclipse.tcf.te.ui.launch.command.debug"
-            class="org.eclipse.tcf.te.launch.ui.internal.handler.DebugHandler">
+      <handler commandId="org.eclipse.tcf.te.ui.launch.command.debug">
+         <class class="org.eclipse.tcf.te.launch.ui.internal.handler.LaunchHandler">
+            <parameter name="mode" value="debug"/>
+         </class>
          <activeWhen>
             <and>
                <with variable="activePartId">

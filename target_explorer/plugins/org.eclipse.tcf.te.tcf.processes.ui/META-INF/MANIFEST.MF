@@ -28,7 +28,6 @@ Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: org.eclipse.tcf.te.tcf.processes.ui.activator;x-internal:=true,
  org.eclipse.tcf.te.tcf.processes.ui.controls,
- org.eclipse.tcf.te.tcf.processes.ui.dialogs,
  org.eclipse.tcf.te.tcf.processes.ui.help,
  org.eclipse.tcf.te.tcf.processes.ui.interfaces,
  org.eclipse.tcf.te.tcf.processes.ui.internal.adapters;x-internal:=true,

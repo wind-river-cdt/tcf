@@ -39,33 +39,7 @@
 
 <!-- Processes menu contributions -->
    <extension point="org.eclipse.ui.menus">
-      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.launch">
-         <command
-               commandId="org.eclipse.tcf.te.tcf.processes.ui.command.launch"
-               helpContextId="org.eclipse.tcf.te.tcf.processes.ui.command_Launch"
-               icon="platform:/plugin/org.eclipse.debug.ui/icons/full/obj16/lrun_obj.gif"
-               id="org.eclipse.tcf.te.tcf.processes.ui.commands.launch"
-               label="%command.launch.label"
-               style="push"
-               tooltip="%command.launch.tooltip">
-               <visibleWhen checkEnabled="false">
-                  <and>
-                     <with variable="selection">
-                        <count value="1"/>
-                        <iterate operator="and" ifEmpty="false">
-                           <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel">
-                              <test
-                                    property="org.eclipse.tcf.te.tcf.locator.hasRemoteService"
-                                    value="Processes">
-                              </test>
-                           </adapt>
-                        </iterate>
-                     </with>
-                  </and>
-               </visibleWhen>
-         </command>
-      </menuContribution>
-      
+     
       <menuContribution locationURI="toolbar:org.eclipse.tcf.te.ui.controls.menu.processes?before=additions">
          <command
                commandId="org.eclipse.tcf.te.tcf.processes.ui.command.refreshViewer"
@@ -306,12 +280,6 @@
    <extension point="org.eclipse.ui.commands">
       <command
             categoryId="org.eclipse.tcf.te.ui.commands.category"
-            helpContextId="org.eclipse.tcf.te.tcf.processes.ui.command_Launch"
-            id="org.eclipse.tcf.te.tcf.processes.ui.command.launch"
-            name="%command.launch.name">
-      </command>
-      <command
-            categoryId="org.eclipse.tcf.te.ui.commands.category"
             helpContextId="org.eclipse.tcf.te.tcf.processes.ui.command_Refresh"
             id="org.eclipse.tcf.te.tcf.processes.ui.command.refreshViewer"
             name="%command.refresh.name">
@@ -332,11 +300,6 @@
 
 <!-- Handler contributions -->
    <extension point="org.eclipse.ui.handlers">
-      <handler
-            class="org.eclipse.tcf.te.tcf.processes.ui.internal.handler.LaunchProcessesCommandHandler"
-            commandId="org.eclipse.tcf.te.tcf.processes.ui.command.launch">
-      </handler>
-
       <handler
             class="org.eclipse.tcf.te.tcf.processes.ui.internal.handler.RefreshProcessListHandler"
             commandId="org.eclipse.tcf.te.tcf.processes.ui.command.refreshViewer">

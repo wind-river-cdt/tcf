@@ -47,39 +47,42 @@ public class LaunchDialogHandler extends AbstractHandler {
 		if (selection instanceof IStructuredSelection && ((IStructuredSelection) selection).size() == 1) {
 			Object element = ((IStructuredSelection)selection).getFirstElement();
 			if (element instanceof LaunchNode) {
-				LaunchNode node = (LaunchNode)element;
-				if (node.getLaunchConfiguration() != null) {
-					final String[] modes = LaunchConfigHelper.getLaunchConfigTypeModes(node.getLaunchConfigurationType(), false);
-					List<String> modeLabels = new ArrayList<String>();
-					int defaultIndex = 0;
-					for (String mode : modes) {
-						if (LaunchManager.getInstance().validate(node.getLaunchConfiguration(), mode)) {
-							ILaunchMode launchMode = DebugPlugin.getDefault().getLaunchManager().getLaunchMode(mode);
-							modeLabels.add(launchMode.getLabel());
-							if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-								defaultIndex = modeLabels.size()-1;
-							}
-						}
-					}
-					if (modeLabels.size() >= 1) {
-						modeLabels.add(IDialogConstants.CANCEL_LABEL);
-						OptionalMessageDialog dialog = new OptionalMessageDialog(
-										UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getShell(),
-										Messages.LaunchDialogHandler_dialog_title,
-										null,
-										NLS.bind(Messages.LaunchDialogHandler_dialog_message, node.getLaunchConfigurationType().getName(), node.getLaunchConfiguration().getName()),
-										MessageDialog.QUESTION,
-										modeLabels.toArray(new String[modeLabels.size()]),
-										defaultIndex,
-										null, null);
-						int result = dialog.open();
-						if (result >= IDialogConstants.INTERNAL_ID) {
-							DebugUITools.launch(node.getLaunchConfiguration(), modes[result - IDialogConstants.INTERNAL_ID]);
-						}
-					}
-				}
+				doLaunch((LaunchNode)element);
 			}
 		}
 		return null;
+	}
+
+	protected void doLaunch(LaunchNode node) {
+		if (node != null && node.getLaunchConfiguration() != null) {
+			final String[] modes = LaunchConfigHelper.getLaunchConfigTypeModes(node.getLaunchConfigurationType(), false);
+			List<String> modeLabels = new ArrayList<String>();
+			int defaultIndex = 0;
+			for (String mode : modes) {
+				if (LaunchManager.getInstance().validate(node.getLaunchConfiguration(), mode)) {
+					ILaunchMode launchMode = DebugPlugin.getDefault().getLaunchManager().getLaunchMode(mode);
+					modeLabels.add(launchMode.getLabel());
+					if (mode.equals(ILaunchManager.DEBUG_MODE)) {
+						defaultIndex = modeLabels.size()-1;
+					}
+				}
+			}
+			if (modeLabels.size() >= 1) {
+				modeLabels.add(IDialogConstants.CANCEL_LABEL);
+				OptionalMessageDialog dialog = new OptionalMessageDialog(
+								UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getShell(),
+								Messages.LaunchDialogHandler_dialog_title,
+								null,
+								NLS.bind(Messages.LaunchDialogHandler_dialog_message, node.getLaunchConfigurationType().getName(), node.getLaunchConfiguration().getName()),
+								MessageDialog.QUESTION,
+								modeLabels.toArray(new String[modeLabels.size()]),
+								defaultIndex,
+								null, null);
+				int result = dialog.open();
+				if (result >= IDialogConstants.INTERNAL_ID) {
+					DebugUITools.launch(node.getLaunchConfiguration(), modes[result - IDialogConstants.INTERNAL_ID]);
+				}
+			}
+		}
 	}
 }

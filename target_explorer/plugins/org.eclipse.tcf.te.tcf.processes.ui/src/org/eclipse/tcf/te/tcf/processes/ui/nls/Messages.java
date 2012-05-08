@@ -52,19 +52,6 @@ public class Messages extends NLS {
 	public static String ProcessPreferencePage_PageDescription;
 	public static String ProcessPreferencePage_RemoveButtonLabel;
 	public static String ProcessPreferencePage_ValueLabel;
-	public static String ProcessSelectionDialog_title;
-
-	public static String LaunchObjectDialog_title;
-	public static String LaunchObjectDialog_image_label;
-	public static String LaunchObjectDialog_arguments_label;
-	public static String LaunchObjectDialog_group_label;
-	public static String LaunchObjectDialog_lineseparator_label;
-	public static String LaunchObjectDialog_lineseparator_default;
-	public static String LaunchObjectDialog_lineseparator_lf;
-	public static String LaunchObjectDialog_lineseparator_crlf;
-	public static String LaunchObjectDialog_lineseparator_cr;
-
-	public static String LaunchProcessesCommandHandler_error_title;
 
 	public static String AbstractChannelCommandHandler_statusDialog_title;
 
@@ -183,7 +170,7 @@ public class Messages extends NLS {
 	public static String GeneralInformationPage_Type;
 
 	public static String GeneralInformationPage_User;
-	
+
 
 	public static String TerminateHandler_TerminationError;
 	public static String ProcessLabelProvider_RootNodeLabel;

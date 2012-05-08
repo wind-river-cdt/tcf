@@ -97,7 +97,10 @@ public class RemoteAppLaunchManagerDelegate extends DefaultLaunchManagerDelegate
 			}
 
 			IPropertiesAccessService service = ServiceManager.getInstance().getService(remoteCtx, IPropertiesAccessService.class);
+
+			Object dnsName = service != null ? service.getProperty(remoteCtx, "dns.name.transient") : null; //$NON-NLS-1$
 			String ctxName = service != null ? (String)service.getTargetAddress(remoteCtx).get(IPropertiesAccessServiceConstants.PROP_ADDRESS) : null;
+			ctxName = dnsName != null && dnsName.toString().trim().length() > 0 ? dnsName.toString().trim() : ctxName;
 
 			if (ctxName != null) {
 				if (launchSpec.getLaunchConfigName() == null ||
