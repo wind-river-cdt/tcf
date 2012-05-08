@@ -40,32 +40,37 @@ public interface IPeerModelProperties {
 	/**
 	 * Property: The peer state.
 	 */
-	public static String PROP_STATE = "state"; //$NON-NLS-1$
+	public static final String PROP_STATE = "state"; //$NON-NLS-1$
 
 	/**
 	 * Peer state: Not determined yet (unknown).
 	 */
-	public static int STATE_UNKNOWN = -1;
+	public static final int STATE_UNKNOWN = -1;
 
 	/**
 	 * Peer state: Peer is reachable, no active communication channel is open.
 	 */
-	public static int STATE_REACHABLE = 0;
+	public static final int STATE_REACHABLE = 0;
 
 	/**
 	 * Peer state: Peer is reachable and an active communication channel is opened.
 	 */
-	public static int STATE_CONNECTED = 1;
+	public static final int STATE_CONNECTED = 1;
 
 	/**
 	 * Peer state: Peer is not reachable. Connection attempt timed out.
 	 */
-	public static int STATE_NOT_REACHABLE = 2;
+	public static final int STATE_NOT_REACHABLE = 2;
 
 	/**
 	 * Peer state: Peer is not reachable. Connection attempt terminated with error.
 	 */
-	public static int STATE_ERROR = 3;
+	public static final int STATE_ERROR = 3;
+
+	/**
+	 * Property: The peer type.
+	 */
+	public static final String PROP_TYPE = "Type"; //$NON-NLS-1$
 
 	/**
 	 * Property: Reference counter tracking the active channels for this peer.
