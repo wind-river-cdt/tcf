@@ -44,6 +44,7 @@ import org.eclipse.tcf.core.TransientPeer;
 import org.eclipse.tcf.debug.test.services.BreakpointsCM;
 import org.eclipse.tcf.debug.test.services.DiagnosticsCM;
 import org.eclipse.tcf.debug.test.services.LineNumbersCM;
+import org.eclipse.tcf.debug.test.services.RegistersCM;
 import org.eclipse.tcf.debug.test.services.RunControlCM;
 import org.eclipse.tcf.debug.test.services.RunControlCM.ContextState;
 import org.eclipse.tcf.debug.test.services.StackTraceCM;
@@ -60,6 +61,7 @@ import org.eclipse.tcf.debug.ui.ITCFObject;
 import org.eclipse.tcf.internal.debug.launch.TCFLaunchDelegate;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
+import org.eclipse.tcf.protocol.JSON;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IBreakpoints;
 import org.eclipse.tcf.services.IDiagnostics;
@@ -67,6 +69,8 @@ import org.eclipse.tcf.services.IDiagnostics.ISymbol;
 import org.eclipse.tcf.services.IExpressions;
 import org.eclipse.tcf.services.ILineNumbers;
 import org.eclipse.tcf.services.IMemoryMap;
+import org.eclipse.tcf.services.IRegisters;
+import org.eclipse.tcf.services.IRegisters.RegistersContext;
 import org.eclipse.tcf.services.IRunControl;
 import org.eclipse.tcf.services.IRunControl.RunControlContext;
 import org.eclipse.tcf.services.IStackTrace;
@@ -109,6 +113,7 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
     protected IBreakpoints bp;
     protected IMemoryMap fMemoryMap;
     protected ILineNumbers fLineNumbers;
+    protected IRegisters fRegisters;
 
     protected RunControlCM fRunControlCM;
     protected DiagnosticsCM fDiagnosticsCM;
@@ -116,7 +121,7 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
     protected StackTraceCM fStackTraceCM;
     protected SymbolsCM fSymbolsCM;
     protected LineNumbersCM fLineNumbersCM;
-
+    protected RegistersCM fRegistersCM;
     protected String fTestId;
     protected RunControlContext fTestCtx;
     protected String fProcessId = "";
@@ -179,7 +184,7 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
         // Do not activate debug view or debug perspective, also to avoid interferring
         // with tests' virtual viewers.
         setProperty(IConfigurationProperties.TARGET_PERSPECTIVE, "org.eclipse.cdt.ui.CPerspective"); //$NON-NLS-1$
-        setProperty(IConfigurationProperties.TARGET_VIEW, "org.eclipse.cdt.internal.ui.cview.CView"); //$NON-NLS-1$
+        setProperty(IConfigurationProperties.TARGET_VIEW, "org.eclipse.cdt.ui.CView"); //$NON-NLS-1$
     }
 
     @Override
@@ -264,9 +269,11 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
         fStackTraceCM = new StackTraceCM(stk, rc);
         fSymbolsCM = new SymbolsCM(syms, fRunControlCM, fMemoryMap);
         fLineNumbersCM = new LineNumbersCM(fLineNumbers, fMemoryMap, fRunControlCM);
+        fRegistersCM = new RegistersCM(fRegisters, rc);
     }
 
     protected void tearDownServiceListeners() throws Exception{
+        fRegistersCM.dispose();
         fSymbolsCM.dispose();
         fBreakpointsCM.dispose();
         fStackTraceCM.dispose();
@@ -386,6 +393,7 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
                 bp = channels[0].getRemoteService(IBreakpoints.class);
                 fMemoryMap = channels[0].getRemoteService(IMemoryMap.class);
                 fLineNumbers = channels[0].getRemoteService(ILineNumbers.class);
+                fRegisters = channels[0].getRemoteService(IRegisters.class);
             };
         });
     }
@@ -583,47 +591,46 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
     }
 
     private boolean runToTestEntry(final String testFunc) throws InterruptedException, ExecutionException {
-    	return new Transaction<Boolean>() {
-    		Object fWaitForResumeKey;
-    		Object fWaitForSuspendKey;
-    		boolean fSuspendEventReceived = false;
-    		@Override
+        return new Transaction<Boolean>() {            
+            Object fWaitForResumeKey;
+            Object fWaitForSuspendKey;
+            boolean fSuspendEventReceived = false;
             protected Boolean process() throws Transaction.InvalidCacheException ,ExecutionException {
-    			ISymbol sym_func0 = validate( fDiagnosticsCM.getSymbol(fProcessId, testFunc) );
-    			String sym_func0_value = sym_func0.getValue().toString();
-    			ContextState state = validate (fRunControlCM.getState(fThreadId));
-
-    			while (!state.suspended || !new BigInteger(state.pc).equals(new BigInteger(sym_func0_value))) {
-    				if (state.suspended && fWaitForSuspendKey == null) {
-    					fSuspendEventReceived = true;
-    					// We are not at test entry.  Create a new suspend wait cache.
-    					fWaitForResumeKey = new Object();
-    					fWaitForSuspendKey = new Object();
-    					ICache<Object> waitForResume = fRunControlCM.waitForContextResumed(fThreadId, fWaitForResumeKey);
-
-    					// Issue resume command.
-    					validate( fRunControlCM.resume(fThreadCtx, fWaitForResumeKey, IRunControl.RM_RESUME, 1) );
-
-    					// Wait until we receive the resume event.
-    					validate(waitForResume);
-    					fWaitForSuspendKey = new Object();
-    					fRunControlCM.waitForContextSuspended(fThreadId, fWaitForSuspendKey);
-    				} else {
-    					if (fWaitForResumeKey != null) {
-    						// Validate resume command
-    						validate( fRunControlCM.resume(fThreadCtx, fWaitForResumeKey, IRunControl.RM_RESUME, 1) );
-    						fWaitForResumeKey = null;
-
-    					}
-    					// Wait until we suspend.
-    					validate( fRunControlCM.waitForContextSuspended(fThreadId, fWaitForSuspendKey) );
-    					fWaitForSuspendKey = null;
-    				}
-    			}
-
-    			return fSuspendEventReceived;
-    		}
-    	}.get();
+                ISymbol sym_func0 = validate( fDiagnosticsCM.getSymbol(fProcessId, testFunc) );
+                String sym_func0_value = sym_func0.getValue().toString();
+                ContextState state = validate (fRunControlCM.getState(fThreadId));
+                
+                while (!state.suspended || !new BigInteger(state.pc).equals(new BigInteger(sym_func0_value))) {
+                    if (state.suspended && fWaitForSuspendKey == null) {
+                        fSuspendEventReceived = true;
+                        // We are not at test entry.  Create a new suspend wait cache.
+                        fWaitForResumeKey = new Object();
+                        fWaitForSuspendKey = new Object();
+                        ICache<Object> waitForResume = fRunControlCM.waitForContextResumed(fThreadId, fWaitForResumeKey);
+                        
+                        // Issue resume command.
+                        validate( fRunControlCM.resume(fThreadCtx, fWaitForResumeKey, IRunControl.RM_RESUME, 1) );
+                        
+                        // Wait until we receive the resume event.
+                        validate(waitForResume);
+                        fWaitForSuspendKey = new Object();
+                        fRunControlCM.waitForContextSuspended(fThreadId, fWaitForSuspendKey);
+                    } else {
+                        if (fWaitForResumeKey != null) {
+                            // Validate resume command
+                            validate( fRunControlCM.resume(fThreadCtx, fWaitForResumeKey, IRunControl.RM_RESUME, 1) );
+                            fWaitForResumeKey = null;
+                            
+                        }
+                        // Wait until we suspend.
+                        validate( fRunControlCM.waitForContextSuspended(fThreadId, fWaitForSuspendKey) );
+                        fWaitForSuspendKey = null;
+                    }
+                }
+                
+                return fSuspendEventReceived;
+            }
+        }.get();
     }
 
     protected void initProcessModel(String testFunc) throws Exception {
@@ -738,5 +745,55 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
             }
         }.get();
     }
+
+    protected void moveToLocation(final String context, final Number address) throws 
+        DebugException, ExecutionException, InterruptedException 
+    {
+        final RegistersContext pcReg = new Transaction<RegistersContext>() {
+            protected RegistersContext process() throws InvalidCacheException ,ExecutionException {
+                String[] registers = validate(fRegistersCM.getChildren(context));
+                return findPCRegister(registers);
+            }
+            
+            private RegistersContext findPCRegister(String[] registerIds) throws InvalidCacheException ,ExecutionException {
+                for (String regId : registerIds) {
+                    RegistersContext reg = validate(fRegistersCM.getContext(regId));
+                    if ( IRegisters.ROLE_PC.equals(reg.getRole()) ) {
+                        return reg;
+                    }
+                }
+                for (String regId : registerIds) {
+                    String[] children = validate(fRegistersCM.getChildren(regId));
+                    RegistersContext pc = findPCRegister(children);
+                    if (pc != null) return pc;
+                }
+                return null;
+            }
+        }.get();        
+        
+        assertNotNull("Cannot find PC register", pcReg);
+        
+        new Transaction<Object>() {
+            protected Object process() throws Transaction.InvalidCacheException ,ExecutionException {
+                byte[] value = addressToByteArray(address, pcReg.getSize(), pcReg.isBigEndian());
+                validate(fRegistersCM.setContextValue(pcReg, this, value));
+                return null;
+            };
+        }.get();
+    }
+    
+    private byte[] addressToByteArray(Number address, int size, boolean bigEndian) {
+        byte[] bytes = new byte[size];
+        byte[] addrBytes = JSON.toBigInteger(address).toByteArray();
+        for (int i=0; i < bytes.length; ++i) {
+            byte b = 0;
+            if (i < addrBytes.length) {
+                b = addrBytes[addrBytes.length - i - 1];
+            }
+            bytes[bigEndian ? size -i - 1 : i] = b;
+        }
+        return bytes;
+    }
+
 
 }

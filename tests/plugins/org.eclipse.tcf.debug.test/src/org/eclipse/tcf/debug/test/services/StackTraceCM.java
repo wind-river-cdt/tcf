@@ -52,12 +52,10 @@ public class StackTraceCM extends AbstractCacheManager implements IRunControl.Ru
         class MyCache extends TokenCache<String[]> implements IStackTrace.DoneGetChildren {
             @Override
             protected IToken retrieveToken() {
-                fRunControlStateResetMap.addPending(this);
                 return fService.getChildren(id, this);
             }
             
             public void doneGetChildren(IToken token, Exception error, String[] context_ids) {
-                fRunControlStateResetMap.removePending(this);
                 fRunControlStateResetMap.addValid(id, this);
                 set(token, context_ids, error);
             }
@@ -72,10 +70,8 @@ public class StackTraceCM extends AbstractCacheManager implements IRunControl.Ru
         
         class MyCache extends RangeCache<StackTraceContext> implements IResettable {
             boolean fIsValid = false;
-            boolean fIsPending = false;
             @Override
             protected void retrieve(final long offset, final int count, DataCallback<List<StackTraceContext>> rm) {
-                if (!fIsPending) fRunControlStateResetMap.addPending(MyCache.this);
                 new Transaction<List<StackTraceContext>>() {
                     @Override
                     protected List<StackTraceContext> process() throws InvalidCacheException, ExecutionException {
@@ -85,7 +81,6 @@ public class StackTraceCM extends AbstractCacheManager implements IRunControl.Ru
                         System.arraycopy(ids, (int)offset, subIds, 0, adjustedCount);
                         StackTraceContext[] contexts = validate(getContexts(subIds));
                         if (!fIsValid) {
-                            fRunControlStateResetMap.removePending(MyCache.this);
                             fRunControlStateResetMap.addValid(parentId, MyCache.this);
                         }
                         return Arrays.asList(contexts);
@@ -96,7 +91,6 @@ public class StackTraceCM extends AbstractCacheManager implements IRunControl.Ru
             
             public void reset() {
                 fIsValid = false;
-                fIsPending = false;
                 @SuppressWarnings("unchecked")
                 List<StackTraceContext> emptyData = (List<StackTraceContext>)Collections.EMPTY_LIST;
                 set(0, 0, emptyData, new Throwable("Cache invalid") );
@@ -133,8 +127,6 @@ public class StackTraceCM extends AbstractCacheManager implements IRunControl.Ru
     
     
     public void contextAdded(RunControlContext[] contexts) {
-        // TODO Auto-generated method stub
-        
     }
 
     public void contextChanged(RunControlContext[] contexts) {

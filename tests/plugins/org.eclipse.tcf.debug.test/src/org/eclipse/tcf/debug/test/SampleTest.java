@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.VirtualItem;
 import org.eclipse.tcf.debug.test.services.IWaitForEventCache;
 import org.eclipse.tcf.debug.test.services.RunControlCM;
+import org.eclipse.tcf.debug.test.services.RunControlCM.ContextState;
 import org.eclipse.tcf.debug.test.util.ICache;
 import org.eclipse.tcf.debug.test.util.RangeCache;
 import org.eclipse.tcf.debug.test.util.Transaction;
@@ -19,6 +20,8 @@ import org.eclipse.tcf.services.IRunControl.RunControlContext;
 import org.eclipse.tcf.services.IStackTrace.StackTraceContext;
 import org.eclipse.tcf.services.ISymbols;
 import org.eclipse.tcf.services.ISymbols.Symbol;
+import org.eclipse.test.performance.Performance;
+import org.eclipse.test.performance.PerformanceMeter;
 import org.junit.Assert;
 
 @SuppressWarnings("restriction")
@@ -66,6 +69,8 @@ public class SampleTest extends AbstractTcfUITest {
 
         initProcessModel("tcf_test_func0");
         
+        
+        
         // Execute step loop
         String previousThreadLabel = null;
         for (int stepNum = 0; stepNum < 100; stepNum++) {
@@ -87,33 +92,58 @@ public class SampleTest extends AbstractTcfUITest {
         }
     }
 
-    public void testSteppingSourceDisplay() throws Exception {
+    public void testSteppingPerformanceWithSourceDisplay() throws Exception {
         initProcessModel("tcf_test_func0");
-        
-        // Execute step loop
-        String previousThreadLabel = null;
-        for (int stepNum = 0; stepNum < 100; stepNum++) {
-            fDebugViewListener.reset();
-            fSourceDisplayListener.reset();
-            
-            resumeAndWaitForSuspend(fThreadCtx, IRunControl.RM_STEP_INTO_LINE);
-            CodeArea area = calcPCCodeArea();
-            if (area != null) {
-                fSourceDisplayListener.setCodeArea(calcPCCodeArea());
-            }
 
-            fDebugViewListener.waitTillFinished(MODEL_CHANGED_COMPLETE | CONTENT_SEQUENCE_COMPLETE | LABEL_UPDATES_RUNNING);
-            if (area != null) {
-                fSourceDisplayListener.waitTillFinished();
+        final Number sym_func0_address = new Transaction<Number>() {
+            protected Number process() throws Transaction.InvalidCacheException ,ExecutionException {
+                return validate( fDiagnosticsCM.getSymbol(fProcessId, "tcf_test_func0") ).getValue();                
+            };
+        }.get();
+        
+        final Number sym_func3_address = new Transaction<Number>() {
+            protected Number process() throws Transaction.InvalidCacheException ,ExecutionException {
+                return validate( fDiagnosticsCM.getSymbol(fProcessId, "tcf_test_func3") ).getValue();                
+            };
+        }.get();
+
+        Performance perf = Performance.getDefault();
+        PerformanceMeter meter = perf.createPerformanceMeter(perf.getDefaultScenarioId(this));
+
+        try {
+            // Execute step loop
+            for (int stepNum = 0; stepNum < 100; stepNum++) {
+                fDebugViewListener.reset();
+                fSourceDisplayListener.reset();
+                
+                meter.start();
+    
+                ContextState state = resumeAndWaitForSuspend(fThreadCtx, IRunControl.RM_STEP_INTO_LINE);
+                
+                CodeArea area = calcPCCodeArea();
+                if (area != null) {
+                    fSourceDisplayListener.setCodeArea(calcPCCodeArea());
+                }
+    
+                fDebugViewListener.waitTillFinished(MODEL_CHANGED_COMPLETE | CONTENT_SEQUENCE_COMPLETE | LABEL_UPDATES_RUNNING);
+                if (area != null) {
+                    fSourceDisplayListener.waitTillFinished();
+                }
+    
+                meter.stop();
+    
+                if (new BigInteger(state.pc).equals(new BigInteger(sym_func3_address.toString()))) {
+                    moveToLocation(fThreadId, sym_func0_address);
+                }
+                    
             }
-            
-            VirtualItem topFrameItem = fDebugViewListener.findElement(
-                new Pattern[] { Pattern.compile(".*"), Pattern.compile(".*"), Pattern.compile(".*" + fProcessId + ".*\\(Step.*"), Pattern.compile(".*")});
-            Assert.assertTrue(topFrameItem != null);
-            String topFrameLabel = ((String[])topFrameItem.getData(VirtualItem.LABEL_KEY))[0];
-            Assert.assertTrue(!topFrameLabel.equals(previousThreadLabel));
-            previousThreadLabel = topFrameLabel;
+        
+            meter.commit();
+            perf.assertPerformance(meter);
+        } finally {
+            meter.dispose();
         }
+
     }
 
     private CodeArea calcPCCodeArea() throws ExecutionException, InterruptedException {

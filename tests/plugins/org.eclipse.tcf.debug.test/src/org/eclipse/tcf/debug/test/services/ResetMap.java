@@ -11,6 +11,7 @@
 package org.eclipse.tcf.debug.test.services;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,7 +20,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.eclipse.tcf.debug.test.util.AbstractCache;
 import org.eclipse.tcf.protocol.Protocol;
 
 /**
@@ -36,6 +36,8 @@ public class ResetMap {
     private Map<String, List<IResettable>> fValid = new TreeMap<String, List<IResettable>>();
     private Map<String, Set<String>> fChildren = new TreeMap<String, Set<String>>();
     private Map<String, String> fParents = new TreeMap<String, String>();
+    
+    // Mapping of context IDs that were reset while a given cache was pending.
     private Map<IResettable, Set<String>> fPending = new LinkedHashMap<IResettable, Set<String>>();
 
     public synchronized Set<String> removePending(IResettable cache) {
@@ -155,6 +157,17 @@ public class ResetMap {
         }
     }
     
+    public synchronized void resetAll() {
+        Collection<List<IResettable>> valid = null;
+        synchronized (this) {
+            valid = fValid.values();
+        }
+        
+        for (List<IResettable> validList : valid) {
+            resetList(validList);
+        }
+    }
+
     public synchronized void addPending(IResettable cache) {
         fPending.put(cache, new TreeSet<String>());
     }

@@ -95,12 +95,10 @@ public class SourceDisplayListener implements IPartListener, IAnnotationModelLis
     }
     
     public void partActivated(IWorkbenchPart part) {
-        System.out.println("activated");
         partBroughtToTop(part);
     }
     
     public void partBroughtToTop(IWorkbenchPart part) {
-        System.out.println("top");
         fActiveEditor = null;
         if (fAnnotationModel != null) {
             fAnnotationModel.removeAnnotationModelListener(this);
@@ -112,14 +110,12 @@ public class SourceDisplayListener implements IPartListener, IAnnotationModelLis
         }
     }
     public void partClosed(IWorkbenchPart part) {
-        System.out.println("closed");
+    }
 
-    }
     public void partDeactivated(IWorkbenchPart part) {
-        System.out.println("deactivated");
     }
+
     public void partOpened(IWorkbenchPart part) {
-        System.out.println("opened");
     }
     
     public void modelChanged(IAnnotationModel model) {
