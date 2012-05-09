@@ -96,6 +96,10 @@
 			<Method name="appendErrorProps"/>
 		</And>
 	</Match>
+	<Match>
+		<Bug pattern="PZLA_PREFER_ZERO_LENGTH_ARRAYS"/>
+		<Package name="org.eclipse.tcf.internal.services.remote"/>
+	</Match>
 
 	
 	<!-- Filters for org.eclipse.tcf.debug.ui bundle -->
