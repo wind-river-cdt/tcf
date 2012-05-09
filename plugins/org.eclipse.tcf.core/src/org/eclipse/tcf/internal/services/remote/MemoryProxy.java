@@ -38,6 +38,12 @@ public class MemoryProxy implements IMemory {
         int stat;
         String msg;
 
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof Range) return compareTo((Range)o) == 0;
+            return false;
+        }
+
         public int compareTo(Range o) {
             if (offs < o.offs) return -1;
             if (offs > o.offs) return +1;
@@ -101,7 +107,7 @@ public class MemoryProxy implements IMemory {
             int l = 0;
             int h = ranges.length - 1;
             while (l <= h) {
-                int n = (l + h) / 2;
+                int n = (l + h) >>> 1;
                 Range r = ranges[n];
                 if (r.offs > offset) {
                     h = n - 1;
@@ -121,7 +127,7 @@ public class MemoryProxy implements IMemory {
             int l = 0;
             int h = ranges.length - 1;
             while (l <= h) {
-                int n = (l + h) / 2;
+                int n = (l + h) >>> 1;
                 Range r = ranges[n];
                 if (r.offs > offset) {
                     h = n - 1;

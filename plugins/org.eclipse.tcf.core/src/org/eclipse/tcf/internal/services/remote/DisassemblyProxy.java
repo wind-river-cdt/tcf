@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.internal.services.remote;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
@@ -65,7 +66,7 @@ public class DisassemblyProxy implements IDisassembly {
             bf.append(' ');
             bf.append(size);
             bf.append(' ');
-            bf.append(data);
+            bf.append(Arrays.toString(data));
             bf.append(' ');
             for (Map<String,Object> m : instruction) bf.append(m.toString());
             bf.append(']');

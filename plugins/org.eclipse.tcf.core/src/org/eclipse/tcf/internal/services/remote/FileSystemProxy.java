@@ -241,7 +241,7 @@ public class FileSystemProxy implements IFileSystem {
 
     public IToken open(String file_name, int flags, FileAttrs attrs, final DoneOpen done) {
         Object dt = toObject(attrs);
-        return new FileSystemCommand("open", new Object[]{ file_name, new Integer(flags), dt }) {
+        return new FileSystemCommand("open", new Object[]{ file_name, Integer.valueOf(flags), dt }) {
             public void done(Exception error, Object[] args) {
                 Status s = null;
                 FileHandle h = null;

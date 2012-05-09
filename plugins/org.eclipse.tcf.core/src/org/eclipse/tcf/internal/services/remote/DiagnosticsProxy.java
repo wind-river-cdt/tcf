@@ -117,8 +117,8 @@ public class DiagnosticsProxy implements IDiagnostics {
         }
         else {
             map = new HashMap<String,Object>();
-            map.put(IErrorReport.ERROR_TIME, new Long(System.currentTimeMillis()));
-            map.put(IErrorReport.ERROR_CODE, new Integer(IErrorReport.TCF_ERROR_OTHER));
+            map.put(IErrorReport.ERROR_TIME, Long.valueOf(System.currentTimeMillis()));
+            map.put(IErrorReport.ERROR_CODE, Integer.valueOf(IErrorReport.TCF_ERROR_OTHER));
             map.put(IErrorReport.ERROR_FORMAT, err.getMessage());
         }
         return new Command(channel, this, "echoERR", new Object[]{ map }) {

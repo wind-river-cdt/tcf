@@ -347,8 +347,8 @@ public class SymbolsProxy implements ISymbols {
         if (o == null) return null;
         Map<String,Object> c = (Map<String,Object>)o;
         HashMap<String,Object[]> m = new HashMap<String,Object[]>();
-        for (String id : c.keySet()) {
-            m.put(id, toObjectArray(c.get(id)));
+        for (Map.Entry<String,Object> e : c.entrySet()) {
+            m.put(e.getKey(), toObjectArray(e.getValue()));
         }
         return m;
     }

@@ -288,8 +288,8 @@ public class ProcessesProxy implements IProcesses {
         if (m == null) return new String[0];
         int n = 0;
         String[] arr = new String[m.size()];
-        for (String s : m.keySet()) {
-            arr[n++] = s + "=" + m.get(s);
+        for (Map.Entry<String,String> e : m.entrySet()) {
+            arr[n++] = e.getKey() + "=" + e.getValue();
         }
         return arr;
     }
