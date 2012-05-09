@@ -77,8 +77,7 @@ public class FileTransferItem extends PropertiesContainer implements IFileTransf
 		if (obj instanceof IFileTransferItem) {
 			return getHostPath().equals(((IFileTransferItem)obj).getHostPath()) &&
 							getTargetPath().equals(((IFileTransferItem)obj).getTargetPath()) &&
-							getDirection() == ((IFileTransferItem)obj).getDirection() &&
-							getOptions().equals(((IFileTransferItem)obj).getOptions());
+							getDirection() == ((IFileTransferItem)obj).getDirection();
 		}
 		return super.equals(obj);
 	}

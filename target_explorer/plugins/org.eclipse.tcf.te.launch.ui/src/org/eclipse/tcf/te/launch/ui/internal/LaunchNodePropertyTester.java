@@ -43,11 +43,6 @@ public class LaunchNodePropertyTester extends PropertyTester {
 			else if (property.equals("canRefresh")) { //$NON-NLS-1$
 				return refreshHandler.canRefresh(receiver);
 			}
-			else if (property.equals("hasLaunchMode")) { //$NON-NLS-1$
-				if (expectedValue != null && LaunchNode.TYPE_LAUNCH_CONFIG.equals(node.getType())) {
-					return node.getLaunchConfigurationType().supportsMode(expectedValue.toString());
-				}
-			}
 			else if (property.equals("isValidLaunchConfig")) { //$NON-NLS-1$
 				if (expectedValue instanceof String) {
 					return node.isValidFor((String)expectedValue);

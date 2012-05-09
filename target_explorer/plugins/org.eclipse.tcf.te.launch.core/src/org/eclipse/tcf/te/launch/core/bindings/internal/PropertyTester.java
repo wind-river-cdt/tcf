@@ -10,6 +10,7 @@
 package org.eclipse.tcf.te.launch.core.bindings.internal;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.tcf.te.launch.core.bindings.LaunchConfigTypeBindingsManager;
@@ -41,6 +42,9 @@ public class PropertyTester extends org.eclipse.core.expressions.PropertyTester 
 			if (receiver instanceof IModelNodeProvider) {
 				selContext = new RemoteSelectionContext(((IModelNodeProvider)receiver).getModelNode(), true);
 			}
+			else if (receiver instanceof IResource) {
+				selContext = new ProjectSelectionContext(((IResource)receiver).getProject(), true);
+			}
 			else if (receiver instanceof IProject) {
 				selContext = new ProjectSelectionContext((IProject)receiver, true);
 			}
@@ -49,9 +53,17 @@ public class PropertyTester extends org.eclipse.core.expressions.PropertyTester 
 				if (project != null) {
 					selContext = new ProjectSelectionContext(project, true);
 				}
-				IModelNode modelNode = (IModelNode)((IAdaptable)receiver).getAdapter(IModelNode.class);
-				if (modelNode != null) {
-					selContext = new RemoteSelectionContext(modelNode, true);
+				else {
+					IResource resource = (IResource)((IAdaptable)receiver).getAdapter(IResource.class);
+					if (resource != null) {
+						selContext = new ProjectSelectionContext(resource.getProject(), true);
+					}
+					else {
+						IModelNode modelNode = (IModelNode)((IAdaptable)receiver).getAdapter(IModelNode.class);
+						if (modelNode != null) {
+							selContext = new RemoteSelectionContext(modelNode, true);
+						}
+					}
 				}
 			}
 			if (selContext != null) {

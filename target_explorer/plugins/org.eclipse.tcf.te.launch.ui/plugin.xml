@@ -17,7 +17,7 @@
             class="org.eclipse.tcf.te.launch.ui.internal.LaunchNodePropertyTester"
             id="org.eclipse.tcf.te.launch.ui.propertytester.launchNode"
             namespace="org.eclipse.tcf.te.launch.ui.model"
-            properties="isLaunchConfig,isLaunchConfigType,canDelete,canRefresh,hasLaunchMode,isValidLaunchConfig"
+            properties="isLaunchConfig,isLaunchConfigType,canDelete,canRefresh,isValidLaunchConfig"
             type="org.eclipse.tcf.te.launch.ui.model.LaunchNode">
       </propertyTester>
    </extension>
@@ -584,10 +584,7 @@
                <iterate 
                      operator="and" 
                      ifEmpty="false">
-                  <and>
-                     <test property="org.eclipse.tcf.te.launch.ui.model.hasLaunchMode" value="run"/>
-                     <test property="org.eclipse.tcf.te.launch.ui.model.isValidLaunchConfig" value="run"/>
-                  </and>
+                  <test property="org.eclipse.tcf.te.launch.ui.model.isValidLaunchConfig" value="run"/>
                </iterate>
             </with>
          </enabledWhen>
@@ -608,10 +605,7 @@
                <iterate 
                      operator="and" 
                      ifEmpty="false">
-                  <and>
-                     <test property="org.eclipse.tcf.te.launch.ui.model.hasLaunchMode" value="debug"/>
-                     <test property="org.eclipse.tcf.te.launch.ui.model.isValidLaunchConfig" value="debug"/>
-                  </and>
+                  <test property="org.eclipse.tcf.te.launch.ui.model.isValidLaunchConfig" value="debug"/>
                </iterate>
             </with>
          </enabledWhen>
@@ -720,10 +714,13 @@
 	         <iterate
 	               ifEmpty="false"
 	               operator="and">
-	            <or>
-	               <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
-	               <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfigType"/>
-	            </or>
+	            <and>
+                   <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
+                   <or>
+	                  <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
+	                  <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfigType"/>
+	               </or>
+	            </and>
 	         </iterate>
 	      </with>
       </definition>
@@ -733,7 +730,10 @@
              <iterate
                    ifEmpty="false"
                    operator="and">
-                <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
+	            <and>
+                   <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
+                   <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
+                </and>
              </iterate>
           </with>
       </definition>
@@ -742,7 +742,10 @@
              <iterate
                    ifEmpty="false"
                    operator="and">
-                <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
+	            <and>
+                   <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
+                   <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
+                </and>
              </iterate>
           </with>
       </definition>
@@ -752,7 +755,10 @@
              <iterate
                    ifEmpty="false"
                    operator="and">
-                <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfigType"/>
+	            <and>
+                   <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
+                   <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfigType"/>
+                </and>
              </iterate>
           </with>
       </definition>

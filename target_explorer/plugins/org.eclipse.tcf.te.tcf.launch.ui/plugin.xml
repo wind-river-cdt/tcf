@@ -40,10 +40,7 @@
          <contextualLaunch>
             <enablement>
                <with variable="selection">
-                  <count value="1"/>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
+                  <iterate ifEmpty="false">
                      <test 
                            forcePluginActivation="true"
                            property="org.eclipse.tcf.te.launch.core.isValidLaunchConfigType"
@@ -65,14 +62,12 @@
          <contextualLaunch>
             <enablement>
                <with variable="selection">
-                  <count value="1"/>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
+                  <iterate ifEmpty="false">
                      <test 
+                           forcePluginActivation="true"
                            property="org.eclipse.tcf.te.launch.core.isValidLaunchConfigType"
                            value="org.eclipse.tcf.te.tcf.launch.type.remote.app"
-                           args="debug"/>
+                           args="run"/>
                   </iterate>
                </with>
             </enablement>
@@ -139,13 +134,20 @@
                label="%LaunchShortcutHandler.Remote.App.run.name"
                style="push">
             <visibleWhen checkEnabled="false">
-            <with variable="selection">
-               <iterate 
-                     operator="and" 
-                     ifEmpty="false">
-                  <instanceof value="org.eclipse.core.resources.IResource"/>
-               </iterate>
-            </with>
+               <with variable="selection">
+                  <iterate 
+                        operator="and" 
+                        ifEmpty="false">
+                     <and>
+                        <adapt type="org.eclipse.debug.ui.actions.ILaunchable"/>
+                        <test 
+                              forcePluginActivation="true"
+                              property="org.eclipse.tcf.te.launch.core.isValidLaunchConfigType"
+                              value="org.eclipse.tcf.te.tcf.launch.type.remote.app"
+                              args="run"/>
+                     </and>
+                  </iterate>
+               </with>
             </visibleWhen>
          </command>
          <command
@@ -156,13 +158,20 @@
                label="%LaunchShortcutHandler.Remote.App.debug.name"
                style="push">
             <visibleWhen checkEnabled="false">
-            <with variable="selection">
-               <iterate 
-                     operator="and" 
-                     ifEmpty="false">
-                  <instanceof value="org.eclipse.core.resources.IResource"/>
-               </iterate>
-            </with>
+               <with variable="selection">
+                  <iterate 
+                        operator="and" 
+                        ifEmpty="false">
+                     <and>
+                        <adapt type="org.eclipse.debug.ui.actions.ILaunchable"/>
+                        <test 
+                              forcePluginActivation="true"
+                              property="org.eclipse.tcf.te.launch.core.isValidLaunchConfigType"
+                              value="org.eclipse.tcf.te.tcf.launch.type.remote.app"
+                              args="run"/>
+                     </and>
+                  </iterate>
+               </with>
             </visibleWhen>
          </command>
       </menuContribution>
@@ -178,11 +187,17 @@
                style="push">
             <visibleWhen checkEnabled="false">
             <with variable="selection">
-               <iterate 
-                     operator="and" 
-                     ifEmpty="false">
-                  <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
-               </iterate>
+               <with variable="selection">
+                  <iterate 
+                        operator="and" 
+                        ifEmpty="false">
+                     <test 
+                           forcePluginActivation="true"
+                           property="org.eclipse.tcf.te.launch.core.isValidLaunchConfigType"
+                           value="org.eclipse.tcf.te.tcf.launch.type.remote.app"
+                           args="run"/>
+                  </iterate>
+               </with>
             </with>
             </visibleWhen>
          </command>
@@ -195,11 +210,17 @@
                style="push">
             <visibleWhen checkEnabled="false">
             <with variable="selection">
-               <iterate 
-                     operator="and" 
-                     ifEmpty="false">
-                  <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
-               </iterate>
+               <with variable="selection">
+                  <iterate 
+                        operator="and" 
+                        ifEmpty="false">
+                     <test 
+                           forcePluginActivation="true"
+                           property="org.eclipse.tcf.te.launch.core.isValidLaunchConfigType"
+                           value="org.eclipse.tcf.te.tcf.launch.type.remote.app"
+                           args="debug"/>
+                  </iterate>
+               </with>
             </with>
             </visibleWhen>
          </command>
@@ -238,10 +259,11 @@
                <iterate 
                      operator="and" 
                      ifEmpty="false">
-                  <or>
-                     <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
-                     <instanceof value="org.eclipse.core.resources.IResource"/>
-                  </or>
+                  <test 
+                        forcePluginActivation="true"
+                        property="org.eclipse.tcf.te.launch.core.isValidLaunchConfigType"
+                        value="org.eclipse.tcf.te.tcf.launch.type.remote.app"
+                        args="run"/>
                </iterate>
             </with>
          </enabledWhen>
@@ -264,10 +286,11 @@
                <iterate 
                      operator="and" 
                      ifEmpty="false">
-                  <or>
-                     <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
-                     <instanceof value="org.eclipse.core.resources.IResource"/>
-                  </or>
+                  <test 
+                        forcePluginActivation="true"
+                        property="org.eclipse.tcf.te.launch.core.isValidLaunchConfigType"
+                        value="org.eclipse.tcf.te.tcf.launch.type.remote.app"
+                        args="debug"/>
                </iterate>
             </with>
          </enabledWhen>

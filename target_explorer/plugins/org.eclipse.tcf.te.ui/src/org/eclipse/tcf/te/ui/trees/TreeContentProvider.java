@@ -59,15 +59,15 @@ public abstract class TreeContentProvider implements ITreeContentProvider, Prope
 	 */
 	protected Pending getPending(Object parent) {
 		Pending pending = pendings.get(parent);
-		if(pending == null) {
+		if(pending == null && viewer != null) {
 			pending = new Pending(viewer);
 			pendings.put(parent, pending);
 		}
 		return pending;
 	}
-	
+
 	@Override
-    public void propertyChange(PropertyChangeEvent evt) {
+	public void propertyChange(PropertyChangeEvent evt) {
 		String property = evt.getPropertyName();
 		if(property.equals("query_started")) { //$NON-NLS-1$
 			Object source = evt.getSource();
@@ -84,13 +84,13 @@ public abstract class TreeContentProvider implements ITreeContentProvider, Prope
 			}
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
 	 */
 	@Override
-    public void dispose() {
+	public void dispose() {
 		for(IPropertyChangeProvider provider : providers) {
 			provider.removePropertyChangeListener(commonViewerListener);
 			provider.removePropertyChangeListener(this);
@@ -101,8 +101,8 @@ public abstract class TreeContentProvider implements ITreeContentProvider, Prope
 			pending.stopAnimation();
 		}
 		pendings.clear();
-    }
-	
+	}
+
 	/**
 	 * Get the filtered children of the parent using the
 	 * filters registered in the viewer.
@@ -123,13 +123,13 @@ public abstract class TreeContentProvider implements ITreeContentProvider, Prope
 		}
 		return result;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
 	 */
 	@Override
-    public Object[] getChildren(Object parentElement) {
+	public Object[] getChildren(Object parentElement) {
 		Assert.isNotNull(parentElement);
 
 		if (parentElement instanceof IAdaptable) {
@@ -139,9 +139,9 @@ public abstract class TreeContentProvider implements ITreeContentProvider, Prope
 				installPropertyChangeListener(viewerInput);
 			}
 		}
-		
+
 		return null;
-    }
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -153,24 +153,24 @@ public abstract class TreeContentProvider implements ITreeContentProvider, Prope
 		this.viewer = (TreeViewer) viewer;
 		this.commonViewerListener = new CommonViewerListener(this.viewer, this);
 	}
-	
+
 	/**
 	 * Install a property change listener to the specified element.
 	 * 
 	 * @param provider The element node.
 	 */
-    private void installPropertyChangeListener(IPropertyChangeProvider provider) {
+	private void installPropertyChangeListener(IPropertyChangeProvider provider) {
 		if(provider != null && !providers.contains(provider) && commonViewerListener != null) {
 			provider.addPropertyChangeListener(commonViewerListener);
 			provider.addPropertyChangeListener(this);
 			providers.add(provider);
 		}
-    }
+	}
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
-     */
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
+	 */
 	@Override
 	public boolean hasChildren(Object element) {
 		Object[] children = getFilteredChildren(element);

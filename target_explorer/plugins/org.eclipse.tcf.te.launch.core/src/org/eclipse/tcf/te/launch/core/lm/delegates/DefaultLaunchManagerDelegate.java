@@ -84,14 +84,15 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 		validateLaunchSpecification(launchSpec);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchManagerDelegate#isDefaultAttribute(java.lang.String, java.lang.Object, org.eclipse.debug.core.ILaunchConfiguration, java.lang.String)
-	 */
 	@Override
-	public boolean isDefaultAttribute(String attributeKey, Object attributeValue, ILaunchConfiguration launchConfig, String launchMode) {
+	public boolean isDefaultAttribute(String attributeKey, Object specValue, Object confValue, ILaunchSpecification launchSpec, ILaunchConfiguration launchConfig, String launchMode) {
 		Assert.isNotNull(attributeKey);
 		Assert.isNotNull(launchConfig);
+		Assert.isNotNull(launchSpec);
 		Assert.isNotNull(launchMode);
+		if (confValue == null && specValue != null) {
+			return true;
+		}
 		return false;
 	}
 
@@ -589,17 +590,13 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 		if (specValue == null && confValue == null) {
 			return FULL_MATCH;
 		}
-		// if launch specification value is null,
-		// values are equal if launch configuration value is default
-		else if (specValue == null) {
-			Assert.isNotNull(confValue);
-			return isDefaultAttribute(attributeKey, confValue, launchConfig, launchSpec.getLaunchMode()) ? FULL_MATCH : NO_MATCH;
+		// if a value is null, partial match if values are default
+		else if (specValue == null || confValue == null) {
+			return isDefaultAttribute(attributeKey, specValue, confValue, launchSpec, launchConfig, launchSpec.getLaunchMode()) ? PARTIAL_MATCH : NO_MATCH;
 		}
-		// if launch configuration value is default,
-		// values are equal if launch specification value is default too
-		else if (isDefaultAttribute(attributeKey, confValue, launchConfig, launchSpec.getLaunchMode()) || confValue == null) {
-			Assert.isNotNull(specValue);
-			return isDefaultAttribute(attributeKey, specValue, launchConfig, launchSpec.getLaunchMode()) ? FULL_MATCH : NO_MATCH;
+		// full match if values are default
+		else if (isDefaultAttribute(attributeKey, specValue, confValue, launchSpec, launchConfig, launchSpec.getLaunchMode())) {
+			return FULL_MATCH;
 		}
 		// use object.equals as default
 		else {

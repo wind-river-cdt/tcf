@@ -378,7 +378,7 @@ public class LaunchManager extends PlatformObject {
 					// exclude the default attributes. We have to find out if the attribute is
 					// set with default value.
 					Object attributeValue = entry.getValue();
-					if (!delegate.isDefaultAttribute(entry.getKey(), attributeValue, launchConfig, launchMode)) {
+					if (!delegate.isDefaultAttribute(entry.getKey(), attributeValue, attributeValue, spec, launchConfig, launchMode)) {
 						spec.addAttribute(entry.getKey(), attributeValue);
 					}
 				}

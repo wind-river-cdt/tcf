@@ -75,14 +75,15 @@ public interface ILaunchManagerDelegate extends IExecutableExtension {
 	 * Test the specified attribute if or if not the specified attribute value is an default value or not.
 	 *
 	 * @param attributeKey The attribute key/name. Must not be <code>null</code>.
-	 * @param attributeValue The attribute value to test.
-	 * @param launchConfig The original launch configuration. Needed to access relevant attributes for default value
-	 *            calculation. Must not be <code>null</code>!
+	 * @param specValue The launch specification value.
+	 * @param confValue The launch configuration value.
+	 * @param launchSpec The launch specification which is the source of the <code>specValue</code>. Must not be <code>null</code>.
+	 * @param launchConfig The launch configuration which is the source of the <code>confValue</code>. Must not be <code>null</code>.
 	 * @param launchMode The launch mode. Default values may differ for different launch modes. Must not be
 	 *            <code>null</code>!
 	 * @return <code>true</code> if the specified attribute value is the default value, <code>false</code> otherwise.
 	 */
-	public boolean isDefaultAttribute(String attributeKey, Object attributeValue, ILaunchConfiguration launchConfig, String launchMode);
+	public boolean isDefaultAttribute(String attributeKey, Object specValue, Object confValue, ILaunchSpecification launchSpec, ILaunchConfiguration launchConfig, String launchMode);
 
 	/**
 	 * Returns a ranked list of launch configurations that best matches the given launch specification. In case of no

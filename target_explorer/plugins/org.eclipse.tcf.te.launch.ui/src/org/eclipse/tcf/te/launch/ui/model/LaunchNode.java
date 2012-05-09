@@ -132,6 +132,9 @@ public class LaunchNode extends ContainerModelNode {
 				modes = Arrays.asList(LaunchConfigHelper.getLaunchConfigTypeModes(getLaunchConfigurationType(), false));
 			}
 			for (String m : modes) {
+				if (!getLaunchConfigurationType().supportsMode(m)) {
+					return false;
+				}
 				ILaunchManagerDelegate delegate = LaunchManager.getInstance().getLaunchManagerDelegate(getLaunchConfigurationType(), m);
 				if (delegate != null) {
 					try {
