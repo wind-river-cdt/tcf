@@ -14,8 +14,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -31,10 +29,14 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.ILaunchesListener2;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDisconnect;
+import org.eclipse.debug.internal.ui.IInternalDebugUIConstants;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.PresentationContext;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.VirtualItem;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.VirtualTreeModelViewer;
+import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugUIConstants;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
@@ -55,6 +57,7 @@ import org.eclipse.tcf.debug.test.util.Query;
 import org.eclipse.tcf.debug.test.util.Task;
 import org.eclipse.tcf.debug.test.util.Transaction;
 import org.eclipse.tcf.debug.ui.ITCFObject;
+import org.eclipse.tcf.internal.debug.launch.TCFLaunchDelegate;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
@@ -68,26 +71,26 @@ import org.eclipse.tcf.services.IRunControl;
 import org.eclipse.tcf.services.IRunControl.RunControlContext;
 import org.eclipse.tcf.services.IStackTrace;
 import org.eclipse.tcf.services.ISymbols;
+import org.eclipse.tcf.te.tests.interfaces.IConfigurationProperties;
+import org.eclipse.tcf.te.tests.tcf.TcfTestCase;
 import org.junit.Assert;
 
 /**
- * Base test for validating TCF Debugger UI. 
+ * Base test for validating TCF Debugger UI.
  */
 @SuppressWarnings("restriction")
-public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdatesListenerConstants {
+public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUpdatesListenerConstants {
 
     private final static int NUM_CHANNELS = 1;
 
-    
     protected IChannel[] channels;
-    
+
     private Query<Object> fMonitorChannelQuery;
     private List<Throwable> errors = new ArrayList<Throwable>();
-    private IPeer peer;
     protected ILaunch fLaunch;
-    
+
     protected VirtualTreeModelViewer fDebugViewViewer;
-    protected TestDebugContextProvider fDebugContextProvider; 
+    protected TestDebugContextProvider fDebugContextProvider;
     protected VirtualViewerUpdatesListener fDebugViewListener;
     protected VariablesVirtualTreeModelViewer fVariablesViewViewer;
     protected VirtualViewerUpdatesListener fVariablesViewListener;
@@ -95,7 +98,7 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
     protected VirtualViewerUpdatesListener fRegistersViewListener;
 
     protected Object fTestRunKey;
-    
+
     protected IDiagnostics diag;
     protected IExpressions expr;
     protected ISymbols syms;
@@ -111,7 +114,7 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
     protected StackTraceCM fStackTraceCM;
     protected SymbolsCM fSymbolsCM;
     protected LineNumbersCM fLineNumbersCM;
-    
+
     protected String fTestId;
     protected RunControlContext fTestCtx;
     protected String fProcessId = "";
@@ -126,6 +129,7 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
             this.attrs = attrs;
         }
 
+        @Override
         public IChannel openChannel() {
             assert Protocol.isDispatchThread();
             IChannel c = super.openChannel();
@@ -158,30 +162,36 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
         return new RemotePeer(l);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.tcf.te.tests.CoreTestCase#initialize()
+     */
+    @Override
+    protected void initialize() {
+        // Turn off the automatic perspective switch and debug view activation to avoid 
+        // jface views from interfering with the virtual viewers used in tests.
+        IPreferenceStore prefs = DebugUITools.getPreferenceStore();
+        prefs.setValue(IInternalDebugUIConstants.PREF_ACTIVATE_DEBUG_VIEW, true);
+        prefs.setValue(IInternalDebugUIConstants.PREF_SWITCH_PERSPECTIVE_ON_SUSPEND, MessageDialogWithToggle.NEVER);
+
+        super.initialize();
+        // Do not activate debug view or debug perspective, also to avoid interferring
+        // with tests' virtual viewers.
+        setProperty(IConfigurationProperties.TARGET_PERSPECTIVE, "org.eclipse.cdt.ui.CPerspective"); //$NON-NLS-1$
+        setProperty(IConfigurationProperties.TARGET_VIEW, "org.eclipse.cdt.internal.ui.cview.CView"); //$NON-NLS-1$
+    }
+
+    @Override
     protected void setUp() throws Exception {
         fTestRunKey = new Object();
-        
+
+        // Launch the agent
+        super.setUp();
+
         createDebugViewViewer();
         createLaunch();
-        
-        // Command line should contain peer description string, for example:
-        // "ID=Test:TransportName=TCP:Host=127.0.0.1:Port=1534"
-        final String[] args = new String[] { "TransportName=TCP:Host=127.0.0.1:Port=1534" };
-        if (args.length < 1) {
-            System.err.println("Missing command line argument - peer identification string");
-            System.exit(4);
-        }
-    
-        peer = new Query<IPeer>() {
-            @Override
-            protected void execute(DataCallback<IPeer> callback) {
-                callback.setData(getPeer(args));
-                callback.done();
-            }
-        }.get();
-        
+
         channels = new IChannel[NUM_CHANNELS];
-        
+
         new Query<Object>() {
             @Override
             protected void execute(DataCallback<Object> callback) {
@@ -203,9 +213,9 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
                 }
             }
         }.get();
-        
+
         getRemoteServices();
-        
+
         new Task<Object>() {
             @Override
             public Object call() throws Exception {
@@ -213,7 +223,7 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
                 return null;
             }
         }.get();
-        
+
         validateTestAvailable();
         clearBreakpoints();
     }
@@ -227,16 +237,18 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
                 return null;
             }
         }.get();
-        
+
         terminateLaunch();
         disposeDebugViewViewer();
-        
+
         new Query<Object>() {
             @Override
             protected void execute(DataCallback<Object> callback) {
                 closeChannels(callback);
             }
         }.get();
+
+        super.tearDown();
     }
 
     protected String getDiagnosticsTestName() {
@@ -251,7 +263,7 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
         fSymbolsCM = new SymbolsCM(syms, fRunControlCM, fMemoryMap);
         fLineNumbersCM = new LineNumbersCM(fLineNumbers, fMemoryMap, fRunControlCM);
     }
-    
+
     protected void tearDownServiceListeners() throws Exception{
         fSymbolsCM.dispose();
         fBreakpointsCM.dispose();
@@ -260,7 +272,7 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
         fDiagnosticsCM.dispose();
         fLineNumbersCM.dispose();
     }
-    
+
     private void createDebugViewViewer() {
         final Display display = Display.getDefault();
         display.syncExec(new Runnable() {
@@ -291,20 +303,23 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
                 fRegistersViewViewer.dispose();
             }
         });
-        
+
     }
-    
+
     private void createLaunch() throws Exception {
         ILaunchManager lManager = DebugPlugin.getDefault().getLaunchManager();
         ILaunchConfigurationType lcType = lManager.getLaunchConfigurationType("org.eclipse.tcf.debug.LaunchConfigurationType");
         ILaunchConfigurationWorkingCopy lcWc = lcType.newInstance(null, "test");
+        lcWc.setAttribute(TCFLaunchDelegate.ATTR_USE_LOCAL_AGENT, false);
+        lcWc.setAttribute(TCFLaunchDelegate.ATTR_RUN_LOCAL_AGENT, false);
+        lcWc.setAttribute(TCFLaunchDelegate.ATTR_PEER_ID, peer.getID());
         lcWc.doSave();
         fDebugViewListener.reset();
         fDebugViewListener.setDelayContentUntilProxyInstall(true);
         fLaunch = lcWc.launch("debug", new NullProgressMonitor());
-        Assert.assertTrue( fLaunch instanceof IDisconnect ); 
-        
-        // The launch element may or may not have been populated into the viewer.  It's label 
+        Assert.assertTrue( fLaunch instanceof IDisconnect );
+
+        // The launch element may or may not have been populated into the viewer.  It's label
         // also may or may not have been updated.  Check viewer item for launch, then wait if needed.
         TreePath launchPath = new TreePath(new Object[] { fLaunch });
         fDebugViewListener.addLabelUpdate(launchPath);
@@ -314,13 +329,13 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
             fDebugViewListener.waitTillFinished(MODEL_CHANGED_COMPLETE | MODEL_PROXIES_INSTALLED | CONTENT_SEQUENCE_COMPLETE | LABEL_UPDATES);
             launchItem = fDebugViewViewer.findItem(launchPath);
         }
-        
+
         Assert.assertTrue( launchItem != null );
         String[] launchItemLabel = (String[])launchItem.getData(VirtualItem.LABEL_KEY);
         Assert.assertTrue( launchItemLabel[0].contains(fLaunch.getLaunchConfiguration().getName()) );
         Assert.assertEquals(fLaunch, launchItem.getData());
     }
-    
+
     private void terminateLaunch() throws DebugException, InterruptedException, ExecutionException {
         ((IDisconnect)fLaunch).disconnect();
 
@@ -328,7 +343,7 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
             @Override
             protected void execute(final DataCallback<Object> callback) {
                 final ILaunchManager lm = DebugPlugin.getDefault().getLaunchManager();
-                
+
                 final AtomicBoolean callbackDone = new AtomicBoolean(false);
                 ILaunchesListener2 disconnectListener = new ILaunchesListener2() {
                     public void launchesAdded(ILaunch[] launches) {}
@@ -347,12 +362,12 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
                 if (((IDisconnect)fLaunch).isDisconnected() && !callbackDone.getAndSet(true)) {
                     lm.removeLaunchListener(disconnectListener);
                     callback.done();
-                    
+
                 }
             }
         }.get();
     }
-    
+
     private void getRemoteServices() {
         assert !Protocol.isDispatchThread();
         Protocol.invokeAndWait(new Runnable() {
@@ -368,10 +383,10 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
             };
         });
     }
-    
+
     private void openChannels(IPeer peer, Callback callback) {
         assert Protocol.isDispatchThread();
-        
+
         for (int i = 0; i < channels.length; i++) {
             channels[i] = peer.openChannel();
         }
@@ -380,6 +395,7 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
                 @Override
                 protected void handleSuccess() {
                     fMonitorChannelQuery = new Query<Object>() {
+                        @Override
                         protected void execute(org.eclipse.tcf.debug.test.util.DataCallback<Object> callback) {
                             monitorChannels(callback, true);
                         };
@@ -387,7 +403,7 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
                     fMonitorChannelQuery.invoke();
                     super.handleSuccess();
                 }
-            }, 
+            },
             false);
     }
 
@@ -402,7 +418,7 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
             // expected
         } catch (InterruptedException e) {
         }
-        
+
         for (int i = 0; i < channels.length; i++) {
             if (channels[i].getState() != IChannel.STATE_CLOSED) channels[i].close();
         }
@@ -415,19 +431,19 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
         final boolean fClose;
         final Callback fCallback;
         private boolean fActive = true;
-        
+
         private class CancelListener implements ICanceledListener {
             public void requestCanceled(Callback rm) {
                 Protocol.invokeLater(new Runnable() {
                     public void run() {
-                        if (deactivate()) { 
+                        if (deactivate()) {
                             fCallback.done();
                         }
                     }
                 });
             }
         }
-        
+
         private boolean deactivate() {
             if (fActive) {
                 fChannel.removeChannelListener(ChannelMonitorListener.this);
@@ -436,7 +452,7 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
             }
             return false;
         }
-        
+
         ChannelMonitorListener (IChannel channel, Callback cb, boolean close) {
             fCallback = cb;
             fClose = close;
@@ -444,10 +460,10 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
             fChannel.addChannelListener(this);
             fCallback.addCancelListener(new CancelListener());
         }
-        
+
         public void onChannelOpened() {
             if (!deactivate()) return;
-            
+
             fChannel.removeChannelListener(this);
             fCallback.done();
         }
@@ -466,7 +482,7 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
             fCallback.done();
         }
     }
-    
+
     protected void monitorChannels(final Callback callback, final boolean close) {
         assert Protocol.isDispatchThread();
 
@@ -480,7 +496,7 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
         }
         acb.setDoneCount(count);
     }
-    
+
     // Checks whether all channels have achieved the desired state.
     private boolean checkChannelsState(IChannel channel, boolean close) {
         if (close) {
@@ -494,14 +510,15 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
         }
         return true;
     }
-    
+
     private void validateTestAvailable() throws ExecutionException, InterruptedException {
         String[] testList = new Transaction<String[]>() {
+            @Override
             protected String[] process() throws InvalidCacheException ,ExecutionException {
                 return validate( fDiagnosticsCM.getTestList() );
             }
         }.get();
-        
+
         int i = 0;
         for (; i < testList.length; i++) {
             if ("RCBP1".equals(testList[i])) break;
@@ -509,7 +526,7 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
 
         Assert.assertTrue("Required test not supported", i != testList.length);
     }
-    
+
     protected void clearBreakpoints() throws InterruptedException, ExecutionException, CoreException {
 
         // Delete eclipse breakpoints.
@@ -521,29 +538,30 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
             }
         };
         ResourcesPlugin.getWorkspace().run(wr, null, 0, null);
-        
+
         // Delete TCF breakpoints
         new Transaction<Object>() {
             @Override
             protected Object process() throws InvalidCacheException, ExecutionException {
                 // Initialize the event cache for breakpoint status
                 @SuppressWarnings("unchecked")
-                Map<String, Object>[] bps = (Map<String, Object>[])new Map[] { };
+                Map<String, Object>[] bps = new Map[] { };
                 validate( fBreakpointsCM.set(bps, this) );
                 return null;
             }
-        }.get();        
+        }.get();
     }
 
     private void startProcess() throws InterruptedException, ExecutionException {
         new Transaction<Object>() {
+            @Override
             protected Object process() throws Transaction.InvalidCacheException ,ExecutionException {
                 fTestId = validate( fDiagnosticsCM.runTest(getDiagnosticsTestName(), this) );
                 fTestCtx = validate( fRunControlCM.getContext(fTestId) );
                 fProcessId = fTestCtx.getProcessID();
                 // Create the cache to listen for exceptions.
-                fRunControlCM.waitForContextException(fTestId, fTestRunKey); 
-                
+                fRunControlCM.waitForContextException(fTestId, fTestRunKey);
+
                 if (!fProcessId.equals(fTestId)) {
                     fThreadId = fTestId;
                 } else {
@@ -551,61 +569,78 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
                     fThreadId = threads[0];
                 }
                 fThreadCtx = validate( fRunControlCM.getContext(fThreadId) );
-                
+
                 Assert.assertTrue("Invalid thread context", fThreadCtx.hasState());
                 return new Object();
             };
         }.get();
     }
-    
+
     private boolean runToTestEntry(final String testFunc) throws InterruptedException, ExecutionException {
-        return new Transaction<Boolean>() {
-            Object fWaitForSuspendKey = new Object();
-            boolean fSuspendEventReceived = false;
+    	return new Transaction<Boolean>() {
+    		Object fWaitForResumeKey;
+    		Object fWaitForSuspendKey;
+    		boolean fSuspendEventReceived = false;
+    		@Override
             protected Boolean process() throws Transaction.InvalidCacheException ,ExecutionException {
-                ISymbol sym_func0 = validate( fDiagnosticsCM.getSymbol(fProcessId, testFunc) );
-                String sym_func0_value = sym_func0.getValue().toString();
-                ContextState state = validate (fRunControlCM.getState(fThreadId));
-                if (state.suspended) {
-                    if ( !new BigInteger(state.pc).equals(new BigInteger(sym_func0_value)) ) {
-                        fSuspendEventReceived = true;
-                        // We are not at test entry.  Create a new suspend wait cache.
-                        fWaitForSuspendKey = new Object();
-                        fRunControlCM.waitForContextSuspended(fThreadId, fWaitForSuspendKey);
-                        // Run to entry point.
-                        validate( fRunControlCM.resume(fThreadCtx, fWaitForSuspendKey, IRunControl.RM_RESUME, 1) );
-                    }
-                } else {
-                    // Wait until we suspend.
-                    validate( fRunControlCM.waitForContextSuspended(fThreadId, fWaitForSuspendKey) );
-                }
-                
-                return fSuspendEventReceived;
-            }
-        }.get();
+    			ISymbol sym_func0 = validate( fDiagnosticsCM.getSymbol(fProcessId, testFunc) );
+    			String sym_func0_value = sym_func0.getValue().toString();
+    			ContextState state = validate (fRunControlCM.getState(fThreadId));
+
+    			while (!state.suspended || !new BigInteger(state.pc).equals(new BigInteger(sym_func0_value))) {
+    				if (state.suspended && fWaitForSuspendKey == null) {
+    					fSuspendEventReceived = true;
+    					// We are not at test entry.  Create a new suspend wait cache.
+    					fWaitForResumeKey = new Object();
+    					fWaitForSuspendKey = new Object();
+    					ICache<Object> waitForResume = fRunControlCM.waitForContextResumed(fThreadId, fWaitForResumeKey);
+
+    					// Issue resume command.
+    					validate( fRunControlCM.resume(fThreadCtx, fWaitForResumeKey, IRunControl.RM_RESUME, 1) );
+
+    					// Wait until we receive the resume event.
+    					validate(waitForResume);
+    					fWaitForSuspendKey = new Object();
+    					fRunControlCM.waitForContextSuspended(fThreadId, fWaitForSuspendKey);
+    				} else {
+    					if (fWaitForResumeKey != null) {
+    						// Validate resume command
+    						validate( fRunControlCM.resume(fThreadCtx, fWaitForResumeKey, IRunControl.RM_RESUME, 1) );
+    						fWaitForResumeKey = null;
+
+    					}
+    					// Wait until we suspend.
+    					validate( fRunControlCM.waitForContextSuspended(fThreadId, fWaitForSuspendKey) );
+    					fWaitForSuspendKey = null;
+    				}
+    			}
+
+    			return fSuspendEventReceived;
+    		}
+    	}.get();
     }
 
     protected void initProcessModel(String testFunc) throws Exception {
         String bpId = "entryPointBreakpoint";
         createBreakpoint(bpId, testFunc);
         fDebugViewListener.reset();
-        
-        ITCFObject processTCFContext = new ITCFObject() {  
+
+        ITCFObject processTCFContext = new ITCFObject() {
             public String getID() { return fProcessId; }
             public IChannel getChannel() { return channels[0]; }
         };
-        ITCFObject threadTCFContext = new ITCFObject() {  
+        ITCFObject threadTCFContext = new ITCFObject() {
             public String getID() { return fThreadId; }
             public IChannel getChannel() { return channels[0]; }
         };
-        
+
         fDebugViewListener.addLabelUpdate(new TreePath(new Object[] { fLaunch, processTCFContext }));
         fDebugViewListener.addLabelUpdate(new TreePath(new Object[] { fLaunch, processTCFContext, threadTCFContext }));
 
-        startProcess();        
+        startProcess();
         runToTestEntry(testFunc);
         removeBreakpoint(bpId);
-        
+
         final String topFrameId = new Transaction<String>() {
             @Override
             protected String process() throws InvalidCacheException, ExecutionException {
@@ -615,15 +650,15 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
             }
         }.get();
 
-        ITCFObject frameTCFContext = new ITCFObject() {  
+        ITCFObject frameTCFContext = new ITCFObject() {
             public String getID() { return topFrameId; }
             public IChannel getChannel() { return channels[0]; }
         };
         fDebugViewListener.addLabelUpdate(new TreePath(new Object[] { fLaunch, processTCFContext, threadTCFContext, frameTCFContext }));
-        
+
         fDebugViewListener.waitTillFinished(MODEL_CHANGED_COMPLETE | CONTENT_SEQUENCE_COMPLETE | LABEL_SEQUENCE_COMPLETE | LABEL_UPDATES);
     }
-    
+
     protected ContextState resumeAndWaitForSuspend(final RunControlContext context, final int mode) throws InterruptedException, ExecutionException {
         return new Transaction<ContextState>() {
             @Override
@@ -645,15 +680,15 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
                 fBp.put(IBreakpoints.PROP_ENABLED, Boolean.TRUE);
                 fBp.put(IBreakpoints.PROP_LOCATION, testFunc);
             }
-            
+
             @Override
             protected Object process() throws InvalidCacheException, ExecutionException {
                 // Prime event wait caches
                 fBreakpointsCM.waitContextAdded(this);
-                
+
                 validate( fBreakpointsCM.add(fBp, this) );
                 validate( fBreakpointsCM.waitContextAdded(this));
-                
+
                 // Wait for breakpoint status event and validate it.
                 Map<String, Object> status = validate(fBreakpointsCM.getStatus(bpId));
                 String s = (String)status.get(IBreakpoints.STATUS_ERROR);
@@ -672,7 +707,7 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
                     if (err != null) {
                         Assert.fail("Invalid BP status: " + s);
                     }
-                }                
+                }
                 return null;
             }
         }.get();
@@ -680,16 +715,16 @@ public abstract class AbstractTcfUITest extends TestCase implements IViewerUpdat
 
     protected void removeBreakpoint(final String bpId) throws InterruptedException, ExecutionException {
         new Transaction<Object>() {
-            
+
             @Override
             protected Object process() throws InvalidCacheException, ExecutionException {
-                
+
                 // Prime event wait caches
                 fBreakpointsCM.waitContextRemoved(this);
 
                 // Remove
                 validate( fBreakpointsCM.remove(new String[] { bpId }, this) );
-                
+
                 // Verify removed event
                 String[] removedIds = validate( fBreakpointsCM.waitContextRemoved(this));
                 Assert.assertTrue(Arrays.asList(removedIds).contains(bpId));

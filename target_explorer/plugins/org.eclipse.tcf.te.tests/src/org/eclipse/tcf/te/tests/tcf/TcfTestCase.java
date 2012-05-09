@@ -140,16 +140,7 @@ public class TcfTestCase extends CoreTestCase {
 		output = output.trim();
 
 		// Read into an object
-		Object object = null;
-		try {
-			object = JSON.parseOne(output.getBytes("UTF-8")); //$NON-NLS-1$
-		} catch (IOException e) {
-			error = e;
-			message = e.getLocalizedMessage();
-		}
-		assertNull("Failed to parse server properties: " + message, error); //$NON-NLS-1$
-		assertTrue("Server properties object is not of expected type Map.", object instanceof Map); //$NON-NLS-1$
-
+		Object object = parseOne(output);
 		@SuppressWarnings("unchecked")
         final Map<String, String> attrs = new HashMap<String, String>((Map<String, String>)object);
 
@@ -207,5 +198,26 @@ public class TcfTestCase extends CoreTestCase {
 	 */
 	protected IPath getAgentLocation() {
 		return getDataLocation("agent", true, true); //$NON-NLS-1$
+	}
+	
+	private static Object parseOne(final String _output) {
+	    final Object[] _object = new Object[1];
+	    final String[] _message = new String[1];
+	    final Throwable[] _error = new Throwable[1];
+	    
+	    Protocol.invokeAndWait(new Runnable() {
+	            @Override
+	            public void run() {
+	                    try {
+	                    _object[0] = JSON.parseOne(_output.getBytes("UTF-8")); //$NON-NLS-1$
+	                    } catch (IOException e) {
+	                            _error[0] = e;
+	                            _message[0] = e.getLocalizedMessage();
+	                    }
+	            }
+	    });
+	    assertNull("Failed to parse server properties: " + _message[0], _error[0]); //$NON-NLS-1$
+	    assertTrue("Server properties object is not of expected type Map.", _object[0] instanceof Map); //$NON-NLS-1$
+	    return _object[0];
 	}
 }
