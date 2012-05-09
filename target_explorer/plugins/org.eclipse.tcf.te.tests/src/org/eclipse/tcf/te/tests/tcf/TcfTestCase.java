@@ -165,7 +165,7 @@ public class TcfTestCase extends CoreTestCase {
 		assertNotNull("Unexpected return value 'null'.", transport); //$NON-NLS-1$
 		String port = attrs.get(IPeer.ATTR_IP_PORT);
 		assertNotNull("Unexpected return value 'null'.", port); //$NON-NLS-1$
-		String ip = IPAddressUtil.getInstance().getCanonicalAddress();
+		String ip = IPAddressUtil.getInstance().getIPv4LoopbackAddress();
 		assertNotNull("Unexpected return value 'null'.", ip); //$NON-NLS-1$
 
 		final String id = transport + ":" + ip + ":" + port; //$NON-NLS-1$ //$NON-NLS-2$
