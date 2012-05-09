@@ -30,4 +30,11 @@ public interface IConfigurationProperties {
 	 * Default value is <b><code>org.eclipse.tcf.te.ui.perspective</code></b>.
 	 */
 	public static final String TARGET_PERSPECTIVE = UIPlugin.getUniqueIdentifier() + ".targetPerspective"; //$NON-NLS-1$
+
+	/**
+	 * Set to the view id to open before starting the test.
+	 * <p>
+	 * Default value is <b><code>org.eclipse.tcf.te.ui.views.View</code></b>.
+	 */
+	public static final String TARGET_VIEW = UIPlugin.getUniqueIdentifier() + ".targetView"; //$NON-NLS-1$
 }

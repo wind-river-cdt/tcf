@@ -21,7 +21,7 @@ public class CoreBundleActivator extends Plugin {
 	private static BundleContext context;
 	// The trace handler instance
 	private static volatile TraceHandler traceHandler;
-	
+
 	// The shared instance
 	private static CoreBundleActivator plugin;
 
@@ -50,7 +50,7 @@ public class CoreBundleActivator extends Plugin {
 		if (getContext() != null && getContext().getBundle() != null) {
 			return getContext().getBundle().getSymbolicName();
 		}
-		return null;
+		return "org.eclipse.tcf.te.tcf.processes.core"; //$NON-NLS-1$
 	}
 
 	/**

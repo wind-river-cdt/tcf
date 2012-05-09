@@ -61,7 +61,7 @@ public class UIPlugin extends AbstractUIPlugin {
 		if (getDefault() != null && getDefault().getBundle() != null) {
 			return getDefault().getBundle().getSymbolicName();
 		}
-		return null;
+		return "org.eclipse.tcf.te.ui.views"; //$NON-NLS-1$
 	}
 
 	/**

@@ -35,7 +35,7 @@ public class CoreBundleActivator implements BundleActivator {
 		if (getContext() != null && getContext().getBundle() != null) {
 			return getContext().getBundle().getSymbolicName();
 		}
-		return null;
+		return "org.eclipse.tcf.te.runtime.persistence"; //$NON-NLS-1$
 	}
 
 	/*

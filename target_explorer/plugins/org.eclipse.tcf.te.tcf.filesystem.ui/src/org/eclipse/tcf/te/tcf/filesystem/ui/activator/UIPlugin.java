@@ -67,7 +67,7 @@ public class UIPlugin extends AbstractUIPlugin implements IPreferenceKeys {
 		if (getDefault() != null && getDefault().getBundle() != null) {
 			return getDefault().getBundle().getSymbolicName();
 		}
-		return null;
+		return "org.eclipse.tcf.te.tcf.filesystem.ui"; //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
@@ -202,7 +202,7 @@ public class UIPlugin extends AbstractUIPlugin implements IPreferenceKeys {
 		boolean autoSaving = preferenceStore.getBoolean(PREF_AUTOSAVING);
 		return autoSaving;
 	}
-	
+
 	/**
 	 * If the option of "expanded_persisted" is set to on.
 	 *
@@ -213,7 +213,7 @@ public class UIPlugin extends AbstractUIPlugin implements IPreferenceKeys {
 		boolean persisted = preferenceStore.getBoolean(PREF_EXPANDED_PERSISTED);
 		return persisted;
 	}
-	
+
 	/**
 	 * If the option of "in-place editor" is set to on.
 	 *

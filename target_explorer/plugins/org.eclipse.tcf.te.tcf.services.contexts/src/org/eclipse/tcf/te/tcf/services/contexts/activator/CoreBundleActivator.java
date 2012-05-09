@@ -38,7 +38,7 @@ public class CoreBundleActivator implements BundleActivator {
 		if (getContext() != null && getContext().getBundle() != null) {
 			return getContext().getBundle().getSymbolicName();
 		}
-		return null;
+		return "org.eclipse.tcf.te.tcf.services.contexts"; //$NON-NLS-1$
 	}
 
 	/**

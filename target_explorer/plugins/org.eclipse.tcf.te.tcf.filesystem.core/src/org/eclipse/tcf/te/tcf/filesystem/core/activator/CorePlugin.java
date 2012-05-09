@@ -21,7 +21,7 @@ import org.osgi.service.url.URLConstants;
 import org.osgi.service.url.URLStreamHandlerService;
 
 /**
- * The activator class of the core file system plugin. 
+ * The activator class of the core file system plugin.
  */
 public class CorePlugin extends Plugin {
 
@@ -44,7 +44,8 @@ public class CorePlugin extends Plugin {
 	 * (non-Javadoc)
 	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
 	 */
-	public void start(BundleContext bundleContext) throws Exception {
+	@Override
+    public void start(BundleContext bundleContext) throws Exception {
 		super.start(bundleContext);
 		CorePlugin.context = bundleContext;
 		plugin = this;
@@ -58,7 +59,8 @@ public class CorePlugin extends Plugin {
 	 * (non-Javadoc)
 	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
 	 */
-	public void stop(BundleContext bundleContext) throws Exception {
+	@Override
+    public void stop(BundleContext bundleContext) throws Exception {
 		if (PersistenceManager.needsDisposal()) PersistenceManager.getInstance().dispose();
 		if (regURLStreamHandlerService != null) {
 			// When URL stream handler service is unregistered, any URL related operation will be invalid.
@@ -69,7 +71,7 @@ public class CorePlugin extends Plugin {
 		plugin = null;
 		super.stop(bundleContext);
 	}
-	
+
 	/**
 	 * Returns the shared instance
 	 *
@@ -86,6 +88,6 @@ public class CorePlugin extends Plugin {
 		if (getContext() != null && getContext().getBundle() != null) {
 			return getContext().getBundle().getSymbolicName();
 		}
-		return null;
+		return "org.eclipse.tcf.te.tcf.filesystem.core"; //$NON-NLS-1$
 	}
 }
