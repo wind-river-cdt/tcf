@@ -19,13 +19,13 @@ import org.eclipse.tcf.core.TransientPeer;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.JSON;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.te.runtime.model.factory.Factory;
 import org.eclipse.tcf.te.runtime.utils.Host;
 import org.eclipse.tcf.te.runtime.utils.net.IPAddressUtil;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelLookupService;
 import org.eclipse.tcf.te.tcf.locator.model.Model;
-import org.eclipse.tcf.te.tcf.locator.nodes.PeerModel;
 import org.eclipse.tcf.te.tests.CoreTestCase;
 
 /**
@@ -192,7 +192,7 @@ public class TcfTestCase extends CoreTestCase {
 			attrs.put(IPeer.ATTR_ID, id);
 			attrs.put(IPeer.ATTR_IP_HOST, ip);
 			peer = new TransientPeer(attrs);
-			peerModel = new PeerModel(model, peer);
+			peerModel = Factory.getInstance().newInstance(IPeerModel.class, new Object[] { model, peer });
 		} else {
 			peerModel = node.get();
 			peer = peerModel.getPeer();

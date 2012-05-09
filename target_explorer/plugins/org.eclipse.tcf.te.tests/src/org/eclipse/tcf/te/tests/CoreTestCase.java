@@ -153,6 +153,7 @@ public class CoreTestCase extends TestCase {
 		setProperty(IConfigurationProperties.MAXIMIZE_VIEW, false);
 
 		setProperty(IConfigurationProperties.TARGET_PERSPECTIVE, "org.eclipse.tcf.te.ui.perspective"); //$NON-NLS-1$
+		setProperty(IConfigurationProperties.TARGET_VIEW, IUIConstants.ID_EXPLORER);
 	}
 
 	/**
@@ -325,7 +326,18 @@ public class CoreTestCase extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		maximizeView();
+
+		// View handling must run in the UI thread
+		if (Display.findDisplay(Thread.currentThread()) == null) {
+			PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
+				@Override
+				public void run() {
+					maximizeView();
+				}
+			});
+		} else {
+			maximizeView();
+		}
 	}
 
 	/* (non-Javadoc)
@@ -333,7 +345,18 @@ public class CoreTestCase extends TestCase {
 	 */
 	@Override
 	protected void tearDown() throws Exception {
-		restoreView();
+		// View handling must run in the UI thread
+		if (Display.findDisplay(Thread.currentThread()) == null) {
+			PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
+				@Override
+				public void run() {
+					restoreView();
+				}
+			});
+		} else {
+			restoreView();
+		}
+
 		flushEventQueue();
 		super.tearDown();
 	}
@@ -397,19 +420,23 @@ public class CoreTestCase extends TestCase {
 	 * A possibly open Eclipse Intro View will be hidden automatically.
 	 */
 	protected void maximizeView() {
+		Assert.isNotNull(Display.findDisplay(Thread.currentThread()), "Illegal Thread Access"); //$NON-NLS-1$
+
 		final String perspectiveId = getProperty(IConfigurationProperties.TARGET_PERSPECTIVE);
 		assertNotNull("Invalid null-value for test case perspective id!", perspectiveId); //$NON-NLS-1$
+		final String viewId = getProperty(IConfigurationProperties.TARGET_VIEW);
+		assertNotNull("Invalid null-value for test case view id!", perspectiveId); //$NON-NLS-1$
 
 		// Find the Eclipse Intro page and hide it.
 		hideView("org.eclipse.ui.internal.introview", perspectiveId); //$NON-NLS-1$
 
 		// Show the main view
 		setProperty(VIEW_ZOOM_STATE_CHANGED, false);
-		IViewPart part = showView(IUIConstants.ID_EXPLORER, perspectiveId);
+		IViewPart part = showView(viewId, perspectiveId);
 		assertNotNull("Main view is not available!", part); //$NON-NLS-1$
 
 		// Get the view reference for setting the maximized state
-		IViewReference reference = findView(IUIConstants.ID_EXPLORER, perspectiveId);
+		IViewReference reference = findView(viewId, perspectiveId);
 		assertNotNull("Failed to lookup view reference for main view!", reference); //$NON-NLS-1$
 		if (reference.getPage().getPartState(reference) != IWorkbenchPage.STATE_MAXIMIZED
 				&& isProperty(IConfigurationProperties.MAXIMIZE_VIEW, true)) {
@@ -431,12 +458,16 @@ public class CoreTestCase extends TestCase {
 	 * Restore the main view state.
 	 */
 	protected void restoreView() {
+		Assert.isNotNull(Display.findDisplay(Thread.currentThread()), "Illegal Thread Access"); //$NON-NLS-1$
+
 		// restore the original view zoom state
 		if (isProperty(VIEW_ZOOM_STATE_CHANGED, true)) {
 			final String perspectiveId = getProperty(IConfigurationProperties.TARGET_PERSPECTIVE);
 			assertNotNull("Invalid null-value for test case perspective id!", perspectiveId); //$NON-NLS-1$
+			final String viewId = getProperty(IConfigurationProperties.TARGET_VIEW);
+			assertNotNull("Invalid null-value for test case view id!", perspectiveId); //$NON-NLS-1$
 
-			IViewReference reference = findView(IUIConstants.ID_EXPLORER, perspectiveId);
+			IViewReference reference = findView(viewId, perspectiveId);
 			assertNotNull("Failed to lookup view reference for RSE Remote Systems View!", reference); //$NON-NLS-1$
 			if (reference.getPage().getPartState(reference) == IWorkbenchPage.STATE_MAXIMIZED
 					&& isProperty(IConfigurationProperties.MAXIMIZE_VIEW, true)) {
@@ -458,6 +489,7 @@ public class CoreTestCase extends TestCase {
 	 * @return The view reference instance to the view or <code>null</code> if not available.
 	 */
 	public final IViewReference findView(String viewId, String perspectiveId) {
+		Assert.isNotNull(Display.findDisplay(Thread.currentThread()), "Illegal Thread Access"); //$NON-NLS-1$
 		Assert.isNotNull(viewId);
 		Assert.isNotNull(perspectiveId);
 
@@ -489,6 +521,7 @@ public class CoreTestCase extends TestCase {
 	 * @return The view part instance to the view or <code>null</code> if it cannot be shown.
 	 */
 	public final IViewPart showView(String viewId, String perspectiveId) {
+		Assert.isNotNull(Display.findDisplay(Thread.currentThread()), "Illegal Thread Access"); //$NON-NLS-1$
 		Assert.isNotNull(viewId);
 		Assert.isNotNull(perspectiveId);
 
@@ -527,6 +560,7 @@ public class CoreTestCase extends TestCase {
 	 * @param perspectiveId The perspective id. Must not be <code>null</code>.
 	 */
 	public final void hideView(String viewId, String perspectiveId) {
+		Assert.isNotNull(Display.findDisplay(Thread.currentThread()), "Illegal Thread Access"); //$NON-NLS-1$
 		Assert.isNotNull(viewId);
 		Assert.isNotNull(perspectiveId);
 

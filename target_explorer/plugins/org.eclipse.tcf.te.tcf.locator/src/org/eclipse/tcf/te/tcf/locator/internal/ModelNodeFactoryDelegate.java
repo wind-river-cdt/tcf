@@ -9,7 +9,10 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.locator.internal;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.eclipse.tcf.protocol.IPeer;
+import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.runtime.model.factory.AbstractFactoryDelegate2;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
@@ -39,13 +42,24 @@ public class ModelNodeFactoryDelegate extends AbstractFactoryDelegate2 {
 	 */
 	@SuppressWarnings("unchecked")
     @Override
-	public <V extends IModelNode> V newInstance(Class<V> nodeInterface, Object[] args) {
+	public <V extends IModelNode> V newInstance(final Class<V> nodeInterface, final Object[] args) {
 		if (args == null) return newInstance(nodeInterface);
 
 		if (IPeerModel.class.equals(nodeInterface)) {
 			// Peer model constructor has 2 arguments, ILocatorModel and IPeer
 			if (args.length == 2 && args[0] instanceof ILocatorModel && args[1] instanceof IPeer) {
-				return (V) new PeerModel((ILocatorModel)args[0], (IPeer)args[1]);
+				final AtomicReference<V> node = new AtomicReference<V>();
+
+				Runnable runnable = new Runnable() {
+					@Override
+                    public void run() {
+						node.set((V) new PeerModel((ILocatorModel)args[0], (IPeer)args[1]));
+					}
+				};
+				if (Protocol.isDispatchThread()) runnable.run();
+				else Protocol.invokeAndWait(runnable);
+
+				return node.get();
 			}
 		}
 
