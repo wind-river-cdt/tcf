@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2010 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2012 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -241,16 +241,16 @@ public class TCFNodeRegister extends TCFNode implements IElementEditor, IWatchIn
             byte[] v = value.getData();
             if (v != null) {
                 bf.append("Hex: ", SWT.BOLD);
-                bf.append(toNumberString(16));
+                bf.append(toNumberString(16), StyledStringBuffer.MONOSPACED);
                 bf.append(", ");
                 bf.append("Dec: ", SWT.BOLD);
-                bf.append(toNumberString(10));
+                bf.append(toNumberString(10), StyledStringBuffer.MONOSPACED);
                 bf.append(", ");
                 bf.append("Oct: ", SWT.BOLD);
-                bf.append(toNumberString(8));
+                bf.append(toNumberString(8), StyledStringBuffer.MONOSPACED);
                 bf.append('\n');
                 bf.append("Bin: ", SWT.BOLD);
-                bf.append(toNumberString(2));
+                bf.append(toNumberString(2), StyledStringBuffer.MONOSPACED);
                 bf.append('\n');
             }
         }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2011 Wind River Systems, Inc. and others.
+ * Copyright (c) 2008, 2012 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,6 +24,8 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.resource.FontDescriptor;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocumentListener;
@@ -40,6 +42,8 @@ import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -74,6 +78,7 @@ public class TCFDetailPane implements IDetailPane {
     private final HashMap<RGB,Color> colors = new HashMap<RGB,Color>();
     private final Map<String,IAction> action_map = new HashMap<String,IAction>();
     private final List<String> selection_actions = new ArrayList<String>();
+    private Font mono_font;
 
     private final ITextPresentationListener presentation_listener = new ITextPresentationListener() {
         public void applyTextPresentation(TextPresentation presentation) {
@@ -240,7 +245,12 @@ public class TCFDetailPane implements IDetailPane {
     private String getStyleRanges(StyledStringBuffer s) {
         style_ranges.clear();
         for (StyledStringBuffer.Style x : s.getStyle()) {
-            style_ranges.add(new StyleRange(x.pos, x.len, getColor(x.fg), getColor(x.bg), x.font));
+            StyleRange r = new StyleRange(x.pos, x.len, getColor(x.fg), getColor(x.bg), x.font);
+            if ((x.font & StyledStringBuffer.MONOSPACED) != 0) {
+                r.fontStyle &= ~StyledStringBuffer.MONOSPACED;
+                r.font = getMonospacedFont();
+            }
+            style_ranges.add(r);
         }
         return s.toString();
     }
@@ -252,7 +262,23 @@ public class TCFDetailPane implements IDetailPane {
         return c;
     }
 
+    private Font getMonospacedFont() {
+        if (mono_font == null) {
+            int height = 0;
+            FontData[] fd = source_viewer.getControl().getFont().getFontData();
+            if (fd != null && fd.length > 0) height = fd[0].getHeight();
+            FontDescriptor d = JFaceResources.getFontDescriptor(JFaceResources.TEXT_FONT);
+            if (height != 0) d = d.setHeight(height);
+            mono_font = d.createFont(display);
+        }
+        return mono_font;
+    }
+
     public void dispose() {
+        if (mono_font != null) {
+            mono_font.dispose();
+            mono_font = null;
+        }
         for (Color c : colors.values()) c.dispose();
         colors.clear();
         if (source_viewer == null) return;

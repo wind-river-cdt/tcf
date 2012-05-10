@@ -1262,15 +1262,15 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
                     case cardinal:
                     case real:
                         bf.append("Dec: ", SWT.BOLD);
-                        bf.append(toNumberString(10, type_class, data, offs, size, big_endian));
+                        bf.append(toNumberString(10, type_class, data, offs, size, big_endian), StyledStringBuffer.MONOSPACED);
                         bf.append("\n");
                         break;
                     }
                     bf.append("Oct: ", SWT.BOLD);
-                    bf.append(toNumberString(8, type_class, data, offs, size, big_endian));
+                    bf.append(toNumberString(8, type_class, data, offs, size, big_endian), StyledStringBuffer.MONOSPACED);
                     bf.append("\n");
                     bf.append("Hex: ", SWT.BOLD);
-                    bf.append(toNumberString(16, type_class, data, offs, size, big_endian));
+                    bf.append(toNumberString(16, type_class, data, offs, size, big_endian), StyledStringBuffer.MONOSPACED);
                     bf.append("\n");
                 }
                 String s = getTypeName(type_class, size);
@@ -1283,10 +1283,10 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
                 bf.append(size == 1 ? " byte\n" : " bytes\n");
             }
             else if (type_class == ISymbols.TypeClass.integer || type_class == ISymbols.TypeClass.real) {
-                bf.append(toNumberString(10, type_class, data, offs, size, big_endian));
+                bf.append(toNumberString(10, type_class, data, offs, size, big_endian), StyledStringBuffer.MONOSPACED);
             }
             else {
-                bf.append(toNumberString(16, type_class, data, offs, size, big_endian));
+                bf.append(toNumberString(16, type_class, data, offs, size, big_endian), StyledStringBuffer.MONOSPACED);
             }
             return true;
         }
@@ -1313,21 +1313,21 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
             case real:
                 if (level == 0) {
                     bf.append("Dec: ", SWT.BOLD);
-                    bf.append(toNumberString(10, type_class, data, offs, size, big_endian));
+                    bf.append(toNumberString(10, type_class, data, offs, size, big_endian), StyledStringBuffer.MONOSPACED);
                     bf.append("\n");
                     bf.append("Oct: ", SWT.BOLD);
-                    bf.append(toNumberString(8, type_class, data, offs, size, big_endian));
+                    bf.append(toNumberString(8, type_class, data, offs, size, big_endian), StyledStringBuffer.MONOSPACED);
                     bf.append("\n");
                     bf.append("Hex: ", SWT.BOLD);
-                    bf.append(toNumberString(16, type_class, data, offs, size, big_endian));
+                    bf.append(toNumberString(16, type_class, data, offs, size, big_endian), StyledStringBuffer.MONOSPACED);
                     bf.append("\n");
                 }
                 else if (type_data.getTypeClass() == ISymbols.TypeClass.cardinal) {
                     bf.append("0x");
-                    bf.append(toNumberString(16, type_class, data, offs, size, big_endian));
+                    bf.append(toNumberString(16, type_class, data, offs, size, big_endian), StyledStringBuffer.MONOSPACED);
                 }
                 else {
-                    bf.append(toNumberString(10, type_class, data, offs, size, big_endian));
+                    bf.append(toNumberString(10, type_class, data, offs, size, big_endian), StyledStringBuffer.MONOSPACED);
                 }
                 break;
             case pointer:
@@ -1335,15 +1335,15 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
             case member_pointer:
                 if (level == 0) {
                     bf.append("Oct: ", SWT.BOLD);
-                    bf.append(toNumberString(8, type_class, data, offs, size, big_endian));
+                    bf.append(toNumberString(8, type_class, data, offs, size, big_endian), StyledStringBuffer.MONOSPACED);
                     bf.append("\n");
                     bf.append("Hex: ", SWT.BOLD);
-                    bf.append(toNumberString(16, type_class, data, offs, size, big_endian));
+                    bf.append(toNumberString(16, type_class, data, offs, size, big_endian), StyledStringBuffer.MONOSPACED);
                     bf.append("\n");
                 }
                 else {
                     bf.append("0x");
-                    bf.append(toNumberString(16, type_class, data, offs, size, big_endian));
+                    bf.append(toNumberString(16, type_class, data, offs, size, big_endian), StyledStringBuffer.MONOSPACED);
                 }
                 break;
             case array:
@@ -1450,8 +1450,8 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
                 if (addr != null) {
                     BigInteger i = JSON.toBigInteger(addr);
                     bf.append("Address: ", SWT.BOLD);
-                    bf.append("0x");
-                    bf.append(i.toString(16));
+                    bf.append("0x", StyledStringBuffer.MONOSPACED);
+                    bf.append(i.toString(16), StyledStringBuffer.MONOSPACED);
                     bf.append('\n');
                 }
             }

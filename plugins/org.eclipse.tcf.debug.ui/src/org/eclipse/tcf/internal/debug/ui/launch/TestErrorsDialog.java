@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2010 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2012 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -61,11 +61,11 @@ class TestErrorsDialog extends Dialog {
         composite.setSize(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
         Label label = new Label(composite, SWT.WRAP);
-        label.setFont(JFaceResources.getFontRegistry().get(JFaceResources.BANNER_FONT));
+        label.setFont(JFaceResources.getFont(JFaceResources.BANNER_FONT));
         label.setText("Connection diagnostics ended with errors:");
 
         text = new Text(composite, SWT.MULTI | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-        text.setFont(JFaceResources.getFontRegistry().get(JFaceResources.TEXT_FONT));
+        text.setFont(JFaceResources.getFont(JFaceResources.TEXT_FONT));
         text.setEditable(false);
         text.setText(createText());
         GridData data = new GridData(GridData.FILL_BOTH);
