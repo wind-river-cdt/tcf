@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.debug.ui.IDetailPane;
 import org.eclipse.jface.action.Action;
@@ -34,6 +35,8 @@ import org.eclipse.jface.text.ITextPresentationListener;
 import org.eclipse.jface.text.TextPresentation;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -60,7 +63,7 @@ import org.eclipse.ui.IWorkbenchPartSite;
  * This detail pane uses a source viewer to display detailed information about the current
  * selection.
  */
-public class TCFDetailPane implements IDetailPane {
+public class TCFDetailPane implements IDetailPane, IPropertyChangeListener {
 
     public static final String ID = "org.eclipse.tcf.debug.DetailPaneFactory";
     public static final String NAME = "TCF Detail Pane";
@@ -78,6 +81,7 @@ public class TCFDetailPane implements IDetailPane {
     private final HashMap<RGB,Color> colors = new HashMap<RGB,Color>();
     private final Map<String,IAction> action_map = new HashMap<String,IAction>();
     private final List<String> selection_actions = new ArrayList<String>();
+    private StyledStringBuffer doc_buffer;
     private Font mono_font;
 
     private final ITextPresentationListener presentation_listener = new ITextPresentationListener() {
@@ -202,6 +206,8 @@ public class TCFDetailPane implements IDetailPane {
         });
         // Add a context menu to the detail area
         createDetailContextMenu(source_viewer.getTextWidget());
+        // Add font registry listener
+        JFaceResources.getFontRegistry().addListener(this);
         return control;
     }
 
@@ -225,6 +231,7 @@ public class TCFDetailPane implements IDetailPane {
                 display.asyncExec(new Runnable() {
                     public void run() {
                         if (g != generation) return;
+                        doc_buffer = s;
                         document.set(getStyleRanges(s));
                     }
                 });
@@ -267,14 +274,27 @@ public class TCFDetailPane implements IDetailPane {
             int height = 0;
             FontData[] fd = source_viewer.getControl().getFont().getFontData();
             if (fd != null && fd.length > 0) height = fd[0].getHeight();
-            FontDescriptor d = JFaceResources.getFontDescriptor(JFaceResources.TEXT_FONT);
+            FontDescriptor d = JFaceResources.getFontDescriptor(IDebugUIConstants.PREF_DETAIL_PANE_FONT);
             if (height != 0) d = d.setHeight(height);
             mono_font = d.createFont(display);
         }
         return mono_font;
     }
 
+    public void propertyChange(PropertyChangeEvent event) {
+        for (Color c : colors.values()) c.dispose();
+        colors.clear();
+        if (mono_font != null) {
+            mono_font.dispose();
+            mono_font = null;
+            if (doc_buffer != null) {
+                document.set(getStyleRanges(doc_buffer));
+            }
+        }
+    }
+
     public void dispose() {
+        JFaceResources.getFontRegistry().removeListener(this);
         if (mono_font != null) {
             mono_font.dispose();
             mono_font = null;
