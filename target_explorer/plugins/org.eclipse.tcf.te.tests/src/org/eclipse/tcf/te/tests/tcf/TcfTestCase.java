@@ -144,9 +144,6 @@ public class TcfTestCase extends CoreTestCase {
 		@SuppressWarnings("unchecked")
         final Map<String, String> attrs = new HashMap<String, String>((Map<String, String>)object);
 
-		error = null;
-		message = null;
-
 		// Lookup the corresponding peer object
 		final ILocatorModel model = Model.getModel();
 		assertNotNull("Failed to access locator model instance.", model); //$NON-NLS-1$
@@ -199,25 +196,37 @@ public class TcfTestCase extends CoreTestCase {
 	protected IPath getAgentLocation() {
 		return getDataLocation("agent", true, true); //$NON-NLS-1$
 	}
-	
-	private static Object parseOne(final String _output) {
-	    final Object[] _object = new Object[1];
-	    final String[] _message = new String[1];
-	    final Throwable[] _error = new Throwable[1];
-	    
-	    Protocol.invokeAndWait(new Runnable() {
-	            @Override
-	            public void run() {
-	                    try {
-	                    _object[0] = JSON.parseOne(_output.getBytes("UTF-8")); //$NON-NLS-1$
-	                    } catch (IOException e) {
-	                            _error[0] = e;
-	                            _message[0] = e.getLocalizedMessage();
-	                    }
-	            }
-	    });
-	    assertNull("Failed to parse server properties: " + _message[0], _error[0]); //$NON-NLS-1$
-	    assertTrue("Server properties object is not of expected type Map.", _object[0] instanceof Map); //$NON-NLS-1$
-	    return _object[0];
+
+	/**
+	 * Parses a object from the given encoded string.
+	 *
+	 * @param encoded The encoded string. Must not be <code>null</code>.
+	 * @return The object
+	 */
+	private static Object parseOne(final String encoded) {
+		assertNotNull(encoded);
+
+		final AtomicReference<Object> object = new AtomicReference<Object>();
+		final AtomicReference<String> message = new AtomicReference<String>();
+		final AtomicReference<Throwable> error = new AtomicReference<Throwable>();
+
+		Runnable runnable = new Runnable() {
+			@Override
+			public void run() {
+				try {
+					object.set(JSON.parseOne(encoded.getBytes("UTF-8"))); //$NON-NLS-1$
+				} catch (IOException e) {
+					error.set(e);
+					message.set(e.getLocalizedMessage());
+				}
+			}
+		};
+		assertFalse("Test is running in TCF dispatch thread.", Protocol.isDispatchThread()); //$NON-NLS-1$
+		Protocol.invokeAndWait(runnable);
+
+		assertNull("Failed to parse server properties: " + message.get(), error.get()); //$NON-NLS-1$
+		assertTrue("Server properties object is not of expected type Map.", object.get() instanceof Map); //$NON-NLS-1$
+
+		return object.get();
 	}
 }
