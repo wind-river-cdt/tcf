@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others.
+ * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,6 @@ package org.eclipse.tcf.internal.cdt.ui.commands;
 import java.math.BigInteger;
 
 import org.eclipse.cdt.debug.core.CDIDebugModel;
-import org.eclipse.cdt.debug.internal.ui.actions.AddWatchpointDialog;
 import org.eclipse.cdt.debug.ui.CDebugUIPlugin;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -27,16 +26,14 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-@SuppressWarnings("restriction")
 public class AddWatchpointHandler extends AbstractHandler {
     public Object execute(ExecutionEvent event) throws ExecutionException {
         ISelection selection = HandlerUtil.getCurrentSelection(event);
-        String expr = null;
+        AddWatchpointDialog dlg = new AddWatchpointDialog(HandlerUtil.getActiveShell(event));
         if (selection instanceof ITextSelection) {
-                expr = ((ITextSelection) selection).getText();
+            String expr = ((ITextSelection)selection).getText();
+            dlg.setExpression(expr);
         }
-        AddWatchpointDialog dlg = new AddWatchpointDialog(HandlerUtil.getActiveShell(event), null);
-        dlg.setExpression(expr);
         if (dlg.open() == Window.OK) {
             addWatchpoint(dlg.getWriteAccess(), dlg.getReadAccess(), dlg.getExpression(), dlg.getMemorySpace(), dlg.getRange());
         }
