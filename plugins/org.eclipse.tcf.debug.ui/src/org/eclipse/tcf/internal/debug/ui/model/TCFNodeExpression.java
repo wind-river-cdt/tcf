@@ -1239,6 +1239,19 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
         return false;
     }
 
+    private void appendNumericValueText(StyledStringBuffer bf, ISymbols.TypeClass type_class,
+            byte[] data, int offs, int size, boolean big_endian) {
+        bf.append("Hex: ", SWT.BOLD);
+        bf.append(toNumberString(16, type_class, data, offs, size, big_endian), StyledStringBuffer.MONOSPACED);
+        bf.append(", ");
+        bf.append("Dec: ", SWT.BOLD);
+        bf.append(toNumberString(10, type_class, data, offs, size, big_endian), StyledStringBuffer.MONOSPACED);
+        bf.append(", ");
+        bf.append("Oct: ", SWT.BOLD);
+        bf.append(toNumberString(8, type_class, data, offs, size, big_endian), StyledStringBuffer.MONOSPACED);
+        bf.append('\n');
+    }
+
     private boolean appendValueText(StyledStringBuffer bf, int level, String type_id,
             byte[] data, int offs, int size, boolean big_endian, Runnable done) {
         if (data == null) return true;
@@ -1255,32 +1268,16 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
             if (level == 0) {
                 assert offs == 0;
                 assert size == data.length;
-                if (size > 0) {
-                    switch (type_class) {
-                    case enumeration:
-                    case integer:
-                    case cardinal:
-                    case real:
-                        bf.append("Dec: ", SWT.BOLD);
-                        bf.append(toNumberString(10, type_class, data, offs, size, big_endian), StyledStringBuffer.MONOSPACED);
-                        bf.append("\n");
-                        break;
-                    }
-                    bf.append("Oct: ", SWT.BOLD);
-                    bf.append(toNumberString(8, type_class, data, offs, size, big_endian), StyledStringBuffer.MONOSPACED);
-                    bf.append("\n");
-                    bf.append("Hex: ", SWT.BOLD);
-                    bf.append(toNumberString(16, type_class, data, offs, size, big_endian), StyledStringBuffer.MONOSPACED);
-                    bf.append("\n");
-                }
+                if (size > 0) appendNumericValueText(bf, type_class, data, offs, size, big_endian);
                 String s = getTypeName(type_class, size);
                 if (s == null) s = "not available";
+                bf.append("Size: ", SWT.BOLD);
+                bf.append(size);
+                bf.append(size == 1 ? " byte" : " bytes");
+                bf.append(", ");
                 bf.append("Type: ", SWT.BOLD);
                 bf.append(s);
                 bf.append('\n');
-                bf.append("Size: ", SWT.BOLD);
-                bf.append(size);
-                bf.append(size == 1 ? " byte\n" : " bytes\n");
             }
             else if (type_class == ISymbols.TypeClass.integer || type_class == ISymbols.TypeClass.real) {
                 bf.append(toNumberString(10, type_class, data, offs, size, big_endian), StyledStringBuffer.MONOSPACED);
@@ -1296,12 +1293,12 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
             String s = string.getData();
             if (s != null) {
                 bf.append(s);
-                bf.append("\n");
+                bf.append('\n');
             }
             else if (e != null) {
                 bf.append("Cannot read pointed value: ", SWT.BOLD, null, rgb_error);
                 bf.append(TCFModel.getErrorMessage(e, false), SWT.ITALIC, null, rgb_error);
-                bf.append("\n");
+                bf.append('\n');
             }
         }
         if (type_data.getSize() > 0) {
@@ -1312,15 +1309,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
             case cardinal:
             case real:
                 if (level == 0) {
-                    bf.append("Dec: ", SWT.BOLD);
-                    bf.append(toNumberString(10, type_class, data, offs, size, big_endian), StyledStringBuffer.MONOSPACED);
-                    bf.append("\n");
-                    bf.append("Oct: ", SWT.BOLD);
-                    bf.append(toNumberString(8, type_class, data, offs, size, big_endian), StyledStringBuffer.MONOSPACED);
-                    bf.append("\n");
-                    bf.append("Hex: ", SWT.BOLD);
-                    bf.append(toNumberString(16, type_class, data, offs, size, big_endian), StyledStringBuffer.MONOSPACED);
-                    bf.append("\n");
+                    appendNumericValueText(bf, type_class, data, offs, size, big_endian);
                 }
                 else if (type_data.getTypeClass() == ISymbols.TypeClass.cardinal) {
                     bf.append("0x");
@@ -1334,12 +1323,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
             case function:
             case member_pointer:
                 if (level == 0) {
-                    bf.append("Oct: ", SWT.BOLD);
-                    bf.append(toNumberString(8, type_class, data, offs, size, big_endian), StyledStringBuffer.MONOSPACED);
-                    bf.append("\n");
-                    bf.append("Hex: ", SWT.BOLD);
-                    bf.append(toNumberString(16, type_class, data, offs, size, big_endian), StyledStringBuffer.MONOSPACED);
-                    bf.append("\n");
+                    appendNumericValueText(bf, type_class, data, offs, size, big_endian);
                 }
                 else {
                     bf.append("0x");
@@ -1348,27 +1332,28 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
                 break;
             case array:
                 if (!appendArrayValueText(bf, level, type_data, data, offs, size, big_endian, done)) return false;
-                if (level == 0) bf.append("\n");
+                if (level == 0) bf.append('\n');
                 break;
             case composite:
                 bf.append('{');
                 if (!appendCompositeValueText(bf, level, type_data, data, offs, size, big_endian, done)) return false;
                 bf.append('}');
-                if (level == 0) bf.append("\n");
+                if (level == 0) bf.append('\n');
                 break;
             }
         }
         if (level == 0) {
             if (!type_name.validate(done)) return false;
-            String nm = type_name.getData();
-            if (nm != null) {
-                bf.append("Type: ", SWT.BOLD);
-                bf.append(nm);
-                bf.append("\n");
-            }
             bf.append("Size: ", SWT.BOLD);
             bf.append(type_data.getSize());
-            bf.append(type_data.getSize() == 1 ? " byte\n" : " bytes\n");
+            bf.append(type_data.getSize() == 1 ? " byte" : " bytes");
+            String nm = type_name.getData();
+            if (nm != null) {
+                bf.append(", ");
+                bf.append("Type: ", SWT.BOLD);
+                bf.append(nm);
+            }
+            bf.append('\n');
         }
         return true;
     }
