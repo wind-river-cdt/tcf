@@ -495,4 +495,20 @@ public final class InvalidPeerModel implements IPeerModel {
 	public boolean isComplete() {
 		throw new IllegalStateException();
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer#addProperties(java.util.Map)
+	 */
+    @Override
+    public void addProperties(Map<String, ?> properties) {
+		throw new IllegalStateException();
+    }
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer#containsKey(java.lang.String)
+	 */
+    @Override
+    public boolean containsKey(String key) {
+		throw new IllegalStateException();
+    }
 }

@@ -216,7 +216,7 @@ public class PeerModel extends ContainerModelNode implements IPeerModel {
 	 * @see org.eclipse.tcf.te.runtime.properties.PropertiesContainer#postSetProperties(java.util.Map)
 	 */
 	@Override
-	protected void postSetProperties(Map<String, Object> properties) {
+	protected void postSetProperties(Map<String, ?> properties) {
 		Assert.isTrue(checkThreadAccess(), "Illegal Thread Access"); //$NON-NLS-1$
 		Assert.isNotNull(properties);
 		Assert.isNotNull(getPeer());

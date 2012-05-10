@@ -12,9 +12,11 @@ package org.eclipse.tcf.te.tcf.ui.wizards;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -25,7 +27,9 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.core.TransientPeer;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.persistence.interfaces.IURIPersistenceService;
+import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
 import org.eclipse.tcf.te.runtime.services.ServiceManager;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
@@ -34,6 +38,7 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelRefreshSe
 import org.eclipse.tcf.te.tcf.locator.model.Model;
 import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.tcf.ui.wizards.pages.NewTargetWizardPage;
+import org.eclipse.tcf.te.ui.interfaces.data.IDataExchangeNode;
 import org.eclipse.tcf.te.ui.views.ViewsUtil;
 import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
 import org.eclipse.tcf.te.ui.wizards.AbstractWizard;
@@ -64,26 +69,46 @@ public class NewTargetWizard extends AbstractWizard implements INewWizard {
 		addPage(new NewTargetWizardPage());
 	}
 
+	/**
+	 * Extract the peer attributes from the wizard pages.
+	 *
+	 * @param peerAttributes The peer attributes. Must not be <code>null</code>.
+	 */
+	protected void extractData(IPropertiesContainer peerAttributes) {
+		Assert.isNotNull(peerAttributes);
+
+		// Walk through the page list and extract the attributes from it
+		for (IWizardPage page : getPages()) {
+			if (page instanceof IDataExchangeNode) {
+				((IDataExchangeNode)page).extractData(peerAttributes);
+			}
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.wizard.Wizard#performFinish()
 	 */
 	@Override
 	public boolean performFinish() {
-		// Create the peer attributes map
-		final Map<String, String> peerAttributes = new HashMap<String, String>();
+		// Create the peer attributes
+		final IPropertiesContainer peerAttributes = new PropertiesContainer();
 
-		// Get the NewTargetWizardPage and extract the attributes from it
-		IWizardPage page = getPage(NewTargetWizardPage.class.getName());
-		if (page instanceof NewTargetWizardPage) {
-			((NewTargetWizardPage)page).extractData(peerAttributes);
-		}
+		// Extract the data from the wizard pages
+		extractData(peerAttributes);
 
 		// Fill in the minimum set of peer attributes to create a new peer
-		if (!peerAttributes.containsKey(IPeer.ATTR_ID)) {
-			peerAttributes.put(IPeer.ATTR_ID, UUID.randomUUID().toString());
+		if (peerAttributes.containsKey(IPeer.ATTR_ID)) {
+			peerAttributes.setProperty(IPeer.ATTR_ID, UUID.randomUUID().toString());
 		}
 		if (!peerAttributes.containsKey(IPeer.ATTR_NAME)) {
-			peerAttributes.put(IPeer.ATTR_NAME, NLS.bind(Messages.NewTargetWizard_newPeer_name, Integer.valueOf(counter.incrementAndGet())));
+			peerAttributes.setProperty(IPeer.ATTR_NAME, NLS.bind(Messages.NewTargetWizard_newPeer_name, Integer.valueOf(counter.incrementAndGet())));
+		}
+
+		// Convert the properties container into a Map<String, String>
+		final Map<String, String> attrs = new HashMap<String, String>();
+		for (Entry<String, Object> entry : peerAttributes.getProperties().entrySet()) {
+			if (entry.getKey() == null || entry.getValue() == null) continue;
+			attrs.put(entry.getKey(), entry.getValue() instanceof String ? (String)entry.getValue() : entry.getValue().toString());
 		}
 
 		try {
@@ -92,7 +117,7 @@ public class NewTargetWizard extends AbstractWizard implements INewWizard {
 			if (persistenceService == null) {
 				throw new IOException("Persistence service instance unavailable."); //$NON-NLS-1$
 			}
-			persistenceService.write(new TransientPeer(peerAttributes), null);
+			persistenceService.write(new TransientPeer(attrs), null);
 
 			// Get the locator model
 			final ILocatorModel model = Model.getModel();
@@ -107,7 +132,7 @@ public class NewTargetWizard extends AbstractWizard implements INewWizard {
 							service.refresh();
 
 							// Get the peer model node from the model and select it in the tree
-							final IPeerModel peerNode = model.getService(ILocatorModelLookupService.class).lkupPeerModelById(peerAttributes.get(IPeer.ATTR_ID));
+							final IPeerModel peerNode = model.getService(ILocatorModelLookupService.class).lkupPeerModelById(attrs.get(IPeer.ATTR_ID));
 							if (peerNode != null) {
 								// Refresh the viewer
 								ViewsUtil.refresh(IUIConstants.ID_EXPLORER);

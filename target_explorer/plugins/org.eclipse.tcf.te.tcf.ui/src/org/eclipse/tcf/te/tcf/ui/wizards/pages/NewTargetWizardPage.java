@@ -49,7 +49,7 @@ import org.eclipse.ui.forms.widgets.Section;
  * Wizard page implementation querying all information needed
  * to create the different TCF peer types.
  */
-public class NewTargetWizardPage extends AbstractValidatingWizardPage {
+public class NewTargetWizardPage extends AbstractValidatingWizardPage implements IDataExchangeNode {
 	private PeerIdControl peerIdControl;
 	private PeerNameControl peerNameControl;
 	TransportTypeControl transportTypeControl;
@@ -343,27 +343,34 @@ public class NewTargetWizardPage extends AbstractValidatingWizardPage {
 		setValidationInProgress(false);
 	}
 
-	/**
-	 * Updates the given attributes map with the current control content.
-	 *
-	 * @param peerAttributes The peer attributes map to update. Must not be <code>null</code>.
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.interfaces.data.IDataExchangeNode#setupData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
 	 */
-	protected void updatePeerAttributes(Map<String, String> peerAttributes) {
+	@Override
+	public void setupData(IPropertiesContainer data) {
+	}
+
+	/**
+	 * Updates the given attributes properties container with the current control content.
+	 *
+	 * @param peerAttributes The peer attributes. Must not be <code>null</code>.
+	 */
+	protected void updatePeerAttributes(IPropertiesContainer peerAttributes) {
 		Assert.isNotNull(peerAttributes);
 
 		// If the page has been never shown, we are done here
 		if (getControl() == null) return;
 
 		if (peerIdControl != null) {
-			peerAttributes.put(IPeer.ATTR_ID, peerIdControl.getEditFieldControlText());
+			peerAttributes.setProperty(IPeer.ATTR_ID, peerIdControl.getEditFieldControlText());
 		}
 
 		String value = peerNameControl != null ? peerNameControl.getEditFieldControlText() : null;
-		if (value != null && !"".equals(value)) peerAttributes.put(IPeer.ATTR_NAME, value); //$NON-NLS-1$
+		if (value != null && !"".equals(value)) peerAttributes.setProperty(IPeer.ATTR_NAME, value); //$NON-NLS-1$
 
 		value = transportTypeControl != null ? transportTypeControl.getSelectedTransportType() : null;
 		if (value != null && !"".equals(value) && !ITransportTypes.TRANSPORT_TYPE_CUSTOM.equals(value)) { //$NON-NLS-1$
-			peerAttributes.put(IPeer.ATTR_TRANSPORT_NAME, value);
+			peerAttributes.setProperty(IPeer.ATTR_TRANSPORT_NAME, value);
 		}
 
 		IWizardConfigurationPanel panel = transportTypePanelControl != null ? transportTypePanelControl.getConfigurationPanel(value) : null;
@@ -374,25 +381,24 @@ public class NewTargetWizardPage extends AbstractValidatingWizardPage {
 			// Copy all string properties to the peer attributes map
 			for (String key : data.getProperties().keySet()) {
 				value = data.getStringProperty(key);
-				if (value != null && !"".equals(value)) peerAttributes.put(key, value); //$NON-NLS-1$
+				if (value != null && !"".equals(value)) peerAttributes.setProperty(key, value); //$NON-NLS-1$
 			}
 		}
 
 		Map<String, String> additionalAttributes = tablePart != null ? tablePart.getAttributes() : null;
 		if (additionalAttributes != null && !additionalAttributes.isEmpty()) {
-			peerAttributes.putAll(additionalAttributes);
+			peerAttributes.addProperties(additionalAttributes);
 		}
 	}
 
-	/**
-	 * Returns the peer attributes.
-	 *
-	 * @param peerAttributes The peer attributes. Must not be <code>null</code>.
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.interfaces.data.IDataExchangeNode#extractData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
 	 */
-	public final void extractData(Map<String, String> peerAttributes) {
-		Assert.isNotNull(peerAttributes);
+	@Override
+	public void extractData(IPropertiesContainer data) {
+		Assert.isNotNull(data);
 		// Update with the current control content
-		updatePeerAttributes(peerAttributes);
+		updatePeerAttributes(data);
 	}
 
 	/* (non-Javadoc)

@@ -62,6 +62,14 @@ public interface IPropertiesContainer extends IAdaptable {
 	public void setProperties(Map<String, Object> properties);
 
 	/**
+	 * Adds all properties from the given map. If a property already exist
+	 * in the properties container, than the value of the property is overwritten.
+	 *
+	 * @param properties The map of properties to add. Must not be <code>null</code>.
+	 */
+	public void addProperties(Map<String, ?> properties);
+
+	/**
 	 * Stores the property under the given property key using the given property value.
 	 * If the current property value is equal to the given property value, no store
 	 * operation will be executed. If the property value is not <code>null</code> and
@@ -231,6 +239,14 @@ public interface IPropertiesContainer extends IAdaptable {
 	 * @return <code>True</code> if the properties container is empty, <code>false</code> if not.
 	 */
 	public boolean isEmpty();
+
+	/**
+	 * Returns whether this properties container contains the given key.
+	 *
+	 * @param key The key. Must not be <code>null</code>.
+	 * @return <code>True</code> if the properties container contains the key, <code>false</code> if not.
+	 */
+	public boolean containsKey(String key);
 
 	/**
 	 * Test if the property value stored under the given property is equal ignoring the case to the given

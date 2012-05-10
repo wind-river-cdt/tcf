@@ -400,11 +400,25 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 	 *
 	 * @param properties The map of properties set. Must not be <code>null</code>.
 	 */
-	protected void postSetProperties(Map<String, Object> properties) {
+	protected void postSetProperties(Map<String, ?> properties) {
 		Assert.isTrue(checkThreadAccess(), "Illegal Thread Access"); //$NON-NLS-1$
 		Assert.isNotNull(properties);
 
 		fireChangeEvent("properties", null, properties); //$NON-NLS-1$
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer#addProperties(java.util.Map)
+	 */
+	@Override
+	public final void addProperties(Map<String, ?> properties) {
+		Assert.isTrue(checkThreadAccess(), "Illegal Thread Access"); //$NON-NLS-1$
+		Assert.isNotNull(properties);
+
+		// Apply everything from the given properties
+		this.properties.putAll(properties);
+		// And signal the change
+		postSetProperties(properties);
 	}
 
 	/* (non-Javadoc)
@@ -519,6 +533,16 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 	public boolean isEmpty() {
 		Assert.isTrue(checkThreadAccess(), "Illegal Thread Access"); //$NON-NLS-1$
 		return properties.isEmpty();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer#containsKey(java.lang.String)
+	 */
+	@Override
+	public boolean containsKey(String key) {
+		Assert.isTrue(checkThreadAccess(), "Illegal Thread Access"); //$NON-NLS-1$
+		Assert.isNotNull(key);
+	    return properties.containsKey(key);
 	}
 
 	/* (non-Javadoc)
