@@ -543,11 +543,9 @@ public class TCFDisassemblyBackend extends AbstractDisassemblyBackend {
                             return;
                         }
                         final ArrayList<ISymbols.Symbol> symbolList = new ArrayList<ISymbols.Symbol>();
-                        final int[] idx = { 0 };
-                        IDisassemblyLine line = disassembly[idx[0]];
-                        Number address = line.getAddress();
-                        symbols.findByAddr(contextId, address, new ISymbols.DoneFind() {
-                            ISymbols.DoneFind doneFind = this;
+                        IDisassemblyLine line = disassembly[0];
+                        symbols.findByAddr(contextId, line.getAddress(), new ISymbols.DoneFind() {
+                            int idx = 0;
                             public void doneFind(IToken token, Exception error, String symbol_id) {
                                 if (error == null && symbol_id != null) {
                                     symbols.getContext(symbol_id, new ISymbols.DoneGetContext() {
@@ -567,15 +565,10 @@ public class TCFDisassemblyBackend extends AbstractDisassemblyBackend {
                                 findNextSymbol(null);
                             }
                             private void findNextSymbol(BigInteger nextAddress) {
-                                while (++idx[0] < disassembly.length) {
-                                    BigInteger instrAddress = JSON.toBigInteger(disassembly[idx[0]].getAddress());
-                                    if (nextAddress == null) {
-                                        nextAddress = instrAddress;
-                                    }
-                                    else if (instrAddress.compareTo(nextAddress) < 0) {
-                                        continue;
-                                    }
-                                    symbols.findByAddr(contextId, instrAddress, doneFind);
+                                while (++idx < disassembly.length) {
+                                    BigInteger instrAddress = JSON.toBigInteger(disassembly[idx].getAddress());
+                                    if (nextAddress != null && instrAddress.compareTo(nextAddress) < 0) continue;
+                                    symbols.findByAddr(contextId, instrAddress, this);
                                     return;
                                 }
                                 ISymbols.Symbol[] functionSymbols =
