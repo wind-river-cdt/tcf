@@ -21,6 +21,7 @@ import org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode;
  */
 public class ProcessComparator implements Comparator<ProcessTreeNode> , Serializable {
     private static final long serialVersionUID = 1L;
+    private static ProcessLabelProvider labelProvider = new ProcessLabelProvider();
 	/*
 	 * (non-Javadoc)
 	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
@@ -32,8 +33,8 @@ public class ProcessComparator implements Comparator<ProcessTreeNode> , Serializ
 		if (node1 == null && node2 != null) return -1;
 
 		// Get the labels
-		String text1 = node1 == null ? null : node1.name;
-		String text2 = node2 == null ? null : node2.name;
+		String text1 = node1 == null ? null : labelProvider.getText(node1);
+		String text2 = node2 == null ? null : labelProvider.getText(node2);
 
 		// Normalize labels
 		if (text1 == null) text1 = ""; //$NON-NLS-1$
