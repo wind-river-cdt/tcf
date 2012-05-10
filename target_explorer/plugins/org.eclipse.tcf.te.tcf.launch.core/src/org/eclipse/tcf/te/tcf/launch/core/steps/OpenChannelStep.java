@@ -15,11 +15,13 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
+import org.eclipse.tcf.te.runtime.stepper.StepperAttributeUtil;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
 import org.eclipse.tcf.te.runtime.utils.StatusHelper;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
+import org.eclipse.tcf.te.tcf.launch.core.interfaces.ICommonTCFLaunchAttributes;
 
 /**
  * Open channel step implementation.
@@ -43,10 +45,11 @@ public class OpenChannelStep extends AbstractTcfLaunchStep {
 	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStep#execute(org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext, org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId, org.eclipse.core.runtime.IProgressMonitor, org.eclipse.tcf.te.runtime.interfaces.callback.ICallback)
 	 */
 	@Override
-	public void execute(IStepContext context, IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor, final ICallback callback) {
+	public void execute(IStepContext context, final IPropertiesContainer data, final IFullQualifiedId fullQualifiedId, IProgressMonitor monitor, final ICallback callback) {
 		Tcf.getChannelManager().openChannel(getActivePeerModel(data).getPeer(), null, new IChannelManager.DoneOpenChannel() {
 			@Override
 			public void doneOpenChannel(final Throwable error, final IChannel channel) {
+				StepperAttributeUtil.setProperty(ICommonTCFLaunchAttributes.ATTR_CHANNEL, fullQualifiedId.getParentId(), data, channel);
 				callback.done(OpenChannelStep.this, StatusHelper.getStatus(error));
 			}
 		});
@@ -54,7 +57,7 @@ public class OpenChannelStep extends AbstractTcfLaunchStep {
 
 	@Override
 	public void rollback(IStepContext context, IPropertiesContainer data, IStatus status, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor, ICallback callback) {
-		IChannel channel = Tcf.getChannelManager().getChannel(getActivePeerModel(data).getPeer());
+		IChannel channel = (IChannel)StepperAttributeUtil.getProperty(ICommonTCFLaunchAttributes.ATTR_CHANNEL, fullQualifiedId, data);
 		if (channel != null && channel.getState() != IChannel.STATE_CLOSED) {
 			Tcf.getChannelManager().closeChannel(channel);
 		}

@@ -11,13 +11,20 @@ package org.eclipse.tcf.te.launch.ui.internal.viewer;
 
 import java.util.EventObject;
 
+import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.tcf.te.launch.core.lm.interfaces.ICommonLaunchAttributes;
+import org.eclipse.tcf.te.launch.core.persistence.DefaultPersistenceDelegate;
 import org.eclipse.tcf.te.launch.ui.model.LaunchModel;
 import org.eclipse.tcf.te.launch.ui.model.LaunchNode;
+import org.eclipse.tcf.te.runtime.concurrent.util.ExecutorsUtil;
 import org.eclipse.tcf.te.runtime.events.ChangeEvent;
 import org.eclipse.tcf.te.runtime.events.EventManager;
 import org.eclipse.tcf.te.runtime.interfaces.events.IEventListener;
+import org.eclipse.tcf.te.runtime.model.interfaces.IContainerModelNode;
+import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
 import org.eclipse.tcf.te.ui.trees.TreeContentProvider;
 import org.eclipse.ui.PlatformUI;
 
@@ -58,8 +65,36 @@ public class LaunchNavigatorContentProvider extends TreeContentProvider implemen
 	 * @see org.eclipse.tcf.te.ui.trees.TreeContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
 	 */
 	@Override
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+	public void inputChanged(final Viewer viewer, Object oldInput, Object newInput) {
 		super.inputChanged(viewer, oldInput, newInput);
+
+		if (newInput != null && !newInput.equals(oldInput)) {
+			LaunchModel model = LaunchModel.getLaunchModel(newInput);
+			LaunchNode lastLaunchedNode = null;
+			long nodeValue = -1;
+			for (IModelNode typeNode : model.getRootNode().getChildren()) {
+				for (IModelNode launchNode : ((IContainerModelNode)typeNode).getChildren()) {
+					ILaunchConfiguration config = ((LaunchNode)launchNode).getLaunchConfiguration();
+					String lastLaunched = DefaultPersistenceDelegate.getAttribute(config, ICommonLaunchAttributes.ATTR_LAST_LAUNCHED, (String)null);
+					if (lastLaunched != null) {
+						long last = Long.parseLong(lastLaunched);
+						if (last > nodeValue) {
+							nodeValue = last;
+							lastLaunchedNode = (LaunchNode)launchNode;
+						}
+					}
+				}
+			}
+			if (lastLaunchedNode != null) {
+				final LaunchNode node = lastLaunchedNode;
+				ExecutorsUtil.executeInUI(new Runnable() {
+					@Override
+					public void run() {
+						viewer.setSelection(new StructuredSelection(node));
+					}
+				});
+			}
+		}
 	}
 
 	/*

@@ -212,6 +212,8 @@ public class DebugService extends AbstractService implements IDebugService {
 				ILaunchConfigurationWorkingCopy wc = lct.newInstance(null, name);
 				// And fill in the launch configuration attributes
 				wc.setAttribute(TCFLaunchDelegate.ATTR_PEER_ID, peerId.get());
+				wc.setAttribute(TCFLaunchDelegate.ATTR_STOP_AT_MAIN, true);
+				wc.setAttribute(TCFLaunchDelegate.ATTR_DISCONNECT_ON_CTX_EXIT, true);
 				wc.setAttribute(TCFLaunchDelegate.ATTR_RUN_LOCAL_AGENT, false);
 				wc.setAttribute(TCFLaunchDelegate.ATTR_USE_LOCAL_AGENT, false);
 				// Save the working copy

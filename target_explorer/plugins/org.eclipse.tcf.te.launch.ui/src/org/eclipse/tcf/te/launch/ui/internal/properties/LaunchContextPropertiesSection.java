@@ -11,6 +11,7 @@ package org.eclipse.tcf.te.launch.ui.internal.properties;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.jface.viewers.ILabelDecorator;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -56,7 +57,19 @@ public class LaunchContextPropertiesSection extends BaseTitledSection {
 		ILaunchConfiguration node = ((LaunchNode)input).getLaunchConfiguration();
 
 		IModelNode[] contexts = LaunchContextsPersistenceDelegate.getLaunchContexts(node);
-		launchContextValue = contexts != null && contexts.length > 0 ? ((ILabelProvider)contexts[0].getAdapter(ILabelProvider.class)).getText(contexts[0]) : ""; //$NON-NLS-1$
+		if (contexts != null && contexts.length > 0) {
+			ILabelProvider labelProvider = (ILabelProvider)contexts[0].getAdapter(ILabelProvider.class);
+			launchContextValue = labelProvider.getText(contexts[0]);
+			if (labelProvider instanceof ILabelDecorator) {
+				launchContextValue = ((ILabelDecorator)labelProvider).decorateText(launchContextValue, contexts[0]);
+			}
+			if (contexts.length > 1) {
+				launchContextValue += ", ..."; //$NON-NLS-1$
+			}
+		}
+		else {
+			launchContextValue = ""; //$NON-NLS-1$
+		}
 	}
 
 	/*

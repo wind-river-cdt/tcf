@@ -2,15 +2,6 @@
 <?eclipse version="3.4"?>
 <plugin>
 
-<!-- Adapter factory contributions -->
-   <extension point="org.eclipse.core.runtime.adapters">
-      <factory
-            class="org.eclipse.tcf.te.tcf.launch.ui.internal.adapters.AdapterFactory"
-            adaptableType="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel">
-         <adapter type="org.eclipse.debug.ui.actions.ILaunchable"/>
-      </factory>
-   </extension>
-
 <!-- Launch configuration type contributions -->
    <extension point="org.eclipse.debug.ui.launchConfigurationTypeImages">
       <launchConfigurationTypeImage

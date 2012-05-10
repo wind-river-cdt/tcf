@@ -22,6 +22,7 @@ import org.eclipse.cdt.utils.elf.Elf.Attribute;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -222,21 +223,32 @@ public class LaunchSelectionManager {
 
 				// If the selection is not an IResource itself, try to adapt to it.
 				// This will possibly trigger an plugin activation on loadAdapter(...).
-				if (sel instanceof IResource) {
-					resource = (IResource)sel;
+				if (sel instanceof IProject) {
+					prj = (IProject)sel;
 				}
 				else {
-					resource = (IResource)Platform.getAdapterManager().loadAdapter(sel, IResource.class.getName());
-				}
+					if (sel instanceof IResource) {
+						resource = (IResource)sel;
+					}
+					else if (sel instanceof IAdaptable) {
+						resource = (IResource)((IAdaptable)sel).getAdapter(IResource.class);
+					}
+					else {
+						resource = (IResource)Platform.getAdapterManager().loadAdapter(sel, IResource.class.getName());
+					}
 
-				// Get the project from the resource
-				prj = resource.getProject();
+					// Get the project from the resource
+					prj = resource != null ? resource.getProject() : null;
+				}
 
 				// If the project could be determined, add the project's
 				// hash code to the cumulative hash code.
 				if (prj != null && !projects.contains(prj)) {
 					projects.add(prj);
 					hash += prj.hashCode();
+				}
+				else {
+					hash += sel.hashCode();
 				}
 			}
 
