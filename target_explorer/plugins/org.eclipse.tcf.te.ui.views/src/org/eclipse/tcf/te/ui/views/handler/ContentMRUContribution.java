@@ -90,7 +90,9 @@ public class ContentMRUContribution extends CompoundContributionItem {
 		for (int i = 0; i < extensionSet.size(); i++) {
 			String extensionId = extensionSet.get(i);
 			INavigatorContentDescriptor contentDescriptor = contentService.getContentDescriptorById(extensionId);
-			items.add(new ActionContributionItem(new ContentMRUAction((i + 1), contentDescriptor, contentService, commonViewer)));
+			if (contentDescriptor != null) {
+				items.add(new ActionContributionItem(new ContentMRUAction((i + 1), contentDescriptor, contentService, commonViewer)));
+			}
 		}
 		return items.toArray(new IContributionItem[items.size()]);
 	}
