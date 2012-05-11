@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.eclipse.debug.internal.ui.viewers.model.provisional.ILabelUpdate;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.tcf.core.ErrorReport;
 import org.eclipse.tcf.internal.debug.model.TCFSymFileRef;
@@ -101,6 +102,28 @@ public class TCFNodeModule extends TCFNode implements IDetailsProvider {
         return true;
     }
 
+    @Override
+    protected void getFontData(ILabelUpdate update, String view_id) {
+        FontData fn = TCFModelFonts.getNormalFontData(view_id);
+        String[] cols = update.getColumnIds();
+        if (cols == null || cols.length == 0) {
+            update.setFontData(fn, 0);
+        }
+        else {
+            String[] ids = update.getColumnIds();
+            for (int i = 0; i < cols.length; i++) {
+                if (TCFColumnPresentationModules.COL_ADDRESS.equals(ids[i]) ||
+                        TCFColumnPresentationModules.COL_OFFSET.equals(ids[i]) ||
+                        TCFColumnPresentationModules.COL_SIZE.equals(ids[i])) {
+                    update.setFontData(TCFModelFonts.getMonospacedFontData(view_id), i);
+                }
+                else {
+                    update.setFontData(fn, i);
+                }
+            }
+        }
+    }
+
     public boolean getDetailText(StyledStringBuffer bf, Runnable done) {
         if (!region.validate(done)) return false;
         MemoryRegion mr = region.getData();
@@ -132,10 +155,10 @@ public class TCFNodeModule extends TCFNode implements IDetailsProvider {
             }
             String section = r.getSectionName();
             if (section != null) bf.append("File section: ", SWT.BOLD).append(section).append('\n');
-            else bf.append("File offset: ", SWT.BOLD).append(toHexString(r.getOffset())).append('\n');
+            else bf.append("File offset: ", SWT.BOLD).append(toHexString(r.getOffset()), StyledStringBuffer.MONOSPACED).append('\n');
         }
-        bf.append("Address: ", SWT.BOLD).append(toHexString(r.getAddress())).append('\n');
-        bf.append("Size: ", SWT.BOLD).append(toHexString(r.getSize())).append('\n');
+        bf.append("Address: ", SWT.BOLD).append(toHexString(r.getAddress()), StyledStringBuffer.MONOSPACED).append('\n');
+        bf.append("Size: ", SWT.BOLD).append(toHexString(r.getSize()), StyledStringBuffer.MONOSPACED).append('\n');
         bf.append("Flags: ", SWT.BOLD).append(getFlagsLabel(r.getFlags())).append('\n');
         return true;
     }

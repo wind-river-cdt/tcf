@@ -30,7 +30,6 @@ import org.eclipse.debug.internal.ui.viewers.model.provisional.IModelDelta;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IPresentationContext;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugUIConstants;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.TextCellEditor;
@@ -1016,9 +1015,6 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
     @Override
     protected boolean getData(ILabelUpdate result, Runnable done) {
         if (is_empty) {
-            FontData font_data = JFaceResources.getFontDescriptor(IDebugUIConstants.PREF_VARIABLE_TEXT_FONT).getFontData()[0];
-            font_data.setStyle(SWT.ITALIC);
-            result.setFontData(font_data, 0);
             result.setLabel("Add new expression", 0);
             result.setImageDescriptor(ImageCache.getImageDescriptor(ImageCache.IMG_NEW_EXPRESSION), 0);
         }
@@ -1154,6 +1150,32 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
             }
         }
         return true;
+    }
+
+    @Override
+    protected void getFontData(ILabelUpdate update, String view_id) {
+        if (is_empty) {
+            update.setFontData(TCFModelFonts.getItalicFontData(view_id), 0);
+        }
+        else {
+            FontData fn = TCFModelFonts.getNormalFontData(view_id);
+            String[] cols = update.getColumnIds();
+            if (cols == null || cols.length == 0) {
+                update.setFontData(fn, 0);
+            }
+            else {
+                String[] ids = update.getColumnIds();
+                for (int i = 0; i < cols.length; i++) {
+                    if (TCFColumnPresentationExpression.COL_HEX_VALUE.equals(ids[i]) ||
+                            TCFColumnPresentationExpression.COL_DEC_VALUE.equals(ids[i])) {
+                        update.setFontData(TCFModelFonts.getMonospacedFontData(view_id), i);
+                    }
+                    else {
+                        update.setFontData(fn, i);
+                    }
+                }
+            }
+        }
     }
 
     private boolean appendArrayValueText(StyledStringBuffer bf, int level, ISymbols.Symbol type,

@@ -25,6 +25,7 @@ import org.eclipse.debug.internal.ui.viewers.model.provisional.ILabelUpdate;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IModelDelta;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IPresentationContext;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IViewerInputUpdate;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.tcf.debug.ui.ITCFObject;
 import org.eclipse.tcf.internal.debug.model.TCFLaunch;
 import org.eclipse.tcf.protocol.IChannel;
@@ -285,6 +286,7 @@ public abstract class TCFNode extends PlatformObject implements ITCFObject, Comp
                     if (!update.isCanceled()) {
                         if (!disposed && channel.getState() == IChannel.STATE_OPEN) {
                             if (!getLockedData(update, this)) return;
+                            getFontData(update, update.getPresentationContext().getId());
                         }
                         else {
                             update.setLabel("...", 0);
@@ -448,6 +450,21 @@ public abstract class TCFNode extends PlatformObject implements ITCFObject, Comp
     protected boolean getData(IViewerInputUpdate update, Runnable done) {
         update.setInputElement(this);
         return true;
+    }
+
+    /**
+     * Get FontData info for node label update.
+     * @param update - label update request.
+     */
+    protected void getFontData(ILabelUpdate update, String view_id) {
+        FontData fd = TCFModelFonts.getNormalFontData(view_id);
+        String[] cols = update.getColumnIds();
+        if (cols == null || cols.length == 0) {
+            update.setFontData(fd, 0);
+        }
+        else {
+            for (int i = 0; i < cols.length; i++) update.setFontData(fd, i);
+        }
     }
 
     /**

@@ -26,6 +26,7 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tcf.internal.debug.model.TCFContextState;
@@ -375,6 +376,27 @@ public class TCFNodeRegister extends TCFNode implements IElementEditor, IWatchIn
             }
             else {
                 result.setLabel(ctx.getName() + " = " + s, 0);
+            }
+        }
+    }
+
+    @Override
+    protected void getFontData(ILabelUpdate update, String view_id) {
+        FontData fn = TCFModelFonts.getNormalFontData(view_id);
+        String[] cols = update.getColumnIds();
+        if (cols == null || cols.length == 0) {
+            update.setFontData(fn, 0);
+        }
+        else {
+            String[] ids = update.getColumnIds();
+            for (int i = 0; i < cols.length; i++) {
+                if (TCFColumnPresentationRegister.COL_HEX_VALUE.equals(ids[i]) ||
+                        TCFColumnPresentationExpression.COL_DEC_VALUE.equals(ids[i])) {
+                    update.setFontData(TCFModelFonts.getMonospacedFontData(view_id), i);
+                }
+                else {
+                    update.setFontData(fn, i);
+                }
             }
         }
     }

@@ -271,11 +271,9 @@ public class TCFDetailPane implements IDetailPane, IPropertyChangeListener {
 
     private Font getMonospacedFont() {
         if (mono_font == null) {
-            int height = 0;
             FontData[] fd = source_viewer.getControl().getFont().getFontData();
-            if (fd != null && fd.length > 0) height = fd[0].getHeight();
             FontDescriptor d = JFaceResources.getFontDescriptor(IDebugUIConstants.PREF_DETAIL_PANE_FONT);
-            if (height != 0) d = d.setHeight(height);
+            if (fd != null && fd.length > 0) d = d.setHeight(fd[0].getHeight());
             mono_font = d.createFont(display);
         }
         return mono_font;
