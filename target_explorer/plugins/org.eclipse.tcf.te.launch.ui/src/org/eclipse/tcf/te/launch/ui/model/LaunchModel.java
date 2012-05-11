@@ -12,17 +12,21 @@ package org.eclipse.tcf.te.launch.ui.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EventObject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationListener;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.tcf.te.launch.core.bindings.LaunchConfigTypeBindingsManager;
 import org.eclipse.tcf.te.launch.core.interfaces.IReferencedProjectItem;
+import org.eclipse.tcf.te.launch.core.lm.interfaces.ICommonLaunchAttributes;
+import org.eclipse.tcf.te.launch.core.persistence.DefaultPersistenceDelegate;
 import org.eclipse.tcf.te.launch.core.persistence.launchcontext.LaunchContextsPersistenceDelegate;
 import org.eclipse.tcf.te.launch.core.persistence.projects.ReferencedProjectItem;
 import org.eclipse.tcf.te.launch.core.persistence.projects.ReferencedProjectsPersistenceDelegate;
@@ -31,15 +35,19 @@ import org.eclipse.tcf.te.launch.core.selection.ProjectSelectionContext;
 import org.eclipse.tcf.te.launch.core.selection.RemoteSelectionContext;
 import org.eclipse.tcf.te.runtime.events.ChangeEvent;
 import org.eclipse.tcf.te.runtime.events.EventManager;
+import org.eclipse.tcf.te.runtime.interfaces.events.IEventListener;
 import org.eclipse.tcf.te.runtime.model.interfaces.IContainerModelNode;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
+import org.eclipse.tcf.te.ui.views.Managers;
+import org.eclipse.tcf.te.ui.views.interfaces.ICategory;
 
 /**
  * LaunchModel
  */
-public final class LaunchModel {
+public final class LaunchModel implements IEventListener, ILaunchConfigurationListener {
 
 	private static final Map<Object,LaunchModel> models = new HashMap<Object, LaunchModel>();
+	private static final Map<String,String> nameToUUID = new HashMap<String, String>();
 
 	/**
 	 * Get the launch model of the rootNode.
@@ -49,12 +57,15 @@ public final class LaunchModel {
 	 * @return The launch model.
 	 */
 	public static LaunchModel getLaunchModel(final Object modelRoot) {
-		LaunchModel model = models.get(modelRoot);
-		if (model == null) {
-			model = new LaunchModel(modelRoot);
-			models.put(modelRoot, model);
+		if (modelRoot instanceof ICategory || modelRoot instanceof IModelNode || modelRoot instanceof IProject) {
+			LaunchModel model = models.get(modelRoot);
+			if (model == null) {
+				model = new LaunchModel(modelRoot);
+				models.put(modelRoot, model);
+			}
+			return model;
 		}
-		return model;
+		return null;
 	}
 
 	private final LaunchNode rootNode;
@@ -67,45 +78,97 @@ public final class LaunchModel {
 		this.modelRoot = modelRoot;
 		rootNode = new LaunchNode(this);
 		refresh();
-		DebugPlugin.getDefault().getLaunchManager().addLaunchConfigurationListener(new ILaunchConfigurationListener() {
-			@Override
-			public void launchConfigurationRemoved(ILaunchConfiguration configuration) {
-				if (!configuration.isWorkingCopy()) {
-					if (refresh()) {
-						EventManager.getInstance().fireEvent(new ChangeEvent(LaunchModel.this, "launchRemoved", null, null)); //$NON-NLS-1$
-					}
-				}
-			}
-			@Override
-			public void launchConfigurationChanged(ILaunchConfiguration configuration) {
-				if (!configuration.isWorkingCopy()) {
-					refresh();
-					EventManager.getInstance().fireEvent(new ChangeEvent(LaunchModel.this, "launchChanged", null, null)); //$NON-NLS-1$
-				}
-			}
-			@Override
-			public void launchConfigurationAdded(ILaunchConfiguration configuration) {
-				if (!configuration.isWorkingCopy()) {
-					if (refresh()) {
-						EventManager.getInstance().fireEvent(new ChangeEvent(LaunchModel.this, "launchAdded", null, null)); //$NON-NLS-1$
-					}
-				}
-			}
-		});
+		DebugPlugin.getDefault().getLaunchManager().addLaunchConfigurationListener(this);
+
+		if (modelRoot instanceof ICategory) {
+			EventManager.getInstance().addEventListener(this, ChangeEvent.class);
+		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.ILaunchConfigurationListener#launchConfigurationRemoved(org.eclipse.debug.core.ILaunchConfiguration)
+	 */
+	@Override
+	public void launchConfigurationRemoved(ILaunchConfiguration configuration) {
+		if (!configuration.isWorkingCopy()) {
+			if (getModelRoot() instanceof ICategory) {
+				Managers.getCategoryManager().remove(((ICategory)getModelRoot()).getId(), getCategoryId(configuration));
+				nameToUUID.remove(configuration.getName());
+			}
+			if (refresh()) {
+				EventManager.getInstance().fireEvent(new ChangeEvent(this, ChangeEvent.ID_REMOVED, null, null));
+			}
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.ILaunchConfigurationListener#launchConfigurationChanged(org.eclipse.debug.core.ILaunchConfiguration)
+	 */
+	@Override
+	public void launchConfigurationChanged(ILaunchConfiguration configuration) {
+		if (!configuration.isWorkingCopy()) {
+			refresh();
+			EventManager.getInstance().fireEvent(new ChangeEvent(this, ChangeEvent.ID_CHANGED, null, null));
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.ILaunchConfigurationListener#launchConfigurationAdded(org.eclipse.debug.core.ILaunchConfiguration)
+	 */
+	@Override
+	public void launchConfigurationAdded(ILaunchConfiguration configuration) {
+		if (!configuration.isWorkingCopy()) {
+			if (refresh()) {
+				EventManager.getInstance().fireEvent(new ChangeEvent(this, ChangeEvent.ID_ADDED, null, null));
+			}
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.interfaces.events.IEventListener#eventFired(java.util.EventObject)
+	 */
+	@Override
+	public void eventFired(EventObject event) {
+		Assert.isTrue(event instanceof ChangeEvent);
+		ChangeEvent e = (ChangeEvent)event;
+		if (e.getSource() instanceof ICategory &&
+						((e.getNewValue() instanceof String && ((String)e.getNewValue()).startsWith(LaunchNode.class.getName())) ||
+										(e.getOldValue() instanceof String && ((String)e.getOldValue()).startsWith(LaunchNode.class.getName())))) {
+			if (refresh()) {
+				EventManager.getInstance().fireEvent(new ChangeEvent(this, ((ChangeEvent)event).getEventId(), null, null));
+			}
+		}
+	}
+
+	/**
+	 * Return the root node of the model tree.
+	 */
 	public LaunchNode getRootNode() {
 		return rootNode;
 	}
 
+	/**
+	 * Return the model root (IModelNode, IProject, ICategory).
+	 */
 	public Object getModelRoot() {
 		return modelRoot;
 	}
 
+	/**
+	 * Refresh the model.
+	 * @return <code>true</code> if the model has changed.
+	 */
 	public boolean refresh() {
 		boolean changed = false;
 		Object parent = rootNode.getModel().getModelRoot();
 		String[] typeIds = new String[0];
+		if (parent instanceof ICategory) {
+			List<String> ids = new ArrayList<String>();
+			for (ILaunchConfigurationType type : DebugPlugin.getDefault().getLaunchManager().getLaunchConfigurationTypes()) {
+				ids.add(type.getIdentifier());
+			}
+			typeIds = ids.toArray(new String[ids.size()]);
+		}
 		if (parent instanceof IProject) {
 			typeIds = LaunchConfigTypeBindingsManager.getInstance().getValidLaunchConfigTypes(
 							new LaunchSelection(null, new ProjectSelectionContext((IProject)parent, true)));
@@ -138,18 +201,15 @@ public final class LaunchModel {
 
 				List<IModelNode> configNodes = new ArrayList<IModelNode>(Arrays.asList(((IContainerModelNode)typeNode).getChildren()));
 				for (ILaunchConfiguration config : configs) {
-					if (parent instanceof IModelNode) {
+					if (parent instanceof ICategory) {
+						if (Managers.getCategoryManager().belongsTo(((ICategory)parent).getId(), getCategoryId(config))) {
+							changed |= checkAndAdd(config, (IContainerModelNode)typeNode, configNodes);
+						}
+					}
+					else if (parent instanceof IModelNode) {
 						IModelNode[] contexts = LaunchContextsPersistenceDelegate.getLaunchContexts(config);
 						if (contexts == null || contexts.length == 0 || Arrays.asList(contexts).contains(parent)) {
-							IModelNode configNode = find(config, configNodes);
-							if (configNode != null) {
-								configNodes.remove(configNode);
-							}
-							else {
-								configNode = new LaunchNode(config);
-								((IContainerModelNode)typeNode).add(configNode);
-								changed = true;
-							}
+							changed |= checkAndAdd(config, (IContainerModelNode)typeNode, configNodes);
 						}
 					}
 					else if (parent instanceof IProject) {
@@ -157,15 +217,7 @@ public final class LaunchModel {
 						IReferencedProjectItem project = new ReferencedProjectItem();
 						project.setProperty(IReferencedProjectItem.PROPERTY_PROJECT_NAME, ((IProject)parent).getName());
 						if (projects != null && Arrays.asList(projects).contains(project)) {
-							IModelNode configNode = find(config, configNodes);
-							if (configNode != null) {
-								configNodes.remove(configNode);
-							}
-							else {
-								configNode = new LaunchNode(config);
-								((IContainerModelNode)typeNode).add(configNode);
-								changed = true;
-							}
+							changed |= checkAndAdd(config, (IContainerModelNode)typeNode, configNodes);
 						}
 					}
 				}
@@ -173,13 +225,29 @@ public final class LaunchModel {
 					((IContainerModelNode)typeNode).remove(configToDelete, true);
 					changed = true;
 				}
-			}
-			for (IModelNode typeToDelete : typeNodes) {
-				rootNode.remove(typeToDelete, true);
-				changed = true;
+				if (parent instanceof ICategory && typeNode.isEmpty()) {
+					typeNodes.add(typeNode);
+				}
 			}
 		}
+		for (IModelNode typeToDelete : typeNodes) {
+			rootNode.remove(typeToDelete, true);
+			changed = true;
+		}
 		return changed;
+	}
+
+	private boolean checkAndAdd(ILaunchConfiguration config, IContainerModelNode typeNode, List<IModelNode> configNodes) {
+		IModelNode configNode = find(config, configNodes);
+		if (configNode != null) {
+			configNodes.remove(configNode);
+		}
+		else {
+			configNode = new LaunchNode(config);
+			typeNode.add(configNode);
+			return true;
+		}
+		return false;
 	}
 
 	private IModelNode find(Object data, List<IModelNode> list) {
@@ -193,5 +261,22 @@ public final class LaunchModel {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Get the unique category id for this launch config.
+	 * @param config The launch configuration.
+	 * @return The unique category id.
+	 */
+	public static String getCategoryId(ILaunchConfiguration config) {
+		String uuid = DefaultPersistenceDelegate.getAttribute(config, ICommonLaunchAttributes.ATTR_UUID, (String)null);
+		if (uuid == null) {
+			uuid = nameToUUID.get(config.getName());
+		}
+		if (uuid != null && !nameToUUID.containsKey(config.getName())) {
+			nameToUUID.put(config.getName(), uuid);
+		}
+
+		return LaunchNode.class.getName() + "." + (uuid != null ? uuid : config.getName()); //$NON-NLS-1$
 	}
 }

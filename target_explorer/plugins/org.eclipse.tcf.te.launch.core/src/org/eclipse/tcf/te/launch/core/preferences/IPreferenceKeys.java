@@ -53,4 +53,10 @@ public interface IPreferenceKeys {
 	 * If set to <code>true</code>, launches are sorted by their last launched time stamp.
 	 */
 	public static final String PREF_SORT_LAUNCHES_BY_LAST_LAUNCHED = PREFIX + ".sortLaunchesByLastLaunched"; //$NON-NLS-1$
+
+	/**
+	 * Preference key to access the flag to hide favorite launches content extension.
+	 */
+	public static final String PREF_HIDE_FAVORITE_LAUNCHES_EXTENSION = "org.eclipse.tcf.te.tcf.launch.ui.navigator.favorites.content.hide"; //$NON-NLS-1$
+
 }

@@ -2,12 +2,18 @@
 <?eclipse version="3.4"?>
 <plugin>
 
+<!-- Preference contributions -->   
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.eclipse.tcf.te.launch.ui.internal.PreferencesInitializer"/>
+   </extension>
+
 <!-- Adapter factory contributions -->
    <extension point="org.eclipse.core.runtime.adapters">
       <factory
             adaptableType="org.eclipse.tcf.te.launch.ui.model.LaunchNode"
             class="org.eclipse.tcf.te.launch.ui.internal.adapters.AdapterFactory">
          <adapter type="org.eclipse.jface.viewers.ILabelProvider"/>
+         <adapter type="org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizable"/>
       </factory>
    </extension>
 
@@ -46,8 +52,26 @@
 <!-- Navigator content contributions -->
    <extension point="org.eclipse.ui.navigator.navigatorContent">
       <navigatorContent
+            id="org.eclipse.tcf.te.tcf.launch.ui.navigator.favorites.content"
+            name="%LaunchTree.name"
+            activeByDefault="true"
+            contentProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchFavoritesContentProvider"
+            labelProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchTreeLabelProvider"
+            priority="normal">
+         <triggerPoints>
+            <instanceof value="org.eclipse.tcf.te.ui.views.interfaces.ICategory"/>
+         </triggerPoints>
+         <possibleChildren>
+            <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
+         </possibleChildren>
+         <commonSorter class="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchTreeViewerSorter"/>
+      </navigatorContent>
+   </extension>
+
+   <extension point="org.eclipse.ui.navigator.navigatorContent">
+      <navigatorContent
             id="org.eclipse.tcf.te.launch.ui.navigator.project.content"
-            name="%LauchTree.name"
+            name="%LaunchTree.name"
       		icon="icons/obj16/launches_root.gif"
             activeByDefault="false"
             contentProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchNavigatorContentProvider"
@@ -78,7 +102,7 @@
       <viewer
             id="org.eclipse.tcf.te.launch.ui.viewer.launches"
             autoExpandLevel="2"
-            contentProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchTreeContentProvider"
+            contentProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchEditorContentProvider"
             doubleClickCommand="org.eclipse.ui.navigator.Open"
             helpId="org.eclipse.tcf.te.launch.ui.LaunchEditorPage"
             menuId="org.eclipse.tcf.te.launch.ui.editor.menu.launches">
@@ -381,7 +405,42 @@
                <reference definitionId="launch.expressions.isSingleLaunchNode"/>
             </visibleWhen>
          </command>
+         <separator
+               name="group.categories"
+               visible="true"/>
+         <menu
+               id="org.eclipse.tcf.te.launch.ui.editor.menu.addTo"
+               label="%AddTo.menu.name">
+            <dynamic 
+                  id="org.eclipse.tcf.te.launch.ui.editor.dynamic.addTo.multi"
+                  class="org.eclipse.tcf.te.ui.views.handler.CategoryAddToContributionItem">
+               <visibleWhen checkEnabled="false">
+                  <with variable="selection">
+                     <test property="org.eclipse.tcf.te.ui.views.validAddToCategoriesCount" value="(1-"/>
+                     <iterate operator="and" ifEmpty="false">
+                        <adapt type="org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizable"/>
+                     </iterate>
+                  </with> 
+               </visibleWhen>
+            </dynamic>
+            <visibleWhen>
+               <reference definitionId="launch.expressions.isSingleLaunchConfig"/>
+            </visibleWhen>
+         </menu>
+         <dynamic
+               id="org.eclipse.tcf.te.launch.ui.editor.dynamic.addTo.single"
+               class="org.eclipse.tcf.te.ui.views.handler.CategoryAddToContributionItem">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <test property="org.eclipse.tcf.te.ui.views.validAddToCategoriesCount" value="1"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <adapt type="org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizable"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </dynamic>
       </menuContribution>
+      
       
    <!-- Launches editor page toolbar contributions -->
       <menuContribution locationURI="toolbar:org.eclipse.tcf.te.launch.ui.editor.menu.launches">

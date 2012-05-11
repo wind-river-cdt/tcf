@@ -20,6 +20,11 @@ public interface ICommonLaunchAttributes {
 	public static final String ATTR_PREFIX = "org.eclipse.tcf.te.launch"; //$NON-NLS-1$
 
 	/**
+	 * Unique identifier.
+	 */
+	public static final String ATTR_UUID = ATTR_PREFIX + ".UUID";     //$NON-NLS-1$
+
+	/**
 	 * Time stamp when last launched.
 	 */
 	public static final String ATTR_LAST_LAUNCHED = ATTR_PREFIX + ".lastLaunched";     //$NON-NLS-1$

@@ -42,6 +42,7 @@ import org.eclipse.tcf.te.launch.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.launch.ui.model.LaunchNode;
 import org.eclipse.tcf.te.launch.ui.selection.LaunchSelectionManager;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
+import org.eclipse.tcf.te.ui.views.interfaces.ICategory;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.actions.CompoundContributionItem;
 import org.eclipse.ui.handlers.IHandlerService;
@@ -109,7 +110,10 @@ public class NewLaunchConfigurationContributionItem extends CompoundContribution
 				for (String mode : LaunchConfigHelper.getLaunchConfigTypeModes(type, false)) {
 					ILaunchManagerDelegate delegate = LaunchManager.getInstance().getLaunchManagerDelegate(type, mode);
 					ILaunchSelection launchSelection = null;
-					if (node.getModel().getModelRoot() instanceof IModelNode) {
+					if (node.getModel().getModelRoot() instanceof ICategory) {
+						launchSelection = LaunchSelectionManager.getInstance().getLaunchSelection(type, mode, LaunchSelectionManager.PART_ID_TE_VIEW);
+					}
+					else if (node.getModel().getModelRoot() instanceof IModelNode) {
 						List<ISelectionContext> selectionContexts = new ArrayList<ISelectionContext>();
 						selectionContexts.add(new RemoteSelectionContext((IModelNode)node.getModel().getModelRoot(), true));
 						selectionContexts.addAll(LaunchSelectionManager.getInstance().getSelectionContextsFor(LaunchSelectionManager.PART_ID_PROJECT_VIEW, type, mode, false));

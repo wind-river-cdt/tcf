@@ -20,8 +20,11 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.te.launch.ui.activator.UIPlugin;
+import org.eclipse.tcf.te.launch.ui.model.LaunchModel;
 import org.eclipse.tcf.te.launch.ui.model.LaunchNode;
 import org.eclipse.tcf.te.launch.ui.nls.Messages;
+import org.eclipse.tcf.te.ui.views.Managers;
+import org.eclipse.tcf.te.ui.views.interfaces.ICategory;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
@@ -61,7 +64,8 @@ public class DeleteHandler extends AbstractHandler {
 	public boolean canDelete(Object element) {
 		if (element instanceof LaunchNode) {
 			LaunchNode node = (LaunchNode)element;
-			return LaunchNode.TYPE_LAUNCH_CONFIG.equals(node.getType()) && !node.getLaunchConfiguration().isReadOnly();
+			return LaunchNode.TYPE_LAUNCH_CONFIG.equals(node.getType()) &&
+							(node.getModel().getModelRoot() instanceof ICategory || !node.getLaunchConfiguration().isReadOnly());
 		}
 		return false;
 	}
@@ -71,13 +75,18 @@ public class DeleteHandler extends AbstractHandler {
 
 		if (element instanceof LaunchNode) {
 			LaunchNode node = (LaunchNode)element;
-			if (MessageDialog.openQuestion(
-							UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getShell(),
-							Messages.DeleteHandlerDelegate_question_title, NLS.bind(Messages.DeleteHandlerDelegate_question_message, node.getLaunchConfiguration().getName()))) {
-				try {
-					node.getLaunchConfiguration().delete();
-				}
-				catch (Exception e) {
+			if (node.getModel().getModelRoot() instanceof ICategory) {
+				Managers.getCategoryManager().remove(((ICategory)node.getModel().getModelRoot()).getId(), LaunchModel.getCategoryId(node.getLaunchConfiguration()));
+			}
+			else {
+				if (MessageDialog.openQuestion(
+								UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getShell(),
+								Messages.DeleteHandlerDelegate_question_title, NLS.bind(Messages.DeleteHandlerDelegate_question_message, node.getLaunchConfiguration().getName()))) {
+					try {
+						node.getLaunchConfiguration().delete();
+					}
+					catch (Exception e) {
+					}
 				}
 			}
 		}

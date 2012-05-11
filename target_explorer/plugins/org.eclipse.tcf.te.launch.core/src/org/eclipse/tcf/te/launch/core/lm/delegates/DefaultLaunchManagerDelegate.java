@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
@@ -30,6 +31,7 @@ import org.eclipse.tcf.te.launch.core.interfaces.IReferencedProjectItem;
 import org.eclipse.tcf.te.launch.core.interfaces.tracing.ITraceIds;
 import org.eclipse.tcf.te.launch.core.lm.LaunchConfigSorter;
 import org.eclipse.tcf.te.launch.core.lm.LaunchSpecification;
+import org.eclipse.tcf.te.launch.core.lm.interfaces.ICommonLaunchAttributes;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.IFileTransferLaunchAttributes;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchAttribute;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchContextLaunchAttributes;
@@ -37,6 +39,7 @@ import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchManagerDelegate;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.IReferencedProjectLaunchAttributes;
 import org.eclipse.tcf.te.launch.core.nls.Messages;
+import org.eclipse.tcf.te.launch.core.persistence.DefaultPersistenceDelegate;
 import org.eclipse.tcf.te.launch.core.persistence.filetransfer.FileTransfersPersistenceDelegate;
 import org.eclipse.tcf.te.launch.core.persistence.launchcontext.LaunchContextsPersistenceDelegate;
 import org.eclipse.tcf.te.launch.core.persistence.projects.ReferencedProjectsPersistenceDelegate;
@@ -71,6 +74,11 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 	public void initLaunchConfigAttributes(ILaunchConfigurationWorkingCopy wc, ILaunchSpecification launchSpec) {
 		Assert.isNotNull(wc);
 		Assert.isNotNull(launchSpec);
+
+		if (!DefaultPersistenceDelegate.hasAttribute(wc, ICommonLaunchAttributes.ATTR_UUID)) {
+			DefaultPersistenceDelegate.setAttribute(wc, ICommonLaunchAttributes.ATTR_UUID, UUID.randomUUID().toString());
+		}
+
 		validateLaunchSpecification(launchSpec);
 	}
 
@@ -81,6 +89,11 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 	public void updateLaunchConfigAttributes(ILaunchConfigurationWorkingCopy wc, ILaunchSpecification launchSpec) {
 		Assert.isNotNull(wc);
 		Assert.isNotNull(launchSpec);
+
+		if (!DefaultPersistenceDelegate.hasAttribute(wc, ICommonLaunchAttributes.ATTR_UUID)) {
+			DefaultPersistenceDelegate.setAttribute(wc, ICommonLaunchAttributes.ATTR_UUID, UUID.randomUUID().toString());
+		}
+
 		validateLaunchSpecification(launchSpec);
 	}
 

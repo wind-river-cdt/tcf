@@ -25,7 +25,10 @@ import java.util.Map;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.tcf.te.runtime.events.ChangeEvent;
+import org.eclipse.tcf.te.runtime.events.EventManager;
 import org.eclipse.tcf.te.ui.views.activator.UIPlugin;
+import org.eclipse.tcf.te.ui.views.extensions.CategoriesExtensionPointManager;
 import org.eclipse.tcf.te.ui.views.interfaces.categories.ICategoryManager;
 
 import com.google.gson.Gson;
@@ -86,7 +89,9 @@ public class CategoryManager implements ICategoryManager {
 	 */
 	private void initialize() {
 		IPath root = getRoot();
-		if (root == null) return;
+		if (root == null) {
+			return;
+		}
 
 		// Clear out the transient maps
 		_t_cat2id.clear();
@@ -104,7 +109,9 @@ public class CategoryManager implements ICategoryManager {
 				reader = new InputStreamReader(new FileInputStream(file), "UTF-8"); //$NON-NLS-1$
 				cat2id.putAll(gson.fromJson(reader, Map.class));
 			} finally {
-				if (reader != null) reader.close();
+				if (reader != null) {
+					reader.close();
+				}
 			}
 		} catch (IOException e) {
 			/* ignored on purpose */
@@ -119,7 +126,9 @@ public class CategoryManager implements ICategoryManager {
 				reader = new InputStreamReader(new FileInputStream(file), "UTF-8"); //$NON-NLS-1$
 				id2cat.putAll(gson.fromJson(reader, Map.class));
 			} finally {
-				if (reader != null) reader.close();
+				if (reader != null) {
+					reader.close();
+				}
 			}
 		} catch (IOException e) {
 			/* ignored on purpose */
@@ -130,9 +139,11 @@ public class CategoryManager implements ICategoryManager {
 	 * @see org.eclipse.tcf.te.ui.views.categories.ICategoryManager#flush()
 	 */
 	@Override
-    public void flush() {
+	public void flush() {
 		IPath root = getRoot();
-		if (root == null) return;
+		if (root == null) {
+			return;
+		}
 
 		// Create the Gson instance
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -145,7 +156,9 @@ public class CategoryManager implements ICategoryManager {
 				writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8"); //$NON-NLS-1$
 				gson.toJson(cat2id, Map.class, writer);
 			} finally {
-				if (writer != null) writer.close();
+				if (writer != null) {
+					writer.close();
+				}
 			}
 		} catch (IOException e) {
 			/* ignored on purpose */
@@ -159,7 +172,9 @@ public class CategoryManager implements ICategoryManager {
 				writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8"); //$NON-NLS-1$
 				gson.toJson(id2cat, Map.class, writer);
 			} finally {
-				if (writer != null) writer.close();
+				if (writer != null) {
+					writer.close();
+				}
 			}
 		} catch (IOException e) {
 			/* ignored on purpose */
@@ -170,7 +185,7 @@ public class CategoryManager implements ICategoryManager {
 	 * @see org.eclipse.tcf.te.ui.views.categories.ICategoryManager#add(java.lang.String, java.lang.String)
 	 */
 	@Override
-    public boolean add(String categoryId, String id) {
+	public boolean add(String categoryId, String id) {
 		Assert.isNotNull(categoryId);
 		Assert.isNotNull(id);
 
@@ -181,16 +196,24 @@ public class CategoryManager implements ICategoryManager {
 			ids = new ArrayList<String>();
 			cat2id.put(categoryId, ids);
 		}
-		if (!ids.contains(id)) added |= ids.add(id);
+		if (!ids.contains(id)) {
+			added |= ids.add(id);
+		}
 
 		List<String> cats = id2cat.get(id);
 		if (cats == null) {
 			cats = new ArrayList<String>();
 			id2cat.put(id, cats);
 		}
-		if (!cats.contains(categoryId)) added |= cats.add(categoryId);
+		if (!cats.contains(categoryId)) {
+			added |= cats.add(categoryId);
+		}
 
-		if (added) flush();
+		if (added) {
+			flush();
+			EventManager.getInstance().fireEvent(
+							new ChangeEvent(CategoriesExtensionPointManager.getInstance().getCategory(categoryId, false), ChangeEvent.ID_ADDED, null, id));
+		}
 
 		return added;
 	}
@@ -210,14 +233,23 @@ public class CategoryManager implements ICategoryManager {
 			ids = new ArrayList<String>();
 			_t_cat2id.put(categoryId, ids);
 		}
-		if (!ids.contains(id)) added |= ids.add(id);
+		if (!ids.contains(id)) {
+			added |= ids.add(id);
+		}
 
 		List<String> cats = _t_id2cat.get(id);
 		if (cats == null) {
 			cats = new ArrayList<String>();
 			_t_id2cat.put(id, cats);
 		}
-		if (!cats.contains(categoryId)) added |= cats.add(categoryId);
+		if (!cats.contains(categoryId)) {
+			added |= cats.add(categoryId);
+		}
+
+		if (added) {
+			EventManager.getInstance().fireEvent(
+							new ChangeEvent(CategoriesExtensionPointManager.getInstance().getCategory(categoryId, false), ChangeEvent.ID_ADDED, null, id));
+		}
 
 		return added;
 	}
@@ -226,7 +258,7 @@ public class CategoryManager implements ICategoryManager {
 	 * @see org.eclipse.tcf.te.ui.views.categories.ICategoryManager#remove(java.lang.String, java.lang.String)
 	 */
 	@Override
-    public boolean remove(String categoryId, String id) {
+	public boolean remove(String categoryId, String id) {
 		Assert.isNotNull(categoryId);
 		Assert.isNotNull(id);
 
@@ -235,26 +267,38 @@ public class CategoryManager implements ICategoryManager {
 		List<String> ids = cat2id.get(categoryId);
 		if (ids != null) {
 			removed |= ids.remove(id);
-			if (ids.isEmpty()) cat2id.remove(categoryId);
+			if (ids.isEmpty()) {
+				cat2id.remove(categoryId);
+			}
 		}
 		ids = _t_cat2id.get(categoryId);
 		if (ids != null) {
 			removed |= ids.remove(id);
-			if (ids.isEmpty()) _t_cat2id.remove(categoryId);
+			if (ids.isEmpty()) {
+				_t_cat2id.remove(categoryId);
+			}
 		}
 
 		List<String> cats = id2cat.get(id);
 		if (cats != null) {
 			removed |= cats.remove(categoryId);
-			if (cats.isEmpty()) id2cat.remove(id);
+			if (cats.isEmpty()) {
+				id2cat.remove(id);
+			}
 		}
 		cats = _t_id2cat.get(id);
 		if (cats != null) {
 			removed |= cats.remove(categoryId);
-			if (cats.isEmpty()) _t_id2cat.remove(id);
+			if (cats.isEmpty()) {
+				_t_id2cat.remove(id);
+			}
 		}
 
-		if (removed) flush();
+		if (removed) {
+			flush();
+			EventManager.getInstance().fireEvent(
+							new ChangeEvent(CategoriesExtensionPointManager.getInstance().getCategory(categoryId, false), ChangeEvent.ID_REMOVED, id, null));
+		}
 
 		return removed;
 	}
@@ -263,7 +307,7 @@ public class CategoryManager implements ICategoryManager {
 	 * @see org.eclipse.tcf.te.ui.views.categories.ICategoryManager#belongsTo(java.lang.String, java.lang.String)
 	 */
 	@Override
-    public boolean belongsTo(String categoryId, String id) {
+	public boolean belongsTo(String categoryId, String id) {
 		Assert.isNotNull(categoryId);
 		Assert.isNotNull(id);
 
@@ -286,13 +330,15 @@ public class CategoryManager implements ICategoryManager {
 	 * @see org.eclipse.tcf.te.ui.views.categories.ICategoryManager#getCategoryIds(java.lang.String)
 	 */
 	@Override
-    public String[] getCategoryIds(String id) {
+	public String[] getCategoryIds(String id) {
 		Assert.isNotNull(id);
 
 		List<String> allCategories = new ArrayList<String>();
 
 		List<String> cats = id2cat.get(id);
-		if (cats != null) allCategories.addAll(cats);
+		if (cats != null) {
+			allCategories.addAll(cats);
+		}
 
 		cats = _t_id2cat.get(id);
 		if (cats != null) {

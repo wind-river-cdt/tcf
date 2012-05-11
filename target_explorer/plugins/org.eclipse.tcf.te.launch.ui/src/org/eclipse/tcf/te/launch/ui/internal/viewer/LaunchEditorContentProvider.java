@@ -13,12 +13,12 @@ package org.eclipse.tcf.te.launch.ui.internal.viewer;
 /**
  * Launch tree content provider implementation.
  */
-public class LaunchTreeContentProvider extends LaunchNavigatorContentProvider {
+public class LaunchEditorContentProvider extends LaunchNavigatorContentProvider {
 
 	/**
 	 * Constructor.
 	 */
-	public LaunchTreeContentProvider() {
+	public LaunchEditorContentProvider() {
 		super();
 	}
 

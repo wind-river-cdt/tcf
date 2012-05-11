@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchTreeLabelProvider;
 import org.eclipse.tcf.te.launch.ui.model.LaunchNode;
+import org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizable;
 
 /**
  * Adapter factory implementation.
@@ -27,8 +28,12 @@ public class AdapterFactory implements IAdapterFactory {
 	@Override
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if (adaptableObject instanceof LaunchNode) {
+			LaunchNode node = (LaunchNode)adaptableObject;
 			if (ILabelProvider.class.equals(adapterType)) {
 				return labelProvider;
+			}
+			if (ICategorizable.class.equals(adapterType) && node.getLaunchConfiguration() != null) {
+				return new CategorizableAdapter(node);
 			}
 		}
 		return null;
@@ -40,7 +45,8 @@ public class AdapterFactory implements IAdapterFactory {
 	@Override
 	public Class[] getAdapterList() {
 		return new Class<?>[] {
-						ILabelProvider.class
+						ILabelProvider.class,
+						ICategorizable.class
 		};
 	}
 

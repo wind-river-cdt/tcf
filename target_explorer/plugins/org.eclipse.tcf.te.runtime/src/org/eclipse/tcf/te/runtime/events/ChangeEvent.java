@@ -20,6 +20,10 @@ import org.eclipse.tcf.te.runtime.interfaces.tracing.ITraceIds;
 public class ChangeEvent extends EventObject {
 	private static final long serialVersionUID = -7859159130977760588L;
 
+	public static final String ID_ADDED = "added"; //$NON-NLS-1$
+	public static final String ID_REMOVED = "removed"; //$NON-NLS-1$
+	public static final String ID_CHANGED = "changed"; //$NON-NLS-1$
+
 	private Object eventId;
 	private Object oldValue;
 	private Object newValue;
@@ -37,7 +41,9 @@ public class ChangeEvent extends EventObject {
 	public ChangeEvent(Object source, Object eventId, Object oldValue, Object newValue) {
 		super(source);
 
-		if (eventId == null) throw new IllegalArgumentException("null eventId"); //$NON-NLS-1$
+		if (eventId == null) {
+			throw new IllegalArgumentException("null eventId"); //$NON-NLS-1$
+		}
 
 		this.eventId = eventId;
 		this.oldValue = oldValue;
@@ -80,7 +86,9 @@ public class ChangeEvent extends EventObject {
 			StringBuilder str = new StringBuilder();
 			str.append("{"); //$NON-NLS-1$
 			for (int i = 0; i < ((Object[]) value).length; i++) {
-				if (i > 0) str.append(","); //$NON-NLS-1$
+				if (i > 0) {
+					str.append(","); //$NON-NLS-1$
+				}
 				str.append(formatValue(((Object[]) value)[i]));
 			}
 			str.append("}"); //$NON-NLS-1$
@@ -99,8 +107,9 @@ public class ChangeEvent extends EventObject {
 
 		String prefix = ""; //$NON-NLS-1$
 		// if tracing the event, formating them a little bit better readable.
-		if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITraceIds.TRACE_EVENTS))
+		if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITraceIds.TRACE_EVENTS)) {
 			prefix = "\n\t\t"; //$NON-NLS-1$
+		}
 
 		toString.append(prefix + "{eventId="); //$NON-NLS-1$
 		toString.append(eventId);

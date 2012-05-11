@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.tcf.te.launch.core.lm.LaunchConfigHelper;
@@ -67,7 +66,6 @@ public class LaunchNode extends ContainerModelNode {
 			parent = parent.getParent();
 		}
 
-		Assert.isNotNull(model);
 		return model;
 	}
 
@@ -79,7 +77,14 @@ public class LaunchNode extends ContainerModelNode {
 	}
 
 	public ILaunchConfigurationType getLaunchConfigurationType() {
-		if (TYPE_LAUNCH_CONFIG.equals(getType())) {
+		if (getLaunchConfiguration() != null) {
+			try {
+				return getLaunchConfiguration().getType();
+			}
+			catch (Exception e) {
+			}
+		}
+		else if (TYPE_LAUNCH_CONFIG.equals(getType())) {
 			return ((LaunchNode)getParent()).getLaunchConfigurationType();
 		}
 		else if (TYPE_LAUNCH_CONFIG_TYPE.equals(getType())) {
@@ -123,6 +128,9 @@ public class LaunchNode extends ContainerModelNode {
 
 	public boolean isValidFor(String mode) {
 		if (TYPE_LAUNCH_CONFIG.equals(getType())) {
+			if (getLaunchConfigurationType() == null) {
+				return false;
+			}
 			List<String> modes;
 			if (mode != null && mode.trim().length() > 0) {
 				modes = new ArrayList<String>();
