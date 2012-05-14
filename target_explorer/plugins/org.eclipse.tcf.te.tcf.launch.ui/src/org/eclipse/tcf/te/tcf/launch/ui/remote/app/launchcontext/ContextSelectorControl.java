@@ -10,13 +10,19 @@
 
 package org.eclipse.tcf.te.tcf.launch.ui.remote.app.launchcontext;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.eclipse.jface.dialogs.IDialogPage;
 import org.eclipse.jface.viewers.DecoratingLabelProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tcf.te.launch.ui.tabs.launchcontext.AbstractContextSelectorControl;
+import org.eclipse.tcf.te.tcf.ui.filter.ValueAddFilter;
 import org.eclipse.tcf.te.tcf.ui.navigator.ContentProviderDelegate;
 import org.eclipse.tcf.te.tcf.ui.navigator.LabelProviderDelegate;
 import org.eclipse.tcf.te.ui.views.interfaces.ICategory;
@@ -82,5 +88,20 @@ public class ContextSelectorControl extends AbstractContextSelectorControl {
 		viewer.setContentProvider(new ContentProvider());
 		LabelProvider labelProvider = new LabelProvider();
 		viewer.setLabelProvider(new DecoratingLabelProvider(labelProvider, labelProvider));
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.launch.ui.tabs.launchcontext.AbstractContextSelectorControl#doCreateViewerFilters()
+	 */
+	@Override
+	protected ViewerFilter[] doCreateViewerFilters() {
+		ViewerFilter[] filters = super.doCreateViewerFilters();
+
+		List<ViewerFilter> newFilters = new ArrayList<ViewerFilter>();
+		if (filters != null) newFilters.addAll(Arrays.asList(filters));
+
+		newFilters.add(new ValueAddFilter());
+
+		return newFilters.toArray(new ViewerFilter[newFilters.size()]);
 	}
 }
