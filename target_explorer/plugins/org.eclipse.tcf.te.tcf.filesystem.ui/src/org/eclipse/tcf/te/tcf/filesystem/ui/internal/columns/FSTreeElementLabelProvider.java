@@ -9,16 +9,15 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.ui.internal.columns;
 
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tcf.te.runtime.utils.Host;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
-import org.eclipse.tcf.te.ui.trees.Pending;
+import org.eclipse.tcf.te.ui.trees.PendingAwareLabelProvider;
 
 /**
  * The label provider for the tree column "name".
  */
-public class FSTreeElementLabelProvider extends LabelProvider {
+public class FSTreeElementLabelProvider extends PendingAwareLabelProvider {
 	// The image provider to provide platform specific images.
 	private ImageProvider imgProvider;
 	
@@ -43,10 +42,6 @@ public class FSTreeElementLabelProvider extends LabelProvider {
 		if (element instanceof FSTreeNode) {
 			return ((FSTreeNode) element).name;
 		}
-		if (element instanceof Pending) {
-			Pending pending = (Pending) element;
-			return pending.getText();
-		}
 		return super.getText(element);
 	}
 
@@ -59,10 +54,6 @@ public class FSTreeElementLabelProvider extends LabelProvider {
 		if (element instanceof FSTreeNode) {
 			FSTreeNode node = (FSTreeNode) element;
 			return imgProvider.getImage(node);
-		}
-		if (element instanceof Pending) {
-			Pending pending = (Pending) element;
-			return pending.getImage();
 		}
 		return super.getImage(element);
 	}

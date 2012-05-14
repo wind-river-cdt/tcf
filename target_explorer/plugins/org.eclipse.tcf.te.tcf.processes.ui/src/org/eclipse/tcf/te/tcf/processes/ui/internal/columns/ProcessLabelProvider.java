@@ -11,18 +11,17 @@ package org.eclipse.tcf.te.tcf.processes.ui.internal.columns;
 
 import java.io.File;
 
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode;
 import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.processes.ui.interfaces.ImageConsts;
 import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
-import org.eclipse.tcf.te.ui.trees.Pending;
+import org.eclipse.tcf.te.ui.trees.PendingAwareLabelProvider;
 
 /**
  * The label provider for the tree column "name".
  */
-public class ProcessLabelProvider extends LabelProvider {
+public class ProcessLabelProvider extends PendingAwareLabelProvider {
 
 	/*
 	 * (non-Javadoc)
@@ -40,10 +39,6 @@ public class ProcessLabelProvider extends LabelProvider {
 			int slash = name.lastIndexOf(File.separator);
 			if (slash != -1) name = name.substring(slash + 1);
 			return name;
-		}
-		if (element instanceof Pending) {
-			Pending pending = (Pending) element;
-			return pending.getText();
 		}
 		return super.getText(element);
 	}
@@ -64,10 +59,6 @@ public class ProcessLabelProvider extends LabelProvider {
             	return UIPlugin.getImage(ImageConsts.OBJ_Process);
             }
             return UIPlugin.getImage(ImageConsts.OBJ_Thread);
-		}
-		if (element instanceof Pending) {
-			Pending pending = (Pending) element;
-			return pending.getImage();
 		}
 		return super.getImage(element);
 	}

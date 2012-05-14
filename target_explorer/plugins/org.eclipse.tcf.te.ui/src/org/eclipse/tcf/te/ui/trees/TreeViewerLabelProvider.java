@@ -11,7 +11,6 @@ package org.eclipse.tcf.te.ui.trees;
 
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Tree;
@@ -20,7 +19,7 @@ import org.eclipse.swt.widgets.TreeColumn;
 /**
  * File system tree control label provider implementation.
  */
-public class TreeViewerLabelProvider extends LabelProvider implements ITableLabelProvider {
+public class TreeViewerLabelProvider extends PendingAwareLabelProvider implements ITableLabelProvider {
 	// Reference to the parent tree viewer
 	private TreeViewer viewer;
 
@@ -71,10 +70,7 @@ public class TreeViewerLabelProvider extends LabelProvider implements ITableLabe
 	@Override
 	public Image getColumnImage(Object element, int columnIndex) {
 		if(element instanceof Pending) {
-			if(columnIndex == 0) {
-				return ((Pending)element).getImage();
-			}
-			return null;
+			return columnIndex == 0 ? super.getImage(element) : null;
 		}
 		ColumnDescriptor column = getColumn(columnIndex);
 		if (column != null) {
@@ -92,8 +88,7 @@ public class TreeViewerLabelProvider extends LabelProvider implements ITableLabe
 	@Override
 	public String getColumnText(Object element, int columnIndex) {
 		if(element instanceof Pending){
-			String text = ((Pending)element).getText();
-			return columnIndex == 0 ? text : "";  //$NON-NLS-1$
+			return columnIndex == 0 ? super.getText(element) : "";  //$NON-NLS-1$
 		}
 		ColumnDescriptor column = getColumn(columnIndex);
 		if (column != null) {

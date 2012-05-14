@@ -66,6 +66,10 @@ public abstract class TreeContentProvider implements ITreeContentProvider, Prope
 		return pending;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+	 */
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		String property = evt.getPropertyName();
