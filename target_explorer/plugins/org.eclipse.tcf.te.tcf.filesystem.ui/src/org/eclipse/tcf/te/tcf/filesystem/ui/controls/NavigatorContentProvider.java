@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.ui.controls;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -52,21 +53,14 @@ public abstract class NavigatorContentProvider extends TreeContentProvider {
 		} else if (parentElement instanceof AbstractTreeNode) {
 			AbstractTreeNode node = (AbstractTreeNode)parentElement;
 			Object[] children = NO_ELEMENTS;
-			List<? extends AbstractTreeNode> current = node.getChildren();
+			List<Object> current = new ArrayList<Object>(node.getChildren());
 			if (!node.childrenQueried) {
-				if (current.isEmpty()) {
-					children = new Object[] { getPending(node) };
-				}
-				else {
-					children = current.toArray();
-				}
+				current.add(getPending(node));
 				if (!node.childrenQueryRunning) {
 					node.queryChildren();
 				}
 			}
-			else {
-				children = current.toArray();
-			}
+			children = current.toArray();
 			return children;
 		}
 

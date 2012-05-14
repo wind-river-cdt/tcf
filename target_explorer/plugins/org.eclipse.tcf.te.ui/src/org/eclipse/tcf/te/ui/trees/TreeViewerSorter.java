@@ -32,6 +32,9 @@ public class TreeViewerSorter extends TreePathViewerSorter {
 	 */
 	@Override
 	public int compare(Viewer viewer, Object e1, Object e2) {
+		if(e1 instanceof Pending || e2 instanceof Pending) {
+			return (e1 instanceof Pending) ? (e2 instanceof Pending ? 0 : 1) : -1;
+		}
 		if (viewer != null && viewer.getControl() != null && !viewer.getControl().isDisposed()) {
 			return doCompare(viewer, e1, e2, doGetSortColumnLabel(viewer), doGetSortColumnIndex(viewer) , doDetermineInverter(viewer));
 		}

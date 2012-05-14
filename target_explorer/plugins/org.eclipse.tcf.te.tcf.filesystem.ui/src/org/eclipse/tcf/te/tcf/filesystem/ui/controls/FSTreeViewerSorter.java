@@ -9,15 +9,15 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.ui.controls;
 
-import org.eclipse.jface.viewers.TreePathViewerSorter;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.columns.FSTreeElementComparator;
+import org.eclipse.tcf.te.ui.trees.TreeViewerSorter;
 
 /**
  * File system tree control viewer sorter implementation.
  */
-public class FSTreeViewerSorter extends TreePathViewerSorter {
+public class FSTreeViewerSorter extends TreeViewerSorter {
 	private final FSTreeElementComparator comparator;
 
 	/**

@@ -40,6 +40,9 @@ public class TreeViewerComparator extends ViewerComparator {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public int compare(Viewer viewer, Object e1, Object e2) {
+		if(e1 instanceof Pending || e2 instanceof Pending) {
+			return (e1 instanceof Pending) ? (e2 instanceof Pending ? 0 : 1) : -1;
+		}
 		Tree tree = ((TreeViewer) viewer).getTree();
 		int inverter = tree.getSortDirection() == SWT.DOWN ? -1 : 1;
 		TreeColumn treeColumn = tree.getSortColumn();
