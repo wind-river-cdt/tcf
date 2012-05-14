@@ -13,10 +13,9 @@ import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.jface.viewers.ITreePathContentProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ICommonLaunchAttributes;
@@ -30,16 +29,12 @@ import org.eclipse.tcf.te.runtime.interfaces.events.IEventListener;
 import org.eclipse.tcf.te.runtime.model.interfaces.IContainerModelNode;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
 import org.eclipse.tcf.te.ui.trees.TreeContentProvider;
-import org.eclipse.tcf.te.ui.views.Managers;
-import org.eclipse.tcf.te.ui.views.extensions.CategoriesExtensionPointManager;
-import org.eclipse.tcf.te.ui.views.interfaces.ICategory;
-import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
 import org.eclipse.ui.PlatformUI;
 
 /**
  * Launches content provider for the common navigator of Target Explorer.
  */
-public class LaunchNavigatorContentProvider extends TreeContentProvider implements ITreePathContentProvider, IEventListener {
+public class LaunchNavigatorContentProvider extends TreeContentProvider implements IEventListener {
 
 	/**
 	 * Constructor.
@@ -127,6 +122,9 @@ public class LaunchNavigatorContentProvider extends TreeContentProvider implemen
 
 		if (element instanceof LaunchNode) {
 			LaunchNode node = (LaunchNode)element;
+			if (node.getModel().getModelRoot() instanceof IProject) {
+				node.getModel();
+			}
 			List<IModelNode> children = new ArrayList<IModelNode>();
 			if (LaunchNode.TYPE_ROOT.equals(node.getType())) {
 				if (isTypeNodeVisible()) {
@@ -249,48 +247,5 @@ public class LaunchNavigatorContentProvider extends TreeContentProvider implemen
 				}
 			});
 		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreePathContentProvider#getChildren(org.eclipse.jface.viewers.TreePath)
-	 */
-	@Override
-	public Object[] getChildren(TreePath parentPath) {
-		return parentPath != null ? getChildren(parentPath.getLastSegment()) : NO_ELEMENTS;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreePathContentProvider#hasChildren(org.eclipse.jface.viewers.TreePath)
-	 */
-	@Override
-	public boolean hasChildren(TreePath path) {
-		return path != null ? hasChildren(path.getLastSegment()) : false;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreePathContentProvider#getParents(java.lang.Object)
-	 */
-	@Override
-	public TreePath[] getParents(Object element) {
-		// Not sure if we ever have to calculate the _full_ tree path. The parent NavigatorContentServiceContentProvider
-		// is consuming only the last segment.
-		List<TreePath> pathes = new ArrayList<TreePath>();
-
-		Object parent = getParent(element);
-		TreePath parentPath = new TreePath(new Object[]{parent});
-		if (!(parent instanceof ICategory) && element instanceof LaunchNode && ((LaunchNode)element).getLaunchConfiguration() != null) {
-			if (Managers.getCategoryManager().belongsTo(IUIConstants.ID_CAT_FAVORITES, LaunchModel.getCategoryId(((LaunchNode)element).getLaunchConfiguration()))) {
-				// Get the "Favorites" category
-				ICategory favCategory = CategoriesExtensionPointManager.getInstance().getCategory(IUIConstants.ID_CAT_FAVORITES, false);
-				if (favCategory != null) {
-					pathes.add(new TreePath(new Object[]{favCategory}));
-				}
-			}
-		}
-		if (!pathes.contains(parentPath)) {
-			pathes.add(parentPath);
-		}
-
-		return pathes.toArray(new TreePath[pathes.size()]);
 	}
 }
