@@ -25,6 +25,8 @@
 		<module>../plugins/org.eclipse.tcf.debug.ui</module>
 		<module>../plugins/org.eclipse.tcf.cdt.ui</module>
 
+		<module>../target_explorer/org.eclipse.tcf.te.tests</module>
+		
 		<module>../features/org.eclipse.tcf.feature</module>
 		<module>../features/org.eclipse.tcf.sdk.feature</module>
 		<module>../features/org.eclipse.tcf.cdt.feature</module>

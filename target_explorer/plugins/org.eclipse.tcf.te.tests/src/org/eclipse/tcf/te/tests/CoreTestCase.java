@@ -656,8 +656,7 @@ public class CoreTestCase extends TestCase {
 		IPath root = null;
 
 		if (path != null) {
-			// The agent lookup must always happen in the core tests plug-in.
-			Bundle bundle = Platform.getBundle("org.eclipse.tcf.te.tests"); //$NON-NLS-1$
+			Bundle bundle = UIPlugin.getDefault().getBundle();
 			if (bundle != null) {
 				IPath relative = new Path ("data").append(path); //$NON-NLS-1$
 				if (hostSpecific) relative = relative.append(Platform.getOS());
