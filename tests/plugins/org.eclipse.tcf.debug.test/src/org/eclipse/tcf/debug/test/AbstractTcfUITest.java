@@ -15,7 +15,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -50,7 +49,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.tcf.core.TransientPeer;
 import org.eclipse.tcf.debug.test.services.BreakpointsCM;
 import org.eclipse.tcf.debug.test.services.DiagnosticsCM;
 import org.eclipse.tcf.debug.test.services.LineNumbersCM;
@@ -88,6 +86,7 @@ import org.eclipse.tcf.services.ISymbols;
 import org.eclipse.tcf.te.tests.interfaces.IConfigurationProperties;
 import org.eclipse.tcf.te.tests.tcf.TcfTestCase;
 import org.junit.Assert;
+import org.osgi.framework.Bundle;
 
 /**
  * Base test for validating TCF Debugger UI.
@@ -138,45 +137,12 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
     protected String fThreadId = "";
     protected RunControlContext fThreadCtx;
 
-    private static class RemotePeer extends TransientPeer {
-        private final ArrayList<Map<String,String>> attrs;
-
-        public RemotePeer(ArrayList<Map<String,String>> attrs) {
-            super(attrs.get(0));
-            this.attrs = attrs;
-        }
-
-        @Override
-        public IChannel openChannel() {
-            assert Protocol.isDispatchThread();
-            IChannel c = super.openChannel();
-            for (int i = 1; i < attrs.size(); i++) c.redirect(attrs.get(i));
-            return c;
-        }
-    }
-
-    private static IPeer getPeer(String[] arr) {
-        ArrayList<Map<String,String>> l = new ArrayList<Map<String,String>>();
-        for (String s : arr) {
-            Map<String,String> map = new HashMap<String,String>();
-            int len = s.length();
-            int i = 0;
-            while (i < len) {
-                int i0 = i;
-                while (i < len && s.charAt(i) != '=' && s.charAt(i) != 0) i++;
-                int i1 = i;
-                if (i < len && s.charAt(i) == '=') i++;
-                int i2 = i;
-                while (i < len && s.charAt(i) != ':') i++;
-                int i3 = i;
-                if (i < len && s.charAt(i) == ':') i++;
-                String key = s.substring(i0, i1);
-                String val = s.substring(i2, i3);
-                map.put(key, val);
-            }
-            l.add(map);
-        }
-        return new RemotePeer(l);
+    /* (non-Javadoc)
+     * @see org.eclipse.tcf.te.tests.CoreTestCase#getTestBundle()
+     */
+    @Override
+    protected Bundle getTestBundle() {
+        return Activator.getDefault().getBundle();
     }
 
     /* (non-Javadoc)
@@ -184,14 +150,14 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
      */
     @Override
     protected void initialize() {
-        // Turn off the automatic perspective switch and debug view activation to avoid 
-        // jface views from interfering with the virtual viewers used in tests.
+        // Turn off the automatic perspective switch and debug view activation to avoid
+        // JFace views from interfering with the virtual viewers used in tests.
         IPreferenceStore prefs = DebugUITools.getPreferenceStore();
         prefs.setValue(IInternalDebugUIConstants.PREF_ACTIVATE_DEBUG_VIEW, true);
         prefs.setValue(IInternalDebugUIConstants.PREF_SWITCH_PERSPECTIVE_ON_SUSPEND, MessageDialogWithToggle.NEVER);
 
         super.initialize();
-        // Do not activate debug view or debug perspective, also to avoid interferring
+        // Do not activate debug view or debug perspective, also to avoid interfering
         // with tests' virtual viewers.
         setProperty(IConfigurationProperties.TARGET_PERSPECTIVE, "org.eclipse.cdt.ui.CPerspective"); //$NON-NLS-1$
         setProperty(IConfigurationProperties.TARGET_VIEW, "org.eclipse.cdt.ui.CView"); //$NON-NLS-1$
@@ -601,15 +567,16 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
     }
 
     private boolean runToTestEntry(final String testFunc) throws InterruptedException, ExecutionException {
-        return new Transaction<Boolean>() {            
+        return new Transaction<Boolean>() {
             Object fWaitForResumeKey;
             Object fWaitForSuspendKey;
             boolean fSuspendEventReceived = false;
+            @Override
             protected Boolean process() throws Transaction.InvalidCacheException ,ExecutionException {
                 ISymbol sym_func0 = validate( fDiagnosticsCM.getSymbol(fProcessId, testFunc) );
                 String sym_func0_value = sym_func0.getValue().toString();
                 ContextState state = validate (fRunControlCM.getState(fThreadId));
-                
+
                 while (!state.suspended || !new BigInteger(state.pc).equals(new BigInteger(sym_func0_value))) {
                     if (state.suspended && fWaitForSuspendKey == null) {
                         fSuspendEventReceived = true;
@@ -617,10 +584,10 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
                         fWaitForResumeKey = new Object();
                         fWaitForSuspendKey = new Object();
                         ICache<Object> waitForResume = fRunControlCM.waitForContextResumed(fThreadId, fWaitForResumeKey);
-                        
+
                         // Issue resume command.
                         validate( fRunControlCM.resume(fThreadCtx, fWaitForResumeKey, IRunControl.RM_RESUME, 1) );
-                        
+
                         // Wait until we receive the resume event.
                         validate(waitForResume);
                         fWaitForSuspendKey = new Object();
@@ -630,14 +597,14 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
                             // Validate resume command
                             validate( fRunControlCM.resume(fThreadCtx, fWaitForResumeKey, IRunControl.RM_RESUME, 1) );
                             fWaitForResumeKey = null;
-                            
+
                         }
                         // Wait until we suspend.
                         validate( fRunControlCM.waitForContextSuspended(fThreadId, fWaitForSuspendKey) );
                         fWaitForSuspendKey = null;
                     }
                 }
-                
+
                 return fSuspendEventReceived;
             }
         }.get();
@@ -756,15 +723,16 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
         }.get();
     }
 
-    protected void moveToLocation(final String context, final Number address) throws 
-        DebugException, ExecutionException, InterruptedException 
+    protected void moveToLocation(final String context, final Number address) throws
+        DebugException, ExecutionException, InterruptedException
     {
         final RegistersContext pcReg = new Transaction<RegistersContext>() {
+            @Override
             protected RegistersContext process() throws InvalidCacheException ,ExecutionException {
                 String[] registers = validate(fRegistersCM.getChildren(context));
                 return findPCRegister(registers);
             }
-            
+
             private RegistersContext findPCRegister(String[] registerIds) throws InvalidCacheException ,ExecutionException {
                 for (String regId : registerIds) {
                     RegistersContext reg = validate(fRegistersCM.getContext(regId));
@@ -779,11 +747,12 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
                 }
                 return null;
             }
-        }.get();        
-        
+        }.get();
+
         assertNotNull("Cannot find PC register", pcReg);
-        
+
         new Transaction<Object>() {
+            @Override
             protected Object process() throws Transaction.InvalidCacheException ,ExecutionException {
                 byte[] value = addressToByteArray(address, pcReg.getSize(), pcReg.isBigEndian());
                 validate(fRegistersCM.setContextValue(pcReg, this, value));
@@ -791,7 +760,7 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
             };
         }.get();
     }
-    
+
     private byte[] addressToByteArray(Number address, int size, boolean bigEndian) {
         byte[] bytes = new byte[size];
         byte[] addrBytes = JSON.toBigInteger(address).toByteArray();

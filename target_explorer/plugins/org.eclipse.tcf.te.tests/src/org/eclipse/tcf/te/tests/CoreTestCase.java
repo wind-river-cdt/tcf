@@ -656,7 +656,7 @@ public class CoreTestCase extends TestCase {
 		IPath root = null;
 
 		if (path != null) {
-			Bundle bundle = UIPlugin.getDefault().getBundle();
+			Bundle bundle = getTestBundle();
 			if (bundle != null) {
 				IPath relative = new Path ("data").append(path); //$NON-NLS-1$
 				if (hostSpecific) relative = relative.append(Platform.getOS());
@@ -675,5 +675,14 @@ public class CoreTestCase extends TestCase {
 		}
 
 		return root;
+	}
+
+	/**
+	 * Returns the test bundle.
+	 *
+	 * @return The test bundle.
+	 */
+	protected Bundle getTestBundle() {
+		return UIPlugin.getDefault().getBundle();
 	}
 }
