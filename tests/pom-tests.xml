@@ -31,7 +31,6 @@
 		<module>../features/org.eclipse.tcf.cdt.sdk.feature</module>
 
 		<!-- The test module executing the tests -->
-		<module>../target_explorer/plugins/org.eclipse.tcf.te.tests</module>
 		<module>plugins/org.eclipse.tcf.debug.test</module>
 	</modules>
 
