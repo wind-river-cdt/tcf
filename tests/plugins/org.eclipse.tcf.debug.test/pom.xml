@@ -38,7 +38,9 @@
  						<include>**/QueryTests.*</include>
  						<include>**/TransactionTests.*</include>
  					</includes>
+					<!--
  					<debugPort>8003</debugPort>
+					-->
 					<useUIHarness>true</useUIHarness>
 					<useUIThread>false</useUIThread>
 					<product>org.eclipse.platform.ide</product>
