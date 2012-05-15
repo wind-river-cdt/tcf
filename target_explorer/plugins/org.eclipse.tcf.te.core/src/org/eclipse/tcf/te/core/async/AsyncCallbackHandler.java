@@ -130,7 +130,8 @@ public class AsyncCallbackHandler {
 			}
 		}
 		else {
-			this.error = error;
+			// Reset the error to null
+			this.error = null;
 		}
 	}
 
