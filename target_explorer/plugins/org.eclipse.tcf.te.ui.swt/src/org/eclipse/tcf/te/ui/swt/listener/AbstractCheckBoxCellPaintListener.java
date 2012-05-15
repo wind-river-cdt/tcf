@@ -2,7 +2,7 @@
  * AbstractCheckBoxCellPaintListener.java
  * Created on Aug 21, 2011
  *
- * Copyright (c) 2011 Wind River Systems, Inc.
+ * Copyright (c) 2011, 2012 Wind River Systems, Inc.
  *
  * The right to copy, distribute, modify, or otherwise make use
  * of this software may be licensed only pursuant to the terms
