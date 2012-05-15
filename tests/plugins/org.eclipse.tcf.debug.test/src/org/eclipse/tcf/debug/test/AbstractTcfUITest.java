@@ -153,7 +153,7 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
         // Turn off the automatic perspective switch and debug view activation to avoid
         // JFace views from interfering with the virtual viewers used in tests.
         IPreferenceStore prefs = DebugUITools.getPreferenceStore();
-        prefs.setValue(IInternalDebugUIConstants.PREF_ACTIVATE_DEBUG_VIEW, true);
+        prefs.setValue(IInternalDebugUIConstants.PREF_ACTIVATE_DEBUG_VIEW, false);
         prefs.setValue(IInternalDebugUIConstants.PREF_SWITCH_PERSPECTIVE_ON_SUSPEND, MessageDialogWithToggle.NEVER);
 
         super.initialize();

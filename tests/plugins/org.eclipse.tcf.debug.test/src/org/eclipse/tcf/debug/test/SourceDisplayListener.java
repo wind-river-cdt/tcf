@@ -52,6 +52,10 @@ public class SourceDisplayListener implements IPartListener, IAnnotationModelLis
     private boolean fAnnotationFound = false;
     private IAnnotationModel fAnnotationModel = null;
 
+    private int fTimeoutInterval = 60000;
+    private long fTimeoutTime;
+
+    
     public SourceDisplayListener() {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         fPage = window.getActivePage();
@@ -74,6 +78,7 @@ public class SourceDisplayListener implements IPartListener, IAnnotationModelLis
     public void reset() {
         fFileFound = false;
         fAnnotationFound = false;
+        fTimeoutTime = System.currentTimeMillis() + fTimeoutInterval;
     }
     
     public void setCodeArea(CodeArea area) {
@@ -81,7 +86,11 @@ public class SourceDisplayListener implements IPartListener, IAnnotationModelLis
         fExpectedLine = area.start_line;
         checkFile();
     }
-    
+
+    public boolean isTimedOut() {
+        return fTimeoutInterval > 0 && fTimeoutTime < System.currentTimeMillis();
+    }
+
     public void waitTillFinished() throws InterruptedException {
         synchronized(this) {
             while(!isFinished()) {
@@ -91,6 +100,10 @@ public class SourceDisplayListener implements IPartListener, IAnnotationModelLis
     }
     
     public synchronized boolean isFinished() {
+        if (isTimedOut()) {
+            throw new RuntimeException("Timed Out: " + toString());
+        }
+        
         return fFileFound && fAnnotationFound;
     }
     
@@ -178,6 +191,25 @@ public class SourceDisplayListener implements IPartListener, IAnnotationModelLis
             }
         }
         return false;
+    }
+    
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer("Source Display Listener");
+
+        buf.append("\n\t");
+        buf.append("fExpectedFile = ");
+        buf.append( fExpectedFile );
+        buf.append(" (found=");
+        buf.append(fFileFound);
+        buf.append(")");
+        buf.append("\n\t");
+        buf.append("fExpectedLine = ");
+        buf.append( fExpectedLine );
+        buf.append(" (found=");
+        buf.append(fAnnotationFound);
+        buf.append(")");
+        return buf.toString();
     }
     
 }

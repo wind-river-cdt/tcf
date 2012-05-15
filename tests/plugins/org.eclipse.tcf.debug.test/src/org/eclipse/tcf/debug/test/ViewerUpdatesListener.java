@@ -259,9 +259,9 @@ public class ViewerUpdatesListener
     }
     
     public boolean isFinished(int flags) {
-//        if (isTimedOut()) {
-//            throw new RuntimeException("Timed Out: " + toString(flags));
-//        }
+        if (isTimedOut()) {
+            throw new RuntimeException("Timed Out: " + toString(flags));
+        }
         
         if (fFailOnRedundantUpdates && !fRedundantUpdates.isEmpty()) {
             Assert.fail("Redundant Updates: " + fRedundantUpdates.toString());
