@@ -214,7 +214,7 @@ public final class ExecutorsUtil {
 
 		synchronized(runnable) {
 			try {
-				if (!invoked.get()) runnable.wait();
+				while (!invoked.get()) runnable.wait();
 			} catch (InterruptedException e) {
 				/* ignored on purpose */
 			}
