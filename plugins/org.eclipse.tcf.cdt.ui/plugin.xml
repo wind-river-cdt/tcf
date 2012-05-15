@@ -75,12 +75,25 @@
             name="%breakpoints.filterPage.name">
          <filter name="debugModelId" value="org.eclipse.tcf.debug"/>
          <enabledWhen>
-            <and>
-               <adapt type="org.eclipse.cdt.debug.core.model.ICBreakpoint"/>
-               <not>
-                  <adapt type="org.eclipse.cdt.debug.core.model.ICTracepoint"/>
-               </not>
-            </and>
+               <and>
+                  <adapt type="org.eclipse.cdt.debug.core.model.ICBreakpoint"/>
+                  <not>
+                     <adapt type="org.eclipse.cdt.debug.core.model.ICTracepoint"/>
+                  </not>
+               </and>
+         </enabledWhen>
+      </page>
+   </extension>
+
+   <extension point="org.eclipse.ui.propertyPages">
+      <page class="org.eclipse.tcf.internal.cdt.ui.breakpoints.TCFBreakpointThreadFilterPage"
+            id="org.eclipse.tcf.breakpoint.scope.filtering"
+            name="%breakpoints.filterPage.name">
+         <enabledWhen>
+               <and>
+                  <instanceof
+                        value="org.eclipse.tcf.internal.cdt.ui.breakpoints.BreakpointScopeCategory"/>
+               </and>
          </enabledWhen>
       </page>
    </extension>
@@ -286,6 +299,12 @@
             id="org.eclipse.tcf.cdt.ui.add_watchpoint"
             name="%command.addWatchpoint.name">
       </command>
+      <command
+            defaultHandler="org.eclipse.tcf.internal.cdt.ui.breakpoints.BreakpointScopeCategoryPropertiesHandler"
+            description="%command.scopeProperties.desc"
+            id="org.eclipse.tcf.cdt.debug.ui.command.breakpointCategoryProperties"
+            name="%command.scopeProperties.name">
+      </command>
    </extension>
 
    <extension
@@ -350,7 +369,35 @@
       <breakpointOrganizer
             class="org.eclipse.tcf.internal.cdt.ui.breakpoints.BreakpointScopeOrganizer"
             id="org.eclipse.tcf.cdt.ui.breakpointScopeGroup"
-            label="Scope">
+            label="%breakpointScope.label">
       </breakpointOrganizer>
    </extension>
+   
+    <extension
+       point="org.eclipse.ui.menus">
+    <menuContribution
+          locationURI="popup:org.eclipse.debug.ui.BreakpointView?after=additions">
+       <command
+             commandId="org.eclipse.tcf.cdt.debug.ui.command.breakpointCategoryProperties"
+             helpContextId="breakpoint_scope_category_properties_action_context"
+             id="org.eclipse.tcf.cdt.debug.ui.menu.command.breakpointScopeCategoryProperties"
+             label="%action.breakpointScope.label">
+          <visibleWhen>
+             <with variable="selection">
+               <count value="1"/>
+               <iterate>
+                   <or>
+                      <!--<instanceof value="org.eclipse.debug.internal.ui.breakpoints.provisional.IBreakpointContainer"/>-->
+	                  <adapt type="org.eclipse.tcf.internal.cdt.ui.breakpoints.BreakpointScopeCategory"/>
+	               </or>
+               </iterate>
+             </with>
+          </visibleWhen>
+       </command>
+    </menuContribution>    
+    
+    
+   </extension>
+   
+   
 </plugin>

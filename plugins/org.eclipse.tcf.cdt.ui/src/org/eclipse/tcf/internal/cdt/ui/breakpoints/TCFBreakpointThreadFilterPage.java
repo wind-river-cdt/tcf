@@ -26,9 +26,17 @@ import org.eclipse.ui.dialogs.PropertyPage;
 public class TCFBreakpointThreadFilterPage extends PropertyPage {
 
     private TCFThreadFilterEditor fThreadFilterEditor;
+    private TCFBreakpointScopeExtension fCategoryScopeExtension;
 
     @Override
     protected Control createContents(Composite parent) {
+        BreakpointScopeCategory category = getScopeCategory();
+        if (category != null) {
+            fCategoryScopeExtension = new TCFBreakpointScopeExtension();
+            fCategoryScopeExtension.setPropertiesFilter(category.getFilter());
+            fCategoryScopeExtension.setRawContextIds(category.getContextIds());
+        }
+        
         noDefaultAndApplyButton();
         Composite fieldEditorComposite = new Composite(parent, SWT.NONE);
         fieldEditorComposite.setLayout( new GridLayout(1, false));
@@ -41,6 +49,13 @@ public class TCFBreakpointThreadFilterPage extends PropertyPage {
         return (ICBreakpoint) getElement().getAdapter(ICBreakpoint.class);
     }
 
+    protected BreakpointScopeCategory getScopeCategory() {
+        if (getElement() instanceof BreakpointScopeCategory) {
+            return (BreakpointScopeCategory)getElement();
+        }        
+        return null;
+    }
+    
     protected TCFBreakpointScopeExtension getFilterExtension() {
         ICBreakpoint bp = getBreakpoint();
         if (bp != null) {
@@ -54,7 +69,7 @@ public class TCFBreakpointThreadFilterPage extends PropertyPage {
                 // potential race condition: ignore
             }
         }
-        return null;
+        return fCategoryScopeExtension;
     }
 
     protected void createThreadFilterEditor(Composite parent) {
@@ -76,5 +91,8 @@ public class TCFBreakpointThreadFilterPage extends PropertyPage {
      */
     protected void doStore() {
         fThreadFilterEditor.doStore();
+        if (fCategoryScopeExtension != null) {
+            getScopeCategory().setFilter(fCategoryScopeExtension.getPropertiesFilter(), fCategoryScopeExtension.getRawContextIds());
+        }
     }
 }
