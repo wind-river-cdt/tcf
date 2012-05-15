@@ -22,7 +22,7 @@ import org.eclipse.tcf.internal.debug.model.TCFBreakpointsModel;
 
 public class TCFBreakpointScopeExtension implements ICBreakpointExtension {
 
-    private String[] fContextIds;
+    private String fContextIds;
     private String fProperties;
     private ICBreakpoint fBreakpoint;
 
@@ -30,44 +30,54 @@ public class TCFBreakpointScopeExtension implements ICBreakpointExtension {
         fBreakpoint = breakpoint;
         IMarker m = breakpoint.getMarker();
         if (m != null && m.exists()) {
-            String contextIdAttr = m.getAttribute(TCFBreakpointsModel.ATTR_CONTEXTIDS, null);
-            if (contextIdAttr != null) fContextIds = contextIdAttr.split(",\\s*");
+            fContextIds = m.getAttribute(TCFBreakpointsModel.ATTR_CONTEXTIDS, null);
             fProperties = m.getAttribute(TCFBreakpointsModel.ATTR_CONTEXT_QUERY, null);
         }
     }
 
-    public void setThreadFilter(String[] threadIds) {
-        fContextIds = threadIds;
-        if (fBreakpoint == null) return;
-        try {
-            ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
-                public void run(IProgressMonitor monitor) throws CoreException {
-                    final IMarker m = fBreakpoint.getMarker();
-                    if (m == null || !m.exists()) return;
-                    String attr = null;
-                    if (fContextIds != null) {
-                        if (fContextIds.length == 0) {
-                            // empty string is filtered out in TCFBreakpointsModel
-                            attr = " ";
-                        }
-                        else {
-                            StringBuilder buf = new StringBuilder();
-                            for (int i = 0; i < fContextIds.length - 1; i++) {
-                                buf.append(fContextIds[i]).append(',');
-                            }
-                            buf.append(fContextIds[fContextIds.length - 1]);
-                            attr = buf.toString();
-                        }
-                    }
-                    m.setAttribute(TCFBreakpointsModel.ATTR_CONTEXTIDS, attr);
-                }
-            }, null);
+    public void setThreadFilter(final String[] threadIds) {
+        String attr;
+        if (threadIds == null) {
+            attr = null;
         }
-        catch (Exception e) {
-            Activator.log(e);
+        else if (threadIds.length == 0) {
+            // empty string is filtered out in TCFBreakpointsModel
+            attr = " ";
         }
+        else {
+            StringBuilder buf = new StringBuilder();
+            for (int i = 0; i < threadIds.length - 1; i++) {
+                buf.append(threadIds[i]).append(',');
+            }
+            buf.append(threadIds[threadIds.length - 1]);
+            attr = buf.toString();
+        }
+        setRawContextIds(attr);
     }
 
+    String getRawContextIds() {
+        return fContextIds;
+    }
+    
+    void setRawContextIds(String contextIDs) {
+        fContextIds = contextIDs;
+        if (fBreakpoint != null) {
+            try {
+                ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
+                    public void run(IProgressMonitor monitor) throws CoreException {
+                        final IMarker m = fBreakpoint.getMarker();
+                        if (m == null || !m.exists()) return;
+                        
+                        m.setAttribute(TCFBreakpointsModel.ATTR_CONTEXTIDS, fContextIds);
+                    }
+                }, null);
+            }
+            catch (Exception e) {
+                Activator.log(e);
+            }
+        }
+    }
+    
     public void setPropertiesFilter(String properties) {
         fProperties = properties;
         if (fBreakpoint == null) return;
@@ -76,8 +86,7 @@ public class TCFBreakpointScopeExtension implements ICBreakpointExtension {
                 public void run(IProgressMonitor monitor) throws CoreException {
                     final IMarker m = fBreakpoint.getMarker();
                     if (m == null || !m.exists()) return;
-                    if (fProperties.length() != 0)
-                        m.setAttribute(TCFBreakpointsModel.ATTR_CONTEXT_QUERY, fProperties);
+                    m.setAttribute(TCFBreakpointsModel.ATTR_CONTEXT_QUERY, fProperties);
                 }
             }, null);
         }
@@ -86,7 +95,14 @@ public class TCFBreakpointScopeExtension implements ICBreakpointExtension {
         }
     }
 
+    public String getPropertiesFilter() {
+        return fProperties;
+    }
+    
     public String[] getThreadFilters() {
-        return fContextIds;
+        if (fContextIds != null) {
+            return fContextIds.split(",\\s*");
+        }
+        return null;
     }
 }

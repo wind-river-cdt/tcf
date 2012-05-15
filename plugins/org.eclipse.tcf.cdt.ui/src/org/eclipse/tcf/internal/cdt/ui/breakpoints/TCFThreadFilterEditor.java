@@ -357,6 +357,9 @@ public class TCFThreadFilterEditor {
                 }
             }
         }
+        if (fPage.getElement() instanceof BreakpointScopeCategory) {
+            expression = ((BreakpointScopeCategory)fPage.getElement()).getFilter();
+        }
 
         return expression;
     }
@@ -700,8 +703,8 @@ public class TCFThreadFilterEditor {
             TCFBreakpointScopeExtension filterExtension = fPage.getFilterExtension();
             if (filterExtension == null) return;
             filterExtension.setPropertiesFilter(scopedExpression);
-        }
-        if (radioBasic.getSelection()) {
+            filterExtension.setThreadFilter(null);
+        } else if (radioBasic.getSelection()) {
             CheckboxTreeViewer viewer = getThreadViewer();
             Object[] elements = viewer.getCheckedElements();
             String[] threadIds;
@@ -723,6 +726,7 @@ public class TCFThreadFilterEditor {
             TCFBreakpointScopeExtension filterExtension = fPage.getFilterExtension();
             if (filterExtension == null) return;
             filterExtension.setThreadFilter(threadIds);
+            filterExtension.setPropertiesFilter(null);
         }
     }
 
