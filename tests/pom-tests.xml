@@ -25,6 +25,11 @@
 		<module>../plugins/org.eclipse.tcf.debug.ui</module>
 		<module>../plugins/org.eclipse.tcf.cdt.ui</module>
 
+		<module>../features/org.eclipse.tcf.feature</module>
+		<module>../features/org.eclipse.tcf.sdk.feature</module>
+		<module>../features/org.eclipse.tcf.cdt.feature</module>
+		<module>../features/org.eclipse.tcf.cdt.sdk.feature</module>
+
 		<module>../target_explorer/plugins/org.eclipse.tcf.te.core</module>
 		<module>../target_explorer/plugins/org.eclipse.tcf.te.core.cdt</module>
 		<module>../target_explorer/plugins/org.eclipse.tcf.te.launch.core</module>
@@ -65,10 +70,10 @@
 		<module>../target_explorer/plugins/org.eclipse.tcf.te.ui.terminals.telnet</module>
 		<module>../target_explorer/plugins/org.eclipse.tcf.te.ui.views</module>
 		
-		<module>../features/org.eclipse.tcf.feature</module>
-		<module>../features/org.eclipse.tcf.sdk.feature</module>
-		<module>../features/org.eclipse.tcf.cdt.feature</module>
-		<module>../features/org.eclipse.tcf.cdt.sdk.feature</module>
+		<module>../target_explorer/features/org.eclipse.tcf.te.feature</module>
+		<module>../target_explorer/features/org.eclipse.tcf.te.sdk.feature</module>
+		<module>../target_explorer/features/org.eclipse.tcf.te.tcf.feature</module>
+		<module>../target_explorer/features/org.eclipse.tcf.te.tcf.sdk.feature</module>
 
 		<!-- The test module executing the tests -->
 		<module>../target_explorer/plugins/org.eclipse.tcf.te.tests</module>
