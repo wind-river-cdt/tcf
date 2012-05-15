@@ -86,7 +86,6 @@ import org.eclipse.tcf.services.ISymbols;
 import org.eclipse.tcf.te.tests.interfaces.IConfigurationProperties;
 import org.eclipse.tcf.te.tests.tcf.TcfTestCase;
 import org.junit.Assert;
-import org.osgi.framework.Bundle;
 
 /**
  * Base test for validating TCF Debugger UI.
@@ -136,14 +135,6 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
     protected String fProcessId = "";
     protected String fThreadId = "";
     protected RunControlContext fThreadCtx;
-
-    /* (non-Javadoc)
-     * @see org.eclipse.tcf.te.tests.CoreTestCase#getTestBundle()
-     */
-    @Override
-    protected Bundle getTestBundle() {
-        return Activator.getDefault().getBundle();
-    }
 
     /* (non-Javadoc)
      * @see org.eclipse.tcf.te.tests.CoreTestCase#initialize()
