@@ -1,5 +1,5 @@
-# *******************************************************************************
-# * Copyright (c) 2011 Wind River Systems, Inc. and others.
+# *****************************************************************************
+# * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others.
 # * All rights reserved. This program and the accompanying materials
 # * are made available under the terms of the Eclipse Public License v1.0
 # * which accompanies this distribution, and is available at
@@ -7,65 +7,85 @@
 # *
 # * Contributors:
 # *     Wind River Systems - initial API and implementation
-# *******************************************************************************
+# *****************************************************************************
 
 from tcf import services
 
 NAME = "RunControl"
 
 # Context property names.
-# Run control context ID */
+
+# Run control context ID
 PROP_ID = "ID"
 
-# Context parent (owner) ID, for a thread it is same as process ID */
+# Context parent (owner) ID, for a thread it is same as process ID
 PROP_PARENT_ID = "ParentID"
 
-# Context process (memory space) ID */
+# Context process (memory space) ID
 PROP_PROCESS_ID = "ProcessID"
 
-# ID of a context that created this context */
+# ID of a context that created this context
 PROP_CREATOR_ID = "CreatorID"
 
-# Human readable context name */
+# Human readable context name
 PROP_NAME = "Name"
 
-# true if the context is a container. Container can propagate run control commands to his children */
+# true if the context is a container. Container can propagate run control
+# commands to his children
 PROP_IS_CONTAINER = "IsContainer"
 
-# true if context has execution state - can be suspended/resumed */
+# true if context has execution state - can be suspended/resumed
 PROP_HAS_STATE = "HasState"
 
-# Bit-set of RM_ values that are supported by the context */
+# Bit-set of RM_ values that are supported by the context
 PROP_CAN_RESUME = "CanResume"
 
-# Bit-set of RM_ values that can be used with count > 1 */
+# Bit-set of RM_ values that can be used with count > 1
 PROP_CAN_COUNT = "CanCount"
 
-# true if suspend command is supported by the context */
+# true if suspend command is supported by the context
 PROP_CAN_SUSPEND = "CanSuspend"
 
-# true if terminate command is supported by the context */
+# true if terminate command is supported by the context
 PROP_CAN_TERMINATE = "CanTerminate"
 
 # Context ID of a run control group that contains the context.
 # Members of same group are always suspended and resumed together:
-# resuming/suspending a context resumes/suspends all members of the group */
+# resuming/suspending a context resumes/suspends all members of the group
 PROP_RC_GROUP = "RCGroup"
+
+# Context ID of a breakpoints group that contains the context.
+# Members of same group share same breakpoint instances:
+# a breakpoint is planted once for the group, no need to plant
+# the breakpoint for each member of the group
+PROP_BP_GROUP = "BPGroup"
+
+# true if detach command is supported by the context
+PROP_CAN_DETACH = "CanDetach"
+
+# Context ID of a symbols group that contains the context.
+# Members of a symbols group share same symbol reader configuration settings,
+# like user defined memory map entries and source lookup info
+PROP_SYMBOLS_GROUP = "SymbolsGroup"
+
 
 # Context resume modes.
 RM_RESUME = 0
 
 # Step over a single instruction.
-# If the instruction is a function call then don't stop until the function returns.
+# If the instruction is a function call then don't stop until the function
+# returns.
 
 RM_STEP_OVER = 1
 
 # Step a single instruction.
-# If the instruction is a function call then stop at first instruction of the function.
+# If the instruction is a function call then stop at first instruction of the
+# function.
 RM_STEP_INTO = 2
 
 # Step over a single source code line.
-# If the line contains a function call then don't stop until the function returns.
+# If the line contains a function call then don't stop until the function
+# returns.
 RM_STEP_OVER_LINE = 3
 
 # Step a single source code line.
@@ -80,7 +100,8 @@ RM_STEP_OUT = 5
 RM_REVERSE_RESUME = 6
 
 # Reverse of RM_STEP_OVER - run backwards over a single instruction.
-# If the instruction is a function call then don't stop until get out of the function.
+# If the instruction is a function call then don't stop until get out of the
+# function.
 RM_REVERSE_STEP_OVER = 7
 
 # Reverse of RM_STEP_INTO.
@@ -88,21 +109,24 @@ RM_REVERSE_STEP_OVER = 7
 RM_REVERSE_STEP_INTO = 8
 
 # Reverse of RM_STEP_OVER_LINE.
-# Resume backward execution of given context until control reaches an instruction that belongs
-# to a different source line.
-# If the line contains a function call then don't stop until get out of the function.
+# Resume backward execution of given context until control reaches an
+# instruction that belongs to a different source line.
+# If the line contains a function call then don't stop until get out of the
+# function.
 # Error is returned if line number information not available.
 RM_REVERSE_STEP_OVER_LINE = 9
 
 # Reverse of RM_STEP_INTO_LINE,
-# Resume backward execution of given context until control reaches an instruction that belongs
-# to a different line of source code.
-# If a function is called, stop at the beginning of the last line of the function code.
+# Resume backward execution of given context until control reaches an
+# instruction that belongs to a different line of source code.
+# If a function is called, stop at the beginning of the last line of the
+# function code.
 # Error is returned if line number information not available.
 RM_REVERSE_STEP_INTO_LINE = 10
 
 # Reverse of RM_STEP_OUT.
-# Resume backward execution of the given context until control reaches the point where the current function was called.
+# Resume backward execution of the given context until control reaches the
+# point where the current function was called.
 RM_REVERSE_STEP_OUT = 11
 
 # Step over instructions until PC is outside the specified range.
@@ -151,15 +175,16 @@ RP_RANGE_START = "RangeStart"
 # Integer - ending address of step range, exclusive */
 RP_RANGE_END = "RangeEnd"
 
+
 class RunControlService(services.Service):
     def getName(self):
         return NAME
 
-    def getContext(self, id, done):
+    def getContext(self, contextID, done):
         """
         Retrieve context properties for given context ID.
 
-        @param id - context ID.
+        @param contextID - context ID.
         @param done - callback interface called when operation is completed.
         """
         raise NotImplementedError("Abstract method")
@@ -193,6 +218,7 @@ class RunControlService(services.Service):
 class RunControlError(Exception):
     pass
 
+
 class DoneGetState(object):
     def doneGetState(self, token, error, suspended, pc, reason, params):
         """
@@ -202,9 +228,11 @@ class DoneGetState(object):
         @param suspended - true if the context is suspended
         @param pc - program counter of the context (if suspended).
         @param reason - suspend reason (if suspended), see REASON_*.
-        @param params - additional target specific data about context state, see STATE_*.
+        @param params - additional target specific data about context state,
+                        see STATE_*.
         """
         pass
+
 
 class DoneCommand(object):
     def doneCommand(self, token, error):
@@ -215,35 +243,41 @@ class DoneCommand(object):
         """
         pass
 
+
 class DoneGetContext(object):
     "Client callback interface for getContext()."
     def doneGetContext(self, token, error, context):
         """
         Called when context data retrieval is done.
-        @param error - error description if operation failed, None if succeeded.
+        @param error - error description if operation failed, None if
+                       succeeded.
         @param context - context data.
         """
         pass
+
 
 class DoneGetChildren(object):
     "Client callback interface for getChildren()."
     def doneGetChildren(self, token, error, context_ids):
         """
         Called when context list retrieval is done.
-        @param error - error description if operation failed, None if succeeded.
+        @param error - error description if operation failed, None if
+                       succeeded.
         @param context_ids - array of available context IDs.
         """
         pass
+
 
 class RunControlContext(object):
     """
     A context corresponds to an execution thread, process, address space, etc.
     A context can belong to a parent context. Contexts hierarchy can be simple
-    plain list or it can form a tree. It is up to target agent developers to choose
-    layout that is most descriptive for a given target. Context IDs are valid across
-    all services. In other words, all services access same hierarchy of contexts,
-    with same IDs, however, each service accesses its own subset of context's
-    attributes and functionality, which is relevant to that service.
+    plain list or it can form a tree. It is up to target agent developers to
+    choose layout that is most descriptive for a given target. Context IDs are
+    valid across all services. In other words, all services access same
+    hierarchy of contexts, with same IDs, however, each service accesses its
+    own subset of context's attributes and functionality, which is relevant to
+    that service.
     """
     def __init__(self, props):
         self._props = props or {}
@@ -254,7 +288,8 @@ class RunControlContext(object):
     def getProperties(self):
         """
         Get context properties. See PROP_* definitions for property names.
-        Context properties are read only, clients should not try to modify them.
+        Context properties are read only, clients should not try to modify
+        them.
         @return Map of context properties.
         """
         return self._props
@@ -297,7 +332,8 @@ class RunControlContext(object):
     def isContainer(self):
         """
         Utility method to read context property PROP_IS_CONTAINER.
-        Executing resume or suspend command on a container causes all its children to resume or suspend.
+        Executing resume or suspend command on a container causes all its
+        children to resume or suspend.
         @return value of PROP_IS_CONTAINER.
         """
         return self._props.get(PROP_IS_CONTAINER)
@@ -314,20 +350,21 @@ class RunControlContext(object):
         """
         Utility method to read context property PROP_CAN_SUSPEND.
         Value 'true' means suspend command is supported by the context,
-        however the method does not check that the command can be executed successfully in
-        the current state of the context. For example, the command still can fail if context is
-        already suspended.
+        however the method does not check that the command can be executed
+        successfully in the current state of the context. For example, the
+        command still can fail if context is already suspended.
         @return value of PROP_CAN_SUSPEND.
         """
         return self._props.get(PROP_CAN_SUSPEND)
 
     def canResume(self, mode):
         """
-        Utility method to read a 'mode' bit in context property PROP_CAN_RESUME.
-        Value 'true' means resume command is supported by the context,
-        however the method does not check that the command can be executed successfully in
-        the current state of the context. For example, the command still can fail if context is
-        already resumed.
+        Utility method to read a 'mode' bit in context property
+        PROP_CAN_RESUME.
+        Value 'true' means resume command is supported by the context, however
+        the method does not check that the command can be executed successfully
+        in the current state of the context. For example, the command still can
+        fail if context is already resumed.
         @param mode - resume mode, see RM_*.
         @return value of requested bit of PROP_CAN_RESUME.
         """
@@ -337,10 +374,10 @@ class RunControlContext(object):
     def canCount(self, mode):
         """
         Utility method to read a 'mode' bit in context property PROP_CAN_COUNT.
-        Value 'true' means resume command with count other then 1 is supported by the context,
-        however the method does not check that the command can be executed successfully in
-        the current state of the context. For example, the command still can fail if context is
-        already resumed.
+        Value 'true' means resume command with count other then 1 is supported
+        by the context, however the method does not check that the command can
+        be executed successfully in the current state of the context. For
+        example, the command still can fail if context is already resumed.
         @param mode - resume mode, see RM_*.
         @return value of requested bit of PROP_CAN_COUNT.
         """
@@ -351,9 +388,9 @@ class RunControlContext(object):
         """
         Utility method to read context property PROP_CAN_TERMINATE.
         Value 'true' means terminate command is supported by the context,
-        however the method does not check that the command can be executed successfully in
-        the current state of the context. For example, the command still can fail if context is
-        already exited.
+        however the method does not check that the command can be executed
+        successfully in the current state of the context. For example, the
+        command still can fail if context is already exited.
         @return value of PROP_CAN_SUSPEND.
         """
         return self._props.get(PROP_CAN_TERMINATE)
@@ -363,10 +400,59 @@ class RunControlContext(object):
         Utility method to read context property PROP_RC_GROUP -
         context ID of a run control group that contains the context.
         Members of same group are always suspended and resumed together:
-        resuming/suspending a context resumes/suspends all members of the group.
+        resuming/suspending a context resumes/suspends all members of the
+        group.
         @return value of PROP_RC_GROUP.
         """
         return self._props.get(PROP_RC_GROUP)
+
+    def getBPGroup(self):
+        """
+        Utility method to read context property PROP_BP_GROUP - context ID of a
+        breakpoints group that contains the context.
+
+        Members of same group share same breakpoint instances:
+        a breakpoint is planted once for the group, no need to plant the
+        breakpoint for each member of the group
+
+        @return value of PROP_BP_GROUP or @b None if the context does not
+                support breakpoints.
+        """
+        return self._props.get(PROP_BP_GROUP)
+
+    def getSymbolsGroup(self):
+        """
+        Utility method to read context property PROP_SYMBOLS_GROUP - context ID
+        of a symbols group that contains the context.
+
+        Members of a symbols group share same symbol reader configuration
+        settings, like user defined memory map entries and source lookup info.
+
+        @return value of PROP_SYMBOLS_GROUP or @b None if the context is not a
+                member of a symbols group.
+        """
+        return self._props.get(PROP_SYMBOLS_GROUP)
+
+    def canDetach(self):
+        """
+        Utility method to read context property PROP_CAN_DETACH.
+        Value 'true' means detach command is supported by the context, however
+        the method does not check that the command can be executed successfully
+        in the current state of the context. For example, the command still can
+        fail if the context already has exited.
+        @return value of PROP_CAN_DETACH.
+        """
+        return self._props.get(PROP_CAN_DETACH)
+
+    def detach(self, done):
+        """
+        Send a command to detach a context.
+
+        @param done - command result call back object.
+
+        @return pending command handle, can be used to cancel the command
+        """
+        raise NotImplementedError("Abstract method")
 
     def getState(self, done):
         """
@@ -390,7 +476,8 @@ class RunControlContext(object):
 #        Send a command to resume a context.
 #        Also resumes children if context is a container.
 #        @param mode - defines how to resume the context, see RM_*.
-#        @param count - if mode implies stepping, defines how many steps to perform.
+#        @param count - if mode implies stepping, defines how many steps to
+#                       perform.
 #        @param done - command result call back object.
 #        @return pending command handle, can be used to cancel the command.
 #        """
@@ -401,8 +488,10 @@ class RunControlContext(object):
         Send a command to resume a context.
         Also resumes children if context is a container.
         @param mode - defines how to resume the context, see RM_*.
-        @param count - if mode implies stepping, defines how many steps to perform.
-        @param params - resume parameters, for example, step range definition, see RP_*.
+        @param count - if mode implies stepping, defines how many steps to
+                       perform.
+        @param params - resume parameters, for example, step range definition,
+                        see RP_*.
         @param done - command result call back object.
         @return pending command handle, can be used to cancel the command.
         """
@@ -416,63 +505,76 @@ class RunControlContext(object):
         """
         raise NotImplementedError("Abstract method")
 
+
 class RunControlListener(object):
     "Service events listener interface."
+
     def contextAdded(self, contexts):
         """
         Called when new contexts are created.
         @param contexts - array of new context properties.
         """
         pass
+
     def contextChanged(self, contexts):
         """
         Called when a context properties changed.
         @param contexts - array of new context properties.
         """
         pass
+
     def contextRemoved(self, context_ids):
         """
         Called when contexts are removed.
         @param context_ids - array of removed context IDs.
         """
         pass
+
     def contextSuspended(self, context, pc, reason, params):
         """
         Called when a thread is suspended.
         @param context - ID of a context that was suspended.
         @param pc - program counter of the context, can be None.
         @param reason - human readable description of suspend reason.
-        @param params - additional, target specific data about suspended context.
+        @param params - additional, target specific data about suspended
+                        context.
         """
         pass
+
     def contextResumed(self, context):
         """
         Called when a thread is resumed.
         @param context - ID of a context that was resumed.
         """
         pass
+
     def containerSuspended(self, context, pc, reason, params, suspended_ids):
         """
-        Called when target simultaneously suspends multiple threads in a container
-        (process, core, etc.).
+        Called when target simultaneously suspends multiple threads in a
+        container (process, core, etc.).
 
-        @param context - ID of a context responsible for the event. It can be container ID or
-        any one of container children, for example, it can be thread that hit "suspend all" breakpoint.
-        Client expected to move focus (selection) to this context.
+        @param context - ID of a context responsible for the event. It can be
+                         container ID or any one of container children, for
+                         example, it can be thread that hit "suspend all"
+                         breakpoint. Client expected to move focus (selection)
+                         to this context.
         @param pc - program counter of the context.
         @param reason - suspend reason, see REASON_*.
-        @param params - additional target specific data about context state, see STATE_*.
+        @param params - additional target specific data about context state,
+                        see STATE_*.
         @param suspended_ids - full list of all contexts that were suspended.
         """
         pass
+
     def containerResumed(self, context_ids):
         """
-        Called when target simultaneously resumes multiple threads in a container (process,
-        core, etc.).
+        Called when target simultaneously resumes multiple threads in a
+        container (process, core, etc.).
 
         @param context_ids - full list of all contexts that were resumed.
         """
         pass
+
     def contextException(self, context, msg):
         """
         Called when an exception is detected in a target thread.
