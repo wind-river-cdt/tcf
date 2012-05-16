@@ -98,9 +98,10 @@
 <!-- Editor page contributions -->
    <extension point="org.eclipse.tcf.te.ui.views.editorPages">
       <editorPage
-            class="org.eclipse.tcf.te.ui.views.editor.pages.TreeViewerExplorerEditorPage:org.eclipse.tcf.te.ui.controls.viewer.fs:File System Explorer"
-            name="%FSExplorerEditorPage.name"
-            id="org.eclipse.tcf.te.tcf.filesystem.FSExplorerEditorPage">
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.pages.FSExplorerEditorPage"
+            icon="icons/obj16/root.gif"
+            id="org.eclipse.tcf.te.tcf.filesystem.FSExplorerEditorPage"
+            name="%FSExplorerEditorPage.name">
       </editorPage>
    </extension>
 
@@ -127,7 +128,7 @@
    
 <!-- Menu contributions -->
    <extension point="org.eclipse.ui.menus">
-      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.controls.menu.fs?after=additions">
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.tcf.filesystem.FSExplorerEditorPage?after=additions">
          <separator
                name="group.new">
          </separator>
@@ -934,7 +935,7 @@
          </command>
       </menuContribution>
       <menuContribution
-            locationURI="toolbar:org.eclipse.tcf.te.ui.controls.menu.fs?before=additions">
+            locationURI="toolbar:org.eclipse.tcf.te.tcf.filesystem.FSExplorerEditorPage?before=additions">
          <command
                commandId="org.eclipse.tcf.te.tcf.filesystem.commands.refreshViewer"
                icon="icons/obj16/refresh.gif"
@@ -1918,10 +1919,7 @@
        <viewer
              autoExpandLevel="0"
              contentProvider="org.eclipse.tcf.te.tcf.filesystem.ui.controls.FSTreeContentProvider"
-             doubleClickCommand="org.eclipse.ui.navigator.Open"
-             helpId="org.eclipse.tcf.te.tcf.filesystem.FSExplorerEditorPage"
              id="org.eclipse.tcf.te.ui.controls.viewer.fs"
-             menuId="org.eclipse.tcf.te.ui.controls.menu.fs"
              persistent="true">
           <creation>
              <style name="SWT.FULL_SELECTION" />

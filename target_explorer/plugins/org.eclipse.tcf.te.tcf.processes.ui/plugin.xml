@@ -15,9 +15,10 @@
 <!-- Editor page contributions -->
    <extension point="org.eclipse.tcf.te.ui.views.editorPages">
       <editorPage
-            class="org.eclipse.tcf.te.ui.views.editor.pages.TreeViewerExplorerEditorPage:org.eclipse.tcf.te.ui.controls.viewer.processes:Process Monitor"
-            name="%ProcessExplorerEditorPage.name"
-            id="org.eclipse.tcf.te.tcf.processes.ui.ProcessExplorerEditorPage">
+            class="org.eclipse.tcf.te.tcf.processes.ui.internal.pages.ProcessMonitorEditorPage"
+            icon="icons/obj16/process_root.gif"
+            id="org.eclipse.tcf.te.tcf.processes.ui.ProcessExplorerEditorPage"
+            name="%ProcessExplorerEditorPage.name">
       </editorPage>
    </extension>
 
@@ -40,7 +41,7 @@
 <!-- Processes menu contributions -->
    <extension point="org.eclipse.ui.menus">
      
-      <menuContribution locationURI="toolbar:org.eclipse.tcf.te.ui.controls.menu.processes?before=additions">
+      <menuContribution locationURI="toolbar:org.eclipse.tcf.te.tcf.processes.ui.ProcessExplorerEditorPage?before=additions">
          <command
                commandId="org.eclipse.tcf.te.tcf.processes.ui.command.refreshViewer"
                icon="icons/obj16/refresh.gif"
@@ -51,14 +52,14 @@
          <command
                commandId="org.eclipse.tcf.te.tcf.processes.ui.command.refreshInterval"
                icon="icons/obj16/refresh_interval.png"
-               id="org.eclipse.tcf.te.tcf.processes.ui.menu.refreshInterval"
+               id="org.eclipse.tcf.te.tcf.processes.ui.ProcessExplorerEditorPage.refreshInterval"
                label="%command.configure.label"
                style="pulldown"
                tooltip="%command.configure.tooltip">
          </command>
       </menuContribution>
 
-      <menuContribution locationURI="menu:org.eclipse.tcf.te.tcf.processes.ui.menu.refreshInterval">
+      <menuContribution locationURI="menu:org.eclipse.tcf.te.tcf.processes.ui.ProcessExplorerEditorPage.refreshInterval">
          <dynamic
                class="org.eclipse.tcf.te.tcf.processes.ui.internal.handler.ConfigIntervalDynamicContribution"
                id="org.eclipse.tcf.te.tcf.processes.ui.menu.refreshIntervalDynamic">
@@ -108,7 +109,7 @@
       </menuContribution>
       
       <menuContribution
-            locationURI="popup:org.eclipse.tcf.te.ui.controls.menu.processes?after=additions">
+            locationURI="popup:org.eclipse.tcf.te.tcf.processes.ui.ProcessExplorerEditorPage?after=additions">
          <separator
                name="group.launch.rundebug"
                visible="true">
@@ -483,9 +484,7 @@
       <viewer
             autoExpandLevel="0"
             contentProvider="org.eclipse.tcf.te.tcf.processes.ui.controls.ProcessTreeContentProvider"
-            helpId="org.eclipse.tcf.te.tcf.processes.ui.ProcessExplorerEditorPage"
             id="org.eclipse.tcf.te.ui.controls.viewer.processes"
-            menuId="org.eclipse.tcf.te.ui.controls.menu.processes"
             persistent="true">
          <creation>
             <style

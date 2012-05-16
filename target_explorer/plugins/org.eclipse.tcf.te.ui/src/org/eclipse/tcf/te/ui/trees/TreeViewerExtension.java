@@ -136,18 +136,6 @@ public class TreeViewerExtension {
 			catch (NumberFormatException nfe) {
 			}
 		}
-		value = configuration.getAttribute("menuId"); //$NON-NLS-1$
-		if (value != null) {
-			descriptor.setContextMenuId(value);
-		}
-		value = configuration.getAttribute("doubleClickCommand"); //$NON-NLS-1$
-		if (value != null) {
-			descriptor.setDoubleClickCommand(value);
-		}
-		value = configuration.getAttribute("helpId"); //$NON-NLS-1$
-		if (value != null) {
-			descriptor.setHelpId(value);
-		}
 		return descriptor;
 	}
 

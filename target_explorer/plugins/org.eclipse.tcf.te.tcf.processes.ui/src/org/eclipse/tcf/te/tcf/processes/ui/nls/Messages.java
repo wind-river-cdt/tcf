@@ -174,4 +174,6 @@ public class Messages extends NLS {
 
 	public static String TerminateHandler_TerminationError;
 	public static String ProcessLabelProvider_RootNodeLabel;
+
+	public static String ProcessMonitorEditorPage_PageTitle;
 }

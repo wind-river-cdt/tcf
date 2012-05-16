@@ -95,6 +95,7 @@ public class Messages extends NLS {
 	public static String FSDropTargetListener_ConfirmMoveTitle;
 	public static String FSDropTargetListener_MovingWarningMultiple;
 	public static String FSDropTargetListener_MovingWarningSingle;
+	public static String FSExplorerEditorPage_PageTitle;
 	public static String FSUpload_Cancel;
 	public static String FSUpload_No;
 	public static String FSUpload_OverwriteConfirmation;

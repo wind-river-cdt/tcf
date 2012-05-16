@@ -94,30 +94,6 @@
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="menuId" type="string">
-            <annotation>
-               <documentation>
-                  The context menu id of the tree viewer.
-               </documentation>
-            </annotation>
-         </attribute>
-         <attribute name="doubleClickCommand" type="string">
-            <annotation>
-               <documentation>
-                  The command invoked when double clicked.
-               </documentation>
-               <appinfo>
-                  <meta.attribute kind="identifier" basedOn="org.eclipse.ui.commands/command/@id"/>
-               </appinfo>
-            </annotation>
-         </attribute>
-         <attribute name="helpId" type="string">
-            <annotation>
-               <documentation>
-                  The help id of the tree viewer.
-               </documentation>
-            </annotation>
-         </attribute>
       </complexType>
    </element>
 

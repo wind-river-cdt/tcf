@@ -84,8 +84,8 @@ public class TreeControl extends AbstractTreeControl {
 	 * @see org.eclipse.tcf.te.ui.trees.AbstractTreeControl#configureTreeViewer(org.eclipse.jface.viewers.TreeViewer)
 	 */
 	@Override
-    protected void configureTreeViewer(TreeViewer viewer) {
-	    super.configureTreeViewer(viewer);
+    protected void doConfigureTreeViewer(TreeViewer viewer) {
+	    super.doConfigureTreeViewer(viewer);
 	    IConfigurationElement configuration = viewerDescriptor.getDragConfig();
 	    if(configuration != null) {
 	    	int operations = viewerExtension.parseDnd(configuration);
@@ -140,37 +140,10 @@ public class TreeControl extends AbstractTreeControl {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.trees.AbstractTreeControl#getHelpId()
-	 */
-	@Override
-    protected String getHelpId() {
-	    return viewerDescriptor.getHelpId();
-    }
-
-	/*
-	 * (non-Javadoc)
 	 * @see org.eclipse.tcf.te.ui.trees.AbstractTreeControl#getAutoExpandLevel()
 	 */
 	@Override
     protected int getAutoExpandLevel() {
 	    return viewerDescriptor.getAutoExpandLevel();
     }
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.trees.AbstractTreeControl#getDoubleClickCommandId()
-	 */
-	@Override
-    protected String getDoubleClickCommandId() {
-	    return viewerDescriptor.getDoubleClickCommand();
-    }
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.trees.AbstractTreeControl#getContextMenuId()
-	 */
-	@Override
-	protected String getContextMenuId() {
-		return viewerDescriptor.getContextMenuId();
-	}
 }

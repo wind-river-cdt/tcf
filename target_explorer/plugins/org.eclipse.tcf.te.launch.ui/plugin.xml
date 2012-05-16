@@ -31,7 +31,7 @@
 <!-- Editor page contributions -->
    <extension point="org.eclipse.tcf.te.ui.views.editorPages">
       <editorPage
-            class="org.eclipse.tcf.te.ui.views.editor.pages.TreeViewerExplorerEditorPage:org.eclipse.tcf.te.launch.ui.viewer.launches:Launches"
+            class="org.eclipse.tcf.te.launch.ui.internal.pages.LaunchExplorerEditorPage"
             name="%LauchEditorPage.name"
             icon="icons/obj16/launches_root.gif"
             id="org.eclipse.tcf.te.launch.ui.LaunchEditorPage">
@@ -102,10 +102,7 @@
       <viewer
             id="org.eclipse.tcf.te.launch.ui.viewer.launches"
             autoExpandLevel="2"
-            contentProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchEditorContentProvider"
-            doubleClickCommand="org.eclipse.ui.navigator.Open"
-            helpId="org.eclipse.tcf.te.launch.ui.LaunchEditorPage"
-            menuId="org.eclipse.tcf.te.launch.ui.editor.menu.launches">
+            contentProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchEditorContentProvider">
          <creation>
             <style name="SWT.FULL_SELECTION"/>
             <style name="SWT.SINGLE"/>
@@ -312,7 +309,7 @@
       </menuContribution>
 
    <!-- Launches editor page menu contributions -->
-      <menuContribution locationURI="popup:org.eclipse.tcf.te.launch.ui.editor.menu.launches">
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.launch.ui.LaunchEditorPage">
          <separator
                name="group.new"
                visible="true"/>
@@ -443,7 +440,7 @@
       
       
    <!-- Launches editor page toolbar contributions -->
-      <menuContribution locationURI="toolbar:org.eclipse.tcf.te.launch.ui.editor.menu.launches">
+      <menuContribution locationURI="toolbar:org.eclipse.tcf.te.launch.ui.LaunchEditorPage">
          <separator
                name="group.run"
                visible="false"/>

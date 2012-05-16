@@ -79,11 +79,6 @@ public interface ImageConsts {
     public static final String  VIEWER_FILTER_CONFIG_DISABLED = "ViewerFilterConfig_disabled"; //$NON-NLS-1$
 
     /**
-     * The key to access the viewer help image.
-     */
-    public static final String  VIEWER_HELP = "ViewerHelp"; //$NON-NLS-1$
-
-    /**
      * The key to access the target object gold overlay image.
      */
     public static final String GOLD_OVR = "GoldOverlay"; //$NON-NLS-1$

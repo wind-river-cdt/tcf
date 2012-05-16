@@ -28,12 +28,6 @@ public class ViewerDescriptor {
 	private boolean persistent = false;
 	// The auto expand level.
 	private int autoExpandLevel = 2;
-	// The context menu id.
-	private String menuId;
-	// The command invoked when double clicked.
-	private String doubleClickCommand;
-	// The help id of the tree viewer.
-	private String helpId;
 
 	public IConfigurationElement getStyleConfig() {
 		return styleConfig;
@@ -81,29 +75,5 @@ public class ViewerDescriptor {
 
 	public void setAutoExpandLevel(int autoExpandLevel) {
 		this.autoExpandLevel = autoExpandLevel;
-	}
-
-	public String getContextMenuId() {
-		return menuId;
-	}
-
-	public void setContextMenuId(String menuId) {
-		this.menuId = menuId;
-	}
-
-	public String getDoubleClickCommand() {
-		return doubleClickCommand;
-	}
-
-	public void setDoubleClickCommand(String doubleClickCommand) {
-		this.doubleClickCommand = doubleClickCommand;
-	}
-
-	public String getHelpId() {
-		return helpId;
-	}
-
-	public void setHelpId(String helpId) {
-		this.helpId = helpId;
 	}
 }

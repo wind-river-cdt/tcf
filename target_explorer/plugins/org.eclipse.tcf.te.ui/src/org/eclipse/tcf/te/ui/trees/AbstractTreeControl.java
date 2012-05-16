@@ -10,8 +10,6 @@
 package org.eclipse.tcf.te.ui.trees;
 
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -20,81 +18,47 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.eclipse.core.commands.Command;
-import org.eclipse.core.commands.ParameterizedCommand;
-import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.SafeRunner;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.action.ToolBarManager;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ColumnViewerEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelDecorator;
 import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerEditor;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.SWTException;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.tcf.te.core.interfaces.IViewerInput;
 import org.eclipse.tcf.te.runtime.utils.Host;
 import org.eclipse.tcf.te.ui.WorkbenchPartControl;
-import org.eclipse.tcf.te.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.forms.CustomFormToolkit;
-import org.eclipse.tcf.te.ui.interfaces.ImageConsts;
-import org.eclipse.tcf.te.ui.nls.Messages;
 import org.eclipse.ui.IDecoratorManager;
-import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.commands.ICommandService;
-import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.ui.handlers.IHandlerService;
-import org.eclipse.ui.menus.IMenuService;
-import org.eclipse.ui.part.MultiPageSelectionProvider;
 
 
 /**
  * Abstract tree control implementation.
  */
-public abstract class AbstractTreeControl extends WorkbenchPartControl implements SelectionListener,
-								IDoubleClickListener, PropertyChangeListener, ISelectionChangedListener, FocusListener {
+public abstract class AbstractTreeControl extends WorkbenchPartControl implements SelectionListener {
 	// Reference to the tree viewer instance
 	private TreeViewer viewer;
 	// Reference to the selection changed listener
@@ -107,8 +71,8 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	private TreeViewerState viewerState;
 	// The action to configure the filters.
 	private ConfigFilterAction configFilterAction;
-	// The tool bar manager
-	private ToolBarManager toolbarManager;
+	// The menu manager
+	private MenuManager manager;
 
 	/**
 	 * Constructor.
@@ -122,8 +86,8 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 *
 	 * @param parentPart The parent workbench part this control is embedded in or <code>null</code>.
 	 */
-	public AbstractTreeControl(IWorkbenchPart parentPart) {
-		super(parentPart);
+	public AbstractTreeControl(IWorkbenchPart parent) {
+		super(parent);
 	}
 
 	/* (non-Javadoc)
@@ -171,10 +135,10 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 		// Create the tree viewer
 		viewer = doCreateTreeViewer(parent);
 		// And configure the tree viewer
-		configureTreeViewer(viewer);
+		doConfigureTreeViewer(viewer);
 
 		// Prepare popup menu and toolbar
-		createContributionItems(viewer);
+		doCreateContributionItems(viewer);
 	}
 
 	/**
@@ -193,7 +157,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 *
 	 * @param viewer The tree viewer. Must not be <code>null</code>.
 	 */
-	protected void configureTreeViewer(TreeViewer viewer) {
+	protected void doConfigureTreeViewer(TreeViewer viewer) {
 		Assert.isNotNull(viewer);
 
 		viewer.setAutoExpandLevel(getAutoExpandLevel());
@@ -206,8 +170,6 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 				if (method.getName().equals("inputChanged")) { //$NON-NLS-1$
 					onInputChanged(args[1], args[2]);
-				} else if(method.getName().equals("dispose")) { //$NON-NLS-1$
-					onContentProviderDisposed();
 				}
 				return method.invoke(contentProvider, args);
 			}
@@ -222,21 +184,11 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 		viewer.getTree().setLayoutData(doCreateTreeViewerLayoutData(viewer));
 
 		// Attach the selection changed listener
-		viewer.addSelectionChangedListener(this);
 		selectionChangedListener = doCreateTreeViewerSelectionChangedListener(viewer);
 		if (selectionChangedListener != null) {
 			viewer.addSelectionChangedListener(selectionChangedListener);
 		}
 
-		viewer.addDoubleClickListener(this);
-
-		// Set the help context.
-		String helpContextId = getHelpId();
-		if (helpContextId != null) {
-			PlatformUI.getWorkbench().getHelpSystem().setHelp(viewer.getTree(), helpContextId);
-		}
-		Tree tree = viewer.getTree();
-		tree.addFocusListener(this);
 		// Define an editor activation strategy for the common viewer so as to be invoked only programmatically.
 		ColumnViewerEditorActivationStrategy activationStrategy = new TreeViewerEditorActivationStrategy(getViewerId(), viewer);
 		TreeViewerEditor.create(viewer, null, activationStrategy, ColumnViewerEditor.DEFAULT);
@@ -250,62 +202,17 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * @param newInput The new input.
 	 */
 	void onInputChanged(Object oldInput, Object newInput) {
-		if(oldInput != null) {
-			uninstallPropertyChangeListener(oldInput);
-		}
 		columns = doCreateViewerColumns(newInput);
 		filterDescriptors = doCreateFilterDescriptors(newInput);
 		if (isStatePersistent()) {
 			updateViewerState(newInput);
 		}
-		createTreeColumns(viewer);
+		doCreateTreeColumns(viewer);
 		viewer.getTree().setHeaderVisible(true);
 		updateFilters();
 		new TreeViewerHeaderMenu(this).create();
 		configFilterAction.updateEnablement();
-		if(newInput != null) {
-			installPropertyChangeListener(newInput);
-		}
 	}
-
-	/**
-	 * Handle the event when the content provider is disposed.
-	 * Un-install the property change listener that has been added
-	 * to the input.
-	 *
-	 * @param oldInput the old input.
-	 * @param newInput The new input.
-	 */
-	void onContentProviderDisposed() {
-		Object input = viewer.getInput();
-		if(input != null) {
-			uninstallPropertyChangeListener(input);
-		}
-	}
-
-	/**
-	 * Uninstall the property change listener from the specified input.
-	 *
-	 * @param input The input of the tree viewer.
-	 */
-	private void uninstallPropertyChangeListener(Object input) {
-	    IViewerInput viewerInput = ViewerStateManager.getViewerInput(input);
-		if(viewerInput != null) {
-			viewerInput.removePropertyChangeListener(this);
-		}
-	}
-
-	/**
-	 * Install the property change listener to the input of the tree viewer.
-	 *
-	 * @param input The input of the tree viewer.
-	 */
-	private void installPropertyChangeListener(Object input) {
-	    IViewerInput viewerInput = ViewerStateManager.getViewerInput(input);
-		if(viewerInput != null) {
-			viewerInput.addPropertyChangeListener(this);
-		}
-    }
 
 	/**
 	 * Update the viewer state using the states from the viewerState which
@@ -368,7 +275,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 		    return true;
 	    }
 	    else if (!column.isVisible() && visible) {
-	    	TreeColumn treeColumn = createTreeColumn(column, false);
+	    	TreeColumn treeColumn = doCreateTreeColumn(column, false);
 	    	column.setTreeColumn(treeColumn);
 		    column.setVisible(visible);
 		    return true;
@@ -385,15 +292,6 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	protected boolean isStatePersistent() {
 	    return true;
     }
-
-	/**
-	 * Get the help context id of this viewer.
-	 *
-	 * @return The help context id or null if no help available.
-	 */
-	protected String getHelpId() {
-		return null;
-	}
 
 	/**
 	 * Create the tree viewer columns from the viewers extension.
@@ -448,7 +346,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 *
 	 * @param viewer The tree viewer.
 	 */
-	protected void createTreeColumns(TreeViewer viewer) {
+	protected void doCreateTreeColumns(TreeViewer viewer) {
 		Assert.isTrue(columns != null && columns.length > 0);
 		List<ColumnDescriptor> visibleColumns = new ArrayList<ColumnDescriptor>();
 		for (ColumnDescriptor column : columns) {
@@ -460,7 +358,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 				return o1.getOrder() < o2.getOrder() ? -1 : (o1.getOrder() > o2.getOrder() ? 1 : 0);
             }});
 		for(ColumnDescriptor visibleColumn : visibleColumns) {
-			createTreeColumn(visibleColumn, true);
+			doCreateTreeColumn(visibleColumn, true);
 		}
 		if(!Host.isWindowsHost()) {
 			Tree tree = viewer.getTree();
@@ -484,7 +382,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * @param append If the new column should be appended.
 	 * @return The tree column created.
 	 */
-	TreeColumn createTreeColumn(final ColumnDescriptor column, boolean append) {
+	TreeColumn doCreateTreeColumn(final ColumnDescriptor column, boolean append) {
 		Tree tree = viewer.getTree();
 		final TreeColumn treeColumn = append ? new TreeColumn(tree, column.getStyle()) :
 			new TreeColumn(tree, column.getStyle(), getColumnIndex(column));
@@ -626,11 +524,11 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 *
 	 * @param viewer The tree viewer instance. Must not be <code>null</code>.
 	 */
-	protected void createContributionItems(TreeViewer viewer) {
+	protected void doCreateContributionItems(TreeViewer viewer) {
 		Assert.isNotNull(viewer);
 
 		// Create the menu manager
-		MenuManager manager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+		manager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		// Attach the menu listener
 		manager.addMenuListener(new IMenuListener() {
 			@Override
@@ -642,72 +540,15 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 		manager.setRemoveAllWhenShown(true);
 		// Associated with the tree
 		viewer.getTree().setMenu(manager.createContextMenu(viewer.getTree()));
-
-		// Register the context menu at the parent workbench part site.
-		if (getParentPart() != null && getParentPart().getSite() != null && getContextMenuId() != null) {
-			getParentPart().getSite().registerContextMenu(getContextMenuId(), manager, viewer);
-		}
-
-		// The toolbar is a bit more complicated as we want to have the
-		// toolbar placed within the section title.
-		createToolbarContributionItem(viewer);
 	}
-
+	
 	/**
-	 * Returns the context menu id.
-	 *
-	 * @return The context menu id.
+	 * Get the context menu manager.
+	 * 
+	 * @return the context menu manager.
 	 */
-	protected abstract String getContextMenuId();
-
-	/**
-	 * Creates the toolbar within the section parent of the given tree viewer.
-	 *
-	 * @param viewer The tree viewer instance. Must not be <code>null</code>.
-	 */
-	protected void createToolbarContributionItem(TreeViewer viewer) {
-		Assert.isNotNull(viewer);
-
-		// Determine the section parent from the tree viewer
-		Composite parent = viewer.getTree().getParent();
-		while (parent != null && !(parent instanceof Section)) {
-			parent = parent.getParent();
-		}
-
-		// We are done here if we cannot find a section parent or the parent is disposed
-		if (parent == null || parent.isDisposed()) {
-			return;
-		}
-
-		toolbarManager = new ToolBarManager(SWT.FLAT | SWT.HORIZONTAL | SWT.RIGHT);
-		// create the toolbar items
-		createToolBarItems(toolbarManager);
-		if (getParentPart() != null && getParentPart().getSite() != null && getContextMenuId() != null) {
-			IMenuService service = (IMenuService) getParentPart().getSite().getService(IMenuService.class);
-			if (service != null) {
-				service.populateContributionManager(toolbarManager, "toolbar:" + this.getContextMenuId()); //$NON-NLS-1$
-			}
-		}
-		ToolBar toolbar = toolbarManager.createControl(parent);
-
-		// The cursor within the toolbar shall change to an hand
-		final Cursor handCursor = new Cursor(parent.getDisplay(), SWT.CURSOR_HAND);
-		toolbar.setCursor(handCursor);
-		// Cursor needs to be explicitly disposed
-		toolbar.addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(DisposeEvent e) {
-				if (handCursor.isDisposed() == false) {
-					handCursor.dispose();
-				}
-			}
-		});
-
-		// If the parent composite is a forms section, set the toolbar
-		// as text client to the section header
-		Section section = (Section)parent;
-		// Set the toolbar as text client
-		section.setTextClient(toolbar);
+	public MenuManager getContextMenuManager() {
+		return manager;
 	}
 
 	/**
@@ -718,21 +559,9 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 *
 	 * @param toolbarManager The toolbar to add the toolbar items too. Must not be <code>null</code>.
 	 */
-	protected void createToolBarItems(ToolBarManager toolbarManager) {
-		Assert.isNotNull(toolbarManager);
-		toolbarManager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+	public void createToolbarContributionItems(IToolBarManager toolbarManager) {
 		toolbarManager.add(new CollapseAllAction(this));
 		toolbarManager.add(configFilterAction = new ConfigFilterAction(this));
-		Action action = new Action(null, IAction.AS_PUSH_BUTTON){
-			@Override
-            public void run() {
-				PlatformUI.getWorkbench().getHelpSystem().displayDynamicHelp();
-            }
-		};
-		action.setToolTipText(Messages.AbstractTreeControl_HelpTooltip);
-		ImageDescriptor image = UIPlugin.getImageDescriptor(ImageConsts.VIEWER_HELP);
-		action.setImageDescriptor(image);
-		toolbarManager.add(action);
 	}
 
 	/**
@@ -816,153 +645,4 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	@Override
     public void widgetDefaultSelected(SelectionEvent e) {
 	}
-
-	/**
-	 * Listens to the double-click event of the tree and expand or collapse
-	 * the tree by default. Subclass may override this method to invoke certain
-	 * command.
-	 *
-	 * @param event the double click event
-	 * @see org.eclipse.jface.viewers.IDoubleClickListener#doubleClick(DoubleClickEvent)
-	 */
-	@Override
-    public void doubleClick(final DoubleClickEvent event) {
-		// If an handled and enabled command is registered for the ICommonActionConstants.OPEN
-		// retargetable action id, redirect the double click handling to the command handler.
-		//
-		// Note: The default tree node expansion must be re-implemented in the active handler!
-		String commandId = getDoubleClickCommandId();
-		Command cmd = null;
-		if(commandId != null) {
-			ICommandService service = (ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class);
-			cmd = service != null ? service.getCommand(commandId) : null;
-		}
-		if (cmd != null && cmd.isDefined() && cmd.isEnabled()) {
-			final Command command = cmd;
-			SafeRunner.run(new SafeRunnable(){
-				@Override
-                public void handleException(Throwable e) {
-					// Ignore exception
-                }
-				@Override
-                public void run() throws Exception {
-					ISelection selection = event.getSelection();
-					EvaluationContext ctx = new EvaluationContext(null, selection);
-					ctx.addVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME, selection);
-					ctx.addVariable(ISources.ACTIVE_MENU_SELECTION_NAME, selection);
-					ctx.addVariable(ISources.ACTIVE_WORKBENCH_WINDOW_NAME, PlatformUI.getWorkbench().getActiveWorkbenchWindow());
-					IWorkbenchPart part = getParentPart();
-					if (part != null) {
-						IWorkbenchPartSite site = part.getSite();
-						ctx.addVariable(ISources.ACTIVE_PART_ID_NAME, site.getId());
-						ctx.addVariable(ISources.ACTIVE_PART_NAME, part);
-						ctx.addVariable(ISources.ACTIVE_SITE_NAME, site);
-						ctx.addVariable(ISources.ACTIVE_SHELL_NAME, site.getShell());
-					}
-					ctx.setAllowPluginActivation(true);
-
-					ParameterizedCommand pCmd = ParameterizedCommand.generateCommand(command, null);
-					Assert.isNotNull(pCmd);
-					IHandlerService handlerSvc = (IHandlerService)PlatformUI.getWorkbench().getService(IHandlerService.class);
-					Assert.isNotNull(handlerSvc);
-					handlerSvc.executeCommandInContext(pCmd, null, ctx);
-                }});
-		} else {
-			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-			Object element = selection.getFirstElement();
-			TreeViewer viewer = (TreeViewer) getViewer();
-			if (viewer.isExpandable(element)) {
-				viewer.setExpandedState(element, !viewer.getExpandedState(element));
-			}
-		}
-	}
-
-	/**
-	 * Get the id of the command invoked when the tree is double-clicked.
-	 * If the id is null, then no command is invoked.
-	 *
-	 * @return The double-click command id.
-	 */
-	protected String getDoubleClickCommandId() {
-	    return null;
-    }
-
-	/*
-	 * (non-Javadoc)
-	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
-	 */
-	@Override
-	public void propertyChange(final PropertyChangeEvent event) {
-		Object object = event.getSource();
-		if (object == viewer.getInput()) {
-			ToolBar toolbar = toolbarManager.getControl();
-			if (!toolbar.isDisposed()) {
-				Display display = toolbar.getDisplay();
-				if (display.getThread() == Thread.currentThread()) {
-					IContributionItem[] items = toolbarManager.getItems();
-					for (IContributionItem item : items) {
-						item.update();
-					}
-				}
-				else {
-					display.asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							propertyChange(event);
-						}
-					});
-				}
-			}
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.swt.events.FocusListener#focusGained(org.eclipse.swt.events.FocusEvent)
-	 */
-	@Override
-    public void focusGained(FocusEvent e) {
-		propagateSelection();
-    }
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.swt.events.FocusListener#focusLost(org.eclipse.swt.events.FocusEvent)
-	 */
-	@Override
-    public void focusLost(FocusEvent e) {
-    }
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
-	 */
-	@Override
-	public void selectionChanged(SelectionChangedEvent event) {
-		propagateSelection();
-	}
-
-	/**
-	 * Propagate the current selection to the editor's selection provider.
-	 */
-	private void propagateSelection() {
-	    IWorkbenchPart parent = getParentPart();
-		if (parent != null) {
-			IWorkbenchPartSite site = parent.getSite();
-			if (site != null) {
-				ISelection selection = getViewer().getSelection();
-				ISelectionProvider selectionProvider = site.getSelectionProvider();
-				// If the parent control is already disposed, we have no real chance of
-				// testing for it. Catch the SWT exception here just in case.
-				try {
-					selectionProvider.setSelection(selection);
-					if (selectionProvider instanceof MultiPageSelectionProvider) {
-						SelectionChangedEvent changedEvent = new SelectionChangedEvent(selectionProvider, selection);
-						((MultiPageSelectionProvider) selectionProvider).firePostSelectionChanged(changedEvent);
-					}
-				} catch (SWTException e) {
-					/* ignored on purpose */
-				}
-			}
-		}
-    }
 }
