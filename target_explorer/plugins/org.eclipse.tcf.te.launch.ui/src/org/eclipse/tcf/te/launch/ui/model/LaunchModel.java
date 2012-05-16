@@ -71,10 +71,13 @@ public final class LaunchModel implements IEventListener, ILaunchConfigurationLi
 	private final LaunchNode rootNode;
 	private final Object modelRoot;
 
+	private String lastAddedUUID = null;
+
 	/**
 	 * Constructor.
 	 */
 	private LaunchModel(Object modelRoot) {
+		Assert.isNotNull(modelRoot);
 		this.modelRoot = modelRoot;
 		rootNode = new LaunchNode(this);
 		refresh();
@@ -92,8 +95,11 @@ public final class LaunchModel implements IEventListener, ILaunchConfigurationLi
 	public void launchConfigurationRemoved(ILaunchConfiguration configuration) {
 		if (!configuration.isWorkingCopy()) {
 			if (getModelRoot() instanceof ICategory) {
-				Managers.getCategoryManager().remove(((ICategory)getModelRoot()).getId(), getCategoryId(configuration));
+				if (!getCategoryId(configuration).equals(lastAddedUUID)) {
+					Managers.getCategoryManager().remove(((ICategory)getModelRoot()).getId(), getCategoryId(configuration));
+				}
 				nameToUUID.remove(configuration.getName());
+				lastAddedUUID = null;
 			}
 			if (refresh()) {
 				EventManager.getInstance().fireEvent(new ChangeEvent(this, ChangeEvent.ID_REMOVED, null, null));
@@ -118,6 +124,11 @@ public final class LaunchModel implements IEventListener, ILaunchConfigurationLi
 	@Override
 	public void launchConfigurationAdded(ILaunchConfiguration configuration) {
 		if (!configuration.isWorkingCopy()) {
+			if (getModelRoot() instanceof ICategory) {
+				if (Managers.getCategoryManager().belongsTo(((ICategory)getModelRoot()).getId(), getCategoryId(configuration))) {
+					lastAddedUUID = getCategoryId(configuration);
+				}
+			}
 			if (refresh()) {
 				EventManager.getInstance().fireEvent(new ChangeEvent(this, ChangeEvent.ID_ADDED, null, null));
 			}
@@ -208,7 +219,7 @@ public final class LaunchModel implements IEventListener, ILaunchConfigurationLi
 					}
 					else if (parent instanceof IModelNode) {
 						IModelNode[] contexts = LaunchContextsPersistenceDelegate.getLaunchContexts(config);
-						if (contexts == null || contexts.length == 0 || Arrays.asList(contexts).contains(parent)) {
+						if (contexts != null && Arrays.asList(contexts).contains(parent)) {
 							changed |= checkAndAdd(config, (IContainerModelNode)typeNode, configNodes);
 						}
 					}
@@ -250,12 +261,25 @@ public final class LaunchModel implements IEventListener, ILaunchConfigurationLi
 		return false;
 	}
 
-	private IModelNode find(Object data, List<IModelNode> list) {
+	private IModelNode find(ILaunchConfiguration config, List<IModelNode> list) {
 		for (IModelNode candidate : list) {
 			if (candidate instanceof LaunchNode) {
-				if ((data instanceof LaunchNode && ((LaunchNode)candidate).equals(data)) ||
-								(data instanceof ILaunchConfiguration && ((LaunchNode)candidate).equals(new LaunchNode((ILaunchConfiguration)data))) ||
-								(data instanceof ILaunchConfigurationType && ((LaunchNode)candidate).equals(new LaunchNode((ILaunchConfigurationType)data)))) {
+				LaunchNode node = new LaunchNode(config);
+				node.setProperty(LaunchNode.PROPERTY_MODEL, this);
+				if (((LaunchNode)candidate).equals(node)) {
+					return candidate;
+				}
+			}
+		}
+		return null;
+	}
+
+	private IModelNode find(ILaunchConfigurationType type, List<IModelNode> list) {
+		for (IModelNode candidate : list) {
+			if (candidate instanceof LaunchNode) {
+				LaunchNode node = new LaunchNode(type);
+				node.setProperty(LaunchNode.PROPERTY_MODEL, this);
+				if (((LaunchNode)candidate).equals(node)) {
 					return candidate;
 				}
 			}

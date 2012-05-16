@@ -43,13 +43,13 @@ public class LaunchTreeLabelProvider extends LabelProvider implements ILabelDeco
 		if (element instanceof LaunchNode) {
 			Image image = null;
 			LaunchNode node = (LaunchNode)element;
-			if (LaunchNode.TYPE_ROOT.equals(node.getType())) {
+			if (node.isType(LaunchNode.TYPE_ROOT)) {
 				image = UIPlugin.getImage(ImageConsts.OBJ_Launches_Root);
 			}
-			else if (LaunchNode.TYPE_LAUNCH_CONFIG_TYPE.equals(node.getType())) {
+			else if (node.isType(LaunchNode.TYPE_LAUNCH_CONFIG_TYPE)) {
 				image = DebugUITools.getImage(node.getLaunchConfigurationType().getIdentifier());
 			}
-			else if (LaunchNode.TYPE_LAUNCH_CONFIG.equals(node.getType())) {
+			else if (node.isType(LaunchNode.TYPE_LAUNCH_CONFIG)) {
 				try {
 					image = DebugUITools.getImage(node.getLaunchConfiguration().getType().getIdentifier());
 				}

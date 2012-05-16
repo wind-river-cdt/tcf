@@ -121,4 +121,9 @@ public class Messages extends NLS {
 
 	public static String LaunchDialogHandler_dialog_title;
 	public static String LaunchDialogHandler_dialog_message;
+
+	public static String CommonDnD_launchMode_dialog_title;
+	public static String CommonDnD_launchMode_dialog_message;
+	public static String CommonDnD_launchType_dialog_title;
+	public static String CommonDnD_launchType_dialog_message;
 }

@@ -28,7 +28,7 @@ public class LastLaunchedColumnLabelProvider extends LabelProvider {
 	 */
 	@Override
 	public String getText(Object element) {
-		if (element instanceof LaunchNode && (LaunchNode.TYPE_LAUNCH_CONFIG.equals(((LaunchNode)element).getType()))) {
+		if (element instanceof LaunchNode && (((LaunchNode)element).isType(LaunchNode.TYPE_LAUNCH_CONFIG))) {
 			try {
 				String lastLaunched = DefaultPersistenceDelegate.getAttribute(((LaunchNode)element).getLaunchConfiguration(), ICommonLaunchAttributes.ATTR_LAST_LAUNCHED, (String)null);
 				if (lastLaunched != null) {

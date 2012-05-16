@@ -218,11 +218,7 @@ public class LaunchManager extends PlatformObject {
 								.equals(launchConfigTypeId)) {
 					try {
 						// create the launch configuration working copy instance
-						wc = launchConfigType.newInstance(null, DebugPlugin
-										.getDefault()
-										.getLaunchManager()
-										.generateLaunchConfigurationName(launchSpec
-														.getLaunchConfigName()));
+						wc = launchConfigType.newInstance(null, LaunchConfigHelper.getUniqueLaunchConfigName(launchSpec.getLaunchConfigName()));
 						// initialize the launch configuration working copy
 						delegate.initLaunchConfigAttributes(wc, launchSpec);
 						// and save the launch configuration
@@ -420,18 +416,4 @@ public class LaunchManager extends PlatformObject {
 			throw new LaunchServiceException(e);
 		}
 	}
-
-	/**
-	 * Remove all illegal characters in the launch configuration name candidate.
-	 *
-	 * @param candidate The launch configuration name candidate.
-	 * @return The unified launch configuration name.
-	 */
-	public static String getUnifiedLaunchConfigName(String candidate) {
-		if (candidate != null) {
-			candidate = candidate.replaceAll("[/\\\"&?:@*]", "_"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		return candidate;
-	}
-
 }

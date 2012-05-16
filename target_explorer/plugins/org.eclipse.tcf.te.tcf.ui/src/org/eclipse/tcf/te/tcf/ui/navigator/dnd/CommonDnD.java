@@ -72,11 +72,13 @@ public class CommonDnD {
 		if (target instanceof ICategory) {
 			ICategory hovered = (ICategory) target;
 			if (IUIConstants.ID_CAT_FAVORITES.equals(hovered.getId())
-					|| IUIConstants.ID_CAT_MY_TARGETS.equals(hovered.getId())) {
+							|| IUIConstants.ID_CAT_MY_TARGETS.equals(hovered.getId())) {
 				Iterator<?> iterator = selection.iterator();
 				while (iterator.hasNext()) {
 					Object element = iterator.next();
-					if (!(element instanceof IPeerModel)) continue;
+					if (!isDraggableObject(element)) {
+						continue;
+					}
 					Managers.getCategoryManager().add(hovered.getId(), ((IPeerModel)element).getPeerId());
 				}
 				// Fire a refresh of the view
@@ -86,7 +88,9 @@ public class CommonDnD {
 			Iterator<?> iterator = selection.iterator();
 			while (iterator.hasNext()) {
 				Object element = iterator.next();
-				if (!(element instanceof IPeerModel)) continue;
+				if (!isDraggableObject(element)) {
+					continue;
+				}
 
 				// To determine the parent category, we have to look at the tree path
 				TreePath[] pathes = selection instanceof TreeSelection ? ((TreeSelection)selection).getPathsFor(element) : null;
@@ -139,16 +143,29 @@ public class CommonDnD {
 		IStructuredSelection selection = (IStructuredSelection) transfer.getSelection();
 
 		if (target instanceof ICategory) {
-			ICategory hovered = (ICategory) target;
+			ICategory category = (ICategory) target;
 
 			// Dragging to the "Neighborhood" category is not possible
-			if (!IUIConstants.ID_CAT_NEIGHBORHOOD.equals(hovered.getId())) {
-				valid = true;
+			if (!IUIConstants.ID_CAT_NEIGHBORHOOD.equals(category.getId())) {
+				boolean allow = true;
+				Iterator<?> iterator = selection.iterator();
+				while (iterator.hasNext()) {
+					Object element = iterator.next();
+					if (!isDraggableObject(element)) {
+						allow = false;
+						break;
+					}
+					if (Managers.getCategoryManager().belongsTo(category.getId(), ((IPeerModel)element).getPeerId())) {
+						allow = false;
+						break;
+					}
+				}
+				valid = allow;
 
 				// If the target is the "Favorites" or the "My Targets" category,
 				// force DROP_LINK operation
-				if ((IUIConstants.ID_CAT_FAVORITES.equals(hovered.getId()) || IUIConstants.ID_CAT_MY_TARGETS.equals(hovered.getId()))
-						&& (operation & DND.DROP_LINK) == 0) {
+				if ((IUIConstants.ID_CAT_FAVORITES.equals(category.getId()) || IUIConstants.ID_CAT_MY_TARGETS.equals(category.getId()))
+								&& (operation & DND.DROP_LINK) == 0) {
 					overrideOperation = DND.DROP_LINK;
 				}
 			}
@@ -159,21 +176,42 @@ public class CommonDnD {
 			Iterator<?> iterator = selection.iterator();
 			while (iterator.hasNext()) {
 				Object element = iterator.next();
-				if (!(element instanceof IPeerModel)) {
+				if (!isDraggableObject(element)) {
 					allow = false;
 					break;
 				}
-				if (!Managers.getCategoryManager().belongsTo(IUIConstants.ID_CAT_FAVORITES, ((IPeerModel)element).getPeerId())
-						&& !Managers.getCategoryManager().belongsTo(IUIConstants.ID_CAT_MY_TARGETS, ((IPeerModel)element).getPeerId())) {
-					allow = false;
-					break;
+
+				// To determine the parent category, we have to look at the tree path
+				TreePath[] pathes = selection instanceof TreeSelection ? ((TreeSelection)selection).getPathsFor(element) : null;
+				if (pathes != null && pathes.length > 0) {
+					for (TreePath path : pathes) {
+						ICategory category = null;
+						TreePath parentPath = path.getParentPath();
+						while (parentPath != null) {
+							if (parentPath.getLastSegment() instanceof ICategory) {
+								category = (ICategory)parentPath.getLastSegment();
+								break;
+							}
+							parentPath = parentPath.getParentPath();
+						}
+
+						if (category == null || IUIConstants.ID_CAT_NEIGHBORHOOD.equals(category.getId())) {
+							allow = false;
+							break;
+						}
+					}
 				}
 			}
 			valid = allow;
 		}
 
-		if (overrideOperation != -1 && dropAdapter != null) {
-			dropAdapter.overrideOperation(overrideOperation);
+		if (dropAdapter != null) {
+			if (!valid) {
+				dropAdapter.overrideOperation(DND.DROP_NONE);
+			}
+			else if (overrideOperation != -1) {
+				dropAdapter.overrideOperation(overrideOperation);
+			}
 		}
 
 		return valid;

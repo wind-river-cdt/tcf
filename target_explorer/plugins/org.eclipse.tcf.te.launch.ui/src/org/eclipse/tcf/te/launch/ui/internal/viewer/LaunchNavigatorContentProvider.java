@@ -52,9 +52,9 @@ public class LaunchNavigatorContentProvider extends TreeContentProvider implemen
 		if (element instanceof LaunchNode) {
 			LaunchNode node = (LaunchNode)element;
 			if (node.getParent() == null ||
-							LaunchNode.TYPE_ROOT.equals(node.getType()) ||
-							(!isTypeNodeVisible() && LaunchNode.TYPE_LAUNCH_CONFIG.equals(node.getType())) ||
-							(!isRootNodeVisible() && LaunchNode.TYPE_LAUNCH_CONFIG_TYPE.equals(node.getType()))) {
+							node.isType(LaunchNode.TYPE_ROOT) ||
+							(!isTypeNodeVisible() && node.isType(LaunchNode.TYPE_LAUNCH_CONFIG)) ||
+							(!isRootNodeVisible() && node.isType(LaunchNode.TYPE_LAUNCH_CONFIG_TYPE))) {
 				return node.getModel().getModelRoot();
 			}
 
@@ -126,7 +126,7 @@ public class LaunchNavigatorContentProvider extends TreeContentProvider implemen
 				node.getModel();
 			}
 			List<IModelNode> children = new ArrayList<IModelNode>();
-			if (LaunchNode.TYPE_ROOT.equals(node.getType())) {
+			if (node.isType(LaunchNode.TYPE_ROOT)) {
 				if (isTypeNodeVisible()) {
 					// return all type nodes of the model
 					if (isEmptyTypeNodeVisible()) {
@@ -170,7 +170,7 @@ public class LaunchNavigatorContentProvider extends TreeContentProvider implemen
 		if (element instanceof LaunchNode) {
 			LaunchNode node = (LaunchNode)element;
 			List<IModelNode> children = new ArrayList<IModelNode>();
-			if (LaunchNode.TYPE_ROOT.equals(node.getType())) {
+			if (node.isType(LaunchNode.TYPE_ROOT)) {
 				if (isTypeNodeVisible()) {
 					// return all type nodes of the model
 					if (isEmptyTypeNodeVisible()) {

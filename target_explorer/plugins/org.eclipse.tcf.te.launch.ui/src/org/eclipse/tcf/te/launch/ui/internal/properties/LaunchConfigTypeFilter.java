@@ -26,7 +26,7 @@ public class LaunchConfigTypeFilter implements IFilter {
 		if (toTest instanceof LaunchNode) {
 			LaunchNode node = (LaunchNode)toTest;
 			try {
-				return LaunchNode.TYPE_LAUNCH_CONFIG_TYPE.equals(node.getType());
+				return node.isType(LaunchNode.TYPE_LAUNCH_CONFIG_TYPE);
 			}
 			catch (Exception e) {
 			}

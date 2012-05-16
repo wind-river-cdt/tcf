@@ -30,12 +30,12 @@ public class LaunchNodePropertyTester extends PropertyTester {
 		if (receiver instanceof LaunchNode) {
 			LaunchNode node = (LaunchNode)receiver;
 			if (property.equals("isLaunchConfigType")) { //$NON-NLS-1$
-				if (LaunchNode.TYPE_LAUNCH_CONFIG_TYPE.equals(node.getType())) {
+				if (node.isType(LaunchNode.TYPE_LAUNCH_CONFIG_TYPE)) {
 					return expectedValue == null || expectedValue.equals(node.getLaunchConfigurationType().getIdentifier());
 				}
 			}
 			else if (property.equals("isLaunchConfig")) { //$NON-NLS-1$
-				return LaunchNode.TYPE_LAUNCH_CONFIG.equals(node.getType());
+				return node.isType(LaunchNode.TYPE_LAUNCH_CONFIG);
 			}
 			else if (property.equals("canDelete")) { //$NON-NLS-1$
 				return deleteHandler.canDelete(receiver);

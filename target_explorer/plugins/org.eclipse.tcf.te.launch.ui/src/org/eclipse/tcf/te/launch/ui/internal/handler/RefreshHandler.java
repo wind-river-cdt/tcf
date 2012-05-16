@@ -19,6 +19,8 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.tcf.te.launch.ui.model.LaunchModel;
 import org.eclipse.tcf.te.launch.ui.model.LaunchNode;
+import org.eclipse.tcf.te.runtime.events.ChangeEvent;
+import org.eclipse.tcf.te.runtime.events.EventManager;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
@@ -68,7 +70,9 @@ public class RefreshHandler extends AbstractHandler {
 		if (element instanceof LaunchNode) {
 			LaunchNode node = (LaunchNode)element;
 			LaunchModel model = node.getModel();
-			model.refresh();
+			if (model.refresh()) {
+				EventManager.getInstance().fireEvent(new ChangeEvent(this, ChangeEvent.ID_CHANGED, null, null));
+			}
 		}
 	}
 }

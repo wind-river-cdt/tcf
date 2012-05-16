@@ -53,7 +53,7 @@ public class LaunchSpecification extends PlatformObject implements ILaunchSpecif
 	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification#getLaunchConfigurationTypeId()
 	 */
 	@Override
-    public String getLaunchConfigurationTypeId() {
+	public String getLaunchConfigurationTypeId() {
 		return typeId;
 	}
 
@@ -61,7 +61,7 @@ public class LaunchSpecification extends PlatformObject implements ILaunchSpecif
 	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification#getLaunchMode()
 	 */
 	@Override
-    public String getLaunchMode() {
+	public String getLaunchMode() {
 		return mode;
 	}
 
@@ -69,7 +69,7 @@ public class LaunchSpecification extends PlatformObject implements ILaunchSpecif
 	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification#isReadOnly()
 	 */
 	@Override
-    public boolean isReadOnly() {
+	public boolean isReadOnly() {
 		return readOnly;
 	}
 
@@ -77,7 +77,7 @@ public class LaunchSpecification extends PlatformObject implements ILaunchSpecif
 	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification#setReadOnly(boolean)
 	 */
 	@Override
-    public void setReadOnly(boolean readOnly) {
+	public void setReadOnly(boolean readOnly) {
 		this.readOnly = readOnly;
 	}
 
@@ -85,7 +85,7 @@ public class LaunchSpecification extends PlatformObject implements ILaunchSpecif
 	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification#addAttribute(java.lang.String, java.lang.Object)
 	 */
 	@Override
-    public void addAttribute(String key, Object value) {
+	public void addAttribute(String key, Object value) {
 		addAttribute(key, value, false);
 	}
 
@@ -93,10 +93,12 @@ public class LaunchSpecification extends PlatformObject implements ILaunchSpecif
 	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification#addAttribute(java.lang.String, java.lang.Object, boolean)
 	 */
 	@Override
-    public void addAttribute(String key, Object value, boolean createOnly) {
+	public void addAttribute(String key, Object value, boolean createOnly) {
 		Assert.isNotNull(key);
 
-		if (isReadOnly()) return;
+		if (isReadOnly()) {
+			return;
+		}
 
 		// Attention: If the value == null -> remove the key from the map!!!
 		if (value != null) {
@@ -111,7 +113,7 @@ public class LaunchSpecification extends PlatformObject implements ILaunchSpecif
 	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification#hasAttribute(java.lang.String)
 	 */
 	@Override
-    public boolean hasAttribute(String key) {
+	public boolean hasAttribute(String key) {
 		Assert.isNotNull(key);
 		return attributes.containsKey(key);
 	}
@@ -120,9 +122,11 @@ public class LaunchSpecification extends PlatformObject implements ILaunchSpecif
 	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification#removeAttribute(java.lang.String)
 	 */
 	@Override
-    public Object removeAttribute(String key) {
+	public Object removeAttribute(String key) {
 		Assert.isNotNull(key);
-		if (isReadOnly()) return null;
+		if (isReadOnly()) {
+			return null;
+		}
 		return attributes.remove(key);
 	}
 
@@ -130,7 +134,7 @@ public class LaunchSpecification extends PlatformObject implements ILaunchSpecif
 	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification#isCreateOnlyAttribute(java.lang.String)
 	 */
 	@Override
-    public boolean isCreateOnlyAttribute(String key) {
+	public boolean isCreateOnlyAttribute(String key) {
 		Assert.isNotNull(key);
 		ILaunchAttribute attribute = getAttribute(key);
 		return attribute != null && attribute.isCreateOnlyAttribute();
@@ -140,7 +144,7 @@ public class LaunchSpecification extends PlatformObject implements ILaunchSpecif
 	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification#getAttribute(java.lang.String, java.lang.Object)
 	 */
 	@Override
-    public Object getAttribute(String key, Object defaultValue) {
+	public Object getAttribute(String key, Object defaultValue) {
 		Assert.isNotNull(key);
 		ILaunchAttribute attribute = getAttribute(key);
 		return (attribute != null && attribute.getValue() != null) ? attribute.getValue() : defaultValue;
@@ -150,7 +154,7 @@ public class LaunchSpecification extends PlatformObject implements ILaunchSpecif
 	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification#clear()
 	 */
 	@Override
-    public void clear() {
+	public void clear() {
 		if (isReadOnly()) {
 			return;
 		}
@@ -161,7 +165,7 @@ public class LaunchSpecification extends PlatformObject implements ILaunchSpecif
 	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification#size()
 	 */
 	@Override
-    public int size() {
+	public int size() {
 		return attributes.size();
 	}
 
@@ -169,7 +173,7 @@ public class LaunchSpecification extends PlatformObject implements ILaunchSpecif
 	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification#isEmpty()
 	 */
 	@Override
-    public boolean isEmpty() {
+	public boolean isEmpty() {
 		return attributes.isEmpty();
 	}
 
@@ -177,7 +181,7 @@ public class LaunchSpecification extends PlatformObject implements ILaunchSpecif
 	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification#getAttribute(java.lang.String)
 	 */
 	@Override
-    public ILaunchAttribute getAttribute(String key) {
+	public ILaunchAttribute getAttribute(String key) {
 		Assert.isNotNull(key);
 		return attributes.get(key);
 	}
@@ -186,7 +190,7 @@ public class LaunchSpecification extends PlatformObject implements ILaunchSpecif
 	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification#getAllAttributes()
 	 */
 	@Override
-    public ILaunchAttribute[] getAllAttributes() {
+	public ILaunchAttribute[] getAllAttributes() {
 		return attributes.values().toArray(new ILaunchAttribute[attributes.size()]);
 	}
 
@@ -194,7 +198,7 @@ public class LaunchSpecification extends PlatformObject implements ILaunchSpecif
 	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification#getLaunchActionLabel()
 	 */
 	@Override
-    public String getLaunchActionLabel() {
+	public String getLaunchActionLabel() {
 		return launchActionLabel;
 	}
 
@@ -202,7 +206,7 @@ public class LaunchSpecification extends PlatformObject implements ILaunchSpecif
 	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification#getLaunchConfigName()
 	 */
 	@Override
-    public String getLaunchConfigName() {
+	public String getLaunchConfigName() {
 		return launchConfigName != null ? launchConfigName : Messages.DefaultLaunchManagerDelegate_defaultLaunchName;
 	}
 
@@ -210,7 +214,7 @@ public class LaunchSpecification extends PlatformObject implements ILaunchSpecif
 	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification#setLaunchActionLabel(java.lang.String)
 	 */
 	@Override
-    public void setLaunchActionLabel(String launchActionLabel) {
+	public void setLaunchActionLabel(String launchActionLabel) {
 		this.launchActionLabel = launchActionLabel;
 	}
 
@@ -218,15 +222,15 @@ public class LaunchSpecification extends PlatformObject implements ILaunchSpecif
 	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification#setLaunchConfigName(java.lang.String)
 	 */
 	@Override
-    public void setLaunchConfigName(String launchConfigName) {
-		this.launchConfigName = LaunchManager.getUnifiedLaunchConfigName(launchConfigName);
+	public void setLaunchConfigName(String launchConfigName) {
+		this.launchConfigName = LaunchConfigHelper.getUniqueLaunchConfigName(launchConfigName);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification#isValid()
 	 */
 	@Override
-    public boolean isValid() {
+	public boolean isValid() {
 		return valid;
 	}
 
@@ -234,7 +238,7 @@ public class LaunchSpecification extends PlatformObject implements ILaunchSpecif
 	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification#setIsValid(boolean)
 	 */
 	@Override
-    public void setIsValid(boolean valid) {
+	public void setIsValid(boolean valid) {
 		this.valid = valid;
 		if (valid) {
 			errorMessage = null;
@@ -245,7 +249,7 @@ public class LaunchSpecification extends PlatformObject implements ILaunchSpecif
 	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification#getErrorMessage()
 	 */
 	@Override
-    public String getErrorMessage() {
+	public String getErrorMessage() {
 		if (!isValid()) {
 			return errorMessage;
 		}
@@ -256,7 +260,7 @@ public class LaunchSpecification extends PlatformObject implements ILaunchSpecif
 	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification#setErrorMessage(java.lang.String)
 	 */
 	@Override
-    public void setErrorMessage(String errorMessage) {
+	public void setErrorMessage(String errorMessage) {
 		this.errorMessage = errorMessage;
 	}
 }

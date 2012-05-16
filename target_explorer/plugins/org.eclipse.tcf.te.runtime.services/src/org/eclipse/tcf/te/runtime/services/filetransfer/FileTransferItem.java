@@ -28,6 +28,12 @@ public class FileTransferItem extends PropertiesContainer implements IFileTransf
 		setProperty(PROPERTY_DIRECTION, HOST_TO_TARGET);
 	}
 
+	public FileTransferItem(IPath fromHost, IPath toTarget) {
+		this();
+		setProperty(PROPERTY_HOST, fromHost.toPortableString());
+		setProperty(PROPERTY_TARGET, toTarget.toPortableString());
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IFileTransferItem#isEnabled()
 	 */

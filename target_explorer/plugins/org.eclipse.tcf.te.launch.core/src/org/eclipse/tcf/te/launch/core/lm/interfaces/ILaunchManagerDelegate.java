@@ -10,7 +10,6 @@
 package org.eclipse.tcf.te.launch.core.lm.interfaces;
 
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.tcf.te.launch.core.exceptions.LaunchServiceException;
 import org.eclipse.tcf.te.launch.core.selection.interfaces.ILaunchSelection;
@@ -72,6 +71,16 @@ public interface ILaunchManagerDelegate extends IExecutableExtension {
 	public void updateLaunchConfigAttributes(ILaunchConfigurationWorkingCopy wc, ILaunchSpecification launchSpec);
 
 	/**
+	 * Updates a launch configuration with the given selection context.
+	 * 
+	 * @param wc The launch configuration working copy.
+	 * @param selContext The selection context to use for the update.
+	 * @param replace <code>true</code> if existing attribute values should be replaced,
+	 *                <code>false</code> if data from the selection context should be added to existing values.
+	 */
+	public void updateLaunchConfig(ILaunchConfigurationWorkingCopy wc, ISelectionContext selContext, boolean replace);
+
+	/**
 	 * Test the specified attribute if or if not the specified attribute value is an default value or not.
 	 *
 	 * @param attributeKey The attribute key/name. Must not be <code>null</code>.
@@ -104,6 +113,14 @@ public interface ILaunchManagerDelegate extends IExecutableExtension {
 	 * @return The default launch configuration name.
 	 */
 	public String getDefaultLaunchName(ILaunchSpecification launchSpec);
+
+	/**
+	 * Get the default launch configuration name.
+	 *
+	 * @param launchConfig The launch configuration to create a default name for the launch config. Must not be <code>null</code>.
+	 * @return The default launch configuration name.
+	 */
+	public String getDefaultLaunchName(ILaunchConfiguration launchConfig);
 
 	/**
 	 * Get a launch specification with all needed attributes for this delegate taken from the selection to find or create a new
@@ -142,25 +159,6 @@ public interface ILaunchManagerDelegate extends IExecutableExtension {
 	public boolean showLaunchDialog(int situation);
 
 	/**
-	 * Returns true, if the launch dialog should only show the given launch configuration (no launch configuration type tree).
-	 */
-	public boolean showLaunchConfigOnly();
-
-	/**
-	 * Returns <code>true</code> if a dialog should pop up when at least one matching
-	 * launch configuration was found.
-	 * If <code>false</code> is returned, the first matching launch configuration will be used.
-	 *
-	 * @param type The launch configuration type to check.
-	 */
-	public boolean showLaunchConfigSelectionDialog(ILaunchConfigurationType type, ILaunchConfiguration[] launchConfigs);
-
-	/**
-	 * Returns the error message when not valid, otherwise <code>null</code>.
-	 */
-	public String getErrorMessage();
-
-	/**
 	 * Return <code>true</code> if the two selection contexts are equal
 	 * for this launch configuration type.
 	 *
@@ -170,11 +168,6 @@ public interface ILaunchManagerDelegate extends IExecutableExtension {
 	 * @return <code>True</code> if the two selection contexts are equal for this launch configuration type, <code>false</code> otherwise.
 	 */
 	public boolean equals(ISelectionContext ctx1, ISelectionContext ctx2);
-
-	/**
-	 * Return <code>true</code> if a default connection should be used when the connection selection is empty.
-	 */
-	public boolean useDefaultConnection();
 
 	/**
 	 * Get a short description for the given launch configuration.

@@ -27,7 +27,7 @@ public class FileTransferFilter implements IFilter {
 		if (toTest instanceof LaunchNode) {
 			LaunchNode node = (LaunchNode)toTest;
 			try {
-				return LaunchNode.TYPE_LAUNCH_CONFIG.equals(node.getType()) &&
+				return node.isType(LaunchNode.TYPE_LAUNCH_CONFIG) &&
 								node.getLaunchConfiguration().getAttribute(IFileTransferLaunchAttributes.ATTR_FILE_TRANSFERS, (String)null) != null;
 			}
 			catch (Exception e) {

@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.tcf.te.launch.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.launch.core.bindings.LaunchConfigTypeBindingsManager;
@@ -54,11 +53,6 @@ import org.eclipse.tcf.te.runtime.services.interfaces.filetransfer.IFileTransfer
  * Default launch manager delegate implementation.
  */
 public class DefaultLaunchManagerDelegate extends ExecutableExtension implements ILaunchManagerDelegate {
-	protected final static int NO_MATCH = 0;
-	protected final static int PARTIAL_MATCH = 1;
-	protected final static int FULL_MATCH = 2;
-
-	protected String errorMessage = null;
 
 	/**
 	 * Constructor.
@@ -95,6 +89,15 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 		}
 
 		validateLaunchSpecification(launchSpec);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchManagerDelegate#updateLaunchConfig(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy, org.eclipse.tcf.te.launch.core.selection.interfaces.ISelectionContext, boolean)
+	 */
+	@Override
+	public void updateLaunchConfig(ILaunchConfigurationWorkingCopy wc, ISelectionContext selContext, boolean replace) {
+		Assert.isNotNull(wc);
+		Assert.isNotNull(selContext);
 	}
 
 	@Override
@@ -216,9 +219,14 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 	 */
 	@Override
 	public String getDefaultLaunchName(ILaunchSpecification launchSpec) {
-		if (launchSpec.getLaunchConfigName() != null) {
-			return launchSpec.getLaunchConfigName();
-		}
+		return Messages.DefaultLaunchManagerDelegate_defaultLaunchName;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchManagerDelegate#getDefaultLaunchName(org.eclipse.debug.core.ILaunchConfiguration)
+	 */
+	@Override
+	public String getDefaultLaunchName(ILaunchConfiguration launchConfig) {
 		return Messages.DefaultLaunchManagerDelegate_defaultLaunchName;
 	}
 
@@ -577,7 +585,7 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 	 * @see #getAttributeRanking(String)
 	 */
 	protected int getFullMatchRanking() {
-		return 0;
+		return 1;
 	}
 
 	/**
@@ -747,47 +755,11 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchManagerDelegate#showLaunchConfigOnly()
-	 */
-	@Override
-	public boolean showLaunchConfigOnly() {
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchManagerDelegate#showLaunchConfigSelectionDialog(org.eclipse.debug.core.ILaunchConfigurationType, org.eclipse.debug.core.ILaunchConfiguration[])
-	 */
-	@Override
-	public boolean showLaunchConfigSelectionDialog(ILaunchConfigurationType type, ILaunchConfiguration[] launchConfigs) {
-		if (type != null) {
-			String key = type.getIdentifier() + ".hideLaunchConfigSelectionDialog"; //$NON-NLS-1$
-			return !CoreBundleActivator.getScopedPreferences().getBoolean(key);
-		}
-		return true;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchManagerDelegate#getErrorMessage()
-	 */
-	@Override
-	public String getErrorMessage() {
-		return errorMessage;
-	}
-
-	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchManagerDelegate#equals(org.eclipse.tcf.te.launch.core.selection.interfaces.ISelectionContext, org.eclipse.tcf.te.launch.core.selection.interfaces.ISelectionContext)
 	 */
 	@Override
 	public boolean equals(ISelectionContext ctx1, ISelectionContext ctx2) {
 		return (ctx1 == null && ctx2 == null) || (ctx1 != null && ctx1.equals(ctx2));
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchManagerDelegate#useDefaultConnection()
-	 */
-	@Override
-	public boolean useDefaultConnection() {
-		return true;
 	}
 
 	@Override

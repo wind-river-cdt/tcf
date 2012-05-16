@@ -27,7 +27,7 @@ public class LaunchContextFilter implements IFilter {
 		if (toTest instanceof LaunchNode) {
 			LaunchNode node = (LaunchNode)toTest;
 			try {
-				return LaunchNode.TYPE_LAUNCH_CONFIG.equals(node.getType()) &&
+				return node.isType(LaunchNode.TYPE_LAUNCH_CONFIG) &&
 								node.getLaunchConfiguration().getAttribute(ILaunchContextLaunchAttributes.ATTR_LAUNCH_CONTEXTS, (String)null) != null;
 			}
 			catch (Exception e) {

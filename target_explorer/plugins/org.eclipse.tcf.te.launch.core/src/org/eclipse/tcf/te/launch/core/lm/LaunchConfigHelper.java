@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.ILaunchMode;
@@ -24,6 +25,15 @@ import org.eclipse.debug.core.ILaunchMode;
  * Static launch configuration utility implementations.
  */
 public class LaunchConfigHelper {
+
+	/**
+	 * Generate a unique launch config name.
+	 * @param name The suggested name.
+	 * @return The unique name.
+	 */
+	public static String getUniqueLaunchConfigName(String name) {
+		return DebugPlugin.getDefault().getLaunchManager().generateLaunchConfigurationName(name);
+	}
 
 	/**
 	 * Get a sorted list of all launch modes for the given launch configuration type.
@@ -95,10 +105,18 @@ public class LaunchConfigHelper {
 		Arrays.sort(launchModes, new Comparator<String>() {
 			@Override
 			public int compare(String o1, String o2) {
-				if (o1.equals(ILaunchManager.RUN_MODE) && !o2.equals(ILaunchManager.RUN_MODE)) return reverse ? 1 : -1;
-				if (o2.equals(ILaunchManager.RUN_MODE) && !o1.equals(ILaunchManager.RUN_MODE)) return reverse ? -1 : 1;
-				if (o1.equals(ILaunchManager.DEBUG_MODE) && !o2.equals(ILaunchManager.DEBUG_MODE)) return reverse ? 1 : -1;
-				if (o2.equals(ILaunchManager.DEBUG_MODE) && !o1.equals(ILaunchManager.DEBUG_MODE)) return reverse ? -1 : 1;
+				if (o1.equals(ILaunchManager.RUN_MODE) && !o2.equals(ILaunchManager.RUN_MODE)) {
+					return reverse ? 1 : -1;
+				}
+				if (o2.equals(ILaunchManager.RUN_MODE) && !o1.equals(ILaunchManager.RUN_MODE)) {
+					return reverse ? -1 : 1;
+				}
+				if (o1.equals(ILaunchManager.DEBUG_MODE) && !o2.equals(ILaunchManager.DEBUG_MODE)) {
+					return reverse ? 1 : -1;
+				}
+				if (o2.equals(ILaunchManager.DEBUG_MODE) && !o1.equals(ILaunchManager.DEBUG_MODE)) {
+					return reverse ? -1 : 1;
+				}
 				return reverse ? o2.compareTo(o1) : o1.compareTo(o2);
 			}
 		});

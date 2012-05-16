@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.tcf.te.launch.core.lm.LaunchConfigHelper;
@@ -31,7 +32,9 @@ public class LaunchNode extends ContainerModelNode {
 	public static final String TYPE_LAUNCH_CONFIG_TYPE = "launchConfigType"; //$NON-NLS-1$
 	public static final String TYPE_LAUNCH_CONFIG = "launchConfig"; //$NON-NLS-1$
 
-	private static final String PROPERTY_MODEL = "model"; //$NON-NLS-1$
+	protected static final String PROPERTY_LAUNCH_CONFIG_TYPE = TYPE_LAUNCH_CONFIG_TYPE;
+	protected static final String PROPERTY_LAUNCH_CONFIG = TYPE_LAUNCH_CONFIG;
+	protected static final String PROPERTY_MODEL = "model"; //$NON-NLS-1$
 
 	private LaunchNode(String type) {
 		super();
@@ -45,18 +48,21 @@ public class LaunchNode extends ContainerModelNode {
 
 	public LaunchNode(ILaunchConfiguration config) {
 		this(TYPE_LAUNCH_CONFIG);
-		setProperty(TYPE_LAUNCH_CONFIG, config);
+		setProperty(PROPERTY_LAUNCH_CONFIG, config);
 	}
 
 	public LaunchNode(ILaunchConfigurationType configType) {
 		this(TYPE_LAUNCH_CONFIG_TYPE);
-		setProperty(TYPE_LAUNCH_CONFIG_TYPE, configType);
+		setProperty(PROPERTY_LAUNCH_CONFIG_TYPE, configType);
 	}
 
-	public String getType() {
-		return getStringProperty(IModelNode.PROPERTY_TYPE);
+	public boolean isType(String type) {
+		return type.equals(getStringProperty(IModelNode.PROPERTY_TYPE));
 	}
 
+	/**
+	 * Return the model for this node. Must not be <code>null</code>.
+	 */
 	public LaunchModel getModel() {
 		LaunchModel model = (LaunchModel)getProperty(PROPERTY_MODEL);
 		IModelNode parent = getParent();
@@ -66,16 +72,20 @@ public class LaunchNode extends ContainerModelNode {
 			parent = parent.getParent();
 		}
 
+		Assert.isNotNull(model);
 		return model;
 	}
 
+	/**
+	 * Return the launch confuration for this node or <code>null</code>.
+	 */
 	public ILaunchConfiguration getLaunchConfiguration() {
-		if (TYPE_LAUNCH_CONFIG.equals(getType())) {
-			return (ILaunchConfiguration)getProperty(TYPE_LAUNCH_CONFIG);
-		}
-		return null;
+		return (ILaunchConfiguration)getProperty(PROPERTY_LAUNCH_CONFIG);
 	}
 
+	/**
+	 * Return the launch configuration type for this launch node or <code>null</code>.
+	 */
 	public ILaunchConfigurationType getLaunchConfigurationType() {
 		if (getLaunchConfiguration() != null) {
 			try {
@@ -84,13 +94,10 @@ public class LaunchNode extends ContainerModelNode {
 			catch (Exception e) {
 			}
 		}
-		else if (TYPE_LAUNCH_CONFIG.equals(getType())) {
+		else if (isType(TYPE_LAUNCH_CONFIG)) {
 			return ((LaunchNode)getParent()).getLaunchConfigurationType();
 		}
-		else if (TYPE_LAUNCH_CONFIG_TYPE.equals(getType())) {
-			return (ILaunchConfigurationType)getProperty(TYPE_LAUNCH_CONFIG_TYPE);
-		}
-		return null;
+		return (ILaunchConfigurationType)getProperty(PROPERTY_LAUNCH_CONFIG_TYPE);
 	}
 
 	/* (non-Javadoc)
@@ -98,13 +105,13 @@ public class LaunchNode extends ContainerModelNode {
 	 */
 	@Override
 	public String getName() {
-		if (TYPE_ROOT.equals(getType())) {
+		if (isType(TYPE_ROOT)) {
 			return "Launches"; //$NON-NLS-1$
 		}
-		else if (TYPE_LAUNCH_CONFIG_TYPE.equals(getType())) {
+		else if (isType(TYPE_LAUNCH_CONFIG_TYPE)) {
 			return getLaunchConfigurationType().getName();
 		}
-		else if (TYPE_LAUNCH_CONFIG.equals(getType())) {
+		else if (isType(TYPE_LAUNCH_CONFIG)) {
 			return getLaunchConfiguration().getName();
 		}
 		return super.getName();
@@ -115,19 +122,26 @@ public class LaunchNode extends ContainerModelNode {
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof LaunchNode && getType() != null && getType().equals(((LaunchNode)obj).getType())) {
-			if (TYPE_LAUNCH_CONFIG_TYPE.equals(getType())) {
-				return getLaunchConfigurationType().equals(((LaunchNode)obj).getLaunchConfigurationType());
-			}
-			else if (TYPE_LAUNCH_CONFIG.equals(getType())) {
-				return getLaunchConfiguration().equals(((LaunchNode)obj).getLaunchConfiguration());
+		if (obj instanceof LaunchNode && isType(((LaunchNode)obj).getStringProperty(PROPERTY_TYPE))) {
+			if (getModel().getModelRoot().equals(((LaunchNode)obj).getModel().getModelRoot())) {
+				if (isType(TYPE_LAUNCH_CONFIG_TYPE)) {
+					return getLaunchConfigurationType().equals(((LaunchNode)obj).getLaunchConfigurationType());
+				}
+				else if (isType(TYPE_LAUNCH_CONFIG)) {
+					return getLaunchConfiguration().equals(((LaunchNode)obj).getLaunchConfiguration());
+				}
 			}
 		}
 		return super.equals(obj);
 	}
 
+	/**
+	 * Check if the launch config node is valid for the given launch mode.
+	 * @param mode The launch mode or <code>null</code> to check for all supported modes;
+	 * @return <code>true</code> if the node is valid for the the given launch mode (or all supported modes if mode is <code>null</code>).
+	 */
 	public boolean isValidFor(String mode) {
-		if (TYPE_LAUNCH_CONFIG.equals(getType())) {
+		if (isType(TYPE_LAUNCH_CONFIG)) {
 			if (getLaunchConfigurationType() == null) {
 				return false;
 			}

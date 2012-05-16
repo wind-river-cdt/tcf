@@ -25,7 +25,7 @@ public class DescriptionColumnLabelProvider extends LabelProvider {
 	 */
 	@Override
 	public String getText(Object element) {
-		if (element instanceof LaunchNode && (LaunchNode.TYPE_LAUNCH_CONFIG.equals(((LaunchNode)element).getType()))) {
+		if (element instanceof LaunchNode && (((LaunchNode)element).isType(LaunchNode.TYPE_LAUNCH_CONFIG))) {
 			String[] modes = LaunchConfigHelper.getLaunchConfigTypeModes(((LaunchNode)element).getLaunchConfigurationType(), false);
 			if (modes != null && modes.length > 0) {
 				ILaunchManagerDelegate delegate = LaunchManager.getInstance().getLaunchManagerDelegate(((LaunchNode)element).getLaunchConfigurationType(), modes[0]);

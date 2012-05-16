@@ -64,7 +64,7 @@ public class DeleteHandler extends AbstractHandler {
 	public boolean canDelete(Object element) {
 		if (element instanceof LaunchNode) {
 			LaunchNode node = (LaunchNode)element;
-			return LaunchNode.TYPE_LAUNCH_CONFIG.equals(node.getType()) &&
+			return node.isType(LaunchNode.TYPE_LAUNCH_CONFIG) &&
 							(node.getModel().getModelRoot() instanceof ICategory || !node.getLaunchConfiguration().isReadOnly());
 		}
 		return false;

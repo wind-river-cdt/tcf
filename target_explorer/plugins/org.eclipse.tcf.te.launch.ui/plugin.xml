@@ -47,6 +47,14 @@
                   isRoot="false"/>
          </includes>
       </viewerContentBinding>
+      <dragAssistant
+            class="org.eclipse.tcf.te.launch.ui.internal.viewer.dnd.DragAssistant"
+            viewerId="org.eclipse.tcf.te.ui.views.View">
+      </dragAssistant>
+      <dragAssistant
+            class="org.eclipse.tcf.te.launch.ui.internal.viewer.dnd.DragAssistant"
+            viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+      </dragAssistant>
    </extension>
    
 <!-- Navigator content contributions -->
@@ -62,9 +70,16 @@
             <instanceof value="org.eclipse.tcf.te.ui.views.interfaces.ICategory"/>
          </triggerPoints>
          <possibleChildren>
-            <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
+            <instanceof value="java.lang.Object"/>
          </possibleChildren>
          <commonSorter class="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchTreeViewerSorter"/>
+         <dropAssistant
+               class="org.eclipse.tcf.te.launch.ui.internal.viewer.dnd.DropAssistant"
+               id="org.eclipse.tcf.te.launch.ui.navigator.dnd">
+            <possibleDropTargets>
+               <instanceof value="java.lang.Object"/>
+            </possibleDropTargets>
+         </dropAssistant>
       </navigatorContent>
    </extension>
 
@@ -81,7 +96,7 @@
             <instanceof value="org.eclipse.core.resources.IProject"/>
          </triggerPoints>
          <possibleChildren>
-            <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
+            <instanceof value="java.lang.Object"/>
          </possibleChildren>
          <commonSorter
                class="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchTreeViewerSorter">
@@ -94,6 +109,13 @@
                <reference definitionId="launch.expressions.isSingleLaunchConfig"/>
             </enablement>
          </actionProvider>
+         <dropAssistant
+               class="org.eclipse.tcf.te.launch.ui.internal.viewer.dnd.DropAssistant"
+               id="org.eclipse.tcf.te.launch.ui.navigator.dnd">
+            <possibleDropTargets>
+               <instanceof value="java.lang.Object"/>
+            </possibleDropTargets>
+         </dropAssistant>
       </navigatorContent>
    </extension>
 
@@ -105,8 +127,29 @@
             contentProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchEditorContentProvider">
          <creation>
             <style name="SWT.FULL_SELECTION"/>
-            <style name="SWT.SINGLE"/>
+            <style name="SWT.MULTI"/>
          </creation>
+         <dragSupport
+               class="org.eclipse.tcf.te.launch.ui.internal.viewer.dnd.DragSourceListener">
+            <operations>
+               <operation name="DND.DROP_COPY"/>
+               <operation name="DND.DROP_MOVE"/>
+               <operation name="DND.DROP_LINK"/>
+            </operations>
+            <transferTypes>
+               <transferType name ="LocalSelectionTransfer"/>
+            </transferTypes>
+         </dragSupport>
+         <dropSupport
+               class="org.eclipse.tcf.te.launch.ui.internal.viewer.dnd.DropTargetListener">
+            <operations>
+               <operation name="DND.DROP_COPY"/>
+               <operation name="DND.DROP_MOVE"/>
+            </operations>
+            <transferTypes>
+               <transferType name ="LocalSelectionTransfer"/>
+            </transferTypes>
+         </dropSupport>
       </viewer>
       <columnContribution viewerId="org.eclipse.tcf.te.launch.ui.viewer.launches">
          <column
@@ -146,7 +189,7 @@
                   id="org.eclipse.tcf.te.launch.ui.views.project.dynamic.new"
                   class="org.eclipse.tcf.te.launch.ui.internal.handler.NewLaunchConfigurationContributionItem">
                <visibleWhen>
-                  <reference definitionId="launch.expressions.isSingleLaunchConfigOrType"/>
+                  <reference definitionId="launch.expressions.isMultiLaunchConfigOrType"/>
                </visibleWhen>
             </dynamic>
          </menu>
@@ -243,7 +286,7 @@
                   id="org.eclipse.tcf.te.launch.ui.views.target.dynamic.new"
                   class="org.eclipse.tcf.te.launch.ui.internal.handler.NewLaunchConfigurationContributionItem">
                <visibleWhen>
-                  <reference definitionId="launch.expressions.isSingleLaunchConfigOrType"/>
+                  <reference definitionId="launch.expressions.isMultiLaunchConfigOrType"/>
                </visibleWhen>
             </dynamic>
          </menu>
@@ -320,7 +363,7 @@
                   id="org.eclipse.tcf.te.launch.ui.editor.dynamic.new"
                   class="org.eclipse.tcf.te.launch.ui.internal.handler.NewLaunchConfigurationContributionItem">
                <visibleWhen>
-                  <reference definitionId="launch.expressions.isSingleLaunchConfigOrType"/>
+                  <reference definitionId="launch.expressions.isMultiLaunchConfigOrType"/>
                </visibleWhen>
             </dynamic>
          </menu>
@@ -617,6 +660,7 @@
             <and>
                <with variable="activePartId">
                   <or>
+                     <equals value="org.eclipse.tcf.te.ui.views.View"/>
                      <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
                      <equals value="org.eclipse.ui.navigator.ProjectExplorer"/>
                   </or>
@@ -638,6 +682,7 @@
          </activeWhen>
          <enabledWhen>
             <with variable="selection">
+               <count value="1"/>
                <iterate 
                      operator="and" 
                      ifEmpty="false">
@@ -662,6 +707,7 @@
          </activeWhen>
          <enabledWhen>
             <with variable="selection">
+               <count value="1"/>
                <iterate 
                      operator="and" 
                      ifEmpty="false">
@@ -774,6 +820,21 @@
       <definition id="launch.expressions.isSingleLaunchConfigOrType">
 	      <with variable="selection">
 	         <count value="1"/>
+	         <iterate
+	               ifEmpty="false"
+	               operator="and">
+	            <and>
+                   <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
+                   <or>
+	                  <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
+	                  <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfigType"/>
+	               </or>
+	            </and>
+	         </iterate>
+	      </with>
+      </definition>
+      <definition id="launch.expressions.isMultiLaunchConfigOrType">
+	      <with variable="selection">
 	         <iterate
 	               ifEmpty="false"
 	               operator="and">

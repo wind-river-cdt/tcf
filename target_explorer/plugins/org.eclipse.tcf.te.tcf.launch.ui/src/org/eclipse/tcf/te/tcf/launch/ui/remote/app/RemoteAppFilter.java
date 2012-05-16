@@ -26,7 +26,7 @@ public class RemoteAppFilter implements IFilter {
 	public boolean select(Object toTest) {
 		if (toTest instanceof LaunchNode) {
 			LaunchNode node = (LaunchNode)toTest;
-			return LaunchNode.TYPE_LAUNCH_CONFIG.equals(node.getType()) &&
+			return node.isType(LaunchNode.TYPE_LAUNCH_CONFIG) &&
 							node.getLaunchConfigurationType().getIdentifier().equals(ILaunchTypes.REMOTE_APPLICATION);
 		}
 		return false;

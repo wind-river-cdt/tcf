@@ -25,6 +25,11 @@ public class ReferencedProjectItem extends PropertiesContainer implements IRefer
 		setProperty(PROPERTY_ENABLED, true);
 	}
 
+	public ReferencedProjectItem(String projectName) {
+		this();
+		setProperty(PROPERTY_PROJECT_NAME, projectName);
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.launch.core.interfaces.IReferencedProjectItem#isEnabled()
 	 */

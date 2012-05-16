@@ -117,8 +117,7 @@ public class CategoryAddToContributionItem extends AbstractCategoryContributionI
 
 				// Delegate to the categorizable element
 				ICategorizable categorizable = getCategorizable(element);
-				Assert.isNotNull(categorizable);
-				enabled &= categorizable.isEnabled(ICategorizable.OPERATION.ADD, category);
+				enabled &= categorizable != null && categorizable.isEnabled(ICategorizable.OPERATION.ADD, category);
 				if (!enabled) {
 					break;
 				}

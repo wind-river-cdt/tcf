@@ -52,7 +52,7 @@ public class StepContextAdapter extends PlatformObject implements IStepContext {
 	 */
 	@Override
 	public String getId() {
-		return launch != null ? launch.getLaunchConfiguration().getName() : null;
+		return launch != null && launch.getLaunchConfiguration() != null ? launch.getLaunchConfiguration().getName() : null;
 	}
 
 	/* (non-Javadoc)
