@@ -896,7 +896,8 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
                 for (TCFModelProxy p : model_proxies.values()) p.saveExpandState(node);
             }
             action_results.remove(id);
-            context_map.remove(id);
+            Object o = context_map.remove(id);
+            if (o instanceof CreateNodeRunnable) ((CreateNodeRunnable)o).onContextRemoved();
             expanded_nodes.remove(id);
             if (mem_blocks_update != null) mem_blocks_update.changeset.remove(id);
         }
@@ -1184,6 +1185,7 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
         final ArrayList<Runnable> waiting_list = new ArrayList<Runnable>();
         final ArrayList<IService> service_list = new ArrayList<IService>();
 
+        // TODO: context_map can accumulate "Invalid context ID" errors
         CreateNodeRunnable(String id) {
             this.id = id;
             assert context_map.get(id) == null;
@@ -1201,50 +1203,46 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
             waiting_list.add(r);
         }
 
+        void done(Object res) {
+            assert res != null;
+            assert res != this;
+            context_map.put(id, res);
+            for (Runnable r : waiting_list) r.run();
+        }
+
+        void onContextRemoved() {
+            assert context_map.get(id) == null;
+            done(new Exception("Invalid context ID"));
+        }
+
         public void run() {
             assert context_map.get(id) == this;
             if (service_list.size() == 0) {
-                context_map.put(id, new Exception("Invalid context ID"));
-                for (Runnable r : waiting_list) r.run();
+                done(new Exception("Invalid context ID"));
             }
             else {
                 IService s = service_list.remove(0);
                 if (s instanceof IRunControl) {
                     ((IRunControl)s).getContext(id, new IRunControl.DoneGetContext() {
                         public void doneGetContext(IToken token, Exception error, IRunControl.RunControlContext context) {
-                            if (error == null && context != null) {
-                                context_map.put(id, context);
-                                for (Runnable r : waiting_list) r.run();
-                            }
-                            else {
-                                run();
-                            }
+                            if (error == null && context != null) done(context);
+                            else run();
                         }
                     });
                 }
                 else if (s instanceof IStackTrace) {
                     ((IStackTrace)s).getContext(new String[]{ id }, new IStackTrace.DoneGetContext() {
                         public void doneGetContext(IToken token, Exception error, IStackTrace.StackTraceContext[] context) {
-                            if (error == null && context != null && context.length == 1 && context[0] != null) {
-                                context_map.put(id, context[0]);
-                                for (Runnable r : waiting_list) r.run();
-                            }
-                            else {
-                                run();
-                            }
+                            if (error == null && context != null && context.length == 1 && context[0] != null) done(context[0]);
+                            else run();
                         }
                     });
                 }
                 else {
                     ((IRegisters)s).getContext(id, new IRegisters.DoneGetContext() {
                         public void doneGetContext(IToken token, Exception error, IRegisters.RegistersContext context) {
-                            if (error == null && context != null) {
-                                context_map.put(id, context);
-                                for (Runnable r : waiting_list) r.run();
-                            }
-                            else {
-                                run();
-                            }
+                            if (error == null && context != null) done(context);
+                            else run();
                         }
                     });
                 }
