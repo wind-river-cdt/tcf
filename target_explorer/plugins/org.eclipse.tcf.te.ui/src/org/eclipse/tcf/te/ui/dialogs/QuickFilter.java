@@ -10,7 +10,6 @@
 package org.eclipse.tcf.te.ui.dialogs;
 
 import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -20,10 +19,10 @@ import org.eclipse.swt.widgets.TreeItem;
 
 public class QuickFilter extends TablePatternFilter {
 	private TreeViewer viewer;
-	private TreePath rootPath;
+	private Object root;
 
 	private QuickFilter(TreeViewer viewer) {
-		super((ILabelProvider)viewer.getLabelProvider());
+		super((ILabelProvider) viewer.getLabelProvider());
 		this.viewer = viewer;
 	}
 
@@ -36,16 +35,16 @@ public class QuickFilter extends TablePatternFilter {
 		return filter;
 	}
 
-	public void showFilter(TreePath root) {
-		this.rootPath = root;
-		if(!isFiltering()) {
+	public void showFilter(Object root) {
+		this.root = root;
+		if (!isFiltering()) {
 			viewer.addFilter(this);
 		}
 		QuickFilterPopup popup = new QuickFilterPopup(viewer, this);
 		Point location = null;
-		if(root != null) {
+		if (root != null) {
 			TreeItem[] items = viewer.getTree().getSelection();
-			if(items != null && items.length > 0) {
+			if (items != null && items.length > 0) {
 				Rectangle bounds = items[0].getBounds();
 				location = new Point(bounds.x, bounds.y);
 			}
@@ -61,10 +60,10 @@ public class QuickFilter extends TablePatternFilter {
 		popup.open();
 		popup.getShell().setLocation(location);
 	}
-	
+
 	public void resetViewer() {
 		viewer.removeFilter(this);
-		rootPath = null;
+		root = null;
 		setPattern(null);
 	}
 
@@ -79,10 +78,10 @@ public class QuickFilter extends TablePatternFilter {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
-		if (rootPath != null && rootPath.equals(parentElement)) {
+		if (root != null && root.equals(parentElement)) {
 			return super.select(viewer, parentElement, element);
 		}
 		return true;

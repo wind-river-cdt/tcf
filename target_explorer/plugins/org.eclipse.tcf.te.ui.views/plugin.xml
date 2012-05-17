@@ -47,6 +47,10 @@
                   <insertionPoint name="group.connection" separator="true"/>
                   <insertionPoint name="group.operations" separator="true"/>
                   <insertionPoint name="group.analysis" separator="true"/>
+                  <insertionPoint
+                        name="group.filter"
+                        separator="true">
+                  </insertionPoint>
                   <insertionPoint name="additions" separator="true"/>
                   <insertionPoint name="group.properties" separator="true"/>
             </popupMenu>
@@ -308,6 +312,19 @@
                   </with>
                </visibleWhen>
          </dynamic>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.filter">
+         <command
+               commandId="org.eclipse.tcf.te.ui.command.quickfilter"
+               label="Filter"
+               style="push">
+         </command>
+         <command
+               commandId="org.eclipse.tcf.te.ui.command.resetfilter"
+               label="Reset"
+               style="push">
+         </command>
       </menuContribution>
 
    </extension>

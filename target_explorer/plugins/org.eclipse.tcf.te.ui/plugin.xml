@@ -38,6 +38,18 @@
             id="org.eclipse.tcf.te.ui.command.refresh"
             name="%command.refresh.name">
       </command>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            description="Filter elements in the tree viewer"
+            id="org.eclipse.tcf.te.ui.command.quickfilter"
+            name="Filter tree elements">
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            description="Reset the quick filter in the tree viewer"
+            id="org.eclipse.tcf.te.ui.command.resetfilter"
+            name="Reset the quick filter">
+      </command>
    </extension>
    
 <!-- Command image contributions -->   
@@ -92,6 +104,30 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="F5">
       </key>
+      <key
+            commandId="org.eclipse.tcf.te.ui.command.quickfilter"
+            contextId="org.eclipse.tcf.te.ui.views.View"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+F">
+      </key>
+      <key
+            commandId="org.eclipse.tcf.te.ui.command.quickfilter"
+            contextId="org.eclipse.tcf.te.ui.views.Editor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+F">
+      </key>
+      <key
+            commandId="org.eclipse.tcf.te.ui.command.resetfilter"
+            contextId="org.eclipse.tcf.te.ui.views.View"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+R">
+      </key>
+      <key
+            commandId="org.eclipse.tcf.te.ui.command.resetfilter"
+            contextId="org.eclipse.tcf.te.ui.views.Editor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+R">
+      </key>
    </extension>
 
 <!-- Status handler contributions -->
@@ -128,6 +164,51 @@
             id="org.eclipse.tcf.te.ui.preferences.general"
             name="%preference.page.name">
       </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="org.eclipse.tcf.te.ui.internal.handlers.QuickFilterHanlder"
+            commandId="org.eclipse.tcf.te.ui.command.quickfilter">
+         <activeWhen>
+            <with
+                  variable="activePartId">
+               <or>
+                  <equals
+                        value="org.eclipse.tcf.te.ui.views.View">
+                  </equals>
+                  <equals
+                        value="org.eclipse.tcf.te.ui.views.Editor">
+                  </equals>
+               </or>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+            <with
+                  variable="selection">
+               <count
+                     value="?">
+               </count>
+            </with>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tcf.te.ui.internal.handlers.QuickFilterResetHanlder"
+            commandId="org.eclipse.tcf.te.ui.command.resetfilter">
+         <activeWhen>
+            <with
+                  variable="activePartId">
+               <or>
+                  <equals
+                        value="org.eclipse.tcf.te.ui.views.View">
+                  </equals>
+                  <equals
+                        value="org.eclipse.tcf.te.ui.views.Editor">
+                  </equals>
+               </or>
+            </with>
+         </activeWhen>
+      </handler>
    </extension>
    
 </plugin>
