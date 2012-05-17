@@ -20,7 +20,6 @@ import java.util.regex.Pattern;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.VirtualItem;
 import org.eclipse.tcf.debug.test.services.IWaitForEventCache;
 import org.eclipse.tcf.debug.test.services.RunControlCM;
-import org.eclipse.tcf.debug.test.services.RunControlCM.ContextState;
 import org.eclipse.tcf.debug.test.util.ICache;
 import org.eclipse.tcf.debug.test.util.RangeCache;
 import org.eclipse.tcf.debug.test.util.Transaction;
@@ -30,20 +29,18 @@ import org.eclipse.tcf.services.IRunControl.RunControlContext;
 import org.eclipse.tcf.services.IStackTrace.StackTraceContext;
 import org.eclipse.tcf.services.ISymbols;
 import org.eclipse.tcf.services.ISymbols.Symbol;
-import org.eclipse.test.performance.Performance;
-import org.eclipse.test.performance.PerformanceMeter;
 import org.junit.Assert;
 
 @SuppressWarnings("restriction")
 public class SampleTest extends AbstractTcfUITest {
 
-    
+
     public void testDebugViewContent() throws Exception {
         initProcessModel("tcf_test_func0");
 
         VirtualItem launchItem = fDebugViewListener.findElement(new Pattern[] { Pattern.compile(".*" + fLaunch.getLaunchConfiguration().getName() + ".*") }  );
         Assert.assertTrue(launchItem != null);
-        
+
         VirtualItem processItem = fDebugViewListener.findElement(launchItem, new Pattern[] { Pattern.compile(".*agent.*") }  );
         Assert.assertTrue(processItem != null);
 
@@ -55,12 +52,12 @@ public class SampleTest extends AbstractTcfUITest {
 
     public void testSteppingDebugViewOnly() throws Exception {
         initProcessModel("tcf_test_func0");
-        
+
         // Execute step loop
         String previousThreadLabel = null;
         for (int stepNum = 0; stepNum < 100; stepNum++) {
             fDebugViewListener.reset();
-            
+
             resumeAndWaitForSuspend(fThreadCtx, IRunControl.RM_STEP_INTO_LINE);
 
             fDebugViewListener.waitTillFinished(MODEL_CHANGED_COMPLETE | CONTENT_SEQUENCE_COMPLETE | LABEL_UPDATES_RUNNING);
@@ -72,22 +69,22 @@ public class SampleTest extends AbstractTcfUITest {
             previousThreadLabel = topFrameLabel;
         }
     }
-    
+
     public void testSteppingWithVariablesAndRegisters() throws Exception {
         fVariablesViewViewer.setActive(true);
         fRegistersViewViewer.setActive(true);
 
         initProcessModel("tcf_test_func0");
-        
-        
-        
+
+
+
         // Execute step loop
         String previousThreadLabel = null;
         for (int stepNum = 0; stepNum < 100; stepNum++) {
             fDebugViewListener.reset();
             fVariablesViewListener.reset();
             fRegistersViewListener.reset();
-            
+
             resumeAndWaitForSuspend(fThreadCtx, IRunControl.RM_STEP_INTO_LINE);
 
             fDebugViewListener.waitTillFinished(MODEL_CHANGED_COMPLETE | CONTENT_SEQUENCE_COMPLETE | LABEL_UPDATES_RUNNING);
@@ -102,18 +99,19 @@ public class SampleTest extends AbstractTcfUITest {
         }
     }
 
+/** DISABLED: Hangs on execution on szg-build
     public void testSteppingPerformanceWithSourceDisplay() throws Exception {
         initProcessModel("tcf_test_func0");
 
         final Number sym_func0_address = new Transaction<Number>() {
             protected Number process() throws Transaction.InvalidCacheException ,ExecutionException {
-                return validate( fDiagnosticsCM.getSymbol(fProcessId, "tcf_test_func0") ).getValue();                
+                return validate( fDiagnosticsCM.getSymbol(fProcessId, "tcf_test_func0") ).getValue();
             };
         }.get();
-        
+
         final Number sym_func3_address = new Transaction<Number>() {
             protected Number process() throws Transaction.InvalidCacheException ,ExecutionException {
-                return validate( fDiagnosticsCM.getSymbol(fProcessId, "tcf_test_func3") ).getValue();                
+                return validate( fDiagnosticsCM.getSymbol(fProcessId, "tcf_test_func3") ).getValue();
             };
         }.get();
 
@@ -125,29 +123,29 @@ public class SampleTest extends AbstractTcfUITest {
             for (int stepNum = 0; stepNum < 100; stepNum++) {
                 fDebugViewListener.reset();
                 fSourceDisplayListener.reset();
-                
+
                 meter.start();
-    
+
                 ContextState state = resumeAndWaitForSuspend(fThreadCtx, IRunControl.RM_STEP_INTO_LINE);
-                
+
                 CodeArea area = calcPCCodeArea();
                 if (area != null) {
                     fSourceDisplayListener.setCodeArea(calcPCCodeArea());
                 }
-    
+
                 fDebugViewListener.waitTillFinished(MODEL_CHANGED_COMPLETE | CONTENT_SEQUENCE_COMPLETE | LABEL_UPDATES_RUNNING);
                 if (area != null) {
                     fSourceDisplayListener.waitTillFinished();
                 }
-    
+
                 meter.stop();
-    
+
                 if (new BigInteger(state.pc).equals(new BigInteger(sym_func3_address.toString()))) {
                     moveToLocation(fThreadId, sym_func0_address);
                 }
-                    
+
             }
-        
+
             meter.commit();
             perf.assertPerformance(meter);
         } finally {
@@ -155,6 +153,7 @@ public class SampleTest extends AbstractTcfUITest {
         }
 
     }
+*/
 
     private CodeArea calcPCCodeArea() throws ExecutionException, InterruptedException {
         return new Transaction<CodeArea>() {
@@ -165,16 +164,16 @@ public class SampleTest extends AbstractTcfUITest {
                 BigInteger pcNumberPlusOne = pcNumber.add(BigInteger.valueOf(1));
                 CodeArea[] areas = validate(fLineNumbersCM.mapToSource(fThreadId, pcNumber, pcNumberPlusOne));
                 if (areas.length >= 1) {
-                    return areas[0]; 
+                    return areas[0];
                 }
                 return null;
             }
         }.get();
     }
-    
+
     public void testSymbolsCMResetOnContextRemove() throws Exception {
         initProcessModel("tcf_test_func0");
-        
+
         // Retrieve the current PC for use later
         final String pc = new Transaction<String>() {
             @Override
@@ -182,7 +181,7 @@ public class SampleTest extends AbstractTcfUITest {
                 return validate(fRunControlCM.getState(fThreadId)).pc;
             }
         }.get();
-        
+
         // Find symbol by name and valide the cache.
         final String symbolId = new Transaction<String>() {
             @Override
@@ -232,7 +231,7 @@ public class SampleTest extends AbstractTcfUITest {
 
     public void testLineNumbersCMResetOnContextRemove() throws Exception {
         initProcessModel("tcf_test_func0");
-        
+
         // Retrieve the current PC for use later
         final String pc = new Transaction<String>() {
             @Override
@@ -240,7 +239,7 @@ public class SampleTest extends AbstractTcfUITest {
                 return validate(fRunControlCM.getState(fThreadId)).pc;
             }
         }.get();
-        
+
         final BigInteger pcNumber = new BigInteger(pc);
         final BigInteger pcNumberPlusOne = pcNumber.add(BigInteger.valueOf(1));
 
@@ -251,19 +250,19 @@ public class SampleTest extends AbstractTcfUITest {
                 CodeArea[] areas = validate(fLineNumbersCM.mapToSource(fProcessId, pcNumber, pcNumberPlusOne));
                 Assert.assertNotNull(areas);
                 Assert.assertTrue(areas.length != 0);
-                
+
                 areas = validate(fLineNumbersCM.mapToSource(fThreadId, pcNumber, pcNumberPlusOne));
                 Assert.assertNotNull(areas);
                 Assert.assertTrue(areas.length != 0);
-                
+
                 CodeArea[] areas2 = validate(fLineNumbersCM.mapToMemory(fProcessId, areas[0].file, areas[0].start_line, areas[0].start_column));
                 Assert.assertNotNull(areas2);
                 Assert.assertTrue(areas2.length != 0);
-                
+
                 areas2 = validate(fLineNumbersCM.mapToMemory(fThreadId, areas[0].file, areas[0].start_line, areas[0].start_column));
                 Assert.assertNotNull(areas2);
                 Assert.assertTrue(areas2.length != 0);
-                
+
                 return areas;
             }
         }.get();
@@ -295,11 +294,11 @@ public class SampleTest extends AbstractTcfUITest {
             }
         }.get();
     }
-    
-    
+
+
     public void testSymbolsCMResetOnContextStateChange() throws Exception {
         initProcessModel("tcf_test_func2");
-        
+
         // Retrieve the current PC and top frame for use later
         final String pc = new Transaction<String>() {
             @Override
@@ -314,7 +313,7 @@ public class SampleTest extends AbstractTcfUITest {
                 return frameIds[frameIds.length - 1];
             }
         }.get();
-        
+
         // Find symbol by name and valide the cache.
         final String symbolId = new Transaction<String>() {
             @Override
@@ -338,7 +337,7 @@ public class SampleTest extends AbstractTcfUITest {
 //                return sym.getAddress();
 //            }
 //        }.get();
-        
+
         // Execute a step.
         resumeAndWaitForSuspend(fThreadCtx, IRunControl.RM_STEP_OUT);
 
@@ -347,10 +346,10 @@ public class SampleTest extends AbstractTcfUITest {
             @Override
             protected Object process() throws InvalidCacheException, ExecutionException {
                 Assert.assertFalse(
-                    "Expected cache to be reset", 
+                    "Expected cache to be reset",
                     fSymbolsCM.getContext(symbolId).isValid());
                 Assert.assertFalse(
-                    "Expected cache to be reset", 
+                    "Expected cache to be reset",
                     fSymbolsCM.find(topFrameId, new BigInteger(pc), "func2_local1").isValid() );
                 return null;
             }
@@ -359,7 +358,7 @@ public class SampleTest extends AbstractTcfUITest {
 
     public void testStackTraceCMResetOnContextStateChange() throws Exception {
         initProcessModel("tcf_test_func2");
-        
+
         // Retrieve the current PC and top frame for use later
         final String pc = new Transaction<String>() {
             @Override
@@ -379,8 +378,8 @@ public class SampleTest extends AbstractTcfUITest {
                 return null;
             }
         }.get();
-        
-        
+
+
         // Execute a step.
         resumeAndWaitForSuspend(fThreadCtx, IRunControl.RM_STEP_OUT);
 
@@ -409,12 +408,12 @@ public class SampleTest extends AbstractTcfUITest {
             }
         }.get();
     }
-    
+
     public void testRunControlCMChildrenInvalidation() throws Exception {
         initProcessModel("tcf_test_func0");
 
         createBreakpoint("testRunControlCMChildrenInvalidation", "tcf_test_func0");
-        
+
         // Wait for each threads to start.
         final String[] threads = new Transaction<String[]>() {
             List<String> fThreads = new ArrayList<String>();
@@ -433,7 +432,7 @@ public class SampleTest extends AbstractTcfUITest {
                 // Validate children cache
                 String[] children = validate (fRunControlCM.getChildren(fProcessId));
                 Assert.assertTrue(
-                    "Expected children array to contain added ids", 
+                    "Expected children array to contain added ids",
                     Arrays.asList(children).containsAll(fThreads));
 
                 return fThreads.toArray(new String[fThreads.size()]);
@@ -467,7 +466,7 @@ public class SampleTest extends AbstractTcfUITest {
                 fRunControlCM.waitForContextRemoved(fProcessId, this);
                 IWaitForEventCache<?>[] waitCaches = new IWaitForEventCache<?>[threads.length];
                 for (int i = 0; i < threads.length; i++) {
-                    waitCaches[i] = fRunControlCM.waitForContextRemoved(threads[i], this); 
+                    waitCaches[i] = fRunControlCM.waitForContextRemoved(threads[i], this);
                 }
                 validate( fDiagnosticsCM.cancelTest(fTestId, this) );
                 validate(waitCaches);
@@ -485,7 +484,7 @@ public class SampleTest extends AbstractTcfUITest {
                     String children[] = validate( fRunControlCM.getChildren(fProcessId) );
                     Assert.assertEquals("Expected no children", 0, children.length);
                 } catch (ExecutionException e) {}
-                
+
                 for (String thread : threads) {
                     try {
                         validate( fRunControlCM.getContext(thread) );
@@ -504,9 +503,9 @@ public class SampleTest extends AbstractTcfUITest {
                 return null;
             }
         }.get();
-        
+
         removeBreakpoint("testRunControlCMChildrenInvalidation");
 
     }
-    
+
 }
