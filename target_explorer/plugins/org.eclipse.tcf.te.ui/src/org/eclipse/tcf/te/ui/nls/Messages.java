@@ -61,6 +61,8 @@ public class Messages extends NLS {
 	public static String DefaultStatusHandler_information_title;
 	public static String DefaultStatusHandler_toggleMessage_doNotShowAgain;
 
+	public static String FilteredCheckedListDialog_DesAllText;
+	public static String FilteredCheckedListDialog_SelAllText;
 	public static String NameValuePairDialog_missingName_error;
 	public static String NameValuePairDialog_missingValue_error;
 	public static String NameValuePairDialog_usedOrIllegalName_error;

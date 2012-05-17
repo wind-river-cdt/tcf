@@ -34,9 +34,13 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -45,6 +49,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tcf.te.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.interfaces.IDescriptionLabelProvider;
+import org.eclipse.tcf.te.ui.nls.Messages;
 import org.eclipse.ui.dialogs.SelectionStatusDialog;
 
 /**
@@ -57,6 +62,10 @@ public class FilteredCheckedListDialog extends SelectionStatusDialog implements 
 	Text filterText;
 	// The check-box style table used to display a list and select elements. 
 	CheckboxTableViewer tableViewer;
+	// The button of select All.
+	Button btnSelAll;
+	// The button of deselect All
+	Button btnDesAll;
 	// The label provider used to provide labels, images and descriptions for the listed items.
 	IDescriptionLabelProvider labelProvider;
 	// The initial filter displayed in the filter text field.
@@ -136,6 +145,7 @@ public class FilteredCheckedListDialog extends SelectionStatusDialog implements 
 		createMessageArea(composite);
 		createPatternFilterText(composite);
 		createTable(composite);
+		createSelBtn(composite);
 		initializeData();
 		return composite;
 	}
@@ -315,6 +325,52 @@ public class FilteredCheckedListDialog extends SelectionStatusDialog implements 
 		patternFilter = new TablePatternFilter(labelProvider);
 		tableViewer.addFilter(patternFilter);
 		tableViewer.addSelectionChangedListener(this);
+	}
+
+	private void createSelBtn(Composite parent) {
+		Composite composite = new Composite(parent, SWT.NONE);
+		GridLayout layout = new GridLayout(2, false);
+		composite.setLayout(layout);
+		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+		composite.setLayoutData(data);
+		
+		btnSelAll = new Button(composite, SWT.PUSH);
+		btnSelAll.setText(Messages.FilteredCheckedListDialog_SelAllText);
+		btnSelAll.addSelectionListener(new SelectionAdapter(){
+			@Override
+            public void widgetSelected(SelectionEvent e) {
+				selectAll();
+            }
+		});
+		
+		btnDesAll = new Button(composite, SWT.PUSH);
+		btnDesAll.setText(Messages.FilteredCheckedListDialog_DesAllText);
+		btnDesAll.addSelectionListener(new SelectionAdapter(){
+			@Override
+            public void widgetSelected(SelectionEvent e) {
+				deselectAll();
+            }
+		});
+    }
+	
+	void selectAll() {
+		TableItem[] items = tableViewer.getTable().getItems();
+		for (TableItem item : items) {
+			if (item.getData() != null && !item.getChecked()) {
+				item.setChecked(true);
+				checkedItems.add(item.getData());
+			}
+		}
+	}
+	
+	void deselectAll() {
+		TableItem[] children = tableViewer.getTable().getItems();
+		for (TableItem item : children) {
+			if (item.getData() != null && item.getChecked()) {
+				item.setChecked(false);
+				checkedItems.remove(item.getData());
+			}
+		}
 	}
 
 	/**
