@@ -84,7 +84,7 @@ public class BreakpointScopeOrganizer extends AbstractBreakpointOrganizerDelegat
             ICBreakpoint cBreakpoint = (ICBreakpoint) breakpoint;
             TCFBreakpointScopeExtension scopeExtension;
             try {
-                scopeExtension = cBreakpoint.getExtension(
+                scopeExtension = (TCFBreakpointScopeExtension)cBreakpoint.getExtension(
                         ITCFConstants.ID_TCF_DEBUG_MODEL, TCFBreakpointScopeExtension.class);
                 if (scopeExtension != null) {
                     scopeExtension.setPropertiesFilter(filter);
