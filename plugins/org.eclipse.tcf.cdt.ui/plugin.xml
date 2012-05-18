@@ -368,6 +368,7 @@
          point="org.eclipse.debug.ui.breakpointOrganizers">
       <breakpointOrganizer
             class="org.eclipse.tcf.internal.cdt.ui.breakpoints.BreakpointScopeOrganizer"
+            icon="icons/obj16/bp_scope.gif"
             id="org.eclipse.tcf.cdt.ui.breakpointScopeGroup"
             label="%breakpointScope.label">
       </breakpointOrganizer>

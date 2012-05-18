@@ -27,7 +27,7 @@ public class ImageCache {
         IMG_TARGET_TAB = "icons/target_tab.gif";
 
     public static final String
-        IMG_BREAKPOINT_SCOPE = "icons/bp_scope.gif";
+        IMG_BREAKPOINT_SCOPE = "icons/obj16/bp_scope.gif";
 
     private static final Map<String,ImageDescriptor> desc_cache = new HashMap<String,ImageDescriptor>();
     private static final Map<ImageDescriptor,Image> image_cache = new HashMap<ImageDescriptor,Image>();
@@ -36,16 +36,23 @@ public class ImageCache {
         if (name == null) return null;
         ImageDescriptor descriptor = desc_cache.get(name);
         if (descriptor == null) {
-            Bundle bundle = Platform.getBundle("org.eclipse.tcf.debug.ui");
+            Bundle bundle = Activator.getDefault().getBundle();
             if (bundle != null){
                 URL url = FileLocator.find(bundle, new Path(name), null);
                 if (url != null) descriptor = ImageDescriptor.createFromURL(url);
             }
             if (descriptor == null) {
-                bundle = Platform.getBundle("org.eclipse.debug.ui");
+                bundle = Platform.getBundle("org.eclipse.tcf.debug.ui");
                 if (bundle != null){
                     URL url = FileLocator.find(bundle, new Path(name), null);
                     if (url != null) descriptor = ImageDescriptor.createFromURL(url);
+                }
+                if (descriptor == null) {
+                    bundle = Platform.getBundle("org.eclipse.debug.ui");
+                    if (bundle != null){
+                        URL url = FileLocator.find(bundle, new Path(name), null);
+                        if (url != null) descriptor = ImageDescriptor.createFromURL(url);
+                    }
                 }
             }
             if (descriptor == null) {
