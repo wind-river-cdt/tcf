@@ -317,12 +317,12 @@
             locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.filter">
          <command
                commandId="org.eclipse.tcf.te.ui.command.quickfilter"
-               label="Filter"
+               label="%command.filter.label"
                style="push">
          </command>
          <command
                commandId="org.eclipse.tcf.te.ui.command.resetfilter"
-               label="Reset"
+               label="%command.reset.label"
                style="push">
          </command>
       </menuContribution>
@@ -440,7 +440,71 @@
             </with>
          </activeWhen>
       </handler>
-   </extension>
+      <handler
+            class="org.eclipse.tcf.te.ui.views.handler.ViewQuickFilterHanlder"
+            commandId="org.eclipse.tcf.te.ui.command.quickfilter">
+         <activeWhen>
+            <with
+                  variable="activePartId">
+               <equals
+                     value="org.eclipse.tcf.te.ui.views.View">
+               </equals>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+            <with
+                  variable="selection">
+               <count
+                     value="?">
+               </count>
+            </with>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tcf.te.ui.views.handler.ViewQuickFilterResetHanlder"
+            commandId="org.eclipse.tcf.te.ui.command.resetfilter">
+         <activeWhen>
+            <with
+                  variable="activePartId">
+               <equals
+                     value="org.eclipse.tcf.te.ui.views.View">
+               </equals>
+            </with>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tcf.te.ui.views.handler.EditorQuickFilterHanlder"
+            commandId="org.eclipse.tcf.te.ui.command.quickfilter">
+         <activeWhen>
+            <with
+                  variable="activePartId">
+               <equals
+                     value="org.eclipse.tcf.te.ui.views.Editor">
+               </equals>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+            <with
+                  variable="selection">
+               <count
+                     value="?">
+               </count>
+            </with>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tcf.te.ui.views.handler.EditorQuickFilterResetHanlder"
+            commandId="org.eclipse.tcf.te.ui.command.resetfilter">
+         <activeWhen>
+            <with
+                  variable="activePartId">
+               <equals
+                     value="org.eclipse.tcf.te.ui.views.Editor">
+               </equals>
+            </with>
+         </activeWhen>
+      </handler>
+    </extension>
 
 <!-- Eclipse core expressions property tester -->
    <extension point="org.eclipse.core.expressions.propertyTesters">

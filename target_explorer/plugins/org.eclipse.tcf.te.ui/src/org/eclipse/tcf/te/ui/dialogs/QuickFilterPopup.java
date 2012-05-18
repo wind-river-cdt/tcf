@@ -32,10 +32,16 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.tcf.te.ui.nls.Messages;
 
+/**
+ * A pop up dialog to input the filter text for the quick filter.
+ * The filter will to listen to the change of the input and
+ * filter the tree viewer accordingly.
+ */
 public class QuickFilterPopup extends PopupDialog {
-	// The pattern filter used filter the content of the list.
-	TablePatternFilter patternFilter;
+	// The quick filter used filter the content of the tree viewer.
+	QuickFilter quickFilter;
 	// The text field used to enter filters.
 	Text filterText;
 	// The initial filter displayed in the filter text field.
@@ -43,13 +49,23 @@ public class QuickFilterPopup extends PopupDialog {
 	// The tree viewer that it works on.
 	TreeViewer treeViewer;
 	
-	public QuickFilterPopup(TreeViewer viewer, QuickFilter quickFilter) {
+	/**
+	 * Create a pop up for the specified tree viewer using the quick filter.
+	 * 
+	 * @param viewer The tree viewer to be filtered.
+	 * @param qFilter The quick filter used to filter the tree viewer.
+	 */
+	public QuickFilterPopup(TreeViewer viewer, QuickFilter qFilter) {
 	    super(viewer.getTree().getShell(), SWT.TOOL, true, true, false, false, false, null, null);
-	    patternFilter = quickFilter;
+	    quickFilter = qFilter;
 	    treeViewer = viewer;
-	    filter = "enter name of elements"; //$NON-NLS-1$
+	    filter = Messages.QuickFilterPopup_PromptMessage;
     }
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.PopupDialog#createDialogArea(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
     protected Control createDialogArea(Composite parent) {
 	    Composite composite = (Composite) super.createDialogArea(parent);
@@ -155,6 +171,9 @@ public class QuickFilterPopup extends PopupDialog {
 	 * @param e The traverse event.
 	 */
 	protected void filterTextKeyTraversed(TraverseEvent e) {
+		if (e.detail == SWT.TRAVERSE_ESCAPE) {
+			quickFilter.resetViewer();
+		}
 		if (e.detail == SWT.TRAVERSE_RETURN) {
 			e.doit = false;
 			if (treeViewer.getTree().getItemCount() == 0) {
@@ -167,7 +186,7 @@ public class QuickFilterPopup extends PopupDialog {
 				if (hasFocus && textChanged && filterText.getText().trim().length() > 0) {
 					TreeItem[] items = treeViewer.getTree().getItems();
 					for (TreeItem item : items) {
-						if (patternFilter.match(item.getText())) {
+						if (quickFilter.match(item.getText())) {
 							treeViewer.getTree().setSelection(new TreeItem[] { item });
 							ISelection sel = treeViewer.getSelection();
 							treeViewer.setSelection(sel, true);
@@ -185,7 +204,7 @@ public class QuickFilterPopup extends PopupDialog {
 	 * @param e The modification event.
 	 */
 	protected void filterTextModifyText(ModifyEvent e) {
-		patternFilter.setPattern(filterText.getText());
+		quickFilter.setPattern(filterText.getText());
 		treeViewer.refresh();
 	}
 }

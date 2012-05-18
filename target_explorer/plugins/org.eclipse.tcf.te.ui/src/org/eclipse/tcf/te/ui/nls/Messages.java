@@ -68,5 +68,6 @@ public class Messages extends NLS {
 	public static String NameValuePairDialog_usedOrIllegalName_error;
 
 	public static String PreferencePage_label;
+	public static String QuickFilterPopup_PromptMessage;
 	public static String ViewerStateManager_MkdirFailed;
 }

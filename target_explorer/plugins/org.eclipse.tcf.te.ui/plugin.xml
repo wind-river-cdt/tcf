@@ -120,13 +120,13 @@
             commandId="org.eclipse.tcf.te.ui.command.resetfilter"
             contextId="org.eclipse.tcf.te.ui.views.View"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+R">
+            sequence="ESC">
       </key>
       <key
             commandId="org.eclipse.tcf.te.ui.command.resetfilter"
             contextId="org.eclipse.tcf.te.ui.views.Editor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+R">
+            sequence="ESC">
       </key>
    </extension>
 
@@ -164,51 +164,6 @@
             id="org.eclipse.tcf.te.ui.preferences.general"
             name="%preference.page.name">
       </page>
-   </extension>
-   <extension
-         point="org.eclipse.ui.handlers">
-      <handler
-            class="org.eclipse.tcf.te.ui.internal.handlers.QuickFilterHanlder"
-            commandId="org.eclipse.tcf.te.ui.command.quickfilter">
-         <activeWhen>
-            <with
-                  variable="activePartId">
-               <or>
-                  <equals
-                        value="org.eclipse.tcf.te.ui.views.View">
-                  </equals>
-                  <equals
-                        value="org.eclipse.tcf.te.ui.views.Editor">
-                  </equals>
-               </or>
-            </with>
-         </activeWhen>
-         <enabledWhen>
-            <with
-                  variable="selection">
-               <count
-                     value="?">
-               </count>
-            </with>
-         </enabledWhen>
-      </handler>
-      <handler
-            class="org.eclipse.tcf.te.ui.internal.handlers.QuickFilterResetHanlder"
-            commandId="org.eclipse.tcf.te.ui.command.resetfilter">
-         <activeWhen>
-            <with
-                  variable="activePartId">
-               <or>
-                  <equals
-                        value="org.eclipse.tcf.te.ui.views.View">
-                  </equals>
-                  <equals
-                        value="org.eclipse.tcf.te.ui.views.Editor">
-                  </equals>
-               </or>
-            </with>
-         </activeWhen>
-      </handler>
    </extension>
    
 </plugin>

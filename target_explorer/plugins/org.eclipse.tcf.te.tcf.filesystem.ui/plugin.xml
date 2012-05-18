@@ -528,6 +528,20 @@
                </with>
             </visibleWhen>
          </command>
+         <separator
+               name="group.filter"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.tcf.te.ui.command.quickfilter"
+               label="%command.filter.label"
+               style="push">
+         </command>
+         <command
+               commandId="org.eclipse.tcf.te.ui.command.resetfilter"
+               label="%command.reset.label"
+               style="push">
+         </command>
          <separator name="group.properties" visible="true"/>
          <command
                commandId="org.eclipse.ui.file.properties"
