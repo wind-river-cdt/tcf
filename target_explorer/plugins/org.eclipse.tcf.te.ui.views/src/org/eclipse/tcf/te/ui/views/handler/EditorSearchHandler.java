@@ -20,28 +20,19 @@ import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.editor.IFormPage;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-/**
- * The handler to reset the tree viewer from the quick filter.
- */
-public class EditorQuickFilterResetHanlder extends AbstractHandler {
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
-	 */
+public class EditorSearchHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchPart part = HandlerUtil.getActiveEditorChecked(event);
-		if(part instanceof FormEditor) {
-			FormEditor editor = (FormEditor)part;
+		if (part instanceof FormEditor) {
+			FormEditor editor = (FormEditor) part;
 			IFormPage formPage = editor.getActivePageInstance();
-			if(formPage instanceof TreeViewerExplorerEditorPage) {
+			if (formPage instanceof TreeViewerExplorerEditorPage) {
 				TreeViewerExplorerEditorPage page = (TreeViewerExplorerEditorPage) formPage;
 				TreeViewer viewer = (TreeViewer) page.getTreeControl().getViewer();
-				TreeViewerUtil.doReset(viewer);
+				TreeViewerUtil.doSearch(viewer);
 			}
 		}
 		return null;
 	}
-
 }

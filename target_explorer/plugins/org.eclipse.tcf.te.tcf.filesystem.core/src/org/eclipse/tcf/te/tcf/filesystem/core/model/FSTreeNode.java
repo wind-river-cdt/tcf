@@ -614,8 +614,8 @@ public final class FSTreeNode extends AbstractTreeNode implements Cloneable {
 	 * @see org.eclipse.tcf.te.tcf.filesystem.core.model.AbstractTreeNode#doCreateQueryDoneOpenChannel()
 	 */
 	@Override
-    protected DoneOpenChannel doCreateQueryDoneOpenChannel() {
-	    return new QueryDoneOpenChannel(this);
+    protected DoneOpenChannel doCreateQueryDoneOpenChannel(ICallback callback) {
+	    return new QueryDoneOpenChannel(this, callback);
     }
 	
 	/*

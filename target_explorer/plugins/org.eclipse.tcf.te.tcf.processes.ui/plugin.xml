@@ -9,6 +9,9 @@
             class="org.eclipse.tcf.te.tcf.processes.ui.internal.adapters.AdapterFactory">
          <adapter type="org.eclipse.jface.viewers.ILabelProvider"/>
          <adapter type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+         <adapter
+               type="org.eclipse.tcf.te.ui.interfaces.ILazyLoader">
+         </adapter>
       </factory>
    </extension>
 

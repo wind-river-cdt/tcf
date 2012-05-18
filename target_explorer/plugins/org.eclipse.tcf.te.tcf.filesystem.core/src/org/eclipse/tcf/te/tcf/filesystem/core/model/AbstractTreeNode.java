@@ -259,8 +259,14 @@ public abstract class AbstractTreeNode extends PlatformObject implements IPeerMo
 	 * Query the children of this file system node.
 	 */
 	public void queryChildren() {
+		queryChildren(null);
+	}
+	/**
+	 * Query the children of this file system node.
+	 */
+	public void queryChildren(ICallback callback) {
 		queryStarted();
-		Tcf.getChannelManager().openChannel(peerNode.getPeer(), null, doCreateQueryDoneOpenChannel());
+		Tcf.getChannelManager().openChannel(peerNode.getPeer(), null, doCreateQueryDoneOpenChannel(callback));
 	}
 
 	/**
@@ -268,7 +274,7 @@ public abstract class AbstractTreeNode extends PlatformObject implements IPeerMo
 	 * 
 	 * @return The callback object.
 	 */
-	protected abstract DoneOpenChannel doCreateQueryDoneOpenChannel();
+	protected abstract DoneOpenChannel doCreateQueryDoneOpenChannel(ICallback callback);
 	
 	/**
 	 * Return if this node is the system root.

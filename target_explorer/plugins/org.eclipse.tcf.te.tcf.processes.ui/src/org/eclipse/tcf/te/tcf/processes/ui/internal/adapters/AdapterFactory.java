@@ -14,6 +14,7 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode;
 import org.eclipse.tcf.te.tcf.processes.ui.internal.columns.ProcessLabelProvider;
+import org.eclipse.tcf.te.ui.interfaces.ILazyLoader;
 
 /**
  * Adapter factory implementation.
@@ -34,6 +35,9 @@ public class AdapterFactory implements IAdapterFactory {
 			if (IPeerModel.class.equals(adapterType)) {
 				return ((ProcessTreeNode)adaptableObject).peerNode;
 			}
+			if(ILazyLoader.class.equals(adapterType)) {
+				return new ProcessTreeNodeLoader((ProcessTreeNode)adaptableObject);
+			}
 		}
 		return null;
 	}
@@ -45,7 +49,8 @@ public class AdapterFactory implements IAdapterFactory {
 	public Class[] getAdapterList() {
 		return new Class<?>[] {
 						ILabelProvider.class,
-						IPeerModel.class
+						IPeerModel.class,
+						ILazyLoader.class
 					};
 	}
 

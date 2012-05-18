@@ -39,7 +39,7 @@ import org.eclipse.tcf.te.ui.nls.Messages;
  * The filter will to listen to the change of the input and
  * filter the tree viewer accordingly.
  */
-public class QuickFilterPopup extends PopupDialog {
+class QuickFilterPopup extends PopupDialog {
 	// The quick filter used filter the content of the tree viewer.
 	QuickFilter quickFilter;
 	// The text field used to enter filters.

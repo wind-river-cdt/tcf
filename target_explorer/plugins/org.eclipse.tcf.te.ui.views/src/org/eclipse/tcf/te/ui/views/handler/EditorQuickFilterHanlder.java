@@ -13,7 +13,7 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.tcf.te.ui.dialogs.QuickFilter;
+import org.eclipse.tcf.te.ui.dialogs.TreeViewerUtil;
 import org.eclipse.tcf.te.ui.views.editor.pages.TreeViewerExplorerEditorPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.forms.editor.FormEditor;
@@ -38,7 +38,7 @@ public class EditorQuickFilterHanlder extends AbstractHandler {
 			if(formPage instanceof TreeViewerExplorerEditorPage) {
 				TreeViewerExplorerEditorPage page = (TreeViewerExplorerEditorPage) formPage;
 				TreeViewer viewer = (TreeViewer) page.getTreeControl().getViewer();
-				QuickFilter.doFilter(viewer);
+				TreeViewerUtil.doFilter(viewer);
 			}
 		}
 		return null;

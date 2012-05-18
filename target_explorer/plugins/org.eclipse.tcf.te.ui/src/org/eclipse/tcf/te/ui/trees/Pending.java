@@ -94,13 +94,23 @@ public class Pending {
 	 * the pending image periodically.
 	 */
 	public void startAnimation() {
-		display.timerExec(FRAME_INTERVAL, new Runnable() {
-			@Override
-            public void run() {
-				viewer.update(Pending.this, null);
-				if (animating) startAnimation();
-			}
-		});
+		if (Display.getCurrent() == null) {
+			display.asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					startAnimation();
+				}
+			});
+		}
+		else {
+			display.timerExec(FRAME_INTERVAL, new Runnable() {
+				@Override
+				public void run() {
+					viewer.update(Pending.this, null);
+					if (animating) startAnimation();
+				}
+			});
+		}
 	}
 	
 	/**

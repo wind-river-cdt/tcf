@@ -325,6 +325,11 @@
                label="%command.reset.label"
                style="push">
          </command>
+         <command
+               commandId="org.eclipse.tcf.te.ui.views.command.search"
+               label="Search..."
+               style="push">
+         </command>
       </menuContribution>
 
    </extension>
@@ -364,6 +369,11 @@
             helpContextId="org.eclipse.tcf.te.ui.views.command_Content"
             id="org.eclipse.tcf.te.ui.views.command.content"
             name="%command.content.name">
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            id="org.eclipse.tcf.te.ui.views.command.search"
+            name="Search...">
       </command>
    </extension>
 
@@ -504,6 +514,30 @@
             </with>
          </activeWhen>
       </handler>
+      <handler
+            class="org.eclipse.tcf.te.ui.views.handler.ViewSearchHandler"
+            commandId="org.eclipse.tcf.te.ui.views.command.search">
+         <activeWhen>
+            <with
+                  variable="activePartId">
+               <equals
+                     value="org.eclipse.tcf.te.ui.views.View">
+               </equals>
+            </with>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tcf.te.ui.views.handler.EditorSearchHandler"
+            commandId="org.eclipse.tcf.te.ui.views.command.search">
+         <activeWhen>
+            <with
+                  variable="activePartId">
+               <equals
+                     value="org.eclipse.tcf.te.ui.views.Editor">
+               </equals>
+            </with>
+         </activeWhen>
+      </handler>
     </extension>
 
 <!-- Eclipse core expressions property tester -->
@@ -561,6 +595,18 @@
             contextId="org.eclipse.tcf.te.ui.views.View"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M3+M2+W">
+      </key>
+      <key
+            commandId="org.eclipse.tcf.te.ui.views.command.search"
+            contextId="org.eclipse.tcf.te.ui.views.View"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+S">
+      </key>
+      <key
+            commandId="org.eclipse.tcf.te.ui.views.command.search"
+            contextId="org.eclipse.tcf.te.ui.views.Editor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+S">
       </key>
    </extension>
    

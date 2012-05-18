@@ -1857,6 +1857,9 @@
          <adapter
                type="org.eclipse.ui.IPersistableElement">
          </adapter>
+         <adapter
+               type="org.eclipse.tcf.te.ui.interfaces.ILazyLoader">
+         </adapter>
       </factory>
       <factory
             adaptableType="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"
