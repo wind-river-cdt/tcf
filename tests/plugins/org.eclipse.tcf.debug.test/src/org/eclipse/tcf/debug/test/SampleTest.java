@@ -42,6 +42,10 @@ public class SampleTest extends AbstractTcfUITest {
         Assert.assertTrue(launchItem != null);
 
         VirtualItem processItem = fDebugViewListener.findElement(launchItem, new Pattern[] { Pattern.compile(".*agent.*") }  );
+        if (processItem == null) {
+            /* Windows? */
+            processItem = fDebugViewListener.findElement(launchItem, new Pattern[] { Pattern.compile("P[0-9]*") }  );
+        }
         Assert.assertTrue(processItem != null);
 
         VirtualItem threadItem = fDebugViewListener.findElement(processItem, new Pattern[] { Pattern.compile(".*" + fThreadId + ".*") }  );
