@@ -36,7 +36,7 @@ public class TCFBreakpointThreadFilterPage extends PropertyPage {
             fCategoryScopeExtension.setPropertiesFilter(category.getFilter());
             fCategoryScopeExtension.setRawContextIds(category.getContextIds());
         }
-        
+
         noDefaultAndApplyButton();
         Composite fieldEditorComposite = new Composite(parent, SWT.NONE);
         fieldEditorComposite.setLayout( new GridLayout(1, false));
@@ -52,10 +52,10 @@ public class TCFBreakpointThreadFilterPage extends PropertyPage {
     protected BreakpointScopeCategory getScopeCategory() {
         if (getElement() instanceof BreakpointScopeCategory) {
             return (BreakpointScopeCategory)getElement();
-        }        
+        }
         return null;
     }
-    
+
     protected TCFBreakpointScopeExtension getFilterExtension() {
         ICBreakpoint bp = getBreakpoint();
         if (bp != null) {

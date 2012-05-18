@@ -372,7 +372,7 @@
             label="%breakpointScope.label">
       </breakpointOrganizer>
    </extension>
-   
+
     <extension
        point="org.eclipse.ui.menus">
     <menuContribution
@@ -394,10 +394,10 @@
              </with>
           </visibleWhen>
        </command>
-    </menuContribution>    
-    
-    
+    </menuContribution>
+
+
    </extension>
-   
-   
+
+
 </plugin>

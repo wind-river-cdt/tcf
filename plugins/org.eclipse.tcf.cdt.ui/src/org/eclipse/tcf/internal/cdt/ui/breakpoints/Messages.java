@@ -27,7 +27,7 @@ public class Messages extends NLS {
     public static String BreakpointScopeCategory_filter_label;
     public static String BreakpointScopeCategory_contexts_label;
     public static String BreakpointScopeCategory_global_label;
-    
+
 
     static {
         // initialize resource bundle

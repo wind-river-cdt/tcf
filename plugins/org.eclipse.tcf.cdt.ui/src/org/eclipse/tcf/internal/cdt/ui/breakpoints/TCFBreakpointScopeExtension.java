@@ -58,7 +58,7 @@ public class TCFBreakpointScopeExtension implements ICBreakpointExtension {
     String getRawContextIds() {
         return fContextIds;
     }
-    
+
     void setRawContextIds(String contextIDs) {
         fContextIds = contextIDs;
         if (fBreakpoint != null) {
@@ -67,7 +67,7 @@ public class TCFBreakpointScopeExtension implements ICBreakpointExtension {
                     public void run(IProgressMonitor monitor) throws CoreException {
                         final IMarker m = fBreakpoint.getMarker();
                         if (m == null || !m.exists()) return;
-                        
+
                         m.setAttribute(TCFBreakpointsModel.ATTR_CONTEXTIDS, fContextIds);
                     }
                 }, null);
@@ -77,7 +77,7 @@ public class TCFBreakpointScopeExtension implements ICBreakpointExtension {
             }
         }
     }
-    
+
     public void setPropertiesFilter(String properties) {
         fProperties = properties;
         if (fBreakpoint == null) return;
@@ -98,7 +98,7 @@ public class TCFBreakpointScopeExtension implements ICBreakpointExtension {
     public String getPropertiesFilter() {
         return fProperties;
     }
-    
+
     public String[] getThreadFilters() {
         if (fContextIds != null) {
             return fContextIds.split(",\\s*");

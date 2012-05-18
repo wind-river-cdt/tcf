@@ -29,45 +29,45 @@ import org.eclipse.ui.handlers.HandlerUtil;
  */
 public class BreakpointScopeCategoryPropertiesHandler extends AbstractHandler {
 
-	/**
-	 * Constructor for CBreakpointPropertiesAction.
-	 */
-	public BreakpointScopeCategoryPropertiesHandler() {
-		super();
-	}
+    /**
+     * Constructor for CBreakpointPropertiesAction.
+     */
+    public BreakpointScopeCategoryPropertiesHandler() {
+        super();
+    }
 
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-	    IWorkbenchPart part = HandlerUtil.getActivePartChecked(event);
-            final BreakpointScopeCategory category = getScopeCategory(event.getApplicationContext());
-	    
-	    if (part != null && category != null) {
-	        PreferenceDialog dlg = PreferencesUtil.createPropertyDialogOn(part.getSite().getShell(), category, null, null, null);
-	        if (dlg != null) {
-	            dlg.open();
-	        }
+    public Object execute(ExecutionEvent event) throws ExecutionException {
+        IWorkbenchPart part = HandlerUtil.getActivePartChecked(event);
+        final BreakpointScopeCategory category = getScopeCategory(event.getApplicationContext());
+
+        if (part != null && category != null) {
+            PreferenceDialog dlg = PreferencesUtil.createPropertyDialogOn(part.getSite().getShell(), category, null, null, null);
+            if (dlg != null) {
+                dlg.open();
             }
-	    
-	    return null;
-	}
+        }
 
-	@Override
-	public void setEnabled(Object evaluationContext) {
-	    setBaseEnabled( getScopeCategory(evaluationContext) != null );
-	}
-	
-	private BreakpointScopeCategory getScopeCategory(Object evaluationContext) {
-	    if (evaluationContext instanceof IEvaluationContext) {
-	        Object s = ((IEvaluationContext) evaluationContext).getVariable(ISources.ACTIVE_MENU_SELECTION_NAME);
-	        if (s instanceof IStructuredSelection) {
-	            IStructuredSelection ss = (IStructuredSelection)s;
-	            if (ss.size() == 1 && ss.getFirstElement() instanceof IBreakpointContainer) {
-	                IAdaptable category = ((IBreakpointContainer)ss.getFirstElement()).getCategory();
-	                if (category instanceof BreakpointScopeCategory) {
-	                    return (BreakpointScopeCategory)category;
-	                }
-	            }
-	        }
-	    }
-	    return null;
-	}
+        return null;
+    }
+
+    @Override
+    public void setEnabled(Object evaluationContext) {
+        setBaseEnabled( getScopeCategory(evaluationContext) != null );
+    }
+
+    private BreakpointScopeCategory getScopeCategory(Object evaluationContext) {
+        if (evaluationContext instanceof IEvaluationContext) {
+            Object s = ((IEvaluationContext) evaluationContext).getVariable(ISources.ACTIVE_MENU_SELECTION_NAME);
+            if (s instanceof IStructuredSelection) {
+                IStructuredSelection ss = (IStructuredSelection)s;
+                if (ss.size() == 1 && ss.getFirstElement() instanceof IBreakpointContainer) {
+                    IAdaptable category = ((IBreakpointContainer)ss.getFirstElement()).getCategory();
+                    if (category instanceof BreakpointScopeCategory) {
+                        return (BreakpointScopeCategory)category;
+                    }
+                }
+            }
+        }
+        return null;
+    }
 }

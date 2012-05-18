@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
@@ -28,9 +28,9 @@ import org.eclipse.tcf.internal.debug.model.ITCFConstants;
 import org.eclipse.tcf.internal.debug.model.TCFBreakpointsModel;
 
 /**
- * Breakpoint organizer which groups breakpoints according to their 
- * breakpoint scope attributes.  
- * 
+ * Breakpoint organizer which groups breakpoints according to their
+ * breakpoint scope attributes.
+ *
  * @see IBreakpointOrganizerDelegate
  */
 @SuppressWarnings("restriction")
@@ -38,15 +38,15 @@ public class BreakpointScopeOrganizer extends AbstractBreakpointOrganizerDelegat
 
     private static IAdaptable[] DEFAULT_CATEGORY_ARRAY = new IAdaptable[] { new BreakpointScopeCategory(null, null) };
 
-    static 
+    static
     {
-        Platform.getAdapterManager().registerAdapters(new BreakpointScopeContainerAdapterFactory(), IBreakpointContainer.class);        
+        Platform.getAdapterManager().registerAdapters(new BreakpointScopeContainerAdapterFactory(), IBreakpointContainer.class);
     }
-    
+
     public BreakpointScopeOrganizer() {
         DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
     }
-    
+
     public IAdaptable[] getCategories(IBreakpoint breakpoint) {
         IMarker marker = breakpoint.getMarker();
         if (marker != null) {
@@ -62,20 +62,20 @@ public class BreakpointScopeOrganizer extends AbstractBreakpointOrganizerDelegat
         DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
         super.dispose();
     }
-    
+
     public void breakpointsAdded(IBreakpoint[] breakpoints) {
     }
-    
+
     public void breakpointsChanged(IBreakpoint[] breakpoints, IMarkerDelta[] deltas) {
-        // Using delta's to see which attributes have changed is not reliable.  
+        // Using delta's to see which attributes have changed is not reliable.
         // Therefore we need to force a full refresh of scope categories whenever
         // we get a breakpoints changed notiifcation.
         fireCategoryChanged(null);
     }
-    
+
     public void breakpointsRemoved(IBreakpoint[] breakpoints, IMarkerDelta[] deltas) {
     }
-    
+
     @Override
     public void addBreakpoint(IBreakpoint breakpoint, IAdaptable category) {
         if (category instanceof BreakpointScopeCategory && breakpoint instanceof ICBreakpoint) {
@@ -96,17 +96,17 @@ public class BreakpointScopeOrganizer extends AbstractBreakpointOrganizerDelegat
             }
         }
     }
-    
+
     @Override
     public boolean canAdd(IBreakpoint breakpoint, IAdaptable category) {
         return category instanceof BreakpointScopeCategory && breakpoint instanceof ICBreakpoint;
     }
-    
+
     @Override
     public boolean canRemove(IBreakpoint breakpoint, IAdaptable category) {
         return breakpoint instanceof ICBreakpoint;
     }
-    
+
     @Override
     public void removeBreakpoint(IBreakpoint breakpoint, IAdaptable category) {
         // Nothing to do, changes handled by add.
@@ -115,19 +115,19 @@ public class BreakpointScopeOrganizer extends AbstractBreakpointOrganizerDelegat
 
 /**
  * Adapter factory which returns the breakpoint category for a given breakpoint
- * container element that is shown in Breakpoints view. 
+ * container element that is shown in Breakpoints view.
  */
 @SuppressWarnings("restriction")
 class BreakpointScopeContainerAdapterFactory implements IAdapterFactory {
-    
+
     private static final Class<?>[] fgAdapterList = new Class[] {
         BreakpointScopeCategory.class
     };
 
     public Object getAdapter(Object obj, @SuppressWarnings("rawtypes") Class adapterType) {
         if ( !(obj instanceof IBreakpointContainer) ) return null;
-        
-        
+
+
         if ( BreakpointScopeCategory.class.equals(adapterType) ) {
             IAdaptable category = ((IBreakpointContainer)obj).getCategory();
             if (category instanceof BreakpointScopeCategory) {
@@ -136,11 +136,9 @@ class BreakpointScopeContainerAdapterFactory implements IAdapterFactory {
         }
         return null;
     }
-    
+
     @SuppressWarnings("rawtypes")
     public Class[] getAdapterList() {
         return fgAdapterList;
     }
 }
-
-

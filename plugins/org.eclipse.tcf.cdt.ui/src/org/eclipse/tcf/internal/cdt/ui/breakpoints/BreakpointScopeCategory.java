@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Wind River Systems - initial API and implementation
  *******************************************************************************/
@@ -34,17 +34,17 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
 /**
  * Element which represents a breakpoint scope grouping in Breakpoints view.
  * <p>
- * Scope grouping contains both a filter and context IDs string, however 
+ * Scope grouping contains both a filter and context IDs string, however
  * only one of them can be active on a breakpoint at one time.
- * 
+ *
  */
 public class BreakpointScopeCategory extends PlatformObject implements IWorkbenchAdapter {
 
     private static Object[] EMPTY_CHILDREN_ARRAY = new Object[0];
-    
+
     private String fFilter;
     private String fContextIds;
-    
+
     public BreakpointScopeCategory(String filter, String contextIds) {
         fFilter = filter;
         fContextIds = contextIds;
@@ -53,20 +53,20 @@ public class BreakpointScopeCategory extends PlatformObject implements IWorkbenc
     public String getFilter() {
         return fFilter;
     }
-    
+
     public String getContextIds() {
         return fContextIds;
     }
 
     /**
-     * Sets the given filter and context strings to all breakpoints which match 
+     * Sets the given filter and context strings to all breakpoints which match
      * the group's current scope settings.
      */
     void setFilter(String filter, String contextIds) {
         final List<ICBreakpoint> bps = findCategoryBreakpoints();
         fFilter = filter;
         fContextIds = contextIds;
-        
+
         if (bps.isEmpty()) return;  // No breakpoints to update
         try {
             ResourcesPlugin.getWorkspace().run(
@@ -77,7 +77,7 @@ public class BreakpointScopeCategory extends PlatformObject implements IWorkbenc
                             getScopeExtension(bp).setRawContextIds(fContextIds);
                         }
                     }
-                }, 
+                },
                 new NullProgressMonitor()
                 );
         }
@@ -85,7 +85,7 @@ public class BreakpointScopeCategory extends PlatformObject implements IWorkbenc
             Activator.log(e);
         }
     }
-    
+
     public String getLabel(Object o) {
         if (getFilter() != null) {
             return MessageFormat.format(Messages.BreakpointScopeCategory_filter_label, new Object[] { getFilter() });
@@ -94,39 +94,39 @@ public class BreakpointScopeCategory extends PlatformObject implements IWorkbenc
         }
         return Messages.BreakpointScopeCategory_global_label;
     }
-    
+
     public ImageDescriptor getImageDescriptor(Object object) {
         return ImageCache.getImageDescriptor(ImageCache.IMG_BREAKPOINT_SCOPE);
     }
-    
+
     public Object[] getChildren(Object o) {
         // Not used
         return EMPTY_CHILDREN_ARRAY;
     }
-    
+
     public Object getParent(Object o) {
         // Not used
         return null;
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof BreakpointScopeCategory) {
-            BreakpointScopeCategory other = (BreakpointScopeCategory)obj; 
-            return ((getFilter() == null && other.getFilter() == null) || 
+            BreakpointScopeCategory other = (BreakpointScopeCategory)obj;
+            return ((getFilter() == null && other.getFilter() == null) ||
                     (getFilter() != null && getFilter().equals(other.getFilter()))) &&
-                   ((getContextIds() == null && other.getContextIds() == null) || 
+                   ((getContextIds() == null && other.getContextIds() == null) ||
                     (getContextIds() != null && getContextIds().equals(other.getContextIds())));
         }
         return false;
     }
-    
+
     @Override
     public int hashCode() {
-        return (getFilter() != null ? getFilter().hashCode() : 0) + 
-                (getContextIds() != null ? getContextIds().hashCode() : 0); 
+        return (getFilter() != null ? getFilter().hashCode() : 0) +
+                (getContextIds() != null ? getContextIds().hashCode() : 0);
     }
-    
+
     private List<ICBreakpoint> findCategoryBreakpoints() {
         List<ICBreakpoint> categoryBreakpoints = new LinkedList<ICBreakpoint>();
         IBreakpoint[] breakpoints = DebugPlugin.getDefault().getBreakpointManager().getBreakpoints();
@@ -135,9 +135,9 @@ public class BreakpointScopeCategory extends PlatformObject implements IWorkbenc
             if (bp instanceof ICBreakpoint && bpMarker != null) {
                 String filter = bpMarker.getAttribute(TCFBreakpointsModel.ATTR_CONTEXT_QUERY, (String)null);
                 String contextIds = bpMarker.getAttribute(TCFBreakpointsModel.ATTR_CONTEXTIDS, (String)null);
-                if( ((getFilter() == null && filter == null) || 
+                if( ((getFilter() == null && filter == null) ||
                         (getFilter() != null && getFilter().equals(filter))) &&
-                       ((getContextIds() == null && contextIds == null) || 
+                       ((getContextIds() == null && contextIds == null) ||
                         (getContextIds() != null && getContextIds().equals(contextIds))) )
                 {
                     categoryBreakpoints.add((ICBreakpoint)bp);
