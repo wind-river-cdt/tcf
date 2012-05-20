@@ -86,7 +86,11 @@ public class TCFBreakpointScopeExtension implements ICBreakpointExtension {
                 public void run(IProgressMonitor monitor) throws CoreException {
                     final IMarker m = fBreakpoint.getMarker();
                     if (m == null || !m.exists()) return;
-                    m.setAttribute(TCFBreakpointsModel.ATTR_CONTEXT_QUERY, fProperties);
+                    if (fProperties.length() != 0)
+                        m.setAttribute(TCFBreakpointsModel.ATTR_CONTEXT_QUERY, fProperties);
+                    else
+                        m.setAttribute(TCFBreakpointsModel.ATTR_CONTEXT_QUERY, null);
+
                 }
             }, null);
         }

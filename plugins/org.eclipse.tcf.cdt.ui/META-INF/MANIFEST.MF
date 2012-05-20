@@ -32,4 +32,5 @@ Export-Package: org.eclipse.tcf.internal.cdt.launch;x-internal:=true,
  org.eclipse.tcf.internal.cdt.ui.disassembly;x-internal:=true,
  org.eclipse.tcf.internal.cdt.ui.hover;x-internal:=true,
  org.eclipse.tcf.internal.cdt.ui.launch;x-internal:=true,
+ org.eclipse.tcf.internal.cdt.ui.preferences,
  org.eclipse.tcf.internal.cdt.ui.sourcelookup;x-internal:=true

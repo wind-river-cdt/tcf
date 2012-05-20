@@ -84,7 +84,6 @@
          </enabledWhen>
       </page>
    </extension>
-
    <extension point="org.eclipse.ui.propertyPages">
       <page class="org.eclipse.tcf.internal.cdt.ui.breakpoints.TCFBreakpointThreadFilterPage"
             id="org.eclipse.tcf.breakpoint.scope.filtering"
@@ -353,7 +352,40 @@
                menubarPath="additions"/>
       </objectContribution>
    </extension>
-
+     <extension
+           point="org.eclipse.core.expressions.propertyTesters">
+        <propertyTester
+              class="org.eclipse.tcf.internal.cdt.ui.breakpoints.ToggleTCFBreakpointTester"
+              id="org.eclipse.tcf.cdt.ui.editorToggleBreakpointTester"
+              namespace="org.eclipse.tcf.cdt.ui"
+              properties="isTCFBreakpointSupported"
+              type="org.eclipse.ui.IWorkbenchPart">
+        </propertyTester>
+        <propertyTester
+              class="org.eclipse.tcf.internal.cdt.ui.breakpoints.ToggleTCFBreakpointTester"
+              id="org.eclipse.tcf.cdt.ui.declarationToggleBreakpointTester"
+              namespace="org.eclipse.tcf.cdt.ui"
+              properties="isTCFBreakpointSupported"
+              type="java.util.List">
+        </propertyTester>
+     </extension>   
+   <extension
+          point="org.eclipse.debug.ui.toggleBreakpointsTargetFactories">
+      <toggleTargetFactory
+            id="org.eclipse.tcf.debug.toggleTCFThreadBreakpointTarget"
+            class="org.eclipse.tcf.internal.cdt.ui.breakpoints.TCFToggleBreakpointsTargetFactory">
+            <enablement>
+            <!-- TODO: SDT: Comment out the testers for now.  Create a new one, to test if
+                 the current launch is TCF or not.  Should be enough. -->
+            <or>
+               <test property="org.eclipse.tcf.cdt.ui.isTCFBreakpointSupported"/>
+               <test property="org.eclipse.cdt.debug.ui.isCEditorSupportsCBreakpoint"/>
+               <test property="org.eclipse.cdt.debug.ui.isAsmEditorSupportsCBreakpoint"/>
+               <test property="org.eclipse.cdt.debug.ui.isDisassemblyEditorSupportsCBreakpoint"/>
+            </or>
+         </enablement>
+      </toggleTargetFactory>
+   </extension>
    <extension
          point="org.eclipse.ui.editors">
       <editor
@@ -365,6 +397,21 @@
       </editor>
    </extension>
    <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.debug.ui.DebugPreferencePage"
+            class="org.eclipse.tcf.internal.cdt.ui.preferences.BreakpointPreferencePage"
+            id="org.eclipse.tcf.cdt.ui.preferences.BreakpointPreferencePage"
+            name="%breakpointsPreferencePage.name">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.tcf.internal.cdt.ui.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
          point="org.eclipse.debug.ui.breakpointOrganizers">
       <breakpointOrganizer
             class="org.eclipse.tcf.internal.cdt.ui.breakpoints.BreakpointScopeOrganizer"
@@ -373,7 +420,6 @@
             label="%breakpointScope.label">
       </breakpointOrganizer>
    </extension>
-
     <extension
        point="org.eclipse.ui.menus">
     <menuContribution
@@ -396,9 +442,5 @@
           </visibleWhen>
        </command>
     </menuContribution>
-
-
    </extension>
-
-
 </plugin>
