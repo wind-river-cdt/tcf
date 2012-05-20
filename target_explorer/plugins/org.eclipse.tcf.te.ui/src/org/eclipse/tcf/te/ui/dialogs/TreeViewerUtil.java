@@ -67,20 +67,13 @@ public class TreeViewerUtil {
 	 */
 	public static void doSearch(TreeViewer viewer) {
 		TreePath rootPath = getSelectedPath(viewer);
-		Object root = getFilterRoot(viewer, rootPath);
-		if(root == viewer.getInput() || viewer.getExpandedState(root)) {
-			TreePath path;
-			if(root == viewer.getInput()) {
-				path = new TreePath(new Object[]{root});
-			}
-			else {
-				path = (TreePath) root;
-			}
-			TreeViewerSearchDialog dialog = new TreeViewerSearchDialog(viewer);
-			dialog.setStartPath(path);
-			dialog.open();
+		if (rootPath == null) {
+			rootPath = new TreePath(new Object[] { viewer.getInput() });
 		}
-    }
+		TreeViewerSearchDialog dialog = new TreeViewerSearchDialog(viewer);
+		dialog.setStartPath(rootPath);
+		dialog.open();
+	}
 
 	/**
 	 * Get the filter root for the viewer based on the root path.

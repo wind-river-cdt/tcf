@@ -6,7 +6,6 @@
  */
 package org.eclipse.tcf.te.ui.interfaces;
 
-import org.eclipse.tcf.te.ui.internal.ISearchCallback;
 
 
 /**
@@ -27,5 +26,5 @@ public interface ISearchMatcher {
 	 * 				The execution context node to be examined.
 	 * @return true if it matches or else false.
 	 */
-	boolean match(Object context);
+	public boolean match(Object context);
 }

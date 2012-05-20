@@ -9,6 +9,9 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.internal;
 
+import java.lang.reflect.InvocationTargetException;
+
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.tcf.te.ui.interfaces.ISearchMatcher;
 
@@ -28,15 +31,6 @@ import org.eclipse.tcf.te.ui.interfaces.ISearchMatcher;
  * @see ISearchCallback
  */
 public interface ITreeSearcher {
-	
-	/**
-	 * Start the search process. This method is called to clear the searching context. Each search
-	 * process is stateful process. Callers must call this method to reset the search state before
-	 * each searching process starts.
-	 * 
-	 * @param start The beginning path from which the seach process starts.
-	 */
-	public void startSearch(TreePath start);
 
 	/**
 	 * Search the viewer for the next target which matches the condition defined by the matcher. The
@@ -46,12 +40,5 @@ public interface ITreeSearcher {
 	 * @param matcher The matcher defining the searching condition. It must not be null.
 	 * @param callback The callback invoked when the next target is done. It must not be null.
 	 */
-	public void searchNext(boolean foreward, ISearchMatcher matcher, ISearchCallback callback);
-
-	/**
-	 * End the search process. This method is called to clear the searching context when the search
-	 * process is ended. Callers must call this method to clean up the state data left by the search
-	 * process.
-	 */
-	public void endSearch();
+	public TreePath searchNext(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException;
 }

@@ -15,6 +15,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 
@@ -44,7 +45,7 @@ public class TreeViewerComparator extends ViewerComparator {
 			return (e1 instanceof Pending) ? (e2 instanceof Pending ? 0 : 1) : -1;
 		}
 		Tree tree = ((TreeViewer) viewer).getTree();
-		int inverter = tree.getSortDirection() == SWT.DOWN ? -1 : 1;
+		int inverter = getSortDirection(tree) == SWT.DOWN ? -1 : 1;
 		TreeColumn treeColumn = tree.getSortColumn();
 		if(treeColumn == null) {
 			// If the sort column is not set, then use the first column.
@@ -60,5 +61,19 @@ public class TreeViewerComparator extends ViewerComparator {
 			}
 		}
 		return inverter * super.compare(viewer, e1, e2);
+	}
+	
+	int getSortDirection(final Tree tree) {
+		if(Display.getCurrent() != null) {
+			return  tree.getSortDirection();
+		}
+		final int[] result = new int[1];
+		tree.getDisplay().syncExec(new Runnable(){
+
+			@Override
+            public void run() {
+				result[0] = getSortDirection(tree);
+            }});
+		return result[0];
 	}
 }

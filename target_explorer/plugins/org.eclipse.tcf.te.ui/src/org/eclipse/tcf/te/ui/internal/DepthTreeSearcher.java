@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.internal;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -47,6 +48,7 @@ public class DepthTreeSearcher extends AbstractSearcher {
 	}
 	// The searching stack in which searching contexts are stored.
 	private LinkedList<StackElement> fSearchStack;
+	private boolean fForeward;
 
 	/**
 	 * Create an execution context searcher with the specified viewer and its
@@ -57,26 +59,22 @@ public class DepthTreeSearcher extends AbstractSearcher {
 	 * @param controller
 	 *            The controller of the execution context viewer.
 	 */
-	public DepthTreeSearcher(TreeViewer viewer) {
-		super(viewer);
+	public DepthTreeSearcher(TreeViewer viewer, ISearchMatcher matcher) {
+		super(viewer, matcher);
 	}
-
-	/**
-	 * Start the search process. This method is called to clear the searching
-	 * context. Each search process is stateful process. Callers must call this
-	 * method to reset the search state before each searching process starts.
-	 * 
-	 * @param start
-	 *            The beginning path from which the seach process starts.
-	 */
+	
 	@Override
-    public void startSearch(TreePath start) {
+    public void setStartPath(TreePath path) {
 		fSearchStack = new LinkedList<StackElement>();
-		if (start == null) {
+		if (path == null) {
 			Object obj = fViewer.getInput();
-			start = new TreePath(new Object[] { obj });
+			path = new TreePath(new Object[] { obj });
 		}
-		initSearchContext(start);
+		initSearchContext(path);
+	}
+	
+	public void setForeward(boolean foreward) {
+		fForeward = foreward;
 	}
 
 	/**
@@ -93,7 +91,7 @@ public class DepthTreeSearcher extends AbstractSearcher {
 			if (i > 0) {
 				IProgressMonitor monitor = new NullProgressMonitor();
 				Object parent = start.getSegment(i-1);
-				Object[] children = getUpdatedChildren(parent, monitor);
+                Object[] children = getUpdatedChildren(parent, monitor);
 				for (int j = 0; j < children.length; j++) {
 					if (children[j] == element) {
 						StackElement parentStack = fSearchStack.get(i - 1);
@@ -114,29 +112,30 @@ public class DepthTreeSearcher extends AbstractSearcher {
 	 * @param monitor The monitor reporting the progress.
 	 * @return The tree path whose leaf node statisfies the searching rule.
 	 */
-	@SuppressWarnings("synthetic-access")
-    protected TreePath searchNode(boolean forward, ISearchMatcher matcher, IProgressMonitor monitor) {
+	@Override
+    public TreePath searchNext(IProgressMonitor monitor)  throws InvocationTargetException, InterruptedException {
 		TreePath result = null;
 		while (!fSearchStack.isEmpty() && result == null && !monitor.isCanceled()) { //Search util the stack is empty or the result is found.
 			StackElement top = fSearchStack.getLast(); //Get the top stack element.
-			if(!forward && top.index == END_INDEX || forward && top.index == START_INDEX){
-				reportProgress(top.node, monitor);
-				result = matchContext(matcher, top.node);
+			if(!fForeward && top.index == END_INDEX || fForeward && top.index == START_INDEX){
+				String elementText = getElementText(top.node);
+				advance(elementText, monitor);
+				result = fMatcher.match(top.node) ? this.createContextPath() : null;
 			}
 			if (top.index == END_INDEX) {//If the top index is END_INDEX, it means the node has been finished.
 				fSearchStack.removeLast(); //Then discard it.
 			} else {
 				Object[] children = getUpdatedChildren(top.node, monitor);//Get current node's children.
 				if (children != null && children.length > 0) {//If there are some children.
-					if(forward && top.index == children.length-1 || !forward && top.index == 0){
+					if(fForeward && top.index == children.length-1 || !fForeward && top.index == 0){
 						//If this is the last index
 						top.index = END_INDEX;
 					}else{
 						//Increase or decrease the index according to the direction.
 						if(top.index == START_INDEX)
-							top.index = forward ? 0 : children.length - 1;
+							top.index = fForeward ? 0 : children.length - 1;
 						else
-							top.index = forward ? top.index + 1 : top.index - 1;
+							top.index = fForeward ? top.index + 1 : top.index - 1;
 						//Push the child at the index with START_INDEX into the stack.
 						fSearchStack.addLast(new StackElement(children[top.index], START_INDEX));
 					}
@@ -145,14 +144,12 @@ public class DepthTreeSearcher extends AbstractSearcher {
 				}
 			}
 		}
+		if(monitor.isCanceled()) {
+			throw new InterruptedException();
+		}
 		return result;
 	}
-	private TreePath matchContext(ISearchMatcher matcher, Object context){
-		if (matcher.match(context)) {//Match the context using the matcher.
-			return createContextPath();//If the matching is successful, assign the result with the current path.
-		}
-		return null;
-	}
+	
 	/**
 	 * Create a path using the current elements of the stack.
 	 * 

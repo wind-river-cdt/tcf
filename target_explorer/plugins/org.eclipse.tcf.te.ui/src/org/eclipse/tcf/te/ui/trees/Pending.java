@@ -9,18 +9,10 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.trees;
 
-import java.io.InputStream;
-import java.net.URL;
-
-import org.eclipse.core.runtime.ISafeRunnable;
-import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.te.ui.activator.UIPlugin;
-import org.eclipse.tcf.te.ui.interfaces.ImageConsts;
 import org.eclipse.tcf.te.ui.nls.Messages;
 
 /**
@@ -28,8 +20,6 @@ import org.eclipse.tcf.te.ui.nls.Messages;
  * displays an animated GIF image read from "pending.gif".
  */
 public class Pending {
-	// The pending images used to display the animation.
-	static Image[] pendingImages;
 	// The interval between two frames.
 	private static final int FRAME_INTERVAL = 100;
 	// Reference to the parent tree viewer
@@ -40,7 +30,8 @@ public class Pending {
 	boolean animating;
 	// The current frame index of the image list.
 	int frame;
-	
+	// The pending images used.
+	Image[] images;
 	/**
 	 * Create a pending node for the specified tree viewer.
 	 * 
@@ -51,42 +42,6 @@ public class Pending {
 		this.display = viewer.getTree().getDisplay();
 		this.animating = true;
 		this.frame = 0;
-		if(pendingImages == null) {
-			loadPendingImages(display);
-		}
-	}
-
-	/**
-	 * Load the pending images used to animate.
-	 */
-	private static void loadPendingImages(final Display display) {
-		SafeRunner.run(new ISafeRunnable() {
-			@Override
-			public void handleException(Throwable exception) {
-				// Ignore it.
-			}
-
-			@Override
-			public void run() throws Exception {
-				InputStream is = null;
-				try {
-					URL url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_ELCL + "pending.gif"); //$NON-NLS-1$
-					if (url != null) {
-						is = url.openStream();
-						ImageData[] imageDatas = new ImageLoader().load(is);
-						pendingImages = new Image[imageDatas.length];
-						for (int i = 0; i < imageDatas.length; i++) {
-							pendingImages[i] = new Image(display, imageDatas[i]);
-						}
-					}
-				}
-				finally {
-					if (is != null) {
-						try { is.close(); } catch (Exception e) {}
-					}
-				}
-			}
-		});
 	}
 	
 	/**
@@ -129,23 +84,12 @@ public class Pending {
 	 */
 	public Image getImage() {
 		Image img = null;
+		Image[] pendingImages = UIPlugin.getDefault().getPendingImages();
 		if (pendingImages != null && pendingImages.length > 0) {
 			img = pendingImages[frame++];
 			frame = frame % pendingImages.length;
 		}
 		return img;
-	}
-	
-	/**
-	 * Dispose the pending images used.
-	 */
-	public static void dispose() {
-		if (pendingImages != null && pendingImages.length > 0) {
-			for (Image img : pendingImages) {
-				img.dispose();
-			}
-		}
-		pendingImages = null;
 	}
 
 	/**

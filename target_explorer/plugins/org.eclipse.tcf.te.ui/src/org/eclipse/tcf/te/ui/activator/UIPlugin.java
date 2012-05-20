@@ -9,16 +9,22 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.activator;
 
+import java.io.InputStream;
 import java.net.URL;
 
+import org.eclipse.core.runtime.ISafeRunnable;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.ImageLoader;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.te.runtime.tracing.TraceHandler;
 import org.eclipse.tcf.te.ui.interfaces.ImageConsts;
 import org.eclipse.tcf.te.ui.jface.images.AbstractImageDescriptor;
-import org.eclipse.tcf.te.ui.trees.Pending;
 import org.eclipse.tcf.te.ui.trees.ViewerStateManager;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -30,11 +36,47 @@ public class UIPlugin extends AbstractUIPlugin {
 	private static UIPlugin plugin;
 	// The trace handler instance
 	private static volatile TraceHandler traceHandler;
+	// The pending images used to display the animation.
+	Image[] pendingImages;
 
 	/**
 	 * The constructor
 	 */
 	public UIPlugin() {
+	}
+
+	/**
+	 * Load the pending images used to animate.
+	 */
+	private void loadPendingImages() {
+		SafeRunner.run(new ISafeRunnable() {
+			@Override
+			public void handleException(Throwable exception) {
+				// Ignore it.
+			}
+
+			@Override
+			public void run() throws Exception {
+				InputStream is = null;
+				try {
+					URL url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_ELCL + "pending.gif"); //$NON-NLS-1$
+					if (url != null) {
+						is = url.openStream();
+						ImageData[] imageDatas = new ImageLoader().load(is);
+						pendingImages = new Image[imageDatas.length];
+						Display display = PlatformUI.getWorkbench().getDisplay();
+						for (int i = 0; i < imageDatas.length; i++) {
+							pendingImages[i] = new Image(display, imageDatas[i]);
+						}
+					}
+				}
+				finally {
+					if (is != null) {
+						try { is.close(); } catch (Exception e) {}
+					}
+				}
+			}
+		});
 	}
 
 	/**
@@ -75,6 +117,7 @@ public class UIPlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		loadPendingImages();
 		// Load the tree viewer's state.
 		ViewerStateManager.getInstance().loadViewerStates();
 	}
@@ -86,10 +129,19 @@ public class UIPlugin extends AbstractUIPlugin {
 	public void stop(BundleContext context) throws Exception {
 		// Save the tree viewer's state.
 		ViewerStateManager.getInstance().storeViewerStates();
-		Pending.dispose();
+		if (pendingImages != null && pendingImages.length > 0) {
+			for (Image img : pendingImages) {
+				img.dispose();
+			}
+		}
+		pendingImages = null;
 		plugin = null;
 		traceHandler = null;
 		super.stop(context);
+	}
+	
+	public Image[] getPendingImages() {
+		return pendingImages;
 	}
 
 	/* (non-Javadoc)

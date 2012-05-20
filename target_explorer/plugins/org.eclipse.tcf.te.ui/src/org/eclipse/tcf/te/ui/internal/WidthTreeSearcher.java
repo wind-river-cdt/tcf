@@ -9,34 +9,29 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.internal;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.tcf.te.ui.interfaces.ISearchMatcher;
 
 public class WidthTreeSearcher extends AbstractSearcher{
 	private Queue<TreePath> queue;
-	// The searching job.
-	private Job fSearchJob;
-	public WidthTreeSearcher(TreeViewer viewer){
-		super(viewer);
+	public WidthTreeSearcher(TreeViewer viewer, ISearchMatcher matcher){
+		super(viewer, matcher);
+	}
+
+	@Override
+    public void setStartPath(TreePath path) {
 		this.queue = new ConcurrentLinkedQueue<TreePath>();
+		this.queue.offer(path);
 	}
+
 	@Override
-	public void startSearch(TreePath start) {
-		queue.offer(start);
-	}
-	
-	@Override
-    protected TreePath searchNode(boolean forward, ISearchMatcher matcher, IProgressMonitor monitor) {
+    public TreePath searchNext(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException{
 		TreePath result = null;
 		while(!queue.isEmpty() && result == null && !monitor.isCanceled()) {
 			TreePath path = queue.poll();
@@ -48,10 +43,14 @@ public class WidthTreeSearcher extends AbstractSearcher{
 					queue.offer(childPath);
 				}
 			}
-			reportProgress(element, monitor);
-			if(matcher.match(element)) {
+			String elementText = getElementText(element);
+			advance(elementText, monitor);
+			if(fMatcher.match(element)) {
 				result = path;
 			}
+		}
+		if(monitor.isCanceled()) {
+			throw new InterruptedException();
 		}
 	    return result;
     }
