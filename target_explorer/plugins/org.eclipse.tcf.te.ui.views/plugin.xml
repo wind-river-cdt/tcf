@@ -600,13 +600,13 @@
             commandId="org.eclipse.tcf.te.ui.views.command.search"
             contextId="org.eclipse.tcf.te.ui.views.View"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+S">
+            sequence="M1+M2+S">
       </key>
       <key
             commandId="org.eclipse.tcf.te.ui.views.command.search"
             contextId="org.eclipse.tcf.te.ui.views.Editor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+S">
+            sequence="M1+M2+S">
       </key>
    </extension>
    
