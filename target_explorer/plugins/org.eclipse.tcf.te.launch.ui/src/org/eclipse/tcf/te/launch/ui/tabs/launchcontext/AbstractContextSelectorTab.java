@@ -50,7 +50,7 @@ public abstract class AbstractContextSelectorTab extends AbstractFormsLaunchConf
 		layout.makeColumnsEqualWidth = true;
 		layout.numColumns = 1;
 		panel.setLayout(layout);
-		panel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		panel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		panel.setBackground(parent.getBackground());
 
 		selectorSection = doCreateContextSelectorSection(getManagedForm(), panel);

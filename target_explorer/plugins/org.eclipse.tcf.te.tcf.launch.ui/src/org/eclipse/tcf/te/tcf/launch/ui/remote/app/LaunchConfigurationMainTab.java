@@ -40,7 +40,7 @@ public class LaunchConfigurationMainTab extends AbstractContextSelectorTab {
 		Composite panel = toolkit.getFormToolkit().createComposite(parent);
 		GridLayout	layout = new GridLayout(1, false);
 		panel.setLayout(layout);
-		panel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		panel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		panel.setBackground(parent.getBackground());
 
 		LaunchConfigurationMainTabSection section = new LaunchConfigurationMainTabSection(form, panel);
