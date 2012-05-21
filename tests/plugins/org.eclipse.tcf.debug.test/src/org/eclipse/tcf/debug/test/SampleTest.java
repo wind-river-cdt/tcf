@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.VirtualItem;
 import org.eclipse.tcf.debug.test.services.IWaitForEventCache;
 import org.eclipse.tcf.debug.test.services.RunControlCM;
+import org.eclipse.tcf.debug.test.services.RunControlCM.ContextState;
 import org.eclipse.tcf.debug.test.util.ICache;
 import org.eclipse.tcf.debug.test.util.RangeCache;
 import org.eclipse.tcf.debug.test.util.Transaction;
@@ -29,6 +30,8 @@ import org.eclipse.tcf.services.IRunControl.RunControlContext;
 import org.eclipse.tcf.services.IStackTrace.StackTraceContext;
 import org.eclipse.tcf.services.ISymbols;
 import org.eclipse.tcf.services.ISymbols.Symbol;
+import org.eclipse.test.performance.Performance;
+import org.eclipse.test.performance.PerformanceMeter;
 import org.junit.Assert;
 
 @SuppressWarnings("restriction")
@@ -103,7 +106,6 @@ public class SampleTest extends AbstractTcfUITest {
         }
     }
 
-/** DISABLED: Hangs on execution on szg-build
     public void testSteppingPerformanceWithSourceDisplay() throws Exception {
         initProcessModel("tcf_test_func0");
 
@@ -157,7 +159,7 @@ public class SampleTest extends AbstractTcfUITest {
         }
 
     }
-*/
+
 
     private CodeArea calcPCCodeArea() throws ExecutionException, InterruptedException {
         return new Transaction<CodeArea>() {

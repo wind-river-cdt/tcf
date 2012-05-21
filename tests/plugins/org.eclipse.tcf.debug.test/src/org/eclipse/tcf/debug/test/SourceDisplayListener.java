@@ -12,10 +12,13 @@ package org.eclipse.tcf.debug.test;
 
 import java.util.Iterator;
 
+import org.eclipse.cdt.debug.internal.core.sourcelookup.CSourceNotFoundElement;
 import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.debug.ui.sourcelookup.CommonSourceNotFoundEditor;
+import org.eclipse.debug.ui.sourcelookup.CommonSourceNotFoundEditorInput;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -25,6 +28,7 @@ import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.IAnnotationModelListener;
 import org.eclipse.tcf.services.ILineNumbers.CodeArea;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPage;
@@ -43,7 +47,7 @@ public class SourceDisplayListener implements IPartListener, IAnnotationModelLis
     private static final String ANNOTATION_TOP_FRAME = "org.eclipse.tcf.debug.top_frame";
     
     private IWorkbenchPage fPage;
-    private ITextEditor fActiveEditor;
+    private IEditorPart fActiveEditor;
     
     private IPath fExpectedFile;
     private int fExpectedLine;
@@ -101,7 +105,7 @@ public class SourceDisplayListener implements IPartListener, IAnnotationModelLis
     
     public synchronized boolean isFinished() {
         if (isTimedOut()) {
-            throw new RuntimeException("Timed Out: " + toString());
+            throw new RuntimeException("Timed Out: "  + toString());
         }
         
         return fFileFound && fAnnotationFound;
@@ -117,8 +121,8 @@ public class SourceDisplayListener implements IPartListener, IAnnotationModelLis
             fAnnotationModel.removeAnnotationModelListener(this);
         }
         
-        if (part instanceof ITextEditor) {
-            fActiveEditor = ((ITextEditor)part);
+        if (part instanceof IEditorPart) {
+            fActiveEditor = ((IEditorPart)part);
             checkFile();
         }
     }
@@ -145,6 +149,11 @@ public class SourceDisplayListener implements IPartListener, IAnnotationModelLis
             location = file.getLocation();
         } else if (input instanceof FileStoreEditorInput) {
             location = URIUtil.toPath(((FileStoreEditorInput)input).getURI()); 
+        } else if (input instanceof CommonSourceNotFoundEditorInput) {
+            Object artifact = ((CommonSourceNotFoundEditorInput)input).getArtifact();
+            if (artifact instanceof CSourceNotFoundElement) {
+                location = new Path( ((CSourceNotFoundElement)artifact).getFile() );
+            }
         }
         
         if (location != null && fExpectedFile != null &&
@@ -152,11 +161,16 @@ public class SourceDisplayListener implements IPartListener, IAnnotationModelLis
         {
             fFileFound = true;
             
-            IDocumentProvider docProvider = fActiveEditor.getDocumentProvider();
-            fAnnotationModel = docProvider.getAnnotationModel(fActiveEditor.getEditorInput());
-            fAnnotationModel.addAnnotationModelListener(this);
+            if (fActiveEditor instanceof ITextEditor) { 
+                IDocumentProvider docProvider = ((ITextEditor)fActiveEditor).getDocumentProvider();
+                fAnnotationModel = docProvider.getAnnotationModel(fActiveEditor.getEditorInput());
+                fAnnotationModel.addAnnotationModelListener(this);
             
-            checkAnnotations();
+                checkAnnotations();
+            } else if (fActiveEditor instanceof CommonSourceNotFoundEditor) {
+                // No annotation will be painted if source not found.
+                fAnnotationFound = true;
+            }
         }
     }
     
@@ -168,13 +182,15 @@ public class SourceDisplayListener implements IPartListener, IAnnotationModelLis
     }
     
     private Position calcExpectedPosition() {
-        IDocument doc = fActiveEditor.getDocumentProvider().getDocument(fActiveEditor.getEditorInput());
-        if (doc == null) return null;
-        try {
-            IRegion region = doc.getLineInformation(fExpectedLine - 1);
-            return new Position(region.getOffset(), region.getLength());
-        } catch (BadLocationException e) {
-        }
+    	if (fActiveEditor instanceof ITextEditor) {
+	        IDocument doc = ((ITextEditor)fActiveEditor).getDocumentProvider().getDocument(fActiveEditor.getEditorInput());
+	        if (doc == null) return null;
+	        try {
+	            IRegion region = doc.getLineInformation(fExpectedLine - 1);
+	            return new Position(region.getOffset(), region.getLength());
+	        } catch (BadLocationException e) {
+	        }
+    	}
         return null;
     }
     
