@@ -19,30 +19,29 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.te.ui.dialogs.FilteredCheckedListDialog;
-import org.eclipse.tcf.te.ui.interfaces.IDescriptionLabelProvider;
 import org.eclipse.tcf.te.ui.views.nls.Messages;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.internal.navigator.NavigatorFilterService;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.navigator.ICommonFilterDescriptor;
+import org.eclipse.ui.navigator.IDescriptionProvider;
 import org.eclipse.ui.navigator.INavigatorContentService;
 
 /**
- * The handler to configure filters in Target Explorer. 
+ * The handler to configure filters in Target Explorer.
  */
 @SuppressWarnings("restriction")
 public class ConfigFiltersHandler extends AbstractHandler {
 
 	/**
-	 * The label provider for common filter descriptors to provide labels, images, and descriptions for 
+	 * The label provider for common filter descriptors to provide labels, images, and descriptions for
 	 * a common filter descriptor.
 	 */
-	class CommonFilterDescriptorLabelProvider extends LabelProvider implements IDescriptionLabelProvider {
-		
-		/*
-		 * (non-Javadoc)
-		 * @see org.eclipse.tcf.te.ui.interfaces.IDescriptiveLabelProvider#getDescription(java.lang.Object)
+	class CommonFilterDescriptorLabelProvider extends LabelProvider implements IDescriptionProvider {
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.ui.navigator.IDescriptionProvider#getDescription(java.lang.Object)
 		 */
 		@Override
         public String getDescription(Object element) {
@@ -51,7 +50,7 @@ public class ConfigFiltersHandler extends AbstractHandler {
 			}
 			return null;
         }
-		
+
 		/*
 		 * (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
@@ -64,7 +63,7 @@ public class ConfigFiltersHandler extends AbstractHandler {
 			return null;
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
@@ -102,10 +101,10 @@ public class ConfigFiltersHandler extends AbstractHandler {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Activate the specified common filters specified in the element array.
-	 * 
+	 *
 	 * @param commonViewer The common viewer to be updated with the viewer filters.
 	 * @param elements The common filters to be activated.
 	 */
@@ -114,7 +113,7 @@ public class ConfigFiltersHandler extends AbstractHandler {
 		for (int i=0;i<elements.length;i++) {
 			ICommonFilterDescriptor descriptor = (ICommonFilterDescriptor) elements[i];
 			filterIdsToActivate[i] = descriptor.getId();
-		} 
+		}
 		UpdateActiveFiltersOperation updateFilters = new UpdateActiveFiltersOperation(commonViewer, filterIdsToActivate);
 		updateFilters.execute(null, null);
     }

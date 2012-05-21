@@ -12,9 +12,9 @@ package org.eclipse.tcf.te.ui.views.handler;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.tcf.te.ui.interfaces.IDescriptionLabelProvider;
 import org.eclipse.tcf.te.ui.views.nls.Messages;
 import org.eclipse.ui.internal.navigator.extensions.NavigatorContentDescriptorManager;
+import org.eclipse.ui.navigator.IDescriptionProvider;
 import org.eclipse.ui.navigator.INavigatorContentDescriptor;
 
 /**
@@ -22,15 +22,14 @@ import org.eclipse.ui.navigator.INavigatorContentDescriptor;
  * texts for content descriptors.
  */
 @SuppressWarnings("restriction")
-class ContentDescriptorLabelProvider extends LabelProvider implements IDescriptionLabelProvider {
+class ContentDescriptorLabelProvider extends LabelProvider implements IDescriptionProvider {
 	// The shared instance
 	static ContentDescriptorLabelProvider instance = new ContentDescriptorLabelProvider();
 	// Used to acquire images for specified navigator content descriptors.
 	private static final NavigatorContentDescriptorManager CONTENT_DESCRIPTOR_REGISTRY = NavigatorContentDescriptorManager .getInstance();
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.interfaces.IDescriptiveLabelProvider#getDescription(java.lang.Object)
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.navigator.IDescriptionProvider#getDescription(java.lang.Object)
 	 */
 	@Override
 	public String getDescription(Object element) {

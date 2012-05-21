@@ -19,6 +19,7 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -48,26 +49,26 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tcf.te.ui.activator.UIPlugin;
-import org.eclipse.tcf.te.ui.interfaces.IDescriptionLabelProvider;
 import org.eclipse.tcf.te.ui.nls.Messages;
 import org.eclipse.ui.dialogs.SelectionStatusDialog;
+import org.eclipse.ui.navigator.IDescriptionProvider;
 
 /**
- * A selection dialog with a checked list and a filter text field. 
+ * A selection dialog with a checked list and a filter text field.
  */
 public class FilteredCheckedListDialog extends SelectionStatusDialog implements ISelectionChangedListener {
 	// The pattern filter used filter the content of the list.
 	TablePatternFilter patternFilter;
 	// The text field used to enter filters.
 	Text filterText;
-	// The check-box style table used to display a list and select elements. 
+	// The check-box style table used to display a list and select elements.
 	CheckboxTableViewer tableViewer;
 	// The button of select All.
 	Button btnSelAll;
 	// The button of deselect All
 	Button btnDesAll;
 	// The label provider used to provide labels, images and descriptions for the listed items.
-	IDescriptionLabelProvider labelProvider;
+	ILabelProvider labelProvider;
 	// The initial filter displayed in the filter text field.
 	String filter;
 	// The elements to be selected.
@@ -77,7 +78,7 @@ public class FilteredCheckedListDialog extends SelectionStatusDialog implements 
 
 	/**
 	 * Constructor used to instantiate a dialog with a specified parent.
-	 * 
+	 *
 	 * @param shell The parent shell.
 	 */
 	public FilteredCheckedListDialog(Shell shell) {
@@ -87,7 +88,7 @@ public class FilteredCheckedListDialog extends SelectionStatusDialog implements 
 
 	/**
 	 * Set the initial filter text to be displayed in the filter text field.
-	 * 
+	 *
 	 * @param filterText The initial filter text.
 	 */
 	public void setFilterText(String filterText) {
@@ -97,16 +98,16 @@ public class FilteredCheckedListDialog extends SelectionStatusDialog implements 
 	/**
 	 * Set the label provider used to provide labels, images and descriptive text
 	 * for items in the list.
-	 * 
+	 *
 	 * @param labelProvider The new label provider.
 	 */
-	public void setLabelProvider(IDescriptionLabelProvider labelProvider) {
+	public void setLabelProvider(ILabelProvider labelProvider) {
 		this.labelProvider = labelProvider;
 	}
 
 	/**
 	 * Set elements to be displayed in the list for selection.
-	 * 
+	 *
 	 * @param elements The elements.
 	 */
 	public void setElements(Object[] elements) {
@@ -121,11 +122,11 @@ public class FilteredCheckedListDialog extends SelectionStatusDialog implements 
 	public void selectionChanged(SelectionChangedEvent event) {
 		IStructuredSelection structuredSelection = (IStructuredSelection) event.getSelection();
 		Object element = structuredSelection.getFirstElement();
-		String description = labelProvider.getDescription(element);
+		String description = labelProvider instanceof IDescriptionProvider ? ((IDescriptionProvider)labelProvider).getDescription(element) : null;
 		if (description == null) description = element == null ? "" : "Enable "+labelProvider.getText(element)+"."; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		updateStatus(new Status(IStatus.OK, UIPlugin.getUniqueIdentifier(), description));
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.dialogs.SelectionStatusDialog#computeResult()
@@ -152,7 +153,7 @@ public class FilteredCheckedListDialog extends SelectionStatusDialog implements 
 
 	/**
 	 * Get accessible name for the filter text field.
-	 * 
+	 *
 	 * @param e The accessible event.
 	 */
 	protected void getAccessibleName(AccessibleEvent e) {
@@ -167,7 +168,7 @@ public class FilteredCheckedListDialog extends SelectionStatusDialog implements 
 
 	/**
 	 * Called when the filter text field gains focus.
-	 * 
+	 *
 	 * @param e The focus event.
 	 */
 	protected void filterTextFocusGained(FocusEvent e) {
@@ -178,7 +179,7 @@ public class FilteredCheckedListDialog extends SelectionStatusDialog implements 
 
 	/**
 	 * Called when a mouse up event happens to the filter text field.
-	 * 
+	 *
 	 * @param e The mouse up event.
 	 */
 	protected void filterTextMouseUp(MouseEvent e) {
@@ -189,7 +190,7 @@ public class FilteredCheckedListDialog extends SelectionStatusDialog implements 
 
 	/**
 	 * Called when a key event happens to the filter text field.
-	 * 
+	 *
 	 * @param e The key event.
 	 */
 	protected void filterTextKeyPressed(KeyEvent e) {
@@ -201,7 +202,7 @@ public class FilteredCheckedListDialog extends SelectionStatusDialog implements 
 
 	/**
 	 * Called when a traverse event happens to the filter text field.
-	 * 
+	 *
 	 * @param e The traverse event.
 	 */
 	protected void filterTextKeyTraversed(TraverseEvent e) {
@@ -228,10 +229,10 @@ public class FilteredCheckedListDialog extends SelectionStatusDialog implements 
 			}
 		}
 	}
-	
+
 	/**
 	 * Called when a text modification event happens.
-	 * 
+	 *
 	 * @param e The modification event.
 	 */
 	protected void filterTextModifyText(ModifyEvent e) {
@@ -244,17 +245,17 @@ public class FilteredCheckedListDialog extends SelectionStatusDialog implements 
 
 	/**
 	 * Called when a list item is checked or unchecked.
-	 * 
+	 *
 	 * @param event The check event.
 	 */
 	protected void tableCheckStateChanged(CheckStateChangedEvent event) {
 		if (event.getChecked()) checkedItems.add(event.getElement());
 		else checkedItems.remove(event.getElement());
 	}
-	
+
 	/**
 	 * Create the filter text field and add listeners to respond to control input.
-	 * 
+	 *
 	 * @param composite The parent composite.
 	 */
 	private void createPatternFilterText(Composite composite) {
@@ -304,7 +305,7 @@ public class FilteredCheckedListDialog extends SelectionStatusDialog implements 
 
 	/**
 	 * Create the checked list and add check state changed listener to monitor events.
-	 * 
+	 *
 	 * @param composite The parent composite.
 	 */
 	private void createTable(Composite composite) {
@@ -319,7 +320,7 @@ public class FilteredCheckedListDialog extends SelectionStatusDialog implements 
 		data.heightHint = 120;
 		data.widthHint = 200;
 		tableViewer.getTable().setLayoutData(data);
-		
+
 		tableViewer.setContentProvider(ArrayContentProvider.getInstance());
 		tableViewer.setLabelProvider(labelProvider);
 		patternFilter = new TablePatternFilter(labelProvider);
@@ -333,7 +334,7 @@ public class FilteredCheckedListDialog extends SelectionStatusDialog implements 
 		composite.setLayout(layout);
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 		composite.setLayoutData(data);
-		
+
 		btnSelAll = new Button(composite, SWT.PUSH);
 		btnSelAll.setText(Messages.FilteredCheckedListDialog_SelAllText);
 		btnSelAll.addSelectionListener(new SelectionAdapter(){
@@ -342,7 +343,7 @@ public class FilteredCheckedListDialog extends SelectionStatusDialog implements 
 				selectAll();
             }
 		});
-		
+
 		btnDesAll = new Button(composite, SWT.PUSH);
 		btnDesAll.setText(Messages.FilteredCheckedListDialog_DesAllText);
 		btnDesAll.addSelectionListener(new SelectionAdapter(){
@@ -352,7 +353,7 @@ public class FilteredCheckedListDialog extends SelectionStatusDialog implements 
             }
 		});
     }
-	
+
 	void selectAll() {
 		TableItem[] items = tableViewer.getTable().getItems();
 		for (TableItem item : items) {
@@ -362,7 +363,7 @@ public class FilteredCheckedListDialog extends SelectionStatusDialog implements 
 			}
 		}
 	}
-	
+
 	void deselectAll() {
 		TableItem[] children = tableViewer.getTable().getItems();
 		for (TableItem item : children) {
