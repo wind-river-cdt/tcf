@@ -32,7 +32,7 @@ public class LaunchTreeLabelProvider extends LabelProvider implements ILabelDeco
 		if (element instanceof LaunchNode) {
 			return ((LaunchNode)element).getName();
 		}
-		return super.getText(element);
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -60,7 +60,7 @@ public class LaunchTreeLabelProvider extends LabelProvider implements ILabelDeco
 				return decorateImage(image, element);
 			}
 		}
-		return super.getImage(element);
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -93,6 +93,9 @@ public class LaunchTreeLabelProvider extends LabelProvider implements ILabelDeco
 	 */
 	@Override
 	public String getDescription(Object element) {
-		return getText(element);
+		if (element instanceof LaunchNode) {
+			return getText(element);
+		}
+		return null;
 	}
 }
