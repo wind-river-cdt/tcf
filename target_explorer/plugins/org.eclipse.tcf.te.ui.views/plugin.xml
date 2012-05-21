@@ -327,7 +327,7 @@
          </command>
          <command
                commandId="org.eclipse.tcf.te.ui.views.command.search"
-               label="Search..."
+               label="%menu.search.label"
                style="push">
          </command>
       </menuContribution>
@@ -373,7 +373,7 @@
       <command
             categoryId="org.eclipse.tcf.te.ui.commands.category"
             id="org.eclipse.tcf.te.ui.views.command.search"
-            name="Search...">
+            name="%command.search.name">
       </command>
    </extension>
 

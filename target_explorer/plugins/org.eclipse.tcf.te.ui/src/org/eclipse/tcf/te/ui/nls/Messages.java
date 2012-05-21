@@ -84,7 +84,6 @@ public class Messages extends NLS {
 	public static String TreeViewerSearchDialog_LblCancelText;
 	public static String TreeViewerSearchDialog_MainTaskName;
 	public static String TreeViewerSearchDialog_NoSuchNode;
-	public static String TreeViewerSearchDialog_NoSuchNode1;
 	public static String TreeViewerSearchDialog_SearchAlgorithm;
 	public static String TreeViewerSearchDialog_BreadthFirst;
 	public static String ViewerStateManager_MkdirFailed;

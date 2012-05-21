@@ -19,20 +19,10 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.tcf.te.ui.interfaces.ISearchMatcher;
 
 /**
- * The search engine for the execution context viewer. It has three methods
- * which defines the process of searching elements in the viewer:
- * <ol>
- * <li><code>startSearch</code> with an initial path to prepare the searching
- * context.</li>
- * <li><code>searchNext</code> to search an element with a rule defined by
- * ISearchMatcher.</li>
- * <li><code>endSearch</code> to clear up the searching context.</li>
- * </ol>
- * 
- * @see ISearchMatcher
- * @see ISearchCallback
+ * The search engine which uses DFS(depth-first search) algorithm
+ * to search elements that matches a specified matcher.
  */
-public class DepthTreeSearcher extends AbstractSearcher {
+public class DepthFirstSearcher extends AbstractSearcher {
 	private static final int START_INDEX = -1;
 	private static final int END_INDEX = -2;
 
@@ -48,21 +38,24 @@ public class DepthTreeSearcher extends AbstractSearcher {
 	}
 	// The searching stack in which searching contexts are stored.
 	private LinkedList<StackElement> fSearchStack;
+	// The searching direction.
 	private boolean fForeward;
 
 	/**
-	 * Create an execution context searcher with the specified viewer and its
-	 * controller.
+	 * Create a depth-first searcher with the specified viewer and a
+	 * matcher.
 	 * 
-	 * @param viewer
-	 *            The execution context viewer.
-	 * @param controller
-	 *            The controller of the execution context viewer.
+	 * @param viewer The tree viewer.
+	 * @param matcher The search matcher used match a single tree node.
 	 */
-	public DepthTreeSearcher(TreeViewer viewer, ISearchMatcher matcher) {
+	public DepthFirstSearcher(TreeViewer viewer, ISearchMatcher matcher) {
 		super(viewer, matcher);
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.interfaces.ITreeSearcher#setStartPath(org.eclipse.jface.viewers.TreePath)
+	 */
 	@Override
     public void setStartPath(TreePath path) {
 		fSearchStack = new LinkedList<StackElement>();
@@ -73,6 +66,11 @@ public class DepthTreeSearcher extends AbstractSearcher {
 		initSearchContext(path);
 	}
 	
+	/**
+	 * Set the searching direction.
+	 * 
+	 * @param foreward searching direction.
+	 */
 	public void setForeward(boolean foreward) {
 		fForeward = foreward;
 	}
@@ -105,12 +103,10 @@ public class DepthTreeSearcher extends AbstractSearcher {
 	}
 
 	/**
-	 * Search the tree using a matcher when the data model is not lazy.
+	 * Search the tree using a matcher using DFS algorithm.
 	 * 
-	 * @param forward Forward search or backward search.
-	 * @param matcher The matcher defining the searching rule.
 	 * @param monitor The monitor reporting the progress.
-	 * @return The tree path whose leaf node statisfies the searching rule.
+	 * @return The tree path whose leaf node satisfies the searching rule.
 	 */
 	@Override
     public TreePath searchNext(IProgressMonitor monitor)  throws InvocationTargetException, InterruptedException {
@@ -119,7 +115,7 @@ public class DepthTreeSearcher extends AbstractSearcher {
 			StackElement top = fSearchStack.getLast(); //Get the top stack element.
 			if(!fForeward && top.index == END_INDEX || fForeward && top.index == START_INDEX){
 				String elementText = getElementText(top.node);
-				advance(elementText, monitor);
+				monitor.subTask(elementText);
 				result = fMatcher.match(top.node) ? this.createContextPath() : null;
 			}
 			if (top.index == END_INDEX) {//If the top index is END_INDEX, it means the node has been finished.

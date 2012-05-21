@@ -18,6 +18,9 @@ import org.eclipse.tcf.te.ui.views.internal.View;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 
+/**
+ * The search handler to search elements in the tree of Target Explorer view.
+ */
 public class ViewSearchHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {

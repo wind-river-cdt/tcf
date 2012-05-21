@@ -13,50 +13,75 @@ import java.lang.reflect.Method;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.te.ui.interfaces.ILazyLoader;
 import org.eclipse.tcf.te.ui.interfaces.ISearchMatcher;
+import org.eclipse.tcf.te.ui.interfaces.ITreeSearcher;
 import org.eclipse.tcf.te.ui.trees.Pending;
 import org.eclipse.ui.PlatformUI;
 
+/**
+ * The abstract implementation of ITreeSearcher which provides common utility methods
+ * for traversing.
+ */
 public abstract class AbstractSearcher implements ITreeSearcher {
-	private static Method methodGetSortedChildren;
+	// The method to access AbstractTreeViewer#getSortedChildren in order to the children visually on the tree.
+	static Method methodGetSortedChildren;
 	static {
-		try {
-	        methodGetSortedChildren = AbstractTreeViewer.class.getDeclaredMethod("getSortedChildren", new Class[]{Object.class}); //$NON-NLS-1$
-	        methodGetSortedChildren.setAccessible(true);
-        }
-        catch (Exception e) {
-        }
+		SafeRunner.run(new ISafeRunnable(){
+			@Override
+            public void handleException(Throwable exception) {
+	            // Ignore on purpose.
+            }
+			@Override
+            public void run() throws Exception {
+				// Initialize the method object.
+		        methodGetSortedChildren = AbstractTreeViewer.class.
+		        				getDeclaredMethod("getSortedChildren", new Class[]{Object.class}); //$NON-NLS-1$
+		        // Because "getSortedChildren" is a protected method, we need to make it accessible.
+		        methodGetSortedChildren.setAccessible(true);
+            }});
 	}
+	// The tree viewer to be searched.
 	protected TreeViewer fViewer;
 	// The label provider of the tree viewer.
-	private ILabelProvider fLabelProvider;
+	protected ILabelProvider fLabelProvider;
+	// The matcher used to match eacho tree nodes.
 	protected ISearchMatcher fMatcher;
-	public AbstractSearcher(TreeViewer viewer, ISearchMatcher matcher) {
+	
+	/**
+	 * Create a searcher with the specified viewer and matcher.
+	 * 
+	 * @param viewer The tree viewer to be searched.
+	 * @param matcher The matcher used to match tree nodes.
+	 */
+	protected AbstractSearcher(TreeViewer viewer, ISearchMatcher matcher) {
 		fViewer = viewer;
 		fLabelProvider = (ILabelProvider) fViewer.getLabelProvider();
 		fMatcher = matcher;
 	}
 	
-	abstract public void setStartPath(TreePath path);
-	
-	public String getElementText(final Object element) {
+	/**
+	 * Get the text representation of a element using the label provider
+	 * of the tree viewer. 
+	 * Note: this method could be called at any thread.
+	 * 
+	 * @param element The element.
+	 * @return The text representation.
+	 */
+	protected String getElementText(final Object element) {
 		if (Display.getCurrent() != null) {
 			if(element == fViewer.getInput()) return "the root"; //$NON-NLS-1$
-			String elementText;
 			if (fLabelProvider != null) {
-				elementText = fLabelProvider.getText(element);
+				return fLabelProvider.getText(element);
 			}
-			else {
-				elementText = element == null ? "" : element.toString(); //$NON-NLS-1$
-			}
-			return elementText;
+			return element == null ? "" : element.toString(); //$NON-NLS-1$
 		}
 		final String[] result = new String[1];
 		fViewer.getTree().getDisplay().syncExec(new Runnable() {
@@ -67,11 +92,16 @@ public abstract class AbstractSearcher implements ITreeSearcher {
         });
 		return result[0];
 	}
-	
-	protected void advance(String msg, IProgressMonitor monitor) {
-		monitor.subTask(msg);
-	}
 
+	/**
+	 * Update the children of the specified parent. If the data of the parent 
+	 * is lazily loaded and not loaded yet, then load the data first, before getting
+	 * the children.
+	 * 
+	 * @param parent The parent node to get the updated children from.
+	 * @param monitor The progress monitor used while loading data.
+	 * @return The updated children of the parent node.
+	 */
 	protected Object[] getUpdatedChildren(final Object parent, final IProgressMonitor monitor) {
 		if (parent instanceof Pending) return new Object[0];
 		final ILazyLoader lazyLoader = getLazyLoader(parent);
@@ -88,36 +118,52 @@ public abstract class AbstractSearcher implements ITreeSearcher {
 		return children;
 	}
 
-	Object[] getSortedChildren(final Object parentElementOrTreePath) {
-		if(Display.getCurrent() != null) {
-		try {
-			if (methodGetSortedChildren != null) {
-				return (Object[]) methodGetSortedChildren.invoke(fViewer, parentElementOrTreePath);
+	/**
+	 * Get the current visible/sorted children under the specified parent element or path
+	 * by invoking the reflective method. This method is UI thread-safe.
+	 * 
+	 * @param parentElementOrTreePath The parent element or path.
+	 * @return The current visible/sorted children of the parent path/element.
+	 */
+	protected Object[] getSortedChildren(final Object parentElementOrTreePath) {
+		if (Display.getCurrent() != null) {
+			try {
+				if (methodGetSortedChildren != null) {
+					return (Object[]) methodGetSortedChildren
+					                .invoke(fViewer, parentElementOrTreePath);
+				}
 			}
+			catch (Exception e) {
+			}
+			return new Object[0];
 		}
-		catch (Exception e) {
-		}
-		return new Object[0];
-		}
-		final Object[][]result = new Object[1][];
-		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable(){
+		final Object[][] result = new Object[1][];
+		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
 			@Override
-            public void run() {
+			public void run() {
 				result[0] = getSortedChildren(parentElementOrTreePath);
-            }});
+			}
+		});
 		return result[0];
 	}
 
-	private ILazyLoader getLazyLoader(Object parent) {
+	/**
+	 * Get a lazy loader from the specified element if it could be
+	 * adapted to a lazy loader.
+	 * 
+	 * @param element The element to get the lazy loader from.
+	 * @return A lazy loader or null if it is not adapted to a lazy loader.
+	 */
+	private ILazyLoader getLazyLoader(Object element) {
 		ILazyLoader loader = null;
-		if(parent instanceof ILazyLoader) {
-			loader = (ILazyLoader) parent;
+		if(element instanceof ILazyLoader) {
+			loader = (ILazyLoader) element;
 		}
-		if(loader == null && parent instanceof IAdaptable) {
-			loader = (ILazyLoader)((IAdaptable)parent).getAdapter(ILazyLoader.class);
+		if(loader == null && element instanceof IAdaptable) {
+			loader = (ILazyLoader)((IAdaptable)element).getAdapter(ILazyLoader.class);
 		}
 		if(loader == null) {
-			loader = (ILazyLoader) Platform.getAdapterManager().getAdapter(parent, ILazyLoader.class);
+			loader = (ILazyLoader) Platform.getAdapterManager().getAdapter(element, ILazyLoader.class);
 		}
 	    return loader;
     }

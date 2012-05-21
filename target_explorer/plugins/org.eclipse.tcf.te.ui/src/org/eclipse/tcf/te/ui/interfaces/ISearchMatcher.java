@@ -1,30 +1,28 @@
-/*
- * ISearchMatcher.java
- * Created on Feb 15, 2011
+/*******************************************************************************
+ * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others. All rights reserved.
+ * This program and the accompanying materials are made available under the terms
+ * of the Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
  *
- * Copyright 2008 Wind River Systems Inc. All rights reserved.
- */
+ * Contributors:
+ * Wind River Systems - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.tcf.te.ui.interfaces;
 
 
 
 /**
  * The search matcher interface. A class implementing this interface defines 
- * the searching rule. It is used by {@link ExecutionContextViewer#searchNext} 
- * to find context nodes which matches the rule.
- * 
- * @see ISearchCallback
- * @see ExecutionContextViewer
- * @author william.chen@windriver.com
- *
+ * the searching rule. 
  */
 public interface ISearchMatcher {
+	
 	/**
-	 * If the current context node matches the matching rule.
+	 * If the element matches the matching rule.
 	 * 
-	 * @param context
-	 * 				The execution context node to be examined.
+	 * @param element
+	 * 				The element to be examined.
 	 * @return true if it matches or else false.
 	 */
-	public boolean match(Object context);
+	public boolean match(Object element);
 }

@@ -203,6 +203,11 @@
                label="%command.reset.label"
                style="push">
          </command>
+         <command
+               commandId="org.eclipse.tcf.te.ui.views.command.search"
+               label="%command.search.label"
+               style="push">
+         </command>
          <separator
                name="group.properties"
                visible="true">

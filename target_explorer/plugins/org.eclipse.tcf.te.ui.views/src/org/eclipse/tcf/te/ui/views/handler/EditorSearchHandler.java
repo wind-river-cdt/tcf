@@ -20,7 +20,14 @@ import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.editor.IFormPage;
 import org.eclipse.ui.handlers.HandlerUtil;
 
+/**
+ * The search handler to search elements in the tree of the properties editor.
+ */
 public class EditorSearchHandler extends AbstractHandler {
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchPart part = HandlerUtil.getActiveEditorChecked(event);

@@ -12,26 +12,26 @@ package org.eclipse.tcf.te.ui.interfaces;
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.viewers.TreePath;
 
 /**
- * The interface to define a loader for certain tree nodes which
- * are lazily loaded when they are expanded in the tree.
+ * The interface to define a search engine for the tree viewer.
  */
-public interface ILazyLoader {
+public interface ITreeSearcher {
 
 	/**
-	 * If the data of the tree node has been loaded.
+	 * Set the path to start searching from.
 	 * 
-	 * @return true if it is already loaded or else false.
+	 * @param path The path from which to start searching.
 	 */
-	public boolean isDataLoaded();
+	public void setStartPath(TreePath path);
 	
 	/**
-	 * Load the data of the tree node including its children.
+	 * Search the viewer for the next target which matches the condition defined by the matcher. 
      * A request to cancel the operation should be honored and acknowledged 
      * by throwing <code>InterruptedException</code>.
-	 * 
-	 * @param monitor The monitor to report the progress. Must not be null.
+     * 
+     * @param monitor the progress monitor used to report searching progress, must not be null.
      * @exception InvocationTargetException if the run method must propagate a checked exception,
      * 	it should wrap it inside an <code>InvocationTargetException</code>; runtime exceptions are automatically
      *  wrapped in an <code>InvocationTargetException</code> by the calling context
@@ -39,5 +39,5 @@ public interface ILazyLoader {
      *  using <code>IProgressMonitor.isCanceled()</code>, it should exit by throwing 
      *  <code>InterruptedException</code>
 	 */
-	public void loadData(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException;
+	public TreePath searchNext(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException;
 }

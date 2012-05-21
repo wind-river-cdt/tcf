@@ -40,15 +40,15 @@
       </command>
       <command
             categoryId="org.eclipse.tcf.te.ui.commands.category"
-            description="Filter elements in the tree viewer"
+            description="%command.filter.description"
             id="org.eclipse.tcf.te.ui.command.quickfilter"
-            name="Filter tree elements">
+            name="%command.filter.name">
       </command>
       <command
             categoryId="org.eclipse.tcf.te.ui.commands.category"
-            description="Reset the quick filter in the tree viewer"
+            description="%command.reset.description"
             id="org.eclipse.tcf.te.ui.command.resetfilter"
-            name="Reset the quick filter">
+            name="%command.reset.name">
       </command>
    </extension>
    
