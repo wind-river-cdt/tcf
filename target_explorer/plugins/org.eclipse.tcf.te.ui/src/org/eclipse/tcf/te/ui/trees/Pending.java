@@ -30,8 +30,7 @@ public class Pending {
 	boolean animating;
 	// The current frame index of the image list.
 	int frame;
-	// The pending images used.
-	Image[] images;
+	
 	/**
 	 * Create a pending node for the specified tree viewer.
 	 * 
