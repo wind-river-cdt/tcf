@@ -94,12 +94,12 @@ public class Messages extends NLS {
 	public static String TransportTypeControl_pipeType_label;
 	public static String TransportTypeControl_customType_label;
 
-	public static String MyRemoteHostAddressControl_label;
-	public static String MyRemoteHostAddressControl_information_missingTargetNameAddress;
-	public static String MyRemoteHostAddressControl_error_invalidTargetNameAddress;
-	public static String MyRemoteHostAddressControl_error_invalidTargetIpAddress;
+	public static String MyNetworkAddressControl_label;
+	public static String MyNetworkAddressControl_information_missingTargetNameAddress;
+	public static String MyNetworkAddressControl_error_invalidTargetNameAddress;
+	public static String MyNetworkAddressControl_error_invalidTargetIpAddress;
 	public static String MyRemoteHostAddressControl_error_targetNameNotResolveable;
-	public static String MyRemoteHostAddressControl_information_checkNameAddressUserInformation;
+	public static String MyNetworkAddressControl_information_checkNameAddressUserInformation;
 
 	public static String PipeNameControl_label;
 	public static String PipeNameControl_information_missingValue;

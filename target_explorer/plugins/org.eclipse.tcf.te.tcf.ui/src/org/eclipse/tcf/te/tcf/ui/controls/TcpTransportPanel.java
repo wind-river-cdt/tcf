@@ -9,51 +9,35 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.ui.controls;
 
-import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.dialogs.IDialogPage;
-import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.TypedEvent;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tcf.protocol.IPeer;
-import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.controls.BaseDialogPageControl;
-import org.eclipse.tcf.te.ui.controls.net.RemoteHostAddressControl;
-import org.eclipse.tcf.te.ui.controls.net.RemoteHostPortControl;
-import org.eclipse.tcf.te.ui.controls.panels.AbstractWizardConfigurationPanel;
 import org.eclipse.tcf.te.ui.controls.validator.NameOrIPValidator;
 import org.eclipse.tcf.te.ui.controls.validator.Validator;
-import org.eclipse.tcf.te.ui.interfaces.data.IDataExchangeNode3;
+import org.eclipse.tcf.te.ui.controls.wire.network.NetworkAddressControl;
+import org.eclipse.tcf.te.ui.controls.wire.network.NetworkCablePanel;
 import org.eclipse.tcf.te.ui.jface.interfaces.IValidatingContainer;
-import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
  * TCP transport type wizard configuration panel.
  */
-public class TcpTransportPanel extends AbstractWizardConfigurationPanel implements IDataExchangeNode3 {
-
-	private RemoteHostAddressControl addressControl = null;
-	private RemoteHostPortControl portControl = null;
+public class TcpTransportPanel extends NetworkCablePanel {
 
 	/**
-	 * Local remote host address control implementation.
+	 * Local address control implementation.
 	 */
-	protected class MyRemoteHostAddressControl extends RemoteHostAddressControl {
+	protected class MyNetworkAddressControl extends NetworkAddressControl {
+
 
 		/**
 		 * Constructor.
 		 *
-		 * @param parentPage The parent dialog page this control is embedded in. Must not be <code>null</code>!
+		 * @param networkPanel The parent network cable. Must not be <code>null</code>.
 		 */
-		public MyRemoteHostAddressControl(IDialogPage parentPage) {
-			super(parentPage);
-			setEditFieldLabel(Messages.MyRemoteHostAddressControl_label);
+		public MyNetworkAddressControl(NetworkCablePanel networkPanel) {
+			super(networkPanel);
+			setEditFieldLabel(Messages.MyNetworkAddressControl_label);
 		}
 
 		/* (non-Javadoc)
@@ -62,10 +46,10 @@ public class TcpTransportPanel extends AbstractWizardConfigurationPanel implemen
 		@Override
 		protected void configureEditFieldValidator(Validator validator) {
 			if (validator instanceof NameOrIPValidator) {
-				validator.setMessageText(NameOrIPValidator.INFO_MISSING_NAME_OR_IP, Messages.MyRemoteHostAddressControl_information_missingTargetNameAddress);
-				validator.setMessageText(NameOrIPValidator.ERROR_INVALID_NAME_OR_IP, Messages.MyRemoteHostAddressControl_error_invalidTargetNameAddress);
-				validator.setMessageText(NameOrIPValidator.ERROR_INVALID_NAME, Messages.MyRemoteHostAddressControl_error_invalidTargetNameAddress);
-				validator.setMessageText(NameOrIPValidator.ERROR_INVALID_IP, Messages.MyRemoteHostAddressControl_error_invalidTargetIpAddress);
+				validator.setMessageText(NameOrIPValidator.INFO_MISSING_NAME_OR_IP, Messages.MyNetworkAddressControl_information_missingTargetNameAddress);
+				validator.setMessageText(NameOrIPValidator.ERROR_INVALID_NAME_OR_IP, Messages.MyNetworkAddressControl_error_invalidTargetNameAddress);
+				validator.setMessageText(NameOrIPValidator.ERROR_INVALID_NAME, Messages.MyNetworkAddressControl_error_invalidTargetNameAddress);
+				validator.setMessageText(NameOrIPValidator.ERROR_INVALID_IP, Messages.MyNetworkAddressControl_error_invalidTargetIpAddress);
 				validator.setMessageText(NameOrIPValidator.INFO_CHECK_NAME, getUserInformationTextCheckNameAddress());
 			}
 		}
@@ -75,41 +59,7 @@ public class TcpTransportPanel extends AbstractWizardConfigurationPanel implemen
 		 */
 		@Override
 		protected String getUserInformationTextCheckNameAddress() {
-			return Messages.MyRemoteHostAddressControl_information_checkNameAddressUserInformation;
-		}
-
-        /* (non-Javadoc)
-         * @see org.eclipse.tcf.te.ui.controls.BaseDialogPageControl#getValidatingContainer()
-         */
-        @Override
-        public IValidatingContainer getValidatingContainer() {
-			return TcpTransportPanel.this.getParentControl().getValidatingContainer();
-		}
-
-		/* (non-Javadoc)
-		 * @see org.eclipse.tcf.te.ui.controls.BaseEditBrowseTextControl#modifyText(org.eclipse.swt.events.ModifyEvent)
-		 */
-		@Override
-		public void modifyText(ModifyEvent e) {
-			super.modifyText(e);
-			if (TcpTransportPanel.this.getParentControl() instanceof ModifyListener) {
-				((ModifyListener)TcpTransportPanel.this.getParentControl()).modifyText(e);
-			}
-		}
-	}
-
-	/**
-	 * Local remote host port control implementation.
-	 */
-	protected class MyRemoteHostPortControl extends RemoteHostPortControl {
-
-		/**
-		 * Constructor.
-		 *
-		 * @param parentPage The parent dialog page this control is embedded in. Must not be <code>null</code>!
-		 */
-		public MyRemoteHostPortControl(IDialogPage parentPage) {
-			super(parentPage);
+			return Messages.MyNetworkAddressControl_information_checkNameAddressUserInformation;
 		}
 
         /* (non-Javadoc)
@@ -137,202 +87,24 @@ public class TcpTransportPanel extends AbstractWizardConfigurationPanel implemen
 	 *
 	 * @param parentPageControl The parent control. Must not be <code>null</code>!
 	 */
-	public TcpTransportPanel(BaseDialogPageControl parentPageControl) {
-		super(parentPageControl);
-	}
+    public TcpTransportPanel(BaseDialogPageControl parentPageControl) {
+	    super(parentPageControl);
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.controls.panels.AbstractWizardConfigurationPanel#dispose()
-	 */
-	@Override
-	public void dispose() {
-		if (addressControl != null) { addressControl.dispose(); addressControl = null; }
-		if (portControl != null) { portControl.dispose(); portControl = null; }
-		super.dispose();
-	}
+    }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.controls.interfaces.IWizardConfigurationPanel#setupPanel(org.eclipse.swt.widgets.Composite, org.eclipse.ui.forms.widgets.FormToolkit)
-	 */
-	@Override
-    public void setupPanel(Composite parent, FormToolkit toolkit) {
-		Assert.isNotNull(parent);
-		Assert.isNotNull(toolkit);
+    /* (non-Javadoc)
+     * @see org.eclipse.tcf.te.ui.controls.wire.network.NetworkCablePanel#doCreateAddressControl(org.eclipse.tcf.te.ui.controls.wire.network.NetworkCablePanel)
+     */
+    @Override
+    protected NetworkAddressControl doCreateAddressControl(NetworkCablePanel parentPanel) {
+        return new MyNetworkAddressControl(parentPanel);
+    }
 
-		boolean adjustBackgroundColor = getParentControl().getParentPage() != null;
-
-		Composite panel = toolkit.createComposite(parent);
-		GridLayout layout = new GridLayout();
-		layout.marginHeight = 0; layout.marginWidth = 0;
-		panel.setLayout(layout);
-		panel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		if (adjustBackgroundColor) panel.setBackground(parent.getBackground());
-
-		setControl(panel);
-
-		addressControl = doCreateAddressControl(getParentControl().getParentPage());
-		addressControl.setupPanel(panel);
-
-		portControl = doCreatePortControl(getParentControl().getParentPage());
-		portControl.setParentControlIsInnerPanel(true);
-		portControl.setupPanel(addressControl.getInnerPanelComposite());
-		portControl.setEditFieldControlText("1534"); //$NON-NLS-1$
-	}
-
-	/**
-	 * Creates the address control instance.
-	 *
-	 * @param parentPage The parent dialog page or <code>null</code>.
-	 * @return The address control instance.
-	 */
-	protected RemoteHostAddressControl doCreateAddressControl(IDialogPage parentPage) {
-		return new MyRemoteHostAddressControl(parentPage);
-	}
-
-	/**
-	 * Creates the port control instance.
-	 *
-	 * @param parentPage The parent dialog page or <code>null</code>.
-	 * @return The port control instance.
-	 */
-	protected RemoteHostPortControl doCreatePortControl(IDialogPage parentPage) {
-		return new MyRemoteHostPortControl(parentPage);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.controls.panels.AbstractWizardConfigurationPanel#isValid()
-	 */
-	@Override
-	public boolean isValid() {
-		boolean valid = super.isValid();
-		if (!valid) return false;
-
-		valid = addressControl.isValid();
-		setMessage(addressControl.getMessage(), addressControl.getMessageType());
-
-		valid &= portControl.isValid();
-		if (portControl.getMessageType() > getMessageType()) {
-			setMessage(portControl.getMessage(), portControl.getMessageType());
-		}
-
-		return valid;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.controls.interfaces.IWizardConfigurationPanel#dataChanged(org.eclipse.tcf.te.runtime.interfaces.nodes.IPropertiesContainer, org.eclipse.swt.events.TypedEvent)
-	 */
-	@Override
-    public boolean dataChanged(IPropertiesContainer data, TypedEvent e) {
-		Assert.isNotNull(data);
-
-		boolean isDirty = false;
-
-		if (addressControl != null) {
-			String address = addressControl.getEditFieldControlText();
-			if (address != null) isDirty |= !address.equals(data.getStringProperty(IPeer.ATTR_IP_HOST));
-		}
-
-		if (portControl != null) {
-			String port = portControl.getEditFieldControlText();
-			if (port != null) isDirty |= !port.equals(data.getStringProperty(IPeer.ATTR_IP_PORT));
-		}
-
-		return isDirty;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataExchangeNode#setupData(org.eclipse.tcf.te.runtime.interfaces.nodes.IPropertiesContainer)
-	 */
-	@Override
-    public void setupData(IPropertiesContainer data) {
-		if (data == null) return;
-
-		if (addressControl != null) {
-			addressControl.setEditFieldControlText(data.getStringProperty(IPeer.ATTR_IP_HOST));
-		}
-
-		if (portControl != null) {
-			portControl.setEditFieldControlText(data.getStringProperty(IPeer.ATTR_IP_PORT));
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataExchangeNode#extractData(org.eclipse.tcf.te.runtime.interfaces.nodes.IPropertiesContainer)
-	 */
-	@Override
-    public void extractData(IPropertiesContainer data) {
-		if (data == null) return;
-
-		if (addressControl != null) {
-			String host = addressControl.getEditFieldControlText();
-			data.setProperty(IPeer.ATTR_IP_HOST, !"".equals(host) ? host : null); //$NON-NLS-1$
-		}
-
-		if (portControl != null) {
-			String port = portControl.getEditFieldControlText();
-			data.setProperty(IPeer.ATTR_IP_PORT, !"".equals(port) ? port : null); //$NON-NLS-1$
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.interfaces.data.IDataExchangeNode2#initializeData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
-	 */
-	@Override
-    public void initializeData(IPropertiesContainer data) {
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.interfaces.data.IDataExchangeNode3#removeData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
-	 */
-	@Override
-    public void removeData(IPropertiesContainer data) {
-		if (data == null) return;
-		data.setProperty(IPeer.ATTR_IP_HOST, null);
-		data.setProperty(IPeer.ATTR_IP_PORT, null);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.interfaces.data.IDataExchangeNode3#copyData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
-	 */
-	@Override
-	public void copyData(IPropertiesContainer src, IPropertiesContainer dst) {
-		Assert.isNotNull(src);
-		Assert.isNotNull(dst);
-		dst.setProperty(IPeer.ATTR_IP_HOST, src.getStringProperty(IPeer.ATTR_IP_HOST));
-		dst.setProperty(IPeer.ATTR_IP_PORT, src.getStringProperty(IPeer.ATTR_IP_PORT));
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.controls.panels.AbstractWizardConfigurationPanel#doSaveWidgetValues(org.eclipse.jface.dialogs.IDialogSettings, java.lang.String)
-	 */
-	@Override
-	public void doSaveWidgetValues(IDialogSettings settings, String idPrefix) {
-		super.doSaveWidgetValues(settings, idPrefix);
-		if (addressControl != null) addressControl.doSaveWidgetValues(settings, idPrefix);
-		if (portControl != null) portControl.doSaveWidgetValues(settings, idPrefix);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.controls.panels.AbstractWizardConfigurationPanel#doRestoreWidgetValues(org.eclipse.jface.dialogs.IDialogSettings, java.lang.String)
-	 */
-	@Override
-	public void doRestoreWidgetValues(IDialogSettings settings, String idPrefix) {
-		super.doRestoreWidgetValues(settings, idPrefix);
-		if (addressControl != null) addressControl.doRestoreWidgetValues(settings, idPrefix);
-		if (portControl != null) portControl.doRestoreWidgetValues(settings, idPrefix);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.controls.panels.AbstractWizardConfigurationPanel#setEnabled(boolean)
-	 */
-	@Override
-	public void setEnabled(boolean enabled) {
-		if (addressControl != null) {
-			SWTControlUtil.setEnabled(addressControl.getEditFieldControl(), enabled);
-			SWTControlUtil.setEnabled(addressControl.getButtonControl(), enabled);
-		}
-		if (portControl != null) {
-			SWTControlUtil.setEnabled(portControl.getEditFieldControl(), enabled);
-		}
-	}
+    /* (non-Javadoc)
+     * @see org.eclipse.tcf.te.ui.controls.wire.network.NetworkCablePanel#getDefaultPort()
+     */
+    @Override
+    protected String getDefaultPort() {
+        return "1534"; //$NON-NLS-1$
+    }
 }

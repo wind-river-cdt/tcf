@@ -96,6 +96,7 @@ public class NetworkCablePanel extends AbstractWizardConfigurationPanel implemen
 		portControl = doCreatePortControl(this);
 		portControl.setParentControlIsInnerPanel(true);
 		portControl.setupPanel(addressControl.getInnerPanelComposite());
+		portControl.setEditFieldControlText(getDefaultPort());
 	}
 
 	/**
@@ -118,6 +119,15 @@ public class NetworkCablePanel extends AbstractWizardConfigurationPanel implemen
 	protected NetworkPortControl doCreatePortControl(NetworkCablePanel parentPanel) {
 		Assert.isNotNull(parentPanel);
 		return new NetworkPortControl(parentPanel);
+	}
+
+	/**
+	 * Returns the default port to set to the port control.
+	 *
+	 * @return The default port to set or <code>null</code>.
+	 */
+	protected String getDefaultPort() {
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -192,7 +202,7 @@ public class NetworkCablePanel extends AbstractWizardConfigurationPanel implemen
 
 		if (portControl != null) {
 			String port = portControl.getEditFieldControlText();
-			if (port != null) isDirty |= !port.equals(container.get(IWireTypeNetwork.PROPERTY_NETWORK_PORT) != null ? container.get(IWireTypeNetwork.PROPERTY_NETWORK_PORT) : ""); //$NON-NLS-1$
+			if (port != null) isDirty |= !port.equals(container.get(IWireTypeNetwork.PROPERTY_NETWORK_PORT) != null ? container.get(IWireTypeNetwork.PROPERTY_NETWORK_PORT) : getDefaultPort() != null ? getDefaultPort() : ""); //$NON-NLS-1$
 		}
 
 		return isDirty;
@@ -213,7 +223,8 @@ public class NetworkCablePanel extends AbstractWizardConfigurationPanel implemen
 		}
 
 		if (portControl != null) {
-			portControl.setEditFieldControlText((String)container.get(IWireTypeNetwork.PROPERTY_NETWORK_PORT));
+			String port = (String)container.get(IWireTypeNetwork.PROPERTY_NETWORK_PORT);
+			portControl.setEditFieldControlText(port != null && !"".equals(port) ? port : getDefaultPort()); //$NON-NLS-1$
 		}
 	}
 
