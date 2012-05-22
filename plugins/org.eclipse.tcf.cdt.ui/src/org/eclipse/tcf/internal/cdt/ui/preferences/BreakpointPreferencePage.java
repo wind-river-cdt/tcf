@@ -92,15 +92,17 @@ public class BreakpointPreferencePage extends FieldEditorPreferencePage implemen
         IDialogSettings dialogSettings = getBreakpointScopeDialogSettings();
         String[] returnList = null;
         String[] expressionList = null;
+        int index = 0;
 
         if ( dialogSettings != null ) {
             expressionList = dialogSettings.getArray(Messages.TCFThreadFilterQueryExpressionStore);
-            int index;
             // Find if there is a null entry.
-            for(index = 0; index < expressionList.length; index++) {
-                String member = expressionList[index];
-                if (member == null || member.length() == 0) {
-                    break;
+            if ( expressionList != null ) {
+                for(index = 0; index < expressionList.length; index++) {
+                    String member = expressionList[index];
+                    if (member == null || member.length() == 0) {
+                        break;
+                    }
                 }
             }
             returnList = new String[index+1];
@@ -109,6 +111,9 @@ public class BreakpointPreferencePage extends FieldEditorPreferencePage implemen
                 returnList[loop+1] = expressionList[loop];
             }
         }
+        else
+            returnList = new String[index];
+
         return returnList;
     }
 
@@ -136,7 +141,7 @@ public class BreakpointPreferencePage extends FieldEditorPreferencePage implemen
             part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart();
         }
         if (part != null) {
-            ISelection selection = part.getSite().getWorkbenchWindow().getSelectionService().getSelection();
+            ISelection selection = part.getSite().getSelectionProvider().getSelection();
             Set<?> enablers = DebugUITools.getToggleBreakpointsTargetManager().getEnabledToggleBreakpointsTargetIDs(part, selection);
 
             if (enablers != null && 
