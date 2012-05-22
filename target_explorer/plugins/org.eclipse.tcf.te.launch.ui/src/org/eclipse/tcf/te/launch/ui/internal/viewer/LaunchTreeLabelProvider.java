@@ -13,6 +13,8 @@ import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jface.viewers.ILabelDecorator;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.tcf.te.launch.core.lm.LaunchManager;
+import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchManagerDelegate;
 import org.eclipse.tcf.te.launch.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.launch.ui.internal.ImageConsts;
 import org.eclipse.tcf.te.launch.ui.model.LaunchNode;
@@ -94,6 +96,12 @@ public class LaunchTreeLabelProvider extends LabelProvider implements ILabelDeco
 	@Override
 	public String getDescription(Object element) {
 		if (element instanceof LaunchNode) {
+			if (((LaunchNode)element).getLaunchConfiguration() != null) {
+				ILaunchManagerDelegate delegate = LaunchManager.getInstance().getLaunchManagerDelegate(((LaunchNode)element).getLaunchConfigurationType(), ""); //$NON-NLS-1$
+				if (delegate != null) {
+					return delegate.getDescription(((LaunchNode)element).getLaunchConfiguration());
+				}
+			}
 			return getText(element);
 		}
 		return null;

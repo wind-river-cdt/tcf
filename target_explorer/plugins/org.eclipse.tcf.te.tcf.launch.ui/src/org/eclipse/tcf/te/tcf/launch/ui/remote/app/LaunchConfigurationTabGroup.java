@@ -12,6 +12,7 @@ package org.eclipse.tcf.te.tcf.launch.ui.remote.app;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.debug.ui.CommonTab;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.tcf.te.launch.ui.tabs.AbstractLaunchConfigurationTabGroup;
@@ -42,5 +43,6 @@ public class LaunchConfigurationTabGroup extends AbstractLaunchConfigurationTabG
 
 		tabs.add(new FileTransferTab());
 		tabs.add(new RefProjetcsTab());
+		tabs.add(new CommonTab());
 	}
 }

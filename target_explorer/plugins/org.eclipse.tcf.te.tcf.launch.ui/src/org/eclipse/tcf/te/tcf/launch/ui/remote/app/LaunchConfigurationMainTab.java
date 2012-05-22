@@ -9,11 +9,14 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.launch.ui.remote.app;
 
+import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tcf.te.launch.ui.tabs.launchcontext.AbstractContextSelectorTab;
+import org.eclipse.tcf.te.tcf.launch.core.interfaces.ILaunchTypes;
 import org.eclipse.tcf.te.tcf.launch.ui.remote.app.launchcontext.ContextSelectorSection;
 import org.eclipse.tcf.te.ui.forms.CustomFormToolkit;
 import org.eclipse.ui.forms.IManagedForm;
@@ -46,5 +49,13 @@ public class LaunchConfigurationMainTab extends AbstractContextSelectorTab {
 		LaunchConfigurationMainTabSection section = new LaunchConfigurationMainTabSection(form, panel);
 		section.getSection().setLayoutData(new GridData(GridData.FILL_BOTH));
 		form.addPart(section);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#getImage()
+	 */
+	@Override
+	public Image getImage() {
+		return DebugUITools.getImage(ILaunchTypes.REMOTE_APPLICATION);
 	}
 }

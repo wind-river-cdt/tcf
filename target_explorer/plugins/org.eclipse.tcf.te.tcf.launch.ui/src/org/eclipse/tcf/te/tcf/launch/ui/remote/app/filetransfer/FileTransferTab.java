@@ -9,9 +9,12 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.launch.ui.remote.app.filetransfer;
 
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tcf.te.launch.ui.tabs.filetransfers.AbstractFileTransferSection;
 import org.eclipse.tcf.te.launch.ui.tabs.filetransfers.AbstractFileTransferTab;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.IManagedForm;
 
 /**
@@ -25,5 +28,13 @@ public class FileTransferTab extends AbstractFileTransferTab {
 	@Override
 	protected AbstractFileTransferSection createFileTransferSection(IManagedForm form, Composite panel) {
 		return new FileTransferSection(getManagedForm(), panel);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#getImage()
+	 */
+	@Override
+	public Image getImage() {
+		return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_TOOL_COPY);
 	}
 }
