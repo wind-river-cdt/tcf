@@ -9,14 +9,19 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.ui.controls;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.TypedEvent;
+import org.eclipse.tcf.protocol.IPeer;
+import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.controls.BaseDialogPageControl;
 import org.eclipse.tcf.te.ui.controls.validator.NameOrIPValidator;
 import org.eclipse.tcf.te.ui.controls.validator.Validator;
 import org.eclipse.tcf.te.ui.controls.wire.network.NetworkAddressControl;
 import org.eclipse.tcf.te.ui.controls.wire.network.NetworkCablePanel;
+import org.eclipse.tcf.te.ui.controls.wire.network.NetworkPortControl;
 import org.eclipse.tcf.te.ui.jface.interfaces.IValidatingContainer;
 
 /**
@@ -89,7 +94,6 @@ public class TcpTransportPanel extends NetworkCablePanel {
 	 */
     public TcpTransportPanel(BaseDialogPageControl parentPageControl) {
 	    super(parentPageControl);
-
     }
 
     /* (non-Javadoc)
@@ -107,4 +111,87 @@ public class TcpTransportPanel extends NetworkCablePanel {
     protected String getDefaultPort() {
         return "1534"; //$NON-NLS-1$
     }
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.controls.interfaces.IWizardConfigurationPanel#dataChanged(org.eclipse.tcf.te.runtime.interfaces.nodes.IPropertiesContainer, org.eclipse.swt.events.TypedEvent)
+	 */
+	@Override
+    public boolean dataChanged(IPropertiesContainer data, TypedEvent e) {
+		Assert.isNotNull(data);
+
+		boolean isDirty = false;
+
+		NetworkAddressControl addressControl = getAddressControl();
+		if (addressControl != null) {
+			String address = addressControl.getEditFieldControlText();
+			if (address != null) isDirty |= !address.equals(data.getStringProperty(IPeer.ATTR_IP_HOST));
+		}
+
+		NetworkPortControl portControl = getPortControl();
+		if (portControl != null) {
+			String port = portControl.getEditFieldControlText();
+			if (port != null) isDirty |= !port.equals(data.getStringProperty(IPeer.ATTR_IP_PORT));
+		}
+
+		return isDirty;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataExchangeNode#setupData(org.eclipse.tcf.te.runtime.interfaces.nodes.IPropertiesContainer)
+	 */
+	@Override
+    public void setupData(IPropertiesContainer data) {
+		if (data == null) return;
+
+		NetworkAddressControl addressControl = getAddressControl();
+		if (addressControl != null) {
+			addressControl.setEditFieldControlText(data.getStringProperty(IPeer.ATTR_IP_HOST));
+		}
+
+		NetworkPortControl portControl = getPortControl();
+		if (portControl != null) {
+			portControl.setEditFieldControlText(data.getStringProperty(IPeer.ATTR_IP_PORT));
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.wizards.interfaces.ISharedDataExchangeNode#extractData(org.eclipse.tcf.te.runtime.interfaces.nodes.IPropertiesContainer)
+	 */
+	@Override
+    public void extractData(IPropertiesContainer data) {
+		if (data == null) return;
+
+		NetworkAddressControl addressControl = getAddressControl();
+		if (addressControl != null) {
+			String host = addressControl.getEditFieldControlText();
+			data.setProperty(IPeer.ATTR_IP_HOST, !"".equals(host) ? host : null); //$NON-NLS-1$
+		}
+
+		NetworkPortControl portControl = getPortControl();
+		if (portControl != null) {
+			String port = portControl.getEditFieldControlText();
+			data.setProperty(IPeer.ATTR_IP_PORT, !"".equals(port) ? port : null); //$NON-NLS-1$
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.interfaces.data.IDataExchangeNode3#removeData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
+	 */
+	@Override
+    public void removeData(IPropertiesContainer data) {
+		if (data == null) return;
+		data.setProperty(IPeer.ATTR_IP_HOST, null);
+		data.setProperty(IPeer.ATTR_IP_PORT, null);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.interfaces.data.IDataExchangeNode3#copyData(org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
+	 */
+	@Override
+	public void copyData(IPropertiesContainer src, IPropertiesContainer dst) {
+		Assert.isNotNull(src);
+		Assert.isNotNull(dst);
+		dst.setProperty(IPeer.ATTR_IP_HOST, src.getStringProperty(IPeer.ATTR_IP_HOST));
+		dst.setProperty(IPeer.ATTR_IP_PORT, src.getStringProperty(IPeer.ATTR_IP_PORT));
+	}
 }

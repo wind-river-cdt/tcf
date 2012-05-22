@@ -18,7 +18,7 @@ import org.eclipse.tcf.te.ui.jface.interfaces.IValidatingContainer;
 /**
  * Local remote host port control implementation.
  */
-class NetworkPortControl extends RemoteHostPortControl {
+public class NetworkPortControl extends RemoteHostPortControl {
 	// Reference to the parent network cable panel
 	private final NetworkCablePanel networkPanel;
 

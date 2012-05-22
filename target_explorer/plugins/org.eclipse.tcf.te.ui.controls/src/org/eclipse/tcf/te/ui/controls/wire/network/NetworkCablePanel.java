@@ -111,6 +111,15 @@ public class NetworkCablePanel extends AbstractWizardConfigurationPanel implemen
 	}
 
 	/**
+	 * Returns the address control.
+	 *
+	 * @return The address control or <code>null</code>.
+	 */
+	protected final NetworkAddressControl getAddressControl() {
+		return addressControl;
+	}
+
+	/**
 	 * Creates the port control instance.
 	 *
 	 * @param parentPanel The parent network cable panel. Must not be <code>null</code>.
@@ -119,6 +128,15 @@ public class NetworkCablePanel extends AbstractWizardConfigurationPanel implemen
 	protected NetworkPortControl doCreatePortControl(NetworkCablePanel parentPanel) {
 		Assert.isNotNull(parentPanel);
 		return new NetworkPortControl(parentPanel);
+	}
+
+	/**
+	 * Returns the port control.
+	 *
+	 * @return The port control or <code>null</code>.
+	 */
+	protected final NetworkPortControl getPortControl() {
+		return portControl;
 	}
 
 	/**
