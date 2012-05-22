@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.internal.cdt.ui.breakpoints;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -68,6 +69,7 @@ import org.eclipse.tcf.internal.debug.ui.model.TCFNode;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExecContext;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.IErrorReport;
 import org.eclipse.tcf.services.IContextQuery;
 import org.eclipse.tcf.services.IRunControl;
 import org.eclipse.tcf.util.TCFDataCache;
@@ -199,6 +201,9 @@ public class TCFThreadFilterEditor {
 
         public Object[] filterList(Object[] resultArray) {
             ArrayList<Object> filteredList = new ArrayList<Object>();
+            String filterExpr = null;
+            if (scopeExprCombo != null)
+                filterExpr = scopeExprCombo.getText();
             if (fContextList.size() != 0) {
                 for (Object obj : resultArray) {
                     for (String id : fContextList) {
@@ -210,7 +215,7 @@ public class TCFThreadFilterEditor {
                     }
                 }
             }
-            if (filteredList.size() != 0) {
+            if (filterExpr != null && filterExpr.length() != 0) {
                 return filteredList.toArray(new Object[filteredList.size()]);
             }
             else {
@@ -393,17 +398,20 @@ public class TCFThreadFilterEditor {
                  IContextQuery service = channel.getRemoteService(IContextQuery.class);
                  service.query(query, new IContextQuery.DoneQuery() {
                      public void doneQuery (IToken token, Exception error, String[] contexts) {
-                         String errorMessage = null;
                          if (error != null) {
-                             String[] errorMessages= error.getMessage().split("\n");
-
-                             for (int i=0; i < errorMessages.length; i++) {
-                                 String startError = Messages.TCFThreadFileterEditorInvalidQuery;
-                                 if (errorMessages[i].startsWith(startError)) {
-                                     errorMessage = errorMessages[i].substring(startError.length(), errorMessages[i].length());
+                             //TODO: What if the error is not an instance of IErrorReport?
+                             if (error instanceof IErrorReport) {
+                                 Map<String,Object> error_data = ((IErrorReport)error).getAttributes();
+                                 if (error_data== null) done (null);
+                                 String fmt = (String)error_data.get(IErrorReport.ERROR_FORMAT);
+                                 if (fmt != null) {
+                                     Object params = error_data.get(IErrorReport.ERROR_PARAMS);
+                                     if (params != null && params instanceof ArrayList) {
+                                         done(new MessageFormat(fmt).format(((ArrayList<?>)params).toArray()));
+                                     }
+                                     done(fmt);
                                  }
                              }
-                             done(errorMessage);
                          }else {
                              for (String context : contexts) {
                                  contextList.add(context);
@@ -458,7 +466,9 @@ public class TCFThreadFilterEditor {
             }
             else {
                 fContextList.clear();
-                String error = getQueryFilteredContexts (expression, fContextList);
+                String error = null;
+                if (expression != null && expression.length() != 0)
+                    error = getQueryFilteredContexts (expression, fContextList);
                 if (error == null ) {
                     scopeExpressionDecoration.hide();
                     fPage.setErrorMessage(null);
@@ -466,7 +476,7 @@ public class TCFThreadFilterEditor {
                 }
                 else {
                     scopeExpressionDecoration.show();
-                    fPage.setErrorMessage(Messages.TCFThreadFilterEditorFormatError);
+                    fPage.setErrorMessage(error);
                     fPage.setValid(false);
                 }
                 scopeExprCombo.getParent().layout();
