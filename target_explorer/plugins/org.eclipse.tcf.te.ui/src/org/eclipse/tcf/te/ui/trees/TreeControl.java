@@ -55,7 +55,7 @@ public class TreeControl extends AbstractTreeControl {
     }
 
 	/**
-	 * Parse and initialze the tree control.
+	 * Parse and initialize the tree control.
 	 */
 	private void initialize() {
 		viewerExtension = new TreeViewerExtension(viewerId);

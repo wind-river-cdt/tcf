@@ -63,13 +63,18 @@ public class TreeViewerComparator extends ViewerComparator {
 		return inverter * super.compare(viewer, e1, e2);
 	}
 	
+	/**
+	 * Get the sorting direction in a UI thread safely.
+	 * 
+	 * @param tree The tree to get the direction from.
+	 * @return the sorting direction of the tree. 
+	 */
 	int getSortDirection(final Tree tree) {
 		if(Display.getCurrent() != null) {
 			return  tree.getSortDirection();
 		}
 		final int[] result = new int[1];
 		tree.getDisplay().syncExec(new Runnable(){
-
 			@Override
             public void run() {
 				result[0] = getSortDirection(tree);
