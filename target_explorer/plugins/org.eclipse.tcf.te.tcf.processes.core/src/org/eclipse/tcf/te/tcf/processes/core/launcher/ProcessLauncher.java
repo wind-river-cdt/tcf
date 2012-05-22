@@ -73,9 +73,10 @@ import org.eclipse.tcf.te.tcf.processes.core.nls.Messages;
  */
 public class ProcessLauncher extends PlatformObject implements IProcessLauncher {
 	// The channel instance
-	/* default */ IChannel channel;
+	/* default */ IChannel channel = null;
+	/* default */ boolean externalChannel = false;
 	// The process properties instance
-	private IPropertiesContainer properties;
+	/* default */ IPropertiesContainer properties;
 
 	// The processes service instance
 	/* default */ IProcesses svcProcesses;
@@ -101,7 +102,16 @@ public class ProcessLauncher extends PlatformObject implements IProcessLauncher 
 	 * Constructor.
 	 */
 	public ProcessLauncher() {
-		this(null);
+		super();
+	}
+
+	/**
+	 * Constructor.
+	 */
+	public ProcessLauncher(IChannel channel) {
+		super();
+		externalChannel = channel != null;
+		this.channel = channel;
 	}
 
 	/**
@@ -135,7 +145,9 @@ public class ProcessLauncher extends PlatformObject implements IProcessLauncher 
 			protected void internalDone(Object caller, IStatus status) {
 				Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 				// Close the channel as all disposal is done
-				if (finChannel != null) Tcf.getChannelManager().closeChannel(finChannel);
+				if (finChannel != null && externalChannel) {
+					Tcf.getChannelManager().closeChannel(finChannel);
+				}
 			}
 		}, new CallbackInvocationDelegate());
 
@@ -191,8 +203,12 @@ public class ProcessLauncher extends PlatformObject implements IProcessLauncher 
 			}
 		};
 
-		if (Protocol.isDispatchThread()) runnable.run();
-		else Protocol.invokeAndWait(runnable);
+		if (Protocol.isDispatchThread()) {
+			runnable.run();
+		}
+		else {
+			Protocol.invokeAndWait(runnable);
+		}
 	}
 
 	/**
@@ -325,91 +341,104 @@ public class ProcessLauncher extends PlatformObject implements IProcessLauncher 
 		// Open a dedicated channel to the given peer
 		Map<String, Boolean> flags = new HashMap<String, Boolean>();
 		flags.put(IChannelManager.FLAG_FORCE_NEW, Boolean.TRUE);
-		Tcf.getChannelManager().openChannel(peer, flags, new IChannelManager.DoneOpenChannel() {
-			/* (non-Javadoc)
-			 * @see org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel#doneOpenChannel(java.lang.Throwable, org.eclipse.tcf.protocol.IChannel)
-			 */
-			@Override
-			public void doneOpenChannel(Throwable error, IChannel channel) {
-				if (error == null) {
-					ProcessLauncher.this.channel = channel;
-
-					// Attach a channel listener so we can dispose ourself if the channel
-					// is closed from the remote side.
-					channel.addChannelListener(new IChannelListener() {
-						/* (non-Javadoc)
-						 * @see org.eclipse.tcf.protocol.IChannel.IChannelListener#onChannelOpened()
-						 */
-						@Override
-						public void onChannelOpened() {
-						}
-						/* (non-Javadoc)
-						 * @see org.eclipse.tcf.protocol.IChannel.IChannelListener#onChannelClosed(java.lang.Throwable)
-						 */
-						@Override
-						public void onChannelClosed(Throwable error) {
-							if (error != null) {
-								IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
-												NLS.bind(Messages.ProcessLauncher_error_channelConnectFailed, peer.getID(), error.getLocalizedMessage()),
-												error);
-								invokeCallback(status, null);
-							}
-						}
-						/* (non-Javadoc)
-						 * @see org.eclipse.tcf.protocol.IChannel.IChannelListener#congestionLevel(int)
-						 */
-						@Override
-						public void congestionLevel(int level) {
-						}
-					});
-
-
-					// Check if the channel is in connected state
-					if (channel.getState() != IChannel.STATE_OPEN) {
+		if (channel != null && externalChannel) {
+			onChannelOpenDone(peer);
+		}
+		else {
+			Tcf.getChannelManager().openChannel(peer, flags, new IChannelManager.DoneOpenChannel() {
+				/* (non-Javadoc)
+				 * @see org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel#doneOpenChannel(java.lang.Throwable, org.eclipse.tcf.protocol.IChannel)
+				 */
+				@Override
+				public void doneOpenChannel(Throwable error, IChannel channel) {
+					if (error == null) {
+						ProcessLauncher.this.channel = channel;
+						onChannelOpenDone(peer);
+					} else {
 						IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
-										Messages.ProcessLauncher_error_channelNotConnected,
-										new IllegalStateException());
+										NLS.bind(Messages.ProcessLauncher_error_channelConnectFailed, peer.getID(), error.getLocalizedMessage()),
+										error);
 						invokeCallback(status, null);
-						return;
 					}
-
-					// Do some very basic sanity checking on the process properties
-					if (properties.getStringProperty(PROP_PROCESS_PATH) == null) {
-						IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
-										Messages.ProcessLauncher_error_missingProcessPath,
-										new IllegalArgumentException(PROP_PROCESS_PATH));
-						invokeCallback(status, null);
-						return;
-					}
-
-					// Get the process and streams services
-					svcProcesses = channel.getRemoteService(IProcesses.class);
-					if (svcProcesses == null) {
-						IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
-										NLS.bind(Messages.ProcessLauncher_error_missingRequiredService, IProcesses.class.getName()),
-										null);
-
-						invokeCallback(status, null);
-						return;
-					}
-
-					svcStreams = channel.getRemoteService(IStreams.class);
-					if (svcStreams == null) {
-						IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
-										NLS.bind(Messages.ProcessLauncher_error_missingRequiredService, IStreams.class.getName()),
-										null);
-						invokeCallback(status, null);
-						return;
-					}
-
-					// Execute the launch now
-					executeLaunch();
-				} else {
-					IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
-									NLS.bind(Messages.ProcessLauncher_error_channelConnectFailed, peer.getID(), error.getLocalizedMessage()),
-									error);
-					invokeCallback(status, null);
 				}
+			});
+		}
+	}
+
+	protected void onChannelOpenDone(final IPeer peer) {
+		Protocol.invokeAndWait(new Runnable() {
+			@Override
+			public void run() {
+				// Attach a channel listener so we can dispose ourself if the channel
+				// is closed from the remote side.
+				channel.addChannelListener(new IChannelListener() {
+					/* (non-Javadoc)
+					 * @see org.eclipse.tcf.protocol.IChannel.IChannelListener#onChannelOpened()
+					 */
+					@Override
+					public void onChannelOpened() {
+					}
+					/* (non-Javadoc)
+					 * @see org.eclipse.tcf.protocol.IChannel.IChannelListener#onChannelClosed(java.lang.Throwable)
+					 */
+					@Override
+					public void onChannelClosed(Throwable error) {
+						if (error != null) {
+							IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
+											NLS.bind(Messages.ProcessLauncher_error_channelConnectFailed, peer.getID(), error.getLocalizedMessage()),
+											error);
+							invokeCallback(status, null);
+						}
+					}
+					/* (non-Javadoc)
+					 * @see org.eclipse.tcf.protocol.IChannel.IChannelListener#congestionLevel(int)
+					 */
+					@Override
+					public void congestionLevel(int level) {
+					}
+				});
+
+
+				// Check if the channel is in connected state
+				if (channel.getState() != IChannel.STATE_OPEN) {
+					IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
+									Messages.ProcessLauncher_error_channelNotConnected,
+									new IllegalStateException());
+					invokeCallback(status, null);
+					return;
+				}
+
+				// Do some very basic sanity checking on the process properties
+				if (properties.getStringProperty(PROP_PROCESS_PATH) == null) {
+					IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
+									Messages.ProcessLauncher_error_missingProcessPath,
+									new IllegalArgumentException(PROP_PROCESS_PATH));
+					invokeCallback(status, null);
+					return;
+				}
+
+				// Get the process and streams services
+				svcProcesses = channel.getRemoteService(IProcesses.class);
+				if (svcProcesses == null) {
+					IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
+									NLS.bind(Messages.ProcessLauncher_error_missingRequiredService, IProcesses.class.getName()),
+									null);
+
+					invokeCallback(status, null);
+					return;
+				}
+
+				svcStreams = channel.getRemoteService(IStreams.class);
+				if (svcStreams == null) {
+					IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
+									NLS.bind(Messages.ProcessLauncher_error_missingRequiredService, IStreams.class.getName()),
+									null);
+					invokeCallback(status, null);
+					return;
+				}
+
+				// Execute the launch now
+				executeLaunch();
 			}
 		});
 	}
@@ -542,7 +571,7 @@ public class ProcessLauncher extends PlatformObject implements IProcessLauncher 
 				// Create the receiver instance. If the file already exist, we
 				// overwrite the file content.
 				StreamsDataReceiver receiver = new StreamsDataReceiver(new BufferedWriter(new FileWriter(filename)),
-																					 new String[] { IProcesses.PROP_STDOUT_ID, IProcesses.PROP_STDERR_ID });
+								new String[] { IProcesses.PROP_STDOUT_ID, IProcesses.PROP_STDERR_ID });
 				// Register the receiver to the streams listener
 				if (getStreamsListener() instanceof ProcessStreamsListener) {
 					((ProcessStreamsListener)getStreamsListener()).registerDataReceiver(receiver);
@@ -614,8 +643,12 @@ public class ProcessLauncher extends PlatformObject implements IProcessLauncher 
 				}
 			};
 
-			if (Protocol.isDispatchThread()) runnable.run();
-			else Protocol.invokeAndWait(runnable);
+			if (Protocol.isDispatchThread()) {
+				runnable.run();
+			}
+			else {
+				Protocol.invokeAndWait(runnable);
+			}
 		}
 
 		if (peerName.get() != null) {
@@ -817,7 +850,9 @@ public class ProcessLauncher extends PlatformObject implements IProcessLauncher 
 
 			// Send a notification
 			ProcessStateChangeEvent event = createRemoteProcessStateChangeEvent(process);
-			if (event != null) EventManager.getInstance().fireEvent(event);
+			if (event != null) {
+				EventManager.getInstance().fireEvent(event);
+			}
 		}
 
 		// Invoke the callback to signal that we are done

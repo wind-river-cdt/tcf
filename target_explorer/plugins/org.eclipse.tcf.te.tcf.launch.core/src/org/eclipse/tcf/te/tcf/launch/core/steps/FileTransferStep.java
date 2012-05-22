@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.IFileTransferLaunchAttributes;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
@@ -22,6 +23,7 @@ import org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
 import org.eclipse.tcf.te.tcf.filesystem.core.services.FileTransferService;
 import org.eclipse.tcf.te.tcf.launch.core.activator.CoreBundleActivator;
+import org.eclipse.tcf.te.tcf.launch.core.interfaces.ICommonTCFLaunchAttributes;
 
 /**
  * Launch process step implementation.
@@ -50,9 +52,10 @@ public class FileTransferStep extends AbstractTcfLaunchStep {
 	 */
 	@Override
 	public void execute(IStepContext context, IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor, final ICallback callback) {
+		IChannel channel = (IChannel)StepperAttributeUtil.getProperty(ICommonTCFLaunchAttributes.ATTR_CHANNEL, fullQualifiedId, data);
 		IFileTransferItem item = (IFileTransferItem)StepperAttributeUtil.getProperty(IFileTransferLaunchAttributes.ATTR_ACTIVE_FILE_TRANSFER, fullQualifiedId, data);
 
-		FileTransferService.transfer(getActivePeerModel(data).getPeer(), item, monitor, callback);
+		FileTransferService.transfer(getActivePeerModel(data).getPeer(), channel, item, monitor, callback);
 	}
 
 	/* (non-Javadoc)

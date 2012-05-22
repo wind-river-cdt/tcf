@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.te.core.utils.text.StringUtil;
 import org.eclipse.tcf.te.launch.core.persistence.DefaultPersistenceDelegate;
@@ -29,6 +30,7 @@ import org.eclipse.tcf.te.runtime.stepper.StepperAttributeUtil;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
 import org.eclipse.tcf.te.tcf.launch.core.activator.CoreBundleActivator;
+import org.eclipse.tcf.te.tcf.launch.core.interfaces.ICommonTCFLaunchAttributes;
 import org.eclipse.tcf.te.tcf.launch.core.interfaces.IRemoteAppLaunchAttributes;
 import org.eclipse.tcf.te.tcf.processes.core.interfaces.launcher.IProcessLauncher;
 import org.eclipse.tcf.te.tcf.processes.core.launcher.ProcessLauncher;
@@ -66,8 +68,9 @@ public class LaunchProcessStep extends AbstractTcfLaunchStep {
 	 */
 	@Override
 	public void execute(IStepContext context, final IPropertiesContainer data, final IFullQualifiedId fullQualifiedId, IProgressMonitor monitor, final ICallback callback) {
+		IChannel channel = (IChannel)StepperAttributeUtil.getProperty(ICommonTCFLaunchAttributes.ATTR_CHANNEL, fullQualifiedId, data);
 		// Construct the launcher object
-		ProcessLauncher launcher = new ProcessLauncher();
+		ProcessLauncher launcher = new ProcessLauncher(channel);
 
 		Map<String, Object> launchAttributes = new HashMap<String, Object>();
 
