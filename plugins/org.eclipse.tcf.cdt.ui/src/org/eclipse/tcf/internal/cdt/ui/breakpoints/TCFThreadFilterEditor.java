@@ -434,7 +434,8 @@ public class TCFThreadFilterEditor {
             int equalsIndex = expression.indexOf('=', fromIndex);
             int commaIndex = expression.indexOf(',', fromIndex);
             int nextEqualsIndex = expression.indexOf('=',equalsIndex+1);
-            if (commaIndex == lastIndex-1 || equalsIndex == -1 || equalsIndex == lastIndex-1) {
+            if (commaIndex == lastIndex-1 || equalsIndex == -1 || equalsIndex == lastIndex-1 ||
+                equalsIndex == 0 || commaIndex == 0) {
                 return true;
             }
             String testChar = expression.substring(equalsIndex-1, equalsIndex);
