@@ -23,8 +23,8 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.IModelListener;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
-import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerRedirector;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelUpdateService;
+import org.eclipse.tcf.te.tcf.locator.nodes.PeerRedirector;
 
 
 /**
@@ -185,8 +185,8 @@ public class LocatorModelUpdateService extends AbstractLocatorModelService imple
 
 		// We can merge the peer attributes only if the destination peer is a AbstractPeer
 		IPeer dst = node.getPeer();
-		if (dst instanceof IPeerRedirector) dst = ((IPeerRedirector)dst).getParent();
-		if (!(dst instanceof AbstractPeer)) return;
+		// If not of correct type, than we cannot update the attributes
+		if (!(dst instanceof AbstractPeer) && !(dst instanceof PeerRedirector)) return;
 		// If destination and source peer are the same objects(!) nothing to do here
 		if (dst == peer) return;
 
@@ -220,6 +220,10 @@ public class LocatorModelUpdateService extends AbstractLocatorModelService imple
 		if (!srcAttrs.isEmpty()) dstAttrs.putAll(srcAttrs);
 
 		// And update the destination peer attributes
-		((AbstractPeer)dst).updateAttributes(dstAttrs);
+		if (dst instanceof AbstractPeer) {
+			((AbstractPeer)dst).updateAttributes(dstAttrs);
+		} else if (dst instanceof PeerRedirector) {
+			((PeerRedirector)dst).updateAttributes(dstAttrs);
+		}
 	}
 }

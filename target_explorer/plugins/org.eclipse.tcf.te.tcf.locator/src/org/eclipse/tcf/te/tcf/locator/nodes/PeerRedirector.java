@@ -21,9 +21,8 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerRedirector;
 /**
  * Peer redirector implementation.
  * <p>
- * If a peer is discovery by querying the <i>remote</i> locator service of a known
- * peer, than the communication with the remotely discovered peer is channeled through
- * the proxy peer (== parent).
+ * If a peer is discovery by querying the <i>remote</i> locator service of a known peer, than the
+ * communication with the remotely discovered peer is channeled through the proxy peer (== parent).
  */
 public class PeerRedirector extends TransientPeer implements IPeerRedirector {
 	// Reference to the parent peer which is serving as proxy
@@ -33,7 +32,8 @@ public class PeerRedirector extends TransientPeer implements IPeerRedirector {
 	 * Constructor.
 	 *
 	 * @param parent The parent peer. Must not be <code>null</code>.
-	 * @param attrs The peer attributes of the remote discovered peer. Must not be <code>null</code>.
+	 * @param attrs The peer attributes of the remote discovered peer. Must not be <code>null</code>
+	 *            .
 	 */
 	public PeerRedirector(IPeer parent, Map<String, String> attrs) {
 		super(attrs);
@@ -45,19 +45,35 @@ public class PeerRedirector extends TransientPeer implements IPeerRedirector {
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.core.TransientPeer#openChannel()
 	 */
-    @Override
-    public IChannel openChannel() {
-        Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
-        IChannel c = parent.openChannel();
-        c.redirect(getID());
-        return c;
-    }
+	@Override
+	public IChannel openChannel() {
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+		IChannel c = parent.openChannel();
+		c.redirect(getID());
+		return c;
+	}
 
-    /* (non-Javadoc)
-     * @see org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerRedirector#getParent()
-     */
-    @Override
-    public IPeer getParent() {
-    	return parent;
-    }
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerRedirector#getParent()
+	 */
+	@Override
+	public IPeer getParent() {
+		return parent;
+	}
+
+	/**
+	 * Update the peer attributes.
+	 *
+	 * @param attrs The new peer attributes. Must not be <code>null</code>.
+	 */
+	public void updateAttributes(Map<String, String> attrs) {
+		Assert.isNotNull(attrs);
+
+		if (!attrs.equals(ro_attrs)) {
+			Assert.isTrue(attrs.get(ATTR_ID).equals(rw_attrs.get(ATTR_ID)));
+			rw_attrs.clear();
+			rw_attrs.putAll(attrs);
+		}
+	}
+
 }
