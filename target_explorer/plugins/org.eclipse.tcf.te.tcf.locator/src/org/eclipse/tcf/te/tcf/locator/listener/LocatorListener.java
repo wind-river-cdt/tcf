@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.tcf.core.AbstractPeer;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.ILocator;
@@ -103,7 +104,21 @@ public class LocatorListener implements ILocator.LocatorListener {
 			// find the corresponding model node to remove
 			IPeerModel peerNode = model.getService(ILocatorModelLookupService.class).lkupPeerModelById(peer.getID());
 			// Update the peer instance
-			if (peerNode != null) peerNode.setProperty(IPeerModelProperties.PROP_INSTANCE, peer);
+			if (peerNode != null) {
+			    // Get the old peer instance
+			    IPeer oldPeer = peerNode.getPeer();
+			    // If old peer and new peer instance are the same _objects_, nothing to do
+			    if (oldPeer != peer) {
+			    	// Peers visible to the locator are replaced with the new instance
+			    	if (oldPeer instanceof AbstractPeer) {
+			    		peerNode.setProperty(IPeerModelProperties.PROP_INSTANCE, peer);
+			    	}
+			    	// Non-visible peers are updated
+			    	else {
+			    		model.getService(ILocatorModelUpdateService.class).mergeUserDefinedAttributes(peerNode, peer, false);
+			    	}
+			    }
+			}
 			// Refresh static peers and merge attributes if required
 			model.getService(ILocatorModelRefreshService.class).refreshStaticPeers();
 		}
