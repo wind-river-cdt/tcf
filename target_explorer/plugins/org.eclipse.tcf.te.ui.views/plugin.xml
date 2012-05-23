@@ -316,18 +316,24 @@
       <menuContribution
             locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.filter">
          <command
-               commandId="org.eclipse.tcf.te.ui.command.quickfilter"
-               label="%command.filter.label"
+               commandId="org.eclipse.tcf.te.ui.views.command.quickfilter"
+               label="Filter"
+               mnemonic="t"
                style="push">
          </command>
          <command
-               commandId="org.eclipse.tcf.te.ui.command.resetfilter"
-               label="%command.reset.label"
+               commandId="org.eclipse.tcf.te.ui.views.command.resetfilter"
+               label="Reset"
+               mnemonic="r"
                style="push">
          </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.search">
          <command
-               commandId="org.eclipse.tcf.te.ui.views.command.search"
-               label="%menu.search.label"
+               commandId="org.eclipse.tcf.te.ui.views.command.find"
+               label="%menu.find.label"
+               mnemonic="f"
                style="push">
          </command>
       </menuContribution>
@@ -372,8 +378,21 @@
       </command>
       <command
             categoryId="org.eclipse.tcf.te.ui.commands.category"
-            id="org.eclipse.tcf.te.ui.views.command.search"
-            name="%command.search.name">
+            description="Find elements in a tree viewer"
+            id="org.eclipse.tcf.te.ui.views.command.find"
+            name="%command.find.name">
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            description="Filter elements in a tree viewer"
+            id="org.eclipse.tcf.te.ui.views.command.quickfilter"
+            name="Quick Filter">
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            description="Reset quick filter in a tree viewer"
+            id="org.eclipse.tcf.te.ui.views.command.resetfilter"
+            name="Reset Quick Filter">
       </command>
    </extension>
 
@@ -452,7 +471,7 @@
       </handler>
       <handler
             class="org.eclipse.tcf.te.ui.views.handler.ViewQuickFilterHanlder"
-            commandId="org.eclipse.tcf.te.ui.command.quickfilter">
+            commandId="org.eclipse.tcf.te.ui.views.command.quickfilter">
          <activeWhen>
             <with
                   variable="activePartId">
@@ -472,7 +491,7 @@
       </handler>
       <handler
             class="org.eclipse.tcf.te.ui.views.handler.ViewQuickFilterResetHanlder"
-            commandId="org.eclipse.tcf.te.ui.command.resetfilter">
+            commandId="org.eclipse.tcf.te.ui.views.command.resetfilter">
          <activeWhen>
             <with
                   variable="activePartId">
@@ -484,7 +503,7 @@
       </handler>
       <handler
             class="org.eclipse.tcf.te.ui.views.handler.EditorQuickFilterHanlder"
-            commandId="org.eclipse.tcf.te.ui.command.quickfilter">
+            commandId="org.eclipse.tcf.te.ui.views.command.quickfilter">
          <activeWhen>
             <with
                   variable="activePartId">
@@ -504,7 +523,7 @@
       </handler>
       <handler
             class="org.eclipse.tcf.te.ui.views.handler.EditorQuickFilterResetHanlder"
-            commandId="org.eclipse.tcf.te.ui.command.resetfilter">
+            commandId="org.eclipse.tcf.te.ui.views.command.resetfilter">
          <activeWhen>
             <with
                   variable="activePartId">
@@ -516,7 +535,7 @@
       </handler>
       <handler
             class="org.eclipse.tcf.te.ui.views.handler.ViewSearchHandler"
-            commandId="org.eclipse.tcf.te.ui.views.command.search">
+            commandId="org.eclipse.tcf.te.ui.views.command.find">
          <activeWhen>
             <with
                   variable="activePartId">
@@ -528,7 +547,7 @@
       </handler>
       <handler
             class="org.eclipse.tcf.te.ui.views.handler.EditorSearchHandler"
-            commandId="org.eclipse.tcf.te.ui.views.command.search">
+            commandId="org.eclipse.tcf.te.ui.views.command.find">
          <activeWhen>
             <with
                   variable="activePartId">
@@ -597,16 +616,40 @@
             sequence="M3+M2+W">
       </key>
       <key
-            commandId="org.eclipse.tcf.te.ui.views.command.search"
+            commandId="org.eclipse.tcf.te.ui.views.command.find"
             contextId="org.eclipse.tcf.te.ui.views.View"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M2+S">
+            sequence="M1+F">
       </key>
       <key
-            commandId="org.eclipse.tcf.te.ui.views.command.search"
+            commandId="org.eclipse.tcf.te.ui.views.command.find"
             contextId="org.eclipse.tcf.te.ui.views.Editor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M2+S">
+            sequence="M1+F">
+      </key>
+      <key
+            commandId="org.eclipse.tcf.te.ui.views.command.quickfilter"
+            contextId="org.eclipse.tcf.te.ui.views.View"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+T">
+      </key>
+      <key
+            commandId="org.eclipse.tcf.te.ui.views.command.quickfilter"
+            contextId="org.eclipse.tcf.te.ui.views.Editor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+T">
+      </key>
+      <key
+            commandId="org.eclipse.tcf.te.ui.views.command.resetfilter"
+            contextId="org.eclipse.tcf.te.ui.views.View"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="ESC">
+      </key>
+      <key
+            commandId="org.eclipse.tcf.te.ui.views.command.resetfilter"
+            contextId="org.eclipse.tcf.te.ui.views.Editor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="ESC">
       </key>
    </extension>
    

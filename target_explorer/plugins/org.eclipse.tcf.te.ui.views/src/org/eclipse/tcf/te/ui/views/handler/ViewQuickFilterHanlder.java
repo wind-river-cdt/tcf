@@ -13,7 +13,7 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.tcf.te.ui.dialogs.TreeViewerUtil;
+import org.eclipse.tcf.te.ui.utils.TreeViewerUtil;
 import org.eclipse.tcf.te.ui.views.internal.View;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.handlers.HandlerUtil;

@@ -8,12 +8,12 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.ui.dialogs;
+package org.eclipse.tcf.te.ui.internal.utils;
 
 import java.util.Vector;
 
 /**
- * A string pattern matcher, suppporting "*" and "?" wildcards.
+ * A string pattern matcher, supporting "*" and "?" wild cards.
  * 
  * @since 1.0.0 Copied from org.eclipse.ui.internal.navigator.StringMatcher
  */

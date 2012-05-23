@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.ui.dialogs;
+package org.eclipse.tcf.te.ui.internal.utils;
 
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.viewers.ISelection;
@@ -39,7 +39,7 @@ import org.eclipse.tcf.te.ui.nls.Messages;
  * The filter will to listen to the change of the input and
  * filter the tree viewer accordingly.
  */
-class QuickFilterPopup extends PopupDialog {
+public class QuickFilterPopup extends PopupDialog {
 	// The quick filter used filter the content of the tree viewer.
 	QuickFilter quickFilter;
 	// The text field used to enter filters.

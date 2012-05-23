@@ -49,6 +49,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tcf.te.ui.activator.UIPlugin;
+import org.eclipse.tcf.te.ui.internal.utils.TablePatternFilter;
 import org.eclipse.tcf.te.ui.nls.Messages;
 import org.eclipse.ui.dialogs.SelectionStatusDialog;
 import org.eclipse.ui.navigator.IDescriptionProvider;

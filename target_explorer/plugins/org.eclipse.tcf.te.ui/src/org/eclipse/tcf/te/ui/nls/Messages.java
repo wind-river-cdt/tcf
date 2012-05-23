@@ -70,7 +70,7 @@ public class Messages extends NLS {
 	public static String PreferencePage_label;
 	public static String QuickFilterPopup_PromptMessage;
 	public static String TreeViewerSearchDialog_BtnBackText;
-	public static String TreeViewerSearchDialog_BtnCancelText;
+	public static String TreeViewerSearchDialog_BtnCloseText;
 	public static String TreeViewerSearchDialog_BtnCaseText;
 	public static String TreeViewerSearchDialog_BtnPreciseText;
 	public static String TreeViewerSearchDialog_BtnSearchText;

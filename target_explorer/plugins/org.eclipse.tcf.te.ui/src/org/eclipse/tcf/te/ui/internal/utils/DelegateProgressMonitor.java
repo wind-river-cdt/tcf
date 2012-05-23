@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.ui.dialogs;
+package org.eclipse.tcf.te.ui.internal.utils;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ProgressMonitorWrapper;
@@ -36,7 +36,7 @@ class DelegateProgressMonitor extends ProgressMonitorWrapper {
 		safeRun(new Runnable() {
 			@Override
 			public void run() {
-				if (!fPmPart.isDisposed()) {
+				if (fPmPart != null && !fPmPart.isDisposed()) {
 					fPmPart.attachToCancelComponent(null);
 					fPmPart.setCanceled(false);
 					fPmPart.setVisible(true);
@@ -55,7 +55,7 @@ class DelegateProgressMonitor extends ProgressMonitorWrapper {
 		safeRun(new Runnable() {
 			@Override
 			public void run() {
-				if (!fPmPart.isDisposed()) {
+				if (fPmPart != null && !fPmPart.isDisposed()) {
 					fPmPart.beginTask(name, totalWork);
 				}
 			}
@@ -68,8 +68,7 @@ class DelegateProgressMonitor extends ProgressMonitorWrapper {
 	 */
 	@Override
 	public boolean isCanceled() {
-		boolean cancel = fPmPart.isCanceled();
-		return cancel || super.isCanceled();
+		return fPmPart != null && fPmPart.isCanceled() || super.isCanceled();
 	}
 
 	/*
@@ -82,7 +81,7 @@ class DelegateProgressMonitor extends ProgressMonitorWrapper {
 		safeRun(new Runnable() {
 			@Override
 			public void run() {
-				if (!fPmPart.isDisposed()) {
+				if (fPmPart != null && !fPmPart.isDisposed()) {
 					fPmPart.subTask(name);
 				}
 			}
@@ -99,7 +98,7 @@ class DelegateProgressMonitor extends ProgressMonitorWrapper {
 		safeRun(new Runnable() {
 			@Override
 			public void run() {
-				if (!fPmPart.isDisposed()) {
+				if (fPmPart != null && !fPmPart.isDisposed()) {
 					fPmPart.done();
 					fPmPart.setVisible(false);
 				}
@@ -117,7 +116,7 @@ class DelegateProgressMonitor extends ProgressMonitorWrapper {
 		safeRun(new Runnable() {
 			@Override
 			public void run() {
-				if (!fPmPart.isDisposed()) {
+				if (fPmPart != null && !fPmPart.isDisposed()) {
 					fPmPart.setTaskName(name);
 				}
 			}
@@ -135,7 +134,7 @@ class DelegateProgressMonitor extends ProgressMonitorWrapper {
 		safeRun(new Runnable() {
 			@Override
 			public void run() {
-				if (!fPmPart.isDisposed()) {
+				if (fPmPart != null && !fPmPart.isDisposed()) {
 					fPmPart.setCanceled(b);
 				}
 			}
@@ -152,7 +151,7 @@ class DelegateProgressMonitor extends ProgressMonitorWrapper {
 		safeRun(new Runnable() {
 			@Override
 			public void run() {
-				if (!fPmPart.isDisposed()) {
+				if (fPmPart != null && !fPmPart.isDisposed()) {
 					fPmPart.worked(work);
 				}
 			}

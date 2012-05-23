@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.ui.internal;
+package org.eclipse.tcf.te.ui.internal.utils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Queue;

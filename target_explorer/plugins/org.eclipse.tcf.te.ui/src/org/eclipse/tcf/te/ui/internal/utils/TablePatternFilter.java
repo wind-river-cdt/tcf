@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.ui.dialogs;
+package org.eclipse.tcf.te.ui.internal.utils;
 
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.Viewer;
@@ -18,11 +18,11 @@ import org.eclipse.jface.viewers.ViewerFilter;
  * The viewer filter to select those elements which matches the given filter pattern.
  * @since 1.0.0 Copied from org.eclipse.ui.internal.navigator.filters.CommonFiltersTab$TablePatternFilter
  */
-class TablePatternFilter extends ViewerFilter {
+public class TablePatternFilter extends ViewerFilter {
 	private static final String ALL = "*"; //$NON-NLS-1$
 	
-	private StringMatcher matcher = null;
-	private ILabelProvider labelProvider;
+	protected StringMatcher matcher = null;
+	protected ILabelProvider labelProvider;
 
 	public TablePatternFilter(ILabelProvider labelProvider) {
 		this.labelProvider = labelProvider;
@@ -38,7 +38,12 @@ class TablePatternFilter extends ViewerFilter {
 		return match(labelProvider.getText(element));
 	}
 
-	protected void setPattern(String newPattern) {
+	/**
+	 * Set a new pattern to filter elements.
+	 * 
+	 * @param newPattern The new pattern
+	 */
+	public void setPattern(String newPattern) {
 		if (newPattern == null || newPattern.trim().length() == 0) {
 			matcher = new StringMatcher(ALL, true, false);
 		}
@@ -55,7 +60,7 @@ class TablePatternFilter extends ViewerFilter {
 	 * 
 	 * @return whether the string matches the pattern
 	 */
-	protected boolean match(String input) {
+	public boolean match(String input) {
 		if (input == null) {
 			return false;
 		}

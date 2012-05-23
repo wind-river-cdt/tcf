@@ -38,18 +38,6 @@
             id="org.eclipse.tcf.te.ui.command.refresh"
             name="%command.refresh.name">
       </command>
-      <command
-            categoryId="org.eclipse.tcf.te.ui.commands.category"
-            description="%command.filter.description"
-            id="org.eclipse.tcf.te.ui.command.quickfilter"
-            name="%command.filter.name">
-      </command>
-      <command
-            categoryId="org.eclipse.tcf.te.ui.commands.category"
-            description="%command.reset.description"
-            id="org.eclipse.tcf.te.ui.command.resetfilter"
-            name="%command.reset.name">
-      </command>
    </extension>
    
 <!-- Command image contributions -->   
@@ -103,30 +91,6 @@
             contextId="org.eclipse.tcf.te.ui.views.Editor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="F5">
-      </key>
-      <key
-            commandId="org.eclipse.tcf.te.ui.command.quickfilter"
-            contextId="org.eclipse.tcf.te.ui.views.View"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+F">
-      </key>
-      <key
-            commandId="org.eclipse.tcf.te.ui.command.quickfilter"
-            contextId="org.eclipse.tcf.te.ui.views.Editor"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+F">
-      </key>
-      <key
-            commandId="org.eclipse.tcf.te.ui.command.resetfilter"
-            contextId="org.eclipse.tcf.te.ui.views.View"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="ESC">
-      </key>
-      <key
-            commandId="org.eclipse.tcf.te.ui.command.resetfilter"
-            contextId="org.eclipse.tcf.te.ui.views.Editor"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="ESC">
       </key>
    </extension>
 

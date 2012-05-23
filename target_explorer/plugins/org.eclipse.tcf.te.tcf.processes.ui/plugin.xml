@@ -190,22 +190,26 @@
             </visibleWhen>
          </command>
          <separator
+               name="group.search"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.tcf.te.ui.views.command.find"
+               label="%command.search.label"
+               style="push">
+         </command>
+         <separator
                name="group.filter"
                visible="true">
          </separator>
          <command
-               commandId="org.eclipse.tcf.te.ui.command.quickfilter"
+               commandId="org.eclipse.tcf.te.ui.views.command.quickfilter"
                label="%command.filter.label"
                style="push">
          </command>
          <command
-               commandId="org.eclipse.tcf.te.ui.command.resetfilter"
+               commandId="org.eclipse.tcf.te.ui.views.command.resetfilter"
                label="%command.reset.label"
-               style="push">
-         </command>
-         <command
-               commandId="org.eclipse.tcf.te.ui.views.command.search"
-               label="%command.search.label"
                style="push">
          </command>
          <separator

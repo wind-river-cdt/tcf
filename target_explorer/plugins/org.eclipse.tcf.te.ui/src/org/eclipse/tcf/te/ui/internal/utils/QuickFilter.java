@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.ui.dialogs;
+package org.eclipse.tcf.te.ui.internal.utils;
 
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.TreePath;
@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.TreeItem;
  * which has the specified name pattern, under a certain tree path.
  * Other elements outside of this tree path is ignored.
  */
-class QuickFilter extends TablePatternFilter {
+public class QuickFilter extends TablePatternFilter {
 	// The tree viewer to filter.
 	private TreeViewer viewer;
 	// The root path to select from.
@@ -31,7 +31,7 @@ class QuickFilter extends TablePatternFilter {
 	/**
 	 * Create a quick filter for the specified viewer.
 	 */
-	QuickFilter(TreeViewer viewer) {
+	public QuickFilter(TreeViewer viewer) {
 		super((ILabelProvider) viewer.getLabelProvider());
 		this.viewer = viewer;
 	}
@@ -41,7 +41,7 @@ class QuickFilter extends TablePatternFilter {
 	 *  
 	 * @param root The root path to filter from.
 	 */
-	void showFilterPopup(Object root) {
+	public void showFilterPopup(Object root) {
 		this.root = root;
 		if (!isFiltering()) {
 			viewer.addFilter(this);
@@ -68,9 +68,9 @@ class QuickFilter extends TablePatternFilter {
 	}
 
 	/**
-	 * Reset the tree viewer to the ogriginal view by removing this filter.
+	 * Reset the tree viewer to the original view by removing this filter.
 	 */
-	void resetViewer() {
+	public void resetViewer() {
 		viewer.removeFilter(this);
 		root = null;
 		setPattern(null);
@@ -81,7 +81,7 @@ class QuickFilter extends TablePatternFilter {
 	 * 
 	 * @return true if it has this filter.
 	 */
-	boolean isFiltering() {
+	public boolean isFiltering() {
 		ViewerFilter[] filters = viewer.getFilters();
 		if (filters != null) {
 			for (ViewerFilter filter : filters) {

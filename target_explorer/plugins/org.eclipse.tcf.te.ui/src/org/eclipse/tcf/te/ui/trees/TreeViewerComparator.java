@@ -27,9 +27,6 @@ public class TreeViewerComparator extends ViewerComparator {
 
 	/**
 	 * Constructor.
-	 *
-	 * @param viewer The parent viewer. Must not be <code>null</code>.
-	 * @param labelProvider The label provider. Must not be <code>null</code>.
 	 */
 	public TreeViewerComparator() {
 	}

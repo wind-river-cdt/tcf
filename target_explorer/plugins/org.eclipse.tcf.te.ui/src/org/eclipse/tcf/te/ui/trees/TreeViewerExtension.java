@@ -61,7 +61,6 @@ public class TreeViewerExtension {
 	 * column descriptors and filter descriptors for the specified viewer.
 	 *
 	 * @param viewerId The tree viewer's id.
-	 * @param viewer The tree viewer to parse the extension for.
 	 */
 	public TreeViewerExtension(String viewerId) {
 		this.viewerId = viewerId;

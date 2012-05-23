@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.ui.dialogs;
+package org.eclipse.tcf.te.ui.utils;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -16,6 +16,9 @@ import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.tcf.te.ui.internal.utils.QuickFilter;
+import org.eclipse.tcf.te.ui.internal.utils.SearchEngine;
+import org.eclipse.tcf.te.ui.internal.utils.TreeViewerSearchDialog;
 /**
  * The utilities to search and filter a tree viewer.
  */
@@ -73,6 +76,15 @@ public class TreeViewerUtil {
 		TreeViewerSearchDialog dialog = new TreeViewerSearchDialog(viewer);
 		dialog.setStartPath(rootPath);
 		dialog.open();
+	}
+	
+	/**
+	 * Search the next element in the tree viewer.
+	 * 
+	 * @param viewer The tree viewer to be searched.
+	 */
+	public static void doSearchNext(TreeViewer viewer) {
+		SearchEngine.getSearchEngine(viewer).startSearch(null, null);
 	}
 
 	/**
