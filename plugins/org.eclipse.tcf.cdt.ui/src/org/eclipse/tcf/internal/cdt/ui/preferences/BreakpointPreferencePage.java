@@ -29,7 +29,7 @@ import org.eclipse.tcf.internal.cdt.ui.breakpoints.TCFToggleBreakpointsTargetFac
 public class BreakpointPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
     public static final String PLUGIN_ID="org.eclipse.tcf.cdt.ui.preferences.BreakpointPreferencePage";
-    
+
     BooleanFieldEditor setDefaultTriggerCheckbox;
     ComboFieldEditor defaultTriggerExpressoinCombo;
     public BreakpointPreferencePage() {
@@ -58,18 +58,18 @@ public class BreakpointPreferencePage extends FieldEditorPreferencePage implemen
         String [] expressionList = getTriggerExpressions();
 
         defaultTriggerExpressoinCombo = new ComboFieldEditor(
-                PreferenceConstants.PREF_DEFAULT_TRIGGER_SCOPE, 
+                PreferenceConstants.PREF_DEFAULT_TRIGGER_SCOPE,
                 Messages.TCFBreakpointPreferencesTriggerScopeExpression,
                 joinToArray2D(expressionList,expressionList),
                 getFieldEditorParent());
 
-        IPreferenceStore store = Activator.getDefault().getPreferenceStore();                   
+        IPreferenceStore store = Activator.getDefault().getPreferenceStore();
         defaultTriggerExpressoinCombo.setEnabled(
-                store.getBoolean(PreferenceConstants.PREF_DEFAULT_TRIGGER_SCOPE_ENABLED), 
+                store.getBoolean(PreferenceConstants.PREF_DEFAULT_TRIGGER_SCOPE_ENABLED),
                 getFieldEditorParent());
 
         addField(defaultTriggerExpressoinCombo);
-        
+
         if (!checkTCFToggleBreakpointAdapter()) {
             setMessage(Messages.TCFBreakpointPrefrencesError, WARNING);
             setValid(false);
@@ -86,7 +86,7 @@ public class BreakpointPreferencePage extends FieldEditorPreferencePage implemen
      * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
      */
     public void init(IWorkbench workbench) {
-    }    
+    }
 
     private String[] getTriggerExpressions() {
         IDialogSettings dialogSettings = getBreakpointScopeDialogSettings();
@@ -118,7 +118,7 @@ public class BreakpointPreferencePage extends FieldEditorPreferencePage implemen
     }
 
     private IDialogSettings getBreakpointScopeDialogSettings() {
-        String component = TCFThreadFilterEditor.PLUGIN_ID;	    
+        String component = TCFThreadFilterEditor.PLUGIN_ID;
         IDialogSettings settings = Activator.getDefault()
                 .getDialogSettings();
         IDialogSettings section = settings.getSection(component);
@@ -144,17 +144,17 @@ public class BreakpointPreferencePage extends FieldEditorPreferencePage implemen
             ISelection selection = part.getSite().getSelectionProvider().getSelection();
             Set<?> enablers = DebugUITools.getToggleBreakpointsTargetManager().getEnabledToggleBreakpointsTargetIDs(part, selection);
 
-            if (enablers != null && 
+            if (enablers != null &&
                 !enablers.contains(TCFToggleBreakpointsTargetFactory.ID_TCF_BREAKPOINT_TOGGLE_TARGET)) {
                 return true;
             }
 
             String preferred = DebugUITools.getToggleBreakpointsTargetManager().getPreferredToggleBreakpointsTargetID(part, selection);
-            if (preferred != null && 
+            if (preferred != null &&
                 !preferred.equals(TCFToggleBreakpointsTargetFactory.ID_TCF_BREAKPOINT_TOGGLE_TARGET)) {
                 return false;
             }
         }
-    return true;
+        return true;
     }
 }

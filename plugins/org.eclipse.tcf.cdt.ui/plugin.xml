@@ -368,7 +368,7 @@
               properties="isTCFBreakpointSupported"
               type="java.util.List">
         </propertyTester>
-     </extension>   
+     </extension>
    <extension
           point="org.eclipse.debug.ui.toggleBreakpointsTargetFactories">
       <toggleTargetFactory

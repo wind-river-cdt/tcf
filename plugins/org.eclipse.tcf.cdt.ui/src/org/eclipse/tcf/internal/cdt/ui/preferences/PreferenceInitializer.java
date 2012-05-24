@@ -20,13 +20,13 @@ import org.eclipse.tcf.internal.cdt.ui.Activator;
  */
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
-	 */
-	public void initializeDefaultPreferences() {
-		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-		store.setDefault(PreferenceConstants.PREF_DEFAULT_TRIGGER_SCOPE_ENABLED, false);
-	}
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
+     */
+    public void initializeDefaultPreferences() {
+        IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+        store.setDefault(PreferenceConstants.PREF_DEFAULT_TRIGGER_SCOPE_ENABLED, false);
+    }
 }

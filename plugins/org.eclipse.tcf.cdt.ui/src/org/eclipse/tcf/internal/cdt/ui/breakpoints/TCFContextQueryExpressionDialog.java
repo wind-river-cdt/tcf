@@ -257,7 +257,7 @@ public class TCFContextQueryExpressionDialog extends SelectionDialog {
                    param.setData("");
                }
            }
-           if (expression == null || 
+           if (expression == null ||
               (expression.length() == 0 && originalExpression.length() == 0) ||
                originalExpression.contentEquals(expression)) {
                getButton(IDialogConstants.OK_ID).setEnabled(false);

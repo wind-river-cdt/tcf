@@ -16,7 +16,7 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.tcf.internal.debug.model.TCFLaunch;
 
-public class ToggleTCFBreakpointTester extends PropertyTester { 
+public class ToggleTCFBreakpointTester extends PropertyTester {
     /*
      * (non-Javadoc)
      * @see org.eclipse.core.expressions.IPropertyTester#test(java.lang.Object, java.lang.String, java.lang.Object[], java.lang.Object)
@@ -29,7 +29,7 @@ public class ToggleTCFBreakpointTester extends PropertyTester {
             }
         }
         return false;
-    }    
+    }
 
     protected ILaunch getAttributeLaunch() {
         ILaunch launch = null;

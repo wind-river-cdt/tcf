@@ -77,7 +77,7 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 public class TCFThreadFilterEditor {
 
     public static final String PLUGIN_ID="org.eclipse.tcf.internal.cdt.ui.breakpoints.TCFThreadFilterEditor";
-    
+
     private static class Context {
         private final String fName;
         private final String fId;
@@ -220,7 +220,7 @@ public class TCFThreadFilterEditor {
                 return resultArray;
             }
         }
-        
+
         public Object getParent(Object element) {
             if (element instanceof Context) {
                 Context ctx = (Context) element;
@@ -243,7 +243,7 @@ public class TCFThreadFilterEditor {
 
         public void dispose() {
         }
-        
+
         public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         }
     }
@@ -292,7 +292,7 @@ public class TCFThreadFilterEditor {
     private ControlDecoration scopeExpressionDecoration;
     private final ArrayList<String> fContextList = new ArrayList<String>();
     private Link preferencesLink;
-    
+
     /**
      * Returns the dialog settings or <code>null</code> if none
      *
@@ -378,7 +378,7 @@ public class TCFThreadFilterEditor {
     /**
      * Validate a Context query using the context query service.
      *   If the query is valid, also get the list of filtered contexts.
-     *   
+     *
      * @param query  The query to validate
      * @return       Error String if validation has failed, else null.
      */
@@ -389,7 +389,7 @@ public class TCFThreadFilterEditor {
              return Messages.TCFThreadFilterEditorNoOpenChannel;
          }
          final IChannel channel = launch.getChannel();
-         
+
          if (channel == null){
              return Messages.TCFThreadFilterEditorNoOpenChannel;
          }
@@ -414,7 +414,7 @@ public class TCFThreadFilterEditor {
          }.getE();
          return result;
      }
-    
+
     boolean missingParameterValue(String expression, int fromIndex) {
         boolean result = false;
         int lastIndex = expression.length();
@@ -500,7 +500,7 @@ public class TCFThreadFilterEditor {
             }
         }
     }
-    
+
     private void setupScopeExpressionCombo(IDialogSettings settings, String bpContextQuery, Combo comboBox) {
         String [] expresionList = null;
         if ( settings != null ) {
@@ -552,7 +552,7 @@ public class TCFThreadFilterEditor {
             comboBox.select(0);
         }
     }
-    
+
     public class linkSelectAdapter implements SelectionListener {
 
         private Shell parentShell;
@@ -563,7 +563,7 @@ public class TCFThreadFilterEditor {
         public void widgetSelected(SelectionEvent e) {
             PreferencesUtil.createPreferenceDialogOn(parentShell,
                     BreakpointPreferencePage.PLUGIN_ID,
-                    new String[] { BreakpointPreferencePage.PLUGIN_ID }, 
+                    new String[] { BreakpointPreferencePage.PLUGIN_ID },
                     null).open();
         }
         public void widgetDefaultSelected(SelectionEvent e) {
@@ -574,10 +574,10 @@ public class TCFThreadFilterEditor {
         GridData twoColumnLayout = new GridData(SWT.FILL,0, true, false);
         twoColumnLayout.horizontalSpan = 2;
         GridData comboGridData = new GridData(SWT.FILL,0, true, false);
-        comboGridData .horizontalIndent = 5;        
+        comboGridData .horizontalIndent = 5;
         IDialogSettings settings= getDialogSettings(false);
         FieldDecoration fieldDecoration = FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_ERROR);
-        
+
         Label epressionLabel = new Label(parent, SWT.NONE);
         epressionLabel.setText(Messages.TCFThreadFilterQueryAdvancedLabel);
         epressionLabel.setFont(parent.getFont());
@@ -595,8 +595,8 @@ public class TCFThreadFilterEditor {
         Button selectExpression = new Button(parent, SWT.PUSH);
         selectExpression.setText(Messages.TCFThreadFilterQueryButtonEdit);
         selectExpression.setLayoutData(new GridData(SWT.RIGHT,0, false, false));
-        selectExpression.addListener(SWT.Selection, new ExpressionSelectButton(parent.getShell()));        
-        
+        selectExpression.addListener(SWT.Selection, new ExpressionSelectButton(parent.getShell()));
+
         Label contextTreeLabel = new Label(parent, SWT.NONE);
         contextTreeLabel.setText(Messages.TCFThreadFilterQueryTreeViewLabel); //$NON-NLS-1$
         contextTreeLabel.setFont(parent.getFont());

@@ -18,7 +18,7 @@ public class Messages extends NLS {
     public static String TCFThreadFilterQueryExpressionStore;
     public static String TCFThreadFilterQueryModeButtonState;
     public static String TCFThreadUseDefaultTriggerScoping;
-    public static String TCFThreadDefaultTriggerScope;    
+    public static String TCFThreadDefaultTriggerScope;
     public static String TCFThreadFilterQueryButtonBasic;
     public static String TCFThreadFilterQueryButtonAdvanced;
     public static String TCFThreadFilterQueryButtonEdit;

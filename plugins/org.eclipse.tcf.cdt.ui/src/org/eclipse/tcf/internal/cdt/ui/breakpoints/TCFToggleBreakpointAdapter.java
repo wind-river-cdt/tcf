@@ -41,15 +41,15 @@ import org.eclipse.ui.IWorkbenchPart;
  * Toggles a TCF Scoped breakpoint in a C/C++ editor.
  */
 public class TCFToggleBreakpointAdapter extends AbstractToggleBreakpointAdapter {
-    
+
     private final String TOGGLE_TYPE;
     private bpAttributes attributes;
-    
+
     TCFToggleBreakpointAdapter(String toggle_type ) {
         TOGGLE_TYPE = toggle_type;
         attributes = new bpAttributes();
     }
-    
+
     private class bpAttributes {
         private HashMap<String, Object> attributes;
         private String error;
@@ -58,7 +58,7 @@ public class TCFToggleBreakpointAdapter extends AbstractToggleBreakpointAdapter 
             attributes = new HashMap<String, Object>();
             error = null;
         }
-        
+
         public void put (String str, Object obj) {
             attributes.put(str, obj);
         }
@@ -66,7 +66,7 @@ public class TCFToggleBreakpointAdapter extends AbstractToggleBreakpointAdapter 
         public HashMap<String, Object> getMap() {
             return attributes;
         }
-        
+
         public void clear() {
             attributes.clear();
         }
@@ -75,15 +75,15 @@ public class TCFToggleBreakpointAdapter extends AbstractToggleBreakpointAdapter 
             return error;
         }
     }
-    
+
     private static IStructuredSelection getDebugContext(IWorkbenchPart part) {
         ISelection selection = DebugUITools.getDebugContextManager().
             getContextService(part.getSite().getWorkbenchWindow()).getActiveContext();
         if (selection instanceof IStructuredSelection) {
             return (IStructuredSelection)selection;
-        } 
+        }
         return StructuredSelection.EMPTY;
-    }        
+    }
 
     private static boolean isDefaultBPContextQueryEnabled() {
         return Platform.getPreferencesService().getBoolean(
@@ -100,7 +100,7 @@ public class TCFToggleBreakpointAdapter extends AbstractToggleBreakpointAdapter 
                 null,
                 null);
     }
-    
+
     private static Boolean checkToggleType ( IWorkbenchPart part, final String toggleType, final bpAttributes attributes) {
         Boolean bFoundError = false;
         if ( part != null ) {
@@ -111,7 +111,7 @@ public class TCFToggleBreakpointAdapter extends AbstractToggleBreakpointAdapter 
                     if (isDefaultBPContextQueryEnabled() == true) {
                         String query = getDefaultBPContextQuery();
                         attributes.put(TCFBreakpointsModel.ATTR_CONTEXT_QUERY, query);
-                    }                 
+                    }
                 }
             }
         }
@@ -125,7 +125,7 @@ public class TCFToggleBreakpointAdapter extends AbstractToggleBreakpointAdapter 
     protected ICLineBreakpoint findLineBreakpoint( String sourceHandle, IResource resource, int lineNumber ) throws CoreException {
             return CDIDebugModel.lineBreakpointExists( sourceHandle, resource, lineNumber );
     }
-    
+
     /* (non-Javadoc)
      * @see org.eclipse.cdt.debug.internal.ui.actions.AbstractToggleBreakpointAdapter#createLineBreakpoint(java.lang.String, org.eclipse.core.resources.IResource, int)
      */
@@ -135,7 +135,7 @@ public class TCFToggleBreakpointAdapter extends AbstractToggleBreakpointAdapter 
         if (!bFoundError ) {
             ICLineBreakpoint lineBp = CDIDebugModel.createBlankLineBreakpoint();
             CDIDebugModel.setLineBreakpointAttributes(
-                    attributes.getMap(), sourceHandle, getBreakpointType(), lineNumber, true, 0, "" ); //$NON-NLS-1$            
+                    attributes.getMap(), sourceHandle, getBreakpointType(), lineNumber, true, 0, "" ); //$NON-NLS-1$
             if ( !interactive ) {
                 CDIDebugModel.createBreakpointMarker(lineBp, resource, attributes.getMap(), true);
             }
@@ -147,16 +147,16 @@ public class TCFToggleBreakpointAdapter extends AbstractToggleBreakpointAdapter 
             // Throw an error to the user.
             IStatus error = new Status(IStatus.ERROR, ITCFConstants.ID_TCF_DEBUG_MODEL, attributes.getError(), null);
             ErrorDialog.openError(null, Messages.TCFBreakpointToggleError, null, error);
-        }                
+        }
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.cdt.debug.internal.ui.actions.AbstractToggleBreakpointAdapter#findFunctionBreakpoint(java.lang.String, org.eclipse.core.resources.IResource, java.lang.String)
      */
     @Override
-    protected ICFunctionBreakpoint findFunctionBreakpoint( 
-                    String sourceHandle, 
-                    IResource resource, 
+    protected ICFunctionBreakpoint findFunctionBreakpoint(
+                    String sourceHandle,
+                    IResource resource,
                     String functionName ) throws CoreException {
             return CDIDebugModel.functionBreakpointExists( sourceHandle, resource, functionName );
     }
@@ -166,21 +166,21 @@ public class TCFToggleBreakpointAdapter extends AbstractToggleBreakpointAdapter 
      */
     @Override
     protected void createFunctionBreakpoint(
-                    boolean interactive, 
-                    IWorkbenchPart part, 
-                    String sourceHandle, 
-                    IResource resource, 
-                    String functionName, 
-                    int charStart, 
-                    int charEnd, 
+                    boolean interactive,
+                    IWorkbenchPart part,
+                    String sourceHandle,
+                    IResource resource,
+                    String functionName,
+                    int charStart,
+                    int charEnd,
                     int lineNumber ) throws CoreException {
-            Boolean bFoundError = checkToggleType(part, TOGGLE_TYPE, attributes); 
+            Boolean bFoundError = checkToggleType(part, TOGGLE_TYPE, attributes);
             if (!bFoundError) {
                 ICFunctionBreakpoint bp = CDIDebugModel.createBlankFunctionBreakpoint();
-                CDIDebugModel.setFunctionBreakpointAttributes( attributes.getMap(), sourceHandle, getBreakpointType(), functionName, 
-                        charStart, charEnd, lineNumber, true, 0, "" ); //$NON-NLS-1$                
+                CDIDebugModel.setFunctionBreakpointAttributes( attributes.getMap(), sourceHandle, getBreakpointType(), functionName,
+                        charStart, charEnd, lineNumber, true, 0, "" ); //$NON-NLS-1$
                 if (!interactive) {
-                    CDIDebugModel.createBreakpointMarker(bp, resource, attributes.getMap(), true);                
+                    CDIDebugModel.createBreakpointMarker(bp, resource, attributes.getMap(), true);
                 }
                 else {
                     openBreakpointPropertiesDialog(bp, part, resource, attributes.getMap());
@@ -189,7 +189,7 @@ public class TCFToggleBreakpointAdapter extends AbstractToggleBreakpointAdapter 
             else {
                 // Throw an error to the user.
                 IStatus error = new Status(IStatus.ERROR, ITCFConstants.ID_TCF_DEBUG_MODEL, attributes.getError(), null);
-                ErrorDialog.openError(null, Messages.TCFBreakpointToggleError, null, error);                
+                ErrorDialog.openError(null, Messages.TCFBreakpointToggleError, null, error);
             }
     }
 
@@ -208,23 +208,23 @@ public class TCFToggleBreakpointAdapter extends AbstractToggleBreakpointAdapter 
     @Override
     protected void createWatchpoint(boolean interactive, IWorkbenchPart part, String sourceHandle, IResource resource, int charStart, int charEnd, int lineNumber,
             String expression, String memorySpace, String range) throws CoreException {
-        Boolean bFoundError = checkToggleType(part, TOGGLE_TYPE, attributes); 
+        Boolean bFoundError = checkToggleType(part, TOGGLE_TYPE, attributes);
         if (!bFoundError) {
             ICWatchpoint bp = CDIDebugModel.createBlankWatchpoint();
-            CDIDebugModel.setWatchPointAttributes(attributes.getMap(), sourceHandle, resource, true, false, 
+            CDIDebugModel.setWatchPointAttributes(attributes.getMap(), sourceHandle, resource, true, false,
                 expression, memorySpace, new BigInteger(range), true, 0, ""); //$NON-NLS-1$
             openBreakpointPropertiesDialog(bp, part, resource, attributes.getMap());
         }
         else {
             // Throw an error to the user.
             IStatus error = new Status(IStatus.ERROR, ITCFConstants.ID_TCF_DEBUG_MODEL, attributes.getError(), null);
-            ErrorDialog.openError(null, Messages.TCFBreakpointToggleError, null, error);                            
-        }        
+            ErrorDialog.openError(null, Messages.TCFBreakpointToggleError, null, error);
+        }
     }
 
     @Override
     protected void createEventBreakpoint(boolean interactive, IWorkbenchPart part, IResource resource, String type, String arg) throws CoreException {
-        Boolean bFoundError = checkToggleType(part, TOGGLE_TYPE, attributes); 
+        Boolean bFoundError = checkToggleType(part, TOGGLE_TYPE, attributes);
         if (!bFoundError) {
             ICEventBreakpoint bp = CDIDebugModel.createBlankEventBreakpoint();
             CDIDebugModel.setEventBreakpointAttributes(attributes.getMap(),type, arg);
@@ -233,7 +233,7 @@ public class TCFToggleBreakpointAdapter extends AbstractToggleBreakpointAdapter 
         else {
             // Throw an error to the user.
             IStatus error = new Status(IStatus.ERROR, ITCFConstants.ID_TCF_DEBUG_MODEL, attributes.getError(), null);
-            ErrorDialog.openError(null, Messages.TCFBreakpointToggleError, null, error);                            
-        }        
+            ErrorDialog.openError(null, Messages.TCFBreakpointToggleError, null, error);
+        }
     }
 }
