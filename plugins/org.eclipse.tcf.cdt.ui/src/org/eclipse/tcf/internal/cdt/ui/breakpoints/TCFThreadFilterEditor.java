@@ -11,7 +11,6 @@
  *******************************************************************************/
 package org.eclipse.tcf.internal.cdt.ui.breakpoints;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -69,7 +68,6 @@ import org.eclipse.tcf.internal.debug.ui.model.TCFNode;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExecContext;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
-import org.eclipse.tcf.protocol.IErrorReport;
 import org.eclipse.tcf.services.IContextQuery;
 import org.eclipse.tcf.services.IRunControl;
 import org.eclipse.tcf.util.TCFDataCache;
@@ -318,7 +316,9 @@ public class TCFThreadFilterEditor {
         fCheckHandler = new CheckHandler();
         Composite mainComposite = new Composite(parent, SWT.NONE);
         mainComposite.setFont(parent.getFont());
-        mainComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+        gd.widthHint = 500;
+        mainComposite.setLayoutData(gd);
         mainComposite.setLayout(new GridLayout(2,false));
         createThreadViewer(mainComposite);
     }
@@ -399,20 +399,9 @@ public class TCFThreadFilterEditor {
                  service.query(query, new IContextQuery.DoneQuery() {
                      public void doneQuery (IToken token, Exception error, String[] contexts) {
                          if (error != null) {
-                             //TODO: What if the error is not an instance of IErrorReport?
-                             if (error instanceof IErrorReport) {
-                                 Map<String,Object> error_data = ((IErrorReport)error).getAttributes();
-                                 if (error_data== null) done (null);
-                                 String fmt = (String)error_data.get(IErrorReport.ERROR_FORMAT);
-                                 if (fmt != null) {
-                                     Object params = error_data.get(IErrorReport.ERROR_PARAMS);
-                                     if (params != null && params instanceof ArrayList) {
-                                         done(new MessageFormat(fmt).format(((ArrayList<?>)params).toArray()));
-                                     }
-                                     done(fmt);
-                                 }
-                             }
-                         }else {
+                             done(TCFModel.getErrorMessage(error, false));
+                         }
+                         else {
                              for (String context : contexts) {
                                  contextList.add(context);
                              }
@@ -430,28 +419,30 @@ public class TCFThreadFilterEditor {
         boolean result = false;
         int lastIndex = expression.length();
         if (lastIndex != 0 && fromIndex <= lastIndex) {
-            String failPattern = new String("[=,\\s]");
             int equalsIndex = expression.indexOf('=', fromIndex);
             int commaIndex = expression.indexOf(',', fromIndex);
             int nextEqualsIndex = expression.indexOf('=',equalsIndex+1);
-            if (commaIndex == lastIndex-1 || equalsIndex == -1 || equalsIndex == lastIndex-1 ||
+            if (commaIndex == lastIndex-1 || equalsIndex == lastIndex-1 ||
                 equalsIndex == 0 || commaIndex == 0) {
                 return true;
             }
-            String testChar = expression.substring(equalsIndex-1, equalsIndex);
-            String testNextChar = expression.substring(equalsIndex+1,equalsIndex+2);
-            if (testChar.matches(failPattern) || testNextChar.matches(failPattern) ||
-                    (commaIndex != -1 && commaIndex < equalsIndex) ||
-                    (nextEqualsIndex != -1 && (commaIndex == -1 || nextEqualsIndex < commaIndex))) {
-                return true;
-            }
-            if (commaIndex!=-1) {
-                testChar = expression.substring(commaIndex-1, commaIndex);
-                testNextChar = expression.substring(commaIndex+1,commaIndex+2);
-                if (testChar.matches(failPattern) || testNextChar.matches(failPattern)) {
+            if (equalsIndex > 0) {
+                String failPattern = new String("[=,\\s]");
+                String testChar = expression.substring(equalsIndex-1, equalsIndex);
+                String testNextChar = expression.substring(equalsIndex+1,equalsIndex+2);
+                if (testChar.matches(failPattern) || testNextChar.matches(failPattern) ||
+                        (commaIndex != -1 && commaIndex < equalsIndex) ||
+                        (nextEqualsIndex != -1 && (commaIndex == -1 || nextEqualsIndex < commaIndex))) {
                     return true;
                 }
-                result = missingParameterValue(expression, commaIndex+1);
+                if (commaIndex!=-1) {
+                    testChar = expression.substring(commaIndex-1, commaIndex);
+                    testNextChar = expression.substring(commaIndex+1,commaIndex+2);
+                    if (testChar.matches(failPattern) || testNextChar.matches(failPattern)) {
+                        return true;
+                    }
+                    result = missingParameterValue(expression, commaIndex+1);
+                }
             }
         }
         return result;
