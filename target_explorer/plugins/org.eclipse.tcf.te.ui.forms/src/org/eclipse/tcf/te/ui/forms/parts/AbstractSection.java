@@ -205,6 +205,30 @@ public abstract class AbstractSection extends SectionPart implements IAdaptable,
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.ui.forms.AbstractFormPart#commit(boolean)
+	 */
+	@Override
+	public void commit(boolean onSave) {
+		// commit is reseting the dirty state
+		boolean hasBeenDirty = isDirty();
+	    super.commit(onSave);
+	    if (hasBeenDirty) getManagedForm().dirtyStateChanged();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.forms.AbstractFormPart#refresh()
+	 */
+	@Override
+	public void refresh() {
+		// refresh is reseting both the stale and the dirty state
+		boolean hasBeenStale = isStale();
+		boolean hasBeenDirty = isDirty();
+	    super.refresh();
+	    if (hasBeenStale) getManagedForm().staleStateChanged();
+	    if (hasBeenDirty) getManagedForm().dirtyStateChanged();
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.ui.jface.interfaces.IValidatable#isValid()
 	 */
 	@Override
