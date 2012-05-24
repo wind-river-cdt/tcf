@@ -137,6 +137,9 @@ public abstract class AbstractFileTransferSection extends AbstractTableSection i
 		section.setClient(client);
 
 		createPartControl((Composite)section.getClient(), SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.SINGLE | SWT.FULL_SELECTION, 2, toolkit);
+
+		// Mark the control update as completed now
+		setIsUpdating(false);
 	}
 
 	@Override

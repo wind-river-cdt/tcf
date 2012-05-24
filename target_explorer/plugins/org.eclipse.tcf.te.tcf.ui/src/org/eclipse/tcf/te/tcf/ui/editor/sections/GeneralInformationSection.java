@@ -159,6 +159,9 @@ public class GeneralInformationSection extends AbstractSection {
 
 		// Adjust the control enablement
 		updateEnablement();
+
+		// Mark the control update as completed now
+		setIsUpdating(false);
 	}
 
 	/**
@@ -308,6 +311,9 @@ public class GeneralInformationSection extends AbstractSection {
 	 */
 	@Override
 	public boolean isValid() {
+	    // Validation is skipped while the controls are updated
+	    if (!isUpdating()) return true;
+
 		boolean valid =  super.isValid();
 
 		if (idControl != null) {
@@ -381,6 +387,9 @@ public class GeneralInformationSection extends AbstractSection {
 	 * @param e The event which triggered the invocation or <code>null</code>.
 	 */
 	public void dataChanged(TypedEvent e) {
+	    // dataChanged is not evaluated while the controls are updated
+	    if (!isUpdating()) return;
+
 		boolean isDirty = false;
 
 		// Compare the data

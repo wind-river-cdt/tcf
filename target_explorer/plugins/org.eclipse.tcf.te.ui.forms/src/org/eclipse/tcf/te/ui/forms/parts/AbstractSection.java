@@ -46,6 +46,13 @@ public abstract class AbstractSection extends SectionPart implements IAdaptable,
 	// The message type. See IMessageProvider
 	private int messageType = NONE;
 
+	// Flag to mark if the controls of the sections are currently updated.
+	// While the control are updated, validation and similar logic should
+	// not be processed.
+	// <p>
+	// <b>Note:</b> This flag default to <code>true</code> on instantiation.
+	private boolean updating = true;
+
 	/**
 	 * Constructor.
 	 *
@@ -262,5 +269,21 @@ public abstract class AbstractSection extends SectionPart implements IAdaptable,
 	@Override
 	public final int getMessageType() {
 		return messageType;
+	}
+
+	/**
+	 * Marks if or if not the controls of the section are currently updated.
+	 */
+	protected final void setIsUpdating(boolean updating) {
+		this.updating = updating;
+	}
+
+	/**
+	 * Returns if or if not the controls of the section are currently updated.
+	 *
+	 * @return <code>True</code> if the controls are currently updated, <code>false</code> otherwise.
+	 */
+	protected final boolean isUpdating() {
+		return updating;
 	}
 }

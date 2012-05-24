@@ -140,6 +140,9 @@ public class AttributesSection extends AbstractSection {
 
 		// Adjust the control enablement
 		updateEnablement();
+
+		// Mark the control update as completed now
+		setIsUpdating(false);
 	}
 
 	/**
@@ -349,6 +352,9 @@ public class AttributesSection extends AbstractSection {
 	 * @param e The event which triggered the invocation or <code>null</code>.
 	 */
 	public void dataChanged(TypedEvent e) {
+	    // dataChanged is not evaluated while the controls are updated
+	    if (!isUpdating()) return;
+
 		boolean isDirty = false;
 
 		if (tablePart != null) {

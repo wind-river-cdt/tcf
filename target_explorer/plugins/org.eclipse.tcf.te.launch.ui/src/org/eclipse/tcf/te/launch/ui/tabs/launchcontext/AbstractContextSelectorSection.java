@@ -102,6 +102,9 @@ public abstract class AbstractContextSelectorSection extends AbstractSection imp
 		selector = doCreateContextSelector();
 		selector.setFormToolkit(toolkit);
 		selector.setupPanel(client);
+
+		// Mark the control update as completed now
+		setIsUpdating(false);
 	}
 
 	/**

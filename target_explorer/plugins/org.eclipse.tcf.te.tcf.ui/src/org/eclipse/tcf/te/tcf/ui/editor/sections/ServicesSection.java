@@ -98,6 +98,9 @@ public class ServicesSection extends AbstractSection {
 		layoutData.widthHint = SWTControlUtil.convertWidthInCharsToPixels(local, 20);
 		layoutData.heightHint = SWTControlUtil.convertHeightInCharsToPixels(remote, 5);
 		remote.setLayoutData(layoutData);
+
+		// Mark the control update as completed now
+		setIsUpdating(false);
 	}
 
 	/**

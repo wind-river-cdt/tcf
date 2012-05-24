@@ -77,6 +77,9 @@ public abstract class AbstractFormTextSection extends AbstractSection implements
 		configureFormText(text);
 
 		section.setClient(client);
+
+		// Mark the control update as completed now
+		setIsUpdating(false);
 	}
 
 	/**
