@@ -405,8 +405,8 @@ public class LocatorModel extends PlatformObject implements ILocatorModel {
 				// Get the peer for the previous node
 				IPeer previousPeer = previousNode.getPeer();
 				if (previousPeer != null) {
-					// We prefer to use the peer node for the canonical IP address before
-					// the loop back address before any other address.
+					// We prefer to use the peer node for the local loopback IP address before
+					// the canonical address before any other address.
 					String loopback = IPAddressUtil.getInstance().getIPv4LoopbackAddress();
 					String canonical = IPAddressUtil.getInstance().getCanonicalAddress();
 
@@ -428,23 +428,23 @@ public class LocatorModel extends PlatformObject implements ILocatorModel {
 					// If the ports of the agent instances are identical,
 					// than try to find the best representation of the agent instance
 					if (peerPort.equals(previousPeerPort))  {
-						if (canonical != null && canonical.equals(peerIP) && !canonical.equals(previousPeerIP)) {
-							// Remove the old node and replace it with the new new
-							peers.remove(previousNode.getPeerId());
-							fireListener(previousNode, false);
-
-							if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITracing.ID_TRACE_LOCATOR_MODEL)) {
-								CoreBundleActivator.getTraceHandler().trace("LocatorModel.validatePeerNodeForAdd: Previous peer node replaced (canonical overwrite)" //$NON-NLS-1$
-																			, ITracing.ID_TRACE_LOCATOR_MODEL, this);
-							}
-						} else if (loopback != null && loopback.equals(peerIP) && !loopback.equals(previousPeerIP)
-								&& (canonical == null || !canonical.equals(previousPeerIP))) {
+						if (loopback != null && loopback.equals(peerIP) && !loopback.equals(previousPeerIP)) {
 							// Remove the old node and replace it with the new new
 							peers.remove(previousNode.getPeerId());
 							fireListener(previousNode, false);
 
 							if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITracing.ID_TRACE_LOCATOR_MODEL)) {
 								CoreBundleActivator.getTraceHandler().trace("LocatorModel.validatePeerNodeForAdd: Previous peer node replaced (loopback overwrite)" //$NON-NLS-1$
+																			, ITracing.ID_TRACE_LOCATOR_MODEL, this);
+							}
+						} else if (canonical != null && canonical.equals(peerIP) && !canonical.equals(previousPeerIP)
+								&& (loopback == null || !loopback.equals(previousPeerIP))) {
+							// Remove the old node and replace it with the new new
+							peers.remove(previousNode.getPeerId());
+							fireListener(previousNode, false);
+
+							if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITracing.ID_TRACE_LOCATOR_MODEL)) {
+								CoreBundleActivator.getTraceHandler().trace("LocatorModel.validatePeerNodeForAdd: Previous peer node replaced (canonical overwrite)" //$NON-NLS-1$
 																			, ITracing.ID_TRACE_LOCATOR_MODEL, this);
 							}
 						} else {

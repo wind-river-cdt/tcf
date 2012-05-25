@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.core.Command;
@@ -24,6 +25,7 @@ import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.ILocator;
+import org.eclipse.tcf.te.runtime.utils.net.IPAddressUtil;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.locator.interfaces.IScanner;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
@@ -222,10 +224,23 @@ public class ScannerRunnable implements Runnable, IChannel.IChannelListener {
 								public void run() {
 									try {
 										InetAddress address = InetAddress.getByName(ip);
-										final String name = address.getCanonicalHostName();
+										final AtomicReference<String> nameRef = new AtomicReference<String>();
+										nameRef.set(address.getCanonicalHostName());
+
+										if (ip.equals(nameRef.get()) && IPAddressUtil.getInstance().isLocalHost(ip)) {
+											String[] candidates = IPAddressUtil.getInstance().getCanonicalHostNames();
+											for (String candidate : candidates) {
+												if (!ip.equals(candidate)) {
+													nameRef.set(candidate);
+													break;
+												}
+											}
+										}
+
 										Protocol.invokeLater(new Runnable() {
 											@Override
 											public void run() {
+												String name = nameRef.get();
 												if (name != null && !"".equals(name) && !ip.equals(name)) { //$NON-NLS-1$
 													String dnsName = name.indexOf('.') != -1 ? name.substring(0, name.indexOf('.')) : name;
 													if (!ip.equalsIgnoreCase(dnsName)) {
