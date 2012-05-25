@@ -70,7 +70,9 @@ public class SampleTest extends AbstractTcfUITest {
             fDebugViewListener.waitTillFinished(MODEL_CHANGED_COMPLETE | CONTENT_SEQUENCE_COMPLETE | LABEL_UPDATES_RUNNING);
             VirtualItem topFrameItem = fDebugViewListener.findElement(
                 new Pattern[] { Pattern.compile(".*"), Pattern.compile(".*"), Pattern.compile(".*" + fProcessId + ".*\\(Step.*"), Pattern.compile(".*")});
-            Assert.assertTrue(topFrameItem != null);
+            if (topFrameItem == null) {
+                Assert.fail("Top stack frame not found. \n\nDebug view dump: \n:" + fDebugViewViewer.toString());
+            }
             String topFrameLabel = ((String[])topFrameItem.getData(VirtualItem.LABEL_KEY))[0];
             Assert.assertTrue(!topFrameLabel.equals(previousThreadLabel));
             previousThreadLabel = topFrameLabel;
@@ -82,8 +84,6 @@ public class SampleTest extends AbstractTcfUITest {
         fRegistersViewViewer.setActive(true);
 
         initProcessModel("tcf_test_func0");
-
-
 
         // Execute step loop
         String previousThreadLabel = null;
