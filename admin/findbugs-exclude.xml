@@ -32,6 +32,11 @@
 		</Or>
 	</Match>
 	
+	<!-- Ignore all REC_CATCH_EXCEPTION -->
+	<Match>
+		<Bug pattern="REC_CATCH_EXCEPTION"/>
+	</Match>
+	
 	<!-- Ignore all EQ_DOESNT_OVERRIDE_EQUALS -->
 	<Match>
 		<Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS"/>
