@@ -76,6 +76,17 @@ public class FileTransferItem extends PropertiesContainer implements IFileTransf
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.properties.PropertiesContainer#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		int hc = getHostPath() != null ? getHostPath().hashCode() : 0;
+		hc = hc << 8 + (getTargetPath() != null ? getTargetPath().hashCode() : 0);
+		hc = hc << 8 + getDirection();
+	    return hc;
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.runtime.properties.PropertiesContainer#equals(java.lang.Object)
 	 */
 	@Override

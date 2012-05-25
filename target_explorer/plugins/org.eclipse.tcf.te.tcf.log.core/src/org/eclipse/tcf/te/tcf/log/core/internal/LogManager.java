@@ -380,6 +380,7 @@ public final class LogManager implements IProtocolStateChangeListener {
 								// Rename the log file if the rotate succeeded,
 								// Delete the log file if not.
 								rc = rc ? file.renameTo(maxFileInCycle) : file.delete();
+								if (!rc) { /* Well, there is nothing we can do about it */ }
 							}
 
 						} else {
@@ -393,7 +394,8 @@ public final class LogManager implements IProtocolStateChangeListener {
 							Assert.isTrue(no <= maxInCycle);
 
 							// Rename the log file
-							file.renameTo(fileInCycle);
+							boolean rc = file.renameTo(fileInCycle);
+							if (!rc) { /* Well, there is nothing we can do about it */ }
 						}
 					}
 				}

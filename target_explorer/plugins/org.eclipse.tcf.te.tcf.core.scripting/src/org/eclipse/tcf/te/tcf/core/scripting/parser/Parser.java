@@ -163,17 +163,18 @@ public class Parser {
     		if (tok.startsWith("{")) { //$NON-NLS-1$
     			// Map type
 
-    			String fullTok = tok;
-    			boolean complete = isComplete(fullTok, '{', '}');
+    			StringBuilder fullTok = new StringBuilder(tok);
+    			boolean complete = isComplete(fullTok.toString(), '{', '}');
     			while (!complete && tokenizer.hasMoreTokens()) {
-    				fullTok = fullTok + " " + tokenizer.nextToken(); //$NON-NLS-1$
-    				complete = isComplete(fullTok, '{', '}');
+    				fullTok.append(" "); //$NON-NLS-1$
+    				fullTok.append(tokenizer.nextToken());
+    				complete = isComplete(fullTok.toString(), '{', '}');
     			}
 
     			if (complete) {
-    				fullTok = fullTok + "\0"; //$NON-NLS-1$
+    				String fullTokStr = fullTok.toString() + "\0"; //$NON-NLS-1$
     				try {
-    					Object[] args = JSON.parseSequence(fullTok.getBytes());
+    					Object[] args = JSON.parseSequence(fullTokStr.getBytes());
     					if (args != null) {
     						for (Object arg : args) {
     							if (arg != null) token.addArgument(arg);
@@ -187,17 +188,18 @@ public class Parser {
     		if (tok.startsWith("[")) { //$NON-NLS-1$
     			// List type
 
-    			String fullTok = tok;
-    			boolean complete = isComplete(fullTok, '[', ']');
+    			StringBuilder fullTok = new StringBuilder(tok);
+    			boolean complete = isComplete(fullTok.toString(), '[', ']');
     			while (!complete && tokenizer.hasMoreTokens()) {
-    				fullTok = fullTok + " " + tokenizer.nextToken(); //$NON-NLS-1$
-    				complete = isComplete(fullTok, '[', ']');
+    				fullTok.append(" "); //$NON-NLS-1$
+    				fullTok.append(tokenizer.nextToken());
+    				complete = isComplete(fullTok.toString(), '[', ']');
     			}
 
     			if (complete) {
-    				fullTok = fullTok + "\0"; //$NON-NLS-1$
+    				String fullTokStr = fullTok.toString() + "\0"; //$NON-NLS-1$
     				try {
-    					Object[] args = JSON.parseSequence(fullTok.getBytes());
+    					Object[] args = JSON.parseSequence(fullTokStr.getBytes());
     					if (args != null) {
     						for (Object arg : args) {
     							if (arg != null) token.addArgument(arg);
