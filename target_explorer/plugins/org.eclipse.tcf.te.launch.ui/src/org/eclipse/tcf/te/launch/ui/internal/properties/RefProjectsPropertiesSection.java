@@ -119,7 +119,7 @@ public class RefProjectsPropertiesSection extends BaseTitledSection {
 	 */
 	@Override
 	public void refresh() {
-		viewer.setInput(items);
+		if (viewer != null) viewer.setInput(items);
 	}
 
 	/* (non-Javadoc)

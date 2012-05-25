@@ -155,17 +155,19 @@ public abstract class AbstractFileTransferSection extends AbstractTableSection i
 
 		final Table table = viewer.getTable();
 
-		((CheckboxTableViewer)viewer).setCheckStateProvider(new FileTransferCheckStateProvider());
-		((CheckboxTableViewer)viewer).addCheckStateListener(new ICheckStateListener() {
-			@Override
-			public void checkStateChanged(CheckStateChangedEvent event) {
-				if (event.getElement() instanceof IFileTransferItem) {
-					IFileTransferItem item = (IFileTransferItem)event.getElement();
-					item.setProperty(IFileTransferItem.PROPERTY_ENABLED, event.getChecked());
-					getManagedForm().dirtyStateChanged();
+		if (viewer instanceof CheckboxTableViewer) {
+			((CheckboxTableViewer)viewer).setCheckStateProvider(new FileTransferCheckStateProvider());
+			((CheckboxTableViewer)viewer).addCheckStateListener(new ICheckStateListener() {
+				@Override
+				public void checkStateChanged(CheckStateChangedEvent event) {
+					if (event.getElement() instanceof IFileTransferItem) {
+						IFileTransferItem item = (IFileTransferItem)event.getElement();
+						item.setProperty(IFileTransferItem.PROPERTY_ENABLED, event.getChecked());
+						getManagedForm().dirtyStateChanged();
+					}
 				}
-			}
-		});
+			});
+		}
 
 		TableViewerColumn tvEnableCol = new TableViewerColumn(viewer, SWT.NONE);
 		final TableColumn colEnable = tvEnableCol.getColumn();
@@ -256,7 +258,7 @@ public abstract class AbstractFileTransferSection extends AbstractTableSection i
 			protected Object getValue(Object element) {
 				if (element instanceof IFileTransferItem) {
 					IFileTransferItem item = (IFileTransferItem)element;
-					return new Boolean(item.getIntProperty(IFileTransferItem.PROPERTY_DIRECTION) != IFileTransferItem.TARGET_TO_HOST);
+					return Boolean.valueOf(item.getIntProperty(IFileTransferItem.PROPERTY_DIRECTION) != IFileTransferItem.TARGET_TO_HOST);
 				}
 				return null;
 			}

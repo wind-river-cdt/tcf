@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.cdt.utils.elf.Elf.Attribute;
@@ -126,8 +127,9 @@ public class LaunchSelectionManager {
 		if (PART_ID_TE_VIEW.equalsIgnoreCase(partId)) {
 			// Get the selected remote contexts
 			Map<IModelNode, Set<IModelNode>> remoteCtxSelections = getRemoteCtxSelections(getPartSelection(PART_ID_TE_VIEW));
-			for (IModelNode remoteCtx : remoteCtxSelections.keySet()) {
-				contexts.add(new RemoteSelectionContext(remoteCtx, remoteCtxSelections.get(remoteCtx).toArray(), preferedPart));
+
+			for (Entry<IModelNode, Set<IModelNode>> remoteCtx : remoteCtxSelections.entrySet()) {
+				contexts.add(new RemoteSelectionContext(remoteCtx.getKey(), remoteCtx.getValue().toArray(), preferedPart));
 			}
 		}
 		else if (PART_ID_PROJECT_VIEW.equalsIgnoreCase(partId)) {

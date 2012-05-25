@@ -140,13 +140,14 @@ public final class LaunchModel implements IEventListener, ILaunchConfigurationLi
 	 */
 	@Override
 	public void eventFired(EventObject event) {
-		Assert.isTrue(event instanceof ChangeEvent);
-		ChangeEvent e = (ChangeEvent)event;
-		if (e.getSource() instanceof ICategory &&
-						((e.getNewValue() instanceof String && ((String)e.getNewValue()).startsWith(LaunchNode.class.getName())) ||
-										(e.getOldValue() instanceof String && ((String)e.getOldValue()).startsWith(LaunchNode.class.getName())))) {
-			if (refresh()) {
-				EventManager.getInstance().fireEvent(new ChangeEvent(this, ((ChangeEvent)event).getEventId(), null, null));
+		if (event instanceof ChangeEvent) {
+			ChangeEvent e = (ChangeEvent)event;
+			if (e.getSource() instanceof ICategory &&
+							((e.getNewValue() instanceof String && ((String)e.getNewValue()).startsWith(LaunchNode.class.getName())) ||
+											(e.getOldValue() instanceof String && ((String)e.getOldValue()).startsWith(LaunchNode.class.getName())))) {
+				if (refresh()) {
+					EventManager.getInstance().fireEvent(new ChangeEvent(this, ((ChangeEvent)event).getEventId(), null, null));
+				}
 			}
 		}
 	}

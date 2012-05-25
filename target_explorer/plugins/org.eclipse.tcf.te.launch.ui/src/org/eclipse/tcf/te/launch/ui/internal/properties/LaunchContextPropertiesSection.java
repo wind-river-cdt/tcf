@@ -78,7 +78,7 @@ public class LaunchContextPropertiesSection extends BaseTitledSection {
 	 */
 	@Override
 	public void refresh() {
-		launchContext.setText(launchContextValue);
+		if (launchContext != null) launchContext.setText(launchContextValue);
 	}
 
 	/* (non-Javadoc)

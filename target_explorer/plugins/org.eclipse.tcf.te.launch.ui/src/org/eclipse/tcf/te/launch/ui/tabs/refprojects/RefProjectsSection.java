@@ -167,17 +167,19 @@ public class RefProjectsSection extends AbstractTableSection implements ILaunchC
 
 		final Table table = viewer.getTable();
 
-		((CheckboxTableViewer)viewer).setCheckStateProvider(new RefProjectsCheckStateProvider());
-		((CheckboxTableViewer)viewer).addCheckStateListener(new ICheckStateListener() {
-			@Override
-			public void checkStateChanged(CheckStateChangedEvent event) {
-				if (event.getElement() instanceof IReferencedProjectItem) {
-					IReferencedProjectItem item = (IReferencedProjectItem)event.getElement();
-					item.setProperty(IReferencedProjectItem.PROPERTY_ENABLED, event.getChecked());
-					getManagedForm().dirtyStateChanged();
+		if (viewer instanceof CheckboxTableViewer) {
+			((CheckboxTableViewer)viewer).setCheckStateProvider(new RefProjectsCheckStateProvider());
+			((CheckboxTableViewer)viewer).addCheckStateListener(new ICheckStateListener() {
+				@Override
+				public void checkStateChanged(CheckStateChangedEvent event) {
+					if (event.getElement() instanceof IReferencedProjectItem) {
+						IReferencedProjectItem item = (IReferencedProjectItem)event.getElement();
+						item.setProperty(IReferencedProjectItem.PROPERTY_ENABLED, event.getChecked());
+						getManagedForm().dirtyStateChanged();
+					}
 				}
-			}
-		});
+			});
+		}
 
 		TableViewerColumn tvEnableCol = new TableViewerColumn(viewer, SWT.NONE);
 		final TableColumn colEnable = tvEnableCol.getColumn();

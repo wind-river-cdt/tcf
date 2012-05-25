@@ -61,7 +61,7 @@ public class LaunchConfigTypePropertiesSection extends BaseTitledSection {
 	 */
 	@Override
 	public void refresh() {
-		name.setText(nameValue);
+		if (name != null) name.setText(nameValue);
 	}
 
 	/* (non-Javadoc)
