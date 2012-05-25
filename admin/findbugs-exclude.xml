@@ -4,9 +4,12 @@
 		<Bug category="I18N"/>
 	</Match>
 	
-	<!-- Ignore all NM_SAME_SIMPLE_NAME_AS_SUPERCLASS violations -->
+	<!-- Ignore all NM_SAME_SIMPLE_NAME_AS_SUPERCLASS or NM_SAME_SIMPLE_NAME_AS_INTERFACE violations -->
 	<Match>
-		<Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"/>
+		<Or>
+			<Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"/>
+			<Bug pattern="NM_SAME_SIMPLE_NAME_AS_INTERFACE"/>
+		<Or>
 	</Match>
 
 	<!-- Ignore all SF_SWITCH_NO_DEFAULT violations -->
