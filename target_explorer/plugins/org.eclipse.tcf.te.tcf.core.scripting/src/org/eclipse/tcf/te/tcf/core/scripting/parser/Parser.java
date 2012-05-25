@@ -113,18 +113,19 @@ public class Parser {
     		if (tok.startsWith("\"")) { //$NON-NLS-1$
     			// String type
 
-    			String fullTok = tok;
-    			boolean complete = isComplete(fullTok, '"', '"');
+    			StringBuilder fullTok = new StringBuilder(tok);
+    			boolean complete = isComplete(fullTok.toString(), '"', '"');
     			while (!complete && tokenizer.hasMoreTokens()) {
-    				fullTok = fullTok + " " + tokenizer.nextToken(); //$NON-NLS-1$
-    				complete = isComplete(fullTok, '"', '"');
+    				fullTok.append(" "); //$NON-NLS-1$
+    				fullTok.append(tokenizer.nextToken());
+    				complete = isComplete(fullTok.toString(), '"', '"');
     			}
 
     			if (complete) {
-    				fullTok = fullTok.trim();
-    				if (fullTok.startsWith("\"")) fullTok = fullTok.substring(1); //$NON-NLS-1$
-    				if (fullTok.endsWith("\"")) fullTok = fullTok.substring(0, fullTok.length() - 1); //$NON-NLS-1$
-    				token.addArgument(fullTok);
+    				String fullTokStr = fullTok.toString().trim();
+    				if (fullTokStr.startsWith("\"")) fullTokStr = fullTokStr.substring(1); //$NON-NLS-1$
+    				if (fullTokStr.endsWith("\"")) fullTokStr = fullTokStr.substring(0, fullTok.length() - 1); //$NON-NLS-1$
+    				token.addArgument(fullTokStr);
     				continue;
     			}
     		}

@@ -37,6 +37,11 @@
 		<Bug pattern="REC_CATCH_EXCEPTION"/>
 	</Match>
 	
+	<!-- Ignore all STCAL_INVOKE_ON_STATIC_DATE_FORMAT_INSTANCE -->
+	<Match>
+		<Bug pattern="STCAL_INVOKE_ON_STATIC_DATE_FORMAT_INSTANCE"/>
+	</Match>
+	
 	<!-- Ignore all EQ_DOESNT_OVERRIDE_EQUALS -->
 	<Match>
 		<Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS"/>
@@ -51,6 +56,12 @@
 			<Method name="stop" params="org.osgi.framework.BundleContext" returns="void"/>
 			<Method name="Activator"/>
 		</Or>
+	</Match>
+	
+	<!-- Ignore all RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE in hasString(String) methods -->
+	<Match>
+		<Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"/>
+		<Method name="hasString" params="java.lang.String" returns="boolean"/>
 	</Match>
 	
 	<!-- Ignore all EI_EXPOSE_REP violations for IAdapterFactory#getAdapterList() -->

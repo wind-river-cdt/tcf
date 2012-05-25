@@ -221,14 +221,19 @@ public class RemoteAppLaunchManagerDelegate extends DefaultLaunchManagerDelegate
 	public void validate(String launchMode, ILaunchConfiguration launchConfig) throws LaunchServiceException {
 		super.validate(launchMode, launchConfig);
 
-		String missingAttributes = null;
+		StringBuilder missingAttributes = new StringBuilder();
 		for (String attribute : MANDATORY_CONFIG_ATTRIBUTES) {
 			if (!isValidAttribute(attribute, launchConfig, launchMode)) {
-				missingAttributes = (missingAttributes == null) ? attribute : missingAttributes + ", " + attribute; //$NON-NLS-1$
+				if (missingAttributes.length() == 0) {
+					missingAttributes.append(attribute);
+				} else {
+					missingAttributes.append(", "); //$NON-NLS-1$
+					missingAttributes.append(attribute);
+				}
 			}
 		}
-		if (missingAttributes != null) {
-			throw new LaunchServiceException("Missing launch configuration attributes: " + '\n' + missingAttributes, LaunchServiceException.TYPE_MISSING_LAUNCH_CONFIG_ATTR); //$NON-NLS-1$
+		if (missingAttributes.length() > 0) {
+			throw new LaunchServiceException("Missing launch configuration attributes: " + '\n' + missingAttributes.toString(), LaunchServiceException.TYPE_MISSING_LAUNCH_CONFIG_ATTR); //$NON-NLS-1$
 		}
 	}
 

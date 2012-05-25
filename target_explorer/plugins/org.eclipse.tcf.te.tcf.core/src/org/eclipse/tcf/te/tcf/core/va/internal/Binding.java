@@ -34,7 +34,7 @@ public class Binding extends ExecutableExtension {
 		// Initialize the value-add id field by reading the <valueadd> extension attribute.
 		// Throws an exception if the id is empty or null.
 		valueAddId = config != null ? config.getAttribute("valueAddId") : null; //$NON-NLS-1$
-		if (valueAddId == null || (valueAddId != null && "".equals(valueAddId.trim()))) { //$NON-NLS-1$
+		if (valueAddId == null || "".equals(valueAddId.trim())) { //$NON-NLS-1$
 			throw createMissingMandatoryAttributeException("valueAddId", config.getContributor().getName()); //$NON-NLS-1$
 		}
 

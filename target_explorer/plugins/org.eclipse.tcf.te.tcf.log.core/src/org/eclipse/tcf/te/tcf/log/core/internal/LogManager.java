@@ -367,17 +367,21 @@ public final class LogManager implements IProtocolStateChangeListener {
 							// We have to rotate the full cycle, first in cycle to be removed.
 							int no = 1;
 							File fileInCycle = path.append(logName + "_" + no + ".log").toFile(); //$NON-NLS-1$ //$NON-NLS-2$
-							fileInCycle.delete();
+							boolean rc = fileInCycle.delete();
+							if (rc) {
+								while (no <= maxInCycle) {
+									no++;
+									fileInCycle = path.append(logName + "_" + no + ".log").toFile(); //$NON-NLS-1$ //$NON-NLS-2$
+									File renameTo = path.append(logName + "_" + (no - 1) + ".log").toFile(); //$NON-NLS-1$ //$NON-NLS-2$
+									rc = fileInCycle.renameTo(renameTo);
+									if (!rc) break;
+								}
 
-							while (no <= maxInCycle) {
-								no++;
-								fileInCycle = path.append(logName + "_" + no + ".log").toFile(); //$NON-NLS-1$ //$NON-NLS-2$
-								File renameTo = path.append(logName + "_" + (no - 1) + ".log").toFile(); //$NON-NLS-1$ //$NON-NLS-2$
-								fileInCycle.renameTo(renameTo);
+								// Rename the log file if the rotate succeeded,
+								// Delete the log file if not.
+								rc = rc ? file.renameTo(maxFileInCycle) : file.delete();
 							}
 
-							// Rename the log file
-							file.renameTo(maxFileInCycle);
 						} else {
 							// Not at the limit, find the next file name in the cycle
 							int no = 1;

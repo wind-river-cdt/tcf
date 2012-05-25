@@ -139,7 +139,9 @@ public class ScriptLauncher extends PlatformObject implements IScriptLauncher {
 						 */
 						@Override
 						public void onChannelClosed(Throwable error) {
-							if (traceListener != null) { ((AbstractChannel)ScriptLauncher.this.channel).removeTraceListener(traceListener); traceListener = null; }
+							if (traceListener != null && ScriptLauncher.this.channel != null) {
+								((AbstractChannel)ScriptLauncher.this.channel).removeTraceListener(traceListener); traceListener = null;
+							}
 							if (error != null) {
 								IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
 															NLS.bind(Messages.ScriptLauncher_error_channelConnectFailed, peer.getID(), error.getLocalizedMessage()),
@@ -320,7 +322,7 @@ public class ScriptLauncher extends PlatformObject implements IScriptLauncher {
 
 		Token token = tokens[index];
 
-		IService service = channel.getRemoteService(token.getServiceName());
+		IService service = channel != null ? channel.getRemoteService(token.getServiceName()) : null;
 		if (service != null) {
 			new Command(channel, service, token.getCommandName(), token.getArguments()) {
 

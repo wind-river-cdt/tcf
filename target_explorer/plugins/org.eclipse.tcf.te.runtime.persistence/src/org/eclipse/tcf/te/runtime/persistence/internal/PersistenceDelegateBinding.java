@@ -34,7 +34,7 @@ public class PersistenceDelegateBinding extends ExecutableExtension {
 		// Initialize the delegate id field by reading the <delegate> extension attribute.
 		// Throws an exception if the id is empty or null.
 		delegateId = config != null ? config.getAttribute("delegateId") : null; //$NON-NLS-1$
-		if (delegateId == null || (delegateId != null && "".equals(delegateId.trim()))) { //$NON-NLS-1$
+		if (delegateId == null || "".equals(delegateId.trim())) { //$NON-NLS-1$
 			throw createMissingMandatoryAttributeException("delegateId", config.getContributor().getName()); //$NON-NLS-1$
 		}
 

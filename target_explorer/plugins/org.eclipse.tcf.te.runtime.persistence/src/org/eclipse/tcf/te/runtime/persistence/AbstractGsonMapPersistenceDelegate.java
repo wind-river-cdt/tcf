@@ -94,10 +94,14 @@ public abstract class AbstractGsonMapPersistenceDelegate extends ExecutableExten
 				file = path.addFileExtension(getDefaultFileExtension()).toFile();
 			}
 
-			Writer writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8"); //$NON-NLS-1$
-			Gson gson = new GsonBuilder().setPrettyPrinting().create();
-			gson.toJson(toMap(context), Map.class, writer);
-			writer.close();
+			Writer writer = null;
+			try {
+				writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8"); //$NON-NLS-1$
+				Gson gson = new GsonBuilder().setPrettyPrinting().create();
+				gson.toJson(toMap(context), Map.class, writer);
+			} finally {
+				if (writer != null) writer.close();
+			}
 		}
 		else if (container instanceof String || String.class.equals(container)) {
 			Gson gson = new GsonBuilder().create();
@@ -133,9 +137,13 @@ public abstract class AbstractGsonMapPersistenceDelegate extends ExecutableExten
 				throw new IOException("URI must denote an absolute file path."); //$NON-NLS-1$
 			}
 
-			Reader reader = new InputStreamReader(new FileInputStream(file), "UTF-8"); //$NON-NLS-1$
-			data = gson.fromJson(reader, Map.class);
-			reader.close();
+			Reader reader = null;
+			try {
+				reader = new InputStreamReader(new FileInputStream(file), "UTF-8"); //$NON-NLS-1$
+				data = gson.fromJson(reader, Map.class);
+			} finally {
+				if (reader != null) reader.close();
+			}
 		}
 		else if (container instanceof String) {
 			data = gson.fromJson((String)container, Map.class);

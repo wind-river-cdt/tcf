@@ -26,7 +26,7 @@ import org.eclipse.tcf.te.tcf.core.concurrent.interfaces.IProxyDescriptor;
  */
 public class DefaultProxyDescriptor implements IProxyDescriptor {
 	// Descriptor cache to store known proxy descriptors.
-	private static Map<Class<?>, IProxyDescriptor> descriptorCache;
+	private volatile static Map<Class<?>, IProxyDescriptor> descriptorCache;
 
 	/**
 	 * Get a default proxy descriptor from the cache using the class as the key.

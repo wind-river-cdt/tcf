@@ -74,20 +74,18 @@ public class MapPersistableURIProvider implements IPersistableURIProvider {
 		// Try the bundles state location first (not available if launched with -data @none).
 		try {
 			IPath path = CoreBundleActivator.getDefault().getStateLocation().append(".peers"); //$NON-NLS-1$
-			if (!path.toFile().exists()) {
-				path.toFile().mkdirs();
-			}
-			if (path.toFile().canRead() && path.toFile().isDirectory()) {
+			boolean exists = path.toFile().exists();
+			if (!exists) exists = path.toFile().mkdirs();
+			if (exists && path.toFile().canRead() && path.toFile().isDirectory()) {
 				location = path;
 			}
 		} catch (IllegalStateException e) {
 			// Workspace less environments (-data @none)
 			// The users local peers lookup directory is $HOME/.tcf/.peers.
 			IPath path = new Path(System.getProperty("user.home")).append(".tcf/.peers"); //$NON-NLS-1$ //$NON-NLS-2$
-			if (!path.toFile().exists()) {
-				path.toFile().mkdirs();
-			}
-			if (path.toFile().canRead() && path.toFile().isDirectory()) {
+			boolean exists = path.toFile().exists();
+			if (!exists) exists = path.toFile().mkdirs();
+			if (exists && path.toFile().canRead() && path.toFile().isDirectory()) {
 				location = path;
 			}
 		}

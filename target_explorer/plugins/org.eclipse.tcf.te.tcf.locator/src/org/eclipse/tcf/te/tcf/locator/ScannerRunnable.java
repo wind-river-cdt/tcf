@@ -297,7 +297,7 @@ public class ScannerRunnable implements Runnable, IChannel.IChannelListener {
 
 		// Set the peer state property, if the scanner the runnable
 		// has been scheduled from is still active.
-		if (parentScanner == null || parentScanner != null && !parentScanner.isTerminated()) {
+		if (parentScanner == null || !parentScanner.isTerminated()) {
 			// Turn off change notifications temporarily
 			boolean changed = peerNode.setChangeEventsEnabled(false);
 

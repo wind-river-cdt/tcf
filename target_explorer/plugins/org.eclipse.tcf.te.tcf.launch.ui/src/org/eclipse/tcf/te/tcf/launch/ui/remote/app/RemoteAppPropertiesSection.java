@@ -68,8 +68,8 @@ public class RemoteAppPropertiesSection extends BaseTitledSection {
 	 */
 	@Override
 	public void refresh() {
-		processImage.setText(new Path(processImageValue).toPortableString());
-		processArgs.setText(processArgsValue);
+		if (processImage != null) processImage.setText(new Path(processImageValue).toPortableString());
+		if (processArgs != null) processArgs.setText(processArgsValue);
 	}
 
 	/* (non-Javadoc)

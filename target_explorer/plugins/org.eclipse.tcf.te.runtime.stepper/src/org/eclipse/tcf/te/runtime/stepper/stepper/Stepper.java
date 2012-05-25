@@ -78,8 +78,7 @@ public class Stepper implements IStepper {
 		super();
 	}
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper#getId()
 	 */
 	@Override
@@ -87,8 +86,7 @@ public class Stepper implements IStepper {
 		return getClass().getName();
 	}
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper#getLabel()
 	 */
 	@Override
@@ -96,8 +94,7 @@ public class Stepper implements IStepper {
 		return getClass().getName();
 	}
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper#getDescription()
 	 */
 	@Override
@@ -107,17 +104,16 @@ public class Stepper implements IStepper {
 
 	/**
 	 * Returns the id of the step group to execute by the stepper.
-	 * 
+	 *
 	 * @return The step group id.
 	 */
 	protected String getStepGroupId() {
-		return getData() != null ? getData()
-						.getStringProperty(IStepperProperties.PROP_STEP_GROUP_ID) : null;
+		return getData() != null ? getData().getStringProperty(IStepperProperties.PROP_STEP_GROUP_ID) : null;
 	}
 
 	/**
 	 * Returns the step group for the given step group id.
-	 * 
+	 *
 	 * @param The step group id. Must not be <code>null</code>:
 	 * @return The step group or <code>null</code>.
 	 */
@@ -133,11 +129,11 @@ public class Stepper implements IStepper {
 
 	/**
 	 * Creates a new instance of the step executor to use for executing a step.
-	 * 
+	 *
 	 * @param step The step. Must not be <code>null</code>.
 	 * @param secondaryId The secondary id or <code>null</code>.
 	 * @param fullQualifiedStepId The fully qualified step id. Must not be <code>null</code>.
-	 * 
+	 *
 	 * @return The step executor instance.
 	 */
 	protected IStepExecutor doCreateStepExecutor(IStep step, String secondaryId, IFullQualifiedId fullQualifiedStepId) {
@@ -146,13 +142,8 @@ public class Stepper implements IStepper {
 		return new StepExecutor();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper#initialize(org.eclipse.tcf.te.runtime
-	 * .interfaces.properties.IPropertiesContainer,
-	 * org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId,
-	 * org.eclipse.core.runtime.IProgressMonitor)
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper#initialize(org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext, org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	public final void initialize(IStepContext context, IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor) throws IllegalStateException {
@@ -187,7 +178,7 @@ public class Stepper implements IStepper {
 
 	/**
 	 * Hook for subclasses to overwrite if subclasses wants to initialize their own state.
-	 * 
+	 *
 	 * @param data The data. Must not be <code>null</code>.
 	 * @param fullQualifiedId The full qualified id of this stepper.
 	 * @param monitor The progress monitor. Must not be <code>null</code>.
@@ -205,8 +196,7 @@ public class Stepper implements IStepper {
 		initialized = true;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper#isInitialized()
 	 */
 	@Override
@@ -216,7 +206,7 @@ public class Stepper implements IStepper {
 
 	/**
 	 * Sets the cancelable state of the stepper.
-	 * 
+	 *
 	 * @param cancelable <code>True</code> if the stepper shall be cancelable, <code>false</code> if
 	 *            not.
 	 */
@@ -226,7 +216,7 @@ public class Stepper implements IStepper {
 
 	/**
 	 * Returns the cancelable state of the stepper.
-	 * 
+	 *
 	 * @return <code>True</code> if the stepper is cancelable, <code>false</code> if not.
 	 */
 	protected final boolean isCancelable() {
@@ -235,7 +225,7 @@ public class Stepper implements IStepper {
 
 	/**
 	 * Get the active context.
-	 * 
+	 *
 	 * @return The active context or <code>null</code>.
 	 */
 	protected IStepContext getContext() {
@@ -244,7 +234,7 @@ public class Stepper implements IStepper {
 
 	/**
 	 * Get the context id.
-	 * 
+	 *
 	 * @return The context id or <code>null</code>.
 	 */
 	protected String getContextId() {
@@ -254,7 +244,7 @@ public class Stepper implements IStepper {
 	/**
 	 * Returns the currently associated data. The method returns <code>null</code> if the stepper is
 	 * not in initialized state.
-	 * 
+	 *
 	 * @return The data or <code>null</code>
 	 */
 	protected final IPropertiesContainer getData() {
@@ -263,7 +253,7 @@ public class Stepper implements IStepper {
 
 	/**
 	 * Returns the full qualified id for this stepper.
-	 * 
+	 *
 	 * @return The full qualified stepper id.
 	 */
 	protected final IFullQualifiedId getFullQualifiedId() {
@@ -273,7 +263,7 @@ public class Stepper implements IStepper {
 	/**
 	 * Returns the currently associated progress monitor. The method returns <code>null</code> if
 	 * the stepper is not in initialized state.
-	 * 
+	 *
 	 * @return The progress monitor or <code>null</code>
 	 */
 	protected final IProgressMonitor getMonitor() {
@@ -287,8 +277,7 @@ public class Stepper implements IStepper {
 		finished = true;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper#isFinished()
 	 */
 	@Override
@@ -296,8 +285,7 @@ public class Stepper implements IStepper {
 		return finished;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper#cleanup()
 	 */
 	@Override
@@ -316,8 +304,7 @@ public class Stepper implements IStepper {
 		initialized = false;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
@@ -329,8 +316,7 @@ public class Stepper implements IStepper {
 		return buffer.toString();
 	}
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper#execute()
 	 */
 	@Override
@@ -339,9 +325,7 @@ public class Stepper implements IStepper {
 
 		CoreBundleActivator.getTraceHandler().trace("Stepper#execute: *** ENTERED", //$NON-NLS-1$
 						0, ITraceIds.TRACE_STEPPING, IStatus.WARNING, this);
-		CoreBundleActivator
-		.getTraceHandler()
-		.trace(" [" + ISharedConstants.TIME_FORMAT.format(new Date(startTime)) + "]" //$NON-NLS-1$ //$NON-NLS-2$
+		CoreBundleActivator.getTraceHandler().trace(" [" + ISharedConstants.TIME_FORMAT.format(new Date(startTime)) + "]" //$NON-NLS-1$ //$NON-NLS-2$
 						+ " ***", //$NON-NLS-1$
 						0, ITraceIds.PROFILE_STEPPING, IStatus.WARNING, this);
 
@@ -367,8 +351,8 @@ public class Stepper implements IStepper {
 
 				// Check if we need a multi status
 				if (statusContainer.size() > 1) {
-					MultiStatus multiStatus = new MultiStatus(CoreBundleActivator.getUniqueIdentifier(), 0, NLS
-									.bind(Messages.Stepper_multiStatus_finishedWithWarnings, getLabel()), null);
+					MultiStatus multiStatus = new MultiStatus(CoreBundleActivator.getUniqueIdentifier(), 0,
+									NLS.bind(Messages.Stepper_multiStatus_finishedWithWarnings, getLabel()), null);
 					for (IStatus subStatus : statusContainer) {
 						multiStatus.merge(subStatus);
 					}
@@ -388,8 +372,7 @@ public class Stepper implements IStepper {
 			long endTime = System.currentTimeMillis();
 			CoreBundleActivator.getTraceHandler().trace("Stepper#execute: *** DONE", //$NON-NLS-1$
 							0, ITraceIds.TRACE_STEPPING, IStatus.WARNING, this);
-			CoreBundleActivator.getTraceHandler()
-			.trace(" [" + ISharedConstants.TIME_FORMAT.format(new Date(endTime)) //$NON-NLS-1$
+			CoreBundleActivator.getTraceHandler().trace(" [" + ISharedConstants.TIME_FORMAT.format(new Date(endTime)) //$NON-NLS-1$
 							+ " , delay = " + (endTime - startTime) + " ms]" //$NON-NLS-1$ //$NON-NLS-2$
 							+ " ***", //$NON-NLS-1$
 							0, ITraceIds.PROFILE_STEPPING, IStatus.WARNING, this);
@@ -398,7 +381,7 @@ public class Stepper implements IStepper {
 
 	/**
 	 * Executes a step or step group.
-	 * 
+	 *
 	 * @param statusContainer The status container. Must not be <code>null</code>.
 	 * @throws CoreException If the execution fails.
 	 */
@@ -410,8 +393,8 @@ public class Stepper implements IStepper {
 
 		// If no step group id is available, throw an exception
 		if (stepGroupId == null) {
-			throw new CoreException(new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(), NLS
-							.bind(Messages.Stepper_error_missingStepGroupId, getLabel())));
+			throw new CoreException(new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
+							NLS.bind(Messages.Stepper_error_missingStepGroupId, getLabel())));
 		}
 
 		// Get the step group
@@ -419,24 +402,22 @@ public class Stepper implements IStepper {
 
 		// If no step group could be found, throw an exception
 		if (stepGroup == null) {
-			throw new CoreException(new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(), NLS
-							.bind(Messages.Stepper_error_missingStepGroup, stepGroupId)));
+			throw new CoreException(new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
+							NLS.bind(Messages.Stepper_error_missingStepGroup, stepGroupId)));
 		}
 
 		// Initialize the progress monitor
 		getMonitor().beginTask(stepGroup.getLabel(), calculateTotalWork(stepGroup));
 
-		IFullQualifiedId fullQualifiedId = getFullQualifiedId()
-						.createChildId(ID_TYPE_CONTEXT_ID, getContextId(), null);
-		fullQualifiedId = fullQualifiedId
-						.createChildId(ID_TYPE_STEP_GROUP_ID, stepGroup.getId(), null);
+		IFullQualifiedId fullQualifiedId = getFullQualifiedId().createChildId(ID_TYPE_CONTEXT_ID, getContextId(), null);
+		fullQualifiedId = fullQualifiedId.createChildId(ID_TYPE_STEP_GROUP_ID, stepGroup.getId(), null);
 		// Execute the step group
 		executeStepGroup(stepGroup, statusContainer, new ArrayList<ExecutedContextStep>(), fullQualifiedId);
 	}
 
 	/**
 	 * Executes a step group.
-	 * 
+	 *
 	 * @param stepGroup The step group. Must not be <code>null</code>.
 	 * @param statusContainer A list holding the warnings occurred during the execution. Must not be
 	 *            <code>null</code>.
@@ -444,7 +425,7 @@ public class Stepper implements IStepper {
 	 *            <code>null</code>.
 	 * @param fullQualifiedGroupId The hierarchy of all parent step group id's separated by "::".
 	 *            Must not be <code>null</code>.
-	 * 
+	 *
 	 * @throws CoreException If the execution fails.
 	 */
 	private void executeStepGroup(IStepGroup stepGroup, List<IStatus> statusContainer, List<ExecutedContextStep> executedSteps, IFullQualifiedId fullQualifiedGroupId) throws CoreException {
@@ -474,13 +455,11 @@ public class Stepper implements IStepper {
 		if (iterator != null) {
 			iterator.initialize(getContext(), getData(), fullQualifiedGroupId, getMonitor());
 		}
-		boolean next = iterator == null || iterator
-						.hasNext(getContext(), getData(), fullQualifiedGroupId, getMonitor());
+		boolean next = iterator == null || iterator.hasNext(getContext(), getData(), fullQualifiedGroupId, getMonitor());
 
 		while (next) {
 			if (iterator != null) {
-				fullQualifiedIterationId = fullQualifiedGroupId
-								.createChildId(ID_TYPE_STEP_GROUP_ITERATION_ID, iterator.getId(), "" + iteration); //$NON-NLS-1$
+				fullQualifiedIterationId = fullQualifiedGroupId.createChildId(ID_TYPE_STEP_GROUP_ITERATION_ID, iterator.getId(), "" + iteration); //$NON-NLS-1$
 				iterator.next(getContext(), getData(), fullQualifiedIterationId, getMonitor());
 			}
 			// Execute the steps or step groups.
@@ -488,14 +467,13 @@ public class Stepper implements IStepper {
 				executeGroupable(groupable, statusContainer, executedSteps, fullQualifiedIterationId);
 			}
 			iteration++;
-			next = iterator != null && iterator
-							.hasNext(getContext(), getData(), fullQualifiedGroupId, getMonitor());
+			next = iterator != null && iterator.hasNext(getContext(), getData(), fullQualifiedGroupId, getMonitor());
 		}
 	}
 
 	/**
 	 * Executes a step groupable. The groupable might encapsulate a step or a step group.
-	 * 
+	 *
 	 * @param step The step groupable. Must not be <code>null</code>.
 	 * @param statusContainer A list holding the warnings occurred during the execution. Must not be
 	 *            <code>null</code>.
@@ -503,7 +481,7 @@ public class Stepper implements IStepper {
 	 *            <code>null</code>.
 	 * @param fullQualifiedParentId The hierarchy of all parent step group id's separated by "::".
 	 *            Must not be <code>null</code>.
-	 * 
+	 *
 	 * @throws CoreException If the execution failed.
 	 */
 	private void executeGroupable(IStepGroupable groupable, List<IStatus> statusContainer, List<ExecutedContextStep> executedSteps, IFullQualifiedId fullQualifiedParentId) throws CoreException {
@@ -520,9 +498,7 @@ public class Stepper implements IStepper {
 
 		// If the passed in groupable is disabled -> we are done immediately
 		if (groupable.isDisabled()) {
-			CoreBundleActivator
-			.getTraceHandler()
-			.trace("Stepper#executeGroupable: DROPPED DISABLED groupable: id = '" + groupable.getExtension().getId() + "'" //$NON-NLS-1$ //$NON-NLS-2$
+			CoreBundleActivator.getTraceHandler().trace("Stepper#executeGroupable: DROPPED DISABLED groupable: id = '" + groupable.getExtension().getId() + "'" //$NON-NLS-1$ //$NON-NLS-2$
 							+ ", secondaryId = '" + groupable.getSecondaryId() + "'", //$NON-NLS-1$ //$NON-NLS-2$
 							0, ITraceIds.TRACE_STEPPING, IStatus.WARNING, this);
 			return;
@@ -532,9 +508,7 @@ public class Stepper implements IStepper {
 		checkForDependenciesExecuted(groupable, executedSteps);
 
 		if (groupable.getExtension() instanceof IStepGroup) {
-			IFullQualifiedId id = fullQualifiedParentId
-							.createChildId(ID_TYPE_STEP_GROUP_ID, groupable.getExtension().getId(), groupable
-											.getSecondaryId());
+			IFullQualifiedId id = fullQualifiedParentId.createChildId(ID_TYPE_STEP_GROUP_ID, groupable.getExtension().getId(), groupable.getSecondaryId());
 			// If the passed in groupable is associated with a step group
 			// -> get the groupable from that group and execute them
 			executeStepGroup((IStepGroup) groupable.getExtension(), statusContainer, executedSteps, id);
@@ -545,9 +519,7 @@ public class Stepper implements IStepper {
 			// create a step executor and invoke the executor.
 			IStep step = (IStep) groupable.getExtension();
 
-			IFullQualifiedId id = fullQualifiedParentId
-							.createChildId(ID_TYPE_STEP_ID, step.getId(), groupable
-											.getSecondaryId());
+			IFullQualifiedId id = fullQualifiedParentId.createChildId(ID_TYPE_STEP_ID, step.getId(), groupable.getSecondaryId());
 
 			// Create the step executor now
 			IStepExecutor executor = doCreateStepExecutor(step, groupable.getSecondaryId(), id);
@@ -581,11 +553,11 @@ public class Stepper implements IStepper {
 	/**
 	 * Checks if all required dependencies have been executed before. If not, the method will throw
 	 * an error status.
-	 * 
+	 *
 	 * @param groupable The groupable. Must not be <code>null</code>.
 	 * @param executedSteps A list holding the id's of the steps executed before. Must not be
 	 *            <code>null</code>.
-	 * 
+	 *
 	 * @throws CoreException If a dependency has not been executed before.
 	 */
 	protected void checkForDependenciesExecuted(IStepGroupable groupable, List<ExecutedContextStep> executedSteps) throws CoreException {
@@ -616,11 +588,11 @@ public class Stepper implements IStepper {
 			}
 
 			if (!requiredStepExecuted) {
-				throw new CoreException(new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(), MessageFormat
-								.format(Messages.Stepper_error_requiredStepNotExecuted, NLS.bind(groupable
-												.getExtension() instanceof IStep ? Messages.Stepper_error_step : Messages.Stepper_error_step, groupable
-																.getExtension().getId()), NLS
-																.bind(Messages.Stepper_error_requiredStepOrGroup, dependency), ""))); //$NON-NLS-1$
+				throw new CoreException(new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(),
+								MessageFormat.format(Messages.Stepper_error_requiredStepNotExecuted,
+												NLS.bind(groupable.getExtension() instanceof IStep ? Messages.Stepper_error_step : Messages.Stepper_error_stepGroup,
+																groupable.getExtension().getId()),
+																NLS.bind(Messages.Stepper_error_requiredStepOrGroup, dependency), ""))); //$NON-NLS-1$
 			}
 
 			// Recursive checking is not necessary here as the step or step group
@@ -634,7 +606,7 @@ public class Stepper implements IStepper {
 	 * Rollback the steps previously executed to the failed step. The rollback is executed in
 	 * reverse order and the step must be of type {@link IExtendedStep} to participate in the
 	 * rollback.
-	 * 
+	 *
 	 * @param executedSteps
 	 * @param progress
 	 */
@@ -673,10 +645,10 @@ public class Stepper implements IStepper {
 	 * Calculates the total work required for the step group. The total work is the sum of the total
 	 * work of each sub step. If one of the steps returns {@link IProgressMonitor#UNKNOWN}, the
 	 * total work will be unknown for the whole step group.
-	 * 
+	 *
 	 * @param stepGroup The step group. Must not be <code>null</code>.
 	 * @return The total work required or {@link IProgressMonitor#UNKNOWN}.
-	 * 
+	 *
 	 * @throws CoreException If the total work of the step group cannot be determined.
 	 */
 	protected int calculateTotalWork(IStepGroup stepGroup) throws CoreException {
@@ -721,7 +693,7 @@ public class Stepper implements IStepper {
 	 * <p>
 	 * If the associated status contains a CANCEL status object, the passed in exception and the
 	 * associated status objects are returned unmodified.
-	 * 
+	 *
 	 * @param e The core exception. Must not be <code>null</code>.
 	 * @param statusContainer The list of non-severe status objects. Must not be <code>null</code>.
 	 * @return The exception to re-throw or <code>null</code>.

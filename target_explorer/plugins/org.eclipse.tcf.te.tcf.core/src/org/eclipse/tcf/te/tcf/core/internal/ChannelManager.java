@@ -902,7 +902,6 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 			return;
 		} else if (channel != null) {
 			// Channel is not in open state -> drop the instance
-			channel = null;
 			channels.remove(id);
 			refCounters.remove(id);
 		}

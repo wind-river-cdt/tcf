@@ -73,7 +73,7 @@ public abstract class AbstractServiceManager {
 			// Initialize the id field by reading the <id> extension attribute.
 			// Throws an exception if the id is empty or null.
 			id = config.getAttribute("id"); //$NON-NLS-1$
-			if (id == null || (id != null && "".equals(id.trim()))) { //$NON-NLS-1$
+			if (id == null || "".equals(id.trim())) { //$NON-NLS-1$
 				throw new CoreException(new Status(IStatus.ERROR,
 										CoreBundleActivator.getUniqueIdentifier(),
 										NLS.bind(Messages.Extension_error_missingRequiredAttribute, "id", config.getContributor().getName()))); //$NON-NLS-1$
@@ -88,7 +88,7 @@ public abstract class AbstractServiceManager {
 					clazz = children[0].getAttribute("class"); //$NON-NLS-1$
 				}
 			}
-			if (clazz == null || (clazz != null && "".equals(clazz.trim()))) { //$NON-NLS-1$
+			if (clazz == null || "".equals(clazz.trim())) { //$NON-NLS-1$
 				throw new CoreException(new Status(IStatus.ERROR,
 										CoreBundleActivator.getUniqueIdentifier(),
 										NLS.bind(Messages.Extension_error_missingRequiredAttribute, "class", config.getContributor().getName()))); //$NON-NLS-1$
@@ -128,13 +128,11 @@ public abstract class AbstractServiceManager {
 						if (unique) {
 							return (IService)service;
 						}
-						else if (service instanceof IService) {
-							this.service = (IService)service;
-						}
-						else {
-							IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(), "Service '" + service.getClass().getName() + "' not of type IService."); //$NON-NLS-1$ //$NON-NLS-2$
-							Platform.getLog(CoreBundleActivator.getContext().getBundle()).log(status);
-						}
+						this.service = (IService)service;
+					}
+					else {
+						IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(), "Service '" + service.getClass().getName() + "' not of type IService."); //$NON-NLS-1$ //$NON-NLS-2$
+						Platform.getLog(CoreBundleActivator.getContext().getBundle()).log(status);
 					}
 				}
 				catch (CoreException e) {
@@ -259,14 +257,28 @@ public abstract class AbstractServiceManager {
 			return expression;
 		}
 
+		/* (non-Javadoc)
+		 * @see java.lang.Object#equals(java.lang.Object)
+		 */
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof IService) {
+				return equals((IService)obj);
+			}
+			if (obj instanceof ServiceProxy) {
+				return equals((ServiceProxy)obj);
+			}
+		    return super.equals(obj);
+		}
+
 		public boolean equals(IService service) {
 			Assert.isNotNull(service);
-			return clazz.equals(service.getClass().getCanonicalName());
+			return clazz != null ? clazz.equals(service.getClass().getCanonicalName()) : false;
 		}
 
 		public boolean equals(ServiceProxy proxy) {
 			Assert.isNotNull(proxy);
-			return clazz.equals(proxy.clazz);
+			return clazz != null ? clazz.equals(proxy.clazz) : false;
 		}
 	}
 

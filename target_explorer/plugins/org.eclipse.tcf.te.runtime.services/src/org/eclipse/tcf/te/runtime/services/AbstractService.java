@@ -30,7 +30,7 @@ public abstract class AbstractService extends PlatformObject implements IService
 	 */
 	@Override
     public final void setId(String id) {
-		if (id == null) this.id = id;
+		if (this.id == null) this.id = id;
 	}
 
 	/* (non-Javadoc)

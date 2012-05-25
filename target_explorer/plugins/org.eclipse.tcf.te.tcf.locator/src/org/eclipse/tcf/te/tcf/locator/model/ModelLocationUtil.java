@@ -28,8 +28,9 @@ public final class ModelLocationUtil {
 	public static IPath getStaticPeersRootLocation() {
 		try {
 			File file = CoreBundleActivator.getDefault().getStateLocation().append(".peers").toFile(); //$NON-NLS-1$
-			if (!file.exists()) file.mkdirs();
-			if (file.canRead() && file.isDirectory()) {
+			boolean exists = file.exists();
+			if (!exists) exists = file.mkdirs();
+			if (exists && file.canRead() && file.isDirectory()) {
 				return new Path(file.toString());
 			}
 		} catch (IllegalStateException e) {
