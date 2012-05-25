@@ -136,8 +136,8 @@ public class LaunchSelectionManager {
 
 			// Get the selected project contexts
 			Map<IProject, Set<IPath>> projectSelections = getProjectSelections(getPartSelection(PART_ID_PROJECT_VIEW), true);
-			for (IProject prj : projectSelections.keySet()) {
-				contexts.add(new ProjectSelectionContext(prj, projectSelections.get(prj).toArray(), preferedPart));
+			for (Entry<IProject, Set<IPath>> prj : projectSelections.entrySet()) {
+				contexts.add(new ProjectSelectionContext(prj.getKey(), prj.getValue().toArray(), preferedPart));
 			}
 		}
 
