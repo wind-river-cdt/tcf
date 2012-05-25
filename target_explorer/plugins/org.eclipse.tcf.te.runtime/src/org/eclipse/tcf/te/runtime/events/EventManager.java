@@ -150,11 +150,22 @@ public final class EventManager {
 		}
 
 		/* (non-Javadoc)
+		 * @see java.lang.Object#hashCode()
+		 */
+		@Override
+		public int hashCode() {
+			if (getListener() != null) {
+				return getListener().hashCode();
+			}
+		    return super.hashCode();
+		}
+
+		/* (non-Javadoc)
 		 * @see java.lang.Object#equals(java.lang.Object)
 		 */
 		@Override
 		public boolean equals(Object obj) {
-			if (obj != null && obj instanceof ListenerListEntry) {
+			if (obj instanceof ListenerListEntry) {
 				ListenerListEntry other = (ListenerListEntry)obj;
 				return this.getListener() == other.getListener();
 			}
@@ -276,7 +287,9 @@ public final class EventManager {
 	 */
 	public void clear() {
 		listeners.clear();
-		extensionPointProcessed = false;
+		synchronized (this) {
+			extensionPointProcessed = false;
+        }
 	}
 
 	/**

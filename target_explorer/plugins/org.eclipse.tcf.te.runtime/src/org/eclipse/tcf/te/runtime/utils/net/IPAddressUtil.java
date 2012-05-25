@@ -3,7 +3,7 @@
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
@@ -136,7 +136,7 @@ public class IPAddressUtil {
 			addrtype |= HOSTMAP_IPV6;
 		}
 		String addrAsString = addr.getHostAddress();
-		fLocalHostAddresses.put(addrAsString, new Integer(addrtype | HOSTMAP_ADDR));
+		fLocalHostAddresses.put(addrAsString, Integer.valueOf(addrtype | HOSTMAP_ADDR));
 		if (0 == (addrtype & (HOSTMAP_LINKLOCAL | HOSTMAP_SITELOCAL | HOSTMAP_MULTICAST))) {
 			// Don't do DNS Reverse Loopkup's for non-routable addresses.
 			// They won't be known to the Name Server anyway, and they
@@ -150,17 +150,17 @@ public class IPAddressUtil {
 				// returns the original address in case it thinks the name is spoofed!
 				if (0 == (addrtype & HOSTMAP_LOOPBACK)) {
 					// Not loopback --> found a Canonical Name.
-					fLocalHostAddresses.put(addrAsNameCan, new Integer(addrtype | HOSTMAP_NAME | HOSTMAP_CANONICALNAME));
+					fLocalHostAddresses.put(addrAsNameCan, Integer.valueOf(addrtype | HOSTMAP_NAME | HOSTMAP_CANONICALNAME));
 					// override the address as canonical-address
-					fLocalHostAddresses.put(addrAsString, new Integer(addrtype | HOSTMAP_ADDR | HOSTMAP_CANONICALADDR));
+					fLocalHostAddresses.put(addrAsString, Integer.valueOf(addrtype | HOSTMAP_ADDR | HOSTMAP_CANONICALADDR));
 				} else {
 					// Loopback --> add the found name as non-canonical.
-					fLocalHostAddresses.put(addrAsNameCan, new Integer(addrtype | HOSTMAP_NAME));
+					fLocalHostAddresses.put(addrAsNameCan, Integer.valueOf(addrtype | HOSTMAP_NAME));
 				}
 			}
 			if (!addrAsName.equals(addrAsString) && !addrAsName.equals(addrAsNameCan)) {
 				// don't override the canonical name by the name.
-				fLocalHostAddresses.put(addrAsName, new Integer(addrtype | HOSTMAP_NAME));
+				fLocalHostAddresses.put(addrAsName, Integer.valueOf(addrtype | HOSTMAP_NAME));
 			}
 		}
 	}
@@ -186,7 +186,7 @@ public class IPAddressUtil {
 			// found a new name for a known local address ?
 			if (!fLocalHostAddresses.containsKey(hostName)) {
 				int addrtype = entryType.intValue() & (~(HOSTMAP_ADDR | HOSTMAP_CANONICALADDR));
-				fLocalHostAddresses.put(hostName, new Integer(addrtype | HOSTMAP_NAME));
+				fLocalHostAddresses.put(hostName, Integer.valueOf(addrtype | HOSTMAP_NAME));
 			}
 			return true;
 		}

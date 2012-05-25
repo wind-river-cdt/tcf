@@ -35,7 +35,7 @@ import org.eclipse.tcf.te.runtime.interfaces.tracing.ITraceIds;
 public class PropertiesContainer extends PlatformObject implements IPropertiesContainer {
 	// Used to have a simple check that the random generated UUID isn't
 	// the same if objects of this type are created very rapidly.
-	private static UUID LAST_UUID_GENERATED = null;
+	private volatile static UUID LAST_UUID_GENERATED = null;
 
 	// The unique node id
 	private final UUID uniqueId;
@@ -463,7 +463,7 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 	@Override
 	public final boolean setProperty(String key, float value) {
 		float oldValue = getFloatProperty(key);
-		if (oldValue != value) {
+		if (Math.abs(oldValue - value) >= .0000001) {
 			return setProperty(key, Float.valueOf(value));
 		}
 		return false;
@@ -475,7 +475,7 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 	@Override
 	public final boolean setProperty(String key, double value) {
 		double oldValue = getDoubleProperty(key);
-		if (oldValue != value) {
+		if (Math.abs(oldValue - value) >= .0000001) {
 			return setProperty(key, Double.valueOf(value));
 		}
 		return false;
@@ -574,7 +574,7 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 	 */
 	@Override
 	public final boolean isProperty(String key, float value) {
-		return getFloatProperty(key) == value;
+		return Math.abs(getFloatProperty(key) - value) < .0000001;
 	}
 
 	/* (non-Javadoc)
@@ -582,7 +582,7 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 	 */
 	@Override
 	public final boolean isProperty(String key, double value) {
-		return getDoubleProperty(key) == value;
+		return Math.abs(getDoubleProperty(key) - value) < .0000001;
 	}
 
 	/* (non-Javadoc)

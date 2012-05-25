@@ -70,7 +70,7 @@ public class ExecutableExtension extends PlatformObject implements IExecutableEx
 		// Initialize the id field by reading the <id> extension attribute.
 		// Throws an exception if the id is empty or null.
 		id = config != null ? config.getAttribute("id") : null; //$NON-NLS-1$
-		if (id == null || (id != null && "".equals(id.trim()))) { //$NON-NLS-1$
+		if (id == null || "".equals(id.trim())) { //$NON-NLS-1$
 			throw createMissingMandatoryAttributeException("id", config.getContributor().getName()); //$NON-NLS-1$
 		}
 

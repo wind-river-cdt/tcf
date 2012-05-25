@@ -121,8 +121,9 @@ public class ExecutableExtensionProxy<V> {
 		Assert.isNotNull(element);
 
 		// The "class" to load can be specified either as attribute or as child element
-		String attributeName = getExecutableExtensionAttributeName() != null ? getExecutableExtensionAttributeName() : "class"; //$NON-NLS-1$
-		if (element != null && (element.getAttribute(attributeName) != null || element.getChildren(attributeName).length > 0)) {
+		String attributeName = getExecutableExtensionAttributeName();
+		Assert.isNotNull(attributeName);
+		if (element.getAttribute(attributeName) != null || element.getChildren(attributeName).length > 0) {
 			try {
 				return (V)element.createExecutableExtension(attributeName);
 			} catch (Exception e) {
