@@ -6,10 +6,10 @@
 	
 	<!-- Ignore all NM_SAME_SIMPLE_NAME_AS_SUPERCLASS or NM_SAME_SIMPLE_NAME_AS_INTERFACE violations -->
 	<Match>
-		<Or>
-			<Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"/>
-			<Bug pattern="NM_SAME_SIMPLE_NAME_AS_INTERFACE"/>
-		<Or>
+		<Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"/>
+	</Match>
+	<Match>
+		<Bug pattern="NM_SAME_SIMPLE_NAME_AS_INTERFACE"/>
 	</Match>
 
 	<!-- Ignore all SF_SWITCH_NO_DEFAULT violations -->
