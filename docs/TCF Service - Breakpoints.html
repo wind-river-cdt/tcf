@@ -345,7 +345,13 @@ R &bull; <i>&lt;token&gt;</i> &bull; <i>&lt;error report&gt;</i> &bull;
 C &bull; <i>&lt;token&gt;</i> &bull; Breakpoints &bull; change &bull; <i>&lt;breakpoint data&gt;</i> &bull;
 </font></b></pre>
 
-<p>The command updates the breakpoint data in the target agent breakpoint table. The host should send this command when the user modifies a breakpoint</p>
+<p>The command updates the breakpoint data in the target agent breakpoint table. The host should send this command when the user modifies a breakpoint.</p>
+
+<ul>
+<li><dt><code><b><font face="Courier New" size=2 color=#333399><i>&lt;breakpoint data&gt;</i></font></b></code>
+<dd>Must be the full set of the breakpoint properties: those that are changed AND those that are not. Any previous property that is not sent in the change command will be removed from the breakpoint.
+</li>
+</ul>
 
 <p>Reply:</p>
 
