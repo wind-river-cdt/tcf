@@ -10,6 +10,12 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.internal.utils;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -23,9 +29,29 @@ public class TablePatternFilter extends ViewerFilter {
 	
 	protected StringMatcher matcher = null;
 	protected ILabelProvider labelProvider;
+	protected List<PropertyChangeListener> listeners;
 
 	public TablePatternFilter(ILabelProvider labelProvider) {
 		this.labelProvider = labelProvider;
+		listeners = Collections.synchronizedList(new ArrayList<PropertyChangeListener>());
+	}
+	
+	/**
+	 * Add a property change listener to this pattern filter.
+	 * 
+	 * @param l The listener.
+	 */
+	public void addPropertyChangeListener(PropertyChangeListener l) {
+		listeners.add(l);
+	}
+	
+	/**
+	 * Remove a property change listener to this pattern filter.
+	 * 
+	 * @param l The listener.
+	 */
+	public void removePropertyChangeListener(PropertyChangeListener l) {
+		listeners.remove(l);
 	}
 
 	/*
@@ -44,14 +70,31 @@ public class TablePatternFilter extends ViewerFilter {
 	 * @param newPattern The new pattern
 	 */
 	public void setPattern(String newPattern) {
+		StringMatcher old = matcher;
 		if (newPattern == null || newPattern.trim().length() == 0) {
-			matcher = new StringMatcher(ALL, true, false);
+			matcher = null;
 		}
 		else {
 			String patternString = ALL + newPattern + ALL;
 			matcher = new StringMatcher(patternString, true, false);
 		}
+		firePatternChangedEvent(old, matcher);
 	}
+
+	/**
+	 * Fire a pattern changed event to all listening listeners.
+	 * 
+	 * @param oldMatcher The old matcher.
+	 * @param newMatcher The new matcher.
+	 */
+	protected void firePatternChangedEvent(StringMatcher oldMatcher, StringMatcher newMatcher) {
+		PropertyChangeEvent event = new PropertyChangeEvent(this, "pattern", oldMatcher, newMatcher); //$NON-NLS-1$
+		synchronized(listeners) {
+			for(PropertyChangeListener listener : listeners) {
+				listener.propertyChange(event);
+			}
+		}
+    }
 
 	/**
 	 * Answers whether the given String matches the pattern.

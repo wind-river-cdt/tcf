@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.te.core.interfaces.IPropertyChangeProvider;
 import org.eclipse.tcf.te.core.interfaces.IViewerInput;
 import org.eclipse.tcf.te.tcf.filesystem.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
@@ -31,8 +32,11 @@ public class ViewerInputAdapterFactory implements IAdapterFactory {
 	@Override
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if(adaptableObject instanceof IPeerModel) {
-			IPeerModel peerModel = (IPeerModel) adaptableObject;
-			return getViewerInput(peerModel);
+			if (IViewerInput.class.equals(adapterType) 
+							|| IPropertyChangeProvider.class.equals(adapterType)) {
+				IPeerModel peerModel = (IPeerModel) adaptableObject;
+				return getViewerInput(peerModel);
+			}
 		}
 		return null;
 	}
@@ -71,7 +75,7 @@ public class ViewerInputAdapterFactory implements IAdapterFactory {
 	 */
 	@Override
 	public Class[] getAdapterList() {
-		return new Class[] { IViewerInput.class };
+		return new Class[] { IViewerInput.class, IPropertyChangeProvider.class };
 	}
 
 }

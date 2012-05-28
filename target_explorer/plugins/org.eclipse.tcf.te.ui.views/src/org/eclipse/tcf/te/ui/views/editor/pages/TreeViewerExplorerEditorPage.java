@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.te.core.interfaces.IViewerInput;
 import org.eclipse.tcf.te.ui.forms.CustomFormToolkit;
+import org.eclipse.tcf.te.ui.interfaces.IFilteringLabelDecorator;
 import org.eclipse.tcf.te.ui.trees.TreeControl;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbenchPartSite;
@@ -67,8 +68,7 @@ public abstract class TreeViewerExplorerEditorPage extends AbstractCustomFormToo
 	 */
 	@Override
 	public void dispose() {
-		Object input = getEditorInputNode();
-	    IViewerInput viewerInput = getViewerInput(input);
+	    IViewerInput viewerInput = getViewerInput();
 		if(viewerInput != null && pcListener != null) {
 			viewerInput.removePropertyChangeListener(pcListener);
 		}
@@ -174,8 +174,7 @@ public abstract class TreeViewerExplorerEditorPage extends AbstractCustomFormToo
 		});
 		viewer.addDoubleClickListener(this);
 		
-		Object input = getEditorInputNode();
-	    IViewerInput viewerInput = getViewerInput(input);
+	    IViewerInput viewerInput = getViewerInput();
 		if(viewerInput != null) {
 			pcListener = new PropertyChangeListener() {
 				@Override
@@ -200,6 +199,38 @@ public abstract class TreeViewerExplorerEditorPage extends AbstractCustomFormToo
 			viewerInput.addPropertyChangeListener(pcListener);
 		}
     }
+	
+	/**
+	 * Get an adapter instance from the adaptable with the specified 
+	 * adapter interface.
+	 * 
+	 * @param adaptable The adaptable to get the adapter.
+	 * @param adapter The adapter interface class.
+	 * @return An adapter or null if it does not adapt to this type.
+	 */
+	@SuppressWarnings("rawtypes")
+	private Object getAdapter(Object adaptable, Class adapter) {
+		Object adapted = null;
+		if(adapter.isInstance(adaptable)) {
+			adapted = adaptable;
+		}
+		if(adapted == null && adaptable instanceof IAdaptable) {
+			adapted = ((IAdaptable)adaptable).getAdapter(adapter);
+		}
+		if(adapted == null && adaptable != null) {
+			adapted = Platform.getAdapterManager().getAdapter(adaptable, adapter);
+		}
+		return adapted;
+	}
+	
+	/**
+	 * Get an adapter of IFilteringLabelDecorator.
+	 * 
+	 * @return an IFilteringLabelDecorator adapter or null if it does not adapt to IFilteringLabelDecorator.
+	 */
+	private IFilteringLabelDecorator getFilteringDecorator() {
+		return (IFilteringLabelDecorator) getAdapter(getEditorInputNode(), IFilteringLabelDecorator.class);
+	}
 
 	/**
 	 * Get the viewer input adapter for the input.
@@ -207,22 +238,8 @@ public abstract class TreeViewerExplorerEditorPage extends AbstractCustomFormToo
 	 * @param input the input of the tree viewer.
 	 * @return The adapter.
 	 */
-	private IViewerInput getViewerInput(Object input) {
-		IViewerInput viewerInput = null;
-		if (input != null) {
-			if (input instanceof IViewerInput) {
-				viewerInput = (IViewerInput) input;
-			}
-			else {
-				if (input instanceof IAdaptable) {
-					viewerInput = (IViewerInput) ((IAdaptable) input).getAdapter(IViewerInput.class);
-				}
-				if (viewerInput == null) {
-					viewerInput = (IViewerInput) Platform.getAdapterManager().getAdapter(input, IViewerInput.class);
-				}
-			}
-		}
-		return viewerInput;
+	private IViewerInput getViewerInput() {
+		return (IViewerInput) getAdapter(getEditorInputNode(), IViewerInput.class);
     }
 	
 	/**
@@ -248,32 +265,48 @@ public abstract class TreeViewerExplorerEditorPage extends AbstractCustomFormToo
 	 */
 	protected void updateUI() {
 		toolbarMgr.update(true);
-		ILabelDecorator decorator = getTitleBarDecorator();
-		if (decorator != null) {
-			IManagedForm managedForm = getManagedForm();
-			Form form = managedForm.getForm().getForm();
-			Object element = getEditorInputNode();
-			String text = getFormTitle();
-			if (text != null) {
-				text = decorator.decorateText(text, element);
-				if (text != null) {
-					try {
-						form.setText(text);
-					}
-					catch (Exception e) {
-						// Ignore any disposed exception
-					}
-				}
+		IManagedForm managedForm = getManagedForm();
+		Form form = managedForm.getForm().getForm();
+		Object element = getEditorInputNode();
+		boolean filterEnabled = false;
+		IFilteringLabelDecorator filterDecorator = getFilteringDecorator();
+		if (filterDecorator != null) {
+			TreeViewer viewer = (TreeViewer) treeControl.getViewer();
+			filterEnabled = filterDecorator.isEnabled(viewer, element);
+		}
+		ILabelDecorator titleDecorator = getTitleBarDecorator();
+		String text = getFormTitle();
+		if (text != null) {
+			if (titleDecorator != null) {
+				text = titleDecorator.decorateText(text, element);
 			}
-			Image image = getFormImage();
-			image = decorator.decorateImage(image, element);
-			if (image != null) {
-				try {
-					form.setImage(image);
-				}
-				catch (Exception e) {
-					// Ignore any disposed exception
-				}
+			if (filterEnabled) {
+				text = filterDecorator.decorateText(text, element);
+			}
+		}
+		Image image = getFormImage();
+		if (image != null) {
+			if (titleDecorator != null) {
+				image = titleDecorator.decorateImage(image, element);
+			}
+			if (filterEnabled) {
+				image = filterDecorator.decorateImage(image, element);
+			}
+		}
+		if (text != null) {
+			try {
+				form.setText(text);
+			}
+			catch (Exception e) {
+				// Ignore any disposed exception
+			}
+		}
+		if (image != null) {
+			try {
+				form.setImage(image);
+			}
+			catch (Exception e) {
+				// Ignore any disposed exception
 			}
 		}
 	}

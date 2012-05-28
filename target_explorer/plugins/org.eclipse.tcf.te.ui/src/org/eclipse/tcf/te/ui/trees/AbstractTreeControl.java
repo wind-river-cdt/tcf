@@ -490,7 +490,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 		IWorkbench workbench = PlatformUI.getWorkbench();
 		IDecoratorManager manager = workbench.getDecoratorManager();
 		ILabelDecorator decorator = manager.getLabelDecorator();
-		return new TreeViewerDecoratingLabelProvider(labelProvider,decorator);
+		return new TreeViewerDecoratingLabelProvider(viewer, labelProvider,decorator);
 	}
 
 	/**

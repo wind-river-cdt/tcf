@@ -1876,6 +1876,9 @@
          <adapter
                type="org.eclipse.tcf.te.core.interfaces.IViewerInput">
          </adapter>
+         <adapter
+               type="org.eclipse.tcf.te.core.interfaces.IPropertyChangeProvider">
+         </adapter>
       </factory>
    </extension>
 

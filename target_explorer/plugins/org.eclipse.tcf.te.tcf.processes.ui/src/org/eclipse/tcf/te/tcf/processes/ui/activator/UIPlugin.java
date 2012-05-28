@@ -15,6 +15,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tcf.te.tcf.processes.ui.interfaces.ImageConsts;
+import org.eclipse.tcf.te.ui.jface.images.AbstractImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -103,5 +104,27 @@ public class UIPlugin extends AbstractUIPlugin {
 	 */
 	public static ImageDescriptor getImageDescriptor(String key) {
 		return getDefault().getImageRegistry().getDescriptor(key);
+	}
+
+	/**
+	 * Loads the image given by the specified image descriptor from the image
+	 * registry. If the image has been loaded ones before already, the cached
+	 * <code>Image</code> object instance is returned. Otherwise, the <code>
+	 * Image</code> object instance will be created and cached before returned.
+	 *
+	 * @param descriptor The image descriptor.
+	 * @return The corresponding <code>Image</code> object instance or <code>null</code>.
+	 */
+	public static Image getSharedImage(AbstractImageDescriptor descriptor) {
+		ImageRegistry registry = getDefault().getImageRegistry();
+
+		String imageKey = descriptor.getDecriptorKey();
+		Image image = registry.get(imageKey);
+		if (image == null) {
+			registry.put(imageKey, descriptor);
+			image = registry.get(imageKey);
+		}
+
+		return image;
 	}
 }

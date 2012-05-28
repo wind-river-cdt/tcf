@@ -21,6 +21,7 @@ import org.eclipse.tcf.te.runtime.events.EventManager;
 import org.eclipse.tcf.te.ui.views.events.ViewerContentChangeEvent;
 import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.navigator.CommonViewerSorter;
+import org.eclipse.ui.navigator.INavigatorContentService;
 
 /**
  * View common viewer implementation.
@@ -29,6 +30,9 @@ public class ViewViewer extends CommonViewer {
 	// Flag to mark the viewer silent. In silent mode, no
 	// ViewerContentChangeEvents are send.
 	private boolean silent = false;
+
+	// Remember the last double click selection event state mask
+	private int lastDoubleClickSelectionEventStateMask = 0;
 
 	/**
 	 * Constructor.
@@ -58,6 +62,19 @@ public class ViewViewer extends CommonViewer {
 		    EventManager.getInstance().fireEvent(event);
 		}
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.navigator.CommonViewer#init()
+	 */
+	@Override
+    protected void init() {
+		setUseHashlookup(true);
+		INavigatorContentService contentService = getNavigatorContentService();
+		setContentProvider(contentService.createCommonContentProvider());
+		setLabelProvider(new ViewViewerDecoratingLabelProvider(this, contentService.createCommonLabelProvider()));
+		initDragAndDrop();
+    }
 
 	/**
 	 * Sets the viewers event firing silent mode.
@@ -126,9 +143,6 @@ public class ViewViewer extends CommonViewer {
 		}
 	    super.setSorter(sorter);
 	}
-
-	// Remember the last double click selection event state mask
-	private int lastDoubleClickSelectionEventStateMask = 0;
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.navigator.CommonViewer#handleDoubleSelect(org.eclipse.swt.events.SelectionEvent)

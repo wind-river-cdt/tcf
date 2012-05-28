@@ -15,7 +15,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.processes.core.model.ProcessModel;
 import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
-import org.eclipse.tcf.te.tcf.processes.ui.interfaces.ImageConsts;
+import org.eclipse.tcf.te.ui.jface.images.AbstractImageDescriptor;
 
 /**
  * The title bar decorator for Process Monitor. 
@@ -32,7 +32,12 @@ public class ProcessMonitorTitleDecorator extends LabelProvider implements ILabe
 			IPeerModel peerModel = (IPeerModel) element;
 			ProcessModel pModel = ProcessModel.getProcessModel(peerModel);
 			if(!pModel.isRefreshStopped()) {
-				return UIPlugin.getImage(ImageConsts.PM_POLLING);
+				Image decoratedImage = image;
+				if (image != null) {
+					AbstractImageDescriptor descriptor = new RefreshingImageDescriptor(UIPlugin.getDefault().getImageRegistry(), image);
+					decoratedImage = UIPlugin.getSharedImage(descriptor);
+				}
+				return decoratedImage;
 			}
 			return image;
 		}

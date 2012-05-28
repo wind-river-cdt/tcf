@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.eclipse.core.runtime.PlatformObject;
+import org.eclipse.tcf.te.core.interfaces.IPropertyChangeProvider;
 import org.eclipse.tcf.te.core.interfaces.IViewerInput;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.core.Tcf;
@@ -235,6 +236,19 @@ public abstract class AbstractTreeNode extends PlatformObject implements IPeerMo
 	public void refresh() {
 		refresh(null);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
+	 */
+	@SuppressWarnings("rawtypes")
+    @Override
+    public Object getAdapter(Class adapter) {
+		if(IPropertyChangeProvider.class.equals(adapter)) {
+			return peerNode.getAdapter(adapter);
+		}
+	    return super.getAdapter(adapter);
+    }
 
 	/**
 	 * Recursively refresh the children of the given process context with a callback, which is

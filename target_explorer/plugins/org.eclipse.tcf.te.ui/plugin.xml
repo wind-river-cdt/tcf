@@ -129,5 +129,15 @@
             name="%preference.page.name">
       </page>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="java.lang.Object"
+            class="org.eclipse.tcf.te.ui.internal.utils.AdapterFactory">
+         <adapter
+               type="org.eclipse.tcf.te.ui.interfaces.IFilteringLabelDecorator">
+         </adapter>
+      </factory>
+   </extension>
    
 </plugin>

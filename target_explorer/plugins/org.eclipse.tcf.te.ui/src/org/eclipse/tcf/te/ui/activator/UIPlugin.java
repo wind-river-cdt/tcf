@@ -171,6 +171,8 @@ public class UIPlugin extends AbstractUIPlugin {
 		registry.put(ImageConsts.GREY_OVR, ImageDescriptor.createFromURL(url));
 		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OVR + "red_ovr.gif"); //$NON-NLS-1$
 		registry.put(ImageConsts.RED_OVR, ImageDescriptor.createFromURL(url));
+		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OVR + "filtering_ovr.png"); //$NON-NLS-1$
+		registry.put(ImageConsts.FILTERING_OVR, ImageDescriptor.createFromURL(url));
 		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OVR + "redX_ovr.gif"); //$NON-NLS-1$
 		registry.put(ImageConsts.RED_X_OVR, ImageDescriptor.createFromURL(url));
 		url = UIPlugin.getDefault().getBundle().getEntry(ImageConsts.IMAGE_DIR_ROOT + ImageConsts.IMAGE_DIR_OVR + "busy.gif"); //$NON-NLS-1$

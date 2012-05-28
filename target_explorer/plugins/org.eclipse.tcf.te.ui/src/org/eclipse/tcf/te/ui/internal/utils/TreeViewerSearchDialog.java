@@ -35,6 +35,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.tcf.te.ui.interfaces.ISearchCallback;
 import org.eclipse.tcf.te.ui.jface.dialogs.CustomTitleAreaDialog;
 import org.eclipse.tcf.te.ui.nls.Messages;
+import org.eclipse.tcf.te.ui.utils.TreeViewerUtil;
 
 /**
  * The searching dialog used to get the searching input.
@@ -88,7 +89,7 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements Sel
 		super(viewer.getTree().getShell());
 		setShellStyle(SWT.DIALOG_TRIM | SWT.MODELESS);
 		fViewer = viewer;
-		fSearcher = SearchEngine.getSearchEngine(fViewer);
+		fSearcher = TreeViewerUtil.getSearchEngine(fViewer);
 		fSearcher.setDepthFirst(depthFirst);
 		fViewer.getTree().addSelectionListener(this);
 		setTitle(Messages.TreeViewerSearchDialog_DialogTitleMessage);
@@ -123,6 +124,9 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements Sel
 		}
 	}
 
+	/**
+	 * Invoked when button "Close" is pressed.
+	 */
 	protected void closePressed() {
 		fSearcher.endSearch();
 		setReturnCode(OK);
@@ -336,6 +340,11 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements Sel
 		getButton(SEARCH_ID).setEnabled(valid);
 	}
 
+	/**
+	 * Set the start searching path.
+	 * 
+	 * @param rootPath The path where to start searching.
+	 */
 	public void setStartPath(TreePath rootPath) {
 		fSearcher.setStartPath(rootPath);
 		String text = fSearcher.getMatcher().getElementText(rootPath.getLastSegment());

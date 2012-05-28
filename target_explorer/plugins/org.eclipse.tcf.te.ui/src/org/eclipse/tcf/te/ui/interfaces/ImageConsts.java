@@ -97,6 +97,11 @@ public interface ImageConsts {
      * The key to access the target object red overlay image.
      */
     public static final String RED_OVR = "RedOverlay"; //$NON-NLS-1$
+    
+    /**
+     * The key to access the filtering decoration image.
+     */
+    public static final String FILTERING_OVR = "FilteringOverlay"; //$NON-NLS-1$
 
     /**
      * The key to access the target object red X overlay image.
