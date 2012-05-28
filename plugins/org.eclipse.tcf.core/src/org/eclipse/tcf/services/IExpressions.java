@@ -193,7 +193,7 @@ public interface IExpressions extends IService {
      * Retrieve expression context info for given context ID.
      * @see Expression
      *
-     * @param id – context ID.
+     * @param id - context ID.
      * @param done - call back interface called when operation is completed.
      * @return - pending command handle.
      */
@@ -206,8 +206,8 @@ public interface IExpressions extends IService {
         /**
          * Called when context data retrieval is done.
          * @param token - command handle
-         * @param error – error description if operation failed, null if succeeded.
-         * @param context – context properties.
+         * @param error - error description if operation failed, null if succeeded.
+         * @param context - context properties.
          */
         void doneGetContext(IToken token, Exception error, Expression context);
     }
@@ -225,7 +225,7 @@ public interface IExpressions extends IService {
      * Children list does *not* include IDs of expressions that were created by clients
      * using "create" command.
      *
-     * @param parent_context_id – parent context ID.
+     * @param parent_context_id - parent context ID.
      * @param done - call back interface called when operation is completed.
      * @return - pending command handle.
      */
@@ -238,8 +238,8 @@ public interface IExpressions extends IService {
         /**
          * Called when context list retrieval is done.
          * @param token - command handle
-         * @param error – error description if operation failed, null if succeeded.
-         * @param context_ids – array of available context IDs.
+         * @param error - error description if operation failed, null if succeeded.
+         * @param context_ids - array of available context IDs.
          */
         void doneGetChildren(IToken token, Exception error, String[] context_ids);
     }
@@ -262,8 +262,8 @@ public interface IExpressions extends IService {
         /**
          * Called when context create context command is done.
          * @param token - command handle
-         * @param error – error description if operation failed, null if succeeded.
-         * @param context – context properties.
+         * @param error - error description if operation failed, null if succeeded.
+         * @param context - context properties.
          */
         void doneCreate(IToken token, Exception error, Expression context);
     }
@@ -283,7 +283,7 @@ public interface IExpressions extends IService {
         /**
          * Called when context dispose command is done.
          * @param token - command handle
-         * @param error – error description if operation failed, null if succeeded.
+         * @param error - error description if operation failed, null if succeeded.
          */
         void doneDispose(IToken token, Exception error);
     }
@@ -303,7 +303,7 @@ public interface IExpressions extends IService {
         /**
          * Called when context dispose command is done.
          * @param token - command handle
-         * @param error – error description if operation failed, null if succeeded.
+         * @param error - error description if operation failed, null if succeeded.
          * @param value - expression evaluation result
          */
         void doneEvaluate(IToken token, Exception error, Value value);
@@ -325,7 +325,7 @@ public interface IExpressions extends IService {
         /**
          * Called when assign command is done.
          * @param token - command handle
-         * @param error – error description if operation failed, null if succeeded.
+         * @param error - error description if operation failed, null if succeeded.
          */
         void doneAssign(IToken token, Exception error);
     }

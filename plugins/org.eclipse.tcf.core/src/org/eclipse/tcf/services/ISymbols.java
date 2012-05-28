@@ -87,7 +87,7 @@ public interface ISymbols extends IService {
 
         /**
          * Get symbol owner ID.
-         * The owner can a thread or memory space (process).
+         * The owner can be a thread or memory space (process).
          * Certain changes in owner state can invalidate cached symbol properties,
          * see getUpdatePolicy() and UPDATE_*.
          */
@@ -280,7 +280,7 @@ public interface ISymbols extends IService {
      * Retrieve symbol context info for given symbol ID.
      * @see Symbol
      *
-     * @param id – symbol context ID.
+     * @param id - symbol context ID.
      * @param done - call back interface called when operation is completed.
      * @return - pending command handle.
      */
@@ -293,8 +293,8 @@ public interface ISymbols extends IService {
         /**
          * Called when context data retrieval is done.
          * @param token - command handle
-         * @param error – error description if operation failed, null if succeeded.
-         * @param context – context properties.
+         * @param error - error description if operation failed, null if succeeded.
+         * @param context - context properties.
          */
         void doneGetContext(IToken token, Exception error, Symbol context);
     }
@@ -305,7 +305,7 @@ public interface ISymbols extends IService {
      * 1. struct, union, or class type - get fields;
      * 2. enumeration type - get enumerators;
      *
-     * @param parent_context_id – parent symbol context ID.
+     * @param parent_context_id - parent symbol context ID.
      * @param done - call back interface called when operation is completed.
      * @return - pending command handle.
      */
@@ -318,8 +318,8 @@ public interface ISymbols extends IService {
         /**
          * Called when context list retrieval is done.
          * @param token - command handle
-         * @param error – error description if operation failed, null if succeeded.
-         * @param context_ids – array of available context IDs.
+         * @param error - error description if operation failed, null if succeeded.
+         * @param context_ids - array of available context IDs.
          */
         void doneGetChildren(IToken token, Exception error, String[] context_ids);
     }
@@ -329,9 +329,9 @@ public interface ISymbols extends IService {
      * Return first symbol that matches.
      * The context can be memory space, process, thread or stack frame.
      *
-     * @param context_id – a search scope.
+     * @param context_id - a search scope.
      * @param ip - instruction pointer - ignored if context_id is a stack frame ID
-     * @param name – symbol name.
+     * @param name - symbol name.
      * @param done - call back interface called when operation is completed.
      * @return - pending command handle.
      */
@@ -342,9 +342,9 @@ public interface ISymbols extends IService {
      * Return all symbol that matches, starting with current scope and going up to compilation unit global scope.
      * The context can be memory space, process, thread or stack frame.
      *
-     * @param context_id – a search scope.
+     * @param context_id - a search scope.
      * @param ip - instruction pointer - ignored if context_id is a stack frame ID
-     * @param name – symbol name.
+     * @param name - symbol name.
      * @param done - call back interface called when operation is completed.
      * @return - pending command handle.
      */
@@ -354,8 +354,8 @@ public interface ISymbols extends IService {
      * Search symbol with given address in given context.
      * The context can be memory space, process, thread or stack frame.
      *
-     * @param context_id – a search scope.
-     * @param addr – symbol address.
+     * @param context_id - a search scope.
+     * @param addr - symbol address.
      * @param done - call back interface called when operation is completed.
      * @return - pending command handle.
      */
@@ -365,10 +365,10 @@ public interface ISymbols extends IService {
      * Search symbol with given address in given context.
      * The context can be memory space, process, thread or stack frame.
      *
-     * @param context_id – a search scope.
+     * @param context_id - a search scope.
      * @param ip - instruction pointer - ignored if context_id is a stack frame ID
-     * @param scope_id – a symbols ID of visibility scope.
-     * @param name – symbol name.
+     * @param scope_id - a symbols ID of visibility scope.
+     * @param name - symbol name.
      * @param done - call back interface called when operation is completed.
      * @return - pending command handle.
      */
@@ -381,7 +381,7 @@ public interface ISymbols extends IService {
         /**
          * Called when symbol search is done.
          * @param token - command handle.
-         * @param error – error description if operation failed, null if succeeded.
+         * @param error - error description if operation failed, null if succeeded.
          * @param symbol_id - symbol ID.
          */
         void doneFind(IToken token, Exception error, String symbol_id);
@@ -394,7 +394,7 @@ public interface ISymbols extends IService {
         /**
          * Called when symbol search is done.
          * @param token - command handle.
-         * @param error – error description if operation failed, null if succeeded.
+         * @param error - error description if operation failed, null if succeeded.
          * @param symbol_id - symbol ID.
          */
         void doneFind(IToken token, Exception error, String[] symbol_ids);
@@ -404,7 +404,7 @@ public interface ISymbols extends IService {
      * List all symbols in given context.
      * The context can be a stack frame.
      *
-     * @param context_id – a scope.
+     * @param context_id - a scope.
      * @param done - call back interface called when operation is completed.
      * @return - pending command handle.
      */
@@ -417,7 +417,7 @@ public interface ISymbols extends IService {
         /**
          * Called when symbol list retrieval is done.
          * @param token - command handle.
-         * @param error – error description if operation failed, null if succeeded.
+         * @param error - error description if operation failed, null if succeeded.
          * @param symbol_ids - array of symbol IDs.
          */
         void doneList(IToken token, Exception error, String[] symbol_ids);
@@ -507,7 +507,7 @@ public interface ISymbols extends IService {
         /**
          * Called when location information retrieval is done.
          * @param token - command handle.
-         * @param error – error description if operation failed, null if succeeded.
+         * @param error - error description if operation failed, null if succeeded.
          * @param props - symbol location properties, see LOC_*.
          */
         void doneGetLocationInfo(IToken token, Exception error, Map<String,Object> props);
@@ -529,7 +529,7 @@ public interface ISymbols extends IService {
         /**
          * Called when stack tracing information retrieval is done.
          * @param token - command handle.
-         * @param error – error description if operation failed, null if succeeded.
+         * @param error - error description if operation failed, null if succeeded.
          * @param address - start of instruction address range
          * @param size - size of instruction address range
          * @param fp_cmds - commands to calculate stack frame pointer
@@ -556,7 +556,7 @@ public interface ISymbols extends IService {
         /**
          * Called when symbol file information retrieval is done.
          * @param token - command handle.
-         * @param error – error description if operation failed, null if succeeded.
+         * @param error - error description if operation failed, null if succeeded.
          * @param props - symbol file properties.
          */
         void doneGetSymFileInfo(IToken token, Exception error, Map<String,Object> props);
