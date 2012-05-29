@@ -50,6 +50,7 @@ public class QuickFilter extends TablePatternFilter implements PropertyChangeLis
 	 */
 	public void showFilterPopup(Object root) {
 		this.root = root;
+		setPattern(null);
 		if (!isFiltering()) {
 			viewer.addFilter(this);
 		}
@@ -58,6 +59,9 @@ public class QuickFilter extends TablePatternFilter implements PropertyChangeLis
 		if (root != null) {
 			TreeItem[] items = viewer.getTree().getSelection();
 			if (items != null && items.length > 0) {
+				for(TreeItem item : items) {
+					viewer.getTree().showItem(item);
+				}
 				Rectangle bounds = items[0].getBounds();
 				location = new Point(bounds.x, bounds.y);
 			}
@@ -72,7 +76,6 @@ public class QuickFilter extends TablePatternFilter implements PropertyChangeLis
 		location = viewer.getTree().toDisplay(location);
 		popup.open();
 		popup.getShell().setLocation(location);
-		viewer.refresh();
 	}
 
 	/*
