@@ -69,6 +69,7 @@ public class Messages extends NLS {
 
 	public static String PreferencePage_label;
 	public static String QuickFilterPopup_PromptMessage;
+	public static String TreeViewerSearchDialog_All;
 	public static String TreeViewerSearchDialog_BtnBackText;
 	public static String TreeViewerSearchDialog_BtnCloseText;
 	public static String TreeViewerSearchDialog_BtnCaseText;
@@ -83,8 +84,12 @@ public class Messages extends NLS {
 	public static String TreeViewerSearchDialog_JobName;
 	public static String TreeViewerSearchDialog_LblCancelText;
 	public static String TreeViewerSearchDialog_MainTaskName;
+	public static String TreeViewerSearchDialog_NoMoreNodeFound;
 	public static String TreeViewerSearchDialog_NoSuchNode;
+	public static String TreeViewerSearchDialog_Scope;
 	public static String TreeViewerSearchDialog_SearchAlgorithm;
+	public static String TreeViewerSearchDialog_Selected;
 	public static String TreeViewerSearchDialog_BreadthFirst;
+	public static String TreeViewerSearchDialog_RootMsg;
 	public static String ViewerStateManager_MkdirFailed;
 }

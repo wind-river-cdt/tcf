@@ -65,7 +65,7 @@ public class SearchMatcher implements ISearchMatcher {
 	 */
 	public String getElementText(final Object element) {
 		if (Display.getCurrent() != null) {
-			if (element == fViewer.getInput()) return "the root"; //$NON-NLS-1$
+			if (element == fViewer.getInput()) return null; 
 			ILabelProvider labelProvider = (ILabelProvider) fViewer.getLabelProvider();
 			if (labelProvider != null) {
 				return labelProvider.getText(element);

@@ -98,6 +98,15 @@ public class SearchEngine {
 			fSearcher.setStartPath(path);
 		}
 	}
+	
+	/**
+	 * If the current searching scope is all.
+	 */
+	public boolean isScopeAll() {
+		if(fStartPath == null) return true;
+		Object element = fStartPath.getLastSegment();
+		return element == fViewer.getInput();
+	}
 
 	/**
 	 * Reset the searching path.

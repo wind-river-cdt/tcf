@@ -86,9 +86,7 @@ public class TreeViewerUtil {
 	 */
 	public static void doSearch(TreeViewer viewer) {
 		TreePath rootPath = getSelectedPath(viewer);
-		if (rootPath == null) {
-			rootPath = new TreePath(new Object[] { viewer.getInput() });
-		}
+		rootPath = getSearchRoot(viewer, rootPath);
 		TreeViewerSearchDialog dialog = new TreeViewerSearchDialog(viewer);
 		dialog.setStartPath(rootPath);
 		dialog.open();
@@ -146,7 +144,23 @@ public class TreeViewerUtil {
 		viewer.setSelection(StructuredSelection.EMPTY);
 		return viewer.getInput();
 	}
-
+	
+	/**
+	 * Reposition the starting search path.
+	 */
+	private static TreePath getSearchRoot(TreeViewer viewer, TreePath rootPath) {
+		if (rootPath != null) {
+			if (!hasChildren(rootPath, viewer)) {
+				rootPath = rootPath.getParentPath();
+			}
+			if (rootPath.getSegmentCount() == 0) {
+				return new TreePath(new Object[] { viewer.getInput() });
+			}
+			return rootPath;
+		}
+		return new TreePath(new Object[] { viewer.getInput() });
+	}
+	
 	/**
 	 * Test if the root for the tree viewer is eligible as a root path 
 	 * of a quick filter.
@@ -157,19 +171,27 @@ public class TreeViewerUtil {
 	 */
 	private static boolean isEligibleRoot(TreePath root, TreeViewer viewer) {
 		if (viewer.getExpandedState(root)) {
-			ITreeContentProvider contentProvider = (ITreeContentProvider) viewer.getContentProvider();
-			Object rootElement = root.getLastSegment();
-			Object[] children = contentProvider.getChildren(rootElement);
-			if (children != null && children.length > 0) {
-				ViewerFilter[] filters = viewer.getFilters();
-				if (filters != null && filters.length > 0) {
-					for (ViewerFilter filter : filters) {
-						children = filter.filter(viewer, rootElement, children);
-						if (children == null || children.length == 0) break;
-					}
+			return hasChildren(root, viewer);
+		}
+		return false;
+	}
+	
+	/**
+	 * Judges if the specified root has children nodes.
+	 */
+	private static boolean hasChildren(TreePath root, TreeViewer viewer) {
+		ITreeContentProvider contentProvider = (ITreeContentProvider) viewer.getContentProvider();
+		Object rootElement = root.getLastSegment();
+		Object[] children = contentProvider.getChildren(rootElement);
+		if (children != null && children.length > 0) {
+			ViewerFilter[] filters = viewer.getFilters();
+			if (filters != null && filters.length > 0) {
+				for (ViewerFilter filter : filters) {
+					children = filter.filter(viewer, rootElement, children);
+					if (children == null || children.length == 0) break;
 				}
-				return children != null && children.length > 0;
 			}
+			return children != null && children.length > 0;
 		}
 		return false;
 	}
