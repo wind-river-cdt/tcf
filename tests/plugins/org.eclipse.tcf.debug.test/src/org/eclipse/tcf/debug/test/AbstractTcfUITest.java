@@ -628,6 +628,12 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
         fDebugViewListener.addLabelUpdate(new TreePath(new Object[] { fLaunch, processTCFContext, threadTCFContext }));
 
         startProcess();
+        
+        // Make sure that delta is posted after launching process so that it doesn't interfere
+        // with the waiting for the whole viewer to update after breakpoint hit (below).
+        fDebugViewListener.waitTillFinished(MODEL_CHANGED_COMPLETE);
+        fDebugViewListener.resetModelChanged();
+        
         runToTestEntry(testFunc);
         removeBreakpoint(bpId);
 
