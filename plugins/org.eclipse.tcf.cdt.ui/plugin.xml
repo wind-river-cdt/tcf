@@ -75,14 +75,23 @@
             name="%breakpoints.filterPage.name">
          <filter name="debugModelId" value="org.eclipse.tcf.debug"/>
          <enabledWhen>
-               <and>
-                  <adapt type="org.eclipse.cdt.debug.core.model.ICBreakpoint"/>
-                  <not>
-                     <adapt type="org.eclipse.cdt.debug.core.model.ICTracepoint"/>
-                  </not>
-               </and>
-         </enabledWhen>
-      </page>
+         <or>
+           <and>
+              <adapt type="org.eclipse.cdt.debug.core.model.ICBreakpoint"/>
+              <not>
+                 <adapt type="org.eclipse.cdt.debug.core.model.ICTracepoint"/>
+              </not>
+           </and>
+           <and>
+              <instanceof value="org.eclipse.cdt.debug.ui.breakpoints.ICBreakpointContext"/>
+              <test property="org.eclipse.cdt.debug.ui.createBreakpointAdapt" value="org.eclipse.cdt.debug.core.model.ICBreakpoint" />
+              <not>   
+                 <test property="org.eclipse.cdt.debug.ui.createBreakpointAdapt" value="org.eclipse.cdt.debug.core.model.ICTracepoint"/>
+               </not>	           
+           </and>
+        </or>
+        </enabledWhen>
+     </page>
    </extension>
    <extension point="org.eclipse.ui.propertyPages">
       <page class="org.eclipse.tcf.internal.cdt.ui.breakpoints.TCFBreakpointThreadFilterPage"

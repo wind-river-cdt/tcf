@@ -328,24 +328,7 @@ public class TCFThreadFilterEditor {
     }
 
     private String getBPFilterExpression() {
-        String expression = null;
-        ICBreakpoint bp = (ICBreakpoint)fPage.getElement().getAdapter(ICBreakpoint.class);
-        if (bp != null) {
-            IMarker marker = bp.getMarker();
-            if (marker != null) {
-                try {
-                    expression = (String)marker.getAttribute(TCFBreakpointsModel.ATTR_CONTEXT_QUERY);
-                }
-                catch (CoreException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        if (fPage.getElement() instanceof BreakpointScopeCategory) {
-            expression = ((BreakpointScopeCategory)fPage.getElement()).getFilter();
-        }
-
-        return expression;
+        return fPage.getFilterExtension().getPropertiesFilter();
     }
 
     private String[] getAvailableAttributes() {

@@ -87,7 +87,9 @@ public class BreakpointScopeCategory extends PlatformObject implements IWorkbenc
     }
 
     public String getLabel(Object o) {
-        if (getFilter() != null) {
+        if (getFilter() != null && getContextIds() != null) {
+            return MessageFormat.format(Messages.BreakpointScopeCategory_filter_and_contexts_label, new Object[] { getFilter(), getContextIds() });
+        } else if (getFilter() != null) {
             return MessageFormat.format(Messages.BreakpointScopeCategory_filter_label, new Object[] { getFilter() });
         } else if (getContextIds() != null) {
             return MessageFormat.format(Messages.BreakpointScopeCategory_contexts_label, new Object[] { getContextIds() });

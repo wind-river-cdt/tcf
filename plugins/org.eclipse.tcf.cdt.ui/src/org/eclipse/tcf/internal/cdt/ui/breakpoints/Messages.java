@@ -36,6 +36,7 @@ public class Messages extends NLS {
     public static String TCFBreakpointPrefrencesError;
     public static String BreakpointScopeCategory_filter_label;
     public static String BreakpointScopeCategory_contexts_label;
+    public static String BreakpointScopeCategory_filter_and_contexts_label;
     public static String BreakpointScopeCategory_global_label;
 
     static {
