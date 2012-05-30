@@ -23,7 +23,7 @@
       <import plugin="org.eclipse.cdt.core" version="5.3.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.debug.core" version="3.7.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.debug.ui" version="3.7.101" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ui" version="3.103.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui" version="3.8.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.forms" version="3.5.100" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.navigator" version="3.5.100" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.views.properties.tabbed" version="3.5.200" match="greaterOrEqual"/>
