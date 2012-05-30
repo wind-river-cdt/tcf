@@ -11,6 +11,8 @@ package org.eclipse.tcf.te.ui.views.listeners;
 
 import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IWindowListener;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchWindow;
 
 /**
@@ -67,7 +69,11 @@ public class WorkbenchWindowListener implements IWindowListener {
 				// Register the part listener
 				service.addPartListener(partListener);
 				// Signal the active part to the part listener after registration
-				partListener.partActivated(window.getActivePage().getActivePartReference());
+				IWorkbenchPage page = window.getActivePage();
+				if (page != null) {
+					IWorkbenchPartReference partRef = page.getActivePartReference();
+					if (partRef != null) partListener.partActivated(partRef);
+				}
 			}
 
 			// Register the perspective listener

@@ -243,9 +243,7 @@
                   icon="icons/eview16/prop_ps.gif"
                   label="%menu.properties.label"
                   style="push">
-                  <visibleWhen checkEnabled="true"/>
             </command>
-            <visibleWhen checkEnabled="true"/>
          </menu>
       </menuContribution>
       

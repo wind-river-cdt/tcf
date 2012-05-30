@@ -14,12 +14,14 @@ import java.net.URL;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.te.runtime.preferences.ScopedEclipsePreferences;
 import org.eclipse.tcf.te.runtime.tracing.TraceHandler;
 import org.eclipse.tcf.te.ui.views.Managers;
 import org.eclipse.tcf.te.ui.views.interfaces.ImageConsts;
 import org.eclipse.tcf.te.ui.views.listeners.WorkbenchWindowListener;
 import org.eclipse.ui.IWindowListener;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -97,8 +99,23 @@ public class UIPlugin extends AbstractUIPlugin {
 		if (windowListener == null && PlatformUI.getWorkbench() != null) {
 			windowListener = new WorkbenchWindowListener();
 			PlatformUI.getWorkbench().addWindowListener(windowListener);
+			activateContexts();
 		}
 	}
+
+	void activateContexts() {
+		if (Display.getCurrent() != null) {
+			IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+			if (window != null) windowListener.windowOpened(window);
+		}
+		else {
+			PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable(){
+				@Override
+                public void run() {
+					activateContexts();
+                }});
+		}
+    }
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
