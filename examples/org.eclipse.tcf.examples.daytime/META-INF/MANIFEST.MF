@@ -2,13 +2,13 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.tcf.examples.daytime;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.1.0.qualifier
 Bundle-Activator: org.eclipse.tcf.internal.examples.daytime.Activator
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime
 Bundle-ActivationPolicy: lazy
 Eclipse-LazyStart: true
-Import-Package: org.eclipse.tcf.core;version="1.0.0",
- org.eclipse.tcf.protocol;version="1.0.0"
+Import-Package: org.eclipse.tcf.core;version="1.1.0",
+ org.eclipse.tcf.protocol;version="1.1.0"
 Export-Package: org.eclipse.tcf.internal.examples.daytime
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

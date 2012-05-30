@@ -12,7 +12,7 @@
 <feature
       id="org.eclipse.tcf.cdt.feature"
       label="%featureName"
-      version="1.0.0.qualifier"
+      version="1.1.0.qualifier"
       provider-name="%providerName">
 
    <description url="http://wiki.eclipse.org/TCF">

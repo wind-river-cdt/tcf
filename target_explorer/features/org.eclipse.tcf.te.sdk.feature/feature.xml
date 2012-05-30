@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.tcf.te.sdk.feature"
       label="%featureName"
-      version="1.0.0.qualifier"
+      version="1.1.0.qualifier"
       provider-name="%providerName">
 
    <description>
@@ -18,7 +18,7 @@
    </license>
 
    <requires>
-      <import feature="org.eclipse.tcf.te.feature" version="1.0.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.tcf.te.feature" version="1.1.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin

@@ -3,20 +3,20 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-Vendor: %providerName
 Bundle-SymbolicName: org.eclipse.tcf.core;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.1.0.qualifier
 Bundle-Localization: plugin
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Eclipse-LazyStart: true
 Bundle-Activator: org.eclipse.tcf.internal.Activator
 Import-Package: org.osgi.framework,
  org.osgi.service.packageadmin,
  org.osgi.util.tracker
-Export-Package: org.eclipse.tcf.core;version="1.0.0",
+Export-Package: org.eclipse.tcf.core;version="1.1.0",
  org.eclipse.tcf.internal;x-internal:=true,
  org.eclipse.tcf.internal.core;x-internal:=true,
  org.eclipse.tcf.internal.services.local;x-internal:=true,
  org.eclipse.tcf.internal.services.remote;x-internal:=true,
- org.eclipse.tcf.protocol;version="1.0.0",
- org.eclipse.tcf.services;version="1.0.0",
- org.eclipse.tcf.util;version="1.0.0"
+ org.eclipse.tcf.protocol;version="1.1.0",
+ org.eclipse.tcf.services;version="1.1.0",
+ org.eclipse.tcf.util;version="1.1.0"

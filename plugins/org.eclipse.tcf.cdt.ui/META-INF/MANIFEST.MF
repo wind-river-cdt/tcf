@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.tcf.cdt.ui;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.1.0.qualifier
 Bundle-Localization: plugin
 Bundle-Activator: org.eclipse.tcf.internal.cdt.ui.Activator
 Require-Bundle: org.eclipse.core.runtime,
@@ -14,16 +14,16 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.cdt.core,
  org.eclipse.cdt.ui,
  org.eclipse.cdt.debug.core,
- org.eclipse.cdt.debug.ui;bundle-version="7.1.0",
+ org.eclipse.cdt.debug.ui;bundle-version="7.2.0",
  org.eclipse.tcf.core,
  org.eclipse.tcf.debug,
  org.eclipse.tcf.debug.ui,
- org.eclipse.jface.text;bundle-version="3.5.0",
+ org.eclipse.jface.text;bundle-version="3.8.0",
  org.eclipse.core.expressions,
- org.eclipse.cdt.launch;bundle-version="6.1.0"
+ org.eclipse.cdt.launch;bundle-version="7.1.0"
 Bundle-ActivationPolicy: lazy
 Eclipse-LazyStart: true
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %providerName
 Export-Package: org.eclipse.tcf.internal.cdt.launch;x-internal:=true,
  org.eclipse.tcf.internal.cdt.ui;x-internal:=true,

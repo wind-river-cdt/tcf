@@ -7,11 +7,11 @@
 	<parent>
 		<groupId>org.eclipse.tcf</groupId>
 		<artifactId>tcf-tests.maven-master</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>1.1.0-SNAPSHOT</version>
 		<relativePath>../../pom-tests.xml</relativePath>
 	</parent>
 
-	<version>1.0.0.qualifier</version>
+	<version>1.1.0.qualifier</version>
 	<artifactId>org.eclipse.tcf.debug.test</artifactId>
 	<packaging>eclipse-test-plugin</packaging>
 
@@ -19,7 +19,7 @@
 		<jacoco.append>true</jacoco.append>
 		
 		<sdk-version>3.8.0</sdk-version>
-		<tcf-version>1.0.0</tcf-version>
+		<tcf-version>1.1.0</tcf-version>
 		
 		<ui.test.vmargs>-Xmx512m -XX:MaxPermSize=256m</ui.test.vmargs>
 	</properties>
