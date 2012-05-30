@@ -17,17 +17,26 @@ public class Messages extends NLS {
 
     public static String TCFThreadFilterQueryExpressionStore;
     public static String TCFThreadFilterQueryModeButtonState;
+    public static String TCFThreadUseDefaultTriggerScoping;
+    public static String TCFThreadDefaultTriggerScope;
     public static String TCFThreadFilterQueryButtonBasic;
     public static String TCFThreadFilterQueryButtonAdvanced;
     public static String TCFThreadFilterQueryButtonEdit;
     public static String TCFThreadFilterQueryAdvancedLabel;
     public static String TCFThreadFilterQueryTreeViewLabel;
     public static String TCFThreadFilterEditorFormatError;
-
+    public static String TCFThreadFilterEditorNoOpenChannel;
+    public static String TCFThreadFileterEditorInvalidQuery;
+    public static String TCFBreakpointPreferencesEnableDefaultTriggerScope;
+    public static String TCFBreakpointPreferencesTriggerScopeExpression;
+    public static String TCFBreakpointPreferencesDescription;
+    public static String TCFBreakpointToggle;
+    public static String TCFBreakpointToggleCannotFindMemory;
+    public static String TCFBreakpointToggleError;
+    public static String TCFBreakpointPrefrencesError;
     public static String BreakpointScopeCategory_filter_label;
     public static String BreakpointScopeCategory_contexts_label;
     public static String BreakpointScopeCategory_global_label;
-
 
     static {
         // initialize resource bundle
