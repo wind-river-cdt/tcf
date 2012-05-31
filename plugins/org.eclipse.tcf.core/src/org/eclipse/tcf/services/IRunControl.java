@@ -191,25 +191,53 @@ public interface IRunControl extends IService {
      * a generic client might be able to handle it better.
      */
     static final String
+        /** Context suspended by suspend command */
         REASON_USER_REQUEST = "Suspended",
+
+        /** Context suspended by step command */
         REASON_STEP = "Step",
+
+        /** Context suspended by breakpoint */
         REASON_BREAKPOINT = "Breakpoint",
+
+        /** Context suspended by exception */
         REASON_EXCEPTION = "Exception",
+
+        /** Context suspended as part of container */
         REASON_CONTAINER = "Container",
+
+        /** Context suspended by watchpoint (data breakpoint) */
         REASON_WATCHPOINT = "Watchpoint",
+
+        /** Context suspended because it received a signal */
         REASON_SIGNAL = "Signal",
+
+        /** Context suspended because a shared library is loaded or unloaded */
         REASON_SHAREDLIB = "Shared Library",
+
+        /** Context suspended because of an error in execution environment */
         REASON_ERROR = "Error";
 
     /**
      * Optional parameters of context state.
      */
     static final String
+        /** Integer - signal that caused the context to become suspended */
         STATE_SIGNAL = "Signal",
+
+        /** String - name of the signal that caused the context to become suspended */
         STATE_SIGNAL_NAME = "SignalName",
+
+        /** String - description of the signal that caused the context to become suspended */
         STATE_SIGNAL_DESCRIPTION = "SignalDescription",
+
+        /** Array of string - IDs of breakpoints that were triggered by the context */
         STATE_BREAKPOINT_IDS = "BPs",
+
+        /** Object - error report that describes a reason why program counter of the context is not available */
         STATE_PC_ERROR = "PCError",
+
+        /** Boolean - true if the context is running in reverse */
         STATE_REVERSING = "Reversing";
 
     /**
@@ -456,11 +484,6 @@ public interface IRunControl extends IService {
          * @return pending command handle, can be used to cancel the command.
          */
         IToken detach(DoneCommand done);
-    }
-
-    class RunControlError extends Exception {
-
-        private static final long serialVersionUID = 1L;
     }
 
     interface DoneGetState {

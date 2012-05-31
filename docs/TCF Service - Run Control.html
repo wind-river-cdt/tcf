@@ -19,6 +19,7 @@
         <li><a href='#CmdResume'>Resume</a>
         <li><a href='#CmdGetState'>Get State</a>
         <li><a href='#CmdTerminate'>Terminate</a>
+        <li><a href='#CmdDetach'>Detach</a>
     </ul>
     <li><a href='#Events'>Events</a>
     <li><a href='#API'>API</a>
@@ -41,6 +42,10 @@
         <td>1.0
         <td>2008-05-06
         <td>Approved
+    <tr>
+        <td>1.1
+        <td>2012-05-30
+        <td>TCF release 1.0
 </table>
 
 <h2><a name='Overview'>Overview</a></h2>
@@ -108,6 +113,15 @@ contextChanged event to notify changes in context data.</p>
     <li><code><b><font face="Courier New" size=2 color=#333399>"ParentID" : <i>&lt;string&gt;</i></font></b></code>
     - ID of a parent context.
 
+    <li><code><b><font face="Courier New" size=2 color=#333399>"ProcessID" : <i>&lt;string&gt;</i></font></b></code>
+    - ID of a process (memory space) of the context.
+
+    <li><code><b><font face="Courier New" size=2 color=#333399>"CreatorID" : <i>&lt;string&gt;</i></font></b></code>
+    - ID of a context that created (started) this context.
+
+    <li><code><b><font face="Courier New" size=2 color=#333399>"Name" : <i>&lt;string&gt;</i></font></b></code>
+    - human redable context name.
+
     <li><code><b><font face="Courier New" size=2 color=#333399>"IsContainer" : <i>&lt;boolean&gt;</i></font></b></code>
     - true if the context is a container.
     Executing resume or suspend command on a container causes all its children to resume or suspend.
@@ -130,7 +144,26 @@ contextChanged event to notify changes in context data.</p>
     - for each resume mode, corresponding bit is '1' if Resume command mode with count other then 1 is supported by the context.
 
     <li><code><b><font face="Courier New" size=2 color=#333399>"CanTerminate" : <i>&lt;boolean&gt;</i></font></b></code>
-    - true if Terminate command is supported by the context,
+    - true if Terminate command is supported by the context.
+
+    <li><code><b><font face="Courier New" size=2 color=#333399>"CanDetach" : <i>&lt;boolean&gt;</i></font></b></code>
+    - true if Detach command is supported by the context.
+
+    <li><code><b><font face="Courier New" size=2 color=#333399>"RCGroup" : <i>&lt;string&gt;</i></font></b></code>
+    - context ID of a run control group that contains the context.
+    Members of same group are always suspended and resumed together:
+    resuming/suspending a context resumes/suspends all members of the group
+
+    <li><code><b><font face="Courier New" size=2 color=#333399>"BPGroup" : <i>&lt;string&gt;</i></font></b></code>
+    - context ID of a breakpoints group that contains the context.
+    Members of same group share same breakpoint instances:
+    a breakpoint is planted once for the group, no need to plant
+    the breakpoint for each member of the group
+
+    <li><code><b><font face="Courier New" size=2 color=#333399>"SymbolsGroup" : <i>&lt;string&gt;</i></font></b></code>
+    - Context ID of a symbols group that contains the context.
+    Members of a symbols group share same symbol reader configuration settings,
+    like user defined memory map entries and source lookup info
 </ul>
 
 <h3><a name='CmdGetChildren'>Get Children</a></h3>
@@ -191,100 +224,126 @@ to context's children. Only contexts with HasState = true can be resumed.</p>
 <p>Resume modes:</p>
     <ul>
         <li>
-            <code>RM_RESUME = 0</code> - resume normal execution. Execution will
+            <code><b><font face="Courier New" size=2 color=#333399>0</b></font></code>
+            - resume normal execution. Execution will
             continue until suspended by command or breakpoint.
         </li>
 
         <li>
-            <code>RM_STEP_OVER = 1</code> - step over a single instruction. If instruction
+            <code><b><font face="Courier New" size=2 color=#333399>1</b></font></code>
+            - step over a single instruction. If instruction
             is function call, execution continues until control returns from the function.
         </li>
 
         <li>
-            <code>RM_STEP_INTO = 2</code> - single instruction in given context.
+            <code><b><font face="Courier New" size=2 color=#333399>2</b></font></code>
+            - single instruction in given context.
         </li>
 
         <li>
-            <code>RM_STEP_OVER_LINE = 3</code> - resume execution of given context until control reaches instruction
+            <code><b><font face="Courier New" size=2 color=#333399>3</b></font></code>
+            - resume execution of given context until control reaches instruction
             that belongs to a different line of source code, but runs any functions called at
             full speed. Error is returned if line number information not available.
         </li>
 
         <li>
-            <code>RM_STEP_INTO_LINE = 4</code> - resumes execution of given context until control reaches instruction
+            <code><b><font face="Courier New" size=2 color=#333399>4</b></font></code>
+            - resumes execution of given context until control reaches instruction
             that belongs to a different line of source code. If a function is called,
             stop at first line of the function code. Error is returned if line number
             information not available.
         </li>
 
         <li>
-            <code>RM_STEP_OUT = 5</code> - resume execution of given context until control returns from current
+            <code><b><font face="Courier New" size=2 color=#333399>5</b></font></code>
+            - resume execution of given context until control returns from current
             function.
         </li>
 
         <li>
-            <code>RM_REVERSE_RESUME = 6</code> - reverse of <code>RM_RESUME</code>; resume backward execution. Execution will
+            <code><b><font face="Courier New" size=2 color=#333399>6</b></font></code>
+            - resume backward execution. Execution will
             continue until suspended by command or breakpoint.
         </li>
 
         <li>
-            <code>RM_REVERSE_STEP_OVER = 7</code> - reverse of <code>RM_STEP_OVER</code>; reverse step over a single instruction.
+            <code><b><font face="Courier New" size=2 color=#333399>7</b></font></code>
+            - reverse step over a single instruction.
         </li>
 
         <li>
-            <code>RM_REVERSE_STEP_INTO = 8</code> - reverse of <code>RM_STEP_INTO</code>; reverse step into a single instruction in the given context.
+            <code><b><font face="Courier New" size=2 color=#333399>8</b></font></code>
+            - reverse step into a single instruction in the given context.
             This effectively "un-executes" the previous instruction.
         </li>
 
         <li>
-            <code>RM_REVERSE_STEP_OVER_LINE = 9</code> - reverse of <code>RM_STEP_OVER_LINE</code>; resume backward execution
-            of given context until control reaches an instruction that belongs to a different source line.
+            <code><b><font face="Courier New" size=2 color=#333399>9</b></font></code>
+            - resume backward execution
+            of the context until control reaches an instruction that belongs to a different source line.
             If the line contains a function call then don't stop until get out of the function.
             Error is returned if line number information not available.
         </li>
 
         <li>
-            <code>RM_REVERSE_STEP_INTO_LINE = 10</code> - reverse of <code>RM_STEP_INTO_LINE</code>; resume backward execution of given context
+            <code><b><font face="Courier New" size=2 color=#333399>10</b></font></code>
+            - resume backward execution of the context
             until control reaches an instruction that belongs to a different line of source code.
             If a function is called, stop at the beginning of the last line of the function code.
             Error is returned if line number information not available.
         </li>
 
         <li>
-            <code>RM_REVERSE_STEP_OUT = 11</code> - reverse of <code>RM_STEP_OUT</code>; resume backward execution of
-            the given context until control reaches the point where the current function was called.
+            <code><b><font face="Courier New" size=2 color=#333399>11</b></font></code>
+            - resume backward execution of
+            the context until control reaches the point where the current function was called.
         </li>
 
         <li>
-            <code>RM_STEP_OVER_RANGE = 12</code> - step over instructions until PC is outside the specified range.
-            If any function call within the range is considered to be in range.
+            <code><b><font face="Courier New" size=2 color=#333399>12</b></font></code>
+            - step over instructions until PC is outside the specified range.
+            A function call within the range is considered to be in range.
         </li>
 
         <li>
-            <code>RM_STEP_INTO_RANGE = 13</code> - step instruction until PC is outside the specified range for any reason.
+            <code><b><font face="Courier New" size=2 color=#333399>13</b></font></code>
+            - step instruction until PC is outside the specified range for any reason.
         </li>
 
         <li>
-            <code>RM_REVERSE_STEP_OVER_RANGE = 14</code> - reverse of <code>RM_STEP_OVER_RANGE</code>.
+            <code><b><font face="Courier New" size=2 color=#333399>14</b></font></code>
+            - resume backward execution until PC is outside the specified range.
+            A function call within the range is considered to be in range.
         </li>
 
         <li>
-            <code>RM_REVERSE_STEP_INTO_RANGE = 15</code> - reverse of <code>RM_STEP_INTO_RANGE</code>.
+            <code><b><font face="Courier New" size=2 color=#333399>15</b></font></code>
+            - resume backward execution until PC is outside the specified range for any reason.
+        </li>
+
+        <li>
+            <code><b><font face="Courier New" size=2 color=#333399>16</b></font></code>
+            - run until the context becomes active - scheduled to run on a target CPU.
+        </li>
+
+        <li>
+            <code><b><font face="Courier New" size=2 color=#333399>17</b></font></code>
+            - run reverse until the context becomes active.
         </li>
     </ul>
 
 <p>Resume parameters names:</p>
-    <ul>
-                <li>
-                        <code>RP_RANGE_START = "RangeStart"</code>
-                        starting address of step range, inclusive.
-                </li>
-                <li>
-                        <code>RP_RANGE_END = "RangeEnd"</code>
-                        ending address of step range, exclusive.
-                </li>
-        </ul>
-
+<ul>
+    <li>
+        <code><b><font face="Courier New" size=2 color=#333399>"RangeStart" : <i>&lt;number&gt;</i></b></font></code>
+        starting address of step range, inclusive.
+    </li>
+    <li>
+        <code><b><font face="Courier New" size=2 color=#333399>"RangeEnd" : <i>&lt;number&gt;</i></b></font></code>
+        ending address of step range, exclusive.
+    </li>
+</ul>
 
 <p>Result message:</p>
 
@@ -315,19 +374,42 @@ R &bull; <i>&lt;token&gt;</i> &bull; <i>&lt;error report&gt;</i> &bull; <i>&lt;b
 <p>State change reason can be any text, but if it is one of predefined strings,
 a generic client might be able to handle it better. Predefined reasons are:</p>
 <ul>
-    <li><code>REASON_USER_REQUEST = "Suspended"</code> - context suspended by command.
-    <li><code>REASON_STEP = "Step"</code> - context resumed or suspended by step command.
-    <li><code>REASON_BREAKPOINT = "Breakpoint"</code> - context suspended by breakpoint.
-    <li><code>REASON_EXCEPTION = "Exception"</code> - context suspended by exception.
-    <li><code>REASON_CONTAINER = "Container"</code> - context suspended or resumed as part of container.
-    <li><code>REASON_WATCHPOINT = "Watchpoint"</code> - context suspended by watchpoint (data breakpoint).
-    <li><code>REASON_SIGNAL = "Signal"</code> - context suspended because it received a signal.
-    <li><code>REASON_SHAREDLIB = "Shared Library"</code> - context suspended because a shared library is loaded or unloaded.
-    <li><code>REASON_ERROR = "Error"</code> - context suspended because of an error in execution environment.
+    <li><code><b><font face="Courier New" size=2 color=#333399>"Suspended"</b></font></code>
+         - context suspended by command.
+    <li><code><b><font face="Courier New" size=2 color=#333399>"Step"</b></font></code>
+         - context suspended by step command.
+    <li><code><b><font face="Courier New" size=2 color=#333399>"Breakpoint"</b></font></code>
+         - context suspended by breakpoint.
+    <li><code><b><font face="Courier New" size=2 color=#333399>"Exception"</b></font></code>
+         - context suspended by exception.
+    <li><code><b><font face="Courier New" size=2 color=#333399>"Container"</b></font></code>
+         - context suspended as part of container.
+    <li><code><b><font face="Courier New" size=2 color=#333399>"Watchpoint"</b></font></code>
+         - context suspended by watchpoint (data breakpoint).
+    <li><code><b><font face="Courier New" size=2 color=#333399>"Signal"</b></font></code>
+         - context suspended because it received a signal.
+    <li><code><b><font face="Courier New" size=2 color=#333399>"Shared Library"</b></font></code>
+         - context suspended because a shared library is loaded or unloaded.
+    <li><code><b><font face="Courier New" size=2 color=#333399>"Error"</b></font></code>
+         - context suspended because of an error in execution environment.
 </ul>
 
 <p>Context state properties can contain any data relevant to context state.
-Definition of state properties depends on a target.</p>
+Definition of state properties depends on a target. Predefined properties are:</p>
+<ul>
+    <li><code><b><font face="Courier New" size=2 color=#333399>"Signal" : <i>&lt;int&gt;</i></b></font></code>
+        - signal that caused the context to become suspended
+    <li><code><b><font face="Courier New" size=2 color=#333399>"SignalName" : <i>&lt;string&gt;</i></b></font></code>
+        - name of the signal that caused the context to become suspended
+    <li><code><b><font face="Courier New" size=2 color=#333399>"SignalDescription" : <i>&lt;string&gt;</i></b></font></code>
+        - description of the signal that caused the context to become suspended
+    <li><code><b><font face="Courier New" size=2 color=#333399>"BPs" : <i>&lt;array of string&gt;</i></b></font></code>
+         - IDs of breakpoints that were triggered by the context
+    <li><code><b><font face="Courier New" size=2 color=#333399>"PCError" : <i>&lt;object&gt;</i></b></font></code>
+         - error report that describes a reason why program counter of the context is not available
+    <li><code><b><font face="Courier New" size=2 color=#333399>"Reversing" : <i>&lt;boolean&gt;</i></b></font></code>
+         - true if the context is running in reverse
+</ul>
 
 <h3><a name='CmdTerminate'>Terminate</a></h3>
 
@@ -336,6 +418,21 @@ C &bull; <i>&lt;token&gt;</i> &bull; RunControl &bull; terminate &bull; <i>&lt;s
 </font></b></pre>
 
 <p>The command terminates execution of given context. The command should fail if CanTerminate
+property of the context is false.</p>
+
+<p>Result message:</p>
+
+<pre><b><font face="Courier New" size=2 color=#333399>
+R &bull; <i>&lt;token&gt;</i> &bull; <i>&lt;error report&gt;</i> &bull;
+</font></b></pre>
+
+<h3><a name='CmdDetach'>Detach</a></h3>
+
+<pre><b><font face="Courier New" size=2 color=#333399>
+C &bull; <i>&lt;token&gt;</i> &bull; RunControl &bull; detach &bull; <i>&lt;string: context ID&gt;</i> &bull;
+</font></b></pre>
+
+<p>The command detaches debugger from the context. The command should fail if CanDetach
 property of the context is false.</p>
 
 <p>Result message:</p>
@@ -416,12 +513,19 @@ E &bull; RunControl &bull; containerResumed &bull; <i>&lt;array of context IDs&g
     <font color=#7F0055>static final</font> String
         PROP_ID = "ID",
         PROP_PARENT_ID = "ParentID",
+        PROP_PROCESS_ID = "ProcessID",
+        PROP_CREATOR_ID = "CreatorID",
+        PROP_NAME = "Name",
         PROP_IS_CONTAINER = "IsContainer",
         PROP_HAS_STATE = "HasState",
         PROP_CAN_RESUME = "CanResume",
         PROP_CAN_COUNT = "CanCount",
         PROP_CAN_SUSPEND = "CanSuspend",
-        PROP_CAN_TERMINATE = "CanTerminate";
+        PROP_CAN_TERMINATE = "CanTerminate",
+        PROP_CAN_DETACH = "CanDetach",
+        PROP_RC_GROUP = "RCGroup",
+        PROP_BP_GROUP = "BPGroup",
+        PROP_SYMBOLS_GROUP = "SymbolsGroup";
 
     <font color=#3F5FBF>/**
      * Context resume modes.
@@ -438,7 +542,13 @@ E &bull; RunControl &bull; containerResumed &bull; <i>&lt;array of context IDs&g
         RM_REVERSE_STEP_INTO = 8,
         RM_REVERSE_STEP_OVER_LINE = 9,
         RM_REVERSE_STEP_INTO_LINE = 10,
-        RM_REVERSE_STEP_OUT = 11;
+        RM_REVERSE_STEP_OUT = 11,
+        RM_STEP_OVER_RANGE = 12,
+        RM_STEP_INTO_RANGE = 13,
+        RM_REVERSE_STEP_OVER_RANGE = 14,
+        RM_REVERSE_STEP_INTO_RANGE = 15,
+        RM_UNTIL_ACTIVE = 16,
+        RM_REVERSE_UNTIL_ACTIVE = 17;
 
     <font color=#3F5FBF>/**
      * State change reason of a context.
@@ -455,6 +565,24 @@ E &bull; RunControl &bull; containerResumed &bull; <i>&lt;array of context IDs&g
         REASON_SIGNAL = "Signal",
         REASON_SHAREDLIB = "Shared Library",
         REASON_ERROR = "Error";
+
+    <font color=#3F5FBF>/**
+     * Optional parameters of context state.
+     */</font>
+    <font color=#7F0055>static final</font> String
+        STATE_SIGNAL = "Signal",
+        STATE_SIGNAL_NAME = "SignalName",
+        STATE_SIGNAL_DESCRIPTION = "SignalDescription",
+        STATE_BREAKPOINT_IDS = "BPs",
+        STATE_PC_ERROR = "PCError",
+        STATE_REVERSING = "Reversing";
+
+    <font color=#3F5FBF>/**
+     * Optional parameters of resume command.
+     */</font>
+    <font color=#7F0055>static final</font> String
+        RP_RANGE_START = "RangeStart",
+        RP_RANGE_END = "RangeEnd";
 
     <font color=#3F5FBF>/**
      * Retrieve context info for given context ID.
@@ -510,6 +638,13 @@ E &bull; RunControl &bull; containerResumed &bull; <i>&lt;array of context IDs&g
     <font color=#7F0055>interface</font> RunControlContext {
 
         <font color=#3F5FBF>/**
+         * Get context properties. See PROP_* definitions for property names.
+         * Context properties are read only, clients should not try to modify them.
+         * <font color=#7F9FBF>@return</font> Map of context properties.
+         */</font>
+        Map&lt;String,Object&gt; getProperties();
+
+        <font color=#3F5FBF>/**
          * Retrieve context ID.
          * Same as getProperties().get("ID")
          */</font>
@@ -522,11 +657,22 @@ E &bull; RunControl &bull; containerResumed &bull; <i>&lt;array of context IDs&g
         String getParentID();
 
         <font color=#3F5FBF>/**
-         * Get context properties. See PROP_* definitions for property names.
-         * Context properties are read only, clients should not try to modify them.
-         * <font color=#7F9FBF>@return</font> Map of context properties.
+         * Retrieve context process ID.
+         * Same as getProperties().get("ProcessID")
          */</font>
-        Map&lt;String,Object&gt; getProperties();
+        String getProcessID();
+
+        <font color=#3F5FBF>/**
+         * Retrieve context creator ID.
+         * Same as getProperties().get("CreatorID")
+         */</font>
+        String getCreatorID();
+
+        <font color=#3F5FBF>/**
+         * Retrieve human readable context name.
+         * Same as getProperties().get("Name")
+         */</font>
+        String getName();
 
         <font color=#3F5FBF>/**
          * Utility method to read context property PROP_IS_CONTAINER.
@@ -580,14 +726,52 @@ E &bull; RunControl &bull; containerResumed &bull; <i>&lt;array of context IDs&g
          * however the method does not check that the command can be executed successfully in
          * the current state of the context. For example, the command still can fail if context is
          * already exited.
-         * <font color=#7F9FBF>@return</font> value of PROP_CAN_SUSPEND.
+         * <font color=#7F9FBF>@return</font> value of PROP_CAN_TERMINATE.
          */</font>
         <font color=#7F0055>boolean</font> canTerminate();
 
         <font color=#3F5FBF>/**
+         * Utility method to read context property PROP_CAN_DETACH.
+         * Value 'true' means detach command is supported by the context,
+         * however the method does not check that the command can be executed successfully in
+         * the current state of the context. For example, the command still can fail if the context
+         * already has exited.
+         * <font color=#7F9FBF>@return</font> value of PROP_CAN_DETACH.
+         */</font>
+        <font color=#7F0055>boolean</font> canDetach();
+
+        <font color=#3F5FBF>/**
+         * Utility method to read context property PROP_RC_GROUP -
+         * context ID of a run control group that contains the context.
+         * Members of same group are always suspended and resumed together:
+         * resuming/suspending a context resumes/suspends all members of the group.
+         * <font color=#7F9FBF>@return</font> value of PROP_RC_GROUP.
+         */</font>
+        String getRCGroup();
+
+        <font color=#3F5FBF>/**
+         * Utility method to read context property PROP_BP_GROUP -
+         * context ID of a breakpoints group that contains the context.
+         * Members of same group share same breakpoint instances:
+         * a breakpoint is planted once for the group, no need to plant
+         * the breakpoint for each member of the group
+         * <font color=#7F9FBF>@return</font> value of PROP_BP_GROUP or null if the context does not support breakpoints.
+         */</font>
+        String getBPGroup();
+
+        <font color=#3F5FBF>/**
+         * Utility method to read context property PROP_SYMBOLS_GROUP -
+         * context ID of a symbols group that contains the context.
+         * Members of a symbols group share same symbol reader configuration settings,
+         * like user defined memory map entries and source lookup info.
+         * <font color=#7F9FBF>@return</font> value of PROP_SYMBOLS_GROUP or null if the context is not a member of a symbols group.
+         */</font>
+        String getSymbolsGroup();
+
+        <font color=#3F5FBF>/**
          * Send a command to retrieve current state of a context.
          * <font color=#7F9FBF>@param</font> done - command result call back object.
-         * <font color=#7F9FBF>@return</font> pending command handle, can be used to cancel the command.
+         * <font color=#7F9FBF>@return</font> pending command handle, PROP_CAN_DETACH be used to cancel the command.
          */</font>
         IToken getState(DoneGetState done);
 
@@ -615,9 +799,13 @@ E &bull; RunControl &bull; containerResumed &bull; <i>&lt;array of context IDs&g
          * <font color=#7F9FBF>@return</font> pending command handle, can be used to cancel the command.
          */</font>
         IToken terminate(DoneCommand done);
-    }
 
-    <font color=#7F0055>class</font> RunControlError <font color=#7F0055>extends</font> Exception {
+        <font color=#3F5FBF>/**
+         * Send a command to detach a context.
+         * <font color=#7F9FBF>@param</font> done - command result call back object.
+         * <font color=#7F9FBF>@return</font> pending command handle, can be used to cancel the command.
+         */</font>
+        IToken detach(DoneCommand done);
     }
 
     <font color=#7F0055>interface</font> DoneGetState {
