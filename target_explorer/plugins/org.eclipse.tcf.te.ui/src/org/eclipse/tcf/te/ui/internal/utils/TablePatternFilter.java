@@ -22,11 +22,12 @@ import org.eclipse.jface.viewers.ViewerFilter;
 
 /**
  * The viewer filter to select those elements which matches the given filter pattern.
- * @since 1.0.0 Copied from org.eclipse.ui.internal.navigator.filters.CommonFiltersTab$TablePatternFilter
+ * <p>
+ * Copied from org.eclipse.ui.internal.navigator.filters.CommonFiltersTab$TablePatternFilter
  */
 public class TablePatternFilter extends ViewerFilter {
 	private static final String ALL = "*"; //$NON-NLS-1$
-	
+
 	protected StringMatcher matcher = null;
 	protected ILabelProvider labelProvider;
 	protected List<PropertyChangeListener> listeners;
@@ -35,19 +36,19 @@ public class TablePatternFilter extends ViewerFilter {
 		this.labelProvider = labelProvider;
 		listeners = Collections.synchronizedList(new ArrayList<PropertyChangeListener>());
 	}
-	
+
 	/**
 	 * Add a property change listener to this pattern filter.
-	 * 
+	 *
 	 * @param l The listener.
 	 */
 	public void addPropertyChangeListener(PropertyChangeListener l) {
 		listeners.add(l);
 	}
-	
+
 	/**
 	 * Remove a property change listener to this pattern filter.
-	 * 
+	 *
 	 * @param l The listener.
 	 */
 	public void removePropertyChangeListener(PropertyChangeListener l) {
@@ -66,7 +67,7 @@ public class TablePatternFilter extends ViewerFilter {
 
 	/**
 	 * Set a new pattern to filter elements.
-	 * 
+	 *
 	 * @param newPattern The new pattern
 	 */
 	public void setPattern(String newPattern) {
@@ -83,7 +84,7 @@ public class TablePatternFilter extends ViewerFilter {
 
 	/**
 	 * Fire a pattern changed event to all listening listeners.
-	 * 
+	 *
 	 * @param oldMatcher The old matcher.
 	 * @param newMatcher The new matcher.
 	 */
@@ -98,9 +99,9 @@ public class TablePatternFilter extends ViewerFilter {
 
 	/**
 	 * Answers whether the given String matches the pattern.
-	 * 
+	 *
 	 * @param input the String to test
-	 * 
+	 *
 	 * @return whether the string matches the pattern
 	 */
 	public boolean match(String input) {

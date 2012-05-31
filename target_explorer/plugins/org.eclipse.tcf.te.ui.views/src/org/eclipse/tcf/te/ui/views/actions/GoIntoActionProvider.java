@@ -19,9 +19,8 @@ import org.eclipse.ui.navigator.ICommonActionExtensionSite;
 
 /**
  * The action provider to add Go Into action to the context menu of Target Explorer.
- * 
- * @since 1.0.0
- * 						-Copied and adapted from org.eclipse.navigator.resource.GoIntoActionProvider.
+ * <p>
+ * Copied and adapted from org.eclipse.navigator.resource.GoIntoActionProvider.
  */
 @SuppressWarnings("restriction")
 public class GoIntoActionProvider extends CommonActionProvider {

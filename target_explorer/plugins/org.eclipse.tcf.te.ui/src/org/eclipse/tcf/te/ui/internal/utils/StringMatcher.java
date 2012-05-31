@@ -14,8 +14,8 @@ import java.util.Vector;
 
 /**
  * A string pattern matcher, supporting "*" and "?" wild cards.
- * 
- * @since 1.0.0 Copied from org.eclipse.ui.internal.navigator.StringMatcher
+ * <p>
+ * Copied from org.eclipse.ui.internal.navigator.StringMatcher
  */
 class StringMatcher {
 	protected String fPattern;
@@ -40,7 +40,7 @@ class StringMatcher {
 	protected static final char fSingleWildCard = '\u0000';
 
 	/**
-	 * 
+	 *
 	 */
 	static class Position {
 		int start; // inclusive
@@ -65,17 +65,17 @@ class StringMatcher {
 	 * StringMatcher constructor takes in a String object that is a simple
 	 * pattern which may contain '*' for 0 and many characters and '?' for
 	 * exactly one character.
-	 * 
+	 *
 	 * Literal '*' and '?' characters must be escaped in the pattern e.g., "\*"
 	 * means literal "*", etc.
-	 * 
+	 *
 	 * Escaping any other character (including the escape character itself),
 	 * just results in that character in the pattern. e.g., "\a" means "a" and
 	 * "\\" means "\"
-	 * 
+	 *
 	 * If invoking the StringMatcher with string literals in Java, don't forget
 	 * escape characters are represented by "\\".
-	 * 
+	 *
 	 * @param pattern
 	 *            the pattern to match text against
 	 * @param ignoreCase
@@ -103,13 +103,13 @@ class StringMatcher {
 
 	/**
 	 * Find the first occurrence of the pattern between
-	 * <code>start</code)(inclusive) 
-	 * and <code>end</code>(exclusive).  
-	 * @param  text  the String object to search in 
+	 * <code>start</code)(inclusive)
+	 * and <code>end</code>(exclusive).
+	 * @param  text  the String object to search in
 	 * @param  start  the starting index of the search range, inclusive
 	 * @param  end  the ending index of the search range, exclusive
-	 * @return an <code>StringMatcher.Position</code> object that keeps the starting 
-	 * (inclusive) and ending positions (exclusive) of the first occurrence of the 
+	 * @return an <code>StringMatcher.Position</code> object that keeps the starting
+	 * (inclusive) and ending positions (exclusive) of the first occurrence of the
 	 * pattern in the specified range of the text; return null if not found or subtext
 	 * is empty (start==end). A pair of zeros is returned if pattern is empty string
 	 * Note that for pattern like "*abc*" with leading and trailing stars, position of "abc"
@@ -168,7 +168,7 @@ class StringMatcher {
 
 	/**
 	 * match the given <code>text</code> with the pattern
-	 * 
+	 *
 	 * @return true if matched eitherwise false
 	 * @param text
 	 *            a String object
@@ -184,7 +184,7 @@ class StringMatcher {
 	 * Given the starting (inclusive) and the ending (exclusive) positions in
 	 * the <code>text</code>, determine if the given substring matches with
 	 * aPattern
-	 * 
+	 *
 	 * @return true if the specified portion of the text matches the pattern
 	 * @param text
 	 *            a String object that contains the substring to match
@@ -294,7 +294,7 @@ class StringMatcher {
 	/**
 	 * Parses the given pattern into segments seperated by wildcard '*'
 	 * characters.
-	 * 
+	 *
 	 */
 	private void parseWildCards() {
 		if (fPattern.startsWith("*")) { //$NON-NLS-1$
@@ -412,7 +412,7 @@ class StringMatcher {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return boolean
 	 * @param text
 	 *            a String to match

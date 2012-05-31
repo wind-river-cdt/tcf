@@ -15,47 +15,45 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
  * A class that implement this interface represents an file system operation,
- * which is an abstract of the action operated over files/folders. 
- * 
- * @since Target Explorer 1.0.0
+ * which is an abstract of the action operated over files/folders.
  */
 public interface IOperation {
-	
+
 	/**
 	 * The algorithm of calculating the message digest of a file.
 	 */
 	public static final String MD_ALG = "MD5";  //$NON-NLS-1$
-	
+
     /**
      * Runs this operation.  Progress should be reported to the given progress monitor.
-     * A request to cancel the operation should be honored and acknowledged 
+     * A request to cancel the operation should be honored and acknowledged
      * by throwing <code>InterruptedException</code>.
      *
      * @param monitor the progress monitor to use to display progress and receive
-     *   requests for cancelation
+     *   requests for cancellation
      * @exception InvocationTargetException if the run method must propagate a checked exception,
      * 	it should wrap it inside an <code>InvocationTargetException</code>; runtime exceptions are automatically
      *  wrapped in an <code>InvocationTargetException</code> by the calling context
-     * @exception InterruptedException if the operation detects a request to cancel, 
-     *  using <code>IProgressMonitor.isCanceled()</code>, it should exit by throwing 
+     * @exception InterruptedException if the operation detects a request to cancel,
+     *  using <code>IProgressMonitor.isCanceled()</code>, it should exit by throwing
      *  <code>InterruptedException</code>
      *
      */
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException;
-    
+
     /**
      * Get the operation's name. This name will be used as the task name of
      * the given monitor.
-     * 
+     *
      * @see IProgressMonitor#beginTask(String, int)
      * @return The name of the operation.
      */
     public String getName();
-    
+
     /**
-     * Get the total amount of work which will used by the progress 
+     * Get the total amount of work which will used by the progress
      * monitor to set the total work.
-     * 
+     *
      * @see IProgressMonitor#beginTask(String, int)
      * @return The total amount of work or UNKNOWN if it is in-determinant
      */

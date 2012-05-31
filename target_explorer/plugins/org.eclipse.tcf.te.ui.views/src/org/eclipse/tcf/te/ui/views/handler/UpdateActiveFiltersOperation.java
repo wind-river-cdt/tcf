@@ -31,19 +31,17 @@ import org.eclipse.ui.navigator.INavigatorContentService;
 /**
  * Ensures that a given set of filters is <i>active</i> and the complement of
  * that set of filters are not <i>active</i>.
- * 
+ *
  * <p>
  * This operation is smart enough not to force any change if each id in each set
  * is already in its desired state (<i>active</i> or <i>inactive</i>).
- * </p>
- * 
- * @since 1.0.0 Copied and adapted from org.eclipse.ui.internal.navigator.filters.UpdateActiveFiltersOperation
- * 
+ * <p>
+ * Copied and adapted from org.eclipse.ui.internal.navigator.filters.UpdateActiveFiltersOperation
  */
 @SuppressWarnings("restriction")
 public class UpdateActiveFiltersOperation extends AbstractOperation {
 
-	private String[] filterIdsToActivate; 
+	private String[] filterIdsToActivate;
 
 	private final CommonViewer commonViewer;
 
@@ -51,8 +49,8 @@ public class UpdateActiveFiltersOperation extends AbstractOperation {
 
 	/**
 	 * Create an operation to activate extensions and refresh the viewer.
-	 * 
-	 * 
+	 *
+	 *
 	 * @param aCommonViewer
 	 *            The CommonViewer instance to update
 	 * @param theActiveFilterIds
@@ -64,7 +62,7 @@ public class UpdateActiveFiltersOperation extends AbstractOperation {
 	public UpdateActiveFiltersOperation(CommonViewer aCommonViewer, String[] theActiveFilterIds) {
 		super(Messages.UpdateActiveFiltersOperation_OperationName);
 		Assert.isNotNull(theActiveFilterIds);
-		
+
 		commonViewer = aCommonViewer;
 		contentService = commonViewer.getNavigatorContentService();
 		filterIdsToActivate = theActiveFilterIds;
@@ -73,7 +71,7 @@ public class UpdateActiveFiltersOperation extends AbstractOperation {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.core.commands.operations.AbstractOperation#execute(org.eclipse.core.runtime.IProgressMonitor,
 	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
@@ -81,7 +79,7 @@ public class UpdateActiveFiltersOperation extends AbstractOperation {
     public IStatus execute(IProgressMonitor monitor, IAdaptable info) {
         NavigatorFilterService filterService = (NavigatorFilterService) contentService.getFilterService();
 		ICommonFilterDescriptor[] filterDescriptors = filterService.getVisibleFilterDescriptorsForUI();
-		
+
 		// Compute delta list.
 		List<String> deltaList = new ArrayList<String>();
 		Set<String> current = new HashSet<String>();
@@ -92,12 +90,12 @@ public class UpdateActiveFiltersOperation extends AbstractOperation {
 				deltaList.add(filterId);
 			}
 		}
-		
+
 		for(String filterId : filterIdsToActivate) {
 			if (current.contains(filterId)) deltaList.remove(filterId);
 			else deltaList.add(filterId);
 		}
-		
+
 		filterService.activateFilterIdsAndUpdateViewer(filterIdsToActivate);
 		MRUList mru = new MRUList(IPreferenceKeys.PREF_FILTER_MRU_LIST);
 		mru.updateMRUList(deltaList);
@@ -106,7 +104,7 @@ public class UpdateActiveFiltersOperation extends AbstractOperation {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.core.commands.operations.AbstractOperation#redo(org.eclipse.core.runtime.IProgressMonitor,
 	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
@@ -117,7 +115,7 @@ public class UpdateActiveFiltersOperation extends AbstractOperation {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.core.commands.operations.AbstractOperation#undo(org.eclipse.core.runtime.IProgressMonitor,
 	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
