@@ -211,6 +211,17 @@ public class TCFThreadFilterEditor {
                             break;
                         }
                     }
+                    // Some queries eliminate parent elements for grandchild matches.
+                    if (filteredList.size() == 0) {
+                        for (Object check_obj : resultArray) {
+                            if ( check_obj instanceof Context && ((Context)obj).fIsContainer) {
+                                Object[] childArray = getChildren(check_obj);
+                                if (childArray != null) {
+                                    filteredList.addAll(Arrays.asList(childArray));
+                                }
+                            }
+                        }
+                    }
                 }
             }
             if (filterExpr != null && filterExpr.length() != 0) {
@@ -457,6 +468,7 @@ public class TCFThreadFilterEditor {
                 scopeExprCombo.getParent().layout();
                 if (fThreadViewer != null) {
                     fThreadViewer.refresh();
+                    setInitialCheckedState();
                 }
             }
         }
