@@ -21,6 +21,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.tcf.te.core.interfaces.IPropertyChangeProvider;
 /**
@@ -55,27 +56,50 @@ public class QuickFilter extends TablePatternFilter implements PropertyChangeLis
 			viewer.addFilter(this);
 		}
 		QuickFilterPopup popup = new QuickFilterPopup(viewer, this);
-		Point location = null;
+		Point location = computePopupLocation();
+		popup.open();
+		popup.getShell().setLocation(location);
+	}
+
+	/**
+	 * Compute the best location of the pop up dialog.
+	 * 
+	 * @return The best location of the pop up dialog.
+	 */
+	private Point computePopupLocation() {
+	    Point location = null;
 		if (root != null) {
-			TreeItem[] items = viewer.getTree().getSelection();
-			if (items != null && items.length > 0) {
-				for(TreeItem item : items) {
-					viewer.getTree().showItem(item);
-				}
-				Rectangle bounds = items[0].getBounds();
-				location = new Point(bounds.x, bounds.y);
-			}
-			else {
-				location = new Point(0, 0);
-			}
+		    TreeItem[] items = viewer.getTree().getSelection();
+		    if (items != null && items.length > 0) {
+		    	for(TreeItem item : items) {
+		    		viewer.getTree().showItem(item);
+		    	}
+		    	Rectangle bounds = items[0].getBounds();
+		    	location = new Point(bounds.x, bounds.y);
+		    }
+		    else {
+		    	location = new Point(0, 0);
+		    }
 		}
 		else {
 			location = new Point(0, 0);
 		}
 		location.y -= viewer.getTree().getItemHeight();
 		location = viewer.getTree().toDisplay(location);
-		popup.open();
-		popup.getShell().setLocation(location);
+	    return location;
+    }
+	
+	/**
+	 * Adjust the position of the pop up when the tree viewer has changed.
+	 * 
+	 * @param popshell The shell of the pop up dialog.
+	 */
+	void adjustPopup(Shell popshell) {
+		Point location = computePopupLocation();
+		Point shellLocation = popshell.getLocation();
+		if(shellLocation != null && !shellLocation.equals(location)) {
+			popshell.setLocation(location);
+		}
 	}
 
 	/*
