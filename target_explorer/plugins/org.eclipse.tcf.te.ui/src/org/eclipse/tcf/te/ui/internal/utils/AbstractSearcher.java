@@ -106,6 +106,9 @@ public abstract class AbstractSearcher implements ITreeSearcher {
 		if (parent instanceof Pending) return new Object[0];
 		final ILazyLoader lazyLoader = getLazyLoader(parent);
 		if (lazyLoader != null) {
+			if(lazyLoader.isLeaf()) {
+				return new Object[0];
+			}
 			if (!lazyLoader.isDataLoaded()) {
 				try{
 					lazyLoader.loadData(monitor);

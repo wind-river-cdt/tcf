@@ -65,4 +65,13 @@ public class ProcessTreeNodeLoader implements ILazyLoader {
         	throw new InvocationTargetException(e);
         }
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.interfaces.ILazyLoader#isLeaf()
+	 */
+	@Override
+    public boolean isLeaf() {
+	    return false;
+    }
 }

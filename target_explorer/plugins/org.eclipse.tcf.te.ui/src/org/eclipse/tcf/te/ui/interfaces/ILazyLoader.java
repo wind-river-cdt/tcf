@@ -18,6 +18,13 @@ import org.eclipse.core.runtime.IProgressMonitor;
  * are lazily loaded when they are expanded in the tree.
  */
 public interface ILazyLoader {
+	
+	/**
+	 * If this tree node is a leaf. 
+	 * 
+	 * @return true if it is.
+	 */
+	public boolean isLeaf();
 
 	/**
 	 * If the data of the tree node has been loaded.
