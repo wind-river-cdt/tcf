@@ -42,6 +42,8 @@ import org.eclipse.tcf.te.ui.utils.TreeViewerUtil;
  * The searching dialog used to get the searching input.
  */
 public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements SelectionListener, ISearchCallback {
+	// The context help id for this dialog.
+	private static final String SEARCH_HELP_ID = "org.eclipse.tcf.te.ui.utils.TreeViewerSearchDialog.help"; //$NON-NLS-1$
 
 	// A new search button's ID.
 	private static final int SEARCH_ID = 31;
@@ -94,6 +96,8 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements Sel
 	protected TreeViewerSearchDialog(TreeViewer viewer, boolean depthFirst) {
 		super(viewer.getTree().getShell());
 		setShellStyle(SWT.DIALOG_TRIM | SWT.MODELESS);
+		setHelpAvailable(true);
+		setContextHelpId(SEARCH_HELP_ID);
 		fViewer = viewer;
 		fSearcher = TreeViewerUtil.getSearchEngine(fViewer);
 		fSearcher.setDepthFirst(depthFirst);
@@ -210,18 +214,25 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements Sel
 		// Create the main container
 		Composite composite = (Composite) super.createDialogArea(parent);
 		Composite container = new Composite(composite, SWT.NONE);
-		GridLayout glayout = new GridLayout(2, false);
-		glayout.marginHeight = 10;
-		glayout.marginWidth = 10;
-		glayout.verticalSpacing = 10;
-		glayout.horizontalSpacing = 10;
+		GridLayout glayout = new GridLayout();
+		glayout.marginHeight = 5;
+		glayout.marginWidth = 5;
+		glayout.verticalSpacing = 5;
+		glayout.horizontalSpacing = 5;
 		container.setLayout(glayout);
 		container.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
+		Composite comp = new Composite(container, SWT.NONE);
+		glayout = new GridLayout(2, false);
+		glayout.marginHeight = 0;
+		glayout.marginWidth = 0;
+		comp.setLayout(glayout);
+		comp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
 		// Searching field.
-		Label label = new Label(container, SWT.NONE);
+		Label label = new Label(comp, SWT.NONE);
 		label.setText(Messages.TreeViewerSearchDialog_LblCancelText);
-		fSearchField = new Text(container, SWT.SINGLE | SWT.BORDER);
+		fSearchField = new Text(comp, SWT.SINGLE | SWT.BORDER);
 		fSearchField.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		fSearchField.addModifyListener(new ModifyListener() {
 			@Override
@@ -242,7 +253,6 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements Sel
 		Group group = new Group(container, SWT.SHADOW_ETCHED_IN);
 		group.setText(Messages.TreeViewerSearchDialog_Scope);
 		GridData data = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		data.horizontalSpan = 2;
 		group.setLayoutData(data);
 		group.setLayout(new GridLayout(2, true));
 		
@@ -262,7 +272,6 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements Sel
 		group = new Group(container, SWT.SHADOW_ETCHED_IN);
 		group.setText(Messages.TreeViewerSearchDialog_SearchAlgorithm);
 		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		data.horizontalSpan = 2;
 		group.setLayoutData(data);
 		group.setLayout(new GridLayout(2, true));
 		
@@ -284,9 +293,8 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements Sel
 		group = new Group(container, SWT.SHADOW_ETCHED_IN);
 		group.setText(Messages.TreeViewerSearchDialog_GrpOptionsText);
 		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		data.horizontalSpan = 2;
 		group.setLayoutData(data);
-		group.setLayout(new GridLayout(4, true));
+		group.setLayout(new GridLayout(2, true));
 
 		// Case sensitive
 		fBtnCase = new Button(group, SWT.CHECK);
@@ -317,7 +325,6 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements Sel
 		// Progress monitor part to display or cancel searching process.
 		fPmPart = new ProgressMonitorPart(container, null, true);
 		data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
-		data.horizontalSpan = 2;
 		fPmPart.setLayoutData(data);
 		fPmPart.setVisible(false);
 		
