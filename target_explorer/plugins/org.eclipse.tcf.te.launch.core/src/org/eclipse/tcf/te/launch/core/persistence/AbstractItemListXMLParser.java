@@ -160,7 +160,7 @@ public abstract class AbstractItemListXMLParser<ItemType> extends DefaultHandler
 					if (delegate != null) {
 						try {
 							ItemType item = (ItemType)delegate.read(getReadClass(), lastData, null);
-							if (!items.contains(item)) {
+							if (items != null && !items.contains(item)) {
 								items.add(item);
 							}
 						}

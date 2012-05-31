@@ -120,7 +120,7 @@ public class DefaultPersistenceDelegate {
 	 */
 	public final static void setAttribute(ILaunchConfigurationWorkingCopy wc, String attributeId, int attributeValue) {
 		if (wc == null || attributeId == null) return;
-		if (isAttributeChanged(wc, attributeId, new Integer(attributeValue))) {
+		if (isAttributeChanged(wc, attributeId, Integer.valueOf(attributeValue))) {
 			// Determine the old attribute value
 			Object oldValue = null;
 			if (hasAttribute(wc, attributeId)) try { oldValue = wc.getAttributes().get(attributeId); } catch (CoreException e) { /* ignored on purpose */ }

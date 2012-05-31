@@ -462,14 +462,19 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 	 */
 	@Override
 	public void validate(String launchMode, ILaunchConfiguration launchConfig) throws LaunchServiceException {
-		String missingAttributes = null;
+		StringBuilder missingAttributes = new StringBuilder();
 		for (String attribute : getMandatoryAttributes()) {
 			if (!isValidAttribute(attribute, launchConfig, launchMode)) {
-				missingAttributes = (missingAttributes == null) ? attribute : missingAttributes + ", " + attribute; //$NON-NLS-1$
+				if (missingAttributes.length() == 0) {
+					missingAttributes.append(attribute);
+				} else {
+					missingAttributes.append(", "); //$NON-NLS-1$
+					missingAttributes.append(attribute);
+				}
 			}
 		}
-		if (missingAttributes != null) {
-			throw new LaunchServiceException("Missing launch configuration attributes: " + '\n' + missingAttributes, LaunchServiceException.TYPE_MISSING_LAUNCH_CONFIG_ATTR); //$NON-NLS-1$
+		if (missingAttributes.length() > 0) {
+			throw new LaunchServiceException("Missing launch configuration attributes: " + '\n' + missingAttributes.toString(), LaunchServiceException.TYPE_MISSING_LAUNCH_CONFIG_ATTR); //$NON-NLS-1$
 		}
 	}
 
@@ -500,15 +505,20 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 	 */
 	@Override
 	public void validate(ILaunchSpecification launchSpec) throws LaunchServiceException {
-		String missingAttributes = null;
+		StringBuilder missingAttributes = new StringBuilder();
 		for (String attribute : getMandatoryAttributes()) {
 			if (launchSpec == null || !launchSpec.hasAttribute(attribute)) {
 				// Remember the missing attribute for adding the list to the exception.
-				missingAttributes = (missingAttributes == null) ? attribute : missingAttributes + ", " + attribute; //$NON-NLS-1$
+				if (missingAttributes.length() == 0) {
+					missingAttributes.append(attribute);
+				} else {
+					missingAttributes.append(", "); //$NON-NLS-1$
+					missingAttributes.append(attribute);
+				}
 			}
 		}
-		if (missingAttributes != null) {
-			throw new LaunchServiceException("Missing launch specification attributes: " + '\n' + missingAttributes, LaunchServiceException.TYPE_MISSING_LAUNCH_SPEC_ATTR); //$NON-NLS-1$
+		if (missingAttributes.length() > 0) {
+			throw new LaunchServiceException("Missing launch specification attributes: " + '\n' + missingAttributes.toString(), LaunchServiceException.TYPE_MISSING_LAUNCH_SPEC_ATTR); //$NON-NLS-1$
 		}
 	}
 

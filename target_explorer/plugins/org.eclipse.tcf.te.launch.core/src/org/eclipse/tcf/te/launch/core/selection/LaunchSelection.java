@@ -10,6 +10,7 @@
 package org.eclipse.tcf.te.launch.core.selection;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.tcf.te.launch.core.selection.interfaces.ILaunchSelection;
@@ -41,7 +42,7 @@ public class LaunchSelection implements ILaunchSelection {
 	 */
 	public LaunchSelection(String mode, ISelectionContext[] contexts) {
 		this.mode = mode;
-		this.contexts = contexts;
+		this.contexts = contexts != null ? Arrays.copyOf(contexts, contexts.length) : null;
 	}
 
 	/* (non-Javadoc)
@@ -57,7 +58,7 @@ public class LaunchSelection implements ILaunchSelection {
 	 */
 	@Override
     public ISelectionContext[] getSelectedContexts() {
-		return contexts != null ? contexts : new ISelectionContext[0];
+		return contexts != null ? Arrays.copyOf(contexts, contexts.length) : new ISelectionContext[0];
 	}
 
 	/* (non-Javadoc)

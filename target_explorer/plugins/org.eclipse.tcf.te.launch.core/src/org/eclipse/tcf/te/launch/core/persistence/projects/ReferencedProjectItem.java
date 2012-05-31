@@ -47,12 +47,25 @@ public class ReferencedProjectItem extends PropertiesContainer implements IRefer
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.properties.PropertiesContainer#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		if (getProjectName() != null) {
+			return getProjectName().hashCode();
+		}
+	    return super.hashCode();
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.runtime.properties.PropertiesContainer#equals(java.lang.Object)
 	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof IReferencedProjectItem) {
-			return getProjectName().equals(((IReferencedProjectItem)obj).getProjectName());
+			String pn1 = getProjectName();
+			String pn2 = ((IReferencedProjectItem)obj).getProjectName();
+			return pn1 != null ? pn1.equals(pn2) : pn2 == null;
 		}
 		return super.equals(obj);
 	}

@@ -9,6 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.launch.core.selection;
 
+import java.util.Arrays;
+
 import org.eclipse.tcf.te.launch.core.selection.interfaces.ISelectionContext;
 
 /**
@@ -137,7 +139,7 @@ public abstract class AbstractSelectionContext implements ISelectionContext {
 		hashCode ^= Boolean.valueOf(isPreferred).hashCode();
 
 		if (selections != null) {
-			hashCode ^= selections.hashCode();
+			hashCode ^= Arrays.hashCode(selections);
 		}
 
 		return hashCode;

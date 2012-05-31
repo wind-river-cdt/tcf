@@ -51,6 +51,17 @@ public class LaunchConfigSorter implements Comparable<LaunchConfigSorter> {
 	}
 
 	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof LaunchConfigSorter) {
+			return ranking == ((LaunchConfigSorter)obj).ranking;
+		}
+	    return super.equals(obj);
+	}
+
+	/* (non-Javadoc)
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	@Override

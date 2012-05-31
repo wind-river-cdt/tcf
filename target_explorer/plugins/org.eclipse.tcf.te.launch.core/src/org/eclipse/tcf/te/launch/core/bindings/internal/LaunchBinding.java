@@ -9,6 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.launch.core.bindings.internal;
 
+import java.util.Arrays;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.te.launch.core.bindings.interfaces.ILaunchBinding;
 
@@ -50,7 +52,7 @@ public class LaunchBinding implements ILaunchBinding {
 	 * @return The list of launch modes or an empty list.
 	 */
 	public final String[] getModes() {
-		return modes;
+		return Arrays.copyOf(modes, modes.length);
 	}
 
 	/* (non-Javadoc)
