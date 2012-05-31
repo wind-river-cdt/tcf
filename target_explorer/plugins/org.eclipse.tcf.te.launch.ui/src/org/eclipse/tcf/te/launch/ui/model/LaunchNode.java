@@ -118,6 +118,20 @@ public class LaunchNode extends ContainerModelNode {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.properties.PropertiesContainer#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		if (isType(TYPE_LAUNCH_CONFIG_TYPE) && getLaunchConfigurationType() != null) {
+			return getLaunchConfigurationType().hashCode();
+		}
+		else if (isType(TYPE_LAUNCH_CONFIG) && getLaunchConfiguration() != null) {
+			return getLaunchConfiguration().hashCode();
+		}
+	    return super.hashCode();
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.runtime.properties.PropertiesContainer#equals(java.lang.Object)
 	 */
 	@Override

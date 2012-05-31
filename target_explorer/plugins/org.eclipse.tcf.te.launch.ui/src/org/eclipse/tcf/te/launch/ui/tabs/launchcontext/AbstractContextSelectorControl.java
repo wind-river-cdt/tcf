@@ -818,6 +818,7 @@ public abstract class AbstractContextSelectorControl extends AbstractDecoratedDi
 	@Override
 	public boolean isValid() {
 		boolean valid = super.isValid();
+		if (!valid) return valid;
 
 		// If there is a last failure cause set, show that failure cause
 		valid = getLastFailureCause() == null;

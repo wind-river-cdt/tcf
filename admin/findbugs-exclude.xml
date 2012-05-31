@@ -90,6 +90,12 @@
 			<Method name="initialize"/>
 		</And>
 	</Match>
+	
+	<!-- Ignore URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD in AbstractFileTransferSection -->
+	<Match>
+		<Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"/>
+		<Class name="org.eclipse.tcf.te.launch.ui.tabs.filetransfers.AbstractFileTransferSection"/>
+	</Match>
 
 	<!-- Filters for org.eclipse.tcf bundle -->
 	<Match>
