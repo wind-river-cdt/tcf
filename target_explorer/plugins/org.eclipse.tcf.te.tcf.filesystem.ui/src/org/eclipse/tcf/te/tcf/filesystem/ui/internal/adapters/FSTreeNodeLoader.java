@@ -19,17 +19,35 @@ import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.Operation;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.ui.interfaces.ILazyLoader;
 
+/**
+ * The implementation of ILazyLoader for FSTreeNode check its data availability
+ * and load its children if not ready.
+ */
 public class FSTreeNodeLoader implements ILazyLoader {
+	// The node to be checked.
 	private FSTreeNode node;
+	/**
+	 * Constructor
+	 * 
+	 * @param node The file/folder node.
+	 */
 	public FSTreeNodeLoader(FSTreeNode node) {
 		this.node = node;
     }
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.interfaces.ILazyLoader#isDataLoaded()
+	 */
 	@Override
 	public boolean isDataLoaded() {
-		return (node.isSystemRoot() || node.isDirectory()) && node.childrenQueried;
+		return node.isFile() || (node.isSystemRoot() || node.isDirectory()) && node.childrenQueried;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.interfaces.ILazyLoader#loadData(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	public void loadData(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 		try {

@@ -60,6 +60,7 @@ public class FSTreeNodeAdapterFactory implements IAdapterFactory {
 				return new PersistableNode(node);
 			}
 			else if(adapterType == ILazyLoader.class) {
+				if(node.isFile()) return null;
 				return new FSTreeNodeLoader(node);
 			}
 		}

@@ -19,17 +19,36 @@ import org.eclipse.tcf.te.tcf.core.concurrent.Rendezvous;
 import org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode;
 import org.eclipse.tcf.te.ui.interfaces.ILazyLoader;
 
+/**
+ * The implementation of ILazyLoader for ProcessTreeNode check its data availability
+ * and load its children if not ready.
+ */
 public class ProcessTreeNodeLoader implements ILazyLoader {
+	// The node to be checked.
 	private ProcessTreeNode node;
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param node the process node.
+	 */
 	public ProcessTreeNodeLoader(ProcessTreeNode node) {
 		this.node = node;
     }
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.interfaces.ILazyLoader#isDataLoaded()
+	 */
 	@Override
 	public boolean isDataLoaded() {
 		return node.childrenQueried;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.interfaces.ILazyLoader#loadData(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	public void loadData(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 		final Rendezvous rendezvous = new Rendezvous();
