@@ -47,7 +47,7 @@ public class FileTransferItem extends PropertiesContainer implements IFileTransf
 	 */
 	@Override
 	public IPath getHostPath() {
-		return new Path(getStringProperty(PROPERTY_HOST));
+		return getStringProperty(PROPERTY_HOST) != null ? new Path(getStringProperty(PROPERTY_HOST)) : null;
 	}
 
 	/* (non-Javadoc)
@@ -55,7 +55,7 @@ public class FileTransferItem extends PropertiesContainer implements IFileTransf
 	 */
 	@Override
 	public IPath getTargetPath() {
-		return new Path(getStringProperty(PROPERTY_TARGET));
+		return getStringProperty(PROPERTY_TARGET) != null ? new Path(getStringProperty(PROPERTY_TARGET)) : null;
 	}
 
 	/* (non-Javadoc)

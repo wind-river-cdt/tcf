@@ -106,7 +106,7 @@ public class UIPlugin extends AbstractUIPlugin {
 	void activateContexts() {
 		if (Display.getCurrent() != null) {
 			IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-			if (window != null) windowListener.windowOpened(window);
+			if (window != null && windowListener != null) windowListener.windowOpened(window);
 		}
 		else {
 			PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable(){
