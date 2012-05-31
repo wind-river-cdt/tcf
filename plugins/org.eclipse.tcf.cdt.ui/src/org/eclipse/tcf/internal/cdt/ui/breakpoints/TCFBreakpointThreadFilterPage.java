@@ -62,7 +62,7 @@ public class TCFBreakpointThreadFilterPage extends PropertyPage {
         }
         return getContainer().getPreferenceStore();
     }
-    
+
     protected BreakpointScopeCategory getScopeCategory() {
         if (getElement() instanceof BreakpointScopeCategory) {
             return (BreakpointScopeCategory)getElement();
@@ -72,7 +72,7 @@ public class TCFBreakpointThreadFilterPage extends PropertyPage {
 
     protected TCFBreakpointScopeExtension getFilterExtension() {
         if (fFilterExtension != null) return fFilterExtension;
-        
+
         ICBreakpoint bp = getBreakpoint();
         if (bp != null) {
             try {

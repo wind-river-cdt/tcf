@@ -125,7 +125,7 @@ public class TCFToggleBreakpointAdapter extends AbstractToggleBreakpointAdapter 
      */
     @Override
     protected void createFunctionBreakpoint(boolean interactive, IWorkbenchPart part, String sourceHandle, IResource resource, String functionName, int charStart, int charEnd,
-            int lineNumber) throws CoreException 
+            int lineNumber) throws CoreException
     {
         Map<String, Object> attributes = getDefaultAttributes(part, TOGGLE_TYPE);
         ICFunctionBreakpoint bp = CDIDebugModel.createBlankFunctionBreakpoint();
@@ -153,7 +153,7 @@ public class TCFToggleBreakpointAdapter extends AbstractToggleBreakpointAdapter 
 
     @Override
     protected void createWatchpoint(boolean interactive, IWorkbenchPart part, String sourceHandle, IResource resource, int charStart, int charEnd, int lineNumber,
-            String expression, String memorySpace, String range) throws CoreException 
+            String expression, String memorySpace, String range) throws CoreException
     {
         Map<String, Object> attributes = getDefaultAttributes(part, TOGGLE_TYPE);
         ICWatchpoint bp = CDIDebugModel.createBlankWatchpoint();

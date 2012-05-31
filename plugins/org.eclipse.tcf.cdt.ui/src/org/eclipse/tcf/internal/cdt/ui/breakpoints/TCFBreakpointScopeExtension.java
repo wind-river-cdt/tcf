@@ -27,7 +27,7 @@ public class TCFBreakpointScopeExtension implements ICBreakpointExtension {
     private String fProperties;
     private ICBreakpoint fBreakpoint;
     private IPreferenceStore fPreferenceStore;
-    
+
     public void initialize(IPreferenceStore prefStore) {
         fPreferenceStore = prefStore;
         fContextIds = fPreferenceStore.getString(TCFBreakpointsModel.ATTR_CONTEXTIDS);
@@ -36,7 +36,7 @@ public class TCFBreakpointScopeExtension implements ICBreakpointExtension {
         }
         fProperties = fPreferenceStore.getString(TCFBreakpointsModel.ATTR_CONTEXT_QUERY);
     }
-    
+
     public void initialize(ICBreakpoint breakpoint) throws CoreException {
         fBreakpoint = breakpoint;
         IMarker m = fBreakpoint.getMarker();
@@ -74,7 +74,7 @@ public class TCFBreakpointScopeExtension implements ICBreakpointExtension {
         fContextIds = contextIDs;
         if (fPreferenceStore!= null) {
             fPreferenceStore.setValue(TCFBreakpointsModel.ATTR_CONTEXTIDS, contextIDs);
-        }    
+        }
         else if (fBreakpoint != null) {
             try {
                 ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
@@ -96,7 +96,7 @@ public class TCFBreakpointScopeExtension implements ICBreakpointExtension {
         fProperties = properties;
         if (fPreferenceStore!= null) {
             fPreferenceStore.setValue(TCFBreakpointsModel.ATTR_CONTEXT_QUERY, properties);
-        }    
+        }
         else if (fBreakpoint != null) {
             try {
                 ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
@@ -107,7 +107,7 @@ public class TCFBreakpointScopeExtension implements ICBreakpointExtension {
                             m.setAttribute(TCFBreakpointsModel.ATTR_CONTEXT_QUERY, fProperties);
                         else
                             m.setAttribute(TCFBreakpointsModel.ATTR_CONTEXT_QUERY, null);
-    
+
                     }
                 }, null);
             }
