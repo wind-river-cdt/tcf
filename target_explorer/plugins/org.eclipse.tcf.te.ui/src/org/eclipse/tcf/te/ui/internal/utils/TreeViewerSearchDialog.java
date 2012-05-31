@@ -244,19 +244,19 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements Sel
 		GridData data = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		data.horizontalSpan = 2;
 		group.setLayoutData(data);
-		group.setLayout(new GridLayout(2, false));
+		group.setLayout(new GridLayout(2, true));
 		
 		fBtnScpAll = new Button(group, SWT.RADIO);
 		fBtnScpAll.setText(Messages.TreeViewerSearchDialog_All);
 		fBtnScpAll.setSelection(fSearcher.isScopeAll());
 		fBtnScpAll.addSelectionListener(l);
-		fBtnScpAll.setLayoutData(new GridData());
+		fBtnScpAll.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		
 		fBtnScpSel = new Button(group, SWT.RADIO);
 		fBtnScpSel.setText(Messages.TreeViewerSearchDialog_Selected);
 		fBtnScpSel.setSelection(!fSearcher.isScopeAll());
 		fBtnScpSel.addSelectionListener(l);
-		fBtnScpSel.setLayoutData(new GridData());
+		fBtnScpSel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		
 		// Search Algoritm Selection Group.
 		group = new Group(container, SWT.SHADOW_ETCHED_IN);
@@ -264,21 +264,21 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements Sel
 		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		data.horizontalSpan = 2;
 		group.setLayoutData(data);
-		group.setLayout(new GridLayout(2, false));
+		group.setLayout(new GridLayout(2, true));
 		
 		// Breadth-first search
 		fBtnBreadth = new Button(group, SWT.RADIO);
 		fBtnBreadth.setText(Messages.TreeViewerSearchDialog_BreadthFirst);
 		fBtnBreadth.setSelection(!fSearcher.isDepthFirst());
 		fBtnBreadth.addSelectionListener(l);
-		fBtnBreadth.setLayoutData(new GridData());
+		fBtnBreadth.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		
 		// Depth-first search
 		fBtnDepth = new Button(group, SWT.RADIO);
 		fBtnDepth.setText(Messages.TreeViewerSearchDialog_DepthFirst);
 		fBtnDepth.setSelection(fSearcher.isDepthFirst());
 		fBtnDepth.addSelectionListener(l);
-		fBtnDepth.setLayoutData(new GridData());
+		fBtnDepth.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		
 		// Search Options Group
 		group = new Group(container, SWT.SHADOW_ETCHED_IN);
@@ -286,26 +286,30 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements Sel
 		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		data.horizontalSpan = 2;
 		group.setLayoutData(data);
-		group.setLayout(new GridLayout(4, false));
+		group.setLayout(new GridLayout(4, true));
 
 		// Case sensitive
 		fBtnCase = new Button(group, SWT.CHECK);
 		fBtnCase.setText(Messages.TreeViewerSearchDialog_BtnCaseText);
+		fBtnCase.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		fBtnCase.addSelectionListener(l);
 		
 		// Matching precisely
 		fBtnMatch = new Button(group, SWT.CHECK);
 		fBtnMatch.setText(Messages.TreeViewerSearchDialog_BtnPreciseText);
+		fBtnMatch.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		fBtnMatch.addSelectionListener(l);
 		
 		// Wrap search
 		fBtnWrap = new Button(group, SWT.CHECK);
 		fBtnWrap.setText(Messages.TreeViewerSearchDialog_BtnWrapText);
+		fBtnWrap.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		fBtnWrap.addSelectionListener(l);
 		
 		// Search backward.
 		fBtnBackward = new Button(group, SWT.CHECK);
 		fBtnBackward.setText(Messages.TreeViewerSearchDialog_BtnBackText);
+		fBtnBackward.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		fBtnBackward.addSelectionListener(l);
 		// Hidden if it is breadth-first search
 		fBtnBackward.setVisible(fSearcher.isDepthFirst());
