@@ -657,6 +657,11 @@
                      <instanceof
                            value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                      </instanceof>
+                     <not>
+                        <test
+                              property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isSystemRoot">
+                        </test>
+                     </not>
                   </iterate>
                </with>
             </visibleWhen>
@@ -680,6 +685,11 @@
                      <instanceof
                            value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                      </instanceof>
+                     <not>
+                        <test
+                              property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isSystemRoot">
+                        </test>
+                     </not>
                   </iterate>
                </with>
             </visibleWhen>
@@ -703,6 +713,11 @@
                      <instanceof
                            value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                      </instanceof>
+                     <not>
+                        <test
+                              property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isSystemRoot">
+                        </test>
+                     </not>
                   </iterate>
                </with>
             </visibleWhen>
@@ -724,6 +739,11 @@
                   <count value="+"/>
                   <iterate operator="and" ifEmpty="false">
                      <instanceof value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode"/>
+                     <not>
+                        <test
+                              property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isSystemRoot">
+                        </test>
+                     </not>
                   </iterate>
                </with>
             </visibleWhen>
@@ -903,6 +923,11 @@
                      <instanceof
                            value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                      </instanceof>
+                     <not>
+                        <test
+                              property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isSystemRoot">
+                        </test>
+                     </not>
                   </iterate>
                </with>
             </visibleWhen>
@@ -925,6 +950,11 @@
                      <instanceof
                            value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                      </instanceof>
+                     <not>
+                        <test
+                              property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isSystemRoot">
+                        </test>
+                     </not>
                   </iterate>
                </with>
             </visibleWhen>
@@ -1337,6 +1367,11 @@
                            property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isRoot">
                      </test>
                   </not>
+                  <not>
+                     <test
+                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isSystemRoot">
+                     </test>
+                  </not>
                   <or>
                      <and>
                         <test
@@ -1397,6 +1432,11 @@
                            property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isRoot">
                      </test>
                   </not>
+                  <not>
+                     <test
+                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isSystemRoot">
+                     </test>
+                  </not>
                </iterate>
             </with>
          </enabledWhen>
@@ -1428,6 +1468,11 @@
                   <instanceof
                         value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                   </instanceof>
+                  <not>
+                     <test
+                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isSystemRoot">
+                     </test>
+                  </not>
                </iterate>
                <test
                      property="org.eclipse.tcf.te.tcf.filesystem.propertytester.clipboard.canPaste">
@@ -1462,6 +1507,11 @@
                   <instanceof
                         value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                   </instanceof>
+                  <not>
+                     <test
+                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isSystemRoot">
+                     </test>
+                  </not>
                   <not>
                      <test
                            property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isRoot">
@@ -1519,6 +1569,11 @@
                   <instanceof
                         value="org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode">
                   </instanceof>
+                  <not>
+                     <test
+                           property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isSystemRoot">
+                     </test>
+                  </not>
                   <not>
                      <test
                            property="org.eclipse.tcf.te.tcf.filesystem.propertytester.treenode.isRoot">
