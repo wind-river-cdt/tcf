@@ -722,7 +722,7 @@ class LocatorService(locator.LocatorService):
                             ok = True
                             break
             if ok:
-                _peer = self.peers.get(id)
+                _peer = self.peers.get(_id)
                 if isinstance(_peer, peer.RemotePeer):
                     _peer.updateAttributes(attrs)
                 elif _peer is None:
