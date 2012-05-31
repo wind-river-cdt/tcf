@@ -11,14 +11,12 @@
 package org.eclipse.tcf.internal.debug.ui.model;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 
 import org.eclipse.core.runtime.PlatformObject;
-import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
-import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IMemoryBlock;
@@ -26,6 +24,15 @@ import org.eclipse.debug.core.model.IMemoryBlockExtension;
 import org.eclipse.debug.core.model.IMemoryBlockRetrieval;
 import org.eclipse.debug.core.model.IMemoryBlockRetrievalExtension;
 import org.eclipse.debug.core.model.MemoryByte;
+import org.eclipse.debug.internal.ui.viewers.model.provisional.IModelDelta;
+import org.eclipse.debug.internal.ui.viewers.model.provisional.IModelProxy;
+import org.eclipse.debug.internal.ui.viewers.model.provisional.IModelProxyFactory;
+import org.eclipse.debug.internal.ui.viewers.model.provisional.IPresentationContext;
+import org.eclipse.debug.internal.ui.viewers.model.provisional.ModelDelta;
+import org.eclipse.debug.internal.ui.viewers.provisional.AbstractModelProxy;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.swt.graphics.Device;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.internal.debug.model.ITCFConstants;
 import org.eclipse.tcf.internal.debug.model.TCFLaunch;
 import org.eclipse.tcf.internal.debug.ui.Activator;
@@ -46,6 +53,7 @@ class TCFMemoryBlockRetrieval implements IMemoryBlockRetrievalExtension {
 
     private final TCFNodeExecContext exec_ctx;
     private final HashSet<MemoryBlock> mem_blocks = new HashSet<MemoryBlock>();
+    private final LinkedList<ModelProxy> model_proxies = new LinkedList<ModelProxy>();
 
     private static class MemData {
         final BigInteger addr;
@@ -61,7 +69,7 @@ class TCFMemoryBlockRetrieval implements IMemoryBlockRetrievalExtension {
         }
     }
 
-    private class MemoryBlock extends PlatformObject implements IMemoryBlockExtension {
+    private class MemoryBlock extends PlatformObject implements IMemoryBlockExtension, IModelProxyFactory {
 
         private final String expression;
         private final long length;
@@ -457,12 +465,78 @@ class TCFMemoryBlockRetrieval implements IMemoryBlockRetrievalExtension {
             return ITCFConstants.ID_TCF_DEBUG_MODEL;
         }
 
+        public IModelProxy createModelProxy(Object element, IPresentationContext context) {
+            assert element == this;
+            return new ModelProxy(this, context.getWindow().getShell().getDisplay());
+        }
+
         @Override
         @SuppressWarnings("rawtypes")
         public Object getAdapter(Class adapter) {
             if (adapter == IMemoryBlockRetrieval.class) return TCFMemoryBlockRetrieval.this;
             if (adapter == IMemoryBlockRetrievalExtension.class) return TCFMemoryBlockRetrieval.this;
             return super.getAdapter(adapter);
+        }
+    }
+
+    private class ModelProxy extends AbstractModelProxy implements Runnable {
+
+        final MemoryBlock mem_block;
+        final Display display;
+
+        ModelDelta delta;
+
+        public ModelProxy(MemoryBlock mem_block, Display display) {
+            this.mem_block = mem_block;
+            this.display = display;
+        }
+
+        @Override
+        public void installed(Viewer viewer) {
+            synchronized (model_proxies) {
+                if (isDisposed()) return;
+                setInstalled(true);
+                super.installed(viewer);
+                model_proxies.add(this);
+            }
+        }
+
+        @Override
+        public void dispose() {
+            synchronized (model_proxies) {
+                if (isDisposed()) return;
+                model_proxies.remove(this);
+                super.dispose();
+            }
+        }
+
+        void onMemoryChanged(boolean suspended) {
+            assert Protocol.isDispatchThread();
+            int flags = IModelDelta.CONTENT;
+            if (suspended) flags |= IModelDelta.STATE;
+            if (delta != null) {
+                delta.setFlags(delta.getFlags() | flags);
+            }
+            else {
+                delta = new ModelDelta(mem_block, flags);
+                Protocol.invokeLater(this);
+            }
+        }
+
+        public void run() {
+            // Note: double posting is neccesery to avoid deadlocks
+            assert Protocol.isDispatchThread();
+            final ModelDelta d = delta;
+            delta = null;
+            synchronized (Device.class) {
+                if (!display.isDisposed()) {
+                    display.asyncExec(new Runnable() {
+                        public void run() {
+                            fireModelChanged(d);
+                        }
+                    });
+                }
+            }
         }
     }
 
@@ -497,12 +571,14 @@ class TCFMemoryBlockRetrieval implements IMemoryBlockRetrievalExtension {
     void onMemoryChanged(boolean suspended) {
         assert Protocol.isDispatchThread();
         if (mem_blocks.size() == 0) return;
-        ArrayList<DebugEvent> list = new ArrayList<DebugEvent>();
         for (MemoryBlock b : mem_blocks) {
             if (suspended) b.mem_prev = b.mem_last;
             b.mem_data = null;
-            list.add(new DebugEvent(b, DebugEvent.CHANGE, DebugEvent.CONTENT));
         }
-        DebugPlugin.getDefault().fireDebugEventSet(list.toArray(new DebugEvent[list.size()]));
+        synchronized (model_proxies) {
+            for (ModelProxy p : model_proxies) {
+                p.onMemoryChanged(suspended);
+            }
+        }
     }
 }

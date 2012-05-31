@@ -193,6 +193,7 @@ public class TCFModelProxy extends AbstractModelProxy implements IModelProxy, Ru
         display = model.getDisplay();
     }
 
+    @Override
     public void installed(Viewer viewer) {
         if (isDisposed()) return;
         super.installed(viewer);
@@ -210,6 +211,7 @@ public class TCFModelProxy extends AbstractModelProxy implements IModelProxy, Ru
         });
     }
 
+    @Override
     public void dispose() {
         if (isDisposed()) return;
         Protocol.invokeAndWait(new Runnable() {
