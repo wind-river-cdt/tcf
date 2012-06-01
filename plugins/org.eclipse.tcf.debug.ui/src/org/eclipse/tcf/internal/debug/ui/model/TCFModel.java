@@ -37,6 +37,9 @@ import org.eclipse.debug.core.model.IDebugModelProvider;
 import org.eclipse.debug.core.model.IExpression;
 import org.eclipse.debug.core.model.IMemoryBlockRetrieval;
 import org.eclipse.debug.core.model.IMemoryBlockRetrievalExtension;
+import org.eclipse.debug.core.model.ISourceLocator;
+import org.eclipse.debug.core.sourcelookup.ISourceLookupDirector;
+import org.eclipse.debug.core.sourcelookup.ISourceLookupParticipant;
 import org.eclipse.debug.internal.ui.viewers.model.ITreeModelViewer;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IChildrenCountUpdate;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IChildrenUpdate;
@@ -971,6 +974,16 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
     }
 
     void flushAllCaches() {
+        ISourceLocator l = launch.getSourceLocator();
+        if (l instanceof ISourceLookupDirector) {
+            ISourceLookupDirector d = (ISourceLookupDirector)l;
+            ISourceLookupParticipant[] participants = d.getParticipants();
+            for (int i = 0; i < participants.length; i++) {
+                ISourceLookupParticipant participant = participants[i];
+                participant.sourceContainersChanged(d);
+            }
+        }
+        for (TCFMemoryBlockRetrieval b : mem_retrieval.values()) b.flushAllCaches();
         for (TCFNode n : id2node.values()) n.flushAllCaches();
     }
 

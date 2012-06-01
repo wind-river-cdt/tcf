@@ -568,6 +568,10 @@ class TCFMemoryBlockRetrieval implements IMemoryBlockRetrievalExtension {
         return exec_ctx.id;
     }
 
+    void flushAllCaches() {
+        for (MemoryBlock b : mem_blocks) b.mem_data = null;
+    }
+
     void onMemoryChanged(boolean suspended) {
         assert Protocol.isDispatchThread();
         if (mem_blocks.size() == 0) return;
