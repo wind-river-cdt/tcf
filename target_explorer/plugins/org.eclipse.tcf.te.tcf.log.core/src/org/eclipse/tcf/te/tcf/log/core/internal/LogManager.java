@@ -21,6 +21,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
@@ -84,7 +85,7 @@ public final class LogManager implements IProtocolStateChangeListener {
 	 * Dispose the log manager instance.
 	 */
 	public void dispose() {
-		String message = NLS.bind(Messages.ChannelTraceListener_logManagerDispose_message,
+		String message = NLS.bind(Messages.LogManager_dispose_message,
 								  DATE_FORMAT.format(new Date(System.currentTimeMillis())));
 		for (FileWriter writer : fileWriterMap.values()) {
 			try {
@@ -380,7 +381,9 @@ public final class LogManager implements IProtocolStateChangeListener {
 								// Rename the log file if the rotate succeeded,
 								// Delete the log file if not.
 								rc = rc ? file.renameTo(maxFileInCycle) : file.delete();
-								if (!rc) { /* Well, there is nothing we can do about it */ }
+								if (!rc && Platform.inDebugMode()) {
+									System.err.println(NLS.bind(Messages.LogManager_error_renameFailed, fullPath.toOSString(), maxFileInCycle.getAbsolutePath()));
+								}
 							}
 
 						} else {
@@ -395,7 +398,9 @@ public final class LogManager implements IProtocolStateChangeListener {
 
 							// Rename the log file
 							boolean rc = file.renameTo(fileInCycle);
-							if (!rc) { /* Well, there is nothing we can do about it */ }
+							if (!rc && Platform.inDebugMode()) {
+								System.err.println(NLS.bind(Messages.LogManager_error_renameFailed, fullPath.toOSString(), fileInCycle.getAbsolutePath()));
+							}
 						}
 					}
 				}

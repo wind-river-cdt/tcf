@@ -31,6 +31,7 @@ public class Messages extends NLS {
 
 	public static String ChannelTraceListener_channelOpened_message;
 	public static String ChannelTraceListener_channelClosed_message;
-	public static String ChannelTraceListener_logManagerDispose_message;
 
+	public static String LogManager_dispose_message;
+	public static String LogManager_error_renameFailed;
 }
