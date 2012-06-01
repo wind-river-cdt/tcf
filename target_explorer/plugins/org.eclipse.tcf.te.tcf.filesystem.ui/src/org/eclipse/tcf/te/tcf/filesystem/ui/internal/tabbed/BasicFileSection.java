@@ -12,13 +12,14 @@ package org.eclipse.tcf.te.tcf.filesystem.ui.internal.tabbed;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tcf.te.tcf.filesystem.ui.nls.Messages;
+import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 /**
  * The section that displays the basic information of a file.
  */
 public class BasicFileSection extends BasicFolderSection {
-	
+
 	// The text field for the size of the file.
 	protected Text sizeText;
 	// The text field for the access time of the file.
@@ -34,15 +35,15 @@ public class BasicFileSection extends BasicFolderSection {
 		sizeText = createTextField(null, Messages.GeneralInformationPage_Size);
 		accessedText = createTextField(sizeText, Messages.GeneralInformationPage_Accessed);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.tcf.te.tcf.filesystem.internal.tabbed.BasicFolderSection#refresh()
 	 */
 	@Override
     public void refresh() {
-		sizeText.setText(getSizeText(clone.attr.size));
-		accessedText.setText(getDateText(clone.attr.atime));
+		SWTControlUtil.setText(sizeText, clone != null ? getSizeText(clone.attr.size) : ""); //$NON-NLS-1$
+		SWTControlUtil.setText(accessedText, clone != null ? getDateText(clone.attr.atime) : ""); //$NON-NLS-1$
 		super.refresh();
     }
 }

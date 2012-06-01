@@ -21,6 +21,7 @@ import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.nls.Messages;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
 import org.eclipse.tcf.te.tcf.ui.tabbed.BaseTitledSection;
+import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
@@ -50,7 +51,7 @@ public class LinuxPermissionsSection extends BaseTitledSection {
 
 	/**
 	 * Create a permission group for a role, such as a user, a group or others.
-	 * 
+	 *
 	 * @param prev The previous permission group to align with.
 	 * @param parent The parent composite.
 	 * @param bit The permission bit index.
@@ -86,7 +87,7 @@ public class LinuxPermissionsSection extends BaseTitledSection {
 
 	/**
 	 * Create a check-box field for a single permission item.
-	 * 
+	 *
 	 * @param label The label of the permission.
 	 * @param index The index of current permission bit mask index.
 	 * @param parent The parent to hold the check-box field.
@@ -121,8 +122,8 @@ public class LinuxPermissionsSection extends BaseTitledSection {
 	public void refresh() {
 		for (int i = 0; i < 9; i++) {
 			final int bit = 1 << (8 - i);
-			final boolean on = (clone.attr.permissions & bit) != 0;
-			btnPermissions[i].setSelection(on);
+			final boolean on = clone != null ? (clone.attr.permissions & bit) != 0 : false;
+			SWTControlUtil.setSelection(btnPermissions[i], on);
 		}
 	}
 

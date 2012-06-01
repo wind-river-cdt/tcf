@@ -52,7 +52,6 @@ public abstract class NavigatorContentProvider extends TreeContentProvider {
 			return getChildren(model.getRoot());
 		} else if (parentElement instanceof AbstractTreeNode) {
 			AbstractTreeNode node = (AbstractTreeNode)parentElement;
-			Object[] children = NO_ELEMENTS;
 			List<Object> current = new ArrayList<Object>(node.getChildren());
 			if (!node.childrenQueried) {
 				current.add(getPending(node));
@@ -60,16 +59,15 @@ public abstract class NavigatorContentProvider extends TreeContentProvider {
 					node.queryChildren();
 				}
 			}
-			children = current.toArray();
-			return children;
+			return current.toArray();
 		}
 
 		return NO_ELEMENTS;
 	}
-	
+
 	/**
 	 * Get the tree node model for this peer node.
-	 * 
+	 *
 	 * @param peerNode The peer node from where to get the model.
 	 * @return The tree node model.
 	 */
@@ -105,7 +103,7 @@ public abstract class NavigatorContentProvider extends TreeContentProvider {
 
 	/**
 	 * If the root node of the tree is visible.
-	 * 
+	 *
 	 * @return true if it is visible.
 	 */
 	protected boolean isRootNodeVisible() {

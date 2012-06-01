@@ -257,6 +257,25 @@ public abstract class AbstractServiceManager {
 			return expression;
 		}
 
+		/* (non-Javadoc)
+		 * @see java.lang.Object#equals(java.lang.Object)
+		 */
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof ServiceProxy) {
+				return id.equals(((ServiceProxy)obj).id);
+			}
+		    return super.equals(obj);
+		}
+
+		/* (non-Javadoc)
+		 * @see java.lang.Object#hashCode()
+		 */
+		@Override
+		public int hashCode() {
+		    return id.hashCode();
+		}
+
 		public boolean equals(IService service) {
 			Assert.isNotNull(service);
 			return clazz != null ? clazz.equals(service.getClass().getCanonicalName()) : false;

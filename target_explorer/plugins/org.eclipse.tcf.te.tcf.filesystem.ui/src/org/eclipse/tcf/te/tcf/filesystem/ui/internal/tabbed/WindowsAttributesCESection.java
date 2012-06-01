@@ -20,6 +20,7 @@ import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.nls.Messages;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
 import org.eclipse.tcf.te.tcf.ui.tabbed.BaseTitledSection;
+import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
@@ -75,10 +76,10 @@ public class WindowsAttributesCESection extends BaseTitledSection {
 	 */
 	@Override
 	public void refresh() {
-		boolean on = node.isWin32AttrOn(IWindowsFileAttributes.FILE_ATTRIBUTE_COMPRESSED);
-		compressButton.setSelection(on);
-		on = node.isWin32AttrOn(IWindowsFileAttributes.FILE_ATTRIBUTE_ENCRYPTED);
-		encryptButton.setSelection(on);
+		boolean on = node != null ? node.isWin32AttrOn(IWindowsFileAttributes.FILE_ATTRIBUTE_COMPRESSED) : false;
+		SWTControlUtil.setSelection(compressButton, on);
+		on = node != null ? node.isWin32AttrOn(IWindowsFileAttributes.FILE_ATTRIBUTE_ENCRYPTED) : false;
+		SWTControlUtil.setSelection(encryptButton, on);
 	}
 
 	/*

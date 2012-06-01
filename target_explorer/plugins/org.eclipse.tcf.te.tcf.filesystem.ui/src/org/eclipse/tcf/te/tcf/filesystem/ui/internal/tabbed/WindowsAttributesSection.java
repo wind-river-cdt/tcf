@@ -19,6 +19,7 @@ import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.nls.Messages;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
 import org.eclipse.tcf.te.tcf.ui.tabbed.BaseTitledSection;
+import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
@@ -34,7 +35,7 @@ public class WindowsAttributesSection extends BaseTitledSection {
 	protected Button readOnlyButton;
 	// The check box for "Hidden" attribute.
 	protected Button hiddenButton;
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.tcf.te.ui.views.tabbed.BaseTitledSection#createControls(org.eclipse.swt.widgets.Composite, org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage)
@@ -42,7 +43,7 @@ public class WindowsAttributesSection extends BaseTitledSection {
 	@Override
     public void createControls(Composite parent, TabbedPropertySheetPage aTabbedPropertySheetPage) {
 	    super.createControls(parent, aTabbedPropertySheetPage);
-		
+
 		readOnlyButton = getWidgetFactory().createButton(composite, Messages.GeneralInformationPage_ReadOnly, SWT.CHECK);
 		FormData data = new FormData();
 		data.left = new FormAttachment(0, ITabbedPropertyConstants.HMARGIN );
@@ -75,8 +76,8 @@ public class WindowsAttributesSection extends BaseTitledSection {
 	 */
 	@Override
     public void refresh() {
-		readOnlyButton.setSelection(clone.isReadOnly());
-		hiddenButton.setSelection(clone.isHidden());
+		SWTControlUtil.setSelection(readOnlyButton, clone != null ? clone.isReadOnly() : false);
+		SWTControlUtil.setSelection(hiddenButton, clone != null ? clone.isHidden(): false);
     }
 
 	/*
@@ -85,6 +86,6 @@ public class WindowsAttributesSection extends BaseTitledSection {
 	 */
 	@Override
     protected String getText() {
-	    return Messages.WindowsAttributesSection_Attributes; 
+	    return Messages.WindowsAttributesSection_Attributes;
     }
 }

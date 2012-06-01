@@ -20,6 +20,7 @@ import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.nls.Messages;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
 import org.eclipse.tcf.te.tcf.ui.tabbed.BaseTitledSection;
+import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
@@ -63,7 +64,7 @@ public class WindowsFolderAISection extends BaseTitledSection {
 
 	/**
 	 * Get the archive's label text.
-	 * 
+	 *
 	 * @return The archive's label text.
 	 */
 	protected String getAchiveText() {
@@ -72,7 +73,7 @@ public class WindowsFolderAISection extends BaseTitledSection {
 
 	/**
 	 * Get the index's label text.
-	 * 
+	 *
 	 * @return The index's label text.
 	 */
 	protected String getIndexText() {
@@ -95,10 +96,10 @@ public class WindowsFolderAISection extends BaseTitledSection {
 	 */
 	@Override
 	public void refresh() {
-		boolean on = node.isWin32AttrOn(IWindowsFileAttributes.FILE_ATTRIBUTE_ARCHIVE);
-		archiveButton.setSelection(on);
-		on = !node.isWin32AttrOn(IWindowsFileAttributes.FILE_ATTRIBUTE_NOT_CONTENT_INDEXED);
-		indexButton.setSelection(on);
+		boolean on = node != null ? node.isWin32AttrOn(IWindowsFileAttributes.FILE_ATTRIBUTE_ARCHIVE) : false;
+		SWTControlUtil.setSelection(archiveButton, on);
+		on = node != null ? !node.isWin32AttrOn(IWindowsFileAttributes.FILE_ATTRIBUTE_NOT_CONTENT_INDEXED) : false;
+		SWTControlUtil.setSelection(indexButton, on);
 	}
 
 	/*

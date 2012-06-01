@@ -58,6 +58,7 @@
 			<Method name="start" params="org.osgi.framework.BundleContext" returns="void"/>
 			<Method name="stop" params="org.osgi.framework.BundleContext" returns="void"/>
 			<Class name="~.*\.Activator"/>
+			<Class name="org.eclipse.tcf.te.runtime.properties.PropertiesContainer"/>
 		</Or>
 	</Match>
 	
@@ -74,10 +75,14 @@
 		</And>
 	</Match>
 	
-	<!-- Ignore all EI_EXPOSE_REP violations for IAdapterFactory#getAdapterList() -->
+	<!-- Ignore EI_EXPOSE_REP -->
 	<Match>
 		<Bug pattern="EI_EXPOSE_REP"/>
-		<Method name="getAdapterList"/>
+		<Or>
+			<Method name="getAdapterList"/>
+			<Class name="org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.FileState"/>
+			<Package name="~org\.eclipse\.tcf\.te\.tcf\.filesystem\.core\.internal\.operations\..*"/>
+		</Or>
 	</Match>
 	
 	<!-- Ignore EI_EXPOSE_REP2 -->
@@ -86,7 +91,7 @@
 		<Or>
 			<Class name="org.eclipse.tcf.te.ui.views.handler.UpdateActiveExtensionsOperation"/>
 			<Class name="org.eclipse.tcf.te.ui.views.handler.UpdateActiveFiltersOperation"/>
-			<Class name="org.eclipse.tcf.te.tcf.terminals.core.launcher.TerminalsStreamsListener"/>
+			<Class name="~org\.eclipse\.tcf\.te\.tcf\.terminals\.core\.launcher\.TerminalsStreamsListener.*"/>
 		</Or>
 	</Match>
 	
@@ -105,6 +110,7 @@
 		<Or>
 			<Class name="org.eclipse.tcf.te.launch.ui.tabs.filetransfers.AbstractFileTransferSection"/>
 			<Class name="org.eclipse.tcf.te.ui.tables.properties.NodePropertiesTableTableNode"/>
+			<Class name="~org\.eclipse\.tcf\.te\.tcf\.terminals\.core\.launcher\.TerminalsStreamsListener.*"/>
 		</Or>
 	</Match>
 
@@ -118,6 +124,18 @@
 	<Match>
 		<Bug pattern="BC_UNCONFIRMED_CAST"/>
 		<Package name="~org\.eclipse\.tcf\.te\.ui\.trees\..*"/>
+	</Match>
+	
+	<!-- Ignore DMI_HARDCODED_ABSOLUTE_FILENAME in Host -->
+	<Match>
+		<Bug pattern="DMI_HARDCODED_ABSOLUTE_FILENAME"/>
+		<Class name="org.eclipse.tcf.te.runtime.utils.Host"/>
+	</Match>
+	
+	<!-- Ignore WA_NOT_IN_LOOP in ProcessOutputReaderThread -->
+	<Match>
+		<Bug pattern="WA_NOT_IN_LOOP"/>
+		<Class name="org.eclipse.tcf.te.runtime.processes.ProcessOutputReaderThread"/>
 	</Match>
 	
 	<!-- Filters for org.eclipse.tcf bundle -->

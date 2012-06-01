@@ -21,6 +21,7 @@ import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.nls.Messages;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
 import org.eclipse.tcf.te.tcf.ui.tabbed.BaseTitledSection;
+import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 /**
@@ -34,7 +35,7 @@ public class BasicFolderSection extends BaseTitledSection {
 	protected FSTreeNode node;
 	// The copy used to be edited.
 	protected FSTreeNode clone;
-	
+
 	// The text for the name of the node.
 	protected Text nameText;
 	// The text for the type of the node.
@@ -74,17 +75,17 @@ public class BasicFolderSection extends BaseTitledSection {
 	  */
 	@Override
     public void refresh() {
-		nameText.setText(clone.name);
-		typeText.setText(clone.getFileType());
-		String location = clone.isRoot() ? Messages.GeneralInformationPage_Computer : clone.getLocation();
-		locationText.setText(location);
-		modifiedText.setText(getDateText(clone.attr.mtime));
+		SWTControlUtil.setText(nameText, clone != null ? clone.name : ""); //$NON-NLS-1$
+		SWTControlUtil.setText(typeText, clone != null ? clone.getFileType() : ""); //$NON-NLS-1$
+		String location = clone == null || clone.isRoot() ? Messages.GeneralInformationPage_Computer : clone.getLocation();
+		SWTControlUtil.setText(locationText, location);
+		SWTControlUtil.setText(modifiedText, clone != null ? getDateText(clone.attr.mtime) : ""); //$NON-NLS-1$
 		super.refresh();
     }
 
 	/**
 	 * Get the string of the specific time using the formatter, DATE_FORMAT.
-	 * 
+	 *
 	 * @param time The time to be formatted.
 	 * @return The string in the format of DATE_FORMAT.
 	 */
@@ -111,5 +112,5 @@ public class BasicFolderSection extends BaseTitledSection {
 	@Override
     protected String getText() {
 	    return Messages.BasicFolderSection_BasicInfoText;
-    }	
+    }
 }

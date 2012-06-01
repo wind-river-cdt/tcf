@@ -64,8 +64,9 @@ public class SaveListener implements IExecutionListener {
                     }
 					@Override
                     public void run() throws Exception {
-						dirtyNode.refresh();
-                    }});
+						if (dirtyNode != null) dirtyNode.refresh();
+                    }
+				});
 			}
 		}
 	}

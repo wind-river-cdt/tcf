@@ -54,7 +54,7 @@ public class FileTransferService {
 
     /**
      * Transfer a file between host and target depending on the {@link IFileTransferItem} data.
-     * 
+     *
      * @param peer The peer, must not be <code>null</code>.
      * @param channel The channel or <code>null</code>.
      * @param item The file transfer item, must not be <code>null</code>.
@@ -94,7 +94,7 @@ public class FileTransferService {
 
     /**
      * Transfer a file between host and target depending on the {@link IFileTransferItem} data.
-     * 
+     *
      * @param peer The peer, must not be <code>null</code>.
      * @param item The file transfer item, must not be <code>null</code>.
      * @param monitor The progress monitor or <code>null</code>.
@@ -351,7 +351,7 @@ public class FileTransferService {
             long timestamp = System.currentTimeMillis();
             speed = ((bytesDone) * 1000) / Math.max(timestamp - startTimeStamp, 1);
 
-            ProgressHelper.worked(monitor, new Long((bytesRead/bytesTotal) * 1000).intValue());
+            ProgressHelper.worked(monitor, (int)((bytesRead/bytesTotal) * 1000));
             ProgressHelper.setSubTaskName(monitor, getProgressMessage(bytesDone, bytesTotal, speed));
         }
     }

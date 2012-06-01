@@ -87,7 +87,7 @@ public abstract class OpCreate extends Operation {
 			if (channel != null) Tcf.getChannelManager().closeChannel(channel);
 			monitor.done();
 		}
-	}	
+	}
 
 	/**
 	 * Refresh new node's stat using the file system service.
@@ -103,7 +103,7 @@ public abstract class OpCreate extends Operation {
 				@Override
 				public void doneStat(IToken token, FileSystemException error, FileAttrs attrs) {
 					if (error == null) {
-						node.setAttributes(attrs);
+						if (node != null) node.setAttributes(attrs);
 					}
 					else {
 						errors[0] = newTCFException(error);

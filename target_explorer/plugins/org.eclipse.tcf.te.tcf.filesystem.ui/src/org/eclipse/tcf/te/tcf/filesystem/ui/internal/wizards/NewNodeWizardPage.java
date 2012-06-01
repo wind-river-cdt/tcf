@@ -137,7 +137,7 @@ public abstract class NewNodeWizardPage extends AbstractValidatingWizardPage {
 		Assert.isNotNull(parent);
 
 		// Create the client composite
-		Composite client = toolkit.createComposite(parent);
+		Composite client = toolkit != null ? toolkit.createComposite(parent) : new Composite(parent, SWT.NONE);
 		client.setLayout(FormLayoutFactory.createSectionClientGridLayout(false, 2));
 		client.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		client.setBackground(parent.getBackground());
