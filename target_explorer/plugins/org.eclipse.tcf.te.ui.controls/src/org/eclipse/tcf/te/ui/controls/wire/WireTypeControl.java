@@ -10,6 +10,7 @@
 package org.eclipse.tcf.te.ui.controls.wire;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -27,10 +28,10 @@ import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
  */
 public class WireTypeControl extends BaseEditBrowseTextControl {
 
-	public final static String[] WIRE_TYPES = new String[] {
-																IWireTypeNetwork.PROPERTY_CONTAINER_NAME,
-																IWireTypeSerial.PROPERTY_CONTAINER_NAME
-														   };
+	private final static String[] WIRE_TYPES = new String[] {
+										IWireTypeNetwork.PROPERTY_CONTAINER_NAME,
+										IWireTypeSerial.PROPERTY_CONTAINER_NAME
+									};
 
 	/**
 	 * Constructor.
@@ -62,6 +63,15 @@ public class WireTypeControl extends BaseEditBrowseTextControl {
 
 		setEditFieldControlHistory(wireTypeLabels.toArray(new String[wireTypeLabels.size()]));
 		SWTControlUtil.select(getEditFieldControl(), 0);
+	}
+
+	/**
+	 * Returns the list of supported wire types.
+	 *
+	 * @return The list of supported wire types.
+	 */
+	public static final String[] getSupportedWireTypes() {
+		return Arrays.copyOf(WIRE_TYPES, WIRE_TYPES.length);
 	}
 
 	/**
