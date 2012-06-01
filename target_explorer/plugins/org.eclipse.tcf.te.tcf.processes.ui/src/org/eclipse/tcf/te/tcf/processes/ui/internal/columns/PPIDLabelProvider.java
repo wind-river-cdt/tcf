@@ -28,8 +28,6 @@ public class PPIDLabelProvider extends LabelProvider {
 		ProcessTreeNode node = (ProcessTreeNode) element;
 		// Pending nodes does not have column texts at all
 		if (node.type.endsWith("PendingNode")) return ""; //$NON-NLS-1$ //$NON-NLS-2$
-		String ppid = Long.toString(node.ppid);
-		if (ppid != null) return ppid;
-		return ""; //$NON-NLS-1$
+		return Long.toString(node.ppid);
 	}
 }

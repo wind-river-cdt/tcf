@@ -16,6 +16,7 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
 import org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode;
 import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
 import org.eclipse.tcf.te.tcf.ui.tabbed.BaseTitledSection;
+import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 /**
@@ -62,10 +63,10 @@ public class BasicInformationSection extends BaseTitledSection {
 	 */
 	@Override
     public void refresh() {
-		nameText.setText(node.name == null ? Messages.ProcessLabelProvider_RootNodeLabel : node.name);
-		typeText.setText(node.type == null ? "" : node.type); //$NON-NLS-1$
-		stateText.setText(node.state == null ? "" : node.state); //$NON-NLS-1$
-		userText.setText(node.username == null ? "" : node.username); //$NON-NLS-1$
+		SWTControlUtil.setText(nameText, node != null && node.name != null ? node.name : Messages.ProcessLabelProvider_RootNodeLabel);
+		SWTControlUtil.setText(typeText, node != null && node.type != null ? node.type : ""); //$NON-NLS-1$
+		SWTControlUtil.setText(stateText, node != null && node.state != null ? node.state : ""); //$NON-NLS-1$
+		SWTControlUtil.setText(userText, node != null && node.username != null ? node.username : ""); //$NON-NLS-1$
 		super.refresh();
     }
 
@@ -75,6 +76,6 @@ public class BasicInformationSection extends BaseTitledSection {
 	 */
 	@Override
 	protected String getText() {
-		return Messages.BasicInformationSection_Title; 
+		return Messages.BasicInformationSection_Title;
 	}
 }

@@ -17,6 +17,7 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
 import org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode;
 import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
 import org.eclipse.tcf.te.tcf.ui.tabbed.BaseTitledSection;
+import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 /**
@@ -50,7 +51,7 @@ public class MemorySection extends BaseTitledSection {
 	 */
 	@Override
 	protected String getText() {
-		return Messages.MemorySection_Title; 
+		return Messages.MemorySection_Title;
 	}
 
 	/*
@@ -70,9 +71,9 @@ public class MemorySection extends BaseTitledSection {
 	 */
 	@Override
 	public void refresh() {
-		vsizeText.setText(context == null ? "" : "" + context.getVSize()); //$NON-NLS-1$ //$NON-NLS-2$
-		psizeText.setText(context == null ? "" : "" + context.getPSize()); //$NON-NLS-1$ //$NON-NLS-2$
-		rssText.setText(context == null ? "" : "" + context.getRSS()); //$NON-NLS-1$ //$NON-NLS-2$
+		SWTControlUtil.setText(vsizeText, context == null ? "" : "" + context.getVSize()); //$NON-NLS-1$ //$NON-NLS-2$
+		SWTControlUtil.setText(psizeText, context == null ? "" : "" + context.getPSize()); //$NON-NLS-1$ //$NON-NLS-2$
+		SWTControlUtil.setText(rssText, context == null ? "" : "" + context.getRSS()); //$NON-NLS-1$ //$NON-NLS-2$
 		super.refresh();
 	}
 }

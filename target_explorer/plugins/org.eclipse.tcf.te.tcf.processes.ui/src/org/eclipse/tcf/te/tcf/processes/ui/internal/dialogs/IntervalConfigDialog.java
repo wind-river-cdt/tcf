@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.processes.ui.internal.preferences.IPreferenceConsts;
 import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
+import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
 
 /**
  * The dialog to configure the refreshing interval of the process list.
@@ -58,7 +59,7 @@ public class IntervalConfigDialog extends StatusDialog implements ModifyListener
 		shell.setText(Messages.IntervalConfigDialog_DialogTitle);
 		super.configureShell(shell);
     }
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
@@ -66,17 +67,17 @@ public class IntervalConfigDialog extends StatusDialog implements ModifyListener
 	@Override
     protected Control createDialogArea(Composite parent) {
 	    Composite composite = (Composite) super.createDialogArea(parent);
-	    
+
 	    Composite comp1 = new Composite(composite, SWT.NONE);
 	    GridData data = new GridData(SWT.FILL, SWT.CENTER, true, false);
 	    comp1.setLayoutData(data);
 	    GridLayout layout = new GridLayout(3, false);
 	    layout.horizontalSpacing = 0;
 	    comp1.setLayout(layout);
-	    
+
 	    Label label = new Label(comp1, SWT.RADIO);
 	    label.setText(Messages.IntervalConfigDialog_ChoiceOneLabel);
-	    
+
 	    text = new Text(comp1, SWT.SINGLE | SWT.BORDER);
 	    text.setTextLimit(Text.LIMIT);
 	    data = new GridData();
@@ -86,22 +87,22 @@ public class IntervalConfigDialog extends StatusDialog implements ModifyListener
 	    text.selectAll();
 	    text.setFocus();
 	    text.addModifyListener(this);
-	    
+
 	    label = new Label(comp1, SWT.NONE);
 	    label.setText(Messages.IntervalConfigDialog_SECONDS);
-    	
+
 	    return composite;
     }
-	
+
 	/**
 	 * Check if the current input is valid and return an IStatus object to return
 	 * the checking result, containing the message and the validating code.
-	 * 
+	 *
 	 * @return A status to indicate if the input is valid.
 	 */
 	private IStatus isInputValid() {
 		String pluginId = UIPlugin.getUniqueIdentifier();
-		String txt = text.getText();
+		String txt = SWTControlUtil.getText(text);
 		if (txt == null || txt.trim().length() == 0) {
 			return new Status(IStatus.ERROR, pluginId, null);
 		}
@@ -122,14 +123,14 @@ public class IntervalConfigDialog extends StatusDialog implements ModifyListener
 	 */
 	@Override
     protected void okPressed() {
-		String txt = text.getText().trim();
+		String txt = SWTControlUtil.getText(text).trim();
 		result = Integer.parseInt(txt);
 	    super.okPressed();
     }
-	
+
 	/**
 	 * Get the input result, a time interval.
-	 * 
+	 *
 	 * @return The input result.
 	 */
 	public int getResult() {
@@ -160,7 +161,7 @@ public class IntervalConfigDialog extends StatusDialog implements ModifyListener
 
 	/**
 	 * Get the current the speed grades in an array of Grade.
-	 * 
+	 *
 	 * @return The current speed grades.
 	 */
 	IntervalGrade[] getGrades(){
@@ -197,7 +198,7 @@ public class IntervalConfigDialog extends StatusDialog implements ModifyListener
 
 	/**
 	 * Set the current interval to the text field.
-	 * 
+	 *
 	 * @param interval The current interval.
 	 */
 	public void setResult(int interval) {

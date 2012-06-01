@@ -17,6 +17,7 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
 import org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode;
 import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
 import org.eclipse.tcf.te.tcf.ui.tabbed.BaseTitledSection;
+import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 /**
@@ -37,7 +38,7 @@ public class BasicContextSection extends BaseTitledSection {
 	protected Text userText;
 	// The owner group of the process.
 	protected Text groupText;
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.tcf.te.ui.views.tabbed.BaseTitledSection#createControls(org.eclipse.swt.widgets.Composite, org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage)
@@ -70,12 +71,12 @@ public class BasicContextSection extends BaseTitledSection {
 	 */
 	@Override
     public void refresh() {
-		fileText.setText(context == null ? "" : (context.getFile() == null ? "" : context.getFile())); //$NON-NLS-1$ //$NON-NLS-2$
-		workDirText.setText(context == null ? "" : (context.getCurrentWorkingDirectory() == null ? "" : context.getCurrentWorkingDirectory())); //$NON-NLS-1$ //$NON-NLS-2$
-		rootText.setText(context == null ? "" : (context.getRoot() == null ? "" : context.getRoot())); //$NON-NLS-1$ //$NON-NLS-2$
-		stateText.setText(context == null ? "" : (context.getState() == null ? "" : context.getState())); //$NON-NLS-1$ //$NON-NLS-2$
-		userText.setText(context == null ? "" : (context.getUserName() == null ? "" : context.getUserName())); //$NON-NLS-1$ //$NON-NLS-2$
-		groupText.setText(context == null ? "" : (context.getGroupName() == null ? "" : context.getGroupName())); //$NON-NLS-1$ //$NON-NLS-2$
+		SWTControlUtil.setText(fileText, context == null ? "" : (context.getFile() == null ? "" : context.getFile())); //$NON-NLS-1$ //$NON-NLS-2$
+		SWTControlUtil.setText(workDirText, context == null ? "" : (context.getCurrentWorkingDirectory() == null ? "" : context.getCurrentWorkingDirectory())); //$NON-NLS-1$ //$NON-NLS-2$
+		SWTControlUtil.setText(rootText, context == null ? "" : (context.getRoot() == null ? "" : context.getRoot())); //$NON-NLS-1$ //$NON-NLS-2$
+		SWTControlUtil.setText(stateText, context == null ? "" : (context.getState() == null ? "" : context.getState())); //$NON-NLS-1$ //$NON-NLS-2$
+		SWTControlUtil.setText(userText, context == null ? "" : (context.getUserName() == null ? "" : context.getUserName())); //$NON-NLS-1$ //$NON-NLS-2$
+		SWTControlUtil.setText(groupText, context == null ? "" : (context.getGroupName() == null ? "" : context.getGroupName())); //$NON-NLS-1$ //$NON-NLS-2$
 		super.refresh();
     }
 
@@ -85,6 +86,6 @@ public class BasicContextSection extends BaseTitledSection {
 	 */
 	@Override
 	protected String getText() {
-		return Messages.BasicContextSection_Title; 
+		return Messages.BasicContextSection_Title;
 	}
 }

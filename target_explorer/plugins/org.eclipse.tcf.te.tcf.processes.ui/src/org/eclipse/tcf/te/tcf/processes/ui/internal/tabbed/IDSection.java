@@ -16,6 +16,7 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
 import org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode;
 import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
 import org.eclipse.tcf.te.tcf.ui.tabbed.BaseTitledSection;
+import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 /**
@@ -62,10 +63,10 @@ public class IDSection extends BaseTitledSection {
 	 */
 	@Override
     public void refresh() {
-		pidText.setText(""+node.pid); //$NON-NLS-1$
-		ppidText.setText(""+node.ppid); //$NON-NLS-1$
-		ipidText.setText(node.id == null ? "" : node.id); //$NON-NLS-1$
-		ippidText.setText(node.parentId == null ? "" : node.parentId); //$NON-NLS-1$
+		SWTControlUtil.setText(pidText, node != null ? Long.toString(node.pid) : ""); //$NON-NLS-1$
+		SWTControlUtil.setText(ppidText, node != null ? Long.toString(node.ppid) : ""); //$NON-NLS-1$
+		SWTControlUtil.setText(ipidText, node != null && node.id != null ? node.id : ""); //$NON-NLS-1$
+		SWTControlUtil.setText(ippidText, node != null && node.parentId != null ? node.parentId : ""); //$NON-NLS-1$
 		super.refresh();
     }
 
@@ -75,6 +76,6 @@ public class IDSection extends BaseTitledSection {
 	 */
 	@Override
 	protected String getText() {
-		return Messages.IDSection_Title; 
+		return Messages.IDSection_Title;
 	}
 }

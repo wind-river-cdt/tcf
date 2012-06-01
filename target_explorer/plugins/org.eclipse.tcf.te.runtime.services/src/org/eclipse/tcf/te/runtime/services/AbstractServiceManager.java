@@ -263,7 +263,7 @@ public abstract class AbstractServiceManager {
 		@Override
 		public boolean equals(Object obj) {
 			if (obj instanceof ServiceProxy) {
-				return id.equals(((ServiceProxy)obj).id);
+				return id != null ? id.equals(((ServiceProxy)obj).id) : ((ServiceProxy)obj).id == null;
 			}
 		    return super.equals(obj);
 		}
@@ -273,7 +273,7 @@ public abstract class AbstractServiceManager {
 		 */
 		@Override
 		public int hashCode() {
-		    return id.hashCode();
+		    return id != null ? id.hashCode() : super.hashCode();
 		}
 
 		public boolean equals(IService service) {

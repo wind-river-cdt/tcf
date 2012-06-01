@@ -91,6 +91,6 @@ public class AdvancedPropertiesSection extends AbstractPropertySection {
 	 */
 	@Override
     public void refresh() {
-		viewer.setInput(properties);
+		if (viewer != null) viewer.setInput(properties);
     }
 }
