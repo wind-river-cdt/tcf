@@ -210,15 +210,12 @@ public class TCFThreadFilterEditor {
                             filteredList.add(obj);
                             break;
                         }
-                    }
-                    // Some queries eliminate parent elements for grandchild matches.
-                    if (filteredList.size() == 0) {
-                        for (Object check_obj : resultArray) {
-                            if ( check_obj instanceof Context && ((Context)obj).fIsContainer) {
-                                Object[] childArray = getChildren(check_obj);
-                                if (childArray != null) {
-                                    filteredList.addAll(Arrays.asList(childArray));
-                                }
+                        else if (obj instanceof Context && ((Context)obj).fIsContainer) {
+                            // Some filters skip a generation.  Check children before passing.
+                            Object[] childArray = getChildren(obj);
+                            if (childArray != null && childArray.length != 0) {
+                                filteredList.add(obj);
+                                break;                                
                             }
                         }
                     }
