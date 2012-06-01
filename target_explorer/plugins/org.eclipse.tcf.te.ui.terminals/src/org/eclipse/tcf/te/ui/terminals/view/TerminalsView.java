@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.terminals.view;
 
+import java.util.UUID;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
@@ -69,7 +71,7 @@ public class TerminalsView extends ViewPart implements ITerminalsView {
 	 */
 	private static class TerminalTransfer extends ByteArrayTransfer {
 		// The static terminal transfer type name. Unique per terminals view instance.
-		private static final String TYPE_NAME = "terminal-transfer-format:" + System.currentTimeMillis() + ":" + LazyInstanceHolder.instance.hashCode(); //$NON-NLS-2$//$NON-NLS-1$
+		private static final String TYPE_NAME = "terminal-transfer-format:" + UUID.randomUUID().toString(); //$NON-NLS-1$
 		// Register the type name and remember the associated unique type id.
 		private static final int TYPEID = registerType(TYPE_NAME);
 
@@ -195,6 +197,7 @@ public class TerminalsView extends ViewPart implements ITerminalsView {
 				final DragSource dragSource = new DragSource(draggedFolder, operations);
 
 				// Initialize the terminal transfer type data
+				Assert.isNotNull(tabFolderManager);
 				TerminalTransfer.getInstance().setDraggedFolderItem(tabFolderManager.getActiveTabItem());
 				TerminalTransfer.getInstance().setTabFolderManager(tabFolderManager);
 
@@ -268,6 +271,7 @@ public class TerminalsView extends ViewPart implements ITerminalsView {
 				if (TerminalTransfer.getInstance().getDraggedFolderItem() != null) {
 					CTabItem draggedItem = TerminalTransfer.getInstance().getDraggedFolderItem();
 
+					Assert.isNotNull(tabFolderManager);
 					CTabItem item = tabFolderManager.cloneTabItemAfterDrop(draggedItem);
 					tabFolderManager.bringToTop(item);
 					switchToTabFolderControl();
@@ -522,7 +526,7 @@ public class TerminalsView extends ViewPart implements ITerminalsView {
 	 */
 	@Override
 	public void setFocus() {
-		pageBookControl.setFocus();
+		if (pageBookControl != null) pageBookControl.setFocus();
 	}
 
 	/* (non-Javadoc)
@@ -530,7 +534,10 @@ public class TerminalsView extends ViewPart implements ITerminalsView {
 	 */
 	@Override
 	public void switchToEmptyPageControl() {
-		if (!pageBookControl.isDisposed() && !emptyPageControl.isDisposed()) pageBookControl.showPage(emptyPageControl);
+		if (pageBookControl != null && !pageBookControl.isDisposed()
+						&& emptyPageControl != null && !emptyPageControl.isDisposed()) {
+			pageBookControl.showPage(emptyPageControl);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -538,7 +545,10 @@ public class TerminalsView extends ViewPart implements ITerminalsView {
 	 */
 	@Override
 	public void switchToTabFolderControl() {
-		if (!pageBookControl.isDisposed() && !tabFolderControl.isDisposed()) pageBookControl.showPage(tabFolderControl);
+		if (pageBookControl != null && !pageBookControl.isDisposed()
+						&& tabFolderControl != null && !tabFolderControl.isDisposed()) {
+			pageBookControl.showPage(tabFolderControl);
+		}
 	}
 
 	/* (non-Javadoc)

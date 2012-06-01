@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others. All rights reserved.
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -35,7 +35,6 @@ import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
 @SuppressWarnings("restriction")
 public class InputStreamMonitor extends OutputStream implements IDisposable {
     // Reference to the parent terminal control
-    @SuppressWarnings("unused")
 	private final ITerminalControl terminalControl;
 
 	// Reference to the monitored (output) stream
@@ -119,6 +118,15 @@ public class InputStreamMonitor extends OutputStream implements IDisposable {
 		}
 
     }
+
+	/**
+	 * Returns the associated terminal control.
+	 *
+	 * @return The associated terminal control.
+	 */
+	protected final ITerminalControl getTerminalControl() {
+		return terminalControl;
+	}
 
 	/**
 	 * Adds the given disposable object to the list. The method will do nothing

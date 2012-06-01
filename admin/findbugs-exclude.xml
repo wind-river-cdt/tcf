@@ -66,6 +66,13 @@
 		<Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"/>
 		<Method name="hasString" params="java.lang.String" returns="boolean"/>
 	</Match>
+	<Match>
+		<Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"/>
+		<And>
+			<Class name="org.eclipse.tcf.te.tcf.terminals.core.launcher.TerminalsLauncher"/>
+			<Method name="executeLaunch"/>
+		</And>
+	</Match>
 	
 	<!-- Ignore all EI_EXPOSE_REP violations for IAdapterFactory#getAdapterList() -->
 	<Match>
@@ -79,6 +86,7 @@
 		<Or>
 			<Class name="org.eclipse.tcf.te.ui.views.handler.UpdateActiveExtensionsOperation"/>
 			<Class name="org.eclipse.tcf.te.ui.views.handler.UpdateActiveFiltersOperation"/>
+			<Class name="org.eclipse.tcf.te.tcf.terminals.core.launcher.TerminalsStreamsListener"/>
 		</Or>
 	</Match>
 	
@@ -97,6 +105,12 @@
 		<Class name="org.eclipse.tcf.te.launch.ui.tabs.filetransfers.AbstractFileTransferSection"/>
 	</Match>
 
+	<!-- Ignore UW_UNCOND_WAIT in InputStreamMonitor -->
+	<Match>
+		<Bug pattern="UW_UNCOND_WAIT"/>
+		<Class name="org.eclipse.tcf.te.ui.terminals.streams.InputStreamMonitor"/>
+	</Match>
+	
 	<!-- Filters for org.eclipse.tcf bundle -->
 	<Match>
 		<Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>

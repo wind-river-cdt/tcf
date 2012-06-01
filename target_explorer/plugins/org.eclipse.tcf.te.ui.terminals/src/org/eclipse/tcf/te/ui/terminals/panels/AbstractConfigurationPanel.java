@@ -34,6 +34,7 @@ import org.eclipse.tcf.te.runtime.services.interfaces.IPropertiesAccessService;
 import org.eclipse.tcf.te.runtime.services.interfaces.constants.IPropertiesAccessServiceConstants;
 import org.eclipse.tcf.te.ui.controls.BaseDialogPageControl;
 import org.eclipse.tcf.te.ui.controls.panels.AbstractWizardConfigurationPanel;
+import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
 import org.eclipse.tcf.te.ui.terminals.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.terminals.interfaces.IConfigurationPanel;
 import org.eclipse.tcf.te.ui.terminals.nls.Messages;
@@ -243,11 +244,13 @@ public abstract class AbstractConfigurationPanel extends AbstractWizardConfigura
 				hostCombo.setEnabled(true);
 
 			}
-			if (hostList.size() == 0) {
-				deleteHostButton.setEnabled(false);
-			}
-			else {
-				deleteHostButton.setEnabled(true);
+			if (deleteHostButton != null) {
+				if (hostList.size() == 0) {
+					deleteHostButton.setEnabled(false);
+				}
+				else {
+					deleteHostButton.setEnabled(true);
+				}
 			}
 		}
 	}
@@ -285,7 +288,7 @@ public abstract class AbstractConfigurationPanel extends AbstractWizardConfigura
 
 				@Override
 				public void widgetSelected(SelectionEvent e) {
-					String host = hostCombo.getText();
+					String host = SWTControlUtil.getText(hostCombo);
 					fillSettingsForHost(host);
 				}
 
@@ -312,7 +315,7 @@ public abstract class AbstractConfigurationPanel extends AbstractWizardConfigura
 						removeSettingsForHost(host);
 						removeSecurePassword(host);
 						fillCombo();
-						hostCombo.select(0);
+						SWTControlUtil.select(hostCombo, 0);
 						host = getHostFromCombo();
 						if (host != null && host.length() != 0) {
 							fillSettingsForHost(host);

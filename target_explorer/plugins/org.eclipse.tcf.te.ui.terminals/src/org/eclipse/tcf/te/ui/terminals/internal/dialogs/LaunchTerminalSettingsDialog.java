@@ -33,7 +33,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
 import org.eclipse.tcf.te.ui.controls.BaseDialogPageControl;
@@ -96,8 +95,6 @@ public class LaunchTerminalSettingsDialog extends CustomTrayDialog {
 	 * An empty terminal settings panel.
 	 */
 	protected class EmptySettingsPanel extends AbstractConfigurationPanel {
-
-		Text fHostText;
 
 		/**
 	     * Constructor.
