@@ -92,7 +92,7 @@ public class ViewerStateManager {
 				return filterDescriptors;
 			}
 		}
-		return null;
+		return new FilterDescriptor[0];
 	}
 
 	/***

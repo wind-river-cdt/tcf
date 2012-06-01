@@ -348,9 +348,6 @@ public abstract class NodePropertiesTableControl extends WorkbenchPartControl {
 			return;
 		}
 
-		// At this point of time, the parent must be of type Section
-		Assert.isTrue(parent instanceof Section);
-
 		// Create the toolbar control
 		ToolBar toolbar = new ToolBar(parent, SWT.FLAT | SWT.HORIZONTAL | SWT.RIGHT);
 

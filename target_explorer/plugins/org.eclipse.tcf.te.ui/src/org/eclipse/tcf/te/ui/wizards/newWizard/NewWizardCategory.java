@@ -241,9 +241,12 @@ public class NewWizardCategory implements IWizardCategory, IWorkbenchAdapter {
 		return wizards.toArray(new IWizardDescriptor[wizards.size()]);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.model.IWorkbenchAdapter#getChildren(java.lang.Object)
+	 */
 	@Override
 	public Object[] getChildren(Object o) {
-		return null;
+		return new Object[0];
 	}
 
 	/* (non-Javadoc)

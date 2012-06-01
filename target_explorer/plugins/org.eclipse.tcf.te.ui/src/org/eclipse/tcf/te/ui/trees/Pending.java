@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.trees;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
@@ -30,10 +31,10 @@ public class Pending {
 	boolean animating;
 	// The current frame index of the image list.
 	int frame;
-	
+
 	/**
 	 * Create a pending node for the specified tree viewer.
-	 * 
+	 *
 	 * @param viewer The tree viewer in which the pending node is added to.
 	 */
 	public Pending(TreeViewer viewer) {
@@ -42,7 +43,7 @@ public class Pending {
 		this.animating = true;
 		this.frame = 0;
 	}
-	
+
 	/**
 	 * Animate the pending images. Start a SWT timer to update
 	 * the pending image periodically.
@@ -66,25 +67,26 @@ public class Pending {
 			});
 		}
 	}
-	
+
 	/**
 	 * Get the label for this pending node.
-	 * 
+	 *
 	 * @return The label of this pending node.
 	 */
 	public String getText() {
-		return Messages.Pending_Label; 
+		return Messages.Pending_Label;
 	}
 
 	/**
 	 * Get the current image in the pending image list.
-	 * 
+	 *
 	 * @return The current image.
 	 */
 	public Image getImage() {
 		Image img = null;
 		Image[] pendingImages = UIPlugin.getDefault().getPendingImages();
-		if (pendingImages != null && pendingImages.length > 0) {
+		Assert.isNotNull(pendingImages);
+		if (pendingImages.length > 0) {
 			img = pendingImages[frame++];
 			frame = frame % pendingImages.length;
 		}

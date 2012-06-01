@@ -202,7 +202,7 @@ public abstract class NewNodeWizardPage extends AbstractValidatingWizardPage {
 		// restore the widget values from the history
 		restoreWidgetValues();
 	}
-	
+
 	/**
 	 * The viewer filter to filter out files.
 	 */
@@ -225,9 +225,10 @@ public abstract class NewNodeWizardPage extends AbstractValidatingWizardPage {
     private void setInput(Object input) {
 		treeViewer.setInput(input);
 		FilterDescriptor[] filterDescriptors = ViewerStateManager.getInstance().getFilterDescriptors(IFSConstants.ID_TREE_VIEWER_FS, input);
-		if (filterDescriptors != null) {
-			for (FilterDescriptor descriptor : filterDescriptors) {
-				if (descriptor.isEnabled()) treeViewer.addFilter(descriptor.getFilter());
+		Assert.isNotNull(filterDescriptors);
+		for (FilterDescriptor descriptor : filterDescriptors) {
+			if (descriptor.isEnabled()) {
+				treeViewer.addFilter(descriptor.getFilter());
 			}
 		}
 	}

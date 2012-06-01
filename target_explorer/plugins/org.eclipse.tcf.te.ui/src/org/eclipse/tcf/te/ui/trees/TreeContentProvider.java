@@ -110,7 +110,7 @@ public abstract class TreeContentProvider implements ITreeContentProvider, Prope
 	/**
 	 * Get the filtered children of the parent using the
 	 * filters registered in the viewer.
-	 * 
+	 *
 	 * @param parent The parent element.
 	 * @return The children after filtering.
 	 */
@@ -144,7 +144,7 @@ public abstract class TreeContentProvider implements ITreeContentProvider, Prope
 			}
 		}
 
-		return null;
+		return NO_ELEMENTS;
 	}
 
 	/*
@@ -160,11 +160,11 @@ public abstract class TreeContentProvider implements ITreeContentProvider, Prope
 
 	/**
 	 * Install a property change listener to the specified element.
-	 * 
+	 *
 	 * @param provider The element node.
 	 */
 	private void installPropertyChangeListener(IPropertyChangeProvider provider) {
-		if(provider != null && !providers.contains(provider) && commonViewerListener != null) {
+		if (provider != null && !providers.contains(provider) && commonViewerListener != null) {
 			provider.addPropertyChangeListener(commonViewerListener);
 			provider.addPropertyChangeListener(this);
 			providers.add(provider);

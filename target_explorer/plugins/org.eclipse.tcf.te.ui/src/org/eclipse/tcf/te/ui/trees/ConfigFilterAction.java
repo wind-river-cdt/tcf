@@ -12,6 +12,7 @@ package org.eclipse.tcf.te.ui.trees;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -27,7 +28,7 @@ import org.eclipse.ui.dialogs.ListSelectionDialog;
 
 /**
  * The action to configure the filters of a tree viewer.
- * 
+ *
  */
 public class ConfigFilterAction extends Action {
 	// The tree control whose filters are to be configured.
@@ -35,7 +36,7 @@ public class ConfigFilterAction extends Action {
 
 	/**
 	 * Create an instance for the specified tree control.
-	 * 
+	 *
 	 * @param treeControl The tree control to be configured.
 	 */
 	public ConfigFilterAction(AbstractTreeControl treeControl) {
@@ -56,8 +57,9 @@ public class ConfigFilterAction extends Action {
 	@Override
 	public void run() {
 		FilterDescriptor[] filterDescriptors = getVisibleFilters();
-		if (filterDescriptors == null || filterDescriptors.length == 0) return;
-		
+		Assert.isNotNull(filterDescriptors);
+		if (filterDescriptors.length == 0) return;
+
 		ILabelProvider filterLabelProvider = createFilterLabelProvider();
 		Shell parent = treeControl.getViewer().getControl().getShell();
 		String message = Messages.ConfigFilterAction_PromptMessage;
@@ -87,29 +89,30 @@ public class ConfigFilterAction extends Action {
 			treeControl.updateFilterState();
 		}
 	}
-	
+
 	/**
 	 * Get currently visible filter descriptors.
-	 * 
+	 *
 	 * @return Currently visible filter descriptors.
 	 */
 	private FilterDescriptor[] getVisibleFilters() {
 		FilterDescriptor[] filterDescriptors = treeControl.getFilterDescriptors();
-		if (filterDescriptors != null && filterDescriptors.length > 0) {
+		Assert.isNotNull(filterDescriptors);
+		if (filterDescriptors.length > 0) {
 			List<FilterDescriptor> visibleList = new ArrayList<FilterDescriptor>();
 			for (FilterDescriptor filterDescriptor : filterDescriptors) {
 				if (filterDescriptor.isVisible()) {
 					visibleList.add(filterDescriptor);
 				}
 			}
-			return visibleList.toArray(new FilterDescriptor[visibleList.size()]);		
+			return visibleList.toArray(new FilterDescriptor[visibleList.size()]);
 		}
-		return null;
+		return filterDescriptors;
 	}
 
 	/**
 	 * Create a label provider for the configure dialog's tree.
-	 * 
+	 *
 	 * @return The label provider.
 	 */
 	private ILabelProvider createFilterLabelProvider() {
@@ -137,8 +140,9 @@ public class ConfigFilterAction extends Action {
 	 */
 	public void updateEnablement() {
 		FilterDescriptor[] filterDescriptors = treeControl.getFilterDescriptors();
+		Assert.isNotNull(filterDescriptors);
 		boolean enabled = false;
-		if(filterDescriptors != null && filterDescriptors.length > 0) {
+		if(filterDescriptors.length > 0) {
 			for(FilterDescriptor filterDescriptor : filterDescriptors) {
 				if(filterDescriptor.isVisible()) {
 					enabled = true;
@@ -146,6 +150,6 @@ public class ConfigFilterAction extends Action {
 				}
 			}
 		}
-		setEnabled(enabled);	    
+		setEnabled(enabled);
     }
 }

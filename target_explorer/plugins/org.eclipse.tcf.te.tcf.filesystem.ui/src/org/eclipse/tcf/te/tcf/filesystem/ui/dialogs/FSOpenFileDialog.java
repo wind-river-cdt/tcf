@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.ui.dialogs;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.DecoratingLabelProvider;
@@ -40,7 +41,7 @@ import org.eclipse.ui.dialogs.ISelectionStatusValidator;
 public class FSOpenFileDialog extends ElementTreeSelectionDialog {
 	/**
 	 * Create an FSFolderSelectionDialog using the specified shell as the parent.
-	 * 
+	 *
 	 * @param parentShell The parent shell.
 	 */
 	public FSOpenFileDialog(Shell parentShell) {
@@ -50,7 +51,7 @@ public class FSOpenFileDialog extends ElementTreeSelectionDialog {
 	/**
 	 * Create an FSFolderSelectionDialog using the specified shell, an FSTreeLabelProvider, and a
 	 * content provider that provides the tree nodes.
-	 * 
+	 *
 	 * @param parentShell The parent shell.
 	 * @param labelProvider The label provider.
 	 * @param contentProvider The content provider.
@@ -77,18 +78,18 @@ public class FSOpenFileDialog extends ElementTreeSelectionDialog {
 	@Override
     public void setInput(Object input) {
 		super.setInput(input);
-		FilterDescriptor[] filterDescriptors = ViewerStateManager.getInstance()
-		                .getFilterDescriptors(IFSConstants.ID_TREE_VIEWER_FS, input);
-		if (filterDescriptors != null) {
-			for(FilterDescriptor descriptor : filterDescriptors) {
-				if(descriptor.isEnabled()) addFilter(descriptor.getFilter());
+		FilterDescriptor[] filterDescriptors = ViewerStateManager.getInstance().getFilterDescriptors(IFSConstants.ID_TREE_VIEWER_FS, input);
+		Assert.isNotNull(filterDescriptors);
+		for (FilterDescriptor descriptor : filterDescriptors) {
+			if (descriptor.isEnabled()) {
+				addFilter(descriptor.getFilter());
 			}
 		}
 	}
 
 	/**
 	 * Create a decorating label provider using the specified label provider.
-	 * 
+	 *
 	 * @param labelProvider The label provider that actually provides labels and images.
 	 * @return The decorating label provider.
 	 */
@@ -111,7 +112,7 @@ public class FSOpenFileDialog extends ElementTreeSelectionDialog {
 
 	/**
 	 * If the specified selection is a valid folder to be selected.
-	 * 
+	 *
 	 * @param selection The selected folders.
 	 * @return An error status if it is invalid or an OK status indicating it is valid.
 	 */

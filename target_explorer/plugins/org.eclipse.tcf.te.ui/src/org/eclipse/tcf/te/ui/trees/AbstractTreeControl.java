@@ -14,6 +14,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -211,7 +212,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 		viewer.getTree().setHeaderVisible(true);
 		updateFilters();
 		new TreeViewerHeaderMenu(this).create();
-		configFilterAction.updateEnablement();
+		if (configFilterAction != null) configFilterAction.updateEnablement();
 	}
 
 	/**
@@ -541,10 +542,10 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 		// Associated with the tree
 		viewer.getTree().setMenu(manager.createContextMenu(viewer.getTree()));
 	}
-	
+
 	/**
 	 * Get the context menu manager.
-	 * 
+	 *
 	 * @return the context menu manager.
 	 */
 	public MenuManager getContextMenuManager() {
@@ -570,12 +571,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * @return The filter descriptors of this viewer.
 	 */
 	public FilterDescriptor[] getFilterDescriptors() {
-		if (filterDescriptors != null) {
-			FilterDescriptor[] descriptors = new FilterDescriptor[filterDescriptors.length];
-			System.arraycopy(filterDescriptors, 0, descriptors, 0, filterDescriptors.length);
-			return descriptors;
-		}
-		return null;
+		return filterDescriptors != null ? Arrays.copyOf(filterDescriptors, filterDescriptors.length) : new FilterDescriptor[0];
 	}
 
 	/**
@@ -584,12 +580,7 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * @return The current viewer columns.
 	 */
 	public ColumnDescriptor[] getViewerColumns() {
-		if (columns != null) {
-			ColumnDescriptor[] columnDescriptors = new ColumnDescriptor[columns.length];
-			System.arraycopy(columns, 0, columnDescriptors, 0, columns.length);
-			return columnDescriptors;
-		}
-		return null;
+		return columns != null ? Arrays.copyOf(columns, columns.length) : new ColumnDescriptor[0];
 	}
 
 	/**

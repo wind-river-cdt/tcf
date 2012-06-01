@@ -11,6 +11,7 @@ package org.eclipse.tcf.te.ui.trees;
 
 import java.util.Comparator;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
@@ -18,7 +19,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
-
 
 /**
  * The tree control viewer comparator implementation.
@@ -30,21 +30,23 @@ public class TreeViewerComparator extends ViewerComparator {
 	 */
 	public TreeViewerComparator() {
 	}
-	
-	/*
-	 * (non-Javadoc)
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ViewerComparator#compare(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public int compare(Viewer viewer, Object e1, Object e2) {
-		if(e1 instanceof Pending || e2 instanceof Pending) {
+		if (e1 instanceof Pending || e2 instanceof Pending) {
 			return (e1 instanceof Pending) ? (e2 instanceof Pending ? 0 : 1) : -1;
 		}
+
+		Assert.isTrue(viewer instanceof TreeViewer);
+
 		Tree tree = ((TreeViewer) viewer).getTree();
 		int inverter = getSortDirection(tree) == SWT.DOWN ? -1 : 1;
 		TreeColumn treeColumn = tree.getSortColumn();
-		if(treeColumn == null) {
+		if (treeColumn == null) {
 			// If the sort column is not set, then use the first column.
 			treeColumn = tree.getColumn(0);
 		}
@@ -59,23 +61,24 @@ public class TreeViewerComparator extends ViewerComparator {
 		}
 		return inverter * super.compare(viewer, e1, e2);
 	}
-	
+
 	/**
 	 * Get the sorting direction in a UI thread safely.
-	 * 
+	 *
 	 * @param tree The tree to get the direction from.
-	 * @return the sorting direction of the tree. 
+	 * @return the sorting direction of the tree.
 	 */
 	int getSortDirection(final Tree tree) {
-		if(Display.getCurrent() != null) {
-			return  tree.getSortDirection();
+		if (Display.getCurrent() != null) {
+			return tree.getSortDirection();
 		}
 		final int[] result = new int[1];
-		tree.getDisplay().syncExec(new Runnable(){
+		tree.getDisplay().syncExec(new Runnable() {
 			@Override
-            public void run() {
+			public void run() {
 				result[0] = getSortDirection(tree);
-            }});
+			}
+		});
 		return result[0];
 	}
 }

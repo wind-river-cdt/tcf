@@ -114,6 +114,12 @@
 		<Class name="org.eclipse.tcf.te.ui.terminals.streams.InputStreamMonitor"/>
 	</Match>
 	
+	<!-- Ignore BC_UNCONFIRMED_CAST -->
+	<Match>
+		<Bug pattern="BC_UNCONFIRMED_CAST"/>
+		<Package name="~org\.eclipse\.tcf\.te\.ui\.trees\..*"/>
+	</Match>
+	
 	<!-- Filters for org.eclipse.tcf bundle -->
 	<Match>
 		<Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>

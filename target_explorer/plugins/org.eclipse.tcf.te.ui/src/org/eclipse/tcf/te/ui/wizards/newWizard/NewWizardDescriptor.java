@@ -9,6 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.wizards.newWizard;
 
+import java.util.Arrays;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -60,7 +62,7 @@ public class NewWizardDescriptor implements IWizardDescriptor, IWorkbenchAdapter
 	@Override
 	public boolean equals(Object other) {
 		if (other instanceof IWizardDescriptor) {
-			((IWizardDescriptor)other).getId().equals(getId());
+			return ((IWizardDescriptor)other).getId().equals(getId());
 		}
 		return super.equals(other);
 	}
@@ -118,7 +120,7 @@ public class NewWizardDescriptor implements IWizardDescriptor, IWorkbenchAdapter
 	 * @param tags The tags.
 	 */
 	public void setTags(String[] tags) {
-		this.tags = tags;
+		this.tags = tags != null ? Arrays.copyOf(tags, tags.length) : null;
 	}
 
 	/* (non-Javadoc)
@@ -126,7 +128,7 @@ public class NewWizardDescriptor implements IWizardDescriptor, IWorkbenchAdapter
 	 */
 	@Override
 	public String[] getTags() {
-		return tags;
+		return tags != null ? Arrays.copyOf(tags, tags.length) : new String[0];
 	}
 
 	/**

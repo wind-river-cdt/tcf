@@ -185,8 +185,10 @@ public class TerminalsView extends ViewPart implements ITerminalsView {
 			 */
 			@Override
 			public void handleEvent(Event event) {
-				// Handle events where a CTabFolder is the source only
+				// Only handle events where a CTabFolder is the source
 				if (!(event.widget instanceof CTabFolder)) return;
+				// TabFolderManager must be created
+				if (tabFolderManager == null) return;
 
 				// only for own tab folders
 				if (event.widget != tabFolderControl) return;
@@ -197,7 +199,6 @@ public class TerminalsView extends ViewPart implements ITerminalsView {
 				final DragSource dragSource = new DragSource(draggedFolder, operations);
 
 				// Initialize the terminal transfer type data
-				Assert.isNotNull(tabFolderManager);
 				TerminalTransfer.getInstance().setDraggedFolderItem(tabFolderManager.getActiveTabItem());
 				TerminalTransfer.getInstance().setTabFolderManager(tabFolderManager);
 
@@ -268,10 +269,9 @@ public class TerminalsView extends ViewPart implements ITerminalsView {
 
 			@Override
 			public void drop(DropTargetEvent event) {
-				if (TerminalTransfer.getInstance().getDraggedFolderItem() != null) {
+				if (TerminalTransfer.getInstance().getDraggedFolderItem() != null && tabFolderManager != null) {
 					CTabItem draggedItem = TerminalTransfer.getInstance().getDraggedFolderItem();
 
-					Assert.isNotNull(tabFolderManager);
 					CTabItem item = tabFolderManager.cloneTabItemAfterDrop(draggedItem);
 					tabFolderManager.bringToTop(item);
 					switchToTabFolderControl();

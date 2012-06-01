@@ -66,10 +66,10 @@ public class FileSelectionControl extends BaseDialogSelectionControl {
 	/**
 	 * Returns the filter extensions string array used by the standard file dialog.
 	 *
-	 * @return The filter extensions string array or <code>null</code>.
+	 * @return The filter extensions string array.
 	 */
 	public String[] getFilterExtensions() {
-		return filterExtensions != null ? Arrays.copyOf(filterExtensions, filterExtensions.length) : null;
+		return filterExtensions != null ? Arrays.copyOf(filterExtensions, filterExtensions.length) : new String[0];
 	}
 
 
@@ -89,7 +89,7 @@ public class FileSelectionControl extends BaseDialogSelectionControl {
 	 * @return The filter names string array or <code>null</code>.
 	 */
 	public String[] getFilterNames() {
-		return filterNames != null ? Arrays.copyOf(filterNames, filterNames.length) : null;
+		return filterNames != null ? Arrays.copyOf(filterNames, filterNames.length) : new String[0];
 	}
 
 	/* (non-Javadoc)
@@ -116,12 +116,12 @@ public class FileSelectionControl extends BaseDialogSelectionControl {
 			FileDialog fileDialog = (FileDialog)dialog;
 
 			// set the file dialog filter extensions if available.
-			if (getFilterExtensions() != null) {
+			if (getFilterExtensions().length > 0) {
 				fileDialog.setFilterExtensions(getFilterExtensions());
 			}
 
 			// set the file dialog filter names if available.
-			if (getFilterNames() != null) {
+			if (getFilterNames().length > 0) {
 				fileDialog.setFilterNames(getFilterNames());
 			}
 

@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.trees;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -32,11 +33,11 @@ public class TreeViewerHeaderMenu extends Menu implements SelectionListener, Lis
 	private Menu treeMenu;
 	//The tree to be configured.
 	private AbstractTreeControl treeControl;
-	
+
 
 	/**
 	 * Create a header menu for the execution context viewer.
-	 * 
+	 *
 	 * @param tree The execution context tree.
 	 */
 	public TreeViewerHeaderMenu(AbstractTreeControl treeControl) {
@@ -53,6 +54,7 @@ public class TreeViewerHeaderMenu extends Menu implements SelectionListener, Lis
 	 */
 	public void create() {
 		ColumnDescriptor[] columns = treeControl.getViewerColumns();
+		Assert.isNotNull(columns);
 		for (int i = 0; i < columns.length; i++) {
 			ColumnDescriptor column = columns[i];
 			MenuItem menuItem = new MenuItem(this, SWT.CHECK);
@@ -111,7 +113,7 @@ public class TreeViewerHeaderMenu extends Menu implements SelectionListener, Lis
 		if (!isDisposed())
 			dispose();
 	}
-	
+
 	/**
 	 * Override the super method to allow the subclassing.
 	 */
@@ -124,6 +126,7 @@ public class TreeViewerHeaderMenu extends Menu implements SelectionListener, Lis
 	 */
 	public void updateSelection() {
 		ColumnDescriptor[] columns = treeControl.getViewerColumns();
+		Assert.isNotNull(columns);
 		for (int i = 0; i < columns.length; i++) {
 			MenuItem item = this.getItem(i);
 			ColumnDescriptor column = columns[i];

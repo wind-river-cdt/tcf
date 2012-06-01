@@ -144,10 +144,10 @@ public class UIPlugin extends AbstractUIPlugin {
 	/**
 	 * Returns the image list used to animate the pending state.
 	 *
-	 * @return A image list or <code>null</code>.
+	 * @return A image list.
 	 */
 	public final Image[] getPendingImages() {
-		return pendingImages != null ? Arrays.copyOf(pendingImages, pendingImages.length) : null;
+		return pendingImages != null ? Arrays.copyOf(pendingImages, pendingImages.length) : new Image[0];
 	}
 
 	/* (non-Javadoc)

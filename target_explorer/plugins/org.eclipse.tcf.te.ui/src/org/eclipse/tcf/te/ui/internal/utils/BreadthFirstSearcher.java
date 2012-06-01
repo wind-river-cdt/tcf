@@ -57,8 +57,7 @@ public class BreadthFirstSearcher extends AbstractSearcher{
 	@Override
     public TreePath searchNext(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException{
 		TreePath result = null;
-		Assert.isNotNull(queue);
-		while(!queue.isEmpty() && result == null && !monitor.isCanceled()) {
+		while(queue != null && !queue.isEmpty() && result == null && !monitor.isCanceled()) {
 			TreePath path = queue.poll();
 			Object element = path.getLastSegment();
 			Object[] children = getUpdatedChildren(element, monitor);
