@@ -280,10 +280,10 @@ public class DefaultStatusHandler extends AbstractStatusHandler {
 
 		switch (severity) {
 			case IStatusHandlerConstants.QUESTION:
-				result = new Boolean(OptionalMessageDialog.openYesNoDialog(shell, title, message, buttonLabel, keyDontAskAgain, helpContextId) == IDialogConstants.YES_ID);
+				result = Boolean.valueOf(OptionalMessageDialog.openYesNoDialog(shell, title, message, buttonLabel, keyDontAskAgain, helpContextId) == IDialogConstants.YES_ID);
 				break;
 			case IStatusHandlerConstants.YES_NO_CANCEL:
-				result = new Integer(OptionalMessageDialog.openYesNoCancelDialog(shell, title, message, buttonLabel, keyDontAskAgain, helpContextId));
+				result = Integer.valueOf(OptionalMessageDialog.openYesNoCancelDialog(shell, title, message, buttonLabel, keyDontAskAgain, helpContextId));
 				break;
 			case IStatus.WARNING:
 				OptionalMessageDialog.openWarningDialog(shell, title, message, buttonLabel, keyDontAskAgain, helpContextId);

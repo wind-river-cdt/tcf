@@ -31,7 +31,7 @@ public class SearchMatcher implements ISearchMatcher {
 
 	/**
 	 * Create a search matcher with the tree viewer.
-	 * 
+	 *
 	 * @param viewer The tree viewer to create a matcher for.
 	 */
 	public SearchMatcher(TreeViewer viewer) {
@@ -50,7 +50,7 @@ public class SearchMatcher implements ISearchMatcher {
 		String target = fSearchTarget;
 		if (!fCaseSensitive) {
 			text = text.toLowerCase();
-			target = fSearchTarget.toLowerCase();
+			target = fSearchTarget != null ? fSearchTarget.toLowerCase() : null;
 		}
 		if (fMatchPrecise) return text.equals(target);
 		return text.indexOf(target) != -1;
@@ -59,13 +59,13 @@ public class SearchMatcher implements ISearchMatcher {
 	/**
 	 * Get the text representation of a element using the label provider of the tree viewer. Note:
 	 * this method could be called at any thread.
-	 * 
+	 *
 	 * @param element The element.
 	 * @return The text representation.
 	 */
 	public String getElementText(final Object element) {
 		if (Display.getCurrent() != null) {
-			if (element == fViewer.getInput()) return null; 
+			if (element == fViewer.getInput()) return null;
 			ILabelProvider labelProvider = (ILabelProvider) fViewer.getLabelProvider();
 			if (labelProvider != null) {
 				return labelProvider.getText(element);
@@ -84,7 +84,7 @@ public class SearchMatcher implements ISearchMatcher {
 
 	/**
 	 * Set the searching target.
-	 * 
+	 *
 	 * @param target The target node's matching string.
 	 */
 	public void setMatchTarget(String target) {
@@ -93,7 +93,7 @@ public class SearchMatcher implements ISearchMatcher {
 
 	/**
 	 * Set if the searching is case-sensitive.
-	 * 
+	 *
 	 * @param caseSensitive
 	 */
 	public void setCaseSensitive(boolean caseSensitive) {
@@ -102,7 +102,7 @@ public class SearchMatcher implements ISearchMatcher {
 
 	/**
 	 * Set if the searching is to match precisely.
-	 * 
+	 *
 	 * @param matchPrecise
 	 */
 	public void setMatchPrecise(boolean matchPrecise) {

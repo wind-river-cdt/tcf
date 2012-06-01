@@ -39,9 +39,9 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.tcf.te.ui.WorkbenchPartControl;
+import org.eclipse.tcf.te.ui.forms.CustomFormToolkit;
 import org.eclipse.tcf.te.ui.interfaces.IUIConstants;
 import org.eclipse.tcf.te.ui.nls.Messages;
-import org.eclipse.tcf.te.ui.forms.CustomFormToolkit;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPart;
@@ -348,6 +348,9 @@ public abstract class NodePropertiesTableControl extends WorkbenchPartControl {
 			return;
 		}
 
+		// At this point of time, the parent must be of type Section
+		Assert.isTrue(parent instanceof Section);
+
 		// Create the toolbar control
 		ToolBar toolbar = new ToolBar(parent, SWT.FLAT | SWT.HORIZONTAL | SWT.RIGHT);
 
@@ -364,13 +367,8 @@ public abstract class NodePropertiesTableControl extends WorkbenchPartControl {
 			}
 		});
 
-		// If the parent composite is a forms section, set the toolbar
-		// as text client to the section header
-		if (parent instanceof Section) {
-			Section section = (Section)parent;
-			// Set the toolbar as text client
-			section.setTextClient(toolbar);
-		}
+		// Set the toolbar as text client to the section header
+		((Section)parent).setTextClient(toolbar);
 
 		// create the toolbar items
 		createToolBarItems(toolbar);

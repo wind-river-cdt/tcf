@@ -11,6 +11,7 @@ package org.eclipse.tcf.te.ui.activator;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Arrays;
 
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.SafeRunner;
@@ -37,7 +38,7 @@ public class UIPlugin extends AbstractUIPlugin {
 	// The trace handler instance
 	private static volatile TraceHandler traceHandler;
 	// The pending images used to display the animation.
-	Image[] pendingImages;
+	/* default */ Image[] pendingImages;
 
 	/**
 	 * The constructor
@@ -139,9 +140,14 @@ public class UIPlugin extends AbstractUIPlugin {
 		traceHandler = null;
 		super.stop(context);
 	}
-	
-	public Image[] getPendingImages() {
-		return pendingImages;
+
+	/**
+	 * Returns the image list used to animate the pending state.
+	 *
+	 * @return A image list or <code>null</code>.
+	 */
+	public final Image[] getPendingImages() {
+		return pendingImages != null ? Arrays.copyOf(pendingImages, pendingImages.length) : null;
 	}
 
 	/* (non-Javadoc)

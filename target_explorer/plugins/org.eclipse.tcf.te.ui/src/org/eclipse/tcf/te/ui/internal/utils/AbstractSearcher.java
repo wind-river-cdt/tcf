@@ -10,6 +10,8 @@
 package org.eclipse.tcf.te.ui.internal.utils;
 
 import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -32,7 +34,7 @@ import org.eclipse.ui.PlatformUI;
  */
 public abstract class AbstractSearcher implements ITreeSearcher {
 	// The method to access AbstractTreeViewer#getSortedChildren in order to the children visually on the tree.
-	static Method methodGetSortedChildren;
+	static volatile Method methodGetSortedChildren;
 	static {
 		SafeRunner.run(new ISafeRunnable(){
 			@Override
@@ -42,22 +44,28 @@ public abstract class AbstractSearcher implements ITreeSearcher {
 			@Override
             public void run() throws Exception {
 				// Initialize the method object.
-		        methodGetSortedChildren = AbstractTreeViewer.class.
-		        				getDeclaredMethod("getSortedChildren", new Class[]{Object.class}); //$NON-NLS-1$
+		        methodGetSortedChildren = AbstractTreeViewer.class.getDeclaredMethod("getSortedChildren", new Class[]{Object.class}); //$NON-NLS-1$
 		        // Because "getSortedChildren" is a protected method, we need to make it accessible.
-		        methodGetSortedChildren.setAccessible(true);
-            }});
+		        AccessController.doPrivileged(new PrivilegedAction<Object>() {
+		        	@Override
+		        	public Object run() {
+				        methodGetSortedChildren.setAccessible(true);
+		        	    return null;
+		        	}
+				});
+            }
+		});
 	}
 	// The tree viewer to be searched.
 	protected TreeViewer fViewer;
 	// The label provider of the tree viewer.
 	protected ILabelProvider fLabelProvider;
-	// The matcher used to match eacho tree nodes.
+	// The matcher used to match echo tree nodes.
 	protected ISearchMatcher fMatcher;
-	
+
 	/**
 	 * Create a searcher with the specified viewer and matcher.
-	 * 
+	 *
 	 * @param viewer The tree viewer to be searched.
 	 * @param matcher The matcher used to match tree nodes.
 	 */
@@ -66,12 +74,12 @@ public abstract class AbstractSearcher implements ITreeSearcher {
 		fLabelProvider = (ILabelProvider) fViewer.getLabelProvider();
 		fMatcher = matcher;
 	}
-	
+
 	/**
 	 * Get the text representation of a element using the label provider
-	 * of the tree viewer. 
+	 * of the tree viewer.
 	 * Note: this method could be called at any thread.
-	 * 
+	 *
 	 * @param element The element.
 	 * @return The text representation.
 	 */
@@ -94,10 +102,10 @@ public abstract class AbstractSearcher implements ITreeSearcher {
 	}
 
 	/**
-	 * Update the children of the specified parent. If the data of the parent 
+	 * Update the children of the specified parent. If the data of the parent
 	 * is lazily loaded and not loaded yet, then load the data first, before getting
 	 * the children.
-	 * 
+	 *
 	 * @param parent The parent node to get the updated children from.
 	 * @param monitor The progress monitor used while loading data.
 	 * @return The updated children of the parent node.
@@ -124,7 +132,7 @@ public abstract class AbstractSearcher implements ITreeSearcher {
 	/**
 	 * Get the current visible/sorted children under the specified parent element or path
 	 * by invoking the reflective method. This method is UI thread-safe.
-	 * 
+	 *
 	 * @param parentElementOrTreePath The parent element or path.
 	 * @return The current visible/sorted children of the parent path/element.
 	 */
@@ -132,8 +140,7 @@ public abstract class AbstractSearcher implements ITreeSearcher {
 		if (Display.getCurrent() != null) {
 			try {
 				if (methodGetSortedChildren != null) {
-					return (Object[]) methodGetSortedChildren
-					                .invoke(fViewer, parentElementOrTreePath);
+					return (Object[]) methodGetSortedChildren.invoke(fViewer, parentElementOrTreePath);
 				}
 			}
 			catch (Exception e) {
@@ -153,7 +160,7 @@ public abstract class AbstractSearcher implements ITreeSearcher {
 	/**
 	 * Get a lazy loader from the specified element if it could be
 	 * adapted to a lazy loader.
-	 * 
+	 *
 	 * @param element The element to get the lazy loader from.
 	 * @return A lazy loader or null if it is not adapted to a lazy loader.
 	 */

@@ -13,6 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -25,11 +26,11 @@ import org.eclipse.tcf.te.ui.interfaces.ISearchMatcher;
 public class BreadthFirstSearcher extends AbstractSearcher{
 	// The queue to pre-populate the nodes to be matched
 	private Queue<TreePath> queue;
-	
+
 	/**
 	 * Create a breadth-first searcher with the specified viewer and a
 	 * matcher.
-	 * 
+	 *
 	 * @param viewer The tree viewer.
 	 * @param matcher The search matcher used match a single tree node.
 	 */
@@ -44,18 +45,19 @@ public class BreadthFirstSearcher extends AbstractSearcher{
 	@Override
     public void setStartPath(TreePath path) {
 		this.queue = new ConcurrentLinkedQueue<TreePath>();
-		this.queue.offer(path);
+		Assert.isTrue(this.queue.offer(path));
 	}
 
 	/**
 	 * Search the tree using a matcher using BFS algorithm.
-	 * 
+	 *
 	 * @param monitor The monitor reporting the progress.
 	 * @return The tree path whose leaf node satisfies the searching rule.
 	 */
 	@Override
     public TreePath searchNext(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException{
 		TreePath result = null;
+		Assert.isNotNull(queue);
 		while(!queue.isEmpty() && result == null && !monitor.isCanceled()) {
 			TreePath path = queue.poll();
 			Object element = path.getLastSegment();
@@ -63,7 +65,7 @@ public class BreadthFirstSearcher extends AbstractSearcher{
 			if(children != null && children.length > 0) {
 				for(Object child : children) {
 					TreePath childPath = path.createChildPath(child);
-					queue.offer(childPath);
+					Assert.isTrue(queue.offer(childPath));
 				}
 			}
 			String elementText = getElementText(element);

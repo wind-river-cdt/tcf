@@ -99,10 +99,13 @@
 		</And>
 	</Match>
 	
-	<!-- Ignore URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD in AbstractFileTransferSection -->
+	<!-- Ignore URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD -->
 	<Match>
 		<Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"/>
-		<Class name="org.eclipse.tcf.te.launch.ui.tabs.filetransfers.AbstractFileTransferSection"/>
+		<Or>
+			<Class name="org.eclipse.tcf.te.launch.ui.tabs.filetransfers.AbstractFileTransferSection"/>
+			<Class name="org.eclipse.tcf.te.ui.tables.properties.NodePropertiesTableTableNode"/>
+		</Or>
 	</Match>
 
 	<!-- Ignore UW_UNCOND_WAIT in InputStreamMonitor -->

@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.dialogs;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -51,6 +52,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.tcf.te.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.internal.utils.TablePatternFilter;
 import org.eclipse.tcf.te.ui.nls.Messages;
+import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
 import org.eclipse.ui.dialogs.SelectionStatusDialog;
 import org.eclipse.ui.navigator.IDescriptionProvider;
 
@@ -112,7 +114,7 @@ public class FilteredCheckedListDialog extends SelectionStatusDialog implements 
 	 * @param elements The elements.
 	 */
 	public void setElements(Object[] elements) {
-		this.elements = elements;
+		this.elements = elements != null ? Arrays.copyOf(elements, elements.length) : null;
 	}
 
 	/*
@@ -123,7 +125,7 @@ public class FilteredCheckedListDialog extends SelectionStatusDialog implements 
 	public void selectionChanged(SelectionChangedEvent event) {
 		IStructuredSelection structuredSelection = (IStructuredSelection) event.getSelection();
 		Object element = structuredSelection.getFirstElement();
-		String description = labelProvider instanceof IDescriptionProvider ? ((IDescriptionProvider)labelProvider).getDescription(element) : null;
+		String description = labelProvider != null && labelProvider instanceof IDescriptionProvider ? ((IDescriptionProvider)labelProvider).getDescription(element) : null;
 		if (description == null) description = element == null ? "" : "Enable "+labelProvider.getText(element)+"."; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		updateStatus(new Status(IStatus.OK, UIPlugin.getUniqueIdentifier(), description));
 	}
@@ -173,7 +175,7 @@ public class FilteredCheckedListDialog extends SelectionStatusDialog implements 
 	 * @param e The focus event.
 	 */
 	protected void filterTextFocusGained(FocusEvent e) {
-		if (filter.equals(filterText.getText().trim())) {
+		if (filter != null && filter.equals(SWTControlUtil.getText(filterText).trim())) {
 			filterText.selectAll();
 		}
 	}
@@ -184,7 +186,7 @@ public class FilteredCheckedListDialog extends SelectionStatusDialog implements 
 	 * @param e The mouse up event.
 	 */
 	protected void filterTextMouseUp(MouseEvent e) {
-		if (filter.equals(filterText.getText().trim())) {
+		if (filter != null && filter.equals(SWTControlUtil.getText(filterText).trim())) {
 			filterText.selectAll();
 		}
 	}
@@ -215,7 +217,7 @@ public class FilteredCheckedListDialog extends SelectionStatusDialog implements 
 			else {
 				// if the initial filter text hasn't changed, do not try to match
 				boolean hasFocus = tableViewer.getTable().setFocus();
-				boolean textChanged = !filter.equals(filterText.getText().trim());
+				boolean textChanged = filter != null && !filter.equals(SWTControlUtil.getText(filterText).trim());
 				if (hasFocus && textChanged && filterText.getText().trim().length() > 0) {
 					TableItem[] items = tableViewer.getTable().getItems();
 					for (TableItem item : items) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Wind River Systems, Inc. and others. All rights reserved.
+ * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others. All rights reserved.
  * This program and the accompanying materials are made available under the terms
  * of the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.dialogs;
 
+import java.util.Arrays;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
@@ -26,8 +27,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tcf.te.ui.interfaces.IContextHelpIds;
-import org.eclipse.tcf.te.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.jface.dialogs.CustomTitleAreaDialog;
+import org.eclipse.tcf.te.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.swt.SWTControlUtil;
 
 /**
@@ -72,8 +73,8 @@ public class NameValuePairDialog extends CustomTitleAreaDialog {
 		this.dialogTitle = dialogTitle;
 		this.title = title;
 		this.message = message;
-		this.fieldLabels = fieldLabels;
-		this.initialValues = initialValues;
+		this.fieldLabels = fieldLabels != null ? Arrays.copyOf(fieldLabels, fieldLabels.length) : null;
+		this.initialValues = initialValues != null ? Arrays.copyOf(initialValues, initialValues.length) : null;
 		this.usedNames = usedNames;
 	}
 
