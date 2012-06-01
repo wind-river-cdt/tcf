@@ -1,12 +1,11 @@
 /*******************************************************************************
- * Copyright (c) 2012 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (c) 2012 Wind River Systems, Inc. and others. All rights reserved.
+ * This program and the accompanying materials are made available under the terms
+ * of the Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     IBM Corporation - initial API and implementation
+ * Wind River Systems - initial API and implementation
  *******************************************************************************/
 package org.eclipse.tcf.internal.cdt.ui.breakpoints;
 
@@ -31,9 +30,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Table;
-
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.dialogs.SelectionDialog;
 
 public class TCFContextQueryExpressionDialog extends SelectionDialog {
@@ -122,7 +120,7 @@ public class TCFContextQueryExpressionDialog extends SelectionDialog {
        for (int i = 0; i < attributeList.length; i++) {
            parameterData[i] = new ParameterDataModel(attributeList[i]);
 
-           String initialValue = getParameterInitialValue((String)attributeList[i], 0);
+           String initialValue = getParameterInitialValue(attributeList[i], 0);
            if (initialValue!= null){
               parameterData[i].setData(initialValue);
           }
@@ -315,6 +313,7 @@ public class TCFContextQueryExpressionDialog extends SelectionDialog {
        }
    }
 
+    @Override
     protected Control createDialogArea(Composite parent) {
         Composite page = new Composite(parent, SWT.NONE);
         GridLayout gridLayout = new GridLayout(1, true);
@@ -340,6 +339,7 @@ public class TCFContextQueryExpressionDialog extends SelectionDialog {
         valueColumn.setEditingSupport(new ExpressionEditingSupport(valueColumn.getViewer()));
         tableViewer.setInput(setupTableList());
         tableViewer.setComparator(new ViewerComparator() {
+            @Override
             public int compare(Viewer viewer, Object e1, Object e2) {
                 ParameterDataModel t1 = (ParameterDataModel) e1;
                 ParameterDataModel t2 = (ParameterDataModel) e2;
@@ -360,11 +360,13 @@ public class TCFContextQueryExpressionDialog extends SelectionDialog {
      * org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets
      * .Shell)
      */
+    @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
         newShell.setText("Select Expression Parameters");
     }
 
+    @Override
     public void create() {
         super.create();
         getButton(IDialogConstants.OK_ID).setEnabled(false);

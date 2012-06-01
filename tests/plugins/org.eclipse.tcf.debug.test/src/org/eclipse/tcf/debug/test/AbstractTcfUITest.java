@@ -1,12 +1,11 @@
 /*******************************************************************************
- * Copyright (c) 2012 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (c) 2012 Wind River Systems, Inc. and others. All rights reserved.
+ * This program and the accompanying materials are made available under the terms
+ * of the Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     IBM Corporation - initial API and implementation
+ * Wind River Systems - initial API and implementation
  *******************************************************************************/
 package org.eclipse.tcf.debug.test;
 
@@ -628,12 +627,12 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
         fDebugViewListener.addLabelUpdate(new TreePath(new Object[] { fLaunch, processTCFContext, threadTCFContext }));
 
         startProcess();
-        
+
         // Make sure that delta is posted after launching process so that it doesn't interfere
         // with the waiting for the whole viewer to update after breakpoint hit (below).
         fDebugViewListener.waitTillFinished(MODEL_CHANGED_COMPLETE);
         fDebugViewListener.resetModelChanged();
-        
+
         runToTestEntry(testFunc);
         removeBreakpoint(bpId);
 

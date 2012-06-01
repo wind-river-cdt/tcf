@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 IBM Corporation and others.
+ * Copyright (c) 2005, 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,8 +20,6 @@ import org.eclipse.ui.dialogs.PatternFilter;
  * string and keywords
  * <p>
  * This class is copied and adapted from <code>org.eclipse.ui.internal.dialogs.WizardPatternFilter</code>.
- *
- * @since 3.8
  */
 public class TargetPatternFilter extends PatternFilter {
     private LabelProviderDelegate targetLabelProvider = new LabelProviderDelegate();

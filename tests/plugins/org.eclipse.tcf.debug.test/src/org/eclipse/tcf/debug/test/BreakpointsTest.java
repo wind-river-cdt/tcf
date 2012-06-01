@@ -1,12 +1,11 @@
 /*******************************************************************************
- * Copyright (c) 2012 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (c) 2012 Wind River Systems, Inc. and others. All rights reserved.
+ * This program and the accompanying materials are made available under the terms
+ * of the Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     IBM Corporation - initial API and implementation
+ * Wind River Systems - initial API and implementation
  *******************************************************************************/
 package org.eclipse.tcf.debug.test;
 
@@ -31,7 +30,8 @@ import org.eclipse.tcf.services.ILineNumbers.CodeArea;
 import org.eclipse.tcf.services.ISymbols.Symbol;
 import org.junit.Assert;
 
-public class BreakpointsTest extends AbstractTcfUITest 
+@SuppressWarnings("restriction")
+public class BreakpointsTest extends AbstractTcfUITest
 {
     private BreakpointsListener fBpListener;
 
@@ -39,22 +39,22 @@ public class BreakpointsTest extends AbstractTcfUITest
     protected void setUp() throws Exception {
         super.setUp();
         fBpListener = new BreakpointsListener();
-        
-        // CDT Breakpoint integration depends on the TCF-CDT breakpoint 
+
+        // CDT Breakpoint integration depends on the TCF-CDT breakpoint
         // integration to be active.  This is normally triggered by selecting
-        // a stack frame in the UI.  Here force activation of the plugin 
+        // a stack frame in the UI.  Here force activation of the plugin
         // artificially.  None of the cdt integration packages are exported, so
-        // use the TCF Launch Context extension point indirectly to force the 
+        // use the TCF Launch Context extension point indirectly to force the
         // plugin to load.
         TCFLaunchContext.getLaunchContext(null);
     }
-    
+
     @Override
     protected void tearDown() throws Exception {
         fBpListener.dispose();
         super.tearDown();
     }
-    
+
     private CodeArea getFunctionCodeArea(String functionName) throws Exception {
         return new Transaction<CodeArea>() {
             @Override
@@ -70,42 +70,43 @@ public class BreakpointsTest extends AbstractTcfUITest
             }
         }.get();
     }
-    
+
     private ICLineBreakpoint createLineBreakpoint(String file, int line) throws CoreException, ExecutionException, InterruptedException {
         // Initiate wait for the context changed event.
         final Object contextChangedWaitKey = new Object();
         Protocol.invokeAndWait(new Runnable() { public void run() {
-            fBreakpointsCM.waitContextAdded(contextChangedWaitKey);               
+            fBreakpointsCM.waitContextAdded(contextChangedWaitKey);
         }});
-        
+
         final ICLineBreakpoint bp = CDIDebugModel.createLineBreakpoint(file, ResourcesPlugin.getWorkspace().getRoot(), ICBreakpointType.REGULAR, line, true, 0, "", true);
-        
+
         Map<String, Object>[] addedBps = new Transaction<Map<String, Object>[]>() {
+            @Override
             protected Map<String, Object>[] process() throws InvalidCacheException ,ExecutionException {
                 return validate(fBreakpointsCM.waitContextAdded(contextChangedWaitKey));
             }
-            
+
         }.get();
 
         fBpListener.setTester(new EventTester() {
             public boolean checkEvent(EventType type, IBreakpoint testBp, Map<String, Object> deltaAttributes) {
-                return (type == EventType.CHANGED && bp == testBp); 
+                return (type == EventType.CHANGED && bp == testBp);
             }
         });
-        
+
         fBpListener.waitForEvent();
-        
+
         Assert.assertEquals(1, addedBps.length);
-        Assert.assertEquals(1, bp.getMarker().getAttribute(ICBreakpoint.INSTALL_COUNT, -1));    
-        
+        Assert.assertEquals(1, bp.getMarker().getAttribute(ICBreakpoint.INSTALL_COUNT, -1));
+
         return bp;
     }
-    
+
     public void testContextAddedOnLineBrakpointCreate() throws Exception {
         initProcessModel("tcf_test_func0");
-        
+
         CodeArea bpCodeArea = getFunctionCodeArea("tcf_test_func0");
         ICLineBreakpoint bp = createLineBreakpoint(bpCodeArea.file, bpCodeArea.start_line);
     }
-    
+
 }
