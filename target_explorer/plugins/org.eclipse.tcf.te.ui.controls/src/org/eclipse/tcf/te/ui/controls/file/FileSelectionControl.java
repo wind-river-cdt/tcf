@@ -9,6 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.controls.file;
 
+import java.util.Arrays;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -55,7 +57,7 @@ public class FileSelectionControl extends BaseDialogSelectionControl {
 	 * @param filterExtensions The filter extensions string array to use or <code>null</code>.
 	 */
 	public void setFilterExtensions(String[] filterExtensions) {
-		this.filterExtensions = filterExtensions;
+		this.filterExtensions = filterExtensions != null ? Arrays.copyOf(filterExtensions, filterExtensions.length) : null;
 		if (getEditFieldValidator() != null && filterExtensions != null) {
 			((FileNameValidator)getEditFieldValidator()).setFileExtensions(filterExtensions);
 		}
@@ -67,7 +69,7 @@ public class FileSelectionControl extends BaseDialogSelectionControl {
 	 * @return The filter extensions string array or <code>null</code>.
 	 */
 	public String[] getFilterExtensions() {
-		return filterExtensions;
+		return filterExtensions != null ? Arrays.copyOf(filterExtensions, filterExtensions.length) : null;
 	}
 
 
@@ -78,7 +80,7 @@ public class FileSelectionControl extends BaseDialogSelectionControl {
 	 * @param filterExtensions The filter names string array to use or <code>null</code>.
 	 */
 	public void setFilterNames(String[] filterNames) {
-		this.filterNames = filterNames;
+		this.filterNames = filterNames != null ? Arrays.copyOf(filterNames, filterNames.length) : null;
 	}
 
 	/**
@@ -87,7 +89,7 @@ public class FileSelectionControl extends BaseDialogSelectionControl {
 	 * @return The filter names string array or <code>null</code>.
 	 */
 	public String[] getFilterNames() {
-		return filterNames;
+		return filterNames != null ? Arrays.copyOf(filterNames, filterNames.length) : null;
 	}
 
 	/* (non-Javadoc)

@@ -211,7 +211,7 @@ public class TerminalsLauncher extends PlatformObject implements ITerminalsLaunc
 						String message = NLS.bind(Messages.TerminalsLauncher_error_terminalExitFailed, context.getProcessID());
 						message += Messages.TerminalsLauncher_error_possibleCauseUnknown;
 
-						IStatus status = new Status(IStatus.WARNING, CoreBundleActivator.getUniqueIdentifier(), message, error);
+						IStatus status = new Status(IStatus.WARNING, CoreBundleActivator.getUniqueIdentifier(), message);
 						Platform.getLog(CoreBundleActivator.getContext().getBundle()).log(status);
 
 						// Dispose the launcher directly
@@ -599,7 +599,7 @@ public class TerminalsLauncher extends PlatformObject implements ITerminalsLaunc
 		Map<String, String> env = (Map<String, String>)properties.getProperty(ITerminalsLauncher.PROP_TERMINAL_ENV);
 
 		// Launch the remote terminal
-		getSvcTerminals().launch(type, encoding, makeEnvironmentArray(env), new ITerminals.DoneLaunch() {
+		getSvcTerminals().launch(type, encoding, env != null ? makeEnvironmentArray(env) : null, new ITerminals.DoneLaunch() {
 			@Override
 			public void doneLaunch(IToken token, Exception error, ITerminals.TerminalContext terminal) {
 				if (error != null) {
@@ -803,11 +803,11 @@ public class TerminalsLauncher extends PlatformObject implements ITerminalsLaunc
 	/**
 	 * Makes an environment array out of the given map.
 	 *
-	 * @param env The environment map or <code>null</code>.
+	 * @param env The environment map. Must not be <code>null</code>.
 	 * @return The string.
 	 */
 	private String[] makeEnvironmentArray(Map<String, String> env) {
-		if (env == null) return null;
+		Assert.isNotNull(env);
 
 		List<String> envList = new ArrayList<String>();
 		for (Entry<String, String> entry : env.entrySet()) {

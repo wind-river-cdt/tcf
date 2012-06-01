@@ -561,14 +561,14 @@ public class BaseEditBrowseTextControl extends AbstractDecoratedDialogPageContro
 	 * this hook to configure the label control for their specific needs and to register any
 	 * required listener to the control.
 	 *
-	 * @param button The label control to configure. Must not be <code>null</code>!
+	 * @param labelControl The label control to configure. Must not be <code>null</code>!
 	 */
-	protected void configureLabelControl(final Control label) {
-		Assert.isNotNull(label);
+	protected void configureLabelControl(final Control labelControl) {
+		Assert.isNotNull(labelControl);
 		if (isAdjustBackgroundColor()) {
-			SWTControlUtil.setBackground(label, label.getParent().getBackground());
+			SWTControlUtil.setBackground(labelControl, labelControl.getParent().getBackground());
 		}
-		if (isLabelIsButton() && label instanceof Button) {
+		if (isLabelIsButton() && labelControl instanceof Button) {
 			((Button)labelControl).addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
@@ -576,7 +576,7 @@ public class BaseEditBrowseTextControl extends AbstractDecoratedDialogPageContro
 				}
 			});
 		}
-		SWTControlUtil.setToolTipText(label, getEditFieldLabelTooltip());
+		SWTControlUtil.setToolTipText(labelControl, getEditFieldLabelTooltip());
 	}
 
 	/**

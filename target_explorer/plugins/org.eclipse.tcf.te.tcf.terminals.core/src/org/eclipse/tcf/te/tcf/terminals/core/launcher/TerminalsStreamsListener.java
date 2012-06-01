@@ -248,7 +248,7 @@ public class TerminalsStreamsListener implements IStreams.StreamsListener, ITerm
 		 *
 		 * @param task The currently active reader task or <code>null</code>.
 		 */
-		protected final synchronized void setActiveTask(TCFTask<ReadData> task) {
+		protected final void setActiveTask(TCFTask<ReadData> task) {
 			activeTask = task;
 		}
 
@@ -315,21 +315,21 @@ public class TerminalsStreamsListener implements IStreams.StreamsListener, ITerm
 					@Override
                     @SuppressWarnings("synthetic-access")
 					public void doneDisconnect(IToken token, Exception error) {
-						// Disconnect is done, ignore any error, invoke the callback
 						synchronized (this) {
+							// Mark the runnable definitely stopped
+							stopped = true;
+							// Disconnect is done, ignore any error, invoke the callback
 							if (getCallback() != null) getCallback().done(this, Status.OK_STATUS);
 						}
-						// Mark the runnable definitely stopped
-						stopped = true;
 					}
 				});
 			} else {
-				// Invoke the callback directly, if any
 				synchronized (this) {
+					// Mark the runnable definitely stopped
+					stopped = true;
+					// Invoke the callback directly, if any
 					if (callback != null) callback.done(this, Status.OK_STATUS);
 				}
-				// Mark the runnable definitely stopped
-				stopped = true;
 			}
 		}
 
@@ -411,7 +411,6 @@ public class TerminalsStreamsListener implements IStreams.StreamsListener, ITerm
 		// The associated stream id
 		/* default */ final String streamId;
 		// The associated stream type id
-		@SuppressWarnings("unused")
 		private final String streamTypeId;
 		// The data provider applicable for the associated stream type id
 		private final StreamsDataProvider provider;
@@ -451,6 +450,15 @@ public class TerminalsStreamsListener implements IStreams.StreamsListener, ITerm
 		}
 
 		/**
+		 * Returns the associated stream type id.
+		 *
+		 * @return The associated stream type id.
+		 */
+		public final String getStreamTypeId() {
+			return streamTypeId;
+		}
+
+		/**
 		 * Stop the runnable.
 		 *
 		 * @param callback The callback to invoke if the runnable stopped.
@@ -480,7 +488,7 @@ public class TerminalsStreamsListener implements IStreams.StreamsListener, ITerm
 		 *
 		 * @param task The currently active writer task or <code>null</code>.
 		 */
-		protected final synchronized void setActiveTask(TCFTask<Object> task) {
+		protected final void setActiveTask(TCFTask<Object> task) {
 			activeTask = task;
 		}
 
@@ -507,14 +515,14 @@ public class TerminalsStreamsListener implements IStreams.StreamsListener, ITerm
 		 */
 		@Override
         public void run() {
-			// If not data provider is set, we are done here immediately
+			// If no data provider is set, we are done here immediately
 			if (provider == null) {
-				// Invoke the callback directly, if any
 				synchronized (this) {
+					// Mark the runnable definitely stopped
+					stopped = true;
+					// Invoke the callback directly, if any
 					if (callback != null) callback.done(this, Status.OK_STATUS);
 				}
-				// Mark the runnable definitely stopped
-				stopped = true;
 
 				return;
 			}
@@ -561,23 +569,23 @@ public class TerminalsStreamsListener implements IStreams.StreamsListener, ITerm
 							@Override
 		                    @SuppressWarnings("synthetic-access")
 							public void doneDisconnect(IToken token, Exception error) {
-								// Disconnect is done, ignore any error, invoke the callback
 								synchronized (this) {
+									// Mark the runnable definitely stopped
+									stopped = true;
+									// Disconnect is done, ignore any error, invoke the callback
 									if (getCallback() != null) getCallback().done(this, Status.OK_STATUS);
 								}
-								// Mark the runnable definitely stopped
-								stopped = true;
 							}
 						});
 					}
 				});
 			} else {
-				// Invoke the callback directly, if any
 				synchronized (this) {
+					// Mark the runnable definitely stopped
+					stopped = true;
+					// Invoke the callback directly, if any
 					if (callback != null) callback.done(this, Status.OK_STATUS);
 				}
-				// Mark the runnable definitely stopped
-				stopped = true;
 			}
 		}
 

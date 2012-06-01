@@ -79,7 +79,7 @@ public class SerialLinePanel extends AbstractWizardConfigurationPanel implements
 	public static final String fcDefaultTTYTimeout = "5"; //$NON-NLS-1$
 	public static final String fcEditableTTYOther = "Other..."; //$NON-NLS-1$
 
-	public static final String[] fcTTYSpeedRates = { "600", //$NON-NLS-1$
+	private static final String[] fcTTYSpeedRates = { "600", //$NON-NLS-1$
 		"1200", //$NON-NLS-1$
 		"2400", //$NON-NLS-1$
 		"4800", //$NON-NLS-1$
@@ -91,19 +91,19 @@ public class SerialLinePanel extends AbstractWizardConfigurationPanel implements
 		"115200" //$NON-NLS-1$
 	};
 
-	public static final String[] fcTTYDatabits = {
+	private static final String[] fcTTYDatabits = {
 		"8", "7" //$NON-NLS-1$ //$NON-NLS-2$
 	};
 
-	public static final String[] fcTTYParity = {
+	private static final String[] fcTTYParity = {
 		"None", "Odd", "Even" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	};
 
-	public static final String[] fcTTYStopbits = {
+	private static final String[] fcTTYStopbits = {
 		"1", "2" //$NON-NLS-1$ //$NON-NLS-2$
 	};
 
-	public static final String[] fcTTYFlowControl = {
+	private static final String[] fcTTYFlowControl = {
 		"None", "Hardware", "Software" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	};
 

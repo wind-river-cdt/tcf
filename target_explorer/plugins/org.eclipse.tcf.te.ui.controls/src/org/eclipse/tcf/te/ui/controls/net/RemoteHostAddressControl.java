@@ -12,6 +12,8 @@ package org.eclipse.tcf.te.ui.controls.net;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -172,12 +174,18 @@ public class RemoteHostAddressControl extends BaseEditBrowseTextControl {
 						monitor.setTaskName(getTaskNameCheckNameAddress());
 						InetAddress[] addresses = InetAddress.getAllByName(address);
 						if (Platform.inDebugMode() && addresses != null) {
-							String message = "RemoteHostAddressControl: Name '" + address + "' resolves to: "; //$NON-NLS-1$ //$NON-NLS-2$
+							StringBuilder message = new StringBuilder();
+							message.append("RemoteHostAddressControl: Name '"); //$NON-NLS-1$
+							message.append(address);
+							message.append("' resolves to: "); //$NON-NLS-1$
+							boolean firstAddress = true;
 							for (InetAddress address : addresses) {
-								message += address.getHostAddress() + ", "; //$NON-NLS-1$
+								if (!firstAddress) message.append(", "); //$NON-NLS-1$
+								message.append(address.getHostAddress());
+								firstAddress = false;
 							}
 
-							IStatus status = new Status(IStatus.WARNING, UIPlugin.getUniqueIdentifier(), message);
+							IStatus status = new Status(IStatus.WARNING, UIPlugin.getUniqueIdentifier(), message.toString());
 							UIPlugin.getDefault().getLog().log(status);
 						}
 
@@ -194,9 +202,15 @@ public class RemoteHostAddressControl extends BaseEditBrowseTextControl {
 							if (parentPage != null) {
 								Class<?>[] paramTypes = new Class[0];
 								Object[] args = new Object[0];
-								Method method = parentPage.getClass().getMethod("getContainer", paramTypes); //$NON-NLS-1$
+								final Method method = parentPage.getClass().getMethod("getContainer", paramTypes); //$NON-NLS-1$
 								if (!method.isAccessible()) {
-									method.setAccessible(true);
+									AccessController.doPrivileged(new PrivilegedAction<Object>() {
+										@Override
+										public Object run() {
+											method.setAccessible(true);
+										    return null;
+										}
+									});
 								}
 								Object result = method.invoke(parentPage, args);
 								if (result instanceof IWizardContainer) {
