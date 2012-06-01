@@ -38,6 +38,7 @@ import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.te.core.interfaces.IViewerInput;
 import org.eclipse.tcf.te.ui.forms.CustomFormToolkit;
@@ -78,6 +79,20 @@ public abstract class TreeViewerExplorerEditorPage extends AbstractCustomFormToo
 		if (treeControl != null) { treeControl.dispose(); treeControl = null; }
 		super.dispose();
 	}
+
+	/**
+	 * Set the initial focus to the tree.
+	 */
+	@Override
+    public void setFocus() {
+		Control control = treeControl.getViewer().getControl();
+		if(control != null && !control.isDisposed()) {
+			control.setFocus();
+		}
+		else {
+			super.setFocus();
+		}
+    }
 
 	/*
 	 * (non-Javadoc)

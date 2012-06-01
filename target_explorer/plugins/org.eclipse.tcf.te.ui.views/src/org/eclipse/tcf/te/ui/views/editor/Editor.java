@@ -72,6 +72,41 @@ public final class Editor extends FormEditor implements IPersistableEditor, ITab
 	}
 
 	/**
+	 * Override this method to delegate the setFocus to
+	 * the active form page.
+	 */
+	@Override
+	public void setFocus() {
+		int index = getActivePage();
+		if (index != -1) {
+			IFormPage fpage = getPage(index);
+			if (fpage != null) {
+				fpage.setFocus();
+			}
+			else super.setFocus();
+		}
+		else super.setFocus();
+	}
+	
+	/**
+	 * Returns the page which has the specified index.
+	 *
+	 * @param index The page's index.
+	 * @return The page object or null if it does not exists.
+	 */
+	private IFormPage getPage(int index) {
+		for(int i=0;i<pages.size();i++) {
+			Object page = pages.get(i);
+			if (page instanceof IFormPage) {
+				IFormPage fpage = (IFormPage)page;
+				if (fpage.getIndex() == index)
+					return fpage;
+			}
+		}
+		return null;
+	}
+	
+	/**
 	 * Update the editor page list. Pages which are not longer valid
 	 * will be removed and pages now being valid gets added.
 	 */
