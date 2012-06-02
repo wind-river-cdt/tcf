@@ -63,17 +63,20 @@
 		</Or>
 	</Match>
 	
-	<!-- Ignore all RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE in hasString(String) methods -->
+	<!-- Ignore RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE -->
 	<Match>
 		<Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"/>
-		<Method name="hasString" params="java.lang.String" returns="boolean"/>
-	</Match>
-	<Match>
-		<Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"/>
-		<And>
-			<Class name="org.eclipse.tcf.te.tcf.terminals.core.launcher.TerminalsLauncher"/>
-			<Method name="executeLaunch"/>
-		</And>
+		<Or>
+			<Method name="hasString" params="java.lang.String" returns="boolean"/>
+			<And>
+				<Class name="org.eclipse.tcf.te.tcf.terminals.core.launcher.TerminalsLauncher"/>
+				<Method name="executeLaunch"/>
+			</And>
+			<And>
+				<Class name="org.eclipse.tcf.te.tcf.processes.core.launcher.ProcessLauncher"/>
+				<Method name="executeLaunch"/>
+			</And>
+		</Or>
 	</Match>
 	
 	<!-- Ignore EI_EXPOSE_REP -->
@@ -93,6 +96,7 @@
 			<Class name="org.eclipse.tcf.te.ui.views.handler.UpdateActiveExtensionsOperation"/>
 			<Class name="org.eclipse.tcf.te.ui.views.handler.UpdateActiveFiltersOperation"/>
 			<Class name="~org\.eclipse\.tcf\.te\.tcf\.terminals\.core\.launcher\.TerminalsStreamsListener.*"/>
+			<Class name="~org\.eclipse\.tcf\.te\.tcf\.processes\.core\.launcher\.ProcessStreamsListener.*"/>
 			<Class name="org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.FileState"/>
 			<Package name="~org\.eclipse\.tcf\.te\.tcf\.filesystem\.core\.internal\.operations"/>
 		</Or>
@@ -144,10 +148,16 @@
 	<!-- Ignore UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR -->
 	<Match>
 		<Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
-		<And>
-			<Class name="org.eclipse.tcf.te.ui.internal.utils.BreadthFirstSearcher"/>
-			<Method name="searchNext"/>
-		</And>
+		<Or>
+			<And>
+				<Class name="org.eclipse.tcf.te.ui.internal.utils.BreadthFirstSearcher"/>
+				<Method name="searchNext"/>
+			</And>
+			<And>
+				<Class name="~org\.eclipse\.tcf\.te\.tcf\.processes\.core\.launcher\.ProcessLauncher.*"/>
+				<Method name="run"/>
+			</And>
+		</Or>
 	</Match>
 	
 	<!-- Filters for org.eclipse.tcf bundle -->

@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.core.nls;
 
-import java.lang.reflect.Field;
-
 import org.eclipse.osgi.util.NLS;
 
 /**
@@ -30,49 +28,15 @@ public class Messages extends NLS {
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 
-	/**
-	 * Returns if or if not this NLS manager contains a constant for
-	 * the given externalized strings key.
-	 *
-	 * @param key The externalized strings key or <code>null</code>.
-	 * @return <code>True</code> if a constant for the given key exists, <code>false</code> otherwise.
-	 */
-	public static boolean hasString(String key) {
-		if (key != null) {
-			try {
-				Field field = Messages.class.getDeclaredField(key);
-				return field != null;
-			} catch (NoSuchFieldException e) { /* ignored on purpose */ }
-		}
+	// **** Declare externalized string id's down here *****
 
-		return false;
-	}
-
-	/**
-	 * Returns the corresponding string for the given externalized strings
-	 * key or <code>null</code> if the key does not exist.
-	 *
-	 * @param key The externalized strings key or <code>null</code>.
-	 * @return The corresponding string or <code>null</code>.
-	 */
-	public static String getString(String key) {
-		if (key != null) {
-			try {
-				Field field = Messages.class.getDeclaredField(key);
-				if (field != null) {
-					return (String)field.get(null);
-				}
-			} catch (Exception e) { /* ignored on purpose */ }
-		}
-
-		return null;
-	}
 	public static String FSTreeNodeContentProvider_rootNode_label;
 	public static String FSTreeNode_TypeFile;
 	public static String FSTreeNode_TypeFileFolder;
 	public static String FSTreeNode_TypeLocalDisk;
 	public static String FSTreeNode_TypeSystemFile;
 	public static String FSTreeNode_TypeUnknownFile;
+
 	public static String Operation_DeletingFileFailed;
 	public static String Operation_NotResponding;
 	public static String Operation_OpeningChannelFailureMessage;
@@ -81,40 +45,55 @@ public class Messages extends NLS {
 	public static String Operation_CopyNOfFile;
 	public static String Operation_CopyOfFile;
 	public static String Operation_CannotCreateDirectory;
+
 	public static String OpCopy_Copying;
 	public static String OpCopy_CannotCopyFile;
 	public static String OpCopy_CopyingFile;
+
 	public static String OpCreate_TaskName;
+
 	public static String TcfURLConnection_NoFileHandleReturned;
 	public static String TcfURLConnection_NoPeerFound;
 	public static String TcfURLConnection_NoSuchTcfAgent;
+
 	public static String OpDelete_Deleting;
 	public static String OpDelete_PrepareToDelete;
 	public static String OpDelete_RemovingFileFolder;
+
 	public static String OpDownload_Downloading;
 	public static String OpDownload_DownloadingMultipleFiles;
 	public static String OpDownload_DownloadingSingleFile;
+
 	public static String OpMove_Moving;
 	public static String OpMove_FileExistsError;
 	public static String OpMove_FolderExistsError;
 	public static String OpMove_CannotMove;
 	public static String OpMove_MovingFile;
+
 	public static String OpOutStreamOp_DownloadingProgress;
+
 	public static String OpRefresh_RefreshJobTitle;
+
 	public static String OpRename_CannotRename;
 	public static String OpRename_TitleRename;
+
 	public static String OpStreamOp_SetReadOnlyFailed;
 	public static String OpStreamOp_Bytes;
 	public static String OpStreamOp_KBs;
 	public static String OpStreamOp_MBs;
+
 	public static String OpUpload_UploadingProgress;
 	public static String OpUpload_UploadNFiles;
 	public static String OpUpload_UploadSingleFile;
+
 	public static String TcfInputStream_NoDataAvailable;
 	public static String TcfInputStream_StreamClosed;
 	public static String TcfOutputStream_StreamClosed;
 	public static String TcfURLStreamHandlerService_ErrorURLFormat;
 	public static String TcfURLStreamHandlerService_IllegalCharacter;
 	public static String TcfURLStreamHandlerService_OnlyDiskPartError;
+
 	public static String CacheManager_MkdirFailed;
+
+	public static String FileTransferService_error_mkdirFailed;
 }

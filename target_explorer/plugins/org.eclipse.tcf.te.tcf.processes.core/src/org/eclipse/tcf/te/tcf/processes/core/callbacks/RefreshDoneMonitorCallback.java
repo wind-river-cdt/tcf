@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.services.ISysMonitor;
@@ -21,7 +22,7 @@ import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode;
 
 /**
- * The monitor's callback invoked after all the contexts of the processes have been 
+ * The monitor's callback invoked after all the contexts of the processes have been
  * fetched and updated.
  */
 public class RefreshDoneMonitorCallback extends Callback {
@@ -41,7 +42,7 @@ public class RefreshDoneMonitorCallback extends Callback {
 	/**
 	 * Create an instance with parameters to initialize the fields.
 	 */
-	public RefreshDoneMonitorCallback(List<ProcessTreeNode> newNodes, ProcessTreeNode parentNode, 
+	public RefreshDoneMonitorCallback(List<ProcessTreeNode> newNodes, ProcessTreeNode parentNode,
 					Queue<ProcessTreeNode> queue, ICallback callback, ISysMonitor service, IChannel channel) {
 		this.newNodes = newNodes;
 		this.parentNode = parentNode;
@@ -61,7 +62,7 @@ public class RefreshDoneMonitorCallback extends Callback {
 		removeDead();
 		for (ProcessTreeNode node : parentNode.getChildren()) {
 			if (node.childrenQueried && !node.childrenQueryRunning) {
-				queue.offer(node);
+				Assert.isTrue(queue.offer(node));
 			}
 		}
 		if (queue.isEmpty()) {
@@ -93,7 +94,7 @@ public class RefreshDoneMonitorCallback extends Callback {
 
 	/**
 	 * Search the specified child node in the specified list.
-	 * 
+	 *
 	 * @param childNode The child node.
 	 * @param list The process node list.
 	 * @return The index of the child node or -1 if no such node.
@@ -108,5 +109,5 @@ public class RefreshDoneMonitorCallback extends Callback {
 			}
 			return -1;
 		}
-	}	
+	}
 }

@@ -247,7 +247,7 @@ public class ProcessStreamsListener implements IStreams.StreamsListener, IProces
 		 *
 		 * @param task The currently active reader task or <code>null</code>.
 		 */
-		protected final synchronized void setActiveTask(TCFTask<ReadData> task) {
+		protected final void setActiveTask(TCFTask<ReadData> task) {
 			activeTask = task;
 		}
 
@@ -312,21 +312,21 @@ public class ProcessStreamsListener implements IStreams.StreamsListener, IProces
 					@Override
                     @SuppressWarnings("synthetic-access")
 					public void doneDisconnect(IToken token, Exception error) {
-						// Disconnect is done, ignore any error, invoke the callback
 						synchronized (this) {
-							if (getCallback() != null) getCallback().done(this, Status.OK_STATUS);
+							// Mark the runnable definitely stopped
+							stopped = true;
+							// Disconnect is done, ignore any error, invoke the callback
+							if (callback != null) callback.done(this, Status.OK_STATUS);
 						}
-						// Mark the runnable definitely stopped
-						stopped = true;
 					}
 				});
 			} else {
-				// Invoke the callback directly, if any
 				synchronized (this) {
+					// Mark the runnable definitely stopped
+					stopped = true;
+					// Invoke the callback directly, if any
 					if (callback != null) callback.done(this, Status.OK_STATUS);
 				}
-				// Mark the runnable definitely stopped
-				stopped = true;
 			}
 			// Make sure that data receivers are disposed before leaving the thread.
 			// This will closes the PipedOutputStream wrapped by the writer in the data receivers,
@@ -482,7 +482,7 @@ public class ProcessStreamsListener implements IStreams.StreamsListener, IProces
 		 *
 		 * @param task The currently active writer task or <code>null</code>.
 		 */
-		protected final synchronized void setActiveTask(TCFTask<Object> task) {
+		protected final void setActiveTask(TCFTask<Object> task) {
 			activeTask = task;
 		}
 
@@ -511,12 +511,12 @@ public class ProcessStreamsListener implements IStreams.StreamsListener, IProces
         public void run() {
 			// If not data provider is set, we are done here immediately
 			if (provider == null) {
-				// Invoke the callback directly, if any
 				synchronized (this) {
+					// Mark the runnable definitely stopped
+					stopped = true;
+					// Invoke the callback directly, if any
 					if (callback != null) callback.done(this, Status.OK_STATUS);
 				}
-				// Mark the runnable definitely stopped
-				stopped = true;
 
 				return;
 			}
@@ -555,21 +555,21 @@ public class ProcessStreamsListener implements IStreams.StreamsListener, IProces
 					@Override
                     @SuppressWarnings("synthetic-access")
 					public void doneDisconnect(IToken token, Exception error) {
-						// Disconnect is done, ignore any error, invoke the callback
 						synchronized (this) {
+							// Mark the runnable definitely stopped
+							stopped = true;
+							// Disconnect is done, ignore any error, invoke the callback
 							if (getCallback() != null) getCallback().done(this, Status.OK_STATUS);
 						}
-						// Mark the runnable definitely stopped
-						stopped = true;
 					}
 				});
 			} else {
-				// Invoke the callback directly, if any
 				synchronized (this) {
+					// Mark the runnable definitely stopped
+					stopped = true;
+					// Invoke the callback directly, if any
 					if (callback != null) callback.done(this, Status.OK_STATUS);
 				}
-				// Mark the runnable definitely stopped
-				stopped = true;
 			}
 		}
 

@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IChannel;
@@ -136,7 +137,15 @@ public class FileTransferService {
         final FileSystemException[] error = new FileSystemException[1];
         final IFileSystem.FileAttrs[] attrs = new IFileSystem.FileAttrs[1];
 
-        item.getHostPath().removeLastSegments(1).toFile().mkdirs();
+        // Create necessary parent directory structure on host side
+        boolean rc = hostPath.removeLastSegments(1).toFile().mkdirs();
+        if (!rc) {
+        	IOException e = new IOException(NLS.bind(Messages.FileTransferService_error_mkdirFailed, hostPath.removeLastSegments(1).toOSString()));
+        	result = StatusHelper.getStatus(e);
+            if (callback != null) callback.done(peer, result);
+            return;
+        }
+
         // If the host file is a directory, append the remote file name
         if (hostPath.toFile().isDirectory()) {
             hostPath = item.getHostPath().append(targetPath.lastSegment());
@@ -210,18 +219,24 @@ public class FileTransferService {
 
             if (result.isOK()) {
                 if (mtime >= 0) {
-                    hostPath.toFile().setLastModified(mtime);
+                    rc = hostPath.toFile().setLastModified(mtime);
+                    if (!rc && Platform.inDebugMode()) {
+                    	System.err.println("Failed to set mtime for " + hostPath.toOSString()); //$NON-NLS-1$
+                    }
                 }
             }
             else if (result.getSeverity() == IStatus.ERROR || result.getSeverity() == IStatus.CANCEL) {
                 try {
-                    hostPath.toFile().delete();
+                    rc = hostPath.toFile().delete();
+                    if (!rc && Platform.inDebugMode()) {
+                    	System.err.println("Failed to delete host file " + hostPath.toOSString()); //$NON-NLS-1$
+                    }
                 }
                 catch (Throwable e) {
                 }
             }
         }
-        callback.done(peer, result);
+        if (callback != null) callback.done(peer, result);
     }
 
     protected static void transferToTarget(IPeer peer, IFileSystem fileSystem, IFileTransferItem item, IProgressMonitor monitor, ICallback callback) {
@@ -321,7 +336,7 @@ public class FileTransferService {
                 fileSystem.remove(targetPath.toString(), null);
             }
         }
-        callback.done(peer, result);
+        if (callback != null) callback.done(peer, result);
     }
 
     private static void copy(InputStream in, OutputStream out, long bytesTotal, IProgressMonitor monitor) throws IOException {
