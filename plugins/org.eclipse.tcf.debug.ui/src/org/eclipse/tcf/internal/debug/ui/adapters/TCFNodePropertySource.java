@@ -27,6 +27,7 @@ import org.eclipse.tcf.internal.debug.ui.Activator;
 import org.eclipse.tcf.internal.debug.ui.model.TCFModel;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNode;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExecContext;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNodeExpression;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNodeLaunch;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNodeModule;
 import org.eclipse.tcf.internal.debug.ui.model.TCFNodeRegister;
@@ -35,9 +36,11 @@ import org.eclipse.tcf.internal.debug.ui.model.TCFNodeStackFrame;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.JSON;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.IExpressions;
 import org.eclipse.tcf.services.IRegisters;
 import org.eclipse.tcf.services.IRunControl;
 import org.eclipse.tcf.services.IStackTrace;
+import org.eclipse.tcf.services.ISymbols;
 import org.eclipse.tcf.util.TCFDataCache;
 import org.eclipse.tcf.util.TCFTask;
 import org.eclipse.ui.IViewPart;
@@ -56,7 +59,7 @@ import org.eclipse.ui.views.properties.PropertySheetPage;
 public class TCFNodePropertySource implements IPropertySource {
 
     private final TCFNode node;
-    private final Map<String, Object> properties = new HashMap<String, Object>();
+    private final Map<String,Object> properties = new HashMap<String,Object>();
 
     private IPropertyDescriptor[] descriptors;
 
@@ -95,9 +98,64 @@ public class TCFNodePropertySource implements IPropertySource {
                         else if (node instanceof TCFNodeModule) {
                             getModuleDescriptors((TCFNodeModule)node);
                         }
+                        else if (node instanceof TCFNodeExpression) {
+                            getExpressionDescriptors((TCFNodeExpression)node);
+                        }
                         else {
                             done(list.toArray(new IPropertyDescriptor[list.size()]));
                         }
+                    }
+
+                    private void getExpressionDescriptors(TCFNodeExpression exp_node) {
+                        TCFDataCache<IExpressions.Expression> exp_cache = exp_node.getExpression();
+                        if (!exp_cache.validate(this)) return;
+                        TCFDataCache<ISymbols.Symbol> type_cache = exp_node.getType();
+                        if (!type_cache.validate(this)) return;
+                        TCFDataCache<IExpressions.Value> value_cache = exp_node.getValue();
+                        if (!value_cache.validate(this)) return;
+
+                        Throwable exp_error = exp_cache.getError();
+                        if (exp_error != null) addDescriptor("Expression", "Error", TCFModel.getErrorMessage(exp_error, false));
+                        IExpressions.Expression exp_data = exp_cache.getData();
+                        if (exp_data != null) {
+                            Map<String,Object> props = exp_data.getProperties();
+                            for (String key : props.keySet()) {
+                                Object value = props.get(key);
+                                if (value instanceof Number) {
+                                    value = toHexAddrString((Number)value);
+                                }
+                                addDescriptor("Expression", key, value);
+                            }
+                        }
+
+                        Throwable type_error = type_cache.getError();
+                        if (type_error != null) addDescriptor("Expression Type", "Error", TCFModel.getErrorMessage(type_error, false));
+                        ISymbols.Symbol type_data = type_cache.getData();
+                        if (type_data != null) {
+                            Map<String,Object> props = type_data.getProperties();
+                            for (String key : props.keySet()) {
+                                Object value = props.get(key);
+                                if (value instanceof Number) {
+                                    value = toHexAddrString((Number)value);
+                                }
+                                addDescriptor("Expression Type", key, value);
+                            }
+                        }
+
+                        Throwable value_error = type_cache.getError();
+                        if (value_error != null) addDescriptor("Expression Value", "Error", TCFModel.getErrorMessage(value_error, false));
+                        IExpressions.Value value_data = value_cache.getData();
+                        if (value_data != null) {
+                            Map<String,Object> props = value_data.getProperties();
+                            for (String key : props.keySet()) {
+                                Object value = props.get(key);
+                                if (value instanceof Number) {
+                                    value = toHexAddrString((Number)value);
+                                }
+                                addDescriptor("Expression Value", key, value);
+                            }
+                        }
+                        done(list.toArray(new IPropertyDescriptor[list.size()]));
                     }
 
                     private void getModuleDescriptors(TCFNodeModule mod_node) {
@@ -107,7 +165,7 @@ public class TCFNodePropertySource implements IPropertySource {
                         if (error != null) addDescriptor("Module Properties", "Error", TCFModel.getErrorMessage(error, false));
                         MemoryRegion ctx = mod_cache.getData();
                         if (ctx != null && ctx.region != null) {
-                            Map<String, Object> props = ctx.region.getProperties();
+                            Map<String,Object> props = ctx.region.getProperties();
                             for (String key : props.keySet()) {
                                 Object value = props.get(key);
                                 if (value instanceof Number) {
@@ -126,7 +184,7 @@ public class TCFNodePropertySource implements IPropertySource {
                         if (error != null) addDescriptor("Register Properties", "Error", TCFModel.getErrorMessage(error, false));
                         IRegisters.RegistersContext ctx = ctx_cache.getData();
                         if (ctx != null) {
-                            Map<String, Object> props = ctx.getProperties();
+                            Map<String,Object> props = ctx.getProperties();
                             for (String key : props.keySet()) {
                                 Object value = props.get(key);
                                 if (value instanceof Number) {
@@ -144,7 +202,7 @@ public class TCFNodePropertySource implements IPropertySource {
                         if (!validateAll(ctx_cache, line_info_cache)) return;
                         IStackTrace.StackTraceContext ctx = ctx_cache.getData();
                         if (ctx != null) {
-                            Map<String, Object> props = ctx.getProperties();
+                            Map<String,Object> props = ctx.getProperties();
                             for (String key : props.keySet()) {
                                 Object value = props.get(key);
                                 if (value instanceof Number) {
@@ -175,7 +233,7 @@ public class TCFNodePropertySource implements IPropertySource {
                         if (!validateAll(ctx_cache, state_cache, mem_map_cache)) return;
                         IRunControl.RunControlContext ctx = ctx_cache.getData();
                         if (ctx != null) {
-                            Map<String, Object> props = ctx.getProperties();
+                            Map<String,Object> props = ctx.getProperties();
                             for (String key : props.keySet()) {
                                 Object value = props.get(key);
                                 if (value instanceof Number) {

@@ -62,9 +62,9 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
     private final boolean deref;
     private final String field_id;
     private final String reg_id;
-    private final TCFData<IExpressions.Expression> var_expression;
     private final TCFData<String> base_text;
-    private final TCFData<Expression> expression;
+    private final TCFData<IExpressions.Expression> var_expression;
+    private final TCFData<IExpressions.Expression> rem_expression;
     private final TCFData<IExpressions.Value> value;
     private final TCFData<ISymbols.Symbol> type;
     private final TCFData<String> type_name;
@@ -77,6 +77,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
     private IExpressions.Value prev_value;
     private IExpressions.Value next_value;
     private byte[] parent_value;
+    private String remote_expression_id;
 
     private static final RGB
         rgb_error = new RGB(192, 0, 0),
@@ -84,32 +85,6 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
         rgb_disabled = new RGB(127, 127, 127);
 
     private static int expr_cnt;
-
-    private class Expression {
-
-        final IExpressions.Expression expression;
-        boolean must_be_disposed;
-
-        Expression(IExpressions.Expression expression) {
-            assert expression != null;
-            this.expression = expression;
-        }
-
-        void dispose() {
-            if (!must_be_disposed) return;
-            if (channel.getState() == IChannel.STATE_OPEN) {
-                IExpressions exps = channel.getRemoteService(IExpressions.class);
-                exps.dispose(expression.getID(), new IExpressions.DoneDispose() {
-                    public void doneDispose(IToken token, Exception error) {
-                        if (error == null) return;
-                        if (channel.getState() != IChannel.STATE_OPEN) return;
-                        Activator.log("Error disposing remote expression evaluator", error);
-                    }
-                });
-            }
-            must_be_disposed = false;
-        }
-    }
 
     TCFNodeExpression(final TCFNode parent, final String script,
             final String field_id, final String var_id, final String reg_id,
@@ -287,7 +262,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
                 return true;
             }
         };
-        expression = new TCFData<Expression>(channel) {
+        rem_expression = new TCFData<IExpressions.Expression>(channel) {
             @Override
             protected boolean startDataRetrieval() {
                 IExpressions exps = launch.getService(IExpressions.class);
@@ -298,9 +273,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
                 String cast = model.getCastToType(id);
                 if (var_id != null && cast == null) {
                     if (!var_expression.validate(this)) return false;
-                    Expression exp = null;
-                    if (var_expression.getData() != null) exp = new Expression(var_expression.getData());
-                    set(null, var_expression.getError(), exp);
+                    set(null, var_expression.getError(), var_expression.getData());
                     return true;
                 }
                 if (!base_text.validate(this)) return false;
@@ -314,26 +287,13 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
                 if (n instanceof TCFNodeStackFrame && ((TCFNodeStackFrame)n).isEmulated()) n = n.parent;
                 command = exps.create(n.id, null, e, new IExpressions.DoneCreate() {
                     public void doneCreate(IToken token, Exception error, IExpressions.Expression context) {
-                        Expression e = null;
-                        if (context != null) {
-                            e = new Expression(context);
-                            e.must_be_disposed = true;
-                        }
-                        if (!isDisposed()) set(token, error, e);
-                        else if (e != null) e.dispose();
+                        disposeRemoteExpression();
+                        if (context != null) remote_expression_id = context.getID();
+                        if (!isDisposed()) set(token, error, context);
+                        else disposeRemoteExpression();
                     }
                 });
                 return false;
-            }
-            @Override
-            public void reset() {
-                if (isValid() && getData() != null) getData().dispose();
-                super.reset();
-            }
-            @Override
-            public void dispose() {
-                if (isValid() && getData() != null) getData().dispose();
-                super.dispose();
             }
         };
         value = new TCFData<IExpressions.Value>(channel) {
@@ -345,15 +305,15 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
                     set(null, null, prev_value);
                     return true;
                 }
-                if (!expression.validate(this)) return false;
-                final Expression exp = expression.getData();
+                if (!rem_expression.validate(this)) return false;
+                final IExpressions.Expression exp = rem_expression.getData();
                 if (exp == null) {
-                    set(null, expression.getError(), null);
+                    set(null, rem_expression.getError(), null);
                     return true;
                 }
                 final TCFDataCache<?> cache = this;
                 IExpressions exps = launch.getService(IExpressions.class);
-                command = exps.evaluate(exp.expression.getID(), new IExpressions.DoneEvaluate() {
+                command = exps.evaluate(exp.getID(), new IExpressions.DoneEvaluate() {
                     public void doneEvaluate(IToken token, Exception error, IExpressions.Value value) {
                         if (command != token) return;
                         command = null;
@@ -389,9 +349,9 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
                     if (val != null) type_id = val.getTypeID();
                 }
                 if (type_id == null) {
-                    if (!expression.validate(this)) return false;
-                    Expression exp = expression.getData();
-                    if (exp != null) type_id = exp.expression.getTypeID();
+                    if (!rem_expression.validate(this)) return false;
+                    IExpressions.Expression exp = rem_expression.getData();
+                    if (exp != null) type_id = exp.getTypeID();
                 }
                 if (type_id == null) {
                     set(null, value.getError(), null);
@@ -583,6 +543,26 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
         children = new TCFChildrenSubExpressions(this, 0, 0, 0);
     }
 
+    private void disposeRemoteExpression() {
+        if (remote_expression_id != null && channel.getState() == IChannel.STATE_OPEN) {
+            IExpressions exps = channel.getRemoteService(IExpressions.class);
+            exps.dispose(remote_expression_id, new IExpressions.DoneDispose() {
+                public void doneDispose(IToken token, Exception error) {
+                    if (error == null) return;
+                    if (channel.getState() != IChannel.STATE_OPEN) return;
+                    Activator.log("Error disposing remote expression evaluator", error);
+                }
+            });
+            remote_expression_id = null;
+        }
+    }
+
+    @Override
+    public void dispose() {
+        disposeRemoteExpression();
+        super.dispose();
+    }
+
     private TCFNodeExpression getRootExpression() {
         TCFNode n = this;
         while (n.parent instanceof TCFNodeExpression || n.parent instanceof TCFNodeArrayPartition) n = n.parent;
@@ -604,7 +584,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
     private void resetBaseText() {
         if (parent_value != null && base_text.isValid()) {
             base_text.reset();
-            expression.cancel();
+            rem_expression.cancel();
             string.cancel();
             value.cancel();
         }
@@ -616,7 +596,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
             type.reset();
             type_name.reset();
         }
-        if (expression.isValid() && expression.getError() != null) expression.reset();
+        if (rem_expression.isValid() && rem_expression.getError() != null) rem_expression.reset();
         if (!func_call || value.isValid() && value.getError() != null) value.reset();
         if (!func_call || string.isValid() && string.getError() != null) string.reset();
         children.onSuspended(func_call);
@@ -669,7 +649,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
     }
 
     public void onCastToTypeChanged() {
-        expression.cancel();
+        rem_expression.cancel();
         value.cancel();
         type.cancel();
         type_name.cancel();
@@ -715,12 +695,21 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
     }
 
     /**
-     * Get expression properties cache.
-     * The cache is empty is the expression does not represent a variable.
+     * Get expression properties cache that represents a variable.
+     * The cache is empty if the node does not represent a variable.
      * @return The expression properties cache.
      */
     public TCFDataCache<IExpressions.Expression> getVariable() {
         return var_expression;
+    }
+
+    /**
+     * Get expression properties cache.
+     * If the node represents a variable, return same data same as getVariable().
+     * @return The expression properties cache.
+     */
+    public TCFDataCache<IExpressions.Expression> getExpression() {
+        return rem_expression;
     }
 
     /**
@@ -1431,10 +1420,10 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
             bf.append("Disabled");
             return true;
         }
-        if (!expression.validate(done)) return false;
+        if (!rem_expression.validate(done)) return false;
         if (!value.validate(done)) return false;
         int pos = bf.length();
-        bf.append(expression.getError(), rgb_error);
+        bf.append(rem_expression.getError(), rgb_error);
         if (bf.length() == pos) bf.append(value.getError(), rgb_error);
         if (bf.length() == pos) {
             IExpressions.Value v = value.getData();
@@ -1467,7 +1456,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
     }
 
     public String getValueText(boolean add_error_text, Runnable done) {
-        if (!expression.validate(done)) return null;
+        if (!rem_expression.validate(done)) return null;
         if (!value.validate(done)) return null;
         StyledStringBuffer bf = new StyledStringBuffer();
         IExpressions.Value v = value.getData();
@@ -1480,8 +1469,8 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
             }
         }
         if (add_error_text) {
-            if (bf.length() == 0 && expression.getError() != null) {
-                bf.append(TCFModel.getErrorMessage(expression.getError(), false));
+            if (bf.length() == 0 && rem_expression.getError() != null) {
+                bf.append(TCFModel.getErrorMessage(rem_expression.getError(), false));
             }
             if (bf.length() == 0 && value.getError() != null) {
                 bf.append(TCFModel.getErrorMessage(value.getError(), false));
@@ -1553,8 +1542,9 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
                         return;
                     }
                     if (!node.is_empty && node.enabled) {
-                        if (!node.expression.validate(this)) return;
-                        if (node.expression.getData() != null && node.expression.getData().expression.canAssign()) {
+                        if (!node.rem_expression.validate(this)) return;
+                        IExpressions.Expression exp = node.rem_expression.getData();
+                        if (exp != null && exp.canAssign()) {
                             if (!node.value.validate(this)) return;
                             if (!node.type.validate(this)) return;
                             if (TCFColumnPresentationExpression.COL_HEX_VALUE.equals(property)) {
@@ -1640,57 +1630,55 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
                             done(Boolean.TRUE);
                             return;
                         }
-                        if (!node.expression.validate(this)) return;
-                        if (node.expression.getData() != null) {
-                            IExpressions.Expression exp = node.expression.getData().expression;
-                            if (exp.canAssign()) {
-                                byte[] bf = null;
-                                int size = exp.getSize();
-                                boolean is_float = false;
-                                boolean big_endian = false;
-                                boolean signed = false;
-                                if (!node.value.validate(this)) return;
-                                IExpressions.Value eval = node.value.getData();
-                                if (eval != null) {
-                                    switch(eval.getTypeClass()) {
-                                    case real:
-                                        is_float = true;
-                                        signed = true;
-                                        break;
-                                    case integer:
-                                        signed = true;
-                                        break;
-                                    }
-                                    big_endian = eval.isBigEndian();
-                                    size = eval.getValue().length;
+                        if (!node.rem_expression.validate(this)) return;
+                        IExpressions.Expression exp = node.rem_expression.getData();
+                        if (exp != null && exp.canAssign()) {
+                            byte[] bf = null;
+                            int size = exp.getSize();
+                            boolean is_float = false;
+                            boolean big_endian = false;
+                            boolean signed = false;
+                            if (!node.value.validate(this)) return;
+                            IExpressions.Value eval = node.value.getData();
+                            if (eval != null) {
+                                switch(eval.getTypeClass()) {
+                                case real:
+                                    is_float = true;
+                                    signed = true;
+                                    break;
+                                case integer:
+                                    signed = true;
+                                    break;
                                 }
-                                String input = (String)value;
-                                String error = null;
-                                if (TCFColumnPresentationExpression.COL_HEX_VALUE.equals(property)) {
-                                    error = TCFNumberFormat.isValidHexNumber(input);
-                                    if (error == null) bf = TCFNumberFormat.toByteArray(input, 16, false, size, signed, big_endian);
-                                }
-                                else if (TCFColumnPresentationExpression.COL_DEC_VALUE.equals(property)) {
-                                    error = TCFNumberFormat.isValidDecNumber(is_float, input);
-                                    if (error == null) bf = TCFNumberFormat.toByteArray(input, 10, is_float, size, signed, big_endian);
-                                }
-                                if (error != null) throw new Exception("Invalid value: " + value, new Exception(error));
-                                if (bf != null) {
-                                    IExpressions exps = node.launch.getService(IExpressions.class);
-                                    exps.assign(exp.getID(), bf, new IExpressions.DoneAssign() {
-                                        public void doneAssign(IToken token, Exception error) {
-                                            node.getRootExpression().onValueChanged();
-                                            if (error != null) {
-                                                node.model.showMessageBox("Cannot modify element value", error);
-                                                done(Boolean.FALSE);
-                                            }
-                                            else {
-                                                done(Boolean.TRUE);
-                                            }
+                                big_endian = eval.isBigEndian();
+                                size = eval.getValue().length;
+                            }
+                            String input = (String)value;
+                            String error = null;
+                            if (TCFColumnPresentationExpression.COL_HEX_VALUE.equals(property)) {
+                                error = TCFNumberFormat.isValidHexNumber(input);
+                                if (error == null) bf = TCFNumberFormat.toByteArray(input, 16, false, size, signed, big_endian);
+                            }
+                            else if (TCFColumnPresentationExpression.COL_DEC_VALUE.equals(property)) {
+                                error = TCFNumberFormat.isValidDecNumber(is_float, input);
+                                if (error == null) bf = TCFNumberFormat.toByteArray(input, 10, is_float, size, signed, big_endian);
+                            }
+                            if (error != null) throw new Exception("Invalid value: " + value, new Exception(error));
+                            if (bf != null) {
+                                IExpressions exps = node.launch.getService(IExpressions.class);
+                                exps.assign(exp.getID(), bf, new IExpressions.DoneAssign() {
+                                    public void doneAssign(IToken token, Exception error) {
+                                        node.getRootExpression().onValueChanged();
+                                        if (error != null) {
+                                            node.model.showMessageBox("Cannot modify element value", error);
+                                            done(Boolean.FALSE);
                                         }
-                                    });
-                                    return;
-                                }
+                                        else {
+                                            done(Boolean.TRUE);
+                                        }
+                                    }
+                                });
+                                return;
                             }
                         }
                         done(Boolean.FALSE);

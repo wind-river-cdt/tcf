@@ -215,7 +215,7 @@ public class TCFThreadFilterEditor {
                             Object[] childArray = getChildren(obj);
                             if (childArray != null && childArray.length != 0) {
                                 filteredList.add(obj);
-                                break;                                
+                                break;
                             }
                         }
                     }
