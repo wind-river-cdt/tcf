@@ -102,7 +102,7 @@ public class TerminateStep {
 							}
 						});
 					} else {
-						onError(node, Messages.DetachStep_error_disconnect, error, callback);
+						onError(node, Messages.DetachStep_error_disconnect, null, callback);
 					}
 				} else {
 					onError(node, Messages.DetachStep_error_openChannel, error, callback);

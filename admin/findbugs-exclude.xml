@@ -118,6 +118,8 @@
 			<Class name="org.eclipse.tcf.te.launch.ui.tabs.filetransfers.AbstractFileTransferSection"/>
 			<Class name="org.eclipse.tcf.te.ui.tables.properties.NodePropertiesTableTableNode"/>
 			<Class name="~org\.eclipse\.tcf\.te\.tcf\.terminals\.core\.launcher\.TerminalsStreamsListener.*"/>
+			<Class name="~org\.eclipse\.tcf\.te\.tcf\.processes\.core\.launcher\.ProcessStreamsListener.*"/>
+			<Class name="org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode"/>
 		</Or>
 	</Match>
 

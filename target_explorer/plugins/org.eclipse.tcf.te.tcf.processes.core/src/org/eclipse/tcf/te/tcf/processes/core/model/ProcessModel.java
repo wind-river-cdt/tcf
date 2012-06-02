@@ -62,10 +62,10 @@ public class ProcessModel implements ITreeNodeModel{
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Create a root process node.
-	 * 
+	 *
 	 * @param peerModel The peer model which this process belongs to.
 	 * @return The root process node.
 	 */
@@ -101,8 +101,10 @@ public class ProcessModel implements ITreeNodeModel{
 					scheduleRefreshing();
 				}
 				else {
-					pollingTimer.cancel();
-					pollingTimer = null;
+					if (pollingTimer != null) {
+						pollingTimer.cancel();
+						pollingTimer = null;
+					}
 				}
 			}
 		};
@@ -171,7 +173,7 @@ public class ProcessModel implements ITreeNodeModel{
 		TimerTask pollingTask = new TimerTask(){
 			@Override
 	        public void run() {
-				if (root.childrenQueried && !root.childrenQueryRunning) {
+				if (root != null && root.childrenQueried && !root.childrenQueryRunning) {
 					root.refresh(refreshCallback);
 				}
 				else {

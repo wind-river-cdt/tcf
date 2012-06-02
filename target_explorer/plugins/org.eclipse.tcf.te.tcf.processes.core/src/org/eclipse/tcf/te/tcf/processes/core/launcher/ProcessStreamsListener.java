@@ -413,7 +413,6 @@ public class ProcessStreamsListener implements IStreams.StreamsListener, IProces
 		// The associated stream id
 		private final String streamId;
 		// The associated stream type id
-		@SuppressWarnings("unused")
 		private final String streamTypeId;
 		// The data provider applicable for the associated stream type id
 		private final StreamsDataProvider provider;
@@ -450,6 +449,15 @@ public class ProcessStreamsListener implements IStreams.StreamsListener, IProces
 		 */
 		public final String getStreamId() {
 			return streamId;
+		}
+
+		/**
+		 * Returns the associated stream type id.
+		 *
+		 * @return The associated stream type id.
+		 */
+		public final String getStreamTypeId() {
+			return streamTypeId;
 		}
 
 		/**

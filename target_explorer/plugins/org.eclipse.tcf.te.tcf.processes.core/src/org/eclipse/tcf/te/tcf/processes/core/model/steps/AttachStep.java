@@ -148,7 +148,7 @@ public class AttachStep {
 							}
 						});
 					} else {
-						onError(node, Messages.AttachStep_error_connect, error, callback);
+						onError(node, Messages.AttachStep_error_connect, null, callback);
 					}
 				} else {
 					onError(node, Messages.AttachStep_error_openChannel, error, callback);
