@@ -79,7 +79,9 @@ public class WorkbenchWindowListener implements IWindowListener {
 			// Register the perspective listener
 			window.addPerspectiveListener(perspectiveListener);
 			// Signal the active perspective to the perspective listener after registration
-			perspectiveListener.perspectiveActivated(window.getActivePage(), window.getActivePage().getPerspective());
+			if (window.getActivePage() != null) {
+				perspectiveListener.perspectiveActivated(window.getActivePage(), window.getActivePage().getPerspective());
+			}
 		}
 
 	}
