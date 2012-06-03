@@ -10,17 +10,22 @@
 package org.eclipse.tcf.debug.test;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
 import org.eclipse.debug.internal.ui.viewers.model.provisional.VirtualItem;
+import org.eclipse.tcf.debug.test.services.IWaitForEventCache;
+import org.eclipse.tcf.debug.test.services.RunControlCM;
 import org.eclipse.tcf.debug.test.services.RunControlCM.ContextState;
 import org.eclipse.tcf.debug.test.util.ICache;
 import org.eclipse.tcf.debug.test.util.RangeCache;
 import org.eclipse.tcf.debug.test.util.Transaction;
 import org.eclipse.tcf.services.ILineNumbers.CodeArea;
 import org.eclipse.tcf.services.IRunControl;
+import org.eclipse.tcf.services.IRunControl.RunControlContext;
 import org.eclipse.tcf.services.IStackTrace.StackTraceContext;
 import org.eclipse.tcf.services.ISymbols;
 import org.eclipse.tcf.services.ISymbols.Symbol;
@@ -411,7 +416,6 @@ public class SampleTest extends AbstractTcfUITest {
         }.get();
     }
 
-/* DISABLED: Hung up automated testing. Aborted after more than 4 hours execution time.
     public void testRunControlCMChildrenInvalidation() throws Exception {
         initProcessModel("tcf_test_func0");
 
@@ -461,7 +465,7 @@ public class SampleTest extends AbstractTcfUITest {
             }.get();
         }
 
-        // End test, check for remvoed events and that state caches were cleared
+        // End test, check for removed events and that state caches were cleared
         new Transaction<String>() {
             @Override
             protected String process() throws InvalidCacheException, ExecutionException {
@@ -510,5 +514,4 @@ public class SampleTest extends AbstractTcfUITest {
         removeBreakpoint("testRunControlCMChildrenInvalidation");
 
     }
-*/
 }
