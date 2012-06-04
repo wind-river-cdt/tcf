@@ -353,7 +353,7 @@ public class AttributesSection extends AbstractSection {
 	 */
 	public void dataChanged(TypedEvent e) {
 	    // dataChanged is not evaluated while the controls are updated
-	    if (!isUpdating()) return;
+	    if (isUpdating()) return;
 
 		boolean isDirty = false;
 

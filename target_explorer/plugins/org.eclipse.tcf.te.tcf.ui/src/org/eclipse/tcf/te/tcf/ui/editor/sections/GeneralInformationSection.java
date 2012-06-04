@@ -312,7 +312,7 @@ public class GeneralInformationSection extends AbstractSection {
 	@Override
 	public boolean isValid() {
 	    // Validation is skipped while the controls are updated
-	    if (!isUpdating()) return true;
+	    if (isUpdating()) return true;
 
 		boolean valid =  super.isValid();
 
@@ -388,7 +388,7 @@ public class GeneralInformationSection extends AbstractSection {
 	 */
 	public void dataChanged(TypedEvent e) {
 	    // dataChanged is not evaluated while the controls are updated
-	    if (!isUpdating()) return;
+	    if (isUpdating()) return;
 
 		boolean isDirty = false;
 
