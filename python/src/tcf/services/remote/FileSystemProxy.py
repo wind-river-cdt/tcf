@@ -1,4 +1,4 @@
-# *******************************************************************************
+# *****************************************************************************
 # * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others.
 # * All rights reserved. This program and the accompanying materials
 # * are made available under the terms of the Eclipse Public License v1.0
@@ -7,11 +7,12 @@
 # *
 # * Contributors:
 # *     Wind River Systems - initial API and implementation
-# *******************************************************************************
+# *****************************************************************************
 
 from tcf import errors, channel
 from tcf.services import filesystem
 from tcf.channel.Command import Command
+
 
 class Status(filesystem.FileSystemException):
     def __init__(self, status_or_exception, message=None, attrs=None):
@@ -39,9 +40,11 @@ class Status(filesystem.FileSystemException):
     def getAttributes(self):
         return self.attrs
 
+
 class FileSystemCommand(Command):
     def __init__(self, service, command, args):
-        super(FileSystemCommand, self).__init__(service.channel, service, command, args)
+        super(FileSystemCommand, self).__init__(service.channel, service,
+                                                command, args)
 
     def _toSFError(self, data):
         if data is None:
@@ -60,6 +63,7 @@ class FileSystemCommand(Command):
             s.initCause(self.toError(caused_by, False))
         return s
 
+
 class FileSystemProxy(filesystem.FileSystemService):
     def __init__(self, channel):
         self.channel = channel
@@ -67,11 +71,13 @@ class FileSystemProxy(filesystem.FileSystemService):
     def close(self, handle, done):
         assert handle.getService() is self
         done = self._makeCallback(done)
-        id = handle.id
+        _id = handle.id
         service = self
+
         class CloseCommand(FileSystemCommand):
             def __init__(self):
-                super(CloseCommand, self).__init__(service, "close", (id,))
+                super(CloseCommand, self).__init__(service, "close", (_id,))
+
             def done(self, error, args):
                 s = None
                 if error:
@@ -86,9 +92,12 @@ class FileSystemProxy(filesystem.FileSystemService):
         done = self._makeCallback(done)
         dt = _toObject(attrs)
         service = self
+
         class SetStatCommand(FileSystemCommand):
             def __init__(self):
-                super(SetStatCommand, self).__init__(service, "setstat", (path, dt))
+                super(SetStatCommand, self).__init__(service, "setstat",
+                                                     (path, dt))
+
             def done(self, error, args):
                 s = None
                 if error:
@@ -102,12 +111,15 @@ class FileSystemProxy(filesystem.FileSystemService):
     def fsetstat(self, handle, attrs, done):
         done = self._makeCallback(done)
         assert handle.getService() is self
-        id = handle.id
+        _id = handle.id
         dt = _toObject(attrs)
         service = self
+
         class FSetStatCommand(FileSystemCommand):
             def __init__(self):
-                super(FSetStatCommand, self).__init__(service, "fsetstat", (id, dt))
+                super(FSetStatCommand, self).__init__(service, "fsetstat",
+                                                      (_id, dt))
+
             def done(self, error, args):
                 s = None
                 if error:
@@ -121,9 +133,11 @@ class FileSystemProxy(filesystem.FileSystemService):
     def stat(self, path, done):
         done = self._makeCallback(done)
         service = self
+
         class StatCommand(FileSystemCommand):
             def __init__(self):
                 super(StatCommand, self).__init__(service, "stat", (path,))
+
             def done(self, error, args):
                 s = None
                 a = None
@@ -132,18 +146,21 @@ class FileSystemProxy(filesystem.FileSystemService):
                 else:
                     assert len(args) == 2
                     s = self._toSFError(args[0])
-                    if not s: a = _toFileAttrs(args[1])
+                    if not s:
+                        a = _toFileAttrs(args[1])
                 done.doneStat(self.token, s, a)
         return StatCommand().token
 
     def fstat(self, handle, done):
         done = self._makeCallback(done)
         assert handle.getService() is self
-        id = handle.id
+        _id = handle.id
         service = self
+
         class FStatCommand(FileSystemCommand):
             def __init__(self):
-                super(FStatCommand, self).__init__(service, "fstat", (id,))
+                super(FStatCommand, self).__init__(service, "fstat", (_id,))
+
             def done(self, error, args):
                 s = None
                 a = None
@@ -152,16 +169,19 @@ class FileSystemProxy(filesystem.FileSystemService):
                 else:
                     assert len(args) == 2
                     s = self._toSFError(args[0])
-                    if not s: a = _toFileAttrs(args[1])
+                    if not s:
+                        a = _toFileAttrs(args[1])
                 done.doneStat(self.token, s, a)
         return FStatCommand().token
 
     def lstat(self, path, done):
         done = self._makeCallback(done)
         service = self
+
         class LStatCommand(FileSystemCommand):
             def __init__(self):
                 super(LStatCommand, self).__init__(service, "lstat", (path,))
+
             def done(self, error, args):
                 s = None
                 a = None
@@ -170,7 +190,8 @@ class FileSystemProxy(filesystem.FileSystemService):
                 else:
                     assert len(args) == 2
                     s = self._toSFError(args[0])
-                    if not s: a = _toFileAttrs(args[1])
+                    if not s:
+                        a = _toFileAttrs(args[1])
                 done.doneStat(self.token, s, a)
         return LStatCommand().token
 
@@ -178,9 +199,12 @@ class FileSystemProxy(filesystem.FileSystemService):
         done = self._makeCallback(done)
         dt = _toObject(attrs)
         service = self
+
         class MkDirCommand(FileSystemCommand):
             def __init__(self):
-                super(MkDirCommand, self).__init__(service, "mkdir", (dt,))
+                super(MkDirCommand, self).__init__(service, "mkdir",
+                                                   (path, dt,))
+
             def done(self, error, args):
                 s = None
                 if error:
@@ -195,9 +219,12 @@ class FileSystemProxy(filesystem.FileSystemService):
         done = self._makeCallback(done)
         dt = _toObject(attrs)
         service = self
+
         class OpenCommand(FileSystemCommand):
             def __init__(self):
-                super(OpenCommand, self).__init__(service, "open", (file_name, flags, dt))
+                super(OpenCommand, self).__init__(service, "open",
+                                                  (file_name, flags, dt))
+
             def done(self, error, args):
                 s = None
                 h = None
@@ -206,16 +233,20 @@ class FileSystemProxy(filesystem.FileSystemService):
                 else:
                     assert len(args) == 2
                     s = self._toSFError(args[0])
-                    if not s: h = service._toFileHandle(args[1])
+                    if not s:
+                        h = service._toFileHandle(args[1])
                 done.doneOpen(self.token, s, h)
         return OpenCommand().token
 
     def opendir(self, path, done):
         done = self._makeCallback(done)
         service = self
+
         class OpenDirCommand(FileSystemCommand):
             def __init__(self):
-                super(OpenDirCommand, self).__init__(service, "opendir", (path,))
+                super(OpenDirCommand, self).__init__(service, "opendir",
+                                                     (path,))
+
             def done(self, error, args):
                 s = None
                 h = None
@@ -224,7 +255,8 @@ class FileSystemProxy(filesystem.FileSystemService):
                 else:
                     assert len(args) == 2
                     s = self._toSFError(args[0])
-                    if not s: h = service._toFileHandle(args[1])
+                    if not s:
+                        h = service._toFileHandle(args[1])
                 done.doneOpen(self.token, s, h)
         return OpenDirCommand().token
 
@@ -233,10 +265,12 @@ class FileSystemProxy(filesystem.FileSystemService):
         done = self._makeCallback(done)
         handleID = handle.id
         service = self
+
         class ReadCommand(FileSystemCommand):
             def __init__(self):
                 super(ReadCommand, self).__init__(service, "read",
                                                   (handleID, offset, length))
+
             def done(self, error, args):
                 s = None
                 b = None
@@ -255,11 +289,14 @@ class FileSystemProxy(filesystem.FileSystemService):
     def readdir(self, handle, done):
         assert handle.getService() is self
         done = self._makeCallback(done)
-        id = handle.id
+        _id = handle.id
         service = self
+
         class ReadDirCommand(FileSystemCommand):
             def __init__(self):
-                super(ReadDirCommand, self).__init__(service, "readdir", (id,))
+                super(ReadDirCommand, self).__init__(service, "readdir",
+                                                     (_id,))
+
             def done(self, error, args):
                 s = None
                 b = None
@@ -278,9 +315,11 @@ class FileSystemProxy(filesystem.FileSystemService):
     def roots(self, done):
         done = self._makeCallback(done)
         service = self
+
         class RootCommand(FileSystemCommand):
             def __init__(self):
                 super(RootCommand, self).__init__(service, "roots", None)
+
             def done(self, error, args):
                 s = None
                 b = None
@@ -297,9 +336,12 @@ class FileSystemProxy(filesystem.FileSystemService):
     def readlink(self, path, done):
         done = self._makeCallback(done)
         service = self
+
         class ReadLinkCommand(FileSystemCommand):
             def __init__(self):
-                super(ReadLinkCommand, self).__init__(service, "readlink", (path,))
+                super(ReadLinkCommand, self).__init__(service, "readlink",
+                                                      (path,))
+
             def done(self, error, args):
                 s = None
                 p = None
@@ -316,9 +358,12 @@ class FileSystemProxy(filesystem.FileSystemService):
     def realpath(self, path, done):
         done = self._makeCallback(done)
         service = self
+
         class RealPathCommand(FileSystemCommand):
             def __init__(self):
-                super(RealPathCommand, self).__init__(service, "realpath", (path,))
+                super(RealPathCommand, self).__init__(service, "realpath",
+                                                      (path,))
+
             def done(self, error, args):
                 s = None
                 p = None
@@ -335,9 +380,12 @@ class FileSystemProxy(filesystem.FileSystemService):
     def remove(self, file_name, done):
         done = self._makeCallback(done)
         service = self
+
         class RemoveCommand(FileSystemCommand):
             def __init__(self):
-                super(RemoveCommand, self).__init__(service, "remove", (file_name,))
+                super(RemoveCommand, self).__init__(service, "remove",
+                                                    (file_name,))
+
             def done(self, error, args):
                 s = None
                 if error:
@@ -351,9 +399,12 @@ class FileSystemProxy(filesystem.FileSystemService):
     def rename(self, old_path, new_path, done):
         done = self._makeCallback(done)
         service = self
+
         class RenameCommand(FileSystemCommand):
             def __init__(self):
-                super(RenameCommand, self).__init__(service, "rename", (old_path, new_path))
+                super(RenameCommand, self).__init__(service, "rename",
+                                                    (old_path, new_path))
+
             def done(self, error, args):
                 s = None
                 if error:
@@ -367,9 +418,11 @@ class FileSystemProxy(filesystem.FileSystemService):
     def rmdir(self, path, done):
         done = self._makeCallback(done)
         service = self
+
         class RmDirCommand(FileSystemCommand):
             def __init__(self):
                 super(RmDirCommand, self).__init__(service, "rmdir", (path,))
+
             def done(self, error, args):
                 s = None
                 if error:
@@ -383,9 +436,12 @@ class FileSystemProxy(filesystem.FileSystemService):
     def symlink(self, link_path, target_path, done):
         done = self._makeCallback(done)
         service = self
+
         class SymLinkCommand(FileSystemCommand):
             def __init__(self):
-                super(SymLinkCommand, self).__init__(service, "symlink", (link_path, target_path))
+                super(SymLinkCommand, self).__init__(service, "symlink",
+                                                     (link_path, target_path))
+
             def done(self, error, args):
                 s = None
                 if error:
@@ -399,12 +455,15 @@ class FileSystemProxy(filesystem.FileSystemService):
     def write(self, handle, offset, data, data_pos, data_size, done):
         assert handle.getService() is self
         done = self._makeCallback(done)
-        id = handle.id
+        _id = handle.id
         binary = bytearray(data[data_pos:data_pos + data_size])
         service = self
+
         class WriteCommand(FileSystemCommand):
             def __init__(self):
-                super(WriteCommand, self).__init__(service, "write", (id, offset, binary))
+                super(WriteCommand, self).__init__(service, "write",
+                                                   (_id, offset, binary))
+
             def done(self, error, args):
                 s = None
                 if error:
@@ -418,10 +477,12 @@ class FileSystemProxy(filesystem.FileSystemService):
     def copy(self, src_path, dst_path, copy_permissions, copy_uidgid, done):
         done = self._makeCallback(done)
         service = self
+
         class CopyCommand(FileSystemCommand):
             def __init__(self):
                 super(CopyCommand, self).__init__(service, "copy",
-                        (id, src_path, dst_path, copy_permissions, copy_uidgid))
+                    (id, src_path, dst_path, copy_permissions, copy_uidgid))
+
             def done(self, error, args):
                 s = None
                 if error:
@@ -435,9 +496,11 @@ class FileSystemProxy(filesystem.FileSystemService):
     def user(self, done):
         done = self._makeCallback(done)
         service = self
+
         class UserCommand(FileSystemCommand):
             def __init__(self):
                 super(UserCommand, self).__init__(service, "user", None)
+
             def done(self, error, args):
                 s = None
                 r_uid = 0
@@ -454,13 +517,17 @@ class FileSystemProxy(filesystem.FileSystemService):
         return UserCommand().token
 
     def _toFileHandle(self, o):
-        if o is None: return None
+        if o is None:
+            return None
         return filesystem.FileHandle(self, o)
 
+
 def _toObject(attrs):
-    if attrs is None: return None
+    if attrs is None:
+        return None
     m = {}
-    if attrs.attributes is not None: m.update(attrs.attributes)
+    if attrs.attributes is not None:
+        m.update(attrs.attributes)
     if (attrs.flags & filesystem.ATTR_SIZE) != 0:
         m["Size"] = attrs.size
     if (attrs.flags & filesystem.ATTR_UIDGID) != 0:
@@ -473,8 +540,10 @@ def _toObject(attrs):
         m["MTime"] = attrs.mtime
     return m
 
+
 def _toFileAttrs(m):
-    if m is None: return None
+    if m is None:
+        return None
     flags = 0
     size = 0
     uid = 0
@@ -502,12 +571,16 @@ def _toFileAttrs(m):
         atime = n1
         mtime = n2
         flags |= filesystem.ATTR_ACMODTIME
-    return filesystem.FileAttrs(flags, size, uid, gid, permissions, atime, mtime, m)
+    return filesystem.FileAttrs(flags, size, uid, gid,
+                                permissions, atime, mtime, m)
+
 
 def _toDirEntryArray(o):
-    if o is None: return None
+    if o is None:
+        return None
     res = []
     for m in o:
-        entry = filesystem.DirEntry(m.get("FileName"), m.get("LongName"), _toFileAttrs(m.get("Attrs")))
+        entry = filesystem.DirEntry(m.get("FileName"), m.get("LongName"),
+                                    _toFileAttrs(m.get("Attrs")))
         res.append(entry)
     return res
