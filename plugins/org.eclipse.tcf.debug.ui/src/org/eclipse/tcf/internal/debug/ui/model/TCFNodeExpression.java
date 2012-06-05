@@ -45,7 +45,6 @@ import org.eclipse.tcf.internal.debug.ui.ImageCache;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.protocol.JSON;
-import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IExpressions;
 import org.eclipse.tcf.services.IMemory;
 import org.eclipse.tcf.services.IMemory.MemoryError;
@@ -371,143 +370,80 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
             }
         };
         string = new TCFData<String>(channel) {
-            IMemory.MemoryContext mem;
             ISymbols.Symbol base_type_data;
             BigInteger addr;
             byte[] buf;
             int size;
             int offs;
-            @SuppressWarnings("incomplete-switch")
             @Override
+            @SuppressWarnings("incomplete-switch")
             protected boolean startDataRetrieval() {
-                if (addr != null) {
-                    if (mem == null) {
-                        TCFDataCache<TCFNodeExecContext> mem_node_cache = model.searchMemoryContext(parent);
-                        if (mem_node_cache == null) {
-                            set(null, new Exception("Context does not provide memory access"), null);
-                            return true;
-                        }
-                        if (!mem_node_cache.validate(this)) return false;
-                        if (mem_node_cache.getError() != null) {
-                            set(null, mem_node_cache.getError(), null);
-                            return true;
-                        }
-                        TCFNodeExecContext mem_node = mem_node_cache.getData();
-                        if (mem_node == null) {
-                            set(null, new Exception("Context does not provide memory access"), null);
-                            return true;
-                        }
-                        TCFDataCache<IMemory.MemoryContext> mem_ctx_cache = mem_node.getMemoryContext();
-                        if (!mem_ctx_cache.validate(this)) return false;
-                        if (mem_ctx_cache.getError() != null) {
-                            set(null, mem_ctx_cache.getError(), null);
-                            return true;
-                        }
-                        mem = mem_ctx_cache.getData();
-                        if (mem == null) {
-                            set(null, new Exception("Context does not provide memory access"), null);
-                            return true;
-                        }
-                    }
-                    if (size == 0) {
-                        // data is ASCII string
-                        if (buf == null) buf = new byte[256];
-                        if (offs >= buf.length) {
-                            byte[] tmp = new byte[buf.length * 2];
-                            System.arraycopy(buf, 0, tmp, 0, buf.length);
-                            buf = tmp;
-                        }
-                        command = mem.get(addr.add(BigInteger.valueOf(offs)), 1, buf, offs, 1, 0, new IMemory.DoneMemory() {
-                            public void doneMemory(IToken token, MemoryError error) {
-                                if (error != null) {
-                                    set(command, error, null);
-                                }
-                                else if (buf[offs] == 0 || offs >= 2048) {
-                                    set(command, null, toASCIIString(buf, 0, offs, '"'));
-                                }
-                                else if (command == token) {
-                                    command = null;
-                                    offs++;
-                                    run();
-                                }
-                            }
-                        });
-                        return false;
-                    }
-                    // data is a struct
-                    if (offs != size) {
-                        if (buf == null || buf.length < size) buf = new byte[size];
-                        command = mem.get(addr, 1, buf, 0, size, 0, new IMemory.DoneMemory() {
-                            public void doneMemory(IToken token, MemoryError error) {
-                                if (error != null) {
-                                    set(command, error, null);
-                                }
-                                else if (command == token) {
-                                    command = null;
-                                    offs = size;
-                                    run();
-                                }
-                            }
-                        });
-                        return false;
-                    }
-                    StyledStringBuffer bf = new StyledStringBuffer();
-                    bf.append('{');
-                    if (!appendCompositeValueText(bf, 1, base_type_data, buf, 0, size, mem.isBigEndian(), this)) return false;
-                    bf.append('}');
-                    set(null, null, bf.toString());
-                    return true;
-                }
+                if (addr != null) return continueMemRead();
+                if (!value.validate(this)) return false;
                 if (!type.validate(this)) return false;
+                IExpressions.Value value_data = value.getData();
                 ISymbols.Symbol type_data = type.getData();
-                if (type_data != null) {
+                if (value_data != null && value_data.getValue() != null && type_data != null) {
                     switch (type_data.getTypeClass()) {
                     case pointer:
                     case array:
-                        TCFDataCache<ISymbols.Symbol> base_type_cahce = model.getSymbolInfoCache(type_data.getBaseTypeID());
-                        if (base_type_cahce != null) {
-                            if (!base_type_cahce.validate(this)) return false;
-                            base_type_data = base_type_cahce.getData();
-                            if (base_type_data != null) {
-                                offs = 0;
-                                size = base_type_data.getSize();
-                                switch (base_type_data.getTypeClass()) {
-                                case integer:
-                                case cardinal:
-                                    if (base_type_data.getSize() != 1) break;
-                                    size = 0; // read until character = 0
-                                case composite:
-                                    if (base_type_data.getSize() == 0) break;
-                                    if (type_data.getTypeClass() == ISymbols.TypeClass.array &&
-                                            base_type_data.getTypeClass() == ISymbols.TypeClass.composite) break;
-                                    if (!value.validate(this)) return false;
-                                    IExpressions.Value v = value.getData();
-                                    if (v != null) {
-                                        byte[] data = v.getValue();
-                                        if (type_data.getTypeClass() == ISymbols.TypeClass.array) {
-                                            set(null, null, toASCIIString(data, 0, data.length, '"'));
-                                            return true;
-                                        }
-                                        BigInteger a = TCFNumberFormat.toBigInteger(data, v.isBigEndian(), false);
-                                        if (!a.equals(BigInteger.valueOf(0))) {
-                                            addr = a;
-                                            Protocol.invokeLater(this);
-                                            return false;
-                                        }
-                                    }
-                                }
+                        TCFDataCache<ISymbols.Symbol> base_type_cache = model.getSymbolInfoCache(type_data.getBaseTypeID());
+                        if (base_type_cache == null) break;
+                        if (!base_type_cache.validate(this)) return false;
+                        base_type_data = base_type_cache.getData();
+                        if (base_type_data == null) break;
+                        size = base_type_data.getSize();
+                        if (size == 0) break;
+                        switch (base_type_data.getTypeClass()) {
+                        case integer:
+                        case cardinal:
+                            if (base_type_data.getSize() != 1) break;
+                            // c-string: read until character = 0
+                            if (type_data.getTypeClass() == ISymbols.TypeClass.array) {
+                                byte[] data = value_data.getValue();
+                                set(null, null, toASCIIString(data, 0, data.length, '"'));
+                                return true;
                             }
+                            // pointer, read c-string data from memory
+                            size = 0; // read until 0
+                            return startMemRead(value_data);
+                        case composite:
+                            if (type_data.getTypeClass() == ISymbols.TypeClass.array) break;
+                            // pointer, read struct data from memory
+                            return startMemRead(value_data);
                         }
                         break;
                     case integer:
                     case cardinal:
                         if (type_data.getSize() == 1) {
-                            if (!value.validate(this)) return false;
-                            IExpressions.Value v = value.getData();
-                            if (v != null) {
-                                byte[] data = v.getValue();
-                                set(null, null, toASCIIString(data, 0, data.length, '\''));
-                                return true;
+                            byte[] data = value_data.getValue();
+                            set(null, null, toASCIIString(data, 0, data.length, '\''));
+                            return true;
+                        }
+                        break;
+                    case enumeration:
+                        TCFDataCache<String[]> type_children_cache = model.getSymbolChildrenCache(type_data.getID());
+                        if (!type_children_cache.validate(this)) return false;
+                        String[] type_children_data = type_children_cache.getData();
+                        if (type_children_data == null) break;
+                        for (String const_id : type_children_data) {
+                            TCFDataCache<ISymbols.Symbol> const_cache = model.getSymbolInfoCache(const_id);
+                            if (!const_cache.validate(this)) return false;
+                            ISymbols.Symbol const_data = const_cache.getData();
+                            if (const_data != null && const_data.getName() != null) {
+                                byte[] const_bytes = const_data.getValue();
+                                if (const_bytes != null) {
+                                    boolean ok = true;
+                                    byte[] data = value_data.getValue();
+                                    for (int i = 0; ok && i < data.length; i++) {
+                                        if (i < const_bytes.length) ok = const_bytes[i] == data[i];
+                                        else ok = data[i] == 0;
+                                    }
+                                    if (ok) {
+                                        set(null, null, const_data.getName());
+                                        return true;
+                                    }
+                                }
                             }
                         }
                         break;
@@ -519,8 +455,95 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
             @Override
             public void reset() {
                 super.reset();
-                mem = null;
                 addr = null;
+            }
+            private boolean startMemRead(IExpressions.Value value_data) {
+                byte[] data = value_data.getValue();
+                BigInteger a = TCFNumberFormat.toBigInteger(data, value_data.isBigEndian(), false);
+                if (!a.equals(BigInteger.valueOf(0))) {
+                    addr = a;
+                    offs = 0;
+                    return continueMemRead();
+                }
+                set(null, null, null);
+                return true;
+            }
+            private boolean continueMemRead() {
+                // indirect value, need to read it from memory
+                TCFDataCache<TCFNodeExecContext> mem_node_cache = model.searchMemoryContext(parent);
+                if (mem_node_cache == null) {
+                    set(null, new Exception("Context does not provide memory access"), null);
+                    return true;
+                }
+                if (!mem_node_cache.validate(this)) return false;
+                if (mem_node_cache.getError() != null) {
+                    set(null, mem_node_cache.getError(), null);
+                    return true;
+                }
+                TCFNodeExecContext mem_node = mem_node_cache.getData();
+                if (mem_node == null) {
+                    set(null, new Exception("Context does not provide memory access"), null);
+                    return true;
+                }
+                TCFDataCache<IMemory.MemoryContext> mem_ctx_cache = mem_node.getMemoryContext();
+                if (!mem_ctx_cache.validate(this)) return false;
+                if (mem_ctx_cache.getError() != null) {
+                    set(null, mem_ctx_cache.getError(), null);
+                    return true;
+                }
+                IMemory.MemoryContext mem_space_data = mem_ctx_cache.getData();
+                if (mem_space_data == null) {
+                    set(null, new Exception("Context does not provide memory access"), null);
+                    return true;
+                }
+                if (size == 0) {
+                    // c-string: read until 0
+                    if (buf == null) buf = new byte[256];
+                    if (offs >= buf.length) {
+                        byte[] tmp = new byte[buf.length * 2];
+                        System.arraycopy(buf, 0, tmp, 0, buf.length);
+                        buf = tmp;
+                    }
+                    command = mem_space_data.get(addr.add(BigInteger.valueOf(offs)), 1, buf, offs, 1, 0, new IMemory.DoneMemory() {
+                        public void doneMemory(IToken token, MemoryError error) {
+                            if (error != null) {
+                                set(command, error, null);
+                            }
+                            else if (buf[offs] == 0 || offs >= 2048) {
+                                set(command, null, toASCIIString(buf, 0, offs, '"'));
+                            }
+                            else if (command == token) {
+                                command = null;
+                                offs++;
+                                run();
+                            }
+                        }
+                    });
+                    return false;
+                }
+                if (offs == 0) {
+                    buf = new byte[size];
+                    command = mem_space_data.get(addr, 1, buf, 0, size, 0, new IMemory.DoneMemory() {
+                        public void doneMemory(IToken token, MemoryError error) {
+                            if (error != null) {
+                                set(command, error, null);
+                            }
+                            else if (command == token) {
+                                command = null;
+                                offs++;
+                                run();
+                            }
+                        }
+                    });
+                    return false;
+                }
+                StyledStringBuffer bf = new StyledStringBuffer();
+                bf.append('{');
+                if (!appendCompositeValueText(bf, 1, base_type_data, buf,
+                        0, size, base_type_data.isBigEndian(), this)) return false;
+                bf.append('}');
+                set(null, null, bf.toString());
+                return true;
             }
         };
         type_name = new TCFData<String>(channel) {
@@ -776,22 +799,18 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
 
     @SuppressWarnings("incomplete-switch")
     private String getTypeName(ISymbols.TypeClass type_class, int size) {
-        String s = null;
         switch (type_class) {
         case integer:
-            if (size == 0) s = "<Void>";
-            else s = "<Integer-" + (size * 8) + ">";
-            break;
+            if (size == 0) return "<Void>";
+            return "<Integer-" + (size * 8) + ">";
         case cardinal:
-            if (size == 0) s = "<Void>";
-            else s = "<Unsigned-" + (size * 8) + ">";
-            break;
+            if (size == 0) return "<Void>";
+            return "<Unsigned-" + (size * 8) + ">";
         case real:
-            if (size == 0) s = "<Void>";
-            else s = "<Float-" + (size * 8) + ">";
-            break;
+            if (size == 0) return null;
+            return "<Float-" + (size * 8) + ">";
         }
-        return s;
+        return null;
     }
 
     @SuppressWarnings("incomplete-switch")
@@ -856,26 +875,24 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
                         {
                             TCFDataCache<String[]> children_cache = model.getSymbolChildrenCache(type_symbol.getID());
                             if (!children_cache.validate(done)) return false;
-                            if (children_cache.getError() == null) {
-                                String[] children = children_cache.getData();
-                                if (children != null) {
-                                    StringBuffer args = new StringBuffer();
-                                    if (name != null) {
-                                        args.append('(');
-                                        args.append(name);
-                                        args.append(')');
-                                        name = null;
-                                    }
+                            String[] children = children_cache.getData();
+                            if (children != null) {
+                                StringBuffer args = new StringBuffer();
+                                if (name != null) {
                                     args.append('(');
-                                    for (String id : children) {
-                                        if (id != children[0]) args.append(',');
-                                        if (!getTypeName(args, model.getSymbolInfoCache(id), done)) return false;
-                                    }
+                                    args.append(name);
                                     args.append(')');
-                                    s = args.toString();
-                                    get_base_type = true;
-                                    break;
+                                    name = null;
                                 }
+                                args.append('(');
+                                for (String id : children) {
+                                    if (id != children[0]) args.append(',');
+                                    if (!getTypeName(args, model.getSymbolInfoCache(id), done)) return false;
+                                }
+                                args.append(')');
+                                s = args.toString();
+                                get_base_type = true;
+                                break;
                             }
                         }
                         s = "<Function>";
@@ -899,7 +916,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
 
             type_cache = model.getSymbolInfoCache(type_symbol.getBaseTypeID());
             if (type_cache == null) {
-                name = "N/A";
+                name = "<Unknown> " + name;
                 break;
             }
         }
@@ -948,15 +965,13 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
         String s = null;
         if (data == null) s = "N/A";
         if (s == null && radix == 10) {
-            if (t != null) {
-                switch (t) {
-                case integer:
-                    s = TCFNumberFormat.toBigInteger(data, offs, size, big_endian, true).toString();
-                    break;
-                case real:
-                    s = TCFNumberFormat.toFPString(data, offs, size, big_endian);
-                    break;
-                }
+            switch (t) {
+            case integer:
+                s = TCFNumberFormat.toBigInteger(data, offs, size, big_endian, true).toString();
+                break;
+            case real:
+                s = TCFNumberFormat.toFPString(data, offs, size, big_endian);
+                break;
             }
         }
         if (s == null) {
