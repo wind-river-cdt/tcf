@@ -83,16 +83,30 @@ public class ScannerRunnable implements Runnable, IChannel.IChannelListener {
 	 */
 	@Override
 	public void run() {
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+
+		// Determine the peer
+		IPeer peer = peerNode.getPeer();
+		if (peer == null) return;
+
+		// Don't scan proxies or value-add's
+		boolean isProxy = peer.getAttributes().containsKey("Proxy"); //$NON-NLS-1$
+
+		String value = peer.getAttributes().get("ValueAdd"); //$NON-NLS-1$
+		boolean isValueAdd = value != null && ("1".equals(value.trim()) || Boolean.parseBoolean(value.trim())); //$NON-NLS-1$
+
+		if (isProxy || isValueAdd) return;
+
 		// Remember the peer node state
 		oldState = peerNode.getIntProperty(IPeerModelProperties.PROP_STATE);
 		// Do not open a channel to incomplete peer nodes
-		if (peerNode.isComplete() && peerNode.getPeer() != null) {
+		if (peerNode.isComplete()) {
 			// Check if there is a shared channel available which is still in open state
-			channel = Tcf.getChannelManager().getChannel(peerNode.getPeer());
+			channel = Tcf.getChannelManager().getChannel(peer);
 			if (channel == null || channel.getState() != IChannel.STATE_OPEN) {
 				sharedChannel = false;
 				// Open the channel
-				channel = peerNode.getPeer().openChannel();
+				channel = peer.openChannel();
 				// Add ourself as channel listener
 				channel.addChannelListener(this);
 			} else {
