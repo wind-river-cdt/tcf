@@ -11,35 +11,34 @@
 package org.eclipse.tcf.internal.debug.ui.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.tcf.debug.ui.ITCFAnnotationProvider;
+import org.eclipse.tcf.debug.ui.ITCFPrettyExpressionProvider;
 import org.eclipse.tcf.internal.debug.ui.Activator;
 import org.osgi.framework.Bundle;
 
 /**
- * TCF clients can implement ITCFAnnotationProvider to manage debugger annotations
- * in the Eclipse workspace.
+ * TCF clients can implement ITCFPrettyExpressionProvider to provide human
+ * readable "pretty expression" strings that represent values of the TCF debug model objects
+ * to be shown in the debugger views.
  *
- * Debugger annotations include editor markers for current instruction pointer,
- * stack frame addresses, and breakpoint planting status.
- *
- * TCF will use internal annotation provider if no suitable provider is found
- * through "annotation_provider" extension point for current selection in the Debug view.
+ * TCF will use internal pretty expression if no suitable provider is found
+ * through "pretty_expression_provider" extension point.
  */
-public class TCFAnnotationProvider {
+public class TCFPrettyExpressionProvider {
 
-    private static ArrayList<ITCFAnnotationProvider> providers;
+    private static ArrayList<ITCFPrettyExpressionProvider> providers;
 
-    public static ITCFAnnotationProvider getAnnotationProvider(Object selection) {
+    public static Collection<ITCFPrettyExpressionProvider> getProviders() {
         if (providers == null) {
-            providers = new  ArrayList<ITCFAnnotationProvider>();
+            providers = new  ArrayList<ITCFPrettyExpressionProvider>();
             try {
                 IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint(
-                        Activator.PLUGIN_ID, "annotation_provider"); //$NON-NLS-1$
+                        Activator.PLUGIN_ID, "pretty_expression_provider"); //$NON-NLS-1$
                 IExtension[] extensions = point.getExtensions();
                 for (int i = 0; i < extensions.length; i++) {
                     try {
@@ -50,22 +49,19 @@ public class TCFAnnotationProvider {
                             String nm = e[j].getName();
                             if (nm.equals("class")) { //$NON-NLS-1$
                                 Class<?> c = bundle.loadClass(e[j].getAttribute("name")); //$NON-NLS-1$
-                                providers.add((ITCFAnnotationProvider)c.newInstance());
+                                providers.add((ITCFPrettyExpressionProvider)c.newInstance());
                             }
                         }
                     }
                     catch (Throwable x) {
-                        Activator.log("Cannot access annotation provider extension points", x);
+                        Activator.log("Cannot access pretty expression provider extension points", x);
                     }
                 }
             }
             catch (Exception x) {
-                Activator.log("Cannot access annotation provider extension points", x);
+                Activator.log("Cannot access pretty expression provider extension points", x);
             }
         }
-        for (ITCFAnnotationProvider p : providers) {
-            if (p.isSupportedSelection(selection)) return p;
-        }
-        return null;
+        return providers;
     }
 }

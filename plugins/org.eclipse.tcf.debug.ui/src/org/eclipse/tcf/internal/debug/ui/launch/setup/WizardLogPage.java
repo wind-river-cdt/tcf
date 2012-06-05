@@ -293,6 +293,7 @@ class WizardLogPage extends WizardPage implements Runnable {
             if (s == null) break;
             send(s, true);
         }
+        rd.close();
         shell.write("\004");
         String s = waitPrompt();
         if (s.length() > 0) throw new Exception(s);

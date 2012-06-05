@@ -13,6 +13,7 @@ package org.eclipse.tcf.internal.debug.ui.model;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.tcf.debug.ui.ITCFPrettyExpressionProvider;
 import org.eclipse.tcf.services.IExpressions;
 import org.eclipse.tcf.services.ISymbols;
 import org.eclipse.tcf.util.TCFDataCache;
@@ -156,11 +157,40 @@ public class TCFChildrenSubExpressions extends TCFChildren {
         return null;
     }
 
+    private TCFNodeExpression findScript(String s) {
+        // TODO: need faster search
+        for (TCFNode n : getNodes()) {
+            if (n instanceof TCFNodeExpression) {
+                TCFNodeExpression e = (TCFNodeExpression)n;
+                if (s.equals(e.getScript())) return e;
+            }
+        }
+        return null;
+    }
+
     @Override
     protected boolean startDataRetrieval() {
         assert !isDisposed();
         TCFNode exp = node;
         while (!(exp instanceof TCFNodeExpression)) exp = exp.parent;
+        for (ITCFPrettyExpressionProvider p : TCFPrettyExpressionProvider.getProviders()) {
+            TCFDataCache<String[]> c = p.getChildren(exp);
+            if (c != null) {
+                if (!c.validate(this)) return false;
+                if (c.getError() == null && c.getData() != null) {
+                    int i = 0;
+                    HashMap<String,TCFNode> data = new HashMap<String,TCFNode>();
+                    for (String s : c.getData()) {
+                        TCFNodeExpression n = findScript(s);
+                        if (n == null) n = new TCFNodeExpression(node, s, null, null, null, -1, false);
+                        n.setSortPosition(i++);
+                        data.put(n.id, n);
+                    }
+                    set(null, null, data);
+                    return true;
+                }
+            }
+        }
         TCFDataCache<ISymbols.Symbol> type_cache = ((TCFNodeExpression)exp).getType();
         if (!type_cache.validate(this)) return false;
         ISymbols.Symbol type_data = type_cache.getData();

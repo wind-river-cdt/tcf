@@ -15,6 +15,7 @@
 
    <extension-point id="launch_context" name="TCF Launch Context" schema="schema/launch_context.exsd"/>
    <extension-point id="annotation_provider" name="TCF Annotation Provider" schema="schema/annotation_provider.exsd"/>
+   <extension-point id="pretty_expression_provider" name="TCF Pretty Expression Provider" schema="schema/pretty_expression_provider.exsd"/>
 
    <extension point="org.eclipse.tcf.startup"/>
 

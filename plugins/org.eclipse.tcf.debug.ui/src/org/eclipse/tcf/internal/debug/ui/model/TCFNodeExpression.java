@@ -37,6 +37,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tcf.debug.ui.ITCFExpression;
+import org.eclipse.tcf.debug.ui.ITCFPrettyExpressionProvider;
 import org.eclipse.tcf.internal.debug.model.TCFContextState;
 import org.eclipse.tcf.internal.debug.ui.Activator;
 import org.eclipse.tcf.internal.debug.ui.ImageCache;
@@ -52,7 +54,8 @@ import org.eclipse.tcf.services.ISymbols;
 import org.eclipse.tcf.util.TCFDataCache;
 import org.eclipse.tcf.util.TCFTask;
 
-public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastToType, IWatchInExpressions, IDetailsProvider {
+public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastToType,
+        IWatchInExpressions, IDetailsProvider, ITCFExpression {
 
     // TODO: User commands: Add Global Variables, Remove Global Variables
     // TODO: enable Change Value user command
@@ -374,6 +377,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
             byte[] buf;
             int size;
             int offs;
+            @SuppressWarnings("incomplete-switch")
             @Override
             protected boolean startDataRetrieval() {
                 if (addr != null) {
@@ -559,6 +563,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
 
     @Override
     public void dispose() {
+        for (ITCFPrettyExpressionProvider p : TCFPrettyExpressionProvider.getProviders()) p.dispose(this);
         disposeRemoteExpression();
         super.dispose();
     }
@@ -585,6 +590,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
         if (parent_value != null && base_text.isValid()) {
             base_text.reset();
             rem_expression.cancel();
+            for (ITCFPrettyExpressionProvider p : TCFPrettyExpressionProvider.getProviders()) p.cancel(this);
             string.cancel();
             value.cancel();
         }
@@ -599,6 +605,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
         if (rem_expression.isValid() && rem_expression.getError() != null) rem_expression.reset();
         if (!func_call || value.isValid() && value.getError() != null) value.reset();
         if (!func_call || string.isValid() && string.getError() != null) string.reset();
+        for (ITCFPrettyExpressionProvider p : TCFPrettyExpressionProvider.getProviders()) p.cancel(this);
         children.onSuspended(func_call);
         if (!func_call) resetBaseText();
         // No need to post delta: parent posted CONTENT
@@ -609,6 +616,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
         type.reset();
         type_name.reset();
         string.reset();
+        for (ITCFPrettyExpressionProvider p : TCFPrettyExpressionProvider.getProviders()) p.cancel(this);
         children.onRegisterValueChanged();
         resetBaseText();
         postAllChangedDelta();
@@ -619,6 +627,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
         type.reset();
         type_name.reset();
         string.reset();
+        for (ITCFPrettyExpressionProvider p : TCFPrettyExpressionProvider.getProviders()) p.cancel(this);
         children.onMemoryChanged();
         resetBaseText();
         if (parent instanceof TCFNodeExpression) return;
@@ -631,6 +640,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
         type.reset();
         type_name.reset();
         string.reset();
+        for (ITCFPrettyExpressionProvider p : TCFPrettyExpressionProvider.getProviders()) p.cancel(this);
         children.onMemoryMapChanged();
         resetBaseText();
         if (parent instanceof TCFNodeExpression) return;
@@ -643,6 +653,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
         type.reset();
         type_name.reset();
         string.reset();
+        for (ITCFPrettyExpressionProvider p : TCFPrettyExpressionProvider.getProviders()) p.cancel(this);
         children.onValueChanged();
         resetBaseText();
         postAllChangedDelta();
@@ -654,6 +665,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
         type.cancel();
         type_name.cancel();
         string.cancel();
+        for (ITCFPrettyExpressionProvider p : TCFPrettyExpressionProvider.getProviders()) p.cancel(this);
         expression_text.cancel();
         children.onCastToTypeChanged();
         resetBaseText();
@@ -762,6 +774,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
         return false;
     }
 
+    @SuppressWarnings("incomplete-switch")
     private String getTypeName(ISymbols.TypeClass type_class, int size) {
         String s = null;
         switch (type_class) {
@@ -781,6 +794,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
         return s;
     }
 
+    @SuppressWarnings("incomplete-switch")
     private boolean getTypeName(StringBuffer bf, TCFDataCache<ISymbols.Symbol> type_cache, Runnable done) {
         String name = null;
         for (;;) {
@@ -921,6 +935,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
         return bf.toString();
     }
 
+    @SuppressWarnings("incomplete-switch")
     private String toNumberString(int radix, ISymbols.TypeClass t, byte[] data, int offs, int size, boolean big_endian) {
         if (size <= 0 || size > 16) return "";
         if (radix != 16) {
@@ -1075,7 +1090,9 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
             }
             else {
                 if (cols == null) {
-                    setLabel(result, name, 0, 16);
+                    String s = getPrettyExpression(done);
+                    if (s == null) return false;
+                    result.setLabel(name + " = " + s, 0);
                 }
                 else {
                     for (int i = 0; i < cols.length; i++) {
@@ -1092,6 +1109,11 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
                         }
                         else if (c.equals(TCFColumnPresentationExpression.COL_DEC_VALUE)) {
                             setLabel(result, null, i, 10);
+                        }
+                        else if (c.equals(TCFColumnPresentationExpression.COL_VALUE)) {
+                            String s = getPrettyExpression(done);
+                            if (s == null) return false;
+                            result.setLabel(s, i);
                         }
                     }
                 }
@@ -1156,7 +1178,8 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
                 String[] ids = update.getColumnIds();
                 for (int i = 0; i < cols.length; i++) {
                     if (TCFColumnPresentationExpression.COL_HEX_VALUE.equals(ids[i]) ||
-                            TCFColumnPresentationExpression.COL_DEC_VALUE.equals(ids[i])) {
+                            TCFColumnPresentationExpression.COL_DEC_VALUE.equals(ids[i]) ||
+                            TCFColumnPresentationExpression.COL_VALUE.equals(ids[i])) {
                         update.setFontData(TCFModelFonts.getMonospacedFontData(view_id), i);
                     }
                     else {
@@ -1165,6 +1188,29 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
                 }
             }
         }
+    }
+
+    private String getPrettyExpression(Runnable done) {
+        for (ITCFPrettyExpressionProvider p : TCFPrettyExpressionProvider.getProviders()) {
+            TCFDataCache<String> c = p.getText(this);
+            if (c != null) {
+                if (!c.validate(done)) return null;
+                if (c.getError() == null && c.getData() != null) return c.getData();
+            }
+        }
+        if (!value.validate(done)) return null;
+        if (!string.validate(done)) return null;
+        if (string.getData() != null) return string.getData();
+        StyledStringBuffer bf = new StyledStringBuffer();
+        IExpressions.Value v = value.getData();
+        if (v != null) {
+            byte[] data = v.getValue();
+            if (data != null) {
+                if (!appendValueText(bf, 1, v.getTypeID(),
+                        data, 0, data.length, v.isBigEndian(), done)) return null;
+            }
+        }
+        return bf.toString();
     }
 
     private boolean appendArrayValueText(StyledStringBuffer bf, int level, ISymbols.Symbol type,
@@ -1263,6 +1309,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
         bf.append('\n');
     }
 
+    @SuppressWarnings("incomplete-switch")
     private boolean appendValueText(StyledStringBuffer bf, int level, String type_id,
             byte[] data, int offs, int size, boolean big_endian, Runnable done) {
         if (data == null) return true;
@@ -1299,16 +1346,15 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
             return true;
         }
         if (level == 0) {
-            if (!string.validate(done)) return false;
-            Throwable e = string.getError();
-            String s = string.getData();
-            if (s != null) {
-                bf.append(s);
+            String s = getPrettyExpression(done);
+            if (s == null) return false;
+            if (s.length() > 0) {
+                bf.append(s, StyledStringBuffer.MONOSPACED);
                 bf.append('\n');
             }
-            else if (e != null) {
+            else if (string.getError() != null) {
                 bf.append("Cannot read pointed value: ", SWT.BOLD, null, rgb_error);
-                bf.append(TCFModel.getErrorMessage(e, false), SWT.ITALIC, null, rgb_error);
+                bf.append(TCFModel.getErrorMessage(string.getError(), false), SWT.ITALIC, null, rgb_error);
                 bf.append('\n');
             }
         }
@@ -1346,10 +1392,11 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
                 if (level == 0) bf.append('\n');
                 break;
             case composite:
-                bf.append('{');
-                if (!appendCompositeValueText(bf, level, type_data, data, offs, size, big_endian, done)) return false;
-                bf.append('}');
-                if (level == 0) bf.append('\n');
+                if (level > 0) {
+                    bf.append('{');
+                    if (!appendCompositeValueText(bf, level, type_data, data, offs, size, big_endian, done)) return false;
+                    bf.append('}');
+                }
                 break;
             }
         }
@@ -1594,6 +1641,7 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
             if (value == null) return;
             final TCFNodeExpression node = (TCFNodeExpression)element;
             new TCFTask<Boolean>() {
+                @SuppressWarnings("incomplete-switch")
                 public void run() {
                     try {
                         if (TCFColumnPresentationExpression.COL_NAME.equals(property)) {

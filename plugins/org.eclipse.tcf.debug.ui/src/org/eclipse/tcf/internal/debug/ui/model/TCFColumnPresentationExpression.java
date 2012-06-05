@@ -25,13 +25,15 @@ public class TCFColumnPresentationExpression implements IColumnPresentation {
         COL_NAME = "Name",
         COL_TYPE = "Type",
         COL_HEX_VALUE = "HexValue",
-        COL_DEC_VALUE = "DecValue";
+        COL_DEC_VALUE = "DecValue",
+        COL_VALUE = "Value";
 
     private static String[] cols_all = {
         COL_NAME,
         COL_TYPE,
         COL_DEC_VALUE,
         COL_HEX_VALUE,
+        COL_VALUE,
     };
 
     private static String[] headers  = {
@@ -39,6 +41,7 @@ public class TCFColumnPresentationExpression implements IColumnPresentation {
         "Type",
         "Decimal",
         "Hex",
+        "Value",
     };
 
     private static String[] cols_ini = {
