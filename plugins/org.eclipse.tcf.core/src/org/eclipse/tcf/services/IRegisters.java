@@ -49,7 +49,8 @@ public interface IRegisters extends IService {
         PROP_MEMORY_ADDRESS = "MemoryAddress",  /** Number, the address of a memory mapped register */
         PROP_MEMORY_CONTEXT = "MemoryContext",  /** String, the context ID of a memory context in which a memory mapped register is located */
         PROP_CAN_SEARCH = "CanSearch",          /** Array of String, a list of attribute names which can be searched for starting on this context */
-        PROP_ROLE = "Role";                     /** String, the role the register plays in a program execution */
+        PROP_ROLE = "Role",                     /** String, the role the register plays in a program execution */
+        PROP_OFFSET = "Offset";                 /** Number, when present describes the offset in the data of the parent register where the value of a field can be found. */
 
     /**
      * Values of context property "Role".
@@ -265,6 +266,12 @@ public interface IRegisters extends IService {
          * @return role name.
          */
         String getRole();
+
+        /**
+         * Get the offset in the data of the parent register where the value of a field can be found
+         * @return offset.
+         */
+        int getOffset();
 
         /**
          * Get complete map of context properties.

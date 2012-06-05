@@ -151,6 +151,12 @@ public class RegistersProxy implements IRegisters {
             return (String)props.get(PROP_ROLE);
         }
 
+        public int getOffset() {
+            Number n = (Number)props.get(PROP_OFFSET);
+            if (n == null) return -1;
+            return n.intValue();
+        }
+
         public IToken get(final DoneGet done) {
             return new Command(channel, RegistersProxy.this, "get",
                     new Object[]{ getID() }) {
