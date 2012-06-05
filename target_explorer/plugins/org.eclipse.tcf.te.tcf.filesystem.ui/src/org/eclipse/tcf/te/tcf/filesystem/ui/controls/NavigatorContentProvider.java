@@ -13,6 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.viewers.ITreeViewerListener;
+import org.eclipse.jface.viewers.TreeExpansionEvent;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.AbstractTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.ITreeNodeModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
@@ -22,7 +25,7 @@ import org.eclipse.tcf.te.ui.trees.TreeContentProvider;
 /**
  * The base navigator content provider for File System and Process Monitor
  */
-public abstract class NavigatorContentProvider extends TreeContentProvider {
+public abstract class NavigatorContentProvider extends TreeContentProvider  implements ITreeViewerListener {
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
@@ -35,6 +38,49 @@ public abstract class NavigatorContentProvider extends TreeContentProvider {
 		}
 		return null;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ITreeViewerListener#treeCollapsed(org.eclipse.jface.viewers.TreeExpansionEvent)
+	 */
+	@Override
+    public void treeCollapsed(TreeExpansionEvent event) {
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ITreeViewerListener#treeExpanded(org.eclipse.jface.viewers.TreeExpansionEvent)
+	 */
+	@Override
+    public void treeExpanded(TreeExpansionEvent event) {
+		Object object = event.getElement();
+	    if(object instanceof AbstractTreeNode) {
+	    	AbstractTreeNode parent = (AbstractTreeNode) object;
+			if (parent.childrenQueried && !parent.childrenQueryRunning) {
+				parent.refreshChildren();
+			}
+		}
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.trees.TreeContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+	 */
+	@Override
+    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+	    super.inputChanged(viewer, oldInput, newInput);
+	    this.viewer.addTreeListener(this);
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.trees.TreeContentProvider#dispose()
+	 */
+	@Override
+    public void dispose() {
+	    this.viewer.removeTreeListener(this);
+	    super.dispose();
+    }
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)

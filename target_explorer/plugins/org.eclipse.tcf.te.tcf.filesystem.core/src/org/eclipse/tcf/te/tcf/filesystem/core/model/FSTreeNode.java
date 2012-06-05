@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
@@ -37,6 +38,7 @@ import org.eclipse.tcf.services.IFileSystem.DirEntry;
 import org.eclipse.tcf.services.IFileSystem.FileAttrs;
 import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
+import org.eclipse.tcf.te.tcf.core.concurrent.CallbackMonitor;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel;
 import org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IWindowsFileAttributes;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.UserAccount;
@@ -618,6 +620,19 @@ public final class FSTreeNode extends AbstractTreeNode implements Cloneable {
 	    return new QueryDoneOpenChannel(this, callback);
     }
 	
+	/**
+	 * Override the queryChildren to refresh the second level children upon expanding.
+	 */
+	@Override
+    public void queryChildren() {
+		queryChildren(new Callback(){
+			@Override
+            protected void internalDone(Object caller, IStatus status) {
+				refreshChildren();
+            }
+		});
+    }
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.tcf.te.tcf.filesystem.core.model.AbstractTreeNode#getParent()
@@ -626,4 +641,38 @@ public final class FSTreeNode extends AbstractTreeNode implements Cloneable {
 	public FSTreeNode getParent() {
 		return (FSTreeNode) parent;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.filesystem.core.model.AbstractTreeNode#refreshChildren()
+	 */
+	@Override
+    public void refreshChildren() {
+		List<FSTreeNode> children = getChildren();
+		if(!children.isEmpty()) {
+			ICallback callback = new Callback(){
+				@Override
+                protected void internalDone(Object caller, IStatus status) {
+					queryDone();
+                }
+			};
+			final CallbackMonitor monitor = new CallbackMonitor(callback);
+			for(FSTreeNode child : children) {
+				if(child.isDirectory() && !child.childrenQueried && !child.childrenQueryRunning) {
+					monitor.lock(child.uniqueId);
+				}
+			}
+			for(FSTreeNode child : children) {
+				if(child.isDirectory() && !child.childrenQueried && !child.childrenQueryRunning) {
+					final UUID uuid = child.uniqueId;
+					child.queryChildren(new Callback(){
+						@Override
+                        protected void internalDone(Object caller, IStatus status) {
+							monitor.unlock(uuid, status);
+                        }
+					});
+				}
+			}
+		}
+    }
 }

@@ -47,7 +47,6 @@ public class Messages extends NLS {
 	public static String ProcessStreamWriterRunnable_error_writeFailed;
 	public static String ProcessStreamReaderRunnable_error_appendFailed;
 
-	public static String CallbackMonitor_AllTasksFinished;
 	public static String PendingOperation_label;
 	public static String ProcessLabelProvider_RootNodeLabel;
 	public static String AttachStep_error_connect;

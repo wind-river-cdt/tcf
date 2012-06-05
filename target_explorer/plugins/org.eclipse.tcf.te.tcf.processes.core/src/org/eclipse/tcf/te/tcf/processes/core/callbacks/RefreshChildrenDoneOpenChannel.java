@@ -22,6 +22,7 @@ import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.core.Tcf;
+import org.eclipse.tcf.te.tcf.core.concurrent.CallbackMonitor;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
 import org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode;
 

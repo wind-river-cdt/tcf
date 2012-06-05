@@ -16,6 +16,7 @@ import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
+import org.eclipse.tcf.te.tcf.core.concurrent.CallbackMonitor;
 import org.eclipse.tcf.te.tcf.processes.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode;
 

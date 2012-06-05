@@ -20,9 +20,11 @@ import org.eclipse.tcf.services.IProcesses.ProcessContext;
 import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.services.ISysMonitor.SysMonitorContext;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
+import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.AbstractTreeNode;
 import org.eclipse.tcf.te.tcf.processes.core.callbacks.QueryDoneOpenChannel;
+import org.eclipse.tcf.te.tcf.processes.core.callbacks.RefreshChildrenDoneOpenChannel;
 import org.eclipse.tcf.te.tcf.processes.core.callbacks.RefreshDoneOpenChannel;
 
 /**
@@ -258,4 +260,9 @@ public final class ProcessTreeNode extends AbstractTreeNode {
     public ProcessTreeNode getParent() {
 		return (ProcessTreeNode) parent;
 	}
+
+	@Override
+    public void refreshChildren() {
+		Tcf.getChannelManager().openChannel(peerNode.getPeer(), null, new RefreshChildrenDoneOpenChannel(this));
+    }
 }

@@ -29,7 +29,7 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
  */
 public abstract class AbstractTreeNode extends PlatformObject implements IPeerModelProvider{
 	// The unique id of this node.
-	private final UUID uniqueId = UUID.randomUUID();
+	protected final UUID uniqueId = UUID.randomUUID();
 
 	/**
 	 * The tree node name.
@@ -305,4 +305,9 @@ public abstract class AbstractTreeNode extends PlatformObject implements IPeerMo
 	public List<? extends AbstractTreeNode> getChildren() {
 		return new ArrayList<AbstractTreeNode>(children);
 	}
+
+	/**
+	 * Refresh the children's children.
+	 */
+	public abstract void refreshChildren();
 }

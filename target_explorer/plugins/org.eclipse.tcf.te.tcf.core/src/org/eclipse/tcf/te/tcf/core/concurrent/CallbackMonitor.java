@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.processes.core.callbacks;
+package org.eclipse.tcf.te.tcf.core.concurrent;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,8 +20,8 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
-import org.eclipse.tcf.te.tcf.processes.core.activator.CoreBundleActivator;
-import org.eclipse.tcf.te.tcf.processes.core.nls.Messages;
+import org.eclipse.tcf.te.tcf.core.activator.CoreBundleActivator;
+import org.eclipse.tcf.te.tcf.core.nls.Messages;
 
 /**
  * A helper class used to synchronize multiple threads. It is used

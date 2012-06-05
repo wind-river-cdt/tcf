@@ -10,15 +10,11 @@
 package org.eclipse.tcf.te.tcf.processes.ui.controls;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.viewers.ITreeViewerListener;
-import org.eclipse.jface.viewers.TreeExpansionEvent;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.ITreeNodeModel;
 import org.eclipse.tcf.te.tcf.filesystem.ui.controls.NavigatorContentProvider;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.processes.core.model.ProcessModel;
-import org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.navigator.NavigatorFilterService;
@@ -32,30 +28,9 @@ import org.eclipse.ui.navigator.INavigatorFilterService;
  * Processes content provider for the common navigator of Target Explorer.
  */
 @SuppressWarnings("restriction")
-public class ProcessNavigatorContentProvider  extends NavigatorContentProvider implements ICommonContentProvider, ITreeViewerListener {
+public class ProcessNavigatorContentProvider  extends NavigatorContentProvider implements ICommonContentProvider {
 	// The "Single Thread" filter id
 	private final static String SINGLE_THREAD_FILTER_ID = "org.eclipse.tcf.te.tcf.processes.ui.navigator.filter.singleThread"; //$NON-NLS-1$
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.trees.TreeContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
-	 */
-	@Override
-    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-	    super.inputChanged(viewer, oldInput, newInput);
-	    this.viewer.addTreeListener(this);
-		refreshChildren(newInput);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.trees.TreeContentProvider#dispose()
-	 */
-	@Override
-    public void dispose() {
-	    super.dispose();
-	    this.viewer.removeTreeListener(this);
-    }
 
 	/*
 	 * (non-Javadoc)
@@ -102,37 +77,5 @@ public class ProcessNavigatorContentProvider  extends NavigatorContentProvider i
      */
     @Override
     public void saveState(IMemento aMemento) {
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.viewers.ITreeViewerListener#treeCollapsed(org.eclipse.jface.viewers.TreeExpansionEvent)
-     */
-	@Override
-    public void treeCollapsed(TreeExpansionEvent event) {
-    }
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreeViewerListener#treeExpanded(org.eclipse.jface.viewers.TreeExpansionEvent)
-	 */
-	@Override
-    public void treeExpanded(TreeExpansionEvent event) {
-		Object element = event.getElement();
-		refreshChildren(element);
-    }
-
-	/**
-	 * Refresh the element's children if it is a process node and its children has
-	 * already been queried.
-	 */
-	private void refreshChildren(Object object) {
-	    if(object instanceof ProcessTreeNode) {
-			ProcessTreeNode parent = (ProcessTreeNode) object;
-			if (parent.childrenQueried && !parent.childrenQueryRunning) {
-				ProcessModel pModel = ProcessModel.getProcessModel(parent.peerNode);
-				pModel.refreshChildren(parent);
-			}
-		}
     }
 }

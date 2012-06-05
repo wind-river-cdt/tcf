@@ -21,11 +21,9 @@ import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.core.interfaces.IViewerInput;
 import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
-import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.ITreeNodeModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.processes.core.activator.CoreBundleActivator;
-import org.eclipse.tcf.te.tcf.processes.core.callbacks.RefreshChildrenDoneOpenChannel;
 import org.eclipse.tcf.te.tcf.processes.core.nls.Messages;
 
 /**
@@ -219,13 +217,6 @@ public class ProcessModel implements ITreeNodeModel{
 	 */
 	public boolean isRefreshStopped() {
 	    return stopped;
-    }
-
-	/**
-	 * Refresh the children without refreshing itself.
-	 */
-	public void refreshChildren(ProcessTreeNode node) {
-		Tcf.getChannelManager().openChannel(node.peerNode.getPeer(), null, new RefreshChildrenDoneOpenChannel(node));
     }
 }
 
