@@ -13,9 +13,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: org.eclipse.tcf.te.tcf.core.model.activator;x-internal:=true,
- org.eclipse.tcf.te.tcf.core.model.contexts,
  org.eclipse.tcf.te.tcf.core.model.interfaces,
- org.eclipse.tcf.te.tcf.core.model.interfaces.contexts,
  org.eclipse.tcf.te.tcf.core.model.interfaces.services,
  org.eclipse.tcf.te.tcf.core.model.nls;x-internal:=true,
  org.eclipse.tcf.te.tcf.core.model.services
