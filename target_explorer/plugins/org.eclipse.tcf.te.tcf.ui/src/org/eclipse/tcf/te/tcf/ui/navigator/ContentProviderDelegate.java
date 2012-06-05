@@ -22,6 +22,7 @@ import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.te.runtime.concurrent.util.ExecutorsUtil;
 import org.eclipse.tcf.te.tcf.locator.interfaces.IModelListener;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
@@ -69,8 +70,10 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 	public Object[] getChildren(Object parentElement) {
 		Object[] children = NO_ELEMENTS;
 
+		// The category element if the parent element is a category node
+		final ICategory category = parentElement instanceof ICategory ? (ICategory)parentElement : null;
 		// The category id if the parent element is a category node
-		final String catID = parentElement instanceof ICategory ? ((ICategory)parentElement).getId() : null;
+		final String catID = category != null ? category.getId() : null;
 
 		// If the parent element is a category, than we assume
 		// the locator model as parent element.
@@ -82,7 +85,7 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 			final IPeerModel[] peers = ((ILocatorModel)parentElement).getPeers();
 			final List<IPeerModel> candidates = new ArrayList<IPeerModel>();
 
-			Runnable runnable = new Runnable() {
+			final Runnable runnable = new Runnable() {
 				@Override
 				public void run() {
 					if (IUIConstants.ID_CAT_FAVORITES.equals(catID)) {
@@ -162,8 +165,18 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 				}
 			};
 
-			if (Protocol.isDispatchThread()) runnable.run();
-			else Protocol.invokeAndWait(runnable);
+			Assert.isTrue(!Protocol.isDispatchThread());
+
+			// The caller thread is very likely the display thread. We have to us a little
+			// trick here to avoid blocking the display thread via a wait on a monitor as
+			// this can (and has) lead to dead-locks with the TCF event dispatch thread if
+			// something fatal (OutOfMemoryError in example) happens in-between.
+			ExecutorsUtil.executeWait(new Runnable() {
+				@Override
+				public void run() {
+					Protocol.invokeAndWait(runnable);
+				}
+			});
 
 			children = candidates.toArray(new IPeerModel[candidates.size()]);
 		}
@@ -231,14 +244,25 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 		} else if (element instanceof PeerRedirectorGroupNode) {
 			// Return the parent peer model node
 			final AtomicReference<IPeerModel> parent = new AtomicReference<IPeerModel>();
-			Runnable runnable = new Runnable() {
+			final Runnable runnable = new Runnable() {
 				@Override
 				public void run() {
 					parent.set(Model.getModel().getService(ILocatorModelLookupService.class).lkupPeerModelById(((PeerRedirectorGroupNode)element).peerId));
 				}
 			};
-			if (Protocol.isDispatchThread()) runnable.run();
-			else Protocol.invokeAndWait(runnable);
+
+			Assert.isTrue(!Protocol.isDispatchThread());
+
+			// The caller thread is very likely the display thread. We have to us a little
+			// trick here to avoid blocking the display thread via a wait on a monitor as
+			// this can (and has) lead to dead-locks with the TCF event dispatch thread if
+			// something fatal (OutOfMemoryError in example) happens in-between.
+			ExecutorsUtil.executeWait(new Runnable() {
+				@Override
+				public void run() {
+					Protocol.invokeAndWait(runnable);
+				}
+			});
 
 			return parent.get();
 		}
