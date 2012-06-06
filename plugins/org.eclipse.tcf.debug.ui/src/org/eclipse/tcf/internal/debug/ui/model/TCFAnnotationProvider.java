@@ -43,7 +43,7 @@ public class TCFAnnotationProvider {
                 IExtension[] extensions = point.getExtensions();
                 for (int i = 0; i < extensions.length; i++) {
                     try {
-                        Bundle bundle = Platform.getBundle(extensions[i].getNamespaceIdentifier());
+                        Bundle bundle = Platform.getBundle(extensions[i].getContributor().getName());
                         bundle.start(Bundle.START_TRANSIENT);
                         IConfigurationElement[] e = extensions[i].getConfigurationElements();
                         for (int j = 0; j < e.length; j++) {
