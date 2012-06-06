@@ -856,8 +856,27 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 				CoreBundleActivator.getTraceHandler().trace(NLS.bind(Messages.ChannelManager_openChannel_reuse_message, id, counter.toString()),
 															0, ITraceIds.TRACE_CHANNEL_MANAGER, IStatus.INFO, this);
 			}
-			// Got an existing channel -> drop out immediately
-			done.doneOpenChannel(null, channel);
+			// Got an existing channel -> drop out immediately if the channel is
+			// already fully opened. Otherwise wait for the channel to be fully open.
+			if (channel.getState() == IChannel.STATE_OPENING) {
+				final IChannel finChannel = channel;
+				channel.addChannelListener(new IChannel.IChannelListener() {
+					@Override
+					public void onChannelOpened() {
+						done.doneOpenChannel(null, finChannel);
+					}
+					@Override
+					public void onChannelClosed(Throwable error) {
+						done.doneOpenChannel(error, finChannel);
+					}
+					@Override
+					public void congestionLevel(int level) {
+					}
+				});
+			}
+			else {
+				done.doneOpenChannel(null, channel);
+			}
 			return;
 		} else if (channel != null) {
 			// Channel is not in open state -> drop the instance
