@@ -236,7 +236,9 @@ public final class FSTreeNode extends AbstractTreeNode implements Cloneable {
 	 * @return true if it is a file, or else false.
 	 */
 	public boolean isFile() {
-		return attr != null && attr.isFile();
+		if (attr != null) return attr.isFile();
+		if (type != null) return type.equals("FSFileNode"); //$NON-NLS-1$
+		return false;
 	}
 
 	/**
@@ -245,7 +247,9 @@ public final class FSTreeNode extends AbstractTreeNode implements Cloneable {
 	 * @return true if it is a directory, or else false.
 	 */
 	public boolean isDirectory() {
-		return attr != null && attr.isDirectory();
+		if (attr != null) return attr.isDirectory();
+		if (type != null) return type.endsWith("DirNode"); //$NON-NLS-1$
+		return false;
 	}
 
 	/**
@@ -658,12 +662,12 @@ public final class FSTreeNode extends AbstractTreeNode implements Cloneable {
 			};
 			final CallbackMonitor monitor = new CallbackMonitor(callback);
 			for(FSTreeNode child : children) {
-				if(child.isDirectory() && !child.childrenQueried && !child.childrenQueryRunning) {
+				if((child.isRoot() || child.isDirectory()) && !child.childrenQueried && !child.childrenQueryRunning) {
 					monitor.lock(child.uniqueId);
 				}
 			}
 			for(FSTreeNode child : children) {
-				if(child.isDirectory() && !child.childrenQueried && !child.childrenQueryRunning) {
+				if((child.isRoot() || child.isDirectory()) && !child.childrenQueried && !child.childrenQueryRunning) {
 					final UUID uuid = child.uniqueId;
 					child.queryChildren(new Callback(){
 						@Override
