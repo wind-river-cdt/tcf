@@ -59,7 +59,7 @@
 			<Method name="stop" params="org.osgi.framework.BundleContext" returns="void"/>
 			<Class name="~.*\.Activator"/>
 			<Class name="org.eclipse.tcf.te.runtime.properties.PropertiesContainer"/>
-			<Class name="~org\.eclipse\.tcf\.te\.ui\.internal\.utils\.AbstractSearcher.*"/>
+			<Class name="~org\.eclipse\.tcf\.te\.ui\.utils\.TreeViewerUtil.*"/>
 		</Or>
 	</Match>
 	
