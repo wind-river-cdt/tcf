@@ -47,58 +47,6 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 	/* default */ final Map<String, IChannel> channels = new HashMap<String, IChannel>();
 
 	/**
-	 * The channel monitor keeps watching the channel after it got successfully opened.
-	 * If the channel is closing eventually, the channel monitor cleans out the reference
-	 * counter and the channels map.
-	 */
-	private final class ChannelMonitor implements IChannel.IChannelListener {
-		// Reference to the monitored channel
-		private final IChannel channel;
-		// Reference to the peer id the channel got opened for
-		private final String id;
-
-		/**
-         * Constructor.
-         *
-         * @param The peer id. Must not be <code>null</code>.
-         * @param The channel. Must not be <code>null</code>.
-         */
-        public ChannelMonitor(String id, IChannel channel) {
-        	Assert.isNotNull(id);
-        	Assert.isNotNull(channel);
-
-        	this.id = id;
-        	this.channel = channel;
-        }
-
-		/* (non-Javadoc)
-		 * @see org.eclipse.tcf.protocol.IChannel.IChannelListener#onChannelOpened()
-		 */
-		@Override
-		public void onChannelOpened() {
-		}
-
-		/* (non-Javadoc)
-		 * @see org.eclipse.tcf.protocol.IChannel.IChannelListener#onChannelClosed(java.lang.Throwable)
-		 */
-		@Override
-		public void onChannelClosed(Throwable error) {
-			// Remove ourself
-			channel.removeChannelListener(this);
-			// Clean the reference counter and the channel map
-			channels.remove(id);
-			refCounters.remove(id);
-		}
-
-		/* (non-Javadoc)
-		 * @see org.eclipse.tcf.protocol.IChannel.IChannelListener#congestionLevel(int)
-		 */
-		@Override
-		public void congestionLevel(int level) {
-		}
-	}
-
-	/**
 	 * Constructor.
 	 */
 	public ChannelManager() {
@@ -220,8 +168,6 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 						public void onChannelOpened() {
 							// Remove ourself as listener from the channel
 							finChannel.removeChannelListener(this);
-							// Register the channel monitor
-							finChannel.addChannelListener(new ChannelMonitor(id, finChannel));
 
 							if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITraceIds.TRACE_CHANNEL_MANAGER)) {
 								CoreBundleActivator.getTraceHandler().trace(NLS.bind(Messages.ChannelManager_openChannel_success_message, id),
