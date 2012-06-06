@@ -173,10 +173,10 @@ public class FileSelectionControl extends BaseDialogSelectionControl {
 	 * @see org.eclipse.tcf.te.ui.controls.BaseEditBrowseTextControl#configureEditFieldValidator(org.eclipse.tcf.te.ui.controls.validator.Validator)
 	 */
 	@Override
-	protected void configureEditFieldValidator(Validator editFieldValidator) {
-		if (editFieldValidator instanceof FileNameValidator) {
+	protected void configureEditFieldValidator(Validator validator) {
+		if (validator instanceof FileNameValidator) {
 			if (getFilterExtensions() != null) {
-				((FileNameValidator)editFieldValidator).setFileExtensions(getFilterExtensions());
+				((FileNameValidator)validator).setFileExtensions(getFilterExtensions());
 			}
 		}
 	}
