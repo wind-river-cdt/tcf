@@ -49,7 +49,7 @@ public class PeerRedirector extends TransientPeer implements IPeerRedirector {
 	public IChannel openChannel() {
 		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 		IChannel c = parent.openChannel();
-		c.redirect(getID());
+		c.redirect(getAttributes());
 		return c;
 	}
 
