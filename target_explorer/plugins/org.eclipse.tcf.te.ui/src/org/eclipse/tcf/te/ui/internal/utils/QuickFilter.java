@@ -78,11 +78,11 @@ public class QuickFilter extends TablePatternFilter implements PropertyChangeLis
 		    	location = new Point(bounds.x, bounds.y-bounds.height);
 		    }
 		    else {
-		    	location = new Point(0, 0);
+		    	location = new Point(0, -viewer.getTree().getItemHeight());
 		    }
 		}
 		else {
-			location = new Point(0, 0);
+			location = new Point(0, -viewer.getTree().getItemHeight());
 		}
 		location = viewer.getTree().toDisplay(location);
 	    return location;
@@ -191,11 +191,14 @@ public class QuickFilter extends TablePatternFilter implements PropertyChangeLis
 	 */
 	private boolean skipMatching(Object parentElement) {
 		if (root == null || parentElement == null) return true;
-		if (parentElement instanceof TreePath) {
-			return !root.equals(parentElement);
+		if(root != TreePath.EMPTY) {
+			if (parentElement instanceof TreePath) {
+				return !root.equals(parentElement);
+			}
+			Object rootElement = root.getLastSegment();
+			return !parentElement.equals(rootElement);
 		}
-		Object rootElement = root.getLastSegment();
-		return !parentElement.equals(rootElement);
+		return false;
 	}
 
 	/**
@@ -205,11 +208,14 @@ public class QuickFilter extends TablePatternFilter implements PropertyChangeLis
 	 * @return true if it is filtering.
 	 */
 	public boolean isFiltering(Object element) {
-		if(root != null) {
-			Object rootElement = root;
-			rootElement = root.getLastSegment();
-			return rootElement == element && matcher != null;
+		if (root != null && matcher != null) {
+			if (root != TreePath.EMPTY) {
+				Object rootElement = root;
+				rootElement = root.getLastSegment();
+				return rootElement == element;
+			}
+			return element == viewer.getInput();
 		}
-	    return false;
-    }
+		return false;
+	}
 }
