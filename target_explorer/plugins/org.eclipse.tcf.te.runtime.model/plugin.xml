@@ -3,4 +3,14 @@
 <plugin>
    <extension-point id="factoryDelegates" name="Model Node Factory Delegates" schema="schema/factoryDelegates.exsd"/>
 
+<!-- Model node factory delegate contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.model.factoryDelegates">
+      <delegate
+            class="org.eclipse.tcf.te.runtime.model.factory.ModelNodeFactoryDelegate"
+            id="org.eclipse.tcf.te.runtime.model.factory.delegate">
+         <nodeType class="org.eclipse.tcf.te.runtime.model.interfaces.IModelNode"/>
+         <nodeType class="org.eclipse.tcf.te.runtime.model.interfaces.IContainerModelNode"/>
+      </delegate>
+   </extension>
+
 </plugin>
