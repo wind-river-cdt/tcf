@@ -74,7 +74,6 @@ import org.eclipse.tcf.te.tcf.processes.core.nls.Messages;
 public class ProcessLauncher extends PlatformObject implements IProcessLauncher {
 	// The channel instance
 	/* default */ IChannel channel = null;
-	/* default */ boolean externalChannel = false;
 	// The process properties instance
 	/* default */ IPropertiesContainer properties;
 
@@ -108,15 +107,6 @@ public class ProcessLauncher extends PlatformObject implements IProcessLauncher 
 	/**
 	 * Constructor.
 	 */
-	public ProcessLauncher(IChannel channel) {
-		super();
-		externalChannel = channel != null;
-		this.channel = channel;
-	}
-
-	/**
-	 * Constructor.
-	 */
 	public ProcessLauncher(IProcessStreamsProxy streamsProxy) {
 		super();
 		this.streamsProxy = streamsProxy;
@@ -145,7 +135,7 @@ public class ProcessLauncher extends PlatformObject implements IProcessLauncher 
 			protected void internalDone(Object caller, IStatus status) {
 				Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 				// Close the channel as all disposal is done
-				if (finChannel != null && externalChannel) {
+				if (finChannel != null) {
 					Tcf.getChannelManager().closeChannel(finChannel);
 				}
 			}
@@ -341,7 +331,7 @@ public class ProcessLauncher extends PlatformObject implements IProcessLauncher 
 		// Open a dedicated channel to the given peer
 		Map<String, Boolean> flags = new HashMap<String, Boolean>();
 		flags.put(IChannelManager.FLAG_FORCE_NEW, Boolean.TRUE);
-		if (channel != null && externalChannel) {
+		if (channel != null && channel.getState() == IChannel.STATE_OPEN) {
 			onChannelOpenDone(peer);
 		}
 		else {

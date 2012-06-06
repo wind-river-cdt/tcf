@@ -118,13 +118,11 @@
             id="org.eclipse.tcf.te.tcf.launch.core.launchProcessStep"
             class="org.eclipse.tcf.te.tcf.launch.core.steps.LaunchProcessStep"
             label="%LaunchStep.LaunchProcess.name">
-         <requires id="org.eclipse.tcf.te.tcf.launch.core.openChannelStep"/>
       </step>
       <step
             id="org.eclipse.tcf.te.tcf.launch.core.attachDebuggerStep"
             class="org.eclipse.tcf.te.tcf.launch.core.steps.AttachDebuggerStep"
             label="%LaunchStep.AttachDebugger.name">
-         <requires id="org.eclipse.tcf.te.tcf.launch.core.openChannelStep"/>
       </step>
       <step
             id="org.eclipse.tcf.te.tcf.launch.core.closeChannelStep"

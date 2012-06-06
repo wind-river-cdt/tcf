@@ -12,6 +12,7 @@ package org.eclipse.tcf.te.tcf.launch.core.steps;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -59,6 +60,11 @@ public class LaunchProcessStep extends AbstractTcfLaunchStep {
 			throw new CoreException(new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(), "missing process image name")); //$NON-NLS-1$
 		}
 
+		IChannel channel = (IChannel)StepperAttributeUtil.getProperty(ICommonTCFLaunchAttributes.ATTR_CHANNEL, fullQualifiedId, data);
+		if (channel == null || channel.getState() != IChannel.STATE_OPEN) {
+			throw new CoreException(new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(), "missing or closed channel")); //$NON-NLS-1$
+		}
+
 		String processArguments = DefaultPersistenceDelegate.getAttribute(getLaunchConfiguration(context), IRemoteAppLaunchAttributes.ATTR_PROCESS_ARGUMENTS, (String)null);
 		StepperAttributeUtil.setProperty(IRemoteAppLaunchAttributes.ATTR_PROCESS_ARGUMENTS, fullQualifiedId, data, processArguments);
 	}
@@ -68,9 +74,10 @@ public class LaunchProcessStep extends AbstractTcfLaunchStep {
 	 */
 	@Override
 	public void execute(IStepContext context, final IPropertiesContainer data, final IFullQualifiedId fullQualifiedId, IProgressMonitor monitor, final ICallback callback) {
-		IChannel channel = (IChannel)StepperAttributeUtil.getProperty(ICommonTCFLaunchAttributes.ATTR_CHANNEL, fullQualifiedId, data);
+		final IChannel channel = (IChannel)StepperAttributeUtil.getProperty(ICommonTCFLaunchAttributes.ATTR_CHANNEL, fullQualifiedId, data);
+		Assert.isTrue(channel != null && channel.getState() == IChannel.STATE_OPEN, "channel is missing or closed"); //$NON-NLS-1$
 		// Construct the launcher object
-		ProcessLauncher launcher = new ProcessLauncher(channel);
+		ProcessLauncher launcher = new ProcessLauncher();
 
 		Map<String, Object> launchAttributes = new HashMap<String, Object>();
 
@@ -81,7 +88,16 @@ public class LaunchProcessStep extends AbstractTcfLaunchStep {
 		launchAttributes.put(IProcessLauncher.PROP_PROCESS_ARGS, args);
 
 		launchAttributes.put(ITerminalsConnectorConstants.PROP_LOCAL_ECHO, Boolean.FALSE);
-		launchAttributes.put(IProcessLauncher.PROP_PROCESS_ASSOCIATE_CONSOLE, Boolean.TRUE);
+
+		boolean outputConsole = DefaultPersistenceDelegate.getAttribute(getLaunchConfiguration(context), "org.eclipse.debug.ui.ATTR_CONSOLE_OUTPUT_ON", true); //$NON-NLS-1$
+		if (outputConsole) {
+			launchAttributes.put(IProcessLauncher.PROP_PROCESS_ASSOCIATE_CONSOLE, Boolean.TRUE);
+		}
+		String outputFile = DefaultPersistenceDelegate.getAttribute(getLaunchConfiguration(context), "org.eclipse.debug.ui.ATTR_CAPTURE_IN_FILE", (String)null); //$NON-NLS-1$
+		if (outputFile != null) {
+			launchAttributes.put(IProcessLauncher.PROP_PROCESS_OUTPUT_REDIRECT_TO_FILE, outputFile);
+		}
+
 		if (ILaunchManager.DEBUG_MODE.equals(getLaunchMode(context))) {
 			launchAttributes.put(IProcessLauncher.PROP_PROCESS_ATTACH, Boolean.TRUE);
 		}
@@ -96,6 +112,7 @@ public class LaunchProcessStep extends AbstractTcfLaunchStep {
 				if (status.isOK() && result instanceof IProcesses.ProcessContext) {
 					StepperAttributeUtil.setProperty(IRemoteAppLaunchAttributes.ATTR_PROCESS_CONTEXT, fullQualifiedId.getParentId(), data, result);
 				}
+				Assert.isTrue(channel.getState() == IChannel.STATE_OPEN, "channel is closed"); //$NON-NLS-1$
 				super.internalDone(caller, status);
 			}
 		});
