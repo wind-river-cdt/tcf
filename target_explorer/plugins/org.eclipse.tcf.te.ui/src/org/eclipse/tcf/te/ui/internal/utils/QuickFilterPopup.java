@@ -59,7 +59,12 @@ public class QuickFilterPopup extends PopupDialog {
 	    super(viewer.getTree().getShell(), SWT.TOOL, true, true, false, false, false, null, null);
 	    quickFilter = qFilter;
 	    treeViewer = viewer;
-	    filter = Messages.QuickFilterPopup_PromptMessage;
+	    if(quickFilter.getFilterText() != null) {
+	    	filter = quickFilter.getFilterText();
+		}
+		else {
+			filter = Messages.QuickFilterPopup_PromptMessage;
+		}
     }
 
 	/*
@@ -73,6 +78,7 @@ public class QuickFilterPopup extends PopupDialog {
 	    layout.marginHeight = 2;
 		filterText = new Text(composite, SWT.SINGLE);
 		GridData data = new GridData(GridData.FILL_HORIZONTAL);
+		data.widthHint = 180;
 		filterText.setLayoutData(data);
 		filterText.setText(filter);
 		filterText.setFont(composite.getFont());
