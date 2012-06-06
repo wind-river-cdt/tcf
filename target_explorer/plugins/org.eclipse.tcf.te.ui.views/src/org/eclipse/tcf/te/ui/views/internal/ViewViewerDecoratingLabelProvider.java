@@ -14,8 +14,8 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.StyledString.Styler;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tcf.te.ui.interfaces.IFilteringLabelDecorator;
 import org.eclipse.ui.internal.navigator.NavigatorDecoratingLabelProvider;
@@ -28,10 +28,10 @@ import org.eclipse.ui.internal.navigator.NavigatorDecoratingLabelProvider;
 public class ViewViewerDecoratingLabelProvider extends NavigatorDecoratingLabelProvider {
 	// The navigator's tree viewer to be decorated.
 	private TreeViewer viewer;
-	
+
 	/**
 	 * Create an instance with the tree viewer and a common label provider.
-	 * 
+	 *
 	 * @param viewer The navigator's tree viewer.
 	 * @param commonLabelProvider The navigator's common label provider.
 	 */
@@ -39,6 +39,19 @@ public class ViewViewerDecoratingLabelProvider extends NavigatorDecoratingLabelP
 	    super(commonLabelProvider);
 	    this.viewer = viewer;
     }
+
+	/**
+	 * Returns the element label with no decoration applied.
+	 *
+	 * @param element The element.
+	 * @return The label.
+	 */
+	public String getTextNoDecoration(Object element) {
+		IStyledLabelProvider provider = getStyledStringProvider();
+		StyledString styledString = provider.getStyledText(element);
+		String text = styledString != null ? styledString.toString() : super.getText(element);
+		return text;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -89,7 +102,7 @@ public class ViewViewerDecoratingLabelProvider extends NavigatorDecoratingLabelP
 
 	/**
 	 * Get an adapter of IFilteringLabelProvider from the specified element.
-	 * 
+	 *
 	 * @param element The element to get the adapter from.
 	 * @return The element's adapter or null if does not adapt to IFilteringLabelProvider.
 	 */
