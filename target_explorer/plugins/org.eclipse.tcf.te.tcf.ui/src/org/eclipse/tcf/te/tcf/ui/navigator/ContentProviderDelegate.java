@@ -63,6 +63,23 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 	// Internal map of RemotePeerDiscoverRootNodes per peer id
 	private final Map<String, PeerRedirectorGroupNode> roots = new HashMap<String, PeerRedirectorGroupNode>();
 
+	/**
+	 * Determines if the given peer model node is filtered from the view completely.
+	 *
+	 * @param peerModel The peer model node. Must not be <code>null</code>.
+	 * @return <code>True</code> if filtered, <code>false</code> otherwise.
+	 */
+	/* default */ final static boolean isFiltered(IPeerModel peerModel) {
+		Assert.isNotNull(peerModel);
+
+		boolean isProxy = peerModel.getPeer().getAttributes().containsKey("Proxy"); //$NON-NLS-1$
+
+		String value = peerModel.getPeer().getAttributes().get("ValueAdd"); //$NON-NLS-1$
+		boolean isValueAdd = value != null && ("1".equals(value.trim()) || Boolean.parseBoolean(value.trim())); //$NON-NLS-1$
+
+		return isProxy || isValueAdd;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
 	 */
@@ -82,7 +99,8 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 		}
 		// If it is the locator model, get the peers
 		if (parentElement instanceof ILocatorModel) {
-			final IPeerModel[] peers = ((ILocatorModel)parentElement).getPeers();
+			final ILocatorModel model = (ILocatorModel)parentElement;
+			final IPeerModel[] peers = model.getPeers();
 			final List<IPeerModel> candidates = new ArrayList<IPeerModel>();
 
 			final Runnable runnable = new Runnable() {
@@ -90,6 +108,9 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 				public void run() {
 					if (IUIConstants.ID_CAT_FAVORITES.equals(catID)) {
 						for (IPeerModel peer : peers) {
+							// Check for filtered nodes (Value-add's and Proxies)
+							if (isFiltered(peer)) continue;
+
 			        	    ICategorizable categorizable = (ICategorizable)peer.getAdapter(ICategorizable.class);
 			            	if (categorizable == null) categorizable = (ICategorizable)Platform.getAdapterManager().getAdapter(peer, ICategorizable.class);
 			            	Assert.isNotNull(categorizable);
@@ -102,28 +123,21 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 					}
 					else if (IUIConstants.ID_CAT_MY_TARGETS.equals(catID)) {
 						for (IPeerModel peer : peers) {
-			        	    ICategorizable categorizable = (ICategorizable)peer.getAdapter(ICategorizable.class);
+							// Check for filtered nodes (Value-add's and Proxies)
+							if (isFiltered(peer)) continue;
+
+							ICategorizable categorizable = (ICategorizable)peer.getAdapter(ICategorizable.class);
 			            	if (categorizable == null) categorizable = (ICategorizable)Platform.getAdapterManager().getAdapter(peer, ICategorizable.class);
 			            	Assert.isNotNull(categorizable);
 
 							String value = peer.getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
 							boolean isStatic = value != null && Boolean.parseBoolean(value.trim());
 
-							boolean isProxy = peer.getPeer().getAttributes().containsKey("Proxy"); //$NON-NLS-1$
-
-							value = peer.getPeer().getAttributes().get("ValueAdd"); //$NON-NLS-1$
-							boolean isValueAdd = value != null && ("1".equals(value.trim()) || Boolean.parseBoolean(value.trim())); //$NON-NLS-1$
-
 							// Static peers, or if launched by current user -> add automatically to "My Targets"
 							boolean startedByCurrentUser = System.getProperty("user.name").equals(peer.getPeer().getUserName()); //$NON-NLS-1$
 							boolean isMyTargets = Managers.getCategoryManager().belongsTo(catID, categorizable.getId());
 							if (!isMyTargets && (isStatic || startedByCurrentUser)) {
-								// "Value-add's" are not saved to the category persistence automatically
-								if (isProxy || isValueAdd) {
-									Managers.getCategoryManager().addTransient(catID, categorizable.getId());
-								} else {
-									Managers.getCategoryManager().add(catID, categorizable.getId());
-								}
+								Managers.getCategoryManager().add(catID, categorizable.getId());
 								isMyTargets = true;
 							}
 
@@ -134,6 +148,9 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 					}
 					else if (IUIConstants.ID_CAT_NEIGHBORHOOD.equals(catID)) {
 						for (IPeerModel peer : peers) {
+							// Check for filtered nodes (Value-add's and Proxies)
+							if (isFiltered(peer)) continue;
+
 			        	    ICategorizable categorizable = (ICategorizable)peer.getAdapter(ICategorizable.class);
 			            	if (categorizable == null) categorizable = (ICategorizable)Platform.getAdapterManager().getAdapter(peer, ICategorizable.class);
 			            	Assert.isNotNull(categorizable);
@@ -141,19 +158,9 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 			            	String value = peer.getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
 							boolean isStatic = value != null && Boolean.parseBoolean(value.trim());
 
-							boolean isProxy = peer.getPeer().getAttributes().containsKey("Proxy"); //$NON-NLS-1$
-
-							value = peer.getPeer().getAttributes().get("ValueAdd"); //$NON-NLS-1$
-							boolean isValueAdd = value != null && ("1".equals(value.trim()) || Boolean.parseBoolean(value.trim())); //$NON-NLS-1$
-
 							boolean isNeighborhood = Managers.getCategoryManager().belongsTo(catID, categorizable.getId());
 							if (!isNeighborhood && !isStatic) {
-								// "Value-add's" are not saved to the category persistence automatically
-								if (isProxy || isValueAdd) {
-									Managers.getCategoryManager().addTransient(catID, categorizable.getId());
-								} else {
-									Managers.getCategoryManager().add(catID, categorizable.getId());
-								}
+								Managers.getCategoryManager().add(catID, categorizable.getId());
 								isNeighborhood = true;
 							}
 

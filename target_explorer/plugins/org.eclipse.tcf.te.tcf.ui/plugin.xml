@@ -120,13 +120,6 @@
             name="%PeersByCurrentUserFilter.name"
             visibleInUI="true">
       </commonFilter>
-      <commonFilter
-            activeByDefault="true"
-            class="org.eclipse.tcf.te.tcf.ui.filter.ValueAddFilter"
-            id="org.eclipse.tcf.te.tcf.ui.navigator.ValueAddFilter"
-            name="%ValueAddFilter.name"
-            visibleInUI="false">
-      </commonFilter>
    </extension>
 
 <!-- Decorator contributions -->   
