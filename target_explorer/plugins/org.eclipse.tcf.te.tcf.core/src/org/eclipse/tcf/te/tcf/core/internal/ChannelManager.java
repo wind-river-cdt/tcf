@@ -340,7 +340,20 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 	public IChannel internalGetChannel(IPeer peer) {
 		Assert.isNotNull(peer);
 		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
-		return channels.get(peer.getID());
+
+		// Get the peer id
+		String id = peer.getID();
+
+		// Get the channel
+		IChannel channel = channels.get(id);
+		if (channel != null && !(channel.getState() == IChannel.STATE_OPEN || channel.getState() == IChannel.STATE_OPENING)) {
+			// Channel is not in open state -> drop the instance
+			channel = null;
+			channels.remove(id);
+			refCounters.remove(id);
+		}
+
+		return channel;
 	}
 
 	/* (non-Javadoc)
