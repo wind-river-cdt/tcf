@@ -72,14 +72,15 @@ public class TablePatternFilter extends ViewerFilter {
 	 * @param newPattern The new pattern
 	 */
 	public void setPattern(String newPattern) {
-		pattern = newPattern;
 		StringMatcher old = matcher;
 		if (newPattern == null || newPattern.trim().length() == 0) {
 			matcher = null;
+			pattern = null;
 		}
 		else {
 			String patternString = ALL + newPattern + ALL;
 			matcher = new StringMatcher(patternString, true, false);
+			pattern = patternString;
 		}
 		firePatternChangedEvent(old, matcher);
 	}
