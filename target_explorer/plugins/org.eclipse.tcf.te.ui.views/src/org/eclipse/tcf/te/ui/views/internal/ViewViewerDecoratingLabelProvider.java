@@ -46,7 +46,8 @@ public class ViewViewerDecoratingLabelProvider extends NavigatorDecoratingLabelP
 	 */
 	@Override
     public String getText(Object element) {
-	    String text = super.getText(element);
+		StyledString styledString = super.getStyledText(element);
+		String text = styledString != null ? styledString.toString() : super.getText(element);
 		IFilteringLabelDecorator decorator = getFilteringDecorator(element);
 		if (decorator != null && decorator.isEnabled(viewer, element)) {
 			return decorator.decorateText(text, element);
