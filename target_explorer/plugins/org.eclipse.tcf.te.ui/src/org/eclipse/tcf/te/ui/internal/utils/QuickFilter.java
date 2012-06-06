@@ -33,7 +33,7 @@ public class QuickFilter extends TablePatternFilter implements PropertyChangeLis
 	// The tree viewer to filter.
 	private TreeViewer viewer;
 	// The root path to select from.
-	private Object root;
+	private TreePath root;
 
 	/**
 	 * Create a quick filter for the specified viewer.
@@ -49,9 +49,8 @@ public class QuickFilter extends TablePatternFilter implements PropertyChangeLis
 	 *  
 	 * @param root The root path to filter from.
 	 */
-	public void showFilterPopup(Object root) {
+	public void showFilterPopup(TreePath root) {
 		this.root = root;
-		setPattern(null);
 		if (!isFiltering()) {
 			viewer.addFilter(this);
 		}
@@ -74,8 +73,9 @@ public class QuickFilter extends TablePatternFilter implements PropertyChangeLis
 		    	for(TreeItem item : items) {
 		    		viewer.getTree().showItem(item);
 		    	}
-		    	Rectangle bounds = items[0].getBounds();
-		    	location = new Point(bounds.x, bounds.y);
+		    	TreeItem item = items[0];
+		    	Rectangle bounds = item.getBounds();
+		    	location = new Point(bounds.x, bounds.y-bounds.height);
 		    }
 		    else {
 		    	location = new Point(0, 0);
@@ -84,7 +84,6 @@ public class QuickFilter extends TablePatternFilter implements PropertyChangeLis
 		else {
 			location = new Point(0, 0);
 		}
-		location.y -= viewer.getTree().getItemHeight();
 		location = viewer.getTree().toDisplay(location);
 	    return location;
     }
@@ -143,11 +142,8 @@ public class QuickFilter extends TablePatternFilter implements PropertyChangeLis
 	 * @return The current filtered element.
 	 */
 	private Object getFilteringElement() {
-		Object element = root;
-		if(root instanceof TreePath) {
-			element = ((TreePath)root).getLastSegment();
-		}
-	    return element;
+		Object element = root.getLastSegment();
+	    return element == null ? viewer.getInput() : element;
     }
 	
 	/**
@@ -196,17 +192,10 @@ public class QuickFilter extends TablePatternFilter implements PropertyChangeLis
 	private boolean skipMatching(Object parentElement) {
 		if (root == null || parentElement == null) return true;
 		if (parentElement instanceof TreePath) {
-			if (root instanceof TreePath) {
-				return !root.equals(parentElement);
-			}
-			Object parent = ((TreePath) parentElement).getLastSegment();
-			return !root.equals(parent);
+			return !root.equals(parentElement);
 		}
-		if (root instanceof TreePath) {
-			Object rootElement = ((TreePath) root).getLastSegment();
-			return !parentElement.equals(rootElement);
-		}
-		return !root.equals(parentElement);
+		Object rootElement = root.getLastSegment();
+		return !parentElement.equals(rootElement);
 	}
 
 	/**
@@ -218,9 +207,7 @@ public class QuickFilter extends TablePatternFilter implements PropertyChangeLis
 	public boolean isFiltering(Object element) {
 		if(root != null) {
 			Object rootElement = root;
-			if(root instanceof TreePath) {
-				rootElement = ((TreePath)root).getLastSegment();
-			}
+			rootElement = root.getLastSegment();
 			return rootElement == element && matcher != null;
 		}
 	    return false;

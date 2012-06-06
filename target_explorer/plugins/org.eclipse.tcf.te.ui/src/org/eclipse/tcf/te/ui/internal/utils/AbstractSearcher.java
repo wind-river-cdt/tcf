@@ -9,16 +9,9 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.internal.utils;
 
-import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.SafeRunner;
-import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Display;
@@ -26,36 +19,13 @@ import org.eclipse.tcf.te.ui.interfaces.ILazyLoader;
 import org.eclipse.tcf.te.ui.interfaces.ISearchMatcher;
 import org.eclipse.tcf.te.ui.interfaces.ITreeSearcher;
 import org.eclipse.tcf.te.ui.trees.Pending;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.tcf.te.ui.utils.TreeViewerUtil;
 
 /**
  * The abstract implementation of ITreeSearcher which provides common utility methods
  * for traversing.
  */
 public abstract class AbstractSearcher implements ITreeSearcher {
-	// The method to access AbstractTreeViewer#getSortedChildren in order to the children visually on the tree.
-	static volatile Method methodGetSortedChildren;
-	static {
-		SafeRunner.run(new ISafeRunnable(){
-			@Override
-            public void handleException(Throwable exception) {
-	            // Ignore on purpose.
-            }
-			@Override
-            public void run() throws Exception {
-				// Initialize the method object.
-		        methodGetSortedChildren = AbstractTreeViewer.class.getDeclaredMethod("getSortedChildren", new Class[]{Object.class}); //$NON-NLS-1$
-		        // Because "getSortedChildren" is a protected method, we need to make it accessible.
-		        AccessController.doPrivileged(new PrivilegedAction<Object>() {
-		        	@Override
-		        	public Object run() {
-				        methodGetSortedChildren.setAccessible(true);
-		        	    return null;
-		        	}
-				});
-            }
-		});
-	}
 	// The tree viewer to be searched.
 	protected TreeViewer fViewer;
 	// The label provider of the tree viewer.
@@ -125,36 +95,8 @@ public abstract class AbstractSearcher implements ITreeSearcher {
 				}
 			}
 		}
-		Object[] children = getSortedChildren(parent);
+		Object[] children = TreeViewerUtil.getSortedChildren(fViewer, parent);
 		return children;
-	}
-
-	/**
-	 * Get the current visible/sorted children under the specified parent element or path
-	 * by invoking the reflective method. This method is UI thread-safe.
-	 *
-	 * @param parentElementOrTreePath The parent element or path.
-	 * @return The current visible/sorted children of the parent path/element.
-	 */
-	protected Object[] getSortedChildren(final Object parentElementOrTreePath) {
-		if (Display.getCurrent() != null) {
-			try {
-				if (methodGetSortedChildren != null) {
-					return (Object[]) methodGetSortedChildren.invoke(fViewer, parentElementOrTreePath);
-				}
-			}
-			catch (Exception e) {
-			}
-			return new Object[0];
-		}
-		final Object[][] result = new Object[1][];
-		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
-			@Override
-			public void run() {
-				result[0] = getSortedChildren(parentElementOrTreePath);
-			}
-		});
-		return result[0];
 	}
 
 	/**

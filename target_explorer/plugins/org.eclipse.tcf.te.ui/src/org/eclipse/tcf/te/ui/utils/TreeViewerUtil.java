@@ -9,6 +9,13 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.utils;
 
+import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+
+import org.eclipse.core.runtime.ISafeRunnable;
+import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -16,14 +23,38 @@ import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.te.ui.internal.utils.QuickFilter;
 import org.eclipse.tcf.te.ui.internal.utils.SearchEngine;
 import org.eclipse.tcf.te.ui.internal.utils.TreeViewerSearchDialog;
+import org.eclipse.ui.PlatformUI;
 /**
  * The utilities to search and filter a tree viewer.
  */
 public class TreeViewerUtil {
-
+	// The method to access AbstractTreeViewer#getSortedChildren in order to the children visually on the tree.
+	static volatile Method methodGetSortedChildren;
+	static {
+		SafeRunner.run(new ISafeRunnable(){
+			@Override
+            public void handleException(Throwable exception) {
+	            // Ignore on purpose.
+            }
+			@Override
+            public void run() throws Exception {
+				// Initialize the method object.
+		        methodGetSortedChildren = AbstractTreeViewer.class.getDeclaredMethod("getSortedChildren", new Class[]{Object.class}); //$NON-NLS-1$
+		        // Because "getSortedChildren" is a protected method, we need to make it accessible.
+		        AccessController.doPrivileged(new PrivilegedAction<Object>() {
+		        	@Override
+		        	public Object run() {
+				        methodGetSortedChildren.setAccessible(true);
+		        	    return null;
+		        	}
+				});
+            }
+		});
+	}
 	/**
 	 * Get and attach a quick filter for a viewer.
 	 * 
@@ -38,7 +69,7 @@ public class TreeViewerUtil {
 		}
 		return filter;
 	}
-
+	
 	/**
 	 * Get a singleton search engine for a tree viewer. If
 	 * it does not exist then create one and store it.
@@ -73,8 +104,8 @@ public class TreeViewerUtil {
 	 */
 	public static void doFilter(TreeViewer viewer) {
 		TreePath rootPath = getSelectedPath(viewer);
-		Object root = getFilterRoot(viewer, rootPath);
-		if (root == viewer.getInput() || viewer.getExpandedState(root)) {
+		TreePath root = getFilterRoot(viewer, rootPath);
+		if (root == TreePath.EMPTY || viewer.getExpandedState(root)) {
 			getQuickFilter(viewer).showFilterPopup(root);
 		}
 	}
@@ -124,7 +155,7 @@ public class TreeViewerUtil {
 	 * @param rootPath The root path of the filter.
 	 * @return An adjust filter.
 	 */
-	private static Object getFilterRoot(TreeViewer viewer, TreePath rootPath) {
+	private static TreePath getFilterRoot(TreeViewer viewer, TreePath rootPath) {
 		if (rootPath != null) {
 			if (!isEligibleRoot(rootPath, viewer)) {
 				rootPath = rootPath.getParentPath();
@@ -137,12 +168,41 @@ public class TreeViewerUtil {
 			}
 			if (rootPath.getSegmentCount() == 0) {
 				viewer.setSelection(StructuredSelection.EMPTY);
-				return viewer.getInput();
+				return TreePath.EMPTY;
 			}
 			return rootPath;
 		}
 		viewer.setSelection(StructuredSelection.EMPTY);
-		return viewer.getInput();
+		return TreePath.EMPTY;
+	}
+	
+	/**
+	 * Get the current visible/sorted children under the specified parent element or path
+	 * by invoking the reflective method. This method is UI thread-safe.
+	 *
+	 * @param viewer the viewer to get the children from.
+	 * @param parentElementOrTreePath The parent element or path.
+	 * @return The current visible/sorted children of the parent path/element.
+	 */
+	public static Object[] getSortedChildren(final TreeViewer viewer, final Object parentElementOrTreePath) {
+		if (Display.getCurrent() != null) {
+			try {
+				if (methodGetSortedChildren != null) {
+					return (Object[]) methodGetSortedChildren.invoke(viewer, parentElementOrTreePath);
+				}
+			}
+			catch (Exception e) {
+			}
+			return new Object[0];
+		}
+		final Object[][] result = new Object[1][];
+		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
+			@Override
+			public void run() {
+				result[0] = getSortedChildren(viewer, parentElementOrTreePath);
+			}
+		});
+		return result[0];
 	}
 	
 	/**
@@ -187,7 +247,9 @@ public class TreeViewerUtil {
 			ViewerFilter[] filters = viewer.getFilters();
 			if (filters != null && filters.length > 0) {
 				for (ViewerFilter filter : filters) {
-					children = filter.filter(viewer, rootElement, children);
+					if (!(filter instanceof QuickFilter)) {
+						children = filter.filter(viewer, rootElement, children);
+					}
 					if (children == null || children.length == 0) break;
 				}
 			}
@@ -213,5 +275,14 @@ public class TreeViewerUtil {
 		}
 		return null;
 	}
+
+	public static String getFilterString(Object element) {
+	    return null;
+    }
+
+	public static String getFilteringString(TreeViewer viewer) {
+		QuickFilter filter = getQuickFilter(viewer);
+	    return filter.getFilterText();
+    }
 
 }

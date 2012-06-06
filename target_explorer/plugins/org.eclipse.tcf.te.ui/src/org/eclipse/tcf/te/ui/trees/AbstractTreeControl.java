@@ -203,16 +203,18 @@ public abstract class AbstractTreeControl extends WorkbenchPartControl implement
 	 * @param newInput The new input.
 	 */
 	void onInputChanged(Object oldInput, Object newInput) {
-		columns = doCreateViewerColumns(newInput);
-		filterDescriptors = doCreateFilterDescriptors(newInput);
-		if (isStatePersistent()) {
-			updateViewerState(newInput);
+		if(newInput != null) {
+			columns = doCreateViewerColumns(newInput);
+			filterDescriptors = doCreateFilterDescriptors(newInput);
+			if (isStatePersistent()) {
+				updateViewerState(newInput);
+			}
+			doCreateTreeColumns(viewer);
+			viewer.getTree().setHeaderVisible(true);
+			updateFilters();
+			new TreeViewerHeaderMenu(this).create();
+			if (configFilterAction != null) configFilterAction.updateEnablement();
 		}
-		doCreateTreeColumns(viewer);
-		viewer.getTree().setHeaderVisible(true);
-		updateFilters();
-		new TreeViewerHeaderMenu(this).create();
-		if (configFilterAction != null) configFilterAction.updateEnablement();
 	}
 
 	/**

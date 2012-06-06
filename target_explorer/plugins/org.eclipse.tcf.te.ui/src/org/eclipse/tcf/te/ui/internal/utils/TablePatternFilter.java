@@ -31,6 +31,7 @@ public class TablePatternFilter extends ViewerFilter {
 	protected StringMatcher matcher = null;
 	protected ILabelProvider labelProvider;
 	protected List<PropertyChangeListener> listeners;
+	protected String pattern;
 
 	public TablePatternFilter(ILabelProvider labelProvider) {
 		this.labelProvider = labelProvider;
@@ -71,6 +72,7 @@ public class TablePatternFilter extends ViewerFilter {
 	 * @param newPattern The new pattern
 	 */
 	public void setPattern(String newPattern) {
+		pattern = newPattern;
 		StringMatcher old = matcher;
 		if (newPattern == null || newPattern.trim().length() == 0) {
 			matcher = null;
@@ -95,6 +97,10 @@ public class TablePatternFilter extends ViewerFilter {
 				listener.propertyChange(event);
 			}
 		}
+    }
+
+	public String getFilterText() {
+	    return pattern;
     }
 
 	/**
