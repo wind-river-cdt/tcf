@@ -63,6 +63,11 @@ public class Messages extends NLS {
 	public static String GeneralInformationSection_state_2;
 	public static String GeneralInformationSection_state_3;
 
+	public static String LabelProviderDelegate_state_0;
+	public static String LabelProviderDelegate_state_1;
+	public static String LabelProviderDelegate_state_2;
+	public static String LabelProviderDelegate_state_3;
+
 	public static String TransportSection_title;
 	public static String TransportSection_description;
 

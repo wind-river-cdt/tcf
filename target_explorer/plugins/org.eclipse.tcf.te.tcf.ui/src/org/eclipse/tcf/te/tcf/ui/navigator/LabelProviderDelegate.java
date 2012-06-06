@@ -9,6 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.ui.navigator;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.core.runtime.Assert;
@@ -17,7 +19,9 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.te.runtime.utils.net.IPAddressUtil;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
 import org.eclipse.tcf.te.tcf.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.ui.internal.ImageConsts;
 import org.eclipse.tcf.te.tcf.ui.navigator.images.PeerImageDescriptor;
@@ -35,24 +39,48 @@ public class LabelProviderDelegate extends LabelProvider implements ILabelDecora
 	 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
 	 */
 	@Override
-	public String getText(Object element) {
+	public String getText(final Object element) {
 		if (element instanceof IPeerModel) {
-			String label = null;
+			StringBuilder builder = new StringBuilder();
 
-			final IPeer peer = ((IPeerModel)element).getPeer();
-			final String[] peerName = new String[1];
-			if (Protocol.isDispatchThread()) {
-				peerName[0] = peer.getName();
-			} else {
-				Protocol.invokeAndWait(new Runnable() {
-					@Override
-					public void run() {
-						peerName[0] = peer.getName();
+			// Copy the peer node and peer attributes
+			final Map<String, Object> attrs = new HashMap<String, Object>();
+
+			Runnable runnable = new Runnable() {
+				@Override
+				public void run() {
+					attrs.putAll(((IPeerModel)element).getProperties());
+					attrs.putAll(((IPeerModel)element).getPeer().getAttributes());
+				}
+			};
+
+			if (Protocol.isDispatchThread()) runnable.run();
+			else Protocol.invokeAndWait(runnable);
+
+			// Build up the base label from the peer name
+			builder.append((String)attrs.get(IPeer.ATTR_NAME));
+
+			// If the label is "TCF Agent", than append IP/dns.name (if not localhost)
+			// and port to the label
+			if ("TCF Agent".equals(builder.toString())) { //$NON-NLS-1$
+				String dnsName = (String)attrs.get("dns.name.transient"); //$NON-NLS-1$
+				String ip = (String)attrs.get(IPeer.ATTR_IP_HOST);
+				String port = (String)attrs.get(IPeer.ATTR_IP_PORT);
+
+				if (ip != null && !"".equals(ip.trim())) { //$NON-NLS-1$
+					builder.append(" "); //$NON-NLS-1$
+					if (!IPAddressUtil.getInstance().isLocalHost(ip)) {
+						builder.append(dnsName != null && !"".equals(dnsName.trim()) ? dnsName.trim() : ip.trim()); //$NON-NLS-1$
 					}
-				});
-			}
-			label = peerName[0];
 
+					if (port != null && !"".equals(port.trim()) && !"1534".equals(port.trim())) { //$NON-NLS-1$ //$NON-NLS-2$
+						builder.append(":"); //$NON-NLS-1$
+						builder.append(port.trim());
+					}
+				}
+			}
+
+			String label = builder.toString();
 			if (label != null && !"".equals(label.trim())) { //$NON-NLS-1$
 				return label;
 			}
@@ -121,10 +149,7 @@ public class LabelProviderDelegate extends LabelProvider implements ILabelDecora
 			Runnable runnable = new Runnable() {
 				@Override
 				public void run() {
-					IPeer peer = ((IPeerModel)element).getPeer();
-					String dnsName = ((IPeerModel)element).getStringProperty("dns.name.transient"); //$NON-NLS-1$
-
-					doDecorateText(builder, peer, dnsName);
+					doDecorateText(builder, (IPeerModel)element);
 				}
 			};
 
@@ -146,25 +171,17 @@ public class LabelProviderDelegate extends LabelProvider implements ILabelDecora
 	 * <b>Note:</b> Must be called with the TCF event dispatch thread.
 	 *
 	 * @param builder The string builder to decorate. Must not be <code>null</code>.
-	 * @param peer The peer. Must not be <code>null</code>.
-	 * @param dnsName The peers DNS name or <code>null</code>.
+	 * @param peerModel The peer model node. Must not be <code>null</code>.
 	 */
-	/* default */ void doDecorateText(StringBuilder builder, IPeer peer, String dnsName) {
+	/* default */ void doDecorateText(StringBuilder builder, IPeerModel peerModel) {
 		Assert.isNotNull(builder);
-		Assert.isNotNull(peer);
+		Assert.isNotNull(peerModel);
 		Assert.isTrue(Protocol.isDispatchThread());
 
-		String ip = peer.getAttributes().get(IPeer.ATTR_IP_HOST);
-		String port = peer.getAttributes().get(IPeer.ATTR_IP_PORT);
-
-		if (ip != null && !"".equals(ip.trim())) { //$NON-NLS-1$
+		int state = peerModel.getIntProperty(IPeerModelProperties.PROP_STATE);
+		if (state > IPeerModelProperties.STATE_UNKNOWN) {
 			builder.append(" ["); //$NON-NLS-1$
-			builder.append(dnsName != null && !"".equals(dnsName.trim()) ? dnsName.trim() : ip.trim()); //$NON-NLS-1$
-
-			if (port != null && !"".equals(port.trim()) && !"1534".equals(port.trim())) { //$NON-NLS-1$ //$NON-NLS-2$
-				builder.append(":"); //$NON-NLS-1$
-				builder.append(port.trim());
-			}
+			builder.append(Messages.getString("LabelProviderDelegate_state_" + state)); //$NON-NLS-1$
 			builder.append("]"); //$NON-NLS-1$
 		}
 	}
