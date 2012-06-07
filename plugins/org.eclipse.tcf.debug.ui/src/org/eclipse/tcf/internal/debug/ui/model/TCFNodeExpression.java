@@ -507,7 +507,8 @@ public class TCFNodeExpression extends TCFNode implements IElementEditor, ICastT
                     command = mem_space_data.get(addr.add(BigInteger.valueOf(offs)), 1, buf, offs, 1, 0, new IMemory.DoneMemory() {
                         public void doneMemory(IToken token, MemoryError error) {
                             if (error != null) {
-                                set(command, error, null);
+                                if (offs == 0) set(command, error, null);
+                                else set(command, null, toASCIIString(buf, 0, offs, '"'));
                             }
                             else if (buf[offs] == 0 || offs >= 2048) {
                                 set(command, null, toASCIIString(buf, 0, offs, '"'));
