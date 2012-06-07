@@ -18,7 +18,10 @@ import java.util.Set;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IChildrenCountUpdate;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IChildrenUpdate;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IHasChildrenUpdate;
+import org.eclipse.debug.internal.ui.viewers.model.provisional.IPresentationContext;
+import org.eclipse.debug.internal.ui.viewers.model.provisional.IViewerUpdate;
 import org.eclipse.debug.ui.IDebugUIConstants;
+import org.eclipse.tcf.debug.ui.ITCFDebugUIConstants;
 import org.eclipse.tcf.services.IMemory;
 import org.eclipse.tcf.services.IRunControl;
 
@@ -27,6 +30,7 @@ public class TCFNodeLaunch extends TCFNode implements ISymbolOwner {
 
     private final TCFChildrenExecContext children;
     private final TCFChildren filtered_children;
+    private final TCFChildrenContextQuery children_query;
     private final Map<String,TCFNodeSymbol> symbols = new HashMap<String,TCFNodeSymbol>();
 
     TCFNodeLaunch(final TCFModel model) {
@@ -61,6 +65,7 @@ public class TCFNodeLaunch extends TCFNode implements ISymbolOwner {
                 super.dispose();
             }
         };
+        children_query = new TCFChildrenContextQuery(this, filtered_children);
     }
 
     @Override
@@ -71,11 +76,24 @@ public class TCFNodeLaunch extends TCFNode implements ISymbolOwner {
         super.dispose();
     }
 
+    @SuppressWarnings("unchecked")
+    private boolean setQuery(IViewerUpdate result, Runnable done) {
+        IPresentationContext context = result.getPresentationContext();
+        String query = (String)context.getProperty(ITCFDebugUIConstants.PROP_CONTEXT_QUERY);
+        Set<String> filter = (Set<String>)context.getProperty(ITCFDebugUIConstants.PROP_FILTER_CONTEXTS);
+        return children_query.setQuery(query, filter, done);
+    }
+
     @Override
     protected boolean getData(IChildrenCountUpdate result, Runnable done) {
-        if (IDebugUIConstants.ID_DEBUG_VIEW.equals(result.getPresentationContext().getId())) {
+        String view_id = result.getPresentationContext().getId();
+        if (IDebugUIConstants.ID_DEBUG_VIEW.equals(view_id)) {
             if (!filtered_children.validate(done)) return false;
             result.setChildCount(filtered_children.size());
+        }
+        else if (ITCFDebugUIConstants.ID_CONTEXT_QUERY_VIEW.equals(view_id)) {
+            if (!setQuery(result, done)) return false;
+            result.setChildCount(children_query.size());
         }
         else {
             result.setChildCount(0);
@@ -85,17 +103,27 @@ public class TCFNodeLaunch extends TCFNode implements ISymbolOwner {
 
     @Override
     protected boolean getData(IChildrenUpdate result, Runnable done) {
-        if (IDebugUIConstants.ID_DEBUG_VIEW.equals(result.getPresentationContext().getId())) {
+        String view_id = result.getPresentationContext().getId();
+        if (IDebugUIConstants.ID_DEBUG_VIEW.equals(view_id)) {
             return filtered_children.getData(result, done);
+        }
+        else if (ITCFDebugUIConstants.ID_CONTEXT_QUERY_VIEW.equals(view_id)) {
+            if (!setQuery(result, done)) return false;
+            return children_query.getData(result, done);
         }
         return true;
     }
 
     @Override
     protected boolean getData(IHasChildrenUpdate result, Runnable done) {
-        if (IDebugUIConstants.ID_DEBUG_VIEW.equals(result.getPresentationContext().getId())) {
+        String view_id = result.getPresentationContext().getId();
+        if (IDebugUIConstants.ID_DEBUG_VIEW.equals(view_id)) {
             if (!filtered_children.validate(done)) return false;
             result.setHasChilren(filtered_children.size() > 0);
+        }
+        else if (ITCFDebugUIConstants.ID_CONTEXT_QUERY_VIEW.equals(view_id)) {
+            if (!setQuery(result, done)) return false;
+            result.setHasChilren(children_query.size() > 0);
         }
         else {
             result.setHasChilren(false);

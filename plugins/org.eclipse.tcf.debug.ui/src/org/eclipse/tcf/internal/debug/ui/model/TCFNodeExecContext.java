@@ -26,10 +26,12 @@ import org.eclipse.debug.internal.ui.viewers.model.provisional.ILabelUpdate;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IModelDelta;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IPresentationContext;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IViewerInputUpdate;
+import org.eclipse.debug.internal.ui.viewers.model.provisional.IViewerUpdate;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.memory.IMemoryRenderingSite;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.tcf.debug.ui.ITCFDebugUIConstants;
 import org.eclipse.tcf.internal.debug.model.TCFContextState;
 import org.eclipse.tcf.internal.debug.model.TCFFunctionRef;
 import org.eclipse.tcf.internal.debug.model.TCFSourceRef;
@@ -56,6 +58,7 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
     private final TCFChildrenHoverExpressions children_hover_exps;
     private final TCFChildrenLogExpressions children_log_exps;
     private final TCFChildrenModules children_modules;
+    private final TCFChildrenContextQuery children_query;
 
     private final TCFData<IMemory.MemoryContext> mem_context;
     private final TCFData<IRunControl.RunControlContext> run_context;
@@ -236,6 +239,7 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
         children_hover_exps = new TCFChildrenHoverExpressions(this);
         children_log_exps = new TCFChildrenLogExpressions(this);
         children_modules = new TCFChildrenModules(this);
+        children_query = new TCFChildrenContextQuery(this, children_exec);
         mem_context = new TCFData<IMemory.MemoryContext>(channel) {
             @Override
             protected boolean startDataRetrieval() {
@@ -833,6 +837,14 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
         return false;
     }
 
+    @SuppressWarnings("unchecked")
+    private boolean setQuery(IViewerUpdate result, Runnable done) {
+        IPresentationContext context = result.getPresentationContext();
+        String query = (String)context.getProperty(ITCFDebugUIConstants.PROP_CONTEXT_QUERY);
+        Set<String> filter = (Set<String>)context.getProperty(ITCFDebugUIConstants.PROP_FILTER_CONTEXTS);
+        return children_query.setQuery(query, filter, done);
+    }
+
     @Override
     protected boolean getData(IChildrenCountUpdate result, Runnable done) {
         TCFChildren children = null;
@@ -880,6 +892,10 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
             if (!mem_context.validate(done)) return false;
             IMemory.MemoryContext ctx = mem_context.getData();
             if (ctx != null) children = children_modules;
+        }
+        else if (ITCFDebugUIConstants.ID_CONTEXT_QUERY_VIEW.equals(view_id)) {
+            if (!setQuery(result, done)) return false;
+            children = children_query;
         }
         if (children != null) {
             if (!children.validate(done)) return false;
@@ -952,6 +968,10 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
             IMemory.MemoryContext ctx = mem_context.getData();
             if (ctx != null) children = children_modules;
         }
+        else if (ITCFDebugUIConstants.ID_CONTEXT_QUERY_VIEW.equals(view_id)) {
+            if (!setQuery(result, done)) return false;
+            children = children_query;
+        }
         if (children == null) return true;
         if (children == children_stack) {
             if (!children.validate(done)) return false;
@@ -1014,6 +1034,10 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
             if (!mem_context.validate(done)) return false;
             IMemory.MemoryContext ctx = mem_context.getData();
             if (ctx != null) children = children_modules;
+        }
+        else if (ITCFDebugUIConstants.ID_CONTEXT_QUERY_VIEW.equals(view_id)) {
+            if (!setQuery(result, done)) return false;
+            children = children_query;
         }
         if (children != null) {
             if (!children.validate(done)) return false;
