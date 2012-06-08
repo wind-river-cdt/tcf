@@ -52,6 +52,16 @@ public abstract class AbstractDecoratedDialogPageControl extends BaseDialogPageC
 		return controlDecoration;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.controls.BaseControl#dispose()
+	 */
+	@Override
+	public void dispose() {
+	    super.dispose();
+
+	    controlDecoration = null;
+	}
+
 	/**
 	 * Returns the control decoration position. The default is
 	 * {@link SWT#TOP} | {@link SWT#LEFT}.
