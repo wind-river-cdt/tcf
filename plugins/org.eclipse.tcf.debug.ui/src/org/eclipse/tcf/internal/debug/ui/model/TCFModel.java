@@ -11,6 +11,7 @@
 package org.eclipse.tcf.internal.debug.ui.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,6 +19,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
@@ -84,6 +87,8 @@ import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.tcf.core.Command;
+import org.eclipse.tcf.debug.ui.ITCFSourceDisplay;
 import org.eclipse.tcf.internal.debug.actions.TCFAction;
 import org.eclipse.tcf.internal.debug.launch.TCFSourceLookupDirector;
 import org.eclipse.tcf.internal.debug.launch.TCFSourceLookupParticipant;
@@ -106,13 +111,12 @@ import org.eclipse.tcf.internal.debug.ui.commands.StepReturnCommand;
 import org.eclipse.tcf.internal.debug.ui.commands.SuspendCommand;
 import org.eclipse.tcf.internal.debug.ui.commands.TerminateCommand;
 import org.eclipse.tcf.internal.debug.ui.preferences.TCFPreferences;
-import org.eclipse.tcf.core.Command;
-import org.eclipse.tcf.debug.ui.ITCFSourceDisplay;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IErrorReport;
 import org.eclipse.tcf.protocol.IService;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.IContextQuery;
 import org.eclipse.tcf.services.IDisassembly;
 import org.eclipse.tcf.services.ILineNumbers;
 import org.eclipse.tcf.services.IMemory;
@@ -304,7 +308,6 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
         new HashMap<ILaunchConfiguration,IEditorInput>();
 
     private final IModelSelectionPolicyFactory model_selection_factory = new IModelSelectionPolicyFactory() {
-
         public IModelSelectionPolicy createModelSelectionPolicyAdapter(
                 Object element, IPresentationContext context) {
             return selection_policy;
@@ -317,6 +320,34 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
     private TCFNodeLaunch launch_node;
     private boolean disposed;
 
+    private Map<String, TCFDataCache<Set<String>>> context_queries = new TreeMap<String, TCFDataCache<Set<String>>>(); 
+    
+    public TCFDataCache<Set<String>> getContextQuery(final String query) {
+        TCFDataCache<Set<String>> data = context_queries.get(query);
+        if (data == null) {
+            data = new TCFDataCache<Set<String>>(channel) {
+                @Override
+                protected boolean startDataRetrieval() {
+                    assert command == null;
+                    IContextQuery service = channel.getRemoteService(IContextQuery.class);
+                    if (service == null) {
+                        set(null, null, null);
+                        return true;
+                    }
+                    
+                    command = service.query(query, new IContextQuery.DoneQuery() {
+                        public void doneQuery (IToken token, Exception error, String[] contexts) {
+                            set( token, error, new TreeSet<String>(Arrays.asList(contexts)) );
+                        }
+                    });
+                    return false;
+                }
+            };
+            context_queries.put(query, data);             
+        }
+        return data;
+    }
+    
     private final IMemory.MemoryListener mem_listener = new IMemory.MemoryListener() {
 
         public void contextAdded(IMemory.MemoryContext[] contexts) {
@@ -402,6 +433,7 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
         }
 
         public void contextAdded(IRunControl.RunControlContext[] contexts) {
+            onContextAdded();
             for (IRunControl.RunControlContext ctx : contexts) {
                 String id = ctx.getParentID();
                 if (id == null) {
@@ -891,6 +923,13 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
         model_proxies.remove(ctx);
     }
 
+    private void onContextAdded() {
+        for (TCFDataCache<?> query : context_queries.values()) {
+            query.reset();
+        }
+        context_queries.clear();
+    }
+
     private void onContextRemoved(String[] context_ids) {
         for (String id : context_ids) {
             TCFNode node = getNode(id);
@@ -904,6 +943,17 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
             expanded_nodes.remove(id);
             if (mem_blocks_update != null) mem_blocks_update.changeset.remove(id);
         }
+        
+        List<String> context_ids_list = Arrays.asList(context_ids);
+        for (TCFDataCache<Set<String>> query : context_queries.values()) {
+            if (query.isValid() && query.getError() == null) {
+                Set<String> query_contexts = query.getData();
+                query_contexts.removeAll(context_ids_list);
+                query.reset(query_contexts);
+            }
+        }
+        context_queries.clear();
+        
         launch_node.onAnyContextAddedOrRemoved();
         // Close debug session if the last context is removed:
         onContextOrProcessRemoved();

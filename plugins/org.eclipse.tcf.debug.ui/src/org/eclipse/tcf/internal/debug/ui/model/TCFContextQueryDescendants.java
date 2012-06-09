@@ -11,10 +11,8 @@
 package org.eclipse.tcf.internal.debug.ui.model;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.eclipse.tcf.util.TCFDataCache;
 
@@ -24,25 +22,19 @@ import org.eclipse.tcf.util.TCFDataCache;
  * An element in the list either matches both query and filter,
  * or it is an ancestor of a matching node.
  */
-public class TCFChildrenContextQuery extends TCFChildren {
+public class TCFContextQueryDescendants extends TCFDataCache<Set<String>> {
 
-    private final TCFChildren children;
+    private final TCFNode node;
 
     private String[] query_data;
     private Set<String> filter;
 
-    TCFChildrenContextQuery(TCFNode node, TCFChildren children) {
-        super(node);
-        this.children = children;
+    TCFContextQueryDescendants(TCFNode node) {
+        super(node.getChannel());
+        this.node = node;
     }
 
-    @Override
-    public void dispose() {
-        getNodes().clear();
-        super.dispose();
-    }
-
-    boolean setQuery(String query, Set<String> filter, Runnable done) {
+    public boolean setQuery(String query, Set<String> filter, Runnable done) {
         String[] query_data = null;
         TCFDataCache<String[]> query_cache = node.getModel().getLaunch().getContextQuery(query);
         if (query_cache != null) {
@@ -58,37 +50,36 @@ public class TCFChildrenContextQuery extends TCFChildren {
         return true;
     }
 
-    private boolean retainAll(Map<String,TCFNode> map, String[] ids) {
+    private boolean getDescendants(Set<String> descendants, String[] ids) {
         TCFModel model = node.getModel();
-        Set<String> set = new HashSet<String>();
         for (String id : ids) {
             if (!model.createNode(id, this)) return false;
             if (isValid()) return true; // error creating a node
             TCFNode n = model.getNode(id);
             while (n != null) {
-                if (n.parent == node || (n.parent == null && !(node instanceof TCFNodeExecContext))) {
-                    set.add(n.getID());
+                if ( n.parent == node || (n.parent == null && !(node instanceof TCFNodeExecContext)) ) {
+                    descendants.add(id);
                     break;
                 }
                 n = n.parent;
             }
         }
-        map.keySet().retainAll(set);
         return true;
     }
-
+    
+    
     @Override
     protected boolean startDataRetrieval() {
-        if (!children.validate(this)) return false;
-        Map<String,TCFNode> map = new HashMap<String,TCFNode>();
-        if (children.size() > 0) {
-            for (TCFNode n : children.toArray()) map.put(n.id, n);
-            if (query_data != null && !retainAll(map, query_data)) return false;
-            if (isValid()) return true; // error creating a node
-            if (filter != null && !retainAll(map, filter.toArray(new String[filter.size()]))) return false;
-            if (isValid()) return true; // error creating a node
+        Set<String> set = new TreeSet<String>();
+        if (query_data != null && !getDescendants(set, query_data)) return false;
+        if (isValid()) return true; // error creating a node
+        if (filter != null) {
+            Set<String> filtered = new TreeSet<String>();
+            if (!getDescendants(filtered, filter.toArray(new String[filter.size()]))) return false;
+            set.retainAll(filtered);
         }
-        set(null, children.getError(), map);
+        if (isValid()) return true; // error creating a node
+        set(null, null, set);
         return true;
     }
 }

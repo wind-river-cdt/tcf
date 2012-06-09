@@ -29,13 +29,16 @@ import org.eclipse.tcf.services.IRunControl;
 public class TCFNodeLaunch extends TCFNode implements ISymbolOwner {
 
     private final TCFChildrenExecContext children;
+
     private final TCFChildren filtered_children;
     private final TCFChildrenContextQuery children_query;
+    private final TCFContextQueryDescendants query_descendants_count;
     private final Map<String,TCFNodeSymbol> symbols = new HashMap<String,TCFNodeSymbol>();
 
     TCFNodeLaunch(final TCFModel model) {
         super(model);
         children = new TCFChildrenExecContext(this);
+        query_descendants_count = new TCFContextQueryDescendants(this);
         filtered_children = new TCFChildren(this) {
             @Override
             protected boolean startDataRetrieval() {
@@ -65,7 +68,7 @@ public class TCFNodeLaunch extends TCFNode implements ISymbolOwner {
                 super.dispose();
             }
         };
-        children_query = new TCFChildrenContextQuery(this, filtered_children);
+        children_query = new TCFChildrenContextQuery(this, children);
     }
 
     @Override
@@ -81,7 +84,8 @@ public class TCFNodeLaunch extends TCFNode implements ISymbolOwner {
         IPresentationContext context = result.getPresentationContext();
         String query = (String)context.getProperty(ITCFDebugUIConstants.PROP_CONTEXT_QUERY);
         Set<String> filter = (Set<String>)context.getProperty(ITCFDebugUIConstants.PROP_FILTER_CONTEXTS);
-        return children_query.setQuery(query, filter, done);
+        return children_query.setQuery(query, model.getLaunch().getModelContexts(filter), done) &&
+                children_query.validate(done);
     }
 
     @Override
@@ -162,6 +166,8 @@ public class TCFNodeLaunch extends TCFNode implements ISymbolOwner {
 
     void onAnyContextAddedOrRemoved() {
         filtered_children.reset();
+        children_query.reset();
+        query_descendants_count.reset();
     }
 
     public void addSymbol(TCFNodeSymbol s) {
@@ -181,4 +187,9 @@ public class TCFNodeLaunch extends TCFNode implements ISymbolOwner {
     public TCFChildren getFilteredChildren() {
         return filtered_children;
     }
+    
+    public TCFContextQueryDescendants getContextQueryDescendants() {
+        return query_descendants_count;
+    }
+
 }

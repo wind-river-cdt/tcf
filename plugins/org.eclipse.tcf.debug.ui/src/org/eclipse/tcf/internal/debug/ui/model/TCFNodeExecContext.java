@@ -12,6 +12,7 @@ package org.eclipse.tcf.internal.debug.ui.model;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -52,6 +53,7 @@ import org.eclipse.ui.IWorkbenchPart;
 public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
 
     private final TCFChildrenExecContext children_exec;
+    private final TCFContextQueryDescendants query_descendants;
     private final TCFChildrenStackTrace children_stack;
     private final TCFChildrenRegisters children_regs;
     private final TCFChildrenExpressions children_exps;
@@ -240,6 +242,7 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
         children_log_exps = new TCFChildrenLogExpressions(this);
         children_modules = new TCFChildrenModules(this);
         children_query = new TCFChildrenContextQuery(this, children_exec);
+        query_descendants = new TCFContextQueryDescendants(this);
         mem_context = new TCFData<IMemory.MemoryContext>(channel) {
             @Override
             protected boolean startDataRetrieval() {
@@ -782,6 +785,44 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
     public TCFChildren getChildren() {
         return children_exec;
     }
+    
+//    public TCFQueryChildrenExecContext getQueryChildren(String query, Set<String> contexts) {
+//        class QueryChildrenKey {
+//            private final String fQuery;
+//            private Set<String> fContexts;
+//            
+//            QueryChildrenKey(String query, Set<String> contexts) {
+//                fQuery = query;
+//                fContexts = contexts;
+//            }
+//            
+//            @Override
+//            public boolean equals(Object other) {
+//                if (other instanceof QueryChildrenKey) {
+//                    QueryChildrenKey element = (QueryChildrenKey)other;
+//                    return ((fQuery == null && element.fQuery == null) || 
+//                            (fQuery != null && fQuery.equals(element.fQuery))) &&
+//                           ((fContexts == null && element.fContexts == null) || 
+//                            (fContexts != null && fContexts.equals(element.fContexts)));
+//                }
+//                return false;
+//            }
+//            
+//            @Override
+//            public int hashCode() {
+//                return (fQuery != null ? fQuery.hashCode() : 0) + (fContexts != null ? fContexts.hashCode() : 0);
+//            }
+//
+//        }
+//        
+//        QueryChildrenKey key = new QueryChildrenKey(query, contexts);
+//        TCFQueryChildrenExecContext children = query_children_exec_map.get(key);
+//        if (children ==null) {
+//            children = new TCFQueryChildrenExecContext(this, children_exec, query, contexts);
+//            query_children_exec_map.put(key, children);
+//        }
+//        return children;
+//    }
 
     public TCFNodeStackFrame getLastTopFrame() {
         if (!resume_pending) return null;
@@ -842,7 +883,7 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
         IPresentationContext context = result.getPresentationContext();
         String query = (String)context.getProperty(ITCFDebugUIConstants.PROP_CONTEXT_QUERY);
         Set<String> filter = (Set<String>)context.getProperty(ITCFDebugUIConstants.PROP_FILTER_CONTEXTS);
-        return children_query.setQuery(query, filter, done);
+        return children_query.setQuery(query, model.getLaunch().getModelContexts(filter), done);
     }
 
     @Override
@@ -1053,7 +1094,14 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
 
     @Override
     protected boolean getData(ILabelUpdate result, Runnable done) {
-        result.getViewerInput();
+        if ( ITCFDebugUIConstants.ID_CONTEXT_QUERY_VIEW.equals(result.getPresentationContext().getId()) ) {
+            return getContextQueryViewData(result, done);
+        } else {
+            return getDebugViewData(result, done);
+        }
+    }
+    
+    private boolean getDebugViewData(ILabelUpdate result, Runnable done) {
         if (!run_context.validate(done)) return false;
         String image_name = null;
         boolean suspended_by_bp = false;
@@ -1093,7 +1141,7 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
                             if (state_data.isReversing()) {
                                 image_name = ImageCache.IMG_THREAD_REVERSING;
                                 label.append(" (Reversing)");
-                            }
+                            }    
                             else {
                                 image_name = ImageCache.IMG_THREAD_RUNNNIG;
                                 label.append(" (Running)");
@@ -1187,6 +1235,74 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
         return true;
     }
 
+    private boolean getContextQueryViewData(ILabelUpdate result, Runnable done) {
+        if (!run_context.validate(done)) return false;
+        String image_name = null;
+        StringBuffer label = new StringBuffer();
+        Throwable error = run_context.getError();
+        if (error != null) {
+            result.setForeground(new RGB(255, 0, 0), 0);
+            label.append(id);
+            label.append(": ");
+            label.append(TCFModel.getErrorMessage(error, false));
+        }
+        else {
+            String query = (String)result.getPresentationContext().getProperty(ITCFDebugUIConstants.PROP_CONTEXT_QUERY);
+            @SuppressWarnings("unchecked")
+            Set<String> contexts = (Set<String>)result.getPresentationContext().getProperty(ITCFDebugUIConstants.PROP_FILTER_CONTEXTS);
+            if (contexts != null) contexts = model.getLaunch().getModelContexts(contexts);
+            if (!query_descendants.setQuery(query, contexts, done)) return false;
+            if (!query_descendants.validate(done)) return false;
+            if (query_descendants.getError() == null) {
+                Set<String> descendants = query_descendants.getData();
+                if (descendants != null && !descendants.isEmpty()) {
+                    label.append("(");
+                    label.append(descendants.size());
+                    label.append(") ");
+                }
+            }
+            
+            TCFDataCache<String[]> query_data = model.getLaunch().getContextQuery(query);
+            if (!query_data.validate(done)) return false;
+            if ( (query_data.getData() != null && !Arrays.asList(query_data.getData()).contains(getID())) || 
+                 (contexts != null && !contexts.contains(getID())) ) 
+            {
+                result.setForeground(new RGB(128, 128, 128), 0);
+            }
+            
+            IRunControl.RunControlContext ctx = run_context.getData();
+            if (ctx == null) {
+                label.append(id);
+            }
+            else {
+                String nm = ctx.getName();
+                if (nm == null && !ctx.hasState()) {
+                    String prs = ctx.getProcessID();
+                    if (prs != null) {
+                        if (!prs_context.validate(done)) return false;
+                        IProcesses.ProcessContext pctx = prs_context.getData();
+                        if (pctx != null) nm = pctx.getName();
+                    }
+                }
+                label.append(nm != null ? nm : id);
+                Object info = ctx.getProperties().get("AdditionalInfo");
+                if (info != null) label.append(info.toString());
+                if (ctx.hasState()) {
+                    image_name = ImageCache.IMG_THREAD_UNKNOWN_STATE;
+                }
+                else {
+                    // Thread container (process)
+                    image_name = ImageCache.IMG_PROCESS_RUNNING;
+                    
+                }
+            }
+        }
+        
+        result.setImageDescriptor(ImageCache.getImageDescriptor(image_name), 0);
+        result.setLabel(label.toString(), 0);
+        return true;
+    }
+
     @Override
     protected boolean getData(IViewerInputUpdate result, Runnable done) {
         result.setInputElement(this);
@@ -1244,9 +1360,12 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
             }
         }
         for (TCFModelProxy p : model.getModelProxies()) {
-            if (IDebugUIConstants.ID_DEBUG_VIEW.equals(p.getPresentationContext().getId())) {
+            String view_id = p.getPresentationContext().getId();
+            if (IDebugUIConstants.ID_DEBUG_VIEW.equals(view_id)) {
                 /* Note: should use IModelDelta.INSERTED but it is broken in Eclipse 3.6 */
                 p.addDelta(this, IModelDelta.ADDED);
+            } else if (ITCFDebugUIConstants.ID_CONTEXT_QUERY_VIEW.equals(view_id)) {
+                p.addDelta(parent, IModelDelta.CONTENT);
             }
         }
     }
@@ -1268,8 +1387,11 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
             }
         }
         for (TCFModelProxy p : model.getModelProxies()) {
-            if (IDebugUIConstants.ID_DEBUG_VIEW.equals(p.getPresentationContext().getId())) {
+            String view_id = p.getPresentationContext().getId();
+            if (IDebugUIConstants.ID_DEBUG_VIEW.equals(view_id)) {
                 p.addDelta(this, IModelDelta.REMOVED);
+            } else if (ITCFDebugUIConstants.ID_CONTEXT_QUERY_VIEW.equals(view_id)) {
+                p.addDelta(parent, IModelDelta.CONTENT);
             }
         }
     }
@@ -1279,9 +1401,10 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
         for (TCFModelProxy p : model.getModelProxies()) {
             int flags = 0;
             String view_id = p.getPresentationContext().getId();
-            if (IDebugUIConstants.ID_DEBUG_VIEW.equals(view_id) &&
-                    (launch.getContextActionsCount(id) == 0 ||
-                    !model.getDelayStackUpdateUtilLastStep())) {
+            if ( (IDebugUIConstants.ID_DEBUG_VIEW.equals(view_id) || 
+                  ITCFDebugUIConstants.ID_CONTEXT_QUERY_VIEW.equals(view_id)) &&
+                 (launch.getContextActionsCount(id) == 0 || !model.getDelayStackUpdateUtilLastStep()))
+            {
                 flags |= IModelDelta.CONTENT;
             }
             if (IDebugUIConstants.ID_REGISTER_VIEW.equals(view_id) ||
@@ -1331,6 +1454,7 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
 
     void onContextAdded(IRunControl.RunControlContext context) {
         children_exec.onContextAdded(context);
+        children_query.reset();
     }
 
     void onContextChanged(IRunControl.RunControlContext context) {
@@ -1348,6 +1472,7 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
         children_stack.onSourceMappingChange();
         children_regs.reset();
         children_exec.onAncestorContextChanged();
+        children_query.reset();
         for (TCFNodeSymbol s : symbols.values()) s.onMemoryMapChanged();
         postAllChangedDelta();
     }
@@ -1376,6 +1501,7 @@ public class TCFNodeExecContext extends TCFNode implements ISymbolOwner {
         dispose();
         postContextRemovedDelta();
         launch.removeContextActions(id);
+        children_query.reset();
     }
 
     void onExpressionAddedOrRemoved() {
