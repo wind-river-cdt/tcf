@@ -53,6 +53,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.tcf.te.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.interfaces.IUIConstants;
 import org.eclipse.tcf.te.ui.nls.Messages;
+import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
@@ -129,13 +130,23 @@ public class NewWizardSelectionPage extends WizardPage {
 		public boolean select(Viewer viewer, Object parentElement, Object element) {
 			if (element instanceof WorkbenchWizardElement) {
 				IConfigurationElement configElement = ((WorkbenchWizardElement)element).getConfigurationElement();
+
+				// Determine the value of the "hideWizard" attribute first
+				boolean isHidden = false;
+				String value = configElement.getAttribute("hideWizard"); //$NON-NLS-1$
+				if (value != null && !"".equals(value)) isHidden = Boolean.parseBoolean(value); //$NON-NLS-1$
+				if (isHidden) return false;
+
+				// Determine the visibility from the enablement
 				IConfigurationElement[] children = configElement.getChildren("enablement"); //$NON-NLS-1$
 				// Either 0 or 1 enablement child elements are allowed
 				if (children != null && children.length > 0) {
 					try {
 						Expression expression = ExpressionConverter.getDefault().perform(children[0]);
 						if (expression != null) {
-							ISelection selection = new StructuredSelection(element);
+							// The selection passed to the expression is the "System Management" view tree selection
+							ISelectionService selectionService = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService();
+							ISelection selection = selectionService != null ? selectionService.getSelection("org.eclipse.tcf.te.ui.views.View") : null; //$NON-NLS-1$
 							EvaluationContext evalContext = new EvaluationContext(null, selection);
 							evalContext.addVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME, selection);
 							evalContext.setAllowPluginActivation(true);
@@ -152,7 +163,6 @@ public class NewWizardSelectionPage extends WizardPage {
 						}
 					}
 				}
-
 			}
 		    return true;
 		}
