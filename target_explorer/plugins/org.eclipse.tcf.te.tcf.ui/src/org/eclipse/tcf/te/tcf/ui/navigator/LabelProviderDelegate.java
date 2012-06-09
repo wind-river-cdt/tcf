@@ -60,9 +60,9 @@ public class LabelProviderDelegate extends LabelProvider implements ILabelDecora
 			// Build up the base label from the peer name
 			builder.append((String)attrs.get(IPeer.ATTR_NAME));
 
-			// If the label is "TCF Agent", than append IP/dns.name (if not localhost)
-			// and port to the label
-			if ("TCF Agent".equals(builder.toString())) { //$NON-NLS-1$
+			// If the label is "TCF Agent" or "TCF Proxy", than append IP/dns.name
+			// (if not localhost) and port to the label
+			if (isAppendAddressText(builder.toString())) {
 				String dnsName = (String)attrs.get("dns.name.transient"); //$NON-NLS-1$
 				String ip = (String)attrs.get(IPeer.ATTR_IP_HOST);
 				String port = (String)attrs.get(IPeer.ATTR_IP_PORT);
@@ -89,6 +89,21 @@ public class LabelProviderDelegate extends LabelProvider implements ILabelDecora
 		}
 
 		return ""; //$NON-NLS-1$
+	}
+
+	/**
+	 * Determines if the IP-address and port needs to be appended
+	 * to the given label.
+	 * <p>
+	 * The default implementation returns <code>true</code> if the label is either
+	 * &quot;TCF Agent&quot; or &quot;TCF Proxy&quot;.
+	 *
+	 * @param label The label. Must not be <code>null</code>.
+	 * @return <code>True</code> if the address shall be appended, <code>false</code> otherwise.
+	 */
+	protected boolean isAppendAddressText(String label) {
+		Assert.isNotNull(label);
+		return "TCF Agent".equals(label) || "TCF Proxy".equals(label); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/* (non-Javadoc)

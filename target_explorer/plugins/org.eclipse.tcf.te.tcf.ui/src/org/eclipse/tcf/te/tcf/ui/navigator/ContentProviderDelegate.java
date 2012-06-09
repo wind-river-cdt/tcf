@@ -30,6 +30,8 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerRedirector;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelLookupService;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelRefreshService;
 import org.eclipse.tcf.te.tcf.locator.model.Model;
+import org.eclipse.tcf.te.tcf.ui.activator.UIPlugin;
+import org.eclipse.tcf.te.tcf.ui.internal.preferences.IPreferenceKeys;
 import org.eclipse.tcf.te.tcf.ui.navigator.nodes.PeerRedirectorGroupNode;
 import org.eclipse.tcf.te.ui.swt.DisplayUtil;
 import org.eclipse.tcf.te.ui.views.Managers;
@@ -64,12 +66,13 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 	private final Map<String, PeerRedirectorGroupNode> roots = new HashMap<String, PeerRedirectorGroupNode>();
 
 	/**
-	 * Determines if the given peer model node is filtered from the view completely.
+	 * Determines if the given peer model node is a proxy or a value-add.
 	 *
 	 * @param peerModel The peer model node. Must not be <code>null</code>.
-	 * @return <code>True</code> if filtered, <code>false</code> otherwise.
+	 * @return <code>True</code> if the peer model node is a proxy or value-add, <code>false</code> otherwise.
 	 */
-	/* default */ final static boolean isFiltered(IPeerModel peerModel) {
+	/* default */ final static boolean isProxyOrValueAdd(IPeerModel peerModel) {
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 		Assert.isNotNull(peerModel);
 
 		boolean isProxy = peerModel.getPeer().getAttributes().containsKey("Proxy"); //$NON-NLS-1$
@@ -78,6 +81,21 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 		boolean isValueAdd = value != null && ("1".equals(value.trim()) || Boolean.parseBoolean(value.trim())); //$NON-NLS-1$
 
 		return isProxy || isValueAdd;
+	}
+
+	/**
+	 * Determines if the given peer model node is filtered from the view completely.
+	 *
+	 * @param peerModel The peer model node. Must not be <code>null</code>.
+	 * @return <code>True</code> if filtered, <code>false</code> otherwise.
+	 */
+	/* default */ final static boolean isFiltered(IPeerModel peerModel) {
+		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
+		Assert.isNotNull(peerModel);
+
+		boolean isProxyOrValueAdd = isProxyOrValueAdd(peerModel) && UIPlugin.getDefault().getPreferenceStore().getBoolean(IPreferenceKeys.PREF_HIDE_PROXIES_AND_VALUEADDS);
+
+		return isProxyOrValueAdd;
 	}
 
 	/* (non-Javadoc)
@@ -137,7 +155,12 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 							boolean startedByCurrentUser = System.getProperty("user.name").equals(peer.getPeer().getUserName()); //$NON-NLS-1$
 							boolean isMyTargets = Managers.getCategoryManager().belongsTo(catID, categorizable.getId());
 							if (!isMyTargets && (isStatic || startedByCurrentUser)) {
-								Managers.getCategoryManager().add(catID, categorizable.getId());
+								// "Value-add's" are not saved to the category persistence automatically
+								if (isProxyOrValueAdd(peer)) {
+									Managers.getCategoryManager().addTransient(catID, categorizable.getId());
+								} else {
+									Managers.getCategoryManager().add(catID, categorizable.getId());
+								}
 								isMyTargets = true;
 							}
 
@@ -160,7 +183,12 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 
 							boolean isNeighborhood = Managers.getCategoryManager().belongsTo(catID, categorizable.getId());
 							if (!isNeighborhood && !isStatic) {
-								Managers.getCategoryManager().add(catID, categorizable.getId());
+								// "Value-add's" are not saved to the category persistence automatically
+								if (isProxyOrValueAdd(peer)) {
+									Managers.getCategoryManager().addTransient(catID, categorizable.getId());
+								} else {
+									Managers.getCategoryManager().add(catID, categorizable.getId());
+								}
 								isNeighborhood = true;
 							}
 

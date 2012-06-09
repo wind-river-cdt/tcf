@@ -22,4 +22,9 @@ public interface IPreferenceKeys {
 	 * Preference key to access the flag to hide dynamic target discovery content extension.
 	 */
 	public static final String PREF_HIDE_DYNAMIC_TARGET_DISCOVERY_EXTENSION = "org.eclipse.tcf.te.tcf.ui.navigator.content.hide"; //$NON-NLS-1$
+
+	/**
+	 * Preference key to access the flag to hide proxies and value-add's in the "System Management" tree.
+	 */
+	public static final String PREF_HIDE_PROXIES_AND_VALUEADDS = PREFIX + ".model.proxies_valueadds.hide"; //$NON-NLS-1$
 }
