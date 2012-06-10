@@ -111,7 +111,7 @@
     <extension
          point="org.eclipse.debug.core.launchConfigurationTypes">
       <launchConfigurationType
-            public="true"
+            public="false"
             sourcePathComputerId="org.eclipse.cdt.debug.core.sourcePathComputer"
             name="%launchConfigType.remoteApplication.name"
             id="org.eclipse.tcf.cdt.launch.remoteApplicationLaunchType"

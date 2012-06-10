@@ -17,6 +17,10 @@
       %license
    </license>
 
+   <url>
+      <update label="%updateSiteName" url="http://download.eclipse.org/tools/releases/juno"/>
+   </url>
+
    <requires>
       <import feature="org.eclipse.tcf.te.feature" version="1.1.0" match="greaterOrEqual"/>
    </requires>

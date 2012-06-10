@@ -28,7 +28,7 @@
    </license>
 
    <url>
-      <update label="%updateSiteName" url="http://download.eclipse.org/tools/cdt/releases/juno"/>
+      <update label="%updateSiteName" url="http://download.eclipse.org/tools/releases/juno"/>
    </url>
 
    <requires>
