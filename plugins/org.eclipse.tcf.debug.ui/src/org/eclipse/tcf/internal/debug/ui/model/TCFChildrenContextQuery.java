@@ -10,12 +10,15 @@
  *******************************************************************************/
 package org.eclipse.tcf.internal.debug.ui.model;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.internal.ui.viewers.model.provisional.IPresentationContext;
+import org.eclipse.debug.internal.ui.viewers.model.provisional.IViewerUpdate;
+import org.eclipse.tcf.debug.ui.ITCFDebugUIConstants;
 import org.eclipse.tcf.util.TCFDataCache;
 
 /**
@@ -26,14 +29,8 @@ import org.eclipse.tcf.util.TCFDataCache;
  */
 public class TCFChildrenContextQuery extends TCFChildren {
 
-    private final TCFChildren children;
-
-    private String[] query_data;
-    private Set<String> filter;
-
-    TCFChildrenContextQuery(TCFNode node, TCFChildren children) {
+    TCFChildrenContextQuery(TCFNode node) {
         super(node);
-        this.children = children;
     }
 
     @Override
@@ -42,53 +39,135 @@ public class TCFChildrenContextQuery extends TCFChildren {
         super.dispose();
     }
 
-    boolean setQuery(String query, Set<String> filter, Runnable done) {
-        String[] query_data = null;
-        TCFDataCache<String[]> query_cache = node.getModel().getLaunch().getContextQuery(query);
-        if (query_cache != null) {
-            if (!query_cache.validate(done)) return false;
-            query_data = query_cache.getData();
-        }
-        if (!Arrays.equals(query_data, this.query_data)) reset();
-        this.query_data = query_data;
-        if (this.filter == filter) return true;
-        if (filter != null && filter.equals(this.filter)) return true;
-        this.filter = filter;
-        reset();
-        return true;
+    public static class Descendants {
+        public Map<String,String> map;
+        public boolean include_parent;
     }
 
-    private boolean retainAll(Map<String,TCFNode> map, String[] ids) {
+    private static String[] getFilterIDs(TCFModel model, Set<String> filter) {
+        if (filter != null) {
+            ILaunchConfiguration launchConfig = model.getLaunch().getLaunchConfiguration();
+            if (launchConfig != null) {
+                Set<String> set = new HashSet<String>();
+                String sessionId = launchConfig.getName();
+                for (String context : filter) {
+                    int slashPos = context.indexOf('/');
+                    if (slashPos > 0 && context.length() > slashPos + 1) {
+                        if ( sessionId.equals(context.substring(0, slashPos)) ) {
+                            set.add(context.substring(slashPos + 1));
+                        }
+                    }
+                }
+                return set.toArray(new String[set.size()]);
+            }
+        }
+        return null;
+    }
+
+    private static boolean getDescendants(TCFNode node, String[] ids, Descendants res, Runnable done) {
+        Map<String,String> map = res.map;
+        boolean include_parent = res.include_parent;
+        res.map = new HashMap<String,String>();
         TCFModel model = node.getModel();
-        Set<String> set = new HashSet<String>();
         for (String id : ids) {
-            if (!model.createNode(id, this)) return false;
-            if (isValid()) return true; // error creating a node
+            assert !(done instanceof TCFDataCache<?>);
+            if (!model.createNode(id, done)) return false;
             TCFNode n = model.getNode(id);
             while (n != null) {
-                if (n.parent == node || (n.parent == null && !(node instanceof TCFNodeExecContext))) {
-                    set.add(n.getID());
+                if (n == node) {
+                    res.include_parent = true;
                     break;
+                }
+                if (n.parent == node) {
+                   res.map.put(id, n.id);
+                   break;
                 }
                 n = n.parent;
             }
         }
-        map.keySet().retainAll(set);
+        if (map != null) {
+            res.map.keySet().retainAll(map.keySet());
+            res.include_parent = res.include_parent && include_parent;
+        }
+        return true;
+    }
+
+    /**
+     * Get node descendants that match both query and filter.
+     * If both query and filter are null, return empty map.
+     * The map maps descendant ID to the node child ID.
+     */
+    public static Descendants getDescendants(TCFNode node, String query, Set<String> filter, Runnable done) {
+        Descendants res = new Descendants();
+
+        String[] query_data = null;
+        TCFDataCache<String[]> query_cache = node.getModel().getLaunch().getContextQuery(query);
+        if (query_cache != null) {
+            if (!query_cache.validate(done)) return null;
+            query_data = query_cache.getData();
+            if (query_data != null && !getDescendants(node, query_data, res, done)) return null;
+        }
+
+        String[] filter_ids = getFilterIDs(node.getModel(), filter);
+        if (filter_ids != null && !getDescendants(node, filter_ids, res, done)) return null;
+
+        return res;
+    }
+
+    /**
+     * Get node descendants that match both query and filter in presentation context of given update.
+     * If both query and filter are null, return empty map.
+     * The map maps descendant ID to the node child ID.
+     */
+    @SuppressWarnings("unchecked")
+    public static Descendants getDescendants(TCFNode node, IViewerUpdate update, Runnable done) {
+        IPresentationContext context = update.getPresentationContext();
+        String query = (String)context.getProperty(ITCFDebugUIConstants.PROP_CONTEXT_QUERY);
+        Set<String> filter = (Set<String>)context.getProperty(ITCFDebugUIConstants.PROP_FILTER_CONTEXTS);
+        return getDescendants(node, query, filter, done);
+    }
+
+    /**
+     * Get node children which descendants match both query and filter in presentation context of given update.
+     * If both query and filter are null, return unfiltered children list.
+     */
+    @SuppressWarnings("unchecked")
+    boolean setQuery(IViewerUpdate update, Runnable done) {
+        IPresentationContext context = update.getPresentationContext();
+        String query = (String)context.getProperty(ITCFDebugUIConstants.PROP_CONTEXT_QUERY);
+        Set<String> filter = (Set<String>)context.getProperty(ITCFDebugUIConstants.PROP_FILTER_CONTEXTS);
+        Map<String,TCFNode> map = new HashMap<String,TCFNode>();
+
+        TCFChildren cache = null;
+        if (node instanceof TCFNodeExecContext) cache = ((TCFNodeExecContext)node).getChildren();
+        else if (node instanceof TCFNodeLaunch) cache = ((TCFNodeLaunch)node).getChildren();
+
+        if (cache != null) {
+            if (!cache.validate(done)) return false;
+            Map<String,TCFNode> cache_data = cache.getData();
+            if (cache_data != null && cache_data.size() > 0) {
+                if (query != null || filter != null) {
+                    Descendants des = getDescendants(node, query, filter, done);
+                    if (des == null) return false;
+                    for (String id : des.map.values()) {
+                        TCFNode n = cache_data.get(id);
+                        if (n != null) map.put(id, n);
+                    }
+                }
+                else {
+                    map.putAll(cache_data);
+                }
+            }
+        }
+
+        reset(map);
         return true;
     }
 
     @Override
     protected boolean startDataRetrieval() {
-        if (!children.validate(this)) return false;
-        Map<String,TCFNode> map = new HashMap<String,TCFNode>();
-        if (children.size() > 0) {
-            for (TCFNode n : children.toArray()) map.put(n.id, n);
-            if (query_data != null && !retainAll(map, query_data)) return false;
-            if (isValid()) return true; // error creating a node
-            if (filter != null && !retainAll(map, filter.toArray(new String[filter.size()]))) return false;
-            if (isValid()) return true; // error creating a node
-        }
-        set(null, children.getError(), map);
+        // The method should not be called - the cache is always valid
+        assert false;
         return true;
     }
 }

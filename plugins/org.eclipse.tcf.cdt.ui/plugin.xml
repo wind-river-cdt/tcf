@@ -451,7 +451,7 @@
           </visibleWhen>
        </command>
     </menuContribution>
-    
+
    </extension>
       <extension point="org.eclipse.debug.ui.detailPaneFactories">
       <detailFactories
@@ -478,5 +478,5 @@
          </enablement>
       </detailFactories>
    </extension>
-   
+
 </plugin>

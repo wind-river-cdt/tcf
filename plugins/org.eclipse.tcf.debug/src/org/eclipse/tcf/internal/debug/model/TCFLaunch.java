@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
@@ -1209,6 +1208,7 @@ public class TCFLaunch extends Launch {
     }
 
     public TCFDataCache<String[]> getContextQuery(final String query) {
+        if (query == null) return null;
         TCFDataCache<String[]> cache = context_query_cache.get(query);
         if (cache == null) {
             if (disconnected) return null;
@@ -1230,27 +1230,6 @@ public class TCFLaunch extends Launch {
         return cache;
     }
 
-    public Set<String> getModelContexts(Set<String> contexts) {
-        if (contexts != null) {
-            ILaunchConfiguration launchConfig = getLaunchConfiguration();
-            if (launchConfig != null) {
-                Set<String> modelContexts = new TreeSet<String>();
-                String sessionId = launchConfig.getName();
-                for (String context : contexts) {
-                    int slashPos = context.indexOf('/');
-                    if (slashPos > 0 && context.length() > slashPos + 1) {
-                        if ( sessionId.equals(context.substring(0, slashPos)) ) {
-                            modelContexts.add(context.substring(slashPos + 1));
-                        }
-                    }
-                }
-                return modelContexts;
-            }
-        }
-        return null;
-    }
-
-    
     /**
      * Activate TCF launch: open communication channel and perform all necessary launch steps.
      * @param mode - on of launch mode constants defined in ILaunchManager.
