@@ -48,7 +48,7 @@
 		<!-- P2 repository URL's -->
 		<platform-site>http://download.eclipse.org/eclipse/updates/3.8milestones</platform-site>
 		<cdt-site>http://download.eclipse.org/tools/cdt/builds/juno/nightly</cdt-site>
-		<tm-site>http://download.eclipse.org/tm/updates/3.4milestones</tm-site>
+		<tm-site>http://download.eclipse.org/tm/updates/3.4milestones/RC2/</tm-site>
 		<rxtx-site>http://rxtx.qbang.org/eclipse</rxtx-site>
 		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/R20120526062928/repository/</orbit-site>
   	</properties>
