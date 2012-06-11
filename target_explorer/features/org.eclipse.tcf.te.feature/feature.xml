@@ -25,11 +25,11 @@
       <import plugin="org.eclipse.core.runtime" version="3.8.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui" version="3.8.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.ide" version="3.8.0" match="greaterOrEqual"/>
-      <import feature="org.eclipse.tcf.feature" version="1.1.0.qualifier" match="greaterOrEqual"/>
-      <import feature="org.eclipse.tm.terminal" version="3.2.0.qualifier" match="greaterOrEqual"/>
-      <import feature="org.eclipse.tm.terminal.serial" version="2.1.100.qualifier" match="greaterOrEqual"/>
-      <import feature="org.eclipse.tm.terminal.ssh" version="2.1.100.qualifier" match="greaterOrEqual"/>
-      <import feature="org.eclipse.tm.terminal.telnet" version="2.1.100.qualifier" match="greaterOrEqual"/>
+      <import feature="org.eclipse.tcf.feature" version="1.1.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.tm.terminal" version="3.2.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.tm.terminal.serial" version="2.1.100" match="greaterOrEqual"/>
+      <import feature="org.eclipse.tm.terminal.ssh" version="2.1.100" match="greaterOrEqual"/>
+      <import feature="org.eclipse.tm.terminal.telnet" version="2.1.100" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.expressions" version="3.4.400" match="greaterOrEqual"/>
       <import plugin="org.eclipse.cdt.core" version="5.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.debug.core" version="3.7.100" match="greaterOrEqual"/>
