@@ -211,7 +211,7 @@ public class TreeViewerUtil {
 			if (filters != null) {
 				QuickFilter filter = filters.get(path);
 				if(filter != null) {
-					return filter.isFiltering() && filter.isFiltering(path);
+					return filter.isFiltering(path);
 				}
 			}
 		}

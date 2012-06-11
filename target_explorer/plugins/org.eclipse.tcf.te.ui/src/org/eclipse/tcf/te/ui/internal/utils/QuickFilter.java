@@ -162,7 +162,7 @@ public class QuickFilter extends TablePatternFilter implements PropertyChangeLis
 	 * 
 	 * @return true if it has this filter.
 	 */
-	public boolean isFiltering() {
+	private boolean isFiltering() {
 		ViewerFilter[] filters = viewer.getFilters();
 		if (filters != null) {
 			for (ViewerFilter filter : filters) {
@@ -203,9 +203,6 @@ public class QuickFilter extends TablePatternFilter implements PropertyChangeLis
 	 * @return true if it is filtering.
 	 */
 	public boolean isFiltering(TreePath path) {
-		if (matcher != null) {
-			return root.equals(path);
-		}
-		return false;
+		return isFiltering() && matcher != null && root.equals(path);
 	}
 }
