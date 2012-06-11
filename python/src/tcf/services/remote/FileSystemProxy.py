@@ -481,7 +481,7 @@ class FileSystemProxy(filesystem.FileSystemService):
         class CopyCommand(FileSystemCommand):
             def __init__(self):
                 super(CopyCommand, self).__init__(service, "copy",
-                    (id, src_path, dst_path, copy_permissions, copy_uidgid))
+                    (src_path, dst_path, copy_permissions, copy_uidgid))
 
             def done(self, error, args):
                 s = None
