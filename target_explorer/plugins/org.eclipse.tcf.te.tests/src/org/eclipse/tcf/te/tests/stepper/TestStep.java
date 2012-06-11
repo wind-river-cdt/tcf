@@ -11,6 +11,7 @@ package org.eclipse.tcf.te.tests.stepper;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.stepper.extensions.AbstractStep;
@@ -34,5 +35,7 @@ public class TestStep extends AbstractStep {
 	 */
 	@Override
 	public void execute(IStepContext context, IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor, ICallback callback) {
+		data.setProperty(getId(), fullQualifiedId.toString());
+		callback.done(this, Status.OK_STATUS);
 	}
 }

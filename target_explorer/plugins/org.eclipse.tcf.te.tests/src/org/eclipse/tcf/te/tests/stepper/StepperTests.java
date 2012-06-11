@@ -15,18 +15,26 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.tcf.te.runtime.concurrent.util.ExecutorsUtil;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
+import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
+import org.eclipse.tcf.te.runtime.stepper.FullQualifiedId;
 import org.eclipse.tcf.te.runtime.stepper.StepperManager;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStep;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroup;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroupable;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepperProperties;
+import org.eclipse.tcf.te.runtime.stepper.stepper.Stepper;
 import org.eclipse.tcf.te.tests.CoreTestCase;
 
 /**
  * Stepper engine test cases.
  */
-public class StepperTestCase extends CoreTestCase {
+public class StepperTests extends CoreTestCase {
 
 	protected static class TestStepContext implements IStepContext {
 
@@ -67,7 +75,7 @@ public class StepperTestCase extends CoreTestCase {
 		TestSuite testSuite = new TestSuite("Test stepper engine"); //$NON-NLS-1$
 
 		// add ourself to the test suite
-		testSuite.addTestSuite(StepperTestCase.class);
+		testSuite.addTestSuite(StepperTests.class);
 
 		return testSuite;
 	}
@@ -264,5 +272,40 @@ public class StepperTestCase extends CoreTestCase {
 		}
 
 		assertEquals("Unexpected number of test step groups found.", 4, testStepGroupCount); //$NON-NLS-1$
+	}
+
+	public void testExecuteStepGroup() {
+		final IStepper stepper = new Stepper();
+
+		IPropertiesContainer properties = new PropertiesContainer();
+		properties.setProperty(IStepperProperties.PROP_NAME, "testExecuteStepGroup"); //$NON-NLS-1$
+		properties.setProperty(IStepperProperties.PROP_STEP_GROUP_ID, "org.eclipse.tcf.te.tests.stepper.stepGroup4"); //$NON-NLS-1$
+
+		// Initialize the stepper
+		IStepContext context = new TestStepContext();
+		IFullQualifiedId fullQualifiedId = new FullQualifiedId(IStepper.ID_TYPE_STEPPER_ID, stepper.getId(), null);
+		stepper.initialize(context, properties, fullQualifiedId, new NullProgressMonitor());
+
+		ExecutorsUtil.execute(new Runnable() {
+			@Override
+			public void run() {
+				// Execute
+				try {
+					stepper.execute();
+				}
+				catch (Exception e) {
+					assertNull("Unexpected exception when executing step group", e); //$NON-NLS-1$
+				}
+			}
+		});
+
+		// Wait for the stepper to be finished
+		assertFalse("Timeout executing step group", ExecutorsUtil.waitAndExecute(10000, new IStepper.ExecutionFinishedConditionTester(stepper))); //$NON-NLS-1$
+
+		assertNotNull("Missing executed step 1", properties.getProperty("org.eclipse.tcf.te.tests.stepper.step1")); //$NON-NLS-1$ //$NON-NLS-2$
+		assertNotNull("Missing executed step 2", properties.getProperty("org.eclipse.tcf.te.tests.stepper.step2")); //$NON-NLS-1$ //$NON-NLS-2$
+		assertNotNull("Missing executed step 3", properties.getProperty("org.eclipse.tcf.te.tests.stepper.step3")); //$NON-NLS-1$ //$NON-NLS-2$
+		assertNotNull("Missing executed step 4", properties.getProperty("org.eclipse.tcf.te.tests.stepper.step4")); //$NON-NLS-1$ //$NON-NLS-2$
+		assertNotNull("Missing executed step 5", properties.getProperty("org.eclipse.tcf.te.tests.stepper.step5")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

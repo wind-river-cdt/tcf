@@ -14,7 +14,8 @@ import junit.framework.TestSuite;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.te.tests.statushandler.StatusHandlerTestCase;
-import org.eclipse.tcf.te.tests.stepper.StepperTestCase;
+import org.eclipse.tcf.te.tests.stepper.StepperTests;
+import org.eclipse.tcf.te.tests.tcf.launch.TcfLaunchTests;
 import org.eclipse.tcf.te.tests.tcf.tests.TcfCoreTests;
 
 /**
@@ -58,7 +59,8 @@ public class AllTests {
 		Assert.isNotNull(suite);
 
 		suite.addTest(StatusHandlerTestCase.getTestSuite());
-		suite.addTest(StepperTestCase.getTestSuite());
+		suite.addTest(StepperTests.getTestSuite());
 		suite.addTest(TcfCoreTests.getTestSuite());
+		suite.addTest(TcfLaunchTests.getTestSuite());
 	}
 }
