@@ -1563,95 +1563,56 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
     private void testGetSetRegisterCommands(final SuspendedContext sc, final Runnable done) {
         Map<String,IRegisters.RegistersContext> reg_map = regs.get(sc.id);
         final Set<IToken> cmds = new HashSet<IToken>();
-        for (final IRegisters.RegistersContext ctx : reg_map.values()) {
-            if (!ctx.isReadable()) continue;
-            if (ctx.isReadOnce()) continue;
-            cmds.add(ctx.get(new IRegisters.DoneGet() {
-                public void doneGet(IToken token, Exception error, final byte[] value) {
-                    cmds.remove(token);
-                    if (suspended.get(sc.id) != sc) return;
-                    if (error != null) {
-                        exit(error);
-                        return;
-                    }
-                    if (ctx.getSize() != value.length) {
-                        exit(new Exception("Invalid register value size"));
-                        return;
-                    }
-                    if (ctx.isWriteable() && !ctx.isWriteOnce()) {
-                        cmds.add(ctx.set(value, new IRegisters.DoneSet() {
-                            public void doneSet(IToken token, Exception error) {
-                                cmds.remove(token);
-                                if (suspended.get(sc.id) != sc) return;
-                                if (error != null) {
-                                    exit(error);
-                                    return;
-                                }
-                                cmds.add(ctx.get(new IRegisters.DoneGet() {
-                                    public void doneGet(IToken token, Exception error, byte[] value1) {
+        if (reg_map.size() > 0) {
+            String[] ids = reg_map.keySet().toArray(new String[reg_map.size()]);
+            for (int n = 0; n < 10000 && cmds.size() < 100; n++) {
+                if (rnd.nextBoolean()) {
+                    String id = ids[rnd.nextInt(ids.length)];
+                    final IRegisters.RegistersContext ctx = reg_map.get(id);
+                    if (!ctx.isReadable()) continue;
+                    if (ctx.isReadOnce()) continue;
+                    cmds.add(ctx.get(new IRegisters.DoneGet() {
+                        public void doneGet(IToken token, Exception error, final byte[] value) {
+                            cmds.remove(token);
+                            if (suspended.get(sc.id) != sc) return;
+                            if (error != null) {
+                                exit(error);
+                                return;
+                            }
+                            if (ctx.getSize() != value.length) {
+                                exit(new Exception("Invalid register value size"));
+                                return;
+                            }
+                            if (ctx.isWriteable() && !ctx.isWriteOnce()) {
+                                cmds.add(ctx.set(value, new IRegisters.DoneSet() {
+                                    public void doneSet(IToken token, Exception error) {
                                         cmds.remove(token);
                                         if (suspended.get(sc.id) != sc) return;
                                         if (error != null) {
                                             exit(error);
                                             return;
                                         }
-                                        for (int i = 0; i < value.length; i++) {
-                                            if (value[i] != value1[i]) {
-                                                exit(new Exception("Invalid register value"));
-                                                return;
+                                        cmds.add(ctx.get(new IRegisters.DoneGet() {
+                                            public void doneGet(IToken token, Exception error, byte[] value1) {
+                                                cmds.remove(token);
+                                                if (suspended.get(sc.id) != sc) return;
+                                                if (error != null) {
+                                                    exit(error);
+                                                    return;
+                                                }
+                                                for (int i = 0; i < value.length; i++) {
+                                                    if (value[i] != value1[i]) {
+                                                        exit(new Exception("Invalid register value"));
+                                                        return;
+                                                    }
+                                                }
+                                                if (cmds.isEmpty()) {
+                                                    done.run();
+                                                }
                                             }
-                                        }
-                                        if (cmds.isEmpty()) {
-                                            done.run();
-                                        }
+                                        }));
                                     }
                                 }));
-                            }
-                        }));
-                    }
-                    if (cmds.isEmpty()) {
-                        done.run();
-                    }
-                }
-            }));
-        }
-        if (!reg_map.isEmpty()) {
-            int data_size = 0;
-            List<IRegisters.Location> locs = new ArrayList<IRegisters.Location>();
-            String[] ids = reg_map.keySet().toArray(new String[reg_map.size()]);
-            for (int i = 0; i < rnd.nextInt(32); i++) {
-                String id = ids[rnd.nextInt(ids.length)];
-                IRegisters.RegistersContext ctx = reg_map.get(id);
-                if (!ctx.isReadable()) continue;
-                if (!ctx.isWriteable()) continue;
-                if (ctx.isReadOnce()) continue;
-                if (ctx.isWriteOnce()) continue;
-                if (ctx.getSize() == 0) continue;
-                int offs = rnd.nextInt(ctx.getSize());
-                int size = rnd.nextInt(ctx.getSize() - offs) + 1;
-                locs.add(new IRegisters.Location(id, offs, size));
-                data_size += size;
-            }
-            final int total_size = data_size;
-            final IRegisters.Location[] loc_arr = locs.toArray(new IRegisters.Location[locs.size()]);
-            cmds.add(srv_registers.getm(loc_arr, new IRegisters.DoneGet() {
-                public void doneGet(IToken token, Exception error, byte[] value) {
-                    cmds.remove(token);
-                    if (suspended.get(sc.id) != sc) return;
-                    if (error == null && value.length != total_size) {
-                        error = new Exception("Invalid data size in Registers.getm reply");
-                    }
-                    if (error != null) {
-                        exit(error);
-                        return;
-                    }
-                    cmds.add(srv_registers.setm(loc_arr, value, new IRegisters.DoneSet() {
-                        public void doneSet(IToken token, Exception error) {
-                            cmds.remove(token);
-                            if (suspended.get(sc.id) != sc) return;
-                            if (error != null) {
-                                exit(error);
-                                return;
                             }
                             if (cmds.isEmpty()) {
                                 done.run();
@@ -1659,7 +1620,53 @@ class TestRCBP1 implements ITCFTest, IRunControl.RunControlListener {
                         }
                     }));
                 }
-            }));
+                else {
+                    int data_size = 0;
+                    int l = rnd.nextInt(32);
+                    List<IRegisters.Location> locs = new ArrayList<IRegisters.Location>();
+                    for (int i = 0; i < l; i++) {
+                        String id = ids[rnd.nextInt(ids.length)];
+                        IRegisters.RegistersContext ctx = reg_map.get(id);
+                        if (!ctx.isReadable()) continue;
+                        if (!ctx.isWriteable()) continue;
+                        if (ctx.isReadOnce()) continue;
+                        if (ctx.isWriteOnce()) continue;
+                        if (ctx.getSize() == 0) continue;
+                        int offs = rnd.nextInt(ctx.getSize());
+                        int size = rnd.nextInt(ctx.getSize() - offs) + 1;
+                        locs.add(new IRegisters.Location(id, offs, size));
+                        data_size += size;
+                    }
+                    final int total_size = data_size;
+                    final IRegisters.Location[] loc_arr = locs.toArray(new IRegisters.Location[locs.size()]);
+                    cmds.add(srv_registers.getm(loc_arr, new IRegisters.DoneGet() {
+                        public void doneGet(IToken token, Exception error, byte[] value) {
+                            cmds.remove(token);
+                            if (suspended.get(sc.id) != sc) return;
+                            if (error == null && value.length != total_size) {
+                                error = new Exception("Invalid data size in Registers.getm reply");
+                            }
+                            if (error != null) {
+                                exit(error);
+                                return;
+                            }
+                            cmds.add(srv_registers.setm(loc_arr, value, new IRegisters.DoneSet() {
+                                public void doneSet(IToken token, Exception error) {
+                                    cmds.remove(token);
+                                    if (suspended.get(sc.id) != sc) return;
+                                    if (error != null) {
+                                        exit(error);
+                                        return;
+                                    }
+                                    if (cmds.isEmpty()) {
+                                        done.run();
+                                    }
+                                }
+                            }));
+                        }
+                    }));
+                }
+            }
         }
         if (cmds.isEmpty()) {
             done.run();
