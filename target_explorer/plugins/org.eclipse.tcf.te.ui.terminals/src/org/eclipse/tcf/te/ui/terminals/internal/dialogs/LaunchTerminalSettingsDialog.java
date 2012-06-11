@@ -60,6 +60,8 @@ public class LaunchTerminalSettingsDialog extends CustomTrayDialog {
 	/* default */ Combo terminals;
 	/* default */ SettingsPanelControl settings;
 
+	private FormToolkit toolkit = null;
+
 	// Map the label added to the combobox to the corresponding launcher delegate.
 	private final Map<String, ILauncherDelegate> label2delegate = new HashMap<String, ILauncherDelegate>();
 
@@ -187,6 +189,8 @@ public class LaunchTerminalSettingsDialog extends CustomTrayDialog {
     @Override
     protected void dispose() {
     	if (settings != null) { settings.dispose(); settings = null; }
+    	if (toolkit != null) { toolkit.dispose(); toolkit = null; }
+
         super.dispose();
     }
 
@@ -238,8 +242,10 @@ public class LaunchTerminalSettingsDialog extends CustomTrayDialog {
         	settings.addConfigurationPanel(terminalLabel, configPanel);
         }
 
+        // Create the toolkit
+        toolkit = new FormToolkit(panel.getDisplay());
 		// Setup the panel control
-		settings.setupPanel(panel, terminals.getItems(), new FormToolkit(panel.getDisplay()));
+		settings.setupPanel(panel, terminals.getItems(), toolkit);
 		GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
 		layoutData.horizontalSpan = 2;
 		settings.getPanel().setLayoutData(layoutData);

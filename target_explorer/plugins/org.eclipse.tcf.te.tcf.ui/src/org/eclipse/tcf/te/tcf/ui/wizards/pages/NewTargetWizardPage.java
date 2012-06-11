@@ -152,6 +152,7 @@ public class NewTargetWizardPage extends AbstractValidatingWizardPage implements
 		if (transportTypeControl != null) { transportTypeControl.dispose(); transportTypeControl = null; }
 		if (transportTypePanelControl != null) { transportTypePanelControl.dispose(); transportTypePanelControl = null; }
 		if (tablePart != null) { tablePart.dispose(); tablePart = null; }
+		if (toolkit != null) { toolkit.dispose(); toolkit = null; }
 
 	    super.dispose();
 	}

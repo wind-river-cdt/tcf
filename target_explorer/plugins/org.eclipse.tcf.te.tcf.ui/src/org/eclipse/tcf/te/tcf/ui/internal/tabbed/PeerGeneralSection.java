@@ -34,9 +34,19 @@ public class PeerGeneralSection extends AbstractPropertySection {
 	private IPeerModel peer;
 	// The table control to display the properties.
 	private NodePropertiesTableControl tableControl;
+	// The form toolkit
+	private CustomFormToolkit toolkit;
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#dispose()
+	 */
+	@Override
+	public void dispose() {
+		if (toolkit != null) { toolkit.dispose(); toolkit = null; }
+	    super.dispose();
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#createControls(org.eclipse.swt.widgets.Composite, org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage)
 	 */
 	@Override
@@ -67,12 +77,11 @@ public class PeerGeneralSection extends AbstractPropertySection {
 				return new TableViewerComparator(viewer, (ITableLabelProvider)viewer.getLabelProvider());
 			}
 		};
-		CustomFormToolkit toolkit = new CustomFormToolkit(new FormToolkit(parent.getDisplay()));
+		toolkit = new CustomFormToolkit(new FormToolkit(parent.getDisplay()));
 		tableControl.setupFormPanel(composite, toolkit);
     }
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#setInput(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
 	 */
 	@Override
@@ -84,8 +93,7 @@ public class PeerGeneralSection extends AbstractPropertySection {
         this.peer = (IPeerModel) input;
     }
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#refresh()
 	 */
 	@Override

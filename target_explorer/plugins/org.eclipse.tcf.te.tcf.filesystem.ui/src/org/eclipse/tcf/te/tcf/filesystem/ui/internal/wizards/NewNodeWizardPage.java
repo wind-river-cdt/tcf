@@ -318,10 +318,8 @@ public abstract class NewNodeWizardPage extends AbstractValidatingWizardPage {
 	 */
 	@Override
 	public void dispose() {
-		if (nameControl != null) {
-			nameControl.dispose();
-			nameControl = null;
-		}
+		if (nameControl != null) { nameControl.dispose(); nameControl = null; }
+		if (toolkit != null) { toolkit.dispose(); toolkit = null; }
 		super.dispose();
 	}
 
