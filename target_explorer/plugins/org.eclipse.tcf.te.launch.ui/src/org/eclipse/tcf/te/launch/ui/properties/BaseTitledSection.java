@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.tcf.te.core.interfaces.IViewerInput;
+import org.eclipse.tcf.te.core.interfaces.IPropertyChangeProvider;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNodeProvider;
 import org.eclipse.ui.IWorkbenchPart;
@@ -43,7 +43,7 @@ public abstract class BaseTitledSection extends AbstractPropertySection implemen
 	// The main composite used to create the section content.
 	protected Composite composite;
 
-	protected IViewerInput viewerInput;
+	protected IPropertyChangeProvider viewerInput;
 
 	// The input node.
 	protected IModelNodeProvider provider;
@@ -61,7 +61,7 @@ public abstract class BaseTitledSection extends AbstractPropertySection implemen
 		Assert.isTrue(selection instanceof IStructuredSelection);
 		Object input = ((IStructuredSelection) selection).getFirstElement();
 		if (input instanceof IAdaptable) {
-			this.viewerInput = (IViewerInput)((IAdaptable)input).getAdapter(IViewerInput.class);
+			this.viewerInput = (IPropertyChangeProvider)((IAdaptable)input).getAdapter(IPropertyChangeProvider.class);
 			if (this.viewerInput != null) {
 				this.viewerInput.addPropertyChangeListener(this);
 			}
@@ -69,7 +69,7 @@ public abstract class BaseTitledSection extends AbstractPropertySection implemen
 		if (this.viewerInput == null && input instanceof IModelNodeProvider) {
 			this.provider = (IModelNodeProvider) input;
 			IModelNode modelNode = this.provider.getModelNode();
-			this.viewerInput = (IViewerInput)modelNode.getAdapter(IViewerInput.class);
+			this.viewerInput = (IPropertyChangeProvider)modelNode.getAdapter(IPropertyChangeProvider.class);
 			if (this.viewerInput != null) {
 				this.viewerInput.addPropertyChangeListener(this);
 			}

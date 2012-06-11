@@ -16,9 +16,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -183,57 +181,19 @@ public class QuickFilter extends TablePatternFilter implements PropertyChangeLis
 	@Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
 		Assert.isNotNull(parentElement);
-		if(root.getSegmentCount() == 0) {
-			return selectElement(parentElement, element);
-		}
-		if(parentElement instanceof TreePath) {
-			TreePath parentPath = (TreePath) parentElement;
-			if(parentPath.startsWith(root, null)) {
-				return selectElement(parentElement, element);
-			}
-			return true;
-		}
-		Object rootElement = root.getLastSegment();
-		Object parent = parentElement;
-		while(parent != null && parent != rootElement) {
-			parent = getParent(parent);
-		}
-		if(parent != null) {
-			return selectElement(parentElement, element);
-		}
-		return true;
+		return !shouldSelect(parentElement) || super.select(viewer, parentElement, element);
 	}
 
 	/**
-	 * Select the element based on parent element.
-	 * The rule is to filter only the direct children of the root element.
+	 * If the current parent element should be selected for matching.
 	 * 
 	 * @param parentElement The parent element.
-	 * @param element The element.
-	 * @return true if the element should be selected.
+	 * @return true if it should continue matching.
 	 */
-	private boolean selectElement(Object parentElement, Object element) {
-		Object rootElement = parentElement instanceof TreePath ? root : (root.getSegmentCount() == 0 ? viewer
-		                .getInput() : root.getLastSegment());
-		if (parentElement.equals(rootElement)) {
-			return super.select(viewer, parentElement, element);
-		}
-		return true;
-    }
-
-	/**
-	 * Get the parent element of the specified element.
-	 * 
-	 * @param element The element whose parent is retrieved.
-	 * @return The parent element.
-	 */
-	private Object getParent(Object element) {
-		IContentProvider contentProvider = viewer.getContentProvider();
-		if(contentProvider instanceof ITreeContentProvider) {
-			ITreeContentProvider treeCp = (ITreeContentProvider) contentProvider;
-			return treeCp.getParent(element);
-		}
-	    return null;
+	private boolean shouldSelect(Object parentElement) {
+	    Object rootElement = parentElement instanceof TreePath ? root : 
+	    	(root.getSegmentCount() == 0 ? viewer.getInput() : root.getLastSegment());
+	    return parentElement.equals(rootElement);
     }
 
 	/**

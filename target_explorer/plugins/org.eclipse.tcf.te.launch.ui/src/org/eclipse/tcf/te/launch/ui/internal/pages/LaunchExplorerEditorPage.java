@@ -52,4 +52,13 @@ public class LaunchExplorerEditorPage extends TreeViewerExplorerEditorPage {
     protected String getContextHelpId() {
 	    return "org.eclipse.tcf.te.launch.ui.LaunchEditorPage"; //$NON-NLS-1$
     }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.views.editor.pages.TreeViewerExplorerEditorPage#getViewerInput()
+	 */
+	@Override
+    protected Object getViewerInput() {
+	    return getEditorInputNode();
+    }
 }
