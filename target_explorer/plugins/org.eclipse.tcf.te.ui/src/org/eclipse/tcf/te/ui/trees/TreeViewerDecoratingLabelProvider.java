@@ -9,15 +9,21 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.trees;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.DecoratingLabelProvider;
 import org.eclipse.jface.viewers.ILabelDecorator;
 import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelDecorator;
+import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.tcf.te.ui.interfaces.IFilteringLabelDecorator;
+import org.eclipse.tcf.te.core.interfaces.IFilterable;
+import org.eclipse.tcf.te.ui.utils.TreeViewerUtil;
 
 /**
  * A subclass of DecoratingLabelProvider provides an FS Tree Viewer
@@ -34,6 +40,8 @@ public class TreeViewerDecoratingLabelProvider extends DecoratingLabelProvider i
 	private ILabelDecorator fDecorator;
 	//Tree viewer that this label provider serves.
 	private TreeViewer viewer;
+	// The content provider of this viewer.
+	private ITreeContentProvider contentProvider;
 
 	/**
 	 * Create a FSTreeDecoratingLabelProvider with an FSTreeLabelProvider and a decorator.
@@ -70,15 +78,43 @@ public class TreeViewerDecoratingLabelProvider extends DecoratingLabelProvider i
 					}
 				}
 			}
-			if (image != null) {
-				IFilteringLabelDecorator decorator = getFilteringDecorator(element);
-				if (decorator != null && decorator.isEnabled(viewer, element)) {
-					return decorator.decorateImage(image, element);
-				}
+			IFilterable decorator = adaptFilterable(element);
+			TreePath path = getTreePath(element);
+			if (image != null && decorator != null && path != null && TreeViewerUtil.isFiltering(viewer, path)) {
+				image = TreeViewerUtil.getDecoratedImage(image, viewer, path);
 			}
 		}
 		return image;
 	}
+
+	/**
+	 * Get the tree path whose leaf is the element.
+	 * 
+	 * @param element The leaf element.
+	 * @return The tree path.
+	 */
+	private TreePath getTreePath(Object element) {
+		List<Object> elements = new ArrayList<Object>();
+		while(element != null) {
+			elements.add(0, element);
+			element = getParent(element);
+		}
+		if(elements.isEmpty()) return TreePath.EMPTY;
+		return new TreePath(elements.toArray());
+	}
+
+	/**
+	 * get the parent path.
+	 * 
+	 * @param element The element whose parent is being retrieved.
+	 * @return The parent element.
+	 */
+	private Object getParent(Object element) {
+		if(this.contentProvider == null) {
+			contentProvider = (ITreeContentProvider) viewer.getContentProvider();
+		}
+	    return contentProvider.getParent(element);
+    }
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object, int)
@@ -102,14 +138,15 @@ public class TreeViewerDecoratingLabelProvider extends DecoratingLabelProvider i
 					}
 				}
 			}
-			IFilteringLabelDecorator decorator = getFilteringDecorator(element);
-			if (decorator != null && decorator.isEnabled(viewer, element)) {
-				text = decorator.decorateText(text, element);
+			IFilterable decorator = adaptFilterable(element);
+			TreePath path = getTreePath(element);
+			if (decorator != null && path != null && TreeViewerUtil.isFiltering(viewer, path)) {
+				text = TreeViewerUtil.getDecoratedText(text, viewer, path);
 			}
 		}
 		return text;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.DecoratingLabelProvider#getImage(java.lang.Object)
@@ -117,11 +154,10 @@ public class TreeViewerDecoratingLabelProvider extends DecoratingLabelProvider i
 	@Override
     public Image getImage(Object element) {
 	    Image image = super.getImage(element);
-		if (image != null) {
-			IFilteringLabelDecorator decorator = getFilteringDecorator(element);
-			if (decorator != null && decorator.isEnabled(viewer, element)) {
-				return decorator.decorateImage(image, element);
-			}
+		IFilterable decorator = adaptFilterable(element);
+		TreePath path = getTreePath(element);
+		if (image != null && decorator != null && path != null && TreeViewerUtil.isFiltering(viewer, path)) {
+			image = TreeViewerUtil.getDecoratedImage(image, viewer, path);
 		}
 		return image;
 	}
@@ -133,9 +169,10 @@ public class TreeViewerDecoratingLabelProvider extends DecoratingLabelProvider i
 	@Override
     public String getText(Object element) {
 	    String text = super.getText(element);
-		IFilteringLabelDecorator decorator = getFilteringDecorator(element);
-		if (decorator != null && decorator.isEnabled(viewer, element)) {
-			return decorator.decorateText(text, element);
+		IFilterable decorator = adaptFilterable(element);
+		TreePath path = getTreePath(element);
+		if (text != null && decorator != null && path != null && TreeViewerUtil.isFiltering(viewer, path)) {
+			text = TreeViewerUtil.getDecoratedText(text, viewer, path);
 		}
 		return text;
     }
@@ -146,18 +183,17 @@ public class TreeViewerDecoratingLabelProvider extends DecoratingLabelProvider i
 	 * @param element The element to get the adapter from.
 	 * @return The element's adapter or null if does not adapt to IFilteringLabelProvider.
 	 */
-	private IFilteringLabelDecorator getFilteringDecorator(Object element) {
-		IFilteringLabelDecorator decorator = null;
-		if(element instanceof IFilteringLabelDecorator) {
-			decorator = (IFilteringLabelDecorator) element;
+	private IFilterable adaptFilterable(Object element) {
+		IFilterable decorator = null;
+		if(element instanceof IFilterable) {
+			decorator = (IFilterable) element;
 		}
 		if(decorator == null && element instanceof IAdaptable) {
-			decorator = (IFilteringLabelDecorator) ((IAdaptable)element).getAdapter(IFilteringLabelDecorator.class);
+			decorator = (IFilterable) ((IAdaptable)element).getAdapter(IFilterable.class);
 		}
 		if(decorator == null) {
-			decorator = (IFilteringLabelDecorator) Platform.getAdapterManager().getAdapter(element, IFilteringLabelDecorator.class);
+			decorator = (IFilterable) Platform.getAdapterManager().getAdapter(element, IFilterable.class);
 		}
 		return decorator;
 	}
-	
 }

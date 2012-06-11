@@ -11,10 +11,14 @@ package org.eclipse.tcf.te.ui.internal.utils;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Map;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -34,23 +38,26 @@ public class QuickFilter extends TablePatternFilter implements PropertyChangeLis
 	private TreeViewer viewer;
 	// The root path to select from.
 	private TreePath root;
+	// If the current filtering is global
+	private boolean global;
 
 	/**
 	 * Create a quick filter for the specified viewer.
 	 */
-	public QuickFilter(TreeViewer viewer) {
+	public QuickFilter(TreeViewer viewer, TreePath root) {
 		super((ILabelProvider) viewer.getLabelProvider());
 		this.viewer = viewer;
+		this.root = root;
 		this.addPropertyChangeListener(this);
 	}
 	
 	/**
 	 * Show the pop up dialog for the specified root path.
 	 *  
-	 * @param root The root path to filter from.
+	 * @param global If the filter is a global one.
 	 */
-	public void showFilterPopup(TreePath root) {
-		this.root = root;
+	public void showFilterPopup(boolean global) {
+		this.global = global;
 		if (!isFiltering()) {
 			viewer.addFilter(this);
 		}
@@ -59,7 +66,7 @@ public class QuickFilter extends TablePatternFilter implements PropertyChangeLis
 		popup.open();
 		popup.getShell().setLocation(location);
 	}
-
+	
 	/**
 	 * Compute the best location of the pop up dialog.
 	 * 
@@ -67,7 +74,7 @@ public class QuickFilter extends TablePatternFilter implements PropertyChangeLis
 	 */
 	private Point computePopupLocation() {
 	    Point location = null;
-		if (root != null) {
+		if (!global) {
 		    TreeItem[] items = viewer.getTree().getSelection();
 		    if (items != null && items.length > 0) {
 		    	for(TreeItem item : items) {
@@ -94,10 +101,12 @@ public class QuickFilter extends TablePatternFilter implements PropertyChangeLis
 	 * @param popshell The shell of the pop up dialog.
 	 */
 	void adjustPopup(Shell popshell) {
-		Point location = computePopupLocation();
-		Point shellLocation = popshell.getLocation();
-		if(shellLocation != null && !shellLocation.equals(location)) {
-			popshell.setLocation(location);
+		if (!global) {
+			Point location = computePopupLocation();
+			Point shellLocation = popshell.getLocation();
+			if (shellLocation != null && !shellLocation.equals(location)) {
+				popshell.setLocation(location);
+			}
 		}
 	}
 
@@ -107,7 +116,8 @@ public class QuickFilter extends TablePatternFilter implements PropertyChangeLis
 	 */
 	@Override
     public void propertyChange(PropertyChangeEvent evt) {
-		Object element = getFilteringElement();
+		Object element = root.getLastSegment();
+	    element = element == null ? viewer.getInput() : element;
 		if(element != null) {
 			IPropertyChangeProvider provider = getPropertyChangeProvider(element);
 			if(provider!=null) {
@@ -135,25 +145,17 @@ public class QuickFilter extends TablePatternFilter implements PropertyChangeLis
 		}
 	    return provider;
     }
-
-	/**
-	 * Get the element which is currently being filtered.
-	 * 
-	 * @return The current filtered element.
-	 */
-	private Object getFilteringElement() {
-		Object element = root.getLastSegment();
-	    return element == null ? viewer.getInput() : element;
-    }
 	
 	/**
 	 * Reset the tree viewer to the original view by removing this filter.
 	 */
 	public void resetViewer() {
 		viewer.removeFilter(this);
+		Map<TreePath, QuickFilter> filters = (Map<TreePath, QuickFilter>) viewer.getData("quick.filter"); //$NON-NLS-1$
+		if (filters != null) {
+			filters.remove(root);
+		}
 		setPattern(null);
-		root = null;
-		viewer.refresh();
 	}
 
 
@@ -180,41 +182,69 @@ public class QuickFilter extends TablePatternFilter implements PropertyChangeLis
 	 */
 	@Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
-		return skipMatching(parentElement) || super.select(viewer, parentElement, element);
+		Assert.isNotNull(parentElement);
+		if(root.getSegmentCount() == 0) {
+			return selectElement(parentElement, element);
+		}
+		if(parentElement instanceof TreePath) {
+			TreePath parentPath = (TreePath) parentElement;
+			if(parentPath.startsWith(root, null)) {
+				return selectElement(parentElement, element);
+			}
+			return true;
+		}
+		Object rootElement = root.getLastSegment();
+		Object parent = parentElement;
+		while(parent != null && parent != rootElement) {
+			parent = getParent(parent);
+		}
+		if(parent != null) {
+			return selectElement(parentElement, element);
+		}
+		return true;
 	}
 
 	/**
-	 * If the specified parent element should be skipped when matching elements.
+	 * Select the element based on parent element.
+	 * The rule is to filter only the direct children of the root element.
 	 * 
 	 * @param parentElement The parent element.
-	 * @return true if it should be skipped.
+	 * @param element The element.
+	 * @return true if the element should be selected.
 	 */
-	private boolean skipMatching(Object parentElement) {
-		if (root == null || parentElement == null) return true;
-		if(root != TreePath.EMPTY) {
-			if (parentElement instanceof TreePath) {
-				return !root.equals(parentElement);
-			}
-			Object rootElement = root.getLastSegment();
-			return !parentElement.equals(rootElement);
+	private boolean selectElement(Object parentElement, Object element) {
+		Object rootElement = parentElement instanceof TreePath ? root : (root.getSegmentCount() == 0 ? viewer
+		                .getInput() : root.getLastSegment());
+		if (parentElement.equals(rootElement)) {
+			return super.select(viewer, parentElement, element);
 		}
-		return false;
-	}
+		return true;
+    }
+
+	/**
+	 * Get the parent element of the specified element.
+	 * 
+	 * @param element The element whose parent is retrieved.
+	 * @return The parent element.
+	 */
+	private Object getParent(Object element) {
+		IContentProvider contentProvider = viewer.getContentProvider();
+		if(contentProvider instanceof ITreeContentProvider) {
+			ITreeContentProvider treeCp = (ITreeContentProvider) contentProvider;
+			return treeCp.getParent(element);
+		}
+	    return null;
+    }
 
 	/**
 	 * If the element is being filtered.
 	 * 
-	 * @param element The element to be checked.
+	 * @param path The element to be checked.
 	 * @return true if it is filtering.
 	 */
-	public boolean isFiltering(Object element) {
-		if (root != null && matcher != null) {
-			if (root != TreePath.EMPTY) {
-				Object rootElement = root;
-				rootElement = root.getLastSegment();
-				return rootElement == element;
-			}
-			return element == viewer.getInput();
+	public boolean isFiltering(TreePath path) {
+		if (matcher != null) {
+			return root.equals(path);
 		}
 		return false;
 	}

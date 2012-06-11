@@ -73,14 +73,13 @@ public class TablePatternFilter extends ViewerFilter {
 	 */
 	public void setPattern(String newPattern) {
 		StringMatcher old = matcher;
+		pattern = newPattern;
 		if (newPattern == null || newPattern.trim().length() == 0) {
 			matcher = null;
-			pattern = null;
 		}
 		else {
 			String patternString = ALL + newPattern + ALL;
 			matcher = new StringMatcher(patternString, true, false);
-			pattern = patternString;
 		}
 		firePatternChangedEvent(old, matcher);
 	}
@@ -100,6 +99,11 @@ public class TablePatternFilter extends ViewerFilter {
 		}
     }
 
+	/**
+	 * Get the filter text typed by the end user.
+	 * 
+	 * @return The current filter text.
+	 */
 	public String getFilterText() {
 	    return pattern;
     }

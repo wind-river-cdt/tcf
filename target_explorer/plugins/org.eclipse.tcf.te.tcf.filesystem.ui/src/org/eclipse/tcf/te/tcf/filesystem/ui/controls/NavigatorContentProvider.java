@@ -34,7 +34,15 @@ public abstract class NavigatorContentProvider extends TreeContentProvider  impl
 	public Object getParent(Object element) {
 		if (element instanceof AbstractTreeNode) {
 			AbstractTreeNode node = (AbstractTreeNode) element;
-			return node.getParent() != null ? node.getParent() : (isRootNodeVisible()? node.peerNode : null);
+			AbstractTreeNode parent = node.getParent();
+			if (parent != null) {
+				if (parent.isSystemRoot()) {
+					if (isRootNodeVisible()) return parent;
+					return null;
+				}
+				return parent;
+			}
+			if (isRootNodeVisible()) return node.peerNode;
 		}
 		return null;
 	}

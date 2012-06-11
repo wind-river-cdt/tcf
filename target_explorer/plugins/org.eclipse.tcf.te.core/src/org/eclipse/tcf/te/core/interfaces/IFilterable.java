@@ -9,21 +9,11 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.core.interfaces;
 
-/**
- * A viewer input is an input of the AbstractTreeControl.
- * <p>
- * If the input of AbstractTreeControl is an instance of or adapted to IViewerInput,
- * AbstractTreeControl adds a property change listener to the input and update
- * its UI including the tree viewer and the tool bar when the properties of the input
- * have changed.
- * 
- * @see AbstractTreeControl
- */
-public interface IViewerInput {
 
-	/**
-	 * Get the id of the input used to persist the state of the tree viewer
-	 * as the persistence id.
-	 */
-	String getInputId();
+/**
+ * The interface to define a tree node on which the quick filter can apply to.
+ * Tree nodes which implement or adapt to this interface are enabled with a quick filter
+ * action to bring up the quick filter dialog. 
+ */
+public interface IFilterable {
 }

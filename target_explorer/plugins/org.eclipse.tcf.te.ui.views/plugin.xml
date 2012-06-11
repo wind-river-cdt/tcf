@@ -315,13 +315,13 @@
             locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.filter">
          <command
                commandId="org.eclipse.tcf.te.ui.views.command.quickfilter"
-               label="Filter"
+               label="%menu.filter.label"
                mnemonic="t"
                style="push">
          </command>
          <command
                commandId="org.eclipse.tcf.te.ui.views.command.resetfilter"
-               label="Reset"
+               label="%menu.reset.label"
                mnemonic="r"
                style="push">
          </command>
@@ -376,21 +376,21 @@
       </command>
       <command
             categoryId="org.eclipse.tcf.te.ui.commands.category"
-            description="Find elements in a tree viewer"
+            description="%command.find.description"
             id="org.eclipse.tcf.te.ui.views.command.find"
             name="%command.find.name">
       </command>
       <command
             categoryId="org.eclipse.tcf.te.ui.commands.category"
-            description="Filter elements in a tree viewer"
+            description="%command.filter.description"
             id="org.eclipse.tcf.te.ui.views.command.quickfilter"
-            name="Quick Filter">
+            name="%command.filter.name">
       </command>
       <command
             categoryId="org.eclipse.tcf.te.ui.commands.category"
-            description="Reset quick filter in a tree viewer"
+            description="%command.reset.description"
             id="org.eclipse.tcf.te.ui.views.command.resetfilter"
-            name="Reset Quick Filter">
+            name="%command.reset.name">
       </command>
    </extension>
 
@@ -480,10 +480,13 @@
          </activeWhen>
          <enabledWhen>
             <with
-                  variable="selection">
-               <count
-                     value="?">
-               </count>
+                  variable="activePart">
+               <adapt
+                     type="org.eclipse.ui.navigator.CommonViewer">
+                  <test
+                        property="org.eclipse.tcf.te.ui.views.isFilterable">
+                  </test>
+               </adapt>
             </with>
          </enabledWhen>
       </handler>
@@ -512,10 +515,10 @@
          </activeWhen>
          <enabledWhen>
             <with
-                  variable="selection">
-               <count
-                     value="?">
-               </count>
+                  variable="activePart">
+               <test
+                     property="org.eclipse.tcf.te.ui.views.isEditorFilterable">
+               </test>
             </with>
          </enabledWhen>
       </handler>
@@ -590,6 +593,20 @@
             properties="parentCategoryId,validAddToCategoriesCount"
             type="org.eclipse.jface.viewers.ISelection">
       </propertyTester>
+      <propertyTester
+            class="org.eclipse.tcf.te.ui.views.internal.quickfilter.QuickFilterTester"
+            id="org.eclipse.tcf.te.ui.views.quickfilter.QuickFilterTester"
+            namespace="org.eclipse.tcf.te.ui.views"
+            properties="isFilterable"
+            type="org.eclipse.ui.navigator.CommonViewer">
+      </propertyTester>
+      <propertyTester
+            class="org.eclipse.tcf.te.ui.views.internal.quickfilter.EditorQuickFilterTester"
+            id="org.eclipse.tcf.te.ui.views.quickfilter.EditorQuickFilterTester"
+            namespace="org.eclipse.tcf.te.ui.views"
+            properties="isEditorFilterable"
+            type="org.eclipse.tcf.te.ui.views.editor.Editor">
+      </propertyTester>
       
    </extension>
    
@@ -649,6 +666,16 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="ESC">
       </key>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.tcf.te.ui.views.internal.View"
+            class="org.eclipse.tcf.te.ui.views.internal.ViewAdapterFactory">
+         <adapter
+               type="org.eclipse.ui.navigator.CommonViewer">
+         </adapter>
+      </factory>
    </extension>
    
 </plugin>

@@ -19,6 +19,7 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.columns.FSTreeElementLabelProvider;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.ui.interfaces.ILazyLoader;
 import org.eclipse.ui.IActionFilter;
 import org.eclipse.ui.IPersistableElement;
@@ -61,6 +62,9 @@ public class FSTreeNodeAdapterFactory implements IAdapterFactory {
 			}
 			else if(adapterType == ILazyLoader.class) {
 				return new FSTreeNodeLoader(node);
+			}
+			else if(adapterType == IPeerModel.class) {
+				return node.getPeerModel();
 			}
 		}
 		return null;

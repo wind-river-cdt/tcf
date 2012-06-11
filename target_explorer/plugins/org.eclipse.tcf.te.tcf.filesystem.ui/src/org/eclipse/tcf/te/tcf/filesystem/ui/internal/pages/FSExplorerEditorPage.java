@@ -9,7 +9,9 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.ui.internal.pages;
 
+import org.eclipse.tcf.te.tcf.filesystem.core.model.FSModel;
 import org.eclipse.tcf.te.tcf.filesystem.ui.nls.Messages;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.ui.views.editor.pages.TreeViewerExplorerEditorPage;
 /**
  * The editor page for the file system explorer. 
@@ -50,5 +52,15 @@ public class FSExplorerEditorPage extends TreeViewerExplorerEditorPage {
 	@Override
     protected String getContextHelpId() {
 	    return "org.eclipse.tcf.te.tcf.filesystem.FSExplorerEditorPage"; //$NON-NLS-1$
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.views.editor.pages.TreeViewerExplorerEditorPage#getViewerInput()
+	 */
+	@Override
+    protected Object getViewerInput() {
+		IPeerModel peerModel = (IPeerModel) getEditorInputNode();
+		return FSModel.getFSModel(peerModel).getRoot();
     }
 }

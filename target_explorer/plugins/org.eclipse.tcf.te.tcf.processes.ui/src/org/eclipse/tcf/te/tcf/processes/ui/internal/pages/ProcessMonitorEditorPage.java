@@ -10,6 +10,8 @@
 package org.eclipse.tcf.te.tcf.processes.ui.internal.pages;
 
 import org.eclipse.jface.viewers.ILabelDecorator;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.tcf.processes.core.model.ProcessModel;
 import org.eclipse.tcf.te.tcf.processes.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.views.editor.pages.TreeViewerExplorerEditorPage;
 
@@ -54,5 +56,15 @@ public class ProcessMonitorEditorPage extends TreeViewerExplorerEditorPage {
 	@Override
     protected ILabelDecorator getTitleBarDecorator() {
 	    return decorator;
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.views.editor.pages.TreeViewerExplorerEditorPage#getViewerInput()
+	 */
+	@Override
+    protected Object getViewerInput() {
+		IPeerModel peerModel = (IPeerModel) getEditorInputNode();
+		return ProcessModel.getProcessModel(peerModel).getRoot();
     }
 }

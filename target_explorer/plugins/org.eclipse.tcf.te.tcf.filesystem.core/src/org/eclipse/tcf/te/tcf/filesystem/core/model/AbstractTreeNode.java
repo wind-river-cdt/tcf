@@ -140,8 +140,8 @@ public abstract class AbstractTreeNode extends PlatformObject implements IPeerMo
 	 */
 	public void firePropertyChange(PropertyChangeEvent event) {
 		if(peerNode != null) {
-			IViewerInput viewerInput = (IViewerInput) peerNode.getAdapter(IViewerInput.class);
-			viewerInput.firePropertyChange(event);
+			IPropertyChangeProvider provider = (IPropertyChangeProvider) peerNode.getAdapter(IPropertyChangeProvider.class);
+			provider.firePropertyChange(event);
 		} else if(parent != null) {
 			parent.firePropertyChange(event);
 		}
@@ -244,6 +244,9 @@ public abstract class AbstractTreeNode extends PlatformObject implements IPeerMo
 	@SuppressWarnings("rawtypes")
     @Override
     public Object getAdapter(Class adapter) {
+		if(IViewerInput.class.equals(adapter)) {
+			return peerNode.getAdapter(IViewerInput.class);
+		}
 		if(IPropertyChangeProvider.class.equals(adapter)) {
 			return peerNode.getAdapter(adapter);
 		}

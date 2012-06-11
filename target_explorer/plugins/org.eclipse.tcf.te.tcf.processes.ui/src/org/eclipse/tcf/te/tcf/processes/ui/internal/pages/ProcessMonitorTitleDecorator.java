@@ -14,6 +14,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.processes.core.model.ProcessModel;
+import org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode;
 import org.eclipse.tcf.te.tcf.processes.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.jface.images.AbstractImageDescriptor;
 
@@ -28,8 +29,9 @@ public class ProcessMonitorTitleDecorator extends LabelProvider implements ILabe
 	 */
 	@Override
 	public Image decorateImage(Image image, Object element) {
-		if(element instanceof IPeerModel) {
-			IPeerModel peerModel = (IPeerModel) element;
+		if(element instanceof ProcessTreeNode) {
+			ProcessTreeNode node = (ProcessTreeNode) element;
+			IPeerModel peerModel = node.peerNode;
 			ProcessModel pModel = ProcessModel.getProcessModel(peerModel);
 			if(!pModel.isRefreshStopped()) {
 				Image decoratedImage = image;
@@ -50,8 +52,9 @@ public class ProcessMonitorTitleDecorator extends LabelProvider implements ILabe
 	 */
 	@Override
 	public String decorateText(String text, Object element) {
-		if(element instanceof IPeerModel) {
-			IPeerModel peerModel = (IPeerModel) element;
+		if(element instanceof ProcessTreeNode) {
+			ProcessTreeNode node = (ProcessTreeNode) element;
+			IPeerModel peerModel = node.peerNode;
 			ProcessModel pModel = ProcessModel.getProcessModel(peerModel);
 			if(!pModel.isRefreshStopped()) {
 				return text + " [Auto Refreshing]"; //$NON-NLS-1$

@@ -14,10 +14,13 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.StyledString.Styler;
+import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.tcf.te.ui.interfaces.IFilteringLabelDecorator;
+import org.eclipse.tcf.te.core.interfaces.IFilterable;
+import org.eclipse.tcf.te.ui.utils.TreeViewerUtil;
 import org.eclipse.ui.internal.navigator.NavigatorDecoratingLabelProvider;
 
 /**
@@ -28,16 +31,27 @@ import org.eclipse.ui.internal.navigator.NavigatorDecoratingLabelProvider;
 public class ViewViewerDecoratingLabelProvider extends NavigatorDecoratingLabelProvider {
 	// The navigator's tree viewer to be decorated.
 	private TreeViewer viewer;
-
+	private TreePath path;
 	/**
 	 * Create an instance with the tree viewer and a common label provider.
-	 *
+	 * 
 	 * @param viewer The navigator's tree viewer.
 	 * @param commonLabelProvider The navigator's common label provider.
 	 */
 	public ViewViewerDecoratingLabelProvider(TreeViewer viewer, ILabelProvider commonLabelProvider) {
 	    super(commonLabelProvider);
 	    this.viewer = viewer;
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.DecoratingStyledCellLabelProvider#update(org.eclipse.jface.viewers.ViewerCell)
+	 */
+	@Override
+    public void update(ViewerCell cell) {
+		path = cell.getViewerRow().getTreePath();
+	    super.update(cell);
+	    path = null;
     }
 
 	/**
@@ -61,9 +75,9 @@ public class ViewViewerDecoratingLabelProvider extends NavigatorDecoratingLabelP
     public String getText(Object element) {
 		StyledString styledString = super.getStyledText(element);
 		String text = styledString != null ? styledString.toString() : super.getText(element);
-		IFilteringLabelDecorator decorator = getFilteringDecorator(element);
-		if (decorator != null && decorator.isEnabled(viewer, element)) {
-			return decorator.decorateText(text, element);
+		IFilterable decorator = adaptFilterable(element);
+		if (text != null && decorator != null && path != null && TreeViewerUtil.isFiltering(viewer, path)) {
+			return TreeViewerUtil.getDecoratedText(text, viewer, path);
 		}
 		return text;
     }
@@ -75,11 +89,9 @@ public class ViewViewerDecoratingLabelProvider extends NavigatorDecoratingLabelP
 	@Override
     public Image getImage(Object element) {
 		Image image = super.getImage(element);
-		if (image != null) {
-			IFilteringLabelDecorator decorator = getFilteringDecorator(element);
-			if (decorator != null && decorator.isEnabled(viewer, element)) {
-				return decorator.decorateImage(image, element);
-			}
+		IFilterable decorator = adaptFilterable(element);
+		if (image != null && decorator != null && path != null && TreeViewerUtil.isFiltering(viewer, path)) {
+			return TreeViewerUtil.getDecoratedImage(image, viewer, path);
 		}
 		return image;
     }
@@ -91,9 +103,10 @@ public class ViewViewerDecoratingLabelProvider extends NavigatorDecoratingLabelP
 	@Override
     protected StyledString getStyledText(Object element) {
 		StyledString styledString = super.getStyledText(element);
-		IFilteringLabelDecorator decorator = getFilteringDecorator(element);
-		if (decorator != null && decorator.isEnabled(viewer, element)) {
-			String decorated = decorator.decorateText(styledString.getString(), element);
+		IFilterable decorator = adaptFilterable(element);
+		String text = styledString.getString();
+		if (text != null && decorator != null && path != null && TreeViewerUtil.isFiltering(viewer, path)) {
+			String decorated = TreeViewerUtil.getDecoratedText(text, viewer, path);
 			Styler style = getDecorationStyle(element);
 			return StyledCellLabelProvider.styleDecoratedString(decorated, style, styledString);
 		}
@@ -102,20 +115,20 @@ public class ViewViewerDecoratingLabelProvider extends NavigatorDecoratingLabelP
 
 	/**
 	 * Get an adapter of IFilteringLabelProvider from the specified element.
-	 *
+	 * 
 	 * @param element The element to get the adapter from.
 	 * @return The element's adapter or null if does not adapt to IFilteringLabelProvider.
 	 */
-	private IFilteringLabelDecorator getFilteringDecorator(Object element) {
-		IFilteringLabelDecorator decorator = null;
-		if(element instanceof IFilteringLabelDecorator) {
-			decorator = (IFilteringLabelDecorator) element;
+	private IFilterable adaptFilterable(Object element) {
+		IFilterable decorator = null;
+		if(element instanceof IFilterable) {
+			decorator = (IFilterable) element;
 		}
 		if(decorator == null && element instanceof IAdaptable) {
-			decorator = (IFilteringLabelDecorator) ((IAdaptable)element).getAdapter(IFilteringLabelDecorator.class);
+			decorator = (IFilterable) ((IAdaptable)element).getAdapter(IFilterable.class);
 		}
 		if(decorator == null) {
-			decorator = (IFilteringLabelDecorator) Platform.getAdapterManager().getAdapter(element, IFilteringLabelDecorator.class);
+			decorator = (IFilterable) Platform.getAdapterManager().getAdapter(element, IFilterable.class);
 		}
 		return decorator;
 	}
@@ -127,10 +140,10 @@ public class ViewViewerDecoratingLabelProvider extends NavigatorDecoratingLabelP
 	@Override
     public Image getColumnImage(Object element, int columnIndex) {
 		Image image = super.getColumnImage(element, columnIndex);
-		if (image != null && columnIndex == 0) {
-			IFilteringLabelDecorator decorator = getFilteringDecorator(element);
-			if (decorator != null && decorator.isEnabled(viewer, element)) {
-				return decorator.decorateImage(image, element);
+		if (columnIndex == 0) {
+			IFilterable decorator = adaptFilterable(element);
+			if (image != null && decorator != null && path != null && TreeViewerUtil.isFiltering(viewer, path)) {
+				return TreeViewerUtil.getDecoratedImage(image, viewer, path);
 			}
 		}
 		return image;
@@ -144,9 +157,9 @@ public class ViewViewerDecoratingLabelProvider extends NavigatorDecoratingLabelP
     public String getColumnText(Object element, int columnIndex) {
 		String text = super.getColumnText(element, columnIndex);
 		if (columnIndex == 0) {
-			IFilteringLabelDecorator decorator = getFilteringDecorator(element);
-			if (decorator != null && decorator.isEnabled(viewer, element)) {
-				return decorator.decorateText(text, element);
+			IFilterable decorator = adaptFilterable(element);
+			if (text != null && decorator != null && path != null && TreeViewerUtil.isFiltering(viewer, path)) {
+				return TreeViewerUtil.getDecoratedText(text, viewer, path);
 			}
 		}
 		return text;

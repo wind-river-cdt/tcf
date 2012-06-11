@@ -24,7 +24,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.tcf.te.core.interfaces.IPropertyChangeProvider;
-import org.eclipse.tcf.te.core.interfaces.IViewerInput;
 
 /**
  * The base tree content provider that defines several default methods.
@@ -138,9 +137,9 @@ public abstract class TreeContentProvider implements ITreeContentProvider, Prope
 
 		if (parentElement instanceof IAdaptable) {
 			IAdaptable adaptable = (IAdaptable) parentElement;
-			IViewerInput viewerInput = (IViewerInput) adaptable.getAdapter(IViewerInput.class);
-			if (viewerInput != null) {
-				installPropertyChangeListener(viewerInput);
+			IPropertyChangeProvider provider = (IPropertyChangeProvider) adaptable.getAdapter(IPropertyChangeProvider.class);
+			if (provider != null) {
+				installPropertyChangeListener(provider);
 			}
 		}
 

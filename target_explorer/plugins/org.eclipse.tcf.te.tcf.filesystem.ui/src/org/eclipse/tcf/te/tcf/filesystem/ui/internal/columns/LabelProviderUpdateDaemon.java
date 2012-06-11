@@ -29,7 +29,7 @@ import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.tcf.te.core.interfaces.IViewerInput;
+import org.eclipse.tcf.te.core.interfaces.IPropertyChangeProvider;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.CacheManager;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.activator.UIPlugin;
@@ -282,7 +282,7 @@ public class LabelProviderUpdateDaemon extends Thread {
 	 */
 	private void sendNotification(FSTreeNode node, String key, ImageDescriptor oldImg, ImageDescriptor newImg) {
 		if (node.peerNode != null) {
-			IViewerInput viewerInput = (IViewerInput) node.peerNode.getAdapter(IViewerInput.class);
+			IPropertyChangeProvider viewerInput = (IPropertyChangeProvider) node.peerNode.getAdapter(IPropertyChangeProvider.class);
 			viewerInput.firePropertyChange(new PropertyChangeEvent(node, key, oldImg, newImg));
 		}
 	}

@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.tcf.protocol.Protocol;
-import org.eclipse.tcf.te.core.interfaces.IViewerInput;
+import org.eclipse.tcf.te.core.interfaces.IPropertyChangeProvider;
 import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.ITreeNodeModel;
@@ -151,9 +151,9 @@ public class ProcessModel implements ITreeNodeModel{
 			this.stopped = stopped;
 			Boolean oldValue = Boolean.valueOf(old);
 			Boolean newValue = Boolean.valueOf(stopped);
-			PropertyChangeEvent event = new PropertyChangeEvent(peerModel, "stopped", oldValue, newValue); //$NON-NLS-1$
-			IViewerInput viewerInput = (IViewerInput) peerModel.getAdapter(IViewerInput.class);
-			viewerInput.firePropertyChange(event);
+			PropertyChangeEvent event = new PropertyChangeEvent(getRoot(), "stopped", oldValue, newValue); //$NON-NLS-1$
+			IPropertyChangeProvider provider = (IPropertyChangeProvider) peerModel.getAdapter(IPropertyChangeProvider.class);
+			provider.firePropertyChange(event);
 		}
     }
 

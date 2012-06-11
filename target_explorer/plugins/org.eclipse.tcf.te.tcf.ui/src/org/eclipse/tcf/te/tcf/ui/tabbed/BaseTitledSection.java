@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.tcf.te.core.interfaces.IViewerInput;
+import org.eclipse.tcf.te.core.interfaces.IPropertyChangeProvider;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
 import org.eclipse.ui.IWorkbenchPart;
@@ -42,7 +42,7 @@ public abstract class BaseTitledSection extends AbstractPropertySection implemen
 	// The main composite used to create the section content.
 	protected Composite composite;
 
-	protected IViewerInput viewerInput;
+	protected IPropertyChangeProvider viewerInput;
 
 	// The input node.
 	protected IPeerModelProvider provider;
@@ -62,7 +62,7 @@ public abstract class BaseTitledSection extends AbstractPropertySection implemen
 		if (input instanceof IPeerModelProvider) {
 			this.provider = (IPeerModelProvider) input;
 			IPeerModel peerNode = this.provider.getPeerModel();
-			this.viewerInput = (IViewerInput) peerNode.getAdapter(IViewerInput.class);
+			this.viewerInput = (IPropertyChangeProvider) peerNode.getAdapter(IPropertyChangeProvider.class);
 			if (this.viewerInput != null) {
 				this.viewerInput.addPropertyChangeListener(this);
 			}

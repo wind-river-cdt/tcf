@@ -77,17 +77,26 @@ public final class Editor extends FormEditor implements IPersistableEditor, ITab
 	 */
 	@Override
 	public void setFocus() {
-		int index = getActivePage();
-		if (index != -1) {
-			IFormPage fpage = getPage(index);
-			if (fpage != null) {
-				fpage.setFocus();
-			}
-			else super.setFocus();
+		IFormPage fpage = getActivePageInstance();
+		if(fpage != null) {
+			fpage.setFocus();
 		}
 		else super.setFocus();
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.forms.editor.FormEditor#getActivePageInstance()
+	 */
+	@Override
+	public IFormPage getActivePageInstance() {
+		int index = getActivePage();
+		if (index != -1) {
+			return getPage(index);
+		}
+		return super.getActivePageInstance();
+	}
+
 	/**
 	 * Returns the page which has the specified index.
 	 *

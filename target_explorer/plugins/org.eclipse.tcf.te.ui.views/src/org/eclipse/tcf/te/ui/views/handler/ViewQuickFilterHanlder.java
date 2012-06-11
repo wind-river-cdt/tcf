@@ -33,7 +33,7 @@ public class ViewQuickFilterHanlder extends AbstractHandler {
 		if (part instanceof View) {
 			View view = (View) part;
 			TreeViewer viewer = view.getCommonViewer();
-			TreeViewerUtil.doFilter(viewer);
+			TreeViewerUtil.doCommonViewerFilter(viewer);
 		}
 		return null;
 	}

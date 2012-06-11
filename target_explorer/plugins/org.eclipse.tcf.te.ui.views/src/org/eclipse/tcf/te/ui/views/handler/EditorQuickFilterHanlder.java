@@ -38,7 +38,7 @@ public class EditorQuickFilterHanlder extends AbstractHandler {
 			if(formPage instanceof TreeViewerExplorerEditorPage) {
 				TreeViewerExplorerEditorPage page = (TreeViewerExplorerEditorPage) formPage;
 				TreeViewer viewer = (TreeViewer) page.getTreeControl().getViewer();
-				TreeViewerUtil.doFilter(viewer);
+				TreeViewerUtil.doEditorFilter(viewer);
 			}
 		}
 		return null;

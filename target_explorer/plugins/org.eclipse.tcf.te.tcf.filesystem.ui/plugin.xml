@@ -537,20 +537,6 @@
                label="%command.search.label"
                style="push">
          </command>
-         <separator
-               name="group.filter"
-               visible="true">
-         </separator>
-         <command
-               commandId="org.eclipse.tcf.te.ui.views.command.quickfilter"
-               label="%command.filter.label"
-               style="push">
-         </command>
-         <command
-               commandId="org.eclipse.tcf.te.ui.views.command.resetfilter"
-               label="%command.reset.label"
-               style="push">
-         </command>
          <separator name="group.properties" visible="true"/>
          <command
                commandId="org.eclipse.ui.file.properties"
@@ -1924,6 +1910,9 @@
          <adapter
                type="org.eclipse.tcf.te.ui.interfaces.ILazyLoader">
          </adapter>
+         <adapter
+               type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel">
+         </adapter>
       </factory>
       <factory
             adaptableType="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"
@@ -2121,7 +2110,9 @@
                visibleInUI="true">
             <activation>
                <with variable="input">
-                  <test property="org.eclipse.tcf.te.tcf.filesystem.propertytester.peer.isWindows"/>
+                  <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel">
+                     <test property="org.eclipse.tcf.te.tcf.filesystem.propertytester.peer.isWindows" />
+                  </adapt>
                </with>
             </activation>
          </filter>

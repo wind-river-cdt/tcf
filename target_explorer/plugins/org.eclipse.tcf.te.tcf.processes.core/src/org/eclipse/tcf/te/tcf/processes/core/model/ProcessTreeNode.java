@@ -19,6 +19,7 @@ import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.IProcesses.ProcessContext;
 import org.eclipse.tcf.services.ISysMonitor;
 import org.eclipse.tcf.services.ISysMonitor.SysMonitorContext;
+import org.eclipse.tcf.te.core.interfaces.IFilterable;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel;
@@ -30,7 +31,7 @@ import org.eclipse.tcf.te.tcf.processes.core.callbacks.RefreshDoneOpenChannel;
 /**
  * Representation of a process tree node.
  */
-public final class ProcessTreeNode extends AbstractTreeNode {
+public final class ProcessTreeNode extends AbstractTreeNode implements IFilterable {
 	/**
 	 * The system monitor context object
 	 */
