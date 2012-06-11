@@ -32,7 +32,6 @@ public class PeerIdControl extends BaseEditBrowseTextControl {
 		setHideBrowseButton(true);
 		setReadOnly(true);
 		setEditFieldLabel(Messages.PeerIdControl_label);
-		setAdjustBackgroundColor(parentPage != null);
 	}
 
 }

@@ -153,7 +153,6 @@ public abstract class NewNodeWizardPage extends AbstractValidatingWizardPage {
 		folderControl.setHasHistory(false);
 		folderControl.setHideBrowseButton(true);
 		folderControl.setHideLabelControl(true);
-		folderControl.setAdjustBackgroundColor(true);
 		folderControl.setHideEditFieldControlDecoration(true);
 		folderControl.setFormToolkit(toolkit);
 		folderControl.setParentControlIsInnerPanel(true);
@@ -190,7 +189,6 @@ public abstract class NewNodeWizardPage extends AbstractValidatingWizardPage {
 		nameControl.setHasHistory(false);
 		nameControl.setHideBrowseButton(true);
 		nameControl.setEditFieldLabel(getNameFieldLabel());
-		nameControl.setAdjustBackgroundColor(true);
 		nameControl.setFormToolkit(toolkit);
 		nameControl.setParentControlIsInnerPanel(true);
 		nameControl.setupPanel(client);

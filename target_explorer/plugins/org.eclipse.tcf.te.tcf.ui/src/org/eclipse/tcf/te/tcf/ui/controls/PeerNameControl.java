@@ -31,7 +31,6 @@ public class PeerNameControl extends BaseEditBrowseTextControl {
 		setHasHistory(false);
 		setHideBrowseButton(true);
 		setEditFieldLabel(Messages.PeerNameControl_label);
-		setAdjustBackgroundColor(parentPage != null);
 	}
 
 }

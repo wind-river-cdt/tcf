@@ -89,6 +89,7 @@ public class BaseEditBrowseTextControl extends AbstractDecoratedDialogPageContro
 	 */
 	public BaseEditBrowseTextControl(IDialogPage parentPage) {
 		super(parentPage);
+		setAdjustBackgroundColor(parentPage != null);
 	}
 
 	/**

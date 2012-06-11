@@ -146,6 +146,7 @@ public abstract class AbstractFormsWizardPage extends AbstractValidatingWizardPa
 		// Create the form toolkit
 		toolkit = createFormToolkit(parent.getDisplay());
 		Assert.isNotNull(toolkit);
+
 		// Create the scrolled form which will hold the launch configuration tab controls
 		ScrolledForm form = toolkit.createScrolledForm(parent, null, true);
 		Assert.isNotNull(form);

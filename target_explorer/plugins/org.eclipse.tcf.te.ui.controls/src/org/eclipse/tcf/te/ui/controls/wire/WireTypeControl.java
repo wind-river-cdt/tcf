@@ -45,7 +45,6 @@ public class WireTypeControl extends BaseEditBrowseTextControl {
 		setReadOnly(true);
 		setHideBrowseButton(true);
 		setEditFieldLabel(Messages.WireTypeControl_label);
-		setAdjustBackgroundColor(parentPage != null);
 	}
 
 	/* (non-Javadoc)

@@ -46,7 +46,6 @@ public class TransportTypeControl extends BaseEditBrowseTextControl {
 		setReadOnly(true);
 		setHideBrowseButton(true);
 		setEditFieldLabel(Messages.TransportTypeControl_label);
-		setAdjustBackgroundColor(parentPage != null);
 	}
 
 	/**

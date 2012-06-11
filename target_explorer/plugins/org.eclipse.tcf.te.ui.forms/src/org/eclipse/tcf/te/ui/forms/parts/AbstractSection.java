@@ -21,6 +21,7 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -75,8 +76,25 @@ public abstract class AbstractSection extends SectionPart implements IAdaptable,
 	public AbstractSection(IManagedForm form, Composite parent, int style, boolean titleBar) {
 		super(parent, form.getToolkit(), titleBar ? (ExpandableComposite.TITLE_BAR | style) : style);
 		initialize(form);
-		getSection().clientVerticalSpacing = FormLayoutFactory.SECTION_HEADER_VERTICAL_SPACING;
-		getSection().setData("part", this); //$NON-NLS-1$
+		configureSection(getSection());
+	}
+
+	/**
+	 * Configure the section.
+	 *
+	 * @param section The section. Must not be <code>null</code>.
+	 */
+	protected void configureSection(Section section) {
+		Assert.isNotNull(section);
+
+		section.clientVerticalSpacing = FormLayoutFactory.SECTION_HEADER_VERTICAL_SPACING;
+		section.setData("part", this); //$NON-NLS-1$
+
+		// Adjust the background
+		Color bg = section.getParent().getBackground();
+		if (bg != null && !bg.equals(section.getBackground())) {
+			section.setBackground(bg);
+		}
 	}
 
 	/**
@@ -99,6 +117,13 @@ public abstract class AbstractSection extends SectionPart implements IAdaptable,
 	protected Composite createClientContainer(Composite parent, int numColumns, FormToolkit toolkit) {
 		Composite container = toolkit != null ? toolkit.createComposite(parent) : new Composite(parent, SWT.NONE);
 		container.setLayout(FormLayoutFactory.createSectionClientGridLayout(false, numColumns));
+
+		// Adjust the background
+		Color bg = parent.getBackground();
+		if (bg != null && !bg.equals(container.getBackground())) {
+			container.setBackground(bg);
+		}
+
 		return container;
 	}
 

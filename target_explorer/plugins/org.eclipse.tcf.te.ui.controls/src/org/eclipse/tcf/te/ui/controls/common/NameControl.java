@@ -32,7 +32,6 @@ public class NameControl extends BaseEditBrowseTextControl {
 		setHideBrowseButton(true);
 		setHasHistory(false);
 		setEditFieldLabel(Messages.NameControl_label);
-		setAdjustBackgroundColor(parentPage != null);
 	}
 
 	/* (non-Javadoc)

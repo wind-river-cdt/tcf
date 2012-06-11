@@ -51,7 +51,6 @@ public class RemoteHostAddressControl extends BaseEditBrowseTextControl {
 		setHasHistory(false);
 		setEditFieldLabel(Messages.RemoteHostAddressControl_label);
 		setButtonLabel(Messages.RemoteHostAddressControl_button_label);
-		setAdjustBackgroundColor(parentPage != null);
 	}
 
 	/* (non-Javadoc)
