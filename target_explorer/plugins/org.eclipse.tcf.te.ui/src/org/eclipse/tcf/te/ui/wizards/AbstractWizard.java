@@ -10,18 +10,26 @@
 package org.eclipse.tcf.te.ui.wizards;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.tcf.te.ui.activator.UIPlugin;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchWizard;
 
 /**
  * An abstract wizard implementation.
  * <p>
  * This wizard implementation is adding dialog settings management.
  */
-public abstract class AbstractWizard extends Wizard {
+public abstract class AbstractWizard extends Wizard implements IWorkbenchWizard {
 	// A marker to remember if the dialog settings got
 	// initialized for this wizard
 	private boolean dialogSettingsInitialized = false;
+
+	// The workbench instance passed to the wizard via IWorkbenchWizard#init.
+	private IWorkbench workbench = null;
+	// The selection passed to the wizard via IWorkbenchWizard#init.
+	private IStructuredSelection selection = null;
 
 	/**
 	 * Initialize the dialog settings and associate them with the wizard.
@@ -77,5 +85,36 @@ public abstract class AbstractWizard extends Wizard {
 			initializeDialogSettings();
 		}
 		return super.getDialogSettings();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench, org.eclipse.jface.viewers.IStructuredSelection)
+	 */
+	@Override
+	public void init(IWorkbench workbench, IStructuredSelection selection) {
+		this.workbench = workbench;
+		this.selection = selection;
+	}
+
+	/**
+	 * Returns the workbench instance.
+	 * <p>
+	 * <b>Note:</b> The workbench instance is set via {@link IWorkbenchWizard#init(IWorkbench, IStructuredSelection)}.
+	 *
+	 * @return The workbench instance or <code>null</code>.
+	 */
+	public final IWorkbench getWorkbench() {
+		return workbench;
+	}
+
+	/**
+	 * Returns the selection.
+	 * <p>
+	 * <b>Note:</b> The selection is set via {@link IWorkbenchWizard#init(IWorkbench, IStructuredSelection)}.
+	 *
+	 * @return The selection or <code>null</code>.
+	 */
+	public final IStructuredSelection getSelection() {
+		return selection;
 	}
 }

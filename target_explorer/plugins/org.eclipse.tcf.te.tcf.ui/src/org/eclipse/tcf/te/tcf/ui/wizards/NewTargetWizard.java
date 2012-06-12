@@ -57,6 +57,7 @@ public class NewTargetWizard extends AbstractWizard implements INewWizard {
 	 */
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
+		super.init(workbench, selection);
 		// Set the window title
 		setWindowTitle(Messages.NewTargetWizard_windowTitle);
 	}

@@ -43,8 +43,6 @@ public abstract class NewNodeWizard extends AbstractWizard implements INewWizard
 	private IPeerModel peer;
 	// The wizard page used to create the new node.
 	private NewNodeWizardPage newPage;
-	// The workbench
-	private IWorkbench workbench;
 
 	/**
 	 * Create an instance.
@@ -59,7 +57,7 @@ public abstract class NewNodeWizard extends AbstractWizard implements INewWizard
 	 */
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
-		this.workbench = workbench;
+		super.init(workbench, selection);
 		// Set the window title
 		setWindowTitle(getTitle());
 		if (!selection.isEmpty()) {
@@ -79,10 +77,10 @@ public abstract class NewNodeWizard extends AbstractWizard implements INewWizard
 			}
 		}
 	}
-	
+
 	/**
 	 * Test if the specified target peer has a file system service.
-	 * 
+	 *
 	 * @param peer The target peer.
 	 * @return true if it has a file system service.
 	 */
@@ -157,10 +155,10 @@ public abstract class NewNodeWizard extends AbstractWizard implements INewWizard
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Select the specified node in the selection provider.
-	 * 
+	 *
 	 * @param node The node to be selected.
 	 */
 	void selectNewNode(FSTreeNode node) {
@@ -171,14 +169,14 @@ public abstract class NewNodeWizard extends AbstractWizard implements INewWizard
 			viewer.setSelection(selection, true);
 		}
     }
-	
+
 	/**
 	 * Get currently focused tree viewer.
-	 * 
+	 *
 	 * @return currently focused tree viewer or null.
 	 */
 	TreeViewer getFocusedViewer() {
-		IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+		IWorkbenchWindow window = getWorkbench() != null ? getWorkbench().getActiveWorkbenchWindow() : null;
 		if (window != null) {
 			IWorkbenchPage page = window.getActivePage();
 			if (page != null) {
@@ -201,14 +199,14 @@ public abstract class NewNodeWizard extends AbstractWizard implements INewWizard
 
 	/**
 	 * Create a wizard page to create a new node.
-	 * 
+	 *
 	 * @return The new wizard page.
 	 */
 	protected abstract NewNodeWizardPage createWizardPage();
 
 	/**
 	 * Create a Create operation instance using the specified folder and the new name.
-	 * 
+	 *
 	 * @param folder The folder in which the new node is created.
 	 * @param name The name of the new node.
 	 * @return a FSCreate instance to do the creation.
@@ -217,33 +215,33 @@ public abstract class NewNodeWizard extends AbstractWizard implements INewWizard
 
 	/**
 	 * The wizard's title to be used.
-	 * 
+	 *
 	 * @return The wizard's title to be used.
 	 */
 	protected abstract String getTitle();
-	
+
 	/**
 	 * Get the current target peer selected.
-	 * 
+	 *
 	 * @return The target peer selected.
 	 */
 	public IPeerModel getPeer(){
 		return peer;
 	}
-	
+
 	/**
 	 * Set the currently selected target peer.
-	 * 
+	 *
 	 * @param peer The newly selected target peer.
 	 */
 	public void setPeer(IPeerModel peer) {
 		this.peer = peer;
 		newPage.setPeer(peer);
 	}
-	
+
 	/**
 	 * Get the current selected folder.
-	 * 
+	 *
 	 * @return the current selected folder.
 	 */
 	public FSTreeNode getFolder() {
