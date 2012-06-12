@@ -129,6 +129,9 @@ public class StatusHandlerTestCase extends CoreTestCase {
 		IStatusHandler handler2 = StatusHandlerManager.getInstance().getHandler("org.eclipse.tcf.te.statushandler.default", true); //$NON-NLS-1$
 		assertNotSame("Failed to get unique instance of the default status handler.", handler, handler2); //$NON-NLS-1$
 
+		IStatusHandler[] handler3 = StatusHandlerManager.getInstance().getHandler(this);
+		assertNotNull("Unexpected return value null.", handler3); //$NON-NLS-1$
+
 		IPropertiesContainer data = new PropertiesContainer();
 		data.setProperty(IStatusHandlerConstants.PROPERTY_TITLE, "Statushandler Test"); //$NON-NLS-1$
 
@@ -172,6 +175,20 @@ public class StatusHandlerTestCase extends CoreTestCase {
 
 		String id = CoreBundleActivator.getUniqueIdentifier();
 		assertNotNull("Failed to get status handler bundle id.", id); //$NON-NLS-1$
+		assertEquals("Unexpected unique identifier: ", "org.eclipse.tcf.te.runtime.statushandler", id); //$NON-NLS-1$ //$NON-NLS-2$
 
+		// Force the context to become null
+		try {
+	        new CoreBundleActivator().start(null);
+        } catch (Exception e) {}
+
+		id = CoreBundleActivator.getUniqueIdentifier();
+		assertNotNull("Failed to get status handler bundle id.", id); //$NON-NLS-1$
+		assertEquals("Unexpected unique identifier: ", "org.eclipse.tcf.te.runtime.statushandler", id); //$NON-NLS-1$ //$NON-NLS-2$
+
+		// Restore the original context
+		try {
+	        new CoreBundleActivator().start(context);
+        } catch (Exception e) {}
 	}
 }
