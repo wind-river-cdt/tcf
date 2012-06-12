@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tests.statushandler;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -190,5 +191,22 @@ public class StatusHandlerTestCase extends CoreTestCase {
 		try {
 	        new CoreBundleActivator().start(context);
         } catch (Exception e) {}
+
+		Class<?>[] clazzes = StatusHandlerManager.class.getDeclaredClasses();
+		assertNotNull("Failed to get declared classes of StatusHandlerManager!", clazzes); //$NON-NLS-1$
+		assertEquals("Unexpected number of declared classes of StatusHandlerManager!", 2, clazzes.length); //$NON-NLS-1$
+		for (Class<?> clazz : clazzes) {
+			if (clazz.getName().endsWith("LazyInstanceHolder")) { //$NON-NLS-1$
+				try {
+					Constructor<?>[] constructors = clazz.getDeclaredConstructors();
+					for (Constructor<?> constructor : constructors) {
+						assertNotNull("Failed to get default constructor of StatusHandlerManager$LazyInstanceHolder!", constructors); //$NON-NLS-1$
+						constructor.setAccessible(true);
+						Object instance = constructor.newInstance((Object[])null);
+						assertNotNull("Failed to invoke default constructor of StatusHandlerManager$LazyInstanceHolder!", instance); //$NON-NLS-1$
+					}
+				} catch (Exception e) {}
+			}
+		}
 	}
 }

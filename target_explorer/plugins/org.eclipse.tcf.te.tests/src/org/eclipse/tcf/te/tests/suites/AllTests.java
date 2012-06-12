@@ -13,6 +13,8 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.tcf.te.tests.concurrent.ConcurrentTestCase;
+import org.eclipse.tcf.te.tests.model.ModelTestCase;
 import org.eclipse.tcf.te.tests.statushandler.StatusHandlerTestCase;
 import org.eclipse.tcf.te.tests.stepper.StepperTests;
 import org.eclipse.tcf.te.tests.tcf.launch.TcfLaunchTests;
@@ -62,5 +64,7 @@ public class AllTests {
 		suite.addTest(StepperTests.getTestSuite());
 		suite.addTest(TcfCoreTests.getTestSuite());
 		suite.addTest(TcfLaunchTests.getTestSuite());
+		suite.addTest(ConcurrentTestCase.getTestSuite());
+		suite.addTest(ModelTestCase.getTestSuite());
 	}
 }
