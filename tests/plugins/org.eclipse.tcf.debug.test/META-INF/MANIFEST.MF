@@ -23,3 +23,7 @@ Require-Bundle: org.eclipse.cdt.debug.core;bundle-version="7.2.0",
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: org.eclipse.debug.internal.ui.viewers.model
+Export-Package: org.eclipse.tcf.debug.test,
+ org.eclipse.tcf.debug.test.services,
+ org.eclipse.tcf.debug.test.util
+
