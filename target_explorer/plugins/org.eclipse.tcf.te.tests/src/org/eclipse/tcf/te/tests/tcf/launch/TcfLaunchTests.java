@@ -61,7 +61,7 @@ public class TcfLaunchTests extends TcfTestCase {
 		assertTrue("Missing hello world example for current OS and Arch:" + Platform.getOS() + "/" + Platform.getOSArch(), //$NON-NLS-1$ //$NON-NLS-2$
 						helloWorldLocation != null &&
 						helloWorldLocation.toFile().exists() &&
-						helloWorldLocation.toFile().canExecute());
+						helloWorldLocation.toFile().canRead());
 
 		String temp = System.getProperty("java.io.tmpdir"); //$NON-NLS-1$
 		IPath tempDir = temp != null ? new Path(temp) : null;
