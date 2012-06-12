@@ -15,6 +15,7 @@ import junit.framework.TestSuite;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
@@ -57,14 +58,14 @@ public class TcfLaunchTests extends TcfTestCase {
 		LaunchContextsPersistenceDelegate.setLaunchContexts(spec, new IModelNode[]{peerModel});
 
 		IPath helloWorldLocation = getHelloWorldLocation();
-		assertTrue("Missing hello world example for current OS and Arch", //$NON-NLS-1$
+		assertTrue("Missing hello world example for current OS and Arch:" + Platform.getOS() + "/" + Platform.getOSArch(), //$NON-NLS-1$ //$NON-NLS-2$
 						helloWorldLocation != null &&
 						helloWorldLocation.toFile().exists() &&
 						helloWorldLocation.toFile().canExecute());
 
 		String temp = System.getProperty("java.io.tmpdir"); //$NON-NLS-1$
 		IPath tempDir = temp != null ? new Path(temp) : null;
-		assertNotNull("Missing temp directory", tempDir); //$NON-NLS-1$
+		assertNotNull("Missing java temp directory", tempDir); //$NON-NLS-1$
 
 		IPath tempHelloWorld = tempDir.append(helloWorldLocation.lastSegment());
 		if (tempHelloWorld.toFile().exists()) {
