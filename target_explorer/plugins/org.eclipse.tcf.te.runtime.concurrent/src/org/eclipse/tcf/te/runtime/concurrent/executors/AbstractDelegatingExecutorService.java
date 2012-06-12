@@ -58,9 +58,7 @@ public abstract class AbstractDelegatingExecutorService extends ExecutableExtens
 			}
 		}
 
-		// Create the executor service delegate
-		this.delegate = createExecutorServiceDelegate();
-		Assert.isNotNull(delegate);
+		initializeExecutorServiceDelegate();
 	}
 
 	/**
@@ -70,6 +68,15 @@ public abstract class AbstractDelegatingExecutorService extends ExecutableExtens
 	 */
 	public String getThreadPoolNamePrefix() {
 		return threadPoolNamePrefix != null ? threadPoolNamePrefix : ""; //$NON-NLS-1$
+	}
+
+	/**
+	 * Initialize the executor service delegate
+	 */
+	public final void initializeExecutorServiceDelegate() {
+		// Create the executor service delegate
+		this.delegate = createExecutorServiceDelegate();
+		Assert.isNotNull(delegate);
 	}
 
 	/**

@@ -26,7 +26,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.tcf.te.runtime.concurrent.Executors;
 import org.eclipse.tcf.te.runtime.concurrent.executors.AbstractDelegatingExecutorService;
 import org.eclipse.tcf.te.runtime.concurrent.interfaces.IExecutor;
@@ -278,7 +277,7 @@ public class ConcurrentTestCase extends CoreTestCase {
 
 		// Construct the test service
 		AbstractDelegatingExecutorService service = new InternalTestAbstractDelegatingExecutorServiceImplementation(result);
-		try { service.setInitializationData(null, null, null); } catch (CoreException e) { service = null; }
+		service.initializeExecutorServiceDelegate();
 		assertNotNull("Failed to instanciate and to initialize the test executor service implementation!", service); //$NON-NLS-1$
 
 		// Invoke each method now

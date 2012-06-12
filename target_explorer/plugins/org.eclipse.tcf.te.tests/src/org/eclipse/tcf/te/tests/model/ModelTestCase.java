@@ -80,7 +80,7 @@ public class ModelTestCase extends CoreTestCase {
 		assertNotNull("Unexpected return value: null", node.getDescription()); //$NON-NLS-1$
 		assertEquals("Unexpected return value: ", 0, node.getDescription().length); //$NON-NLS-1$
 		assertNull("Unexpected return value: not null", node.getImageId()); //$NON-NLS-1$
-		assertTrue("Unexpected return value false", node.isVisible()); //$NON-NLS-1$
+		assertFalse("Unexpected return value true", node.isVisible()); //$NON-NLS-1$
 
 		node.setProperty("PROPERTY_BOOLEAN", true); //$NON-NLS-1$
 		assertEquals("Unexpected return value: ", true, node.getBooleanProperty("PROPERTY_BOOLEAN")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -89,14 +89,14 @@ public class ModelTestCase extends CoreTestCase {
 
 		// Get all properties of the node
 		Map<String, Object> properties = node.getProperties();
-		assertEquals("Unexpected number of properties!", 5, properties.size()); //$NON-NLS-1$
+		assertEquals("Unexpected number of properties!", 4, properties.size()); //$NON-NLS-1$
 
 		node.clearProperties();
 		assertTrue("Node still contains properties after node.clearProperties()!", node.getProperties().isEmpty()); //$NON-NLS-1$
 
 		// And set all properties again
 		node.setProperties(properties);
-		assertEquals("Unexpected number of properties.", 5, properties.size()); //$NON-NLS-1$
+		assertEquals("Unexpected number of properties.", 4, properties.size()); //$NON-NLS-1$
 
 		TestModelNode child = new TestModelNode(node);
 		assertNotNull("Failed to construct test model node instance!", child); //$NON-NLS-1$
@@ -162,9 +162,9 @@ public class ModelTestCase extends CoreTestCase {
 		assertNotNull("Failed to create file transfer item from pathes!", item2); //$NON-NLS-1$
 
 		assertNotNull("Unexpected value 'null' for item2.getTargetPath()!", item2.getTargetPath()); //$NON-NLS-1$
-		assertEquals("Invalid target patch decoded from encoded item!", "/root/cobble.out", item2.getTargetPath()); //$NON-NLS-1$ //$NON-NLS-2$
+		assertEquals("Invalid target path!", "/root/cobble.out", item2.getTargetPath().toString()); //$NON-NLS-1$ //$NON-NLS-2$
 		assertNotNull("Unexpected value 'null' for item2.getHostPath()!", item2.getHostPath()); //$NON-NLS-1$
-		assertEquals("Invalid target patch decoded from encoded item!", "/folk/uwe/tmp/cobble.out", item2.getHostPath().toString()); //$NON-NLS-1$ //$NON-NLS-2$
+		assertEquals("Invalid host path!", "/folk/uwe/tmp/cobble.out", item2.getHostPath().toString()); //$NON-NLS-1$ //$NON-NLS-2$
 		assertTrue("Unexpected value 'false' for item2.isEnabled()!",item2.isEnabled()); //$NON-NLS-1$
 		assertEquals("Unexpected return value:", IFileTransferItem.HOST_TO_TARGET, item2.getDirection()); //$NON-NLS-1$
 		assertNull("Unexpected value 'non-null' for item.getOptions()", item2.getOptions()); //$NON-NLS-1$

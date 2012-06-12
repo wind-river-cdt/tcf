@@ -463,7 +463,7 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 	@Override
 	public final boolean setProperty(String key, float value) {
 		float oldValue = getFloatProperty(key);
-		if (Math.abs(oldValue - value) >= .0000001) {
+		if (oldValue != value) {
 			return setProperty(key, Float.valueOf(value));
 		}
 		return false;
@@ -475,7 +475,7 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 	@Override
 	public final boolean setProperty(String key, double value) {
 		double oldValue = getDoubleProperty(key);
-		if (Math.abs(oldValue - value) >= .0000001) {
+		if (oldValue != value) {
 			return setProperty(key, Double.valueOf(value));
 		}
 		return false;

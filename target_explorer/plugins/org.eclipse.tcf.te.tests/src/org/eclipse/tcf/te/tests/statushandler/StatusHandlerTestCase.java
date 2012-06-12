@@ -194,7 +194,7 @@ public class StatusHandlerTestCase extends CoreTestCase {
 
 		Class<?>[] clazzes = StatusHandlerManager.class.getDeclaredClasses();
 		assertNotNull("Failed to get declared classes of StatusHandlerManager!", clazzes); //$NON-NLS-1$
-		assertEquals("Unexpected number of declared classes of StatusHandlerManager!", 2, clazzes.length); //$NON-NLS-1$
+		assertEquals("Unexpected number of declared classes of StatusHandlerManager!", 1, clazzes.length); //$NON-NLS-1$
 		for (Class<?> clazz : clazzes) {
 			if (clazz.getName().endsWith("LazyInstanceHolder")) { //$NON-NLS-1$
 				try {
