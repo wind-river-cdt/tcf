@@ -47,7 +47,6 @@ public class AllTests {
 		TestSuite suite = new TestSuite("All Target Explorer Tests"); //$NON-NLS-1$
 
 		addTests(suite);
-		AllFileSystemTests.addTests(suite);
 
 		return suite;
 	}
@@ -66,5 +65,8 @@ public class AllTests {
 		suite.addTest(TcfLaunchTests.getTestSuite());
 		suite.addTest(ConcurrentTestCase.getTestSuite());
 		suite.addTest(ModelTestCase.getTestSuite());
+
+		AllFileSystemTests.addTests(suite);
+		AllProcessTests.addTests(suite);
 	}
 }

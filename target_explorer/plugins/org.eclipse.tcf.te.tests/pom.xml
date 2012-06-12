@@ -31,12 +31,11 @@
 				<artifactId>tycho-surefire-plugin</artifactId>
 				<version>${tycho-version}</version>
 				<configuration>
-<!--  			    <debugPort>8003</debugPort>  -->
- 					<includes>
- 						<include>**/All*Tests.*</include>
- 					</includes>
+					<testSuite>org.eclipse.tcf.te.tests</testSuite>
+					<testClass>org.eclipse.tcf.te.tests.suites.AllTests</testClass>
 					<useUIHarness>true</useUIHarness>
 					<useUIThread>true</useUIThread>
+<!--  			    <debugPort>8003</debugPort>  -->
 					<product>org.eclipse.platform.ide</product>
 					<argLine>${tycho.testArgLine} ${ui.test.vmargs}</argLine>
 					<application>org.eclipse.ui.ide.workbench</application>
