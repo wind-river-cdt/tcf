@@ -13,14 +13,12 @@ import java.util.EventObject;
 
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tcf.te.runtime.events.EventManager;
 import org.eclipse.tcf.te.ui.views.events.ViewerContentChangeEvent;
 import org.eclipse.ui.navigator.CommonViewer;
-import org.eclipse.ui.navigator.CommonViewerSorter;
 import org.eclipse.ui.navigator.INavigatorContentService;
 
 /**
@@ -130,18 +128,6 @@ public class ViewViewer extends CommonViewer {
 
 	    ViewerContentChangeEvent event = new ViewerContentChangeEvent(this, ViewerContentChangeEvent.REFRESH);
 	    fireEvent(event);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.navigator.CommonViewer#setSorter(org.eclipse.jface.viewers.ViewerSorter)
-	 */
-	@Override
-	public void setSorter(ViewerSorter sorter) {
-		if (sorter instanceof CommonViewerSorter) {
-			sorter = new ViewViewerSorter((CommonViewerSorter)sorter);
-			((ViewViewerSorter)sorter).setContentService(getNavigatorContentService());
-		}
-	    super.setSorter(sorter);
 	}
 
 	/* (non-Javadoc)
