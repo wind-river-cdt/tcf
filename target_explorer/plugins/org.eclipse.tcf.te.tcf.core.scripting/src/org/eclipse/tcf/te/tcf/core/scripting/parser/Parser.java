@@ -124,7 +124,7 @@ public class Parser {
     			if (complete) {
     				String fullTokStr = fullTok.toString().trim();
     				if (fullTokStr.startsWith("\"")) fullTokStr = fullTokStr.substring(1); //$NON-NLS-1$
-    				if (fullTokStr.endsWith("\"")) fullTokStr = fullTokStr.substring(0, fullTok.length() - 1); //$NON-NLS-1$
+    				if (fullTokStr.endsWith("\"")) fullTokStr = fullTokStr.substring(0, fullTok.length() - 2); //$NON-NLS-1$
     				token.addArgument(fullTokStr);
     				continue;
     			}
