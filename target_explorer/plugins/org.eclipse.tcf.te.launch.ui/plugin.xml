@@ -91,7 +91,7 @@
             activeByDefault="false"
             contentProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchNavigatorContentProvider"
             labelProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchTreeLabelProvider"
-            priority="normal">
+            priority="lower">
          <triggerPoints>
             <instanceof value="org.eclipse.core.resources.IProject"/>
          </triggerPoints>
