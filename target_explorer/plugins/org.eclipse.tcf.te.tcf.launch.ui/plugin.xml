@@ -71,8 +71,7 @@
       <editorPageBinding
             id="org.eclipse.tcf.te.tcf.launch.ui.binding.LaunchEditorPage"
             pageId="org.eclipse.tcf.te.launch.ui.LaunchEditorPage"
-            insertBefore="org.eclipse.tcf.te.tcf.filesystem.FSExplorerEditorPage"
-            insertAfter="org.eclipse.tcf.te.tcf.ui.OverviewEditorPage">
+            insertAfter="last">
          <enablement>
             <with variable="activeEditorInput">
                <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
