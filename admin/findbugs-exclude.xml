@@ -162,6 +162,12 @@
 		</Or>
 	</Match>
 	
+	<!-- Ignore FE_FLOATING_POINT_EQUALITY -->
+	<Match>
+		<Bug pattern="FE_FLOATING_POINT_EQUALITY"/>
+		<Class name="org.eclipse.tcf.te.runtime.properties.PropertiesContainer"/>
+	</Match>
+	
 	<!-- Filters for org.eclipse.tcf bundle -->
 	<Match>
 		<Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
