@@ -117,6 +117,13 @@ public class Messages extends NLS {
 	public static String OpenWithMenu_NoEditorFound;
 	public static String OpenWithMenu_OpenWith;
 	public static String FSRename_RenameFileFolderTitle;
+	public static String FSTreeNodeSearchable_FilesAndFolders;
+	public static String FSTreeNodeSearchable_FilesOnly;
+	public static String FSTreeNodeSearchable_FindFilesAndFolders;
+	public static String FSTreeNodeSearchable_FindMessage;
+	public static String FSTreeNodeSearchable_FoldersOnly;
+	public static String FSTreeNodeSearchable_SearchingTargets;
+	public static String FSTreeNodeSearchable_SelectedFileSystem;
 	public static String RenameFilesHandler_TitleRename;
 	public static String RenameFilesHandler_TitleRenameFile;
 	public static String RenameFilesHandler_TitleRenameFolder;
@@ -176,4 +183,8 @@ public class Messages extends NLS {
 	public static String TargetSelectionPage_Description;
 	public static String TargetSelectionPage_Targets;
 	public static String TargetSelectionPage_Title;
+	public static String TreeViewerSearchDialog_LblCancelText;
+	public static String TreeViewerSearchDialog_GrpOptionsText;
+	public static String TreeViewerSearchDialog_BtnCaseText;
+	public static String TreeViewerSearchDialog_BtnPreciseText;
 }

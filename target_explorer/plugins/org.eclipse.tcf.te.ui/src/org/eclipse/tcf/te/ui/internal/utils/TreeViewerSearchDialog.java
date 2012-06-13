@@ -9,59 +9,55 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.internal.utils;
 
+import java.util.EventObject;
+
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TreePath;
-import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.wizard.ProgressMonitorPart;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.tcf.te.ui.forms.FormLayoutFactory;
+import org.eclipse.tcf.te.ui.interfaces.IOptionListener;
 import org.eclipse.tcf.te.ui.interfaces.ISearchCallback;
+import org.eclipse.tcf.te.ui.interfaces.ISearchable;
 import org.eclipse.tcf.te.ui.jface.dialogs.CustomTitleAreaDialog;
 import org.eclipse.tcf.te.ui.nls.Messages;
-import org.eclipse.tcf.te.ui.utils.TreeViewerUtil;
+import org.eclipse.ui.forms.events.ExpansionEvent;
+import org.eclipse.ui.forms.events.IExpansionListener;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
+import org.eclipse.ui.forms.widgets.Section;
 
 /**
  * The searching dialog used to get the searching input.
  */
-public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements SelectionListener, ISearchCallback {
+public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements ISearchCallback, IOptionListener {
 	// The context help id for this dialog.
 	private static final String SEARCH_HELP_ID = "org.eclipse.tcf.te.ui.utils.TreeViewerSearchDialog.help"; //$NON-NLS-1$
 
 	// A new search button's ID.
 	private static final int SEARCH_ID = 31;
 	
-	// The input field for searching conditions.
-	private Text fSearchField;
-	// The radio button of depth-first algorithm.
-	private Button fBtnDepth;
-	// The radio button of breadth-first algorithm.
-	private Button fBtnBreadth;
-	// The case sensitive check box.
-	private Button fBtnCase;
-	// The wrap search check box.
-	private Button fBtnWrap;
-	// The matching rule check box.
-	private Button fBtnMatch;
+	private Combo fCmbAlg;
 	// The searching orientation check box.
 	private Button fBtnBackward;
+	// The wrap search check box.
+	private Button fBtnWrap;
+	
 	// The progress monitor part that controls the searching job.
 	private ProgressMonitorPart fPmPart;
 	
@@ -69,11 +65,8 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements Sel
 	SearchEngine fSearcher;
 	// The tree viewer to be searched.
 	TreeViewer fViewer;
-
-	// The scope all button
-	private Button fBtnScpAll;
-	// The scope selected button
-	private Button fBtnScpSel;
+	
+	ISearchable fSearchable;
 
 	/**
 	 * Create a searching dialog using the default algorithm and 
@@ -99,21 +92,23 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements Sel
 		setHelpAvailable(true);
 		setContextHelpId(SEARCH_HELP_ID);
 		fViewer = viewer;
-		fSearcher = TreeViewerUtil.getSearchEngine(fViewer);
-		fSearcher.setDepthFirst(depthFirst);
-		fViewer.getTree().addSelectionListener(this);
-		setTitle(Messages.TreeViewerSearchDialog_DialogTitleMessage);
+		fSearcher = getSearchEngine(fViewer, depthFirst);
 	}
 
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.tcf.te.ui.jface.dialogs.CustomTitleAreaDialog#close()
+	/**
+	 * Get a singleton search engine for a tree viewer. If
+	 * it does not exist then create one and store it.
+	 * 
+	 * @param viewer The tree viewer.
+	 * @return A search engine.
 	 */
-	@Override
-	public boolean close() {
-		fViewer.getTree().removeSelectionListener(this);
-		return super.close();
+	private SearchEngine getSearchEngine(TreeViewer viewer, boolean depthFirst) {
+		SearchEngine searcher = (SearchEngine) viewer.getData("search.engine"); //$NON-NLS-1$
+		if (searcher == null) {
+			searcher = new SearchEngine(viewer, depthFirst);
+			viewer.setData("search.engine", searcher); //$NON-NLS-1$
+		}
+		return searcher;
 	}
 
 	/*
@@ -138,6 +133,9 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements Sel
 	 * Invoked when button "Close" is pressed.
 	 */
 	protected void closePressed() {
+		if(fSearchable != null) {
+			fSearchable.removeOptionListener(this);
+		}
 		fSearcher.endSearch();
 		setReturnCode(OK);
 		close();
@@ -147,20 +145,8 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements Sel
 	 * Called when search button is pressed to start a new search.
 	 */
 	private void searchButtonPressed() {
-		fSearcher.getMatcher().setMatchTarget(fSearchField.getText().trim());
 		getButton(SEARCH_ID).setEnabled(false);
 		fSearcher.startSearch(this, fPmPart);
-	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
-	 */
-	@Override
-	protected void configureShell(Shell newShell) {
-		super.configureShell(newShell);
-		newShell.setText(Messages.TreeViewerSearchDialog_DialogTitle);
 	}
 
 	/*
@@ -209,7 +195,7 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements Sel
 	 * (non-Javadoc)
 	 * @see org.eclipse.tcf.te.ui.jface.dialogs.CustomTitleAreaDialog#createDialogArea(org.eclipse.swt.widgets.Composite)
 	 */
-	@Override
+    @Override
 	protected Control createDialogArea(Composite parent) {
 		// Create the main container
 		Composite composite = (Composite) super.createDialogArea(parent);
@@ -222,105 +208,72 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements Sel
 		container.setLayout(glayout);
 		container.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
-		Composite comp = new Composite(container, SWT.NONE);
-		glayout = new GridLayout(2, false);
-		glayout.marginHeight = 0;
-		glayout.marginWidth = 0;
-		comp.setLayout(glayout);
-		comp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		
-		// Searching field.
-		Label label = new Label(comp, SWT.NONE);
-		label.setText(Messages.TreeViewerSearchDialog_LblCancelText);
-		fSearchField = new Text(comp, SWT.SINGLE | SWT.BORDER);
-		fSearchField.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		fSearchField.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(ModifyEvent e) {
-				updateSearchButton();
-				fSearcher.resetPath();
-			}
-		});
+		if(fSearchable != null) {
+			fSearchable.createPart(container);
+		}
 		
 		SelectionListener l = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				optionChecked(e);
+				selectionChanged(e);
 			}
 		};
 		
-		// Search Algoritm Selection Group.
-		Group group = new Group(container, SWT.SHADOW_ETCHED_IN);
-		group.setText(Messages.TreeViewerSearchDialog_Scope);
-		GridData data = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		group.setLayoutData(data);
-		group.setLayout(new GridLayout(2, true));
-		
-		fBtnScpAll = new Button(group, SWT.RADIO);
-		fBtnScpAll.setText(Messages.TreeViewerSearchDialog_All);
-		fBtnScpAll.setSelection(fSearcher.isScopeAll());
-		fBtnScpAll.addSelectionListener(l);
-		fBtnScpAll.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		
-		fBtnScpSel = new Button(group, SWT.RADIO);
-		fBtnScpSel.setText(Messages.TreeViewerSearchDialog_Selected);
-		fBtnScpSel.setSelection(!fSearcher.isScopeAll());
-		fBtnScpSel.addSelectionListener(l);
-		fBtnScpSel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		
-		// Search Algoritm Selection Group.
-		group = new Group(container, SWT.SHADOW_ETCHED_IN);
-		group.setText(Messages.TreeViewerSearchDialog_SearchAlgorithm);
-		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		group.setLayoutData(data);
-		group.setLayout(new GridLayout(2, true));
-		
-		// Breadth-first search
-		fBtnBreadth = new Button(group, SWT.RADIO);
-		fBtnBreadth.setText(Messages.TreeViewerSearchDialog_BreadthFirst);
-		fBtnBreadth.setSelection(!fSearcher.isDepthFirst());
-		fBtnBreadth.addSelectionListener(l);
-		fBtnBreadth.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		
-		// Depth-first search
-		fBtnDepth = new Button(group, SWT.RADIO);
-		fBtnDepth.setText(Messages.TreeViewerSearchDialog_DepthFirst);
-		fBtnDepth.setSelection(fSearcher.isDepthFirst());
-		fBtnDepth.addSelectionListener(l);
-		fBtnDepth.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		
-		// Search Options Group
-		group = new Group(container, SWT.SHADOW_ETCHED_IN);
-		group.setText(Messages.TreeViewerSearchDialog_GrpOptionsText);
-		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		group.setLayoutData(data);
-		group.setLayout(new GridLayout(2, true));
+		Section section = new Section(container, ExpandableComposite.TWISTIE | ExpandableComposite.CLIENT_INDENT);
+		section.setText(Messages.TreeViewerSearchDialog_AdvancedOptions);
+		section.setLayout(FormLayoutFactory.createSectionClientGridLayout(false, 2));
+		GridData layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		section.setLayoutData(layoutData);
 
-		// Case sensitive
-		fBtnCase = new Button(group, SWT.CHECK);
-		fBtnCase.setText(Messages.TreeViewerSearchDialog_BtnCaseText);
-		fBtnCase.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		fBtnCase.addSelectionListener(l);
+		final Composite client = new Composite(section, SWT.NONE);
+		client.setLayout(new GridLayout(3, false));
+		client.setBackground(section.getBackground());
+		section.setClient(client);
 		
-		// Matching precisely
-		fBtnMatch = new Button(group, SWT.CHECK);
-		fBtnMatch.setText(Messages.TreeViewerSearchDialog_BtnPreciseText);
-		fBtnMatch.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		fBtnMatch.addSelectionListener(l);
+		section.addExpansionListener(new IExpansionListener(){
+			@Override
+            public void expansionStateChanging(ExpansionEvent e) {
+            }
+
+			@Override
+            public void expansionStateChanged(ExpansionEvent e) {
+				expansionChanged(e.getState(), client.getSize().y);
+            }});
+		
+		Label label = new Label(client, SWT.NONE);
+		label.setLayoutData(new GridData());
+		label.setText(Messages.TreeViewerSearchDialog_SearchNodesUsing);
+		
+		fCmbAlg = new Combo(client, SWT.BORDER | SWT.READ_ONLY);
+		fCmbAlg.setLayoutData(new GridData());
+		fCmbAlg.setItems(new String[]{Messages.TreeViewerSearchDialog_BFS, Messages.TreeViewerSearchDialog_DFS});
+		fCmbAlg.select(0); 
+		fCmbAlg.addSelectionListener(l);
+		
+		label = new Label(client, SWT.NONE);
+		GridData data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		label.setLayoutData(data);
+		label.setText(Messages.TreeViewerSearchDialog_UseOptions);
 		
 		// Wrap search
-		fBtnWrap = new Button(group, SWT.CHECK);
+		fBtnWrap = new Button(client, SWT.CHECK);
 		fBtnWrap.setText(Messages.TreeViewerSearchDialog_BtnWrapText);
-		fBtnWrap.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		data.horizontalSpan = 3;
+		data.horizontalIndent = 10;
+		fBtnWrap.setLayoutData(data);
 		fBtnWrap.addSelectionListener(l);
 		
 		// Search backward.
-		fBtnBackward = new Button(group, SWT.CHECK);
+		fBtnBackward = new Button(client, SWT.CHECK);
 		fBtnBackward.setText(Messages.TreeViewerSearchDialog_BtnBackText);
-		fBtnBackward.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		data.horizontalSpan = 3;
+		data.horizontalIndent = 10;
+		fBtnBackward.setLayoutData(data);
 		fBtnBackward.addSelectionListener(l);
 		// Hidden if it is breadth-first search
-		fBtnBackward.setVisible(fSearcher.isDepthFirst());
+		fBtnBackward.setEnabled(fSearcher.isDepthFirst());
 		
 		// Progress monitor part to display or cancel searching process.
 		fPmPart = new ProgressMonitorPart(container, null, true);
@@ -328,7 +281,44 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements Sel
 		fPmPart.setLayoutData(data);
 		fPmPart.setVisible(false);
 		
+		if(fSearchable != null) {
+			String title = fSearchable.getSearchTitle();
+			getShell().setText(title);
+			this.setTitle(title);
+		}
+
 		return composite;
+	}
+
+	protected void expansionChanged(boolean state, int client_height) {
+		Point p = getShell().getSize();
+		p.y = state ? p.y + client_height : p.y - client_height;
+		getShell().setSize(p.x, p.y);
+    }
+
+	private ISearchable getSearchable() {
+		TreePath path = fSearcher.getStartPath();
+		if(path != null) {
+			Object element = path.getLastSegment();
+			if(element != null) {
+				if(element instanceof ISearchable) {
+					return (ISearchable) element;
+				}
+				ISearchable searchable = null;
+				if(element instanceof IAdaptable) {
+					searchable = (ISearchable)((IAdaptable)element).getAdapter(ISearchable.class);
+				}
+				if(searchable == null) {
+					searchable = (ISearchable)Platform.getAdapterManager().getAdapter(element, ISearchable.class);
+				}
+				if(searchable != null) {
+					searchable.addOptionListener(this);
+					fSearcher.setSearchable(searchable);
+				}
+				return searchable;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -336,65 +326,25 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements Sel
 	 * 
 	 * @param e The selection event.
 	 */
-	void optionChecked(SelectionEvent e) {
+	void selectionChanged(SelectionEvent e) {
 		Object src = e.getSource();
-		if (src == fBtnCase) {
-			fSearcher.getMatcher().setCaseSensitive(fBtnCase.getSelection());
-		}
-		else if (src == fBtnWrap) {
-			fSearcher.setWrap(fBtnWrap.getSelection());
-		}
-		else if (src == fBtnMatch) {
-			fSearcher.getMatcher().setMatchPrecise(fBtnMatch.getSelection());
-		}
-		else if (src == fBtnBackward) {
+		if (src == fBtnBackward) {
 			fSearcher.endSearch();
 			fSearcher.setStartPath(fSearcher.getLastResult());
 			fSearcher.setForeward(!fBtnBackward.getSelection());
 		}
-		else if (src == fBtnDepth || src == fBtnBreadth) {
-			if (src == fBtnDepth) {
-				fBtnDepth.setSelection(true);
-				fBtnBreadth.setSelection(false);
-			}
-			else if (src == fBtnBreadth) {
-				fBtnBreadth.setSelection(true);
-				fBtnDepth.setSelection(false);
-			}
+		else if (src == fBtnWrap) {
+			fSearcher.setWrap(fBtnWrap.getSelection());
+		}
+		else if (src == fCmbAlg) {
+			int index = fCmbAlg.getSelectionIndex();
 			fSearcher.endSearch();
-			boolean selection = fBtnDepth.getSelection();
+			boolean selection = index == 1;
 			fSearcher.setDepthFirst(selection);
-			fBtnBackward.setVisible(selection);
+			fBtnBackward.setEnabled(selection);
 			fSearcher.resetPath();
 			fSearcher.setForeward(!fBtnBackward.getSelection());
 		}
-		else if (src == fBtnScpAll || src == fBtnScpSel) {
-			if(src == fBtnScpAll) {
-				fBtnScpAll.setSelection(true);
-				fBtnScpSel.setSelection(false);
-			}
-			else {
-				fBtnScpAll.setSelection(false);
-				fBtnScpSel.setSelection(true);
-			}
-			fSearcher.endSearch();
-			boolean scpAll = fBtnScpAll.getSelection();
-			if(scpAll) {
-				setStartPath(new TreePath(new Object[]{fViewer.getInput()}));
-			}
-			else {
-				treeSelected();
-			}
-		}
-	}
-
-	/**
-	 * Update the enablement of search button.
-	 */
-	void updateSearchButton() {
-		String txt = fSearchField.getText();
-		boolean valid = txt != null && txt.trim().length() > 0;
-		getButton(SEARCH_ID).setEnabled(valid);
 	}
 
 	/**
@@ -404,64 +354,19 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements Sel
 	 */
 	public void setStartPath(TreePath rootPath) {
 		fSearcher.setStartPath(rootPath);
-		String text = fSearcher.getMatcher().getElementText(rootPath.getLastSegment());
-		if(text != null) {
-			this.setDefaultMessage(NLS.bind(Messages.TreeViewerSearchDialog_DialogPromptMessage, text), NONE);
+		fSearchable = getSearchable();
+		if (fSearchable != null) {
+			Object element = rootPath.getLastSegment();
+			String text = fSearchable.getSearchMessage(element);
+			if (text != null) {
+				setDefaultMessage(text, NONE);
+			}
 		}
-		else {
-			this.setDefaultMessage(Messages.TreeViewerSearchDialog_RootMsg, NONE);
-		}
-		updateScope();
-    }
+	}
 	
-	/**
-	 * Update the state of the scope buttons
-	 */
-	private void updateScope() {
-		if (fBtnScpAll != null && fBtnScpSel != null && fSearcher != null) {
-			fBtnScpAll.setSelection(fSearcher.isScopeAll());
-			fBtnScpSel.setSelection(!fSearcher.isScopeAll());
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-	 */
 	@Override
-    public void widgetSelected(SelectionEvent e) {
-		treeSelected();
-	}
-
-	/**
-	 * Invoked while a tree node is selected.
-	 */
-	private void treeSelected() {
-	    fSearcher.endSearch();
-		ISelection sel = fViewer.getSelection();
-		if (sel == null || sel.isEmpty()) {
-			fSearcher.resetPath();
-			updateScope();
-		}
-		else {
-			TreeSelection iss = (TreeSelection) sel;
-			TreePath[] paths = iss.getPaths();
-			if (paths == null || paths.length == 0) {
-				fSearcher.resetPath();
-				updateScope();
-			}
-			else {
-				setStartPath(paths[0]);
-			}
-		}
-		fSearcher.setLastResult(null);
-    }
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
-	 */
-	@Override
-    public void widgetDefaultSelected(SelectionEvent e) {
+    public void optionChanged(EventObject event) {
+		getButton(SEARCH_ID).setEnabled(fSearchable != null && fSearchable.isInputValid());
+		fSearcher.resetPath();
     }
 }

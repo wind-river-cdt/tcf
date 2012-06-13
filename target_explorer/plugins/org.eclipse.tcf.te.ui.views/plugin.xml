@@ -545,6 +545,24 @@
                </equals>
             </with>
          </activeWhen>
+         <enabledWhen>
+            <with
+                  variable="selection">
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <or>
+                     <instanceof
+                           value="org.eclipse.tcf.te.ui.interfaces.ISearchable">
+                     </instanceof>
+                     <adapt
+                           type="org.eclipse.tcf.te.ui.interfaces.ISearchable">
+                     </adapt>
+                  </or>
+               </iterate>
+            </with>
+         </enabledWhen>
       </handler>
       <handler
             class="org.eclipse.tcf.te.ui.views.handler.EditorSearchHandler"
@@ -557,6 +575,24 @@
                </equals>
             </with>
          </activeWhen>
+         <enabledWhen>
+            <with
+                  variable="selection">
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <or>
+                     <instanceof
+                           value="org.eclipse.tcf.te.ui.interfaces.ISearchable">
+                     </instanceof>
+                     <adapt
+                           type="org.eclipse.tcf.te.ui.interfaces.ISearchable">
+                     </adapt>
+                  </or>
+               </iterate>
+            </with>
+         </enabledWhen>
       </handler>
     </extension>
 

@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IFileSystem;
+import org.eclipse.tcf.services.IFileSystem.DoneClose;
 import org.eclipse.tcf.services.IFileSystem.DoneOpen;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.services.IFileSystem.IFileHandle;
@@ -60,6 +61,13 @@ public class QueryDoneOpen extends CallbackBase implements DoneOpen {
 			service.readdir(handle, new QueryDoneReadDir(callback, channel, service, handle, parentNode));
 		}
 		else if (callback != null) {
+			// Close the handle and channel if EOF is signaled or an error occurred.
+			if (handle != null) {
+				service.close(handle, new DoneClose() {
+					@Override
+					public void doneClose(IToken token, FileSystemException error) {}
+				});
+			}
 			IStatus status = new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), getErrorMessage(error), error);
 			callback.done(this, status);
 		}

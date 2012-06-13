@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.tcf.te.ui.interfaces.ISearchMatcher;
+import org.eclipse.tcf.te.ui.interfaces.ISearchable;
 
 /**
  * The search engine which uses BFS(breadth-first search) algorithm
@@ -34,8 +34,8 @@ public class BreadthFirstSearcher extends AbstractSearcher{
 	 * @param viewer The tree viewer.
 	 * @param matcher The search matcher used match a single tree node.
 	 */
-	public BreadthFirstSearcher(TreeViewer viewer, ISearchMatcher matcher){
-		super(viewer, matcher);
+	public BreadthFirstSearcher(TreeViewer viewer, ISearchable searchable){
+		super(viewer, searchable);
 	}
 
 	/*
@@ -67,7 +67,7 @@ public class BreadthFirstSearcher extends AbstractSearcher{
 					Assert.isTrue(queue.offer(childPath));
 				}
 			}
-			String elementText = getElementText(element);
+			String elementText = fSearchable.getElementText(element);
 			monitor.subTask(elementText);
 			if(fMatcher.match(element)) {
 				result = path;

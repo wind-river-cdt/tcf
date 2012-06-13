@@ -33,7 +33,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.te.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.internal.utils.FilteringImageDescriptor;
 import org.eclipse.tcf.te.ui.internal.utils.QuickFilter;
-import org.eclipse.tcf.te.ui.internal.utils.SearchEngine;
 import org.eclipse.tcf.te.ui.internal.utils.TreeViewerSearchDialog;
 import org.eclipse.tcf.te.ui.jface.images.AbstractImageDescriptor;
 import org.eclipse.ui.PlatformUI;
@@ -94,21 +93,6 @@ public class TreeViewerUtil {
 		return text;
 	}
 
-	/**
-	 * Get a singleton search engine for a tree viewer. If
-	 * it does not exist then create one and store it.
-	 * 
-	 * @param viewer The tree viewer.
-	 * @return A search engine.
-	 */
-	public static SearchEngine getSearchEngine(TreeViewer viewer) {
-		SearchEngine searcher = (SearchEngine) viewer.getData("search.engine"); //$NON-NLS-1$
-		if (searcher == null) {
-			searcher = new SearchEngine(viewer);
-			viewer.setData("search.engine", searcher); //$NON-NLS-1$
-		}
-		return searcher;
-	}
 
 	/**
 	 * Reset the viewer to the original view.
@@ -188,15 +172,6 @@ public class TreeViewerUtil {
 		TreeViewerSearchDialog dialog = new TreeViewerSearchDialog(viewer);
 		dialog.setStartPath(rootPath);
 		dialog.open();
-	}
-	
-	/**
-	 * Search the next element in the tree viewer.
-	 * 
-	 * @param viewer The tree viewer to be searched.
-	 */
-	public static void doSearchNext(TreeViewer viewer) {
-		getSearchEngine(viewer).startSearch(null, null);
 	}
 	
 	/**

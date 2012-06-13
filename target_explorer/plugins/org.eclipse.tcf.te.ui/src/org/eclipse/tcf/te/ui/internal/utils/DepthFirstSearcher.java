@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.tcf.te.ui.interfaces.ISearchMatcher;
+import org.eclipse.tcf.te.ui.interfaces.ISearchable;
 
 /**
  * The search engine which uses DFS(depth-first search) algorithm
@@ -48,8 +48,8 @@ public class DepthFirstSearcher extends AbstractSearcher {
 	 * @param viewer The tree viewer.
 	 * @param matcher The search matcher used match a single tree node.
 	 */
-	public DepthFirstSearcher(TreeViewer viewer, ISearchMatcher matcher) {
-		super(viewer, matcher);
+	public DepthFirstSearcher(TreeViewer viewer, ISearchable searchable) {
+		super(viewer, searchable);
 	}
 	
 	/*
@@ -114,7 +114,7 @@ public class DepthFirstSearcher extends AbstractSearcher {
 		while (!fSearchStack.isEmpty() && result == null && !monitor.isCanceled()) { //Search util the stack is empty or the result is found.
 			StackElement top = fSearchStack.getLast(); //Get the top stack element.
 			if(!fForeward && top.index == END_INDEX || fForeward && top.index == START_INDEX){
-				String elementText = getElementText(top.node);
+				String elementText = fSearchable.getElementText(top.node);
 				monitor.subTask(elementText);
 				result = fMatcher.match(top.node) ? this.createContextPath() : null;
 			}

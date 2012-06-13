@@ -23,6 +23,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.wizard.ProgressMonitorPart;
 import org.eclipse.tcf.te.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.interfaces.ISearchCallback;
+import org.eclipse.tcf.te.ui.interfaces.ISearchable;
 import org.eclipse.tcf.te.ui.nls.Messages;
 
 /**
@@ -38,7 +39,7 @@ public class SearchEngine {
 	// If the search algorithm is depth preferable
 	boolean fDepthFirst;
 	// The search matcher used to match tree nodes during traversing.
-	SearchMatcher fMatcher;
+	ISearchable fSearchable;
 	// The current starting path of the searcher engine.
 	TreePath fStartPath;
 	// Whether it is wrap search.
@@ -50,11 +51,16 @@ public class SearchEngine {
 	 * Create an instance for the tree viewer.
 	 * 
 	 * @param viewer The tree viewer.
+	 * @param depthFirst 
 	 */
-	public SearchEngine(TreeViewer viewer) {
+	public SearchEngine(TreeViewer viewer, boolean depthFirst) {
 		fViewer = viewer;
-		fMatcher = new SearchMatcher(viewer);
-		fSearcher = new BreadthFirstSearcher(fViewer, fMatcher);
+		fDepthFirst = depthFirst;
+	}
+	
+	public void setSearchable(ISearchable matcher) {
+		fSearchable = matcher;
+		fSearcher = fDepthFirst ? new DepthFirstSearcher(fViewer, fSearchable) : new BreadthFirstSearcher(fViewer, fSearchable);
 	}
 
 	/**
@@ -74,17 +80,8 @@ public class SearchEngine {
 	public void setDepthFirst(boolean depthFirst) {
 		if (fDepthFirst != depthFirst) {
 			fDepthFirst = depthFirst;
-			fSearcher = fDepthFirst ? new DepthFirstSearcher(fViewer, fMatcher) : new BreadthFirstSearcher(fViewer, fMatcher);
+			fSearcher = fDepthFirst ? new DepthFirstSearcher(fViewer, fSearchable) : new BreadthFirstSearcher(fViewer, fSearchable);
 		}
-	}
-
-	/**
-	 * Get the current matcher used.
-	 * 
-	 * @return the current matcher
-	 */
-	public SearchMatcher getMatcher() {
-		return fMatcher;
 	}
 
 	/**
@@ -97,6 +94,10 @@ public class SearchEngine {
 		if (fSearcher != null) {
 			fSearcher.setStartPath(path);
 		}
+	}
+	
+	public TreePath getStartPath() {
+		return fStartPath;
 	}
 	
 	/**

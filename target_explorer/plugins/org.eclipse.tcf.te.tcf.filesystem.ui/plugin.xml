@@ -1913,6 +1913,9 @@
          <adapter
                type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel">
          </adapter>
+         <adapter
+               type="org.eclipse.tcf.te.ui.interfaces.ISearchable">
+         </adapter>
       </factory>
       <factory
             adaptableType="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"

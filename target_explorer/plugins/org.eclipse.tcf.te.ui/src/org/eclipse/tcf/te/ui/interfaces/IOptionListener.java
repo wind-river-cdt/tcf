@@ -9,20 +9,18 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.interfaces;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jface.viewers.TreePath;
+import java.util.EventListener;
+import java.util.EventObject;
 
 /**
- * This callback is invoked when a searching target is hit to report
- * the result.
+ * The interface that listens and processes the event that
+ * the searching options have been changed. 
  */
-public interface ISearchCallback {
+public interface IOptionListener extends EventListener {
 	/**
-	 * The callback invoked when the searching job is done, to process
-	 * the path found.
+	 * Invoked when one of the searching options has changed.
 	 * 
-	 * @param status The searching resulting status.
-	 * @param path The tree path found or null if no appropriate node is found.
+	 * @param event An option changed event.
 	 */
-	public void searchDone(IStatus status, TreePath treePath);
+	public void optionChanged(EventObject event);
 }

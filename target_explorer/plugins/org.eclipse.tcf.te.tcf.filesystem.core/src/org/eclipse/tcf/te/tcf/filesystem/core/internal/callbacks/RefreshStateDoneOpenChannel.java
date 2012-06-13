@@ -49,6 +49,9 @@ public class RefreshStateDoneOpenChannel extends CallbackBase implements IChanne
 	public void doneOpenChannel(Throwable error, IChannel channel) {
 		IPeer peer = node.peerNode.getPeer();
 		if (error != null) {
+			if(channel != null) {
+				Tcf.getChannelManager().closeChannel(channel);
+			}
 			String message = getErrorMessage(error);
 			IStatus status = new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), message, error);
 			invokeCallback(status);

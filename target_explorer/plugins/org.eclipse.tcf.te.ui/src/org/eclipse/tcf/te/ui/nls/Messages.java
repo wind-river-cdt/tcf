@@ -69,27 +69,24 @@ public class Messages extends NLS {
 
 	public static String PreferencePage_label;
 	public static String QuickFilterPopup_PromptMessage;
+	public static String TreeViewerSearchDialog_AdvancedOptions;
 	public static String TreeViewerSearchDialog_All;
+	public static String TreeViewerSearchDialog_BFS;
 	public static String TreeViewerSearchDialog_BtnBackText;
 	public static String TreeViewerSearchDialog_BtnCloseText;
-	public static String TreeViewerSearchDialog_BtnCaseText;
-	public static String TreeViewerSearchDialog_BtnPreciseText;
 	public static String TreeViewerSearchDialog_BtnSearchText;
-	public static String TreeViewerSearchDialog_BtnWrapText;
 	public static String TreeViewerSearchDialog_DepthFirst;
-	public static String TreeViewerSearchDialog_DialogPromptMessage;
-	public static String TreeViewerSearchDialog_DialogTitle;
-	public static String TreeViewerSearchDialog_DialogTitleMessage;
-	public static String TreeViewerSearchDialog_GrpOptionsText;
+	public static String TreeViewerSearchDialog_DFS;
 	public static String TreeViewerSearchDialog_JobName;
-	public static String TreeViewerSearchDialog_LblCancelText;
 	public static String TreeViewerSearchDialog_MainTaskName;
 	public static String TreeViewerSearchDialog_NoMoreNodeFound;
 	public static String TreeViewerSearchDialog_NoSuchNode;
 	public static String TreeViewerSearchDialog_Scope;
 	public static String TreeViewerSearchDialog_SearchAlgorithm;
+	public static String TreeViewerSearchDialog_SearchNodesUsing;
 	public static String TreeViewerSearchDialog_Selected;
 	public static String TreeViewerSearchDialog_BreadthFirst;
-	public static String TreeViewerSearchDialog_RootMsg;
 	public static String ViewerStateManager_MkdirFailed;
+	public static String TreeViewerSearchDialog_BtnWrapText;
+	public static String TreeViewerSearchDialog_UseOptions;
 }
