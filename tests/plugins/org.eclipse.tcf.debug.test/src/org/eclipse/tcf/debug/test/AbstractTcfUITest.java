@@ -51,6 +51,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.debug.test.services.BreakpointsCM;
 import org.eclipse.tcf.debug.test.services.DiagnosticsCM;
 import org.eclipse.tcf.debug.test.services.LineNumbersCM;
+import org.eclipse.tcf.debug.test.services.ProcessesCM;
 import org.eclipse.tcf.debug.test.services.RegistersCM;
 import org.eclipse.tcf.debug.test.services.RunControlCM;
 import org.eclipse.tcf.debug.test.services.RunControlCM.ContextState;
@@ -76,6 +77,7 @@ import org.eclipse.tcf.services.IDiagnostics.ISymbol;
 import org.eclipse.tcf.services.IExpressions;
 import org.eclipse.tcf.services.ILineNumbers;
 import org.eclipse.tcf.services.IMemoryMap;
+import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.IRegisters;
 import org.eclipse.tcf.services.IRegisters.RegistersContext;
 import org.eclipse.tcf.services.IRunControl;
@@ -122,6 +124,7 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
     protected IMemoryMap fMemoryMap;
     protected ILineNumbers fLineNumbers;
     protected IRegisters fRegisters;
+    protected IProcesses fProcesses;
 
     protected RunControlCM fRunControlCM;
     protected DiagnosticsCM fDiagnosticsCM;
@@ -130,11 +133,8 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
     protected SymbolsCM fSymbolsCM;
     protected LineNumbersCM fLineNumbersCM;
     protected RegistersCM fRegistersCM;
-    protected String fTestId;
-    protected RunControlContext fTestCtx;
-    protected String fProcessId = "";
-    protected String fThreadId = "";
-    protected RunControlContext fThreadCtx;
+    protected ProcessesCM fProcessesCM;
+    
 
     /* (non-Javadoc)
      * @see org.eclipse.tcf.te.tests.CoreTestCase#getTestBundle()
@@ -245,9 +245,11 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
         fSymbolsCM = new SymbolsCM(syms, fRunControlCM, fMemoryMap);
         fLineNumbersCM = new LineNumbersCM(fLineNumbers, fMemoryMap, fRunControlCM);
         fRegistersCM = new RegistersCM(fRegisters, rc);
+        fProcessesCM = new ProcessesCM(fProcesses);
     }
 
     protected void tearDownServiceListeners() throws Exception{
+        fProcessesCM.dispose();
         fRegistersCM.dispose();
         fSymbolsCM.dispose();
         fBreakpointsCM.dispose();
@@ -369,6 +371,7 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
                 fMemoryMap = channels[0].getRemoteService(IMemoryMap.class);
                 fLineNumbers = channels[0].getRemoteService(ILineNumbers.class);
                 fRegisters = channels[0].getRemoteService(IRegisters.class);
+                fProcesses = channels[0].getRemoteService(IProcesses.class);
             };
         });
     }
@@ -541,40 +544,42 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
         }.get();
     }
 
-    private void startProcess() throws InterruptedException, ExecutionException {
-        new Transaction<Object>() {
+    private TestProcessInfo startProcess() throws InterruptedException, ExecutionException {
+        return new Transaction<TestProcessInfo>() {
             @Override
-            protected Object process() throws Transaction.InvalidCacheException ,ExecutionException {
-                fTestId = validate( fDiagnosticsCM.runTest(getDiagnosticsTestName(), this) );
-                fTestCtx = validate( fRunControlCM.getContext(fTestId) );
-                fProcessId = fTestCtx.getProcessID();
+            protected TestProcessInfo process() throws Transaction.InvalidCacheException ,ExecutionException {
+                String testId = validate( fDiagnosticsCM.runTest(getDiagnosticsTestName(), this) );
+                RunControlContext testCtx = validate( fRunControlCM.getContext(testId) );
+                String processId = testCtx.getProcessID();
                 // Create the cache to listen for exceptions.
-                fRunControlCM.waitForContextException(fTestId, fTestRunKey);
+                fRunControlCM.waitForContextException(testId, fTestRunKey);
 
-                if (!fProcessId.equals(fTestId)) {
-                    fThreadId = fTestId;
+                String threadId = "";
+                if (!processId.equals(testId)) {
+                    threadId = testId;
                 } else {
-                    String[] threads = validate( fRunControlCM.getChildren(fProcessId) );
-                    fThreadId = threads[0];
+                    String[] threads = validate( fRunControlCM.getChildren(processId) );
+                    threadId = threads[0];
                 }
-                fThreadCtx = validate( fRunControlCM.getContext(fThreadId) );
+                RunControlContext threadCtx = validate( fRunControlCM.getContext(threadId) );
 
-                Assert.assertTrue("Invalid thread context", fThreadCtx.hasState());
-                return new Object();
+                Assert.assertTrue("Invalid thread context", threadCtx.hasState());
+                
+                return new TestProcessInfo(testId, testCtx, processId, threadId, threadCtx);
             };
         }.get();
     }
 
-    private boolean runToTestEntry(final String testFunc) throws InterruptedException, ExecutionException {
+    private boolean runToTestEntry(final TestProcessInfo processInfo, final String testFunc) throws InterruptedException, ExecutionException {
         return new Transaction<Boolean>() {
             Object fWaitForResumeKey;
             Object fWaitForSuspendKey;
             boolean fSuspendEventReceived = false;
             @Override
             protected Boolean process() throws Transaction.InvalidCacheException ,ExecutionException {
-                ISymbol sym_func0 = validate( fDiagnosticsCM.getSymbol(fProcessId, testFunc) );
+                ISymbol sym_func0 = validate( fDiagnosticsCM.getSymbol(processInfo.fProcessId, testFunc) );
                 String sym_func0_value = sym_func0.getValue().toString();
-                ContextState state = validate (fRunControlCM.getState(fThreadId));
+                ContextState state = validate (fRunControlCM.getState(processInfo.fThreadId));
 
                 while (!state.suspended || !new BigInteger(state.pc).equals(new BigInteger(sym_func0_value))) {
                     if (state.suspended && fWaitForSuspendKey == null) {
@@ -582,24 +587,24 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
                         // We are not at test entry.  Create a new suspend wait cache.
                         fWaitForResumeKey = new Object();
                         fWaitForSuspendKey = new Object();
-                        ICache<Object> waitForResume = fRunControlCM.waitForContextResumed(fThreadId, fWaitForResumeKey);
+                        ICache<Object> waitForResume = fRunControlCM.waitForContextResumed(processInfo.fThreadId, fWaitForResumeKey);
 
                         // Issue resume command.
-                        validate( fRunControlCM.resume(fThreadCtx, fWaitForResumeKey, IRunControl.RM_RESUME, 1) );
+                        validate( fRunControlCM.resume(processInfo.fThreadCtx, fWaitForResumeKey, IRunControl.RM_RESUME, 1) );
 
                         // Wait until we receive the resume event.
                         validate(waitForResume);
                         fWaitForSuspendKey = new Object();
-                        fRunControlCM.waitForContextSuspended(fThreadId, fWaitForSuspendKey);
+                        fRunControlCM.waitForContextSuspended(processInfo.fThreadId, fWaitForSuspendKey);
                     } else {
                         if (fWaitForResumeKey != null) {
                             // Validate resume command
-                            validate( fRunControlCM.resume(fThreadCtx, fWaitForResumeKey, IRunControl.RM_RESUME, 1) );
+                            validate( fRunControlCM.resume(processInfo.fThreadCtx, fWaitForResumeKey, IRunControl.RM_RESUME, 1) );
                             fWaitForResumeKey = null;
 
                         }
                         // Wait until we suspend.
-                        validate( fRunControlCM.waitForContextSuspended(fThreadId, fWaitForSuspendKey) );
+                        validate( fRunControlCM.waitForContextSuspended(processInfo.fThreadId, fWaitForSuspendKey) );
                         fWaitForSuspendKey = null;
                     }
                 }
@@ -609,37 +614,38 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
         }.get();
     }
 
-    protected void initProcessModel(String testFunc) throws Exception {
+    protected TestProcessInfo initProcessModel(String testFunc) throws Exception {
         String bpId = "entryPointBreakpoint";
         createBreakpoint(bpId, testFunc);
         fDebugViewListener.reset();
 
+        final TestProcessInfo processInfo = startProcess();
+
         ITCFObject processTCFContext = new ITCFObject() {
-            public String getID() { return fProcessId; }
+            public String getID() { return processInfo.fProcessId; }
             public IChannel getChannel() { return channels[0]; }
         };
         ITCFObject threadTCFContext = new ITCFObject() {
-            public String getID() { return fThreadId; }
+            public String getID() { return processInfo.fThreadId; }
             public IChannel getChannel() { return channels[0]; }
         };
 
         fDebugViewListener.addLabelUpdate(new TreePath(new Object[] { fLaunch, processTCFContext }));
         fDebugViewListener.addLabelUpdate(new TreePath(new Object[] { fLaunch, processTCFContext, threadTCFContext }));
 
-        startProcess();
 
         // Make sure that delta is posted after launching process so that it doesn't interfere
         // with the waiting for the whole viewer to update after breakpoint hit (below).
         fDebugViewListener.waitTillFinished(MODEL_CHANGED_COMPLETE);
         fDebugViewListener.resetModelChanged();
 
-        runToTestEntry(testFunc);
+        runToTestEntry(processInfo, testFunc);
         removeBreakpoint(bpId);
 
         final String topFrameId = new Transaction<String>() {
             @Override
             protected String process() throws InvalidCacheException, ExecutionException {
-                String[] frameIds = validate( fStackTraceCM.getChildren(fThreadId) );
+                String[] frameIds = validate( fStackTraceCM.getChildren(processInfo.fThreadId) );
                 Assert.assertTrue("No stack frames" , frameIds.length != 0);
                 return frameIds[frameIds.length - 1];
             }
@@ -652,6 +658,14 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
         fDebugViewListener.addLabelUpdate(new TreePath(new Object[] { fLaunch, processTCFContext, threadTCFContext, frameTCFContext }));
 
         fDebugViewListener.waitTillFinished(MODEL_CHANGED_COMPLETE | CONTENT_SEQUENCE_COMPLETE | LABEL_SEQUENCE_COMPLETE | LABEL_UPDATES);
+        
+        VirtualItem topFrameItem = fDebugViewListener.findElement(
+            new Pattern[] { Pattern.compile(".*"), Pattern.compile(".*"), Pattern.compile(".*" + processInfo.fProcessId + ".*\\(Breakpoint.*"), Pattern.compile(".*")});
+        if (topFrameItem == null) {
+            Assert.fail("Top stack frame not found. \n\nDebug view dump: \n:" + fDebugViewViewer.toString());
+        }
+
+        return processInfo;
     }
 
     protected ContextState resumeAndWaitForSuspend(final RunControlContext context, final int mode) throws InterruptedException, ExecutionException {
@@ -666,7 +680,9 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
         }.get();
     }
 
-    protected void createBreakpoint(final String bpId, final String testFunc) throws InterruptedException, ExecutionException {
+    protected void createBreakpoint(final String bpId, final String testFunc) 
+        throws InterruptedException, ExecutionException 
+    {
         new Transaction<Object>() {
             private Map<String,Object> fBp;
             {
@@ -691,13 +707,14 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
                     Assert.fail("Invalid BP status: " + s);
                 }
                 @SuppressWarnings("unchecked")
-                Collection<Map<String,Object>> list = (Collection<Map<String,Object>>)status.get(IBreakpoints.STATUS_INSTANCES);
+                Collection<Map<String,Object>> list = 
+                    (Collection<Map<String,Object>>)status.get(IBreakpoints.STATUS_INSTANCES);
                 if (list != null) {
                     String err = null;
                     for (Map<String,Object> map : list) {
-                        String ctx = (String)map.get(IBreakpoints.INSTANCE_CONTEXT);
-                        if (fProcessId.equals(ctx) && map.get(IBreakpoints.INSTANCE_ERROR) != null)
+                        if (map.get(IBreakpoints.INSTANCE_ERROR) != null) {
                             err = (String)map.get(IBreakpoints.INSTANCE_ERROR);
+                        }
                     }
                     if (err != null) {
                         Assert.fail("Invalid BP status: " + s);

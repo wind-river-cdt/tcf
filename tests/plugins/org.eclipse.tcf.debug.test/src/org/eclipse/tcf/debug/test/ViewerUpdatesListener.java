@@ -121,15 +121,15 @@ public class ViewerUpdatesListener
 	}
 	
 	
-    public void setFailOnRedundantUpdates(boolean failOnRedundantUpdates) {
+    public synchronized void setFailOnRedundantUpdates(boolean failOnRedundantUpdates) {
         fFailOnRedundantUpdates = failOnRedundantUpdates;
     }
 
-    public void setFailOnMultipleModelUpdateSequences(boolean failOnMultipleLabelUpdateSequences) {
+    public synchronized void setFailOnMultipleModelUpdateSequences(boolean failOnMultipleLabelUpdateSequences) {
         fFailOnMultipleModelUpdateSequences = failOnMultipleLabelUpdateSequences;
     }
 
-    public void setFailOnMultipleLabelUpdateSequences(boolean failOnMultipleLabelUpdateSequences) {
+    public synchronized void setFailOnMultipleLabelUpdateSequences(boolean failOnMultipleLabelUpdateSequences) {
         fFailOnMultipleLabelUpdateSequences = failOnMultipleLabelUpdateSequences;
     }
     
@@ -139,7 +139,7 @@ public class ViewerUpdatesListener
      * every reset.
      * @param delay If true, listener will delay. 
      */
-    public void setDelayContentUntilProxyInstall(boolean delay) {
+    public synchronized void setDelayContentUntilProxyInstall(boolean delay) {
         fDelayContentUntilProxyInstall = delay;
     }
 
@@ -147,7 +147,7 @@ public class ViewerUpdatesListener
      * Sets the the maximum amount of time (in milliseconds) that the update listener 
      * is going to wait. If set to -1, the listener will wait indefinitely. 
      */
-    public void setTimeoutInterval(int milis) {
+    public synchronized void setTimeoutInterval(int milis) {
         fTimeoutInterval = milis;
     }
     
@@ -221,32 +221,40 @@ public class ViewerUpdatesListener
         }
     }
 
-    public void addLabelUpdate(TreePath path) {
+    public synchronized void addLabelUpdate(TreePath path) {
+        for (IViewerUpdate update : fLabelUpdatesCompleted)  {
+            if ( matchPath(path, update.getElementPath()) ) {
+                return;
+            }
+        }
         fLabelUpdates.add(path);
     }
 
-    public void addPropertiesUpdate(TreePath path) {
+    public synchronized void addPropertiesUpdate(TreePath path) {
         fPropertiesUpdates.add(path);
     }
 
-    public void removeLabelUpdate(TreePath path) {
+    public synchronized void removeLabelUpdate(TreePath path) {
         fLabelUpdates.remove(path);
     }
 
-    public void addStateUpdate(TreePath path) {
+    public synchronized void addStateUpdate(TreePath path) {
         fStateUpdates.add(path);
     }
 
-    public void removeStateUpdate(TreePath path) {
+    public synchronized void removeStateUpdate(TreePath path) {
         fStateUpdates.remove(path);
     }
 
+    protected boolean matchPath(TreePath patternPath, TreePath elementPath) {
+        return elementPath.equals(patternPath);
+    }
     
     public boolean isFinished() {
         return isFinished(ALL_UPDATES_COMPLETE);
     }
     
-    public boolean isTimedOut() {
+    public synchronized boolean isTimedOut() {
         return fTimeoutInterval > 0 && fTimeoutTime < System.currentTimeMillis();
     }
     
@@ -258,7 +266,7 @@ public class ViewerUpdatesListener
         }
     }
     
-    public boolean isFinished(int flags) {
+    public synchronized boolean isFinished(int flags) {
         if (isTimedOut()) {
             throw new RuntimeException("Timed Out: " + toString(flags));
         }
@@ -480,7 +488,7 @@ public class ViewerUpdatesListener
     public void stateUpdateStarted(Object input, IViewerUpdate update) {
     }
     
-    private String toString(int flags) {
+    private synchronized  String toString(int flags) {
         StringBuffer buf = new StringBuffer("Viewer Update Listener");
 
         if (fFailOnRedundantUpdates) {

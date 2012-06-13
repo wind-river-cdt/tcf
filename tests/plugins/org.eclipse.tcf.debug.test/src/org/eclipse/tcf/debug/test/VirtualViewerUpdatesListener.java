@@ -41,24 +41,50 @@ public class VirtualViewerUpdatesListener extends ViewerUpdatesListener {
     }
     
     public VirtualItem findElement(VirtualItem parent, Pattern[] patterns) {
-        VirtualItem item = parent;
-        patterns: for (int i = 0; i < patterns.length; i++) {
-            for (VirtualItem child : item.getItems()) {
-                String[] label = (String[])child.getData(VirtualItem.LABEL_KEY);
-                if (label != null && label.length >= 1 && label[0] != null && patterns[i].matcher(label[0]).matches()) {
-                    item = child;
-                    continue patterns;
+        return findElement(parent, patterns, 0);
+    }
+
+    private VirtualItem findElement(VirtualItem parent, Pattern[] patterns, int patternIdx) {
+        if (patternIdx >= patterns.length) return parent;
+        for (VirtualItem child : parent.getItems()) {
+            String[] label = (String[])child.getData(VirtualItem.LABEL_KEY);
+            if (label != null && label.length >= 1 && label[0] != null && 
+                patterns[patternIdx].matcher(label[0]).matches()) 
+            {
+                VirtualItem item = findElement(child, patterns, patternIdx+1);
+                if (item != null) {
+                    return item;
                 }
             }
-            return null;
         }
-        return item;
+        return null;
     }
 
     @Override
     protected Set<TreePath> makeTreePathSet() {
         return new MatchingSet();
     }
+    
+    protected boolean matchPath(TreePath patternPath, TreePath elementPath) {
+        if (patternPath.getSegmentCount() != elementPath.getSegmentCount()) {
+            return false;
+        }
+        
+        for (int i = 0; i < patternPath.getSegmentCount(); i++) {
+            Object patternSegment = patternPath.getSegment(i);
+            Object elementSegment = elementPath.getSegment(i);
+            if ( fPatternComparer.equals(elementSegment, patternSegment) ) {
+                continue;
+            } else if (fTCFContextComparer.equals(elementSegment, patternSegment) ) {
+                continue;
+            } else if (patternSegment.equals(elementSegment)) {
+                continue;
+            } 
+            return false;
+        }
+        return true;
+    }
+
     
     private final IElementComparer fPatternComparer = new IElementComparer() {
         public boolean equals(Object a, Object b) {
@@ -164,31 +190,12 @@ public class VirtualViewerUpdatesListener extends ViewerUpdatesListener {
         
         private int find(TreePath path) {
             for (int i = 0; i < fList.size(); i++) {
-                if (matches(fList.get(i), path)) {
+                if (matchPath(fList.get(i), path)) {
                     return i;
                 }
             }
             return -1;
         }
         
-        private boolean matches(TreePath patternPath, TreePath elementPath) {
-            if (patternPath.getSegmentCount() != elementPath.getSegmentCount()) {
-                return false;
-            }
-            
-            for (int i = 0; i < patternPath.getSegmentCount(); i++) {
-                Object patternSegment = patternPath.getSegment(i);
-                Object elementSegment = elementPath.getSegment(i);
-                if ( fPatternComparer.equals(elementSegment, patternSegment) ) {
-                    continue;
-                } else if (fTCFContextComparer.equals(elementSegment, patternSegment) ) {
-                    continue;
-                } else if (patternSegment.equals(elementSegment)) {
-                    continue;
-                } 
-                return false;
-            }
-            return true;
-        }
     }
 }

@@ -55,15 +55,15 @@ public class BreakpointsTest extends AbstractTcfUITest
         super.tearDown();
     }
 
-    private CodeArea getFunctionCodeArea(String functionName) throws Exception {
+    private CodeArea getFunctionCodeArea(final TestProcessInfo processInfo, String functionName) throws Exception {
         return new Transaction<CodeArea>() {
             @Override
             protected CodeArea process() throws InvalidCacheException, ExecutionException {
-            	ContextState state = validate ( fRunControlCM.getState(fThreadId) );
-                String symId = validate ( fSymbolsCM.find(fProcessId, new BigInteger(state.pc), "tcf_test_func0") );
+            	ContextState state = validate ( fRunControlCM.getState(processInfo.fThreadId) );
+                String symId = validate ( fSymbolsCM.find(processInfo.fProcessId, new BigInteger(state.pc), "tcf_test_func0") );
                 Symbol sym = validate ( fSymbolsCM.getContext(symId) );
                 CodeArea[] area = validate ( fLineNumbersCM.mapToSource(
-                		fProcessId,
+                    processInfo.fProcessId,
                 		sym.getAddress(),
                 		new BigInteger(sym.getAddress().toString()).add(BigInteger.valueOf(1))) );
                 return area[0];
@@ -103,9 +103,9 @@ public class BreakpointsTest extends AbstractTcfUITest
     }
 
     public void testContextAddedOnLineBrakpointCreate() throws Exception {
-        initProcessModel("tcf_test_func0");
+        TestProcessInfo processInfo = initProcessModel("tcf_test_func0");
 
-        CodeArea bpCodeArea = getFunctionCodeArea("tcf_test_func0");
+        CodeArea bpCodeArea = getFunctionCodeArea(processInfo, "tcf_test_func0");
         ICLineBreakpoint bp = createLineBreakpoint(bpCodeArea.file, bpCodeArea.start_line);
     }
 
