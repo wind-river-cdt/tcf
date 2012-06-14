@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.debug.test;
 
+import org.eclipse.debug.internal.ui.viewers.model.provisional.IPresentationContext;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IViewerInputRequestor;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IViewerInputUpdate;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.PresentationContext;
@@ -32,9 +33,13 @@ public class VariablesVirtualTreeModelViewer extends VirtualTreeModelViewer impl
     private IDebugContextProvider fDebugContextProvider;
     private ViewerInputService fInputService;
     private boolean fActive = false;
-        
+
     public VariablesVirtualTreeModelViewer(String contextId, IDebugContextProvider debugContextProvider) {
-        super(Display.getDefault(), SWT.NONE, new PresentationContext(contextId));
+        this(new PresentationContext(contextId), debugContextProvider);
+    }
+
+    public VariablesVirtualTreeModelViewer(IPresentationContext context, IDebugContextProvider debugContextProvider) {
+        super(Display.getDefault(), SWT.NONE, context);
         fInputService = new ViewerInputService(this, new IViewerInputRequestor() {
             
             public void viewerInputComplete(IViewerInputUpdate update) {
