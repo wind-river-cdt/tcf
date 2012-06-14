@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.core.runtime.Status;
@@ -192,9 +193,7 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 							}
 
 							// Channel opening failed
-							if (error != null) {
-								done.doneOpenChannel(error, finChannel);
-							}
+							done.doneOpenChannel(error != null ? error : new OperationCanceledException(), finChannel);
 						}
 
 						@Override
@@ -228,9 +227,7 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 
 					@Override
 					public void onChannelClosed(Throwable error) {
-						if(error != null) {
-							done.doneOpenChannel(error, finChannel);
-						}
+						done.doneOpenChannel(error != null ? error : new OperationCanceledException(), finChannel);
 					}
 
 					@Override
@@ -871,9 +868,7 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 					}
 					@Override
 					public void onChannelClosed(Throwable error) {
-						if (error != null) {
-							done.doneOpenChannel(error, finChannel);
-						}
+						done.doneOpenChannel(error != null ? error : new OperationCanceledException(), finChannel);
 					}
 					@Override
 					public void congestionLevel(int level) {

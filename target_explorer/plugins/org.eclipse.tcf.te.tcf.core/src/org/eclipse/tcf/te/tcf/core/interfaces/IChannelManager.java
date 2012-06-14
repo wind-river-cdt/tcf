@@ -12,6 +12,7 @@ package org.eclipse.tcf.te.tcf.core.interfaces;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.tcf.osgi.services.IValueAddService;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
@@ -50,6 +51,10 @@ public interface IChannelManager extends IAdaptable {
 	interface DoneOpenChannel {
 		/**
 		 * Called when the channel fully opened or failed to open.
+		 * <p>
+		 * <b>Note:</b> If error is of type {@link OperationCanceledException}, than it signals that
+		 * the channel got closed normally while still in state {@link IChannel#STATE_OPENING}. Clients
+		 * should handle the case explicitly if necessary.
 		 *
 		 * @param error The error description if operation failed, <code>null</code> if succeeded.
 		 * @param channel The channel object or <code>null</code>.
