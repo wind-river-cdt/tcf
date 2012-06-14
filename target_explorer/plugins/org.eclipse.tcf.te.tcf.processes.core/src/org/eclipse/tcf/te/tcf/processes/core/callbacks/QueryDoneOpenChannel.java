@@ -11,6 +11,7 @@ package org.eclipse.tcf.te.tcf.processes.core.callbacks;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.Protocol;
@@ -58,7 +59,7 @@ public class QueryDoneOpenChannel implements IChannelManager.DoneOpenChannel {
 	@Override
     public void doneOpenChannel(Throwable error, final IChannel channel) {
 		Assert.isTrue(Protocol.isDispatchThread());
-		if (error == null && channel != null) {
+		if (error == null) {
 			ISysMonitor service = channel.getRemoteService(ISysMonitor.class);
 			if (service != null) {
 				service.getChildren(parentNode.id, new QueryDoneGetChildren(new Callback(){
@@ -76,8 +77,8 @@ public class QueryDoneOpenChannel implements IChannelManager.DoneOpenChannel {
 				callback.done(this, Status.OK_STATUS);
 			}
 		}
-		else if (callback != null) {
-			IStatus status = error == null ? Status.OK_STATUS : new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(), error.getMessage(), error);
+		else if (!(error instanceof OperationCanceledException) && callback != null) {
+			IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(), error.getMessage(), error);
 			callback.done(this, status);
 		}
     }

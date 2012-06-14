@@ -58,8 +58,13 @@ public class SearchEngine {
 		fDepthFirst = depthFirst;
 	}
 	
-	public void setSearchable(ISearchable matcher) {
-		fSearchable = matcher;
+	/**
+	 * The set the searchable
+	 * 
+	 * @param searchable the searchable element.
+	 */
+	public void setSearchable(ISearchable searchable) {
+		fSearchable = searchable;
 		fSearcher = fDepthFirst ? new DepthFirstSearcher(fViewer, fSearchable) : new BreadthFirstSearcher(fViewer, fSearchable);
 	}
 
@@ -96,6 +101,11 @@ public class SearchEngine {
 		}
 	}
 	
+	/**
+	 * Get the start path.
+	 * 
+	 * @return the start path.
+	 */
 	public TreePath getStartPath() {
 		return fStartPath;
 	}
@@ -158,6 +168,7 @@ public class SearchEngine {
 				return Status.OK_STATUS;
 			}
 		};
+		fSearchJob.setSystem(true);
 		fSearchJob.addJobChangeListener(new JobChangeAdapter() {
 			@Override
 			public void done(final IJobChangeEvent event) {

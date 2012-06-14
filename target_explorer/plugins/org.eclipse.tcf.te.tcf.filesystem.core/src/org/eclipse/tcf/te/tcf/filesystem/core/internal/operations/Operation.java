@@ -18,6 +18,7 @@ import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IChannel;
@@ -150,7 +151,7 @@ public class Operation extends Ancestor<FSTreeNode> implements IOperation {
 						String message = NLS.bind(Messages.Operation_NotResponding, peer.getID());
 						errors[0] = new TCFChannelException(message);
 					}
-					else {
+					else if(!(error instanceof OperationCanceledException)) {
 						String message = NLS.bind(Messages.Operation_OpeningChannelFailureMessage, peer.getID(), error.getMessage());
 						errors[0] = new TCFChannelException(message, error);
 					}

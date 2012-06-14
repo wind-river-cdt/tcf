@@ -68,7 +68,7 @@ public class FSTreeNodeAdapterFactory implements IAdapterFactory {
 				return node.getPeerModel();
 			}
 			else if(adapterType == ISearchable.class) {
-				return new FSTreeNodeSearchable();
+				return new FSTreeNodeSearchable(node);
 			}
 		}
 		return null;

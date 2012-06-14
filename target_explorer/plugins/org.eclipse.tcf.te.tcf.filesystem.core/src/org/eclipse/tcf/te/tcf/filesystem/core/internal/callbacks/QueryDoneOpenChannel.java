@@ -11,6 +11,7 @@ package org.eclipse.tcf.te.tcf.filesystem.core.internal.callbacks;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.Protocol;
@@ -31,6 +32,7 @@ public class QueryDoneOpenChannel extends CallbackBase implements DoneOpenChanne
 	FSTreeNode parentNode;
 	// Callback object.
 	ICallback callback;
+	boolean first;
 
 	/**
 	 * Create an instance with a parent node.
@@ -71,24 +73,20 @@ public class QueryDoneOpenChannel extends CallbackBase implements DoneOpenChanne
             }
 		};
 		if(error == null) {
-			if(channel != null) {
-				IFileSystem service = channel.getRemoteService(IFileSystem.class);
-				if(service != null) {
-					if(parentNode.isSystemRoot()) {
-						service.roots(new QueryDoneRoots(proxy, parentNode));
-					} else {
-						String absPath = parentNode.getLocation();
-						service.opendir(absPath, new QueryDoneOpen(proxy, channel, service, parentNode));
-					}
+			IFileSystem service = channel.getRemoteService(IFileSystem.class);
+			if(service != null) {
+				if(parentNode.isSystemRoot()) {
+					service.roots(new QueryDoneRoots(proxy, parentNode));
 				} else {
-					Status status = new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), Messages.Operation_NoFileSystemError, null);
-					proxy.done(this, status);
+					String absPath = parentNode.getLocation();
+					service.opendir(absPath, new QueryDoneOpen(proxy, channel, service, parentNode));
 				}
+			} else {
+				Status status = new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), Messages.Operation_NoFileSystemError, null);
+				proxy.done(this, status);
 			}
-			else {
-				proxy.done(this, Status.OK_STATUS);
-			}
-		} else {
+		} 
+		else if(!(error instanceof OperationCanceledException)) {
 			IStatus status = new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), getErrorMessage(error), error);
 			proxy.done(this, status);
 		}

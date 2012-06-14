@@ -86,10 +86,11 @@ public class QueryDoneReadDir extends CallbackBase implements DoneReadDir {
 			// Close the handle and channel if EOF is signaled or an error occurred.
 			service.close(handle, new DoneClose() {
 				@Override
-                public void doneClose(IToken token, FileSystemException error) {}
+				public void doneClose(IToken token, FileSystemException error) {
+					IStatus status = error == null ? Status.OK_STATUS : new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), getErrorMessage(error), error);
+					callback.done(this, status);
+				}
 			});
-			Status status = new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), getErrorMessage(error), error);
-			callback.done(this, status);
 		}
 	}
 }

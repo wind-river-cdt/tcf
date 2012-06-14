@@ -10,6 +10,7 @@
 package org.eclipse.tcf.te.tcf.filesystem.core.internal.callbacks;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IChannel;
@@ -52,9 +53,11 @@ public class RefreshStateDoneOpenChannel extends CallbackBase implements IChanne
 			if(channel != null) {
 				Tcf.getChannelManager().closeChannel(channel);
 			}
-			String message = getErrorMessage(error);
-			IStatus status = new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), message, error);
-			invokeCallback(status);
+			if (!(error instanceof OperationCanceledException)) {
+				String message = getErrorMessage(error);
+				IStatus status = new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), message, error);
+				invokeCallback(status);
+			}
 		}
 		else {
 			IFileSystem service = channel.getRemoteService(IFileSystem.class);

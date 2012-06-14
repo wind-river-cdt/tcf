@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.tcf.te.ui.interfaces.ISearchMatcher;
 import org.eclipse.tcf.te.ui.interfaces.ISearchable;
 
 /**
@@ -57,6 +58,7 @@ public class BreadthFirstSearcher extends AbstractSearcher{
 	@Override
     public TreePath searchNext(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException{
 		TreePath result = null;
+		ISearchMatcher matcher = fSearchable.getMatcher();
 		while(queue != null && !queue.isEmpty() && result == null && !monitor.isCanceled()) {
 			TreePath path = queue.poll();
 			Object element = path.getLastSegment();
@@ -69,7 +71,7 @@ public class BreadthFirstSearcher extends AbstractSearcher{
 			}
 			String elementText = fSearchable.getElementText(element);
 			monitor.subTask(elementText);
-			if(fMatcher.match(element)) {
+			if(matcher.match(element)) {
 				result = path;
 			}
 		}

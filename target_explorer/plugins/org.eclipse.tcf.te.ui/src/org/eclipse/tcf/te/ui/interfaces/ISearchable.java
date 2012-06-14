@@ -10,6 +10,7 @@
 package org.eclipse.tcf.te.ui.interfaces;
 
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tcf.te.ui.utils.AbstractSearchable;
 
 /**
  * This interface should be implemented or adapted by the tree nodes which
@@ -46,12 +47,20 @@ public interface ISearchable {
 	public String getElementText(Object element);
 	
 	/**
-	 * Create the option part in the searching dialog where the user 
-	 * enters the matching rule used in searching.
+	 * Create the part in the searching dialog where the user 
+	 * enters the common matching rule used in searching.
 	 * 
 	 * @param parent The parent composite of this option part.
 	 */
-	public void createPart(Composite parent);
+	public void createCommonPart(Composite parent);
+	
+	/**
+	 * Create the part in the searching dialog where the user 
+	 * enters the advanced matching rule used in searching.
+	 * 
+	 * @param parent The parent composite of this option part.
+	 */
+	public void createAdvancedPart(Composite parent);
 	
 	/**
 	 * Get a searching matcher object to test if a tree node matches

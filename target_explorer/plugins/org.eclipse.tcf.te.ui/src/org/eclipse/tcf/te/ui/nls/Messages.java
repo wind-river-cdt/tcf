@@ -88,5 +88,6 @@ public class Messages extends NLS {
 	public static String TreeViewerSearchDialog_BreadthFirst;
 	public static String ViewerStateManager_MkdirFailed;
 	public static String TreeViewerSearchDialog_BtnWrapText;
+	public static String TreeViewerSearchDialog_GeneralOptions;
 	public static String TreeViewerSearchDialog_UseOptions;
 }

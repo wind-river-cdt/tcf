@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.tcf.te.ui.interfaces.ISearchMatcher;
 import org.eclipse.tcf.te.ui.interfaces.ISearchable;
 
 /**
@@ -111,12 +112,13 @@ public class DepthFirstSearcher extends AbstractSearcher {
 	@Override
     public TreePath searchNext(IProgressMonitor monitor)  throws InvocationTargetException, InterruptedException {
 		TreePath result = null;
+		ISearchMatcher matcher = fSearchable.getMatcher();
 		while (!fSearchStack.isEmpty() && result == null && !monitor.isCanceled()) { //Search util the stack is empty or the result is found.
 			StackElement top = fSearchStack.getLast(); //Get the top stack element.
 			if(!fForeward && top.index == END_INDEX || fForeward && top.index == START_INDEX){
 				String elementText = fSearchable.getElementText(top.node);
 				monitor.subTask(elementText);
-				result = fMatcher.match(top.node) ? this.createContextPath() : null;
+				result = matcher.match(top.node) ? this.createContextPath() : null;
 			}
 			if (top.index == END_INDEX) {//If the top index is END_INDEX, it means the node has been finished.
 				fSearchStack.removeLast(); //Then discard it.

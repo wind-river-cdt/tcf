@@ -15,7 +15,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.tcf.te.ui.interfaces.ILazyLoader;
-import org.eclipse.tcf.te.ui.interfaces.ISearchMatcher;
 import org.eclipse.tcf.te.ui.interfaces.ISearchable;
 import org.eclipse.tcf.te.ui.interfaces.ITreeSearcher;
 import org.eclipse.tcf.te.ui.trees.Pending;
@@ -30,10 +29,8 @@ public abstract class AbstractSearcher implements ITreeSearcher {
 	protected TreeViewer fViewer;
 	// The label provider of the tree viewer.
 	protected ILabelProvider fLabelProvider;
-	
+	// The searchable element.
 	protected ISearchable fSearchable;
-	
-	protected ISearchMatcher fMatcher;
 
 	/**
 	 * Create a searcher with the specified viewer and matcher.
@@ -45,7 +42,6 @@ public abstract class AbstractSearcher implements ITreeSearcher {
 		fViewer = viewer;
 		fLabelProvider = (ILabelProvider) fViewer.getLabelProvider();
 		this.fSearchable = searchable;
-		this.fMatcher = searchable.getMatcher();
 	}
 
 	/**

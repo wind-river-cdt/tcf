@@ -47,7 +47,7 @@ public class RefreshDoneOpenChannel implements IChannelManager.DoneOpenChannel {
 	@Override
     public void doneOpenChannel(Throwable error, final IChannel channel) {
 		Assert.isTrue(Protocol.isDispatchThread());
-		if (error == null && channel != null) {
+		if (error == null) {
 			ISysMonitor service = channel.getRemoteService(ISysMonitor.class);
 			if (service != null) {
 				Queue<ProcessTreeNode> queue = new ConcurrentLinkedQueue<ProcessTreeNode>();

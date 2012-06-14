@@ -65,11 +65,18 @@ public class QueryDoneOpen extends CallbackBase implements DoneOpen {
 			if (handle != null) {
 				service.close(handle, new DoneClose() {
 					@Override
-					public void doneClose(IToken token, FileSystemException error) {}
+					public void doneClose(IToken token, FileSystemException error) {
+						IStatus status;
+						if (error == null) status = Status.OK_STATUS;
+						else status = new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), getErrorMessage(error), error);
+						callback.done(this, status);
+					}
 				});
 			}
-			IStatus status = new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), getErrorMessage(error), error);
-			callback.done(this, status);
+			else {
+				IStatus status = new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), getErrorMessage(error), error);
+				callback.done(this, status);
+			}
 		}
 	}
 }

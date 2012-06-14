@@ -23,24 +23,19 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.tcf.te.ui.forms.FormLayoutFactory;
 import org.eclipse.tcf.te.ui.interfaces.IOptionListener;
 import org.eclipse.tcf.te.ui.interfaces.ISearchCallback;
 import org.eclipse.tcf.te.ui.interfaces.ISearchable;
 import org.eclipse.tcf.te.ui.jface.dialogs.CustomTitleAreaDialog;
 import org.eclipse.tcf.te.ui.nls.Messages;
-import org.eclipse.ui.forms.events.ExpansionEvent;
-import org.eclipse.ui.forms.events.IExpansionListener;
-import org.eclipse.ui.forms.widgets.ExpandableComposite;
-import org.eclipse.ui.forms.widgets.Section;
 
 /**
  * The searching dialog used to get the searching input.
@@ -200,84 +195,17 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements ISe
 		// Create the main container
 		Composite composite = (Composite) super.createDialogArea(parent);
 		Composite container = new Composite(composite, SWT.NONE);
-		GridLayout glayout = new GridLayout();
-		glayout.marginHeight = 5;
-		glayout.marginWidth = 5;
-		glayout.verticalSpacing = 5;
-		glayout.horizontalSpacing = 5;
-		container.setLayout(glayout);
+		container.setLayout(new GridLayout());
 		container.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		if(fSearchable != null) {
-			fSearchable.createPart(container);
+			fSearchable.createCommonPart(container);
+			fSearchable.createAdvancedPart(container);
 		}
-		
-		SelectionListener l = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				selectionChanged(e);
-			}
-		};
-		
-		Section section = new Section(container, ExpandableComposite.TWISTIE | ExpandableComposite.CLIENT_INDENT);
-		section.setText(Messages.TreeViewerSearchDialog_AdvancedOptions);
-		section.setLayout(FormLayoutFactory.createSectionClientGridLayout(false, 2));
-		GridData layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		section.setLayoutData(layoutData);
-
-		final Composite client = new Composite(section, SWT.NONE);
-		client.setLayout(new GridLayout(3, false));
-		client.setBackground(section.getBackground());
-		section.setClient(client);
-		
-		section.addExpansionListener(new IExpansionListener(){
-			@Override
-            public void expansionStateChanging(ExpansionEvent e) {
-            }
-
-			@Override
-            public void expansionStateChanged(ExpansionEvent e) {
-				expansionChanged(e.getState(), client.getSize().y);
-            }});
-		
-		Label label = new Label(client, SWT.NONE);
-		label.setLayoutData(new GridData());
-		label.setText(Messages.TreeViewerSearchDialog_SearchNodesUsing);
-		
-		fCmbAlg = new Combo(client, SWT.BORDER | SWT.READ_ONLY);
-		fCmbAlg.setLayoutData(new GridData());
-		fCmbAlg.setItems(new String[]{Messages.TreeViewerSearchDialog_BFS, Messages.TreeViewerSearchDialog_DFS});
-		fCmbAlg.select(0); 
-		fCmbAlg.addSelectionListener(l);
-		
-		label = new Label(client, SWT.NONE);
-		GridData data = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		label.setLayoutData(data);
-		label.setText(Messages.TreeViewerSearchDialog_UseOptions);
-		
-		// Wrap search
-		fBtnWrap = new Button(client, SWT.CHECK);
-		fBtnWrap.setText(Messages.TreeViewerSearchDialog_BtnWrapText);
-		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		data.horizontalSpan = 3;
-		data.horizontalIndent = 10;
-		fBtnWrap.setLayoutData(data);
-		fBtnWrap.addSelectionListener(l);
-		
-		// Search backward.
-		fBtnBackward = new Button(client, SWT.CHECK);
-		fBtnBackward.setText(Messages.TreeViewerSearchDialog_BtnBackText);
-		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		data.horizontalSpan = 3;
-		data.horizontalIndent = 10;
-		fBtnBackward.setLayoutData(data);
-		fBtnBackward.addSelectionListener(l);
-		// Hidden if it is breadth-first search
-		fBtnBackward.setEnabled(fSearcher.isDepthFirst());
 		
 		// Progress monitor part to display or cancel searching process.
 		fPmPart = new ProgressMonitorPart(container, null, true);
-		data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
+		GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
 		fPmPart.setLayoutData(data);
 		fPmPart.setVisible(false);
 		
@@ -290,10 +218,58 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements ISe
 		return composite;
 	}
 
-	protected void expansionChanged(boolean state, int client_height) {
-		Point p = getShell().getSize();
-		p.y = state ? p.y + client_height : p.y - client_height;
-		getShell().setSize(p.x, p.y);
+    /**
+     * Create the part to input the general search options.
+     * 
+     * @param container The parent container
+     */
+	protected void createGeneralOptions(Composite container) {
+	    SelectionListener l = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				selectionChanged(e);
+			}
+		};
+		
+		Group generalGroup = new Group(container, SWT.NONE);
+		generalGroup.setText(Messages.TreeViewerSearchDialog_GeneralOptions);
+		generalGroup.setLayout(new GridLayout(3, false));
+		generalGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		
+		Label label = new Label(generalGroup, SWT.NONE);
+		label.setLayoutData(new GridData());
+		label.setText(Messages.TreeViewerSearchDialog_SearchNodesUsing);
+		
+		fCmbAlg = new Combo(generalGroup, SWT.BORDER | SWT.READ_ONLY);
+		fCmbAlg.setLayoutData(new GridData());
+		fCmbAlg.setItems(new String[]{Messages.TreeViewerSearchDialog_BFS, Messages.TreeViewerSearchDialog_DFS});
+		fCmbAlg.select(0); 
+		fCmbAlg.addSelectionListener(l);
+		
+		label = new Label(generalGroup, SWT.NONE);
+		GridData data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		label.setLayoutData(data);
+		label.setText(Messages.TreeViewerSearchDialog_UseOptions);
+		
+		// Wrap search
+		fBtnWrap = new Button(generalGroup, SWT.CHECK);
+		fBtnWrap.setText(Messages.TreeViewerSearchDialog_BtnWrapText);
+		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		data.horizontalSpan = 3;
+		data.horizontalIndent = 10;
+		fBtnWrap.setLayoutData(data);
+		fBtnWrap.addSelectionListener(l);
+		
+		// Search backward.
+		fBtnBackward = new Button(generalGroup, SWT.CHECK);
+		fBtnBackward.setText(Messages.TreeViewerSearchDialog_BtnBackText);
+		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		data.horizontalSpan = 3;
+		data.horizontalIndent = 10;
+		fBtnBackward.setLayoutData(data);
+		fBtnBackward.addSelectionListener(l);
+		// Hidden if it is breadth-first search
+		fBtnBackward.setEnabled(fSearcher.isDepthFirst());
     }
 
 	private ISearchable getSearchable() {
@@ -310,10 +286,6 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements ISe
 				}
 				if(searchable == null) {
 					searchable = (ISearchable)Platform.getAdapterManager().getAdapter(element, ISearchable.class);
-				}
-				if(searchable != null) {
-					searchable.addOptionListener(this);
-					fSearcher.setSearchable(searchable);
 				}
 				return searchable;
 			}
@@ -356,6 +328,8 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements ISe
 		fSearcher.setStartPath(rootPath);
 		fSearchable = getSearchable();
 		if (fSearchable != null) {
+			fSearchable.addOptionListener(this);
+			fSearcher.setSearchable(fSearchable);
 			Object element = rootPath.getLastSegment();
 			String text = fSearchable.getSearchMessage(element);
 			if (text != null) {
