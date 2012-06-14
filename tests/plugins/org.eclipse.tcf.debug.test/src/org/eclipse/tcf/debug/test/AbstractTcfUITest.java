@@ -38,14 +38,19 @@ import org.eclipse.debug.core.ILaunchesListener2;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDisconnect;
 import org.eclipse.debug.internal.ui.IInternalDebugUIConstants;
+import org.eclipse.debug.internal.ui.elements.adapters.DefaultBreakpointsViewInput;
+import org.eclipse.debug.internal.ui.viewers.model.provisional.IPresentationContext;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.PresentationContext;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.VirtualItem;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.VirtualTreeModelViewer;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugUIConstants;
+import org.eclipse.debug.ui.contexts.AbstractDebugContextProvider;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TreePath;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.debug.test.services.BreakpointsCM;
@@ -110,6 +115,8 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
     protected VirtualViewerUpdatesListener fVariablesViewListener;
     protected VariablesVirtualTreeModelViewer fRegistersViewViewer;
     protected VirtualViewerUpdatesListener fRegistersViewListener;
+    protected VariablesVirtualTreeModelViewer fBreakpointsViewViewer;
+    protected VirtualViewerUpdatesListener fBreakpointsViewListener;
     protected TestSourceDisplayService fSourceDisplayService;
     protected SourceDisplayListener fSourceDisplayListener;
 
@@ -272,6 +279,17 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
                 fVariablesViewListener = new VirtualViewerUpdatesListener(fVariablesViewViewer);
                 fRegistersViewViewer = new VariablesVirtualTreeModelViewer(IDebugUIConstants.ID_REGISTER_VIEW, fDebugContextProvider);
                 fRegistersViewListener = new VirtualViewerUpdatesListener(fRegistersViewViewer);
+                final IPresentationContext context = new PresentationContext(IDebugUIConstants.ID_BREAKPOINT_VIEW);
+                fBreakpointsViewViewer = new VariablesVirtualTreeModelViewer(
+                    context,
+                    new AbstractDebugContextProvider(null) {
+                        private final ISelection fInput = new TreeSelection( new TreePath(new Object[] { new DefaultBreakpointsViewInput(context) }) );
+                        @Override
+                        public ISelection getActiveContext() {
+                            return fInput;
+                        }
+                    });
+                fBreakpointsViewListener = new VirtualViewerUpdatesListener(fBreakpointsViewViewer);
                 fSourceDisplayService = new TestSourceDisplayService(fDebugContextProvider);
                 fSourceDisplayListener = new SourceDisplayListener();
             }
