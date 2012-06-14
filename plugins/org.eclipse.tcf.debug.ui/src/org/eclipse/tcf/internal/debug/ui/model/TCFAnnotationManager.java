@@ -159,13 +159,17 @@ public class TCFAnnotationManager {
         final Map<IEditorInput,ITextEditor> editors = new HashMap<IEditorInput,ITextEditor>();
 
         ITCFAnnotationProvider provider;
-        Runnable update_task;
+        UpdateTask update_task;
         TCFNode update_node;
 
         void dispose() {
             for (TCFAnnotation a : annotations) a.dispose();
             annotations.clear();
         }
+    }
+
+    private static abstract class UpdateTask implements Runnable {
+        boolean done;
     }
 
     private final HashMap<IWorkbenchWindow,WorkbenchWindowInfo> windows =
@@ -499,9 +503,10 @@ public class TCFAnnotationManager {
         assert Thread.currentThread() == display.getThread();
         final WorkbenchWindowInfo win_info = windows.get(window);
         if (win_info == null) return;
-        if (win_info.update_task != null && win_info.update_node == node) return;
-        if (win_info.update_node != node && node != null) {
-            win_info.provider = TCFAnnotationProvider.getAnnotationProvider(node);
+        ITCFAnnotationProvider provider = TCFAnnotationProvider.getAnnotationProvider(node);
+        if (win_info.provider != provider) {
+            if (win_info.provider != null) win_info.provider.updateAnnotations(window, null);
+            win_info.provider = provider;
         }
         if (win_info.provider != null) {
             if (win_info.annotations.size() > 0) {
@@ -513,8 +518,9 @@ public class TCFAnnotationManager {
             win_info.provider.updateAnnotations(window, node);
             return;
         }
+        if (win_info.update_node == node && win_info.update_task != null && !win_info.update_task.done) return;
         win_info.update_node = node;
-        win_info.update_task = new Runnable() {
+        win_info.update_task = new UpdateTask() {
             public void run() {
                 if (win_info.update_task != this) {
                     /* Selection has changed and another update has started - abort this */
@@ -674,6 +680,7 @@ public class TCFAnnotationManager {
                 done(set);
             }
             private void done(final Set<TCFAnnotation> res) {
+                done = true;
                 final Runnable update_task = this;
                 displayExec(new Runnable() {
                     public void run() {

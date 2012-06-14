@@ -35,6 +35,7 @@ public class TCFAnnotationProvider {
     private static ArrayList<ITCFAnnotationProvider> providers;
 
     public static ITCFAnnotationProvider getAnnotationProvider(Object selection) {
+        if (selection == null) return null;
         if (providers == null) {
             providers = new  ArrayList<ITCFAnnotationProvider>();
             try {
