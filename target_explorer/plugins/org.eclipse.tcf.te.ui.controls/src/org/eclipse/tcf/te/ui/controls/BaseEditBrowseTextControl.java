@@ -1003,11 +1003,7 @@ public class BaseEditBrowseTextControl extends AbstractDecoratedDialogPageContro
 	 */
 	public String getEditFieldControlText() {
 		String value = SWTControlUtil.getText(editFieldControl);
-		if (value == null)
-		{
-			value = ""; //$NON-NLS-1$
-		}
-		return value;
+		return value != null ? value : ""; //$NON-NLS-1$
 	}
 
 	/**
