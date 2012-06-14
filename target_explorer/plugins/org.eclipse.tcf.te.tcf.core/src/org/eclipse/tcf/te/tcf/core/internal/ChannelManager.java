@@ -192,7 +192,9 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 							}
 
 							// Channel opening failed
-							done.doneOpenChannel(error, finChannel);
+							if (error != null) {
+								done.doneOpenChannel(error, finChannel);
+							}
 						}
 
 						@Override
@@ -226,7 +228,9 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 
 					@Override
 					public void onChannelClosed(Throwable error) {
-						done.doneOpenChannel(error, finChannel);
+						if(error != null) {
+							done.doneOpenChannel(error, finChannel);
+						}
 					}
 
 					@Override
@@ -867,7 +871,9 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 					}
 					@Override
 					public void onChannelClosed(Throwable error) {
-						done.doneOpenChannel(error, finChannel);
+						if (error != null) {
+							done.doneOpenChannel(error, finChannel);
+						}
 					}
 					@Override
 					public void congestionLevel(int level) {
