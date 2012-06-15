@@ -114,6 +114,17 @@ public abstract class AbstractContextSelectorSection extends AbstractSection imp
 	protected abstract AbstractContextSelectorControl doCreateContextSelector();
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.forms.parts.AbstractSection#getAdapter(java.lang.Class)
+	 */
+	@Override
+	public Object getAdapter(Class adapter) {
+		if (AbstractContextSelectorControl.class.isAssignableFrom(adapter)) {
+			return selector;
+		}
+	    return super.getAdapter(adapter);
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ui.forms.AbstractFormPart#dispose()
 	 */
 	@Override

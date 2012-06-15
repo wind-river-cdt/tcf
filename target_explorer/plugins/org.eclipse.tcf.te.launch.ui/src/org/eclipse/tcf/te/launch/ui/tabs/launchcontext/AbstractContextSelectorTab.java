@@ -61,6 +61,15 @@ public abstract class AbstractContextSelectorTab extends AbstractFormsLaunchConf
 	}
 
 	/**
+	 * Returns the context selector section.
+	 *
+	 * @return The context selector section or <code>null</code>.
+	 */
+	protected final AbstractContextSelectorSection getContextSelectorSection() {
+		return selectorSection;
+	}
+
+	/**
 	 * Do create additional managed form content.
 	 *
 	 * @param form The managed form.
