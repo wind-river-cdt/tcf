@@ -132,29 +132,6 @@ public class RunControlCM extends AbstractCacheManager implements RunControlList
         
     }
 
-    protected abstract static class ContextKey<V> extends Key<V> {
-        RunControlContext fContext;
-        
-        ContextKey(Class<V> cacheClass, RunControlContext context) {
-            super(cacheClass);
-            fContext = context;
-        }
-        
-        @Override
-        public boolean equals(Object obj) {
-            if (super.equals(obj) && obj instanceof ContextKey<?>) {
-                return ((ContextKey<?>)obj).fContext.equals(fContext);
-            } 
-            return false;        
-        }
-        
-        @Override
-        public int hashCode() {
-            return super.hashCode() + fContext.hashCode();
-        }
-    }
-
-    
     private class ContextStateCache extends CallbackCache<ContextState> implements IResettable {
         
         private class InnerContextStateCache extends TokenCache<ContextState> implements IRunControl.DoneGetState {
@@ -231,11 +208,11 @@ public class RunControlCM extends AbstractCacheManager implements RunControlList
         return mapCache(new ContextStateKey(id));
     }
 
-    protected abstract static class ContextCommandKey<V> extends ContextKey<V> {
+    protected abstract static class ContextCommandKey<V> extends IdKey<V> {
         Object fClientKey;
         
-        ContextCommandKey(Class<V> cacheClass, RunControlContext context, Object clientKey) {
-            super(cacheClass, context);
+        ContextCommandKey(Class<V> cacheClass, String contextId, Object clientKey) {
+            super(cacheClass, contextId);
             fClientKey = clientKey;
         }
         
@@ -266,7 +243,7 @@ public class RunControlCM extends AbstractCacheManager implements RunControlList
                 return context.suspend(this);
             }
         }
-        return mapCache( new ContextCommandKey<MyCache>(MyCache.class, context, clientKey) {
+        return mapCache( new ContextCommandKey<MyCache>(MyCache.class, context.getID(), clientKey) {
                 @Override MyCache createCache() { return new MyCache(); }
             });
     }
@@ -280,7 +257,7 @@ public class RunControlCM extends AbstractCacheManager implements RunControlList
                 return context.resume(mode, count, this);
             }
         }
-        return mapCache( new ContextCommandKey<MyCache>(MyCache.class, context, clientKey) {
+        return mapCache( new ContextCommandKey<MyCache>(MyCache.class, context.getID(), clientKey) {
                 @Override MyCache createCache() { return new MyCache(); }
             });        
     }
@@ -294,7 +271,7 @@ public class RunControlCM extends AbstractCacheManager implements RunControlList
                 return context.resume(mode, count, params, this);
             }
         }
-        return mapCache( new ContextCommandKey<MyCache>(MyCache.class, context, clientKey) {
+        return mapCache( new ContextCommandKey<MyCache>(MyCache.class, context.getID(), clientKey) {
                 @Override MyCache createCache() { return new MyCache(); }
             });        
     }
@@ -306,7 +283,7 @@ public class RunControlCM extends AbstractCacheManager implements RunControlList
                 return context.terminate(this);
             }
         }
-        return mapCache( new ContextCommandKey<MyCache>(MyCache.class, context, clientKey) {
+        return mapCache( new ContextCommandKey<MyCache>(MyCache.class, context.getID(), clientKey) {
                 @Override MyCache createCache() { return new MyCache(); }
             });        
         

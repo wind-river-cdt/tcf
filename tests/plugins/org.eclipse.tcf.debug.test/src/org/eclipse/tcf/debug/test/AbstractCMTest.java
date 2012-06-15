@@ -20,7 +20,6 @@ import java.util.TreeMap;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -38,21 +37,9 @@ import org.eclipse.debug.core.ILaunchesListener2;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDisconnect;
 import org.eclipse.debug.internal.ui.IInternalDebugUIConstants;
-import org.eclipse.debug.internal.ui.elements.adapters.DefaultBreakpointsViewInput;
-import org.eclipse.debug.internal.ui.viewers.model.provisional.IPresentationContext;
-import org.eclipse.debug.internal.ui.viewers.model.provisional.PresentationContext;
-import org.eclipse.debug.internal.ui.viewers.model.provisional.VirtualItem;
-import org.eclipse.debug.internal.ui.viewers.model.provisional.VirtualTreeModelViewer;
 import org.eclipse.debug.ui.DebugUITools;
-import org.eclipse.debug.ui.IDebugUIConstants;
-import org.eclipse.debug.ui.contexts.AbstractDebugContextProvider;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.TreePath;
-import org.eclipse.jface.viewers.TreeSelection;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.tcf.debug.test.services.BreakpointsCM;
 import org.eclipse.tcf.debug.test.services.DiagnosticsCM;
 import org.eclipse.tcf.debug.test.services.LineNumbersCM;
@@ -70,7 +57,6 @@ import org.eclipse.tcf.debug.test.util.ICache;
 import org.eclipse.tcf.debug.test.util.Query;
 import org.eclipse.tcf.debug.test.util.Task;
 import org.eclipse.tcf.debug.test.util.Transaction;
-import org.eclipse.tcf.debug.ui.ITCFObject;
 import org.eclipse.tcf.internal.debug.launch.TCFLaunchDelegate;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
@@ -98,7 +84,7 @@ import org.osgi.framework.Bundle;
  * Base test for validating TCF Debugger UI.
  */
 @SuppressWarnings("restriction")
-public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUpdatesListenerConstants {
+public abstract class AbstractCMTest extends TcfTestCase implements IViewerUpdatesListenerConstants {
 
     private final static int NUM_CHANNELS = 1;
 
@@ -107,18 +93,6 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
     private Query<Object> fMonitorChannelQuery;
     private List<Throwable> errors = new ArrayList<Throwable>();
     protected ILaunch fLaunch;
-
-    protected VirtualTreeModelViewer fDebugViewViewer;
-    protected TestDebugContextProvider fDebugContextProvider;
-    protected VirtualViewerUpdatesListener fDebugViewListener;
-    protected VariablesVirtualTreeModelViewer fVariablesViewViewer;
-    protected VirtualViewerUpdatesListener fVariablesViewListener;
-    protected VariablesVirtualTreeModelViewer fRegistersViewViewer;
-    protected VirtualViewerUpdatesListener fRegistersViewListener;
-    protected VariablesVirtualTreeModelViewer fBreakpointsViewViewer;
-    protected VirtualViewerUpdatesListener fBreakpointsViewListener;
-    protected TestSourceDisplayService fSourceDisplayService;
-    protected SourceDisplayListener fSourceDisplayListener;
 
     protected Object fTestRunKey;
 
@@ -175,8 +149,6 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
 
         // Launch the agent
         super.setUp();
-
-        createDebugViewViewer();
         createLaunch();
 
         channels = new IChannel[NUM_CHANNELS];
@@ -228,7 +200,6 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
         }.get();
 
         terminateLaunch();
-        disposeDebugViewViewer();
 
         new Query<Object>() {
             @Override
@@ -266,53 +237,6 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
         fLineNumbersCM.dispose();
     }
 
-    private void createDebugViewViewer() {
-        final Display display = Display.getDefault();
-        display.syncExec(new Runnable() {
-            public void run() {
-                fDebugViewViewer = new VirtualTreeModelViewer(display, SWT.NONE, new PresentationContext(IDebugUIConstants.ID_DEBUG_VIEW));
-                fDebugViewViewer.setInput(DebugPlugin.getDefault().getLaunchManager());
-                fDebugViewViewer.setAutoExpandLevel(-1);
-                fDebugViewListener = new VirtualViewerUpdatesListener(fDebugViewViewer);
-                fDebugContextProvider = new TestDebugContextProvider(fDebugViewViewer);
-                fVariablesViewViewer = new VariablesVirtualTreeModelViewer(IDebugUIConstants.ID_VARIABLE_VIEW, fDebugContextProvider);
-                fVariablesViewListener = new VirtualViewerUpdatesListener(fVariablesViewViewer);
-                fRegistersViewViewer = new VariablesVirtualTreeModelViewer(IDebugUIConstants.ID_REGISTER_VIEW, fDebugContextProvider);
-                fRegistersViewListener = new VirtualViewerUpdatesListener(fRegistersViewViewer);
-                final IPresentationContext context = new PresentationContext(IDebugUIConstants.ID_BREAKPOINT_VIEW);
-                fBreakpointsViewViewer = new VariablesVirtualTreeModelViewer(
-                    context,
-                    new AbstractDebugContextProvider(null) {
-                        private final ISelection fInput = new TreeSelection( new TreePath(new Object[] { new DefaultBreakpointsViewInput(context) }) );
-                        @Override
-                        public ISelection getActiveContext() {
-                            return fInput;
-                        }
-                    });
-                fBreakpointsViewListener = new VirtualViewerUpdatesListener(fBreakpointsViewViewer);
-                fSourceDisplayService = new TestSourceDisplayService(fDebugContextProvider);
-                fSourceDisplayListener = new SourceDisplayListener();
-            }
-        });
-    }
-
-    private void disposeDebugViewViewer() {
-        final Display display = Display.getDefault();
-        display.syncExec(new Runnable() {
-            public void run() {
-                fSourceDisplayListener.dispose();
-                fSourceDisplayService.dispose();
-                fDebugViewListener.dispose();
-                fDebugContextProvider.dispose();
-                fDebugViewViewer.dispose();
-                fVariablesViewListener.dispose();
-                fVariablesViewViewer.dispose();
-                fRegistersViewListener.dispose();
-                fRegistersViewViewer.dispose();
-            }
-        });
-
-    }
 
     private void createLaunch() throws Exception {
         ILaunchManager lManager = DebugPlugin.getDefault().getLaunchManager();
@@ -322,26 +246,8 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
         lcWc.setAttribute(TCFLaunchDelegate.ATTR_RUN_LOCAL_AGENT, false);
         lcWc.setAttribute(TCFLaunchDelegate.ATTR_PEER_ID, peer.getID());
         lcWc.doSave();
-        fDebugViewListener.reset();
-        fDebugViewListener.setDelayContentUntilProxyInstall(true);
         fLaunch = lcWc.launch("debug", new NullProgressMonitor());
         Assert.assertTrue( fLaunch instanceof IDisconnect );
-
-        // The launch element may or may not have been populated into the viewer.  It's label
-        // also may or may not have been updated.  Check viewer item for launch, then wait if needed.
-        TreePath launchPath = new TreePath(new Object[] { fLaunch });
-        fDebugViewListener.addLabelUpdate(launchPath);
-        VirtualItem launchItem = fDebugViewViewer.findItem(launchPath);
-            fDebugViewListener.findElement(new Pattern[] { Pattern.compile(".*" + fLaunch.getLaunchConfiguration().getName() + ".*") }  );
-        if (launchItem == null || launchItem.getData() == null || launchItem.getData(VirtualItem.LABEL_KEY) == null) {
-            fDebugViewListener.waitTillFinished(MODEL_CHANGED_COMPLETE | MODEL_PROXIES_INSTALLED | CONTENT_SEQUENCE_COMPLETE | LABEL_UPDATES);
-            launchItem = fDebugViewViewer.findItem(launchPath);
-        }
-
-        Assert.assertTrue( launchItem != null );
-        String[] launchItemLabel = (String[])launchItem.getData(VirtualItem.LABEL_KEY);
-        Assert.assertTrue( launchItemLabel[0].contains(fLaunch.getLaunchConfiguration().getName()) );
-        Assert.assertEquals(fLaunch, launchItem.getData());
     }
 
     private void terminateLaunch() throws DebugException, InterruptedException, ExecutionException {
@@ -632,35 +538,16 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
         }.get();
     }
 
-    protected TestProcessInfo initProcessModel(String testFunc) throws Exception {
+    protected TestProcessInfo startProcess(String testFunc) throws Exception {
         String bpId = "entryPointBreakpoint";
         createBreakpoint(bpId, testFunc);
-        fDebugViewListener.reset();
 
         final TestProcessInfo processInfo = startProcess();
-
-        ITCFObject processTCFContext = new ITCFObject() {
-            public String getID() { return processInfo.fProcessId; }
-            public IChannel getChannel() { return channels[0]; }
-        };
-        ITCFObject threadTCFContext = new ITCFObject() {
-            public String getID() { return processInfo.fThreadId; }
-            public IChannel getChannel() { return channels[0]; }
-        };
-
-        fDebugViewListener.addLabelUpdate(new TreePath(new Object[] { fLaunch, processTCFContext }));
-        fDebugViewListener.addLabelUpdate(new TreePath(new Object[] { fLaunch, processTCFContext, threadTCFContext }));
-
-
-        // Make sure that delta is posted after launching process so that it doesn't interfere
-        // with the waiting for the whole viewer to update after breakpoint hit (below).
-        fDebugViewListener.waitTillFinished(MODEL_CHANGED_COMPLETE| CONTENT_SEQUENCE_COMPLETE | LABEL_SEQUENCE_COMPLETE | LABEL_UPDATES);
-        fDebugViewListener.reset();
 
         runToTestEntry(processInfo, testFunc);
         removeBreakpoint(bpId);
 
-        final String topFrameId = new Transaction<String>() {
+        new Transaction<String>() {
             @Override
             protected String process() throws InvalidCacheException, ExecutionException {
                 String[] frameIds = validate( fStackTraceCM.getChildren(processInfo.fThreadId) );
@@ -668,20 +555,6 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
                 return frameIds[frameIds.length - 1];
             }
         }.get();
-
-        ITCFObject frameTCFContext = new ITCFObject() {
-            public String getID() { return topFrameId; }
-            public IChannel getChannel() { return channels[0]; }
-        };
-        fDebugViewListener.addLabelUpdate(new TreePath(new Object[] { fLaunch, processTCFContext, threadTCFContext, frameTCFContext }));
-
-        fDebugViewListener.waitTillFinished(MODEL_CHANGED_COMPLETE | CONTENT_SEQUENCE_COMPLETE | LABEL_SEQUENCE_COMPLETE | LABEL_UPDATES);
-        
-        VirtualItem topFrameItem = fDebugViewListener.findElement(
-            new Pattern[] { Pattern.compile(".*"), Pattern.compile(".*"), Pattern.compile(".*" + processInfo.fProcessId + ".*\\(.*[Bb]reakpoint.*"), Pattern.compile(".*")});
-        if (topFrameItem == null) {
-            Assert.fail("Top stack frame not found. \n\nDebug view dump: \n:" + fDebugViewViewer.toString());
-        }
 
         return processInfo;
     }
@@ -813,6 +686,4 @@ public abstract class AbstractTcfUITest extends TcfTestCase implements IViewerUp
         }
         return bytes;
     }
-
-
 }

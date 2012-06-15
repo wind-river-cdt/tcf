@@ -100,8 +100,7 @@ public class StackTraceCM extends AbstractCacheManager implements IRunControl.Ru
 
         return mapCache(new IdKey<MyCache>(MyCache.class, parentId) {
             @Override MyCache createCache() { return new MyCache(); }        
-        });        
-
+        });
     }
     
     public ICache<StackTraceContext[]> getContexts(final String[] ids) {
