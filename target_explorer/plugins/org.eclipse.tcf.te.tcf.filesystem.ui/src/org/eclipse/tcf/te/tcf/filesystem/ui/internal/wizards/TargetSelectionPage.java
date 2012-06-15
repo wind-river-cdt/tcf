@@ -39,6 +39,7 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelPeerNodeQueryService;
 import org.eclipse.tcf.te.tcf.locator.model.Model;
+import org.eclipse.tcf.te.tcf.ui.navigator.ContentProviderDelegate;
 import org.eclipse.tcf.te.tcf.ui.navigator.LabelProviderDelegate;
 import org.eclipse.tcf.te.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.interfaces.IUIConstants;
@@ -106,7 +107,7 @@ public class TargetSelectionPage extends AbstractValidatingWizardPage {
 			}
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.wizard.WizardPage#getWizard()
@@ -115,7 +116,7 @@ public class TargetSelectionPage extends AbstractValidatingWizardPage {
     public NewNodeWizard getWizard() {
 		return (NewNodeWizard) super.getWizard();
 	}
-	
+
 	/**
 	 * Returns the default page title.
 	 *
@@ -133,7 +134,7 @@ public class TargetSelectionPage extends AbstractValidatingWizardPage {
 	protected String getDefaultDescription() {
 		return Messages.TargetSelectionPage_Description;
 	}
-	
+
 	/**
 	 * A styled label provider for the target selection list.
 	 */
@@ -168,7 +169,7 @@ public class TargetSelectionPage extends AbstractValidatingWizardPage {
 		filteredTree.setLayoutData(layoutData);
 
 		treeViewer = filteredTree.getViewer();
-		treeViewer.setContentProvider(new TargetContentProvider());
+		treeViewer.setContentProvider(new ContentProviderDelegate());
 		IBaseLabelProvider labelProvider = new DecoratingStyledCellLabelProvider(new TargetStyledLabelProvider(), new LabelProviderDelegate(), null);
 		treeViewer.setLabelProvider(labelProvider);
 		treeViewer.setComparator(new TargetViewerComparator());
@@ -177,6 +178,9 @@ public class TargetSelectionPage extends AbstractValidatingWizardPage {
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
 				if (element instanceof IPeerModel) {
 					IPeerModel peer = (IPeerModel) element;
+
+
+
 					NewNodeWizard wizard = getWizard();
 					return wizard.hasFileSystem(peer);
 				}

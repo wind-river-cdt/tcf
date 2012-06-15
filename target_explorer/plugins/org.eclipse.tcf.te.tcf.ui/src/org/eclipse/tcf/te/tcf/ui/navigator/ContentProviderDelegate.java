@@ -197,6 +197,13 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 							}
 						}
 					}
+					else {
+						for (IPeerModel peer : peers) {
+							// Check for filtered nodes (Value-add's and Proxies)
+							if (isFiltered(peer)) continue;
+							candidates.add(peer);
+						}
+					}
 				}
 			};
 
