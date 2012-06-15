@@ -33,10 +33,15 @@
 				<configuration>
  					<includes>
  						<include>**/BreakpointsTest.*</include>
+ 						<include>**/TransactionTests.*</include>
+ 						<include>**/BreakpointDetailPaneTest.*</include>
+ 						<include>**/BreakpointsViewTest.*</include>
+ 						<include>**/RunControlCMTest.*</include>
+ 						<include>**/StackTraceCMTest.*</include> 						
  						<include>**/SampleTest.*</include>
  						<include>**/CacheTests.*</include>
  						<include>**/QueryTests.*</include>
- 						<include>**/TransactionTests.*</include>
+ 						<include>**/RangeCacheTests.*</include>
  					</includes>
 					<!--
  					<debugPort>8003</debugPort>

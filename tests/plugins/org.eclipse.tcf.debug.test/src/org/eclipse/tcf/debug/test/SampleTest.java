@@ -10,22 +10,17 @@
 package org.eclipse.tcf.debug.test;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
 import org.eclipse.debug.internal.ui.viewers.model.provisional.VirtualItem;
-import org.eclipse.tcf.debug.test.services.IWaitForEventCache;
-import org.eclipse.tcf.debug.test.services.RunControlCM;
 import org.eclipse.tcf.debug.test.services.RunControlCM.ContextState;
 import org.eclipse.tcf.debug.test.util.ICache;
 import org.eclipse.tcf.debug.test.util.RangeCache;
 import org.eclipse.tcf.debug.test.util.Transaction;
 import org.eclipse.tcf.services.ILineNumbers.CodeArea;
 import org.eclipse.tcf.services.IRunControl;
-import org.eclipse.tcf.services.IRunControl.RunControlContext;
 import org.eclipse.tcf.services.IStackTrace.StackTraceContext;
 import org.eclipse.tcf.services.ISymbols;
 import org.eclipse.tcf.services.ISymbols.Symbol;
@@ -361,157 +356,5 @@ public class SampleTest extends AbstractTcfUITest {
                 return null;
             }
         }.get();
-    }
-
-    public void testStackTraceCMResetOnContextStateChange() throws Exception {
-        final TestProcessInfo processInfo = initProcessModel("tcf_test_func2");
-
-        // Retrieve the current PC and top frame for use later
-        final String pc = new Transaction<String>() {
-            @Override
-            protected String process() throws InvalidCacheException, ExecutionException {
-                return validate(fRunControlCM.getState(processInfo.fThreadId)).pc;
-            }
-        }.get();
-
-        // Retrieve data from caches (make them valid).
-        new Transaction<Object>() {
-            @Override
-            protected String process() throws InvalidCacheException, ExecutionException {
-                String[] frameIds = validate( fStackTraceCM.getChildren(processInfo.fThreadId) );
-                validate (fStackTraceCM.getContexts(frameIds));
-                RangeCache<StackTraceContext> framesRange = fStackTraceCM.getContextRange(processInfo.fThreadId);
-                validate( framesRange.getRange(0, frameIds.length) );
-                return null;
-            }
-        }.get();
-
-
-        // Execute a step.
-        resumeAndWaitForSuspend(processInfo.fThreadCtx, IRunControl.RM_STEP_OUT);
-
-        // End test, check that all caches were reset and now return an error.
-        new Transaction<Object>() {
-            @Override
-            protected Object process() throws InvalidCacheException, ExecutionException {
-                ICache<String[]> frameIdsCache = fStackTraceCM.getChildren(processInfo.fThreadId);
-                Assert.assertFalse("Expected cache to be reset", frameIdsCache.isValid());
-                return null;
-            }
-        }.get();
-
-        new Transaction<Object>() {
-            @Override
-            protected Object process() throws InvalidCacheException, ExecutionException {
-                String[] frameIds = validate( fStackTraceCM.getChildren(processInfo.fThreadId) );
-                ICache<StackTraceContext[]> cache = fStackTraceCM.getContexts(frameIds);
-                Assert.assertFalse("Expected cache to be reset", cache.isValid());
-
-                RangeCache<StackTraceContext> framesRange = fStackTraceCM.getContextRange(processInfo.fThreadId);
-                ICache<List<StackTraceContext>> framesRangeCache = framesRange.getRange(0, frameIds.length);
-                Assert.assertFalse("Expected cache to be reset", framesRangeCache.isValid());
-
-                return null;
-            }
-        }.get();
-    }
-
-    public void testRunControlCMChildrenInvalidation() throws Exception {
-        final TestProcessInfo processInfo = initProcessModel("tcf_test_func0");
-
-        createBreakpoint("testRunControlCMChildrenInvalidation", "tcf_test_func0");
-
-        // Wait for each threads to start.
-        final String[] threads = new Transaction<String[]>() {
-            List<String> fThreads = new ArrayList<String>();
-            @Override
-            protected String[] process() throws InvalidCacheException, ExecutionException {
-                IWaitForEventCache<RunControlContext[]> waitCache = fRunControlCM.waitForContextAdded(processInfo.fProcessId, this);
-                validate(fRunControlCM.resume(processInfo.fTestCtx, this, IRunControl.RM_RESUME, 1));
-                RunControlContext[] addedContexts = validate(waitCache);
-                for (RunControlContext addedContext : addedContexts) {
-                    fThreads.add(addedContext.getID());
-                }
-                if (fThreads.size() < 4) {
-                    waitCache.reset();
-                    validate(waitCache);
-                }
-                // Validate children cache
-                String[] children = validate (fRunControlCM.getChildren(processInfo.fProcessId));
-                Assert.assertTrue(
-                    "Expected children array to contain added ids",
-                    Arrays.asList(children).containsAll(fThreads));
-
-                return fThreads.toArray(new String[fThreads.size()]);
-            }
-        }.get();
-
-        // Wait for each thread to suspend, update caches
-        for (final String thread : threads) {
-            new Transaction<Object>() {
-                @Override
-                protected Object process() throws InvalidCacheException, ExecutionException {
-                    RunControlCM.ContextState state = validate(fRunControlCM.getState(thread));
-                    if (!state.suspended) {
-                        validate( fRunControlCM.waitForContextSuspended(thread, this) );
-                    }
-                    String symId = validate( fSymbolsCM.find(thread, new BigInteger(state.pc), "tcf_test_func0") );
-                    Number symAddr = validate( fSymbolsCM.getContext(symId) ).getAddress();
-                    Assert.assertEquals("Expected thread to suspend at breakpoint address", symAddr.toString(), state.pc);
-                    String[] children = validate( fRunControlCM.getChildren(thread));
-                    Assert.assertEquals("Expected thread to have no children contexts", 0, children.length);
-                    return null;
-                }
-            }.get();
-        }
-
-        // End test, check for removed events and that state caches were cleared
-        new Transaction<String>() {
-            @Override
-            protected String process() throws InvalidCacheException, ExecutionException {
-                // Create wait caches
-                fRunControlCM.waitForContextRemoved(processInfo.fProcessId, this);
-                IWaitForEventCache<?>[] waitCaches = new IWaitForEventCache<?>[threads.length];
-                for (int i = 0; i < threads.length; i++) {
-                    waitCaches[i] = fRunControlCM.waitForContextRemoved(threads[i], this);
-                }
-                validate( fDiagnosticsCM.cancelTest(processInfo.fTestId, this) );
-                validate(waitCaches);
-                validate(fRunControlCM.waitForContextRemoved(processInfo.fProcessId, this));
-
-                try {
-                    validate( fRunControlCM.getContext(processInfo.fProcessId) );
-                    Assert.fail("Expected error");
-                } catch (ExecutionException e) {}
-                try {
-                    validate( fRunControlCM.getState(processInfo.fProcessId) );
-                    Assert.fail("Expected error");
-                } catch (ExecutionException e) {}
-                try {
-                    String children[] = validate( fRunControlCM.getChildren(processInfo.fProcessId) );
-                    Assert.assertEquals("Expected no children", 0, children.length);
-                } catch (ExecutionException e) {}
-
-                for (String thread : threads) {
-                    try {
-                        validate( fRunControlCM.getContext(thread) );
-                        Assert.fail("Expected error");
-                    } catch (ExecutionException e) {}
-                    try {
-                        validate( fRunControlCM.getState(thread) );
-                        Assert.fail("Expected error");
-                    } catch (ExecutionException e) {}
-                    try {
-                        String children[] = validate( fRunControlCM.getChildren(processInfo.fProcessId) );
-                        Assert.assertEquals("Expected no children", 0, children.length);
-                    } catch (ExecutionException e) {}
-                }
-
-                return null;
-            }
-        }.get();
-
-        removeBreakpoint("testRunControlCMChildrenInvalidation");
-
     }
 }
