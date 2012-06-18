@@ -35,6 +35,13 @@ import org.eclipse.tcf.te.ui.utils.AbstractSearchable;
  * the general operations of a file search.
  */
 public class FSGeneralSearchable extends AbstractSearchable {
+	// The keys to access the options stored in the dialog settings.
+	private static final String INCLUDE_HIDDEN = "FS.IncludeHidden"; //$NON-NLS-1$
+	private static final String INCLUDE_SYSTEM = "FS.IncludeSystem"; //$NON-NLS-1$
+	private static final String TARGET_NAME = "FS.TargetName"; //$NON-NLS-1$
+	private static final String TARGET_TYPE = "FS.TargetType"; //$NON-NLS-1$
+	private static final String MATCH_PRECISE = "FS.MatchPrecise"; //$NON-NLS-1$
+	private static final String CASE_SENSITIVE = "FS.CaseSensitive"; //$NON-NLS-1$
 	// The check option to define if system files should be searched.
 	private Button fBtnSystem;
 	// The check option to define if hidden files should be searched.
@@ -201,23 +208,23 @@ public class FSGeneralSearchable extends AbstractSearchable {
 	@Override
     public void restoreValues(IDialogSettings settings) {
 		if(settings != null) {
-			fCaseSensitive = settings.getBoolean("CaseSensitive"); //$NON-NLS-1$
+			fCaseSensitive = settings.getBoolean(CASE_SENSITIVE);
 			fBtnCase.setSelection(fCaseSensitive);
-			fMatchPrecise = settings.getBoolean("MatchPrecise"); //$NON-NLS-1$
+			fMatchPrecise = settings.getBoolean(MATCH_PRECISE);
 			fBtnMatch.setSelection(fMatchPrecise);
 			try {
-				fTargetType = settings.getInt("TargetType"); //$NON-NLS-1$
+				fTargetType = settings.getInt(TARGET_TYPE);
 				fCmbTypes.select(fTargetType);
 			}catch(NumberFormatException e) {
 				fTargetType = 0;
 			}
-			fTargetName = settings.get("TargetName"); //$NON-NLS-1$
+			fTargetName = settings.get(TARGET_NAME);
 			if (fTargetName != null) {
 				fSearchField.setEditFieldControlText(fTargetName);
 			}
 			if (rootNode.isWindowsNode()) {
-				fIncludeSystem = settings.get("IncludeSystem") == null ? true : settings.getBoolean("IncludeSystem"); //$NON-NLS-1$ //$NON-NLS-2$
-				fIncludeHidden = settings.get("IncludeHidden") == null ? true : settings.getBoolean("IncludeHidden"); //$NON-NLS-1$ //$NON-NLS-2$
+				fIncludeSystem = settings.get(INCLUDE_SYSTEM) == null ? true : settings.getBoolean(INCLUDE_SYSTEM);
+				fIncludeHidden = settings.get(INCLUDE_HIDDEN) == null ? true : settings.getBoolean(INCLUDE_HIDDEN);
 			}
 		}
 		else {
@@ -249,13 +256,13 @@ public class FSGeneralSearchable extends AbstractSearchable {
 	@Override
     public void persistValues(IDialogSettings settings) {
 		if(settings != null) {
-			settings.put("CaseSensitive", fCaseSensitive); //$NON-NLS-1$
-			settings.put("MatchPrecise", fMatchPrecise); //$NON-NLS-1$
-			settings.put("TargetType", fTargetType); //$NON-NLS-1$
-			settings.put("TargetName", fTargetName); //$NON-NLS-1$
+			settings.put(CASE_SENSITIVE, fCaseSensitive);
+			settings.put(MATCH_PRECISE, fMatchPrecise);
+			settings.put(TARGET_TYPE, fTargetType);
+			settings.put(TARGET_NAME, fTargetName);
 			if(rootNode.isWindowsNode()) {
-				settings.put("IncludeSystem", fIncludeSystem); //$NON-NLS-1$
-				settings.put("IncludeHidden", fIncludeHidden); //$NON-NLS-1$
+				settings.put(INCLUDE_SYSTEM, fIncludeSystem);
+				settings.put(INCLUDE_HIDDEN, fIncludeHidden);
 			}
 		}
     }

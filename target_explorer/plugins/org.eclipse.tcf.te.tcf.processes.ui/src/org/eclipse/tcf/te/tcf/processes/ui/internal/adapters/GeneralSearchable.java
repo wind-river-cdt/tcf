@@ -33,6 +33,10 @@ import org.eclipse.tcf.te.ui.utils.AbstractSearchable;
  * the general operations of a process search.
  */
 public class GeneralSearchable extends AbstractSearchable {
+	// The keys to access the options stored in the dialog settings.
+	private static final String TARGET_NAME = "PM.TargetName"; //$NON-NLS-1$
+	private static final String MATCH_PRECISE = "PM.MatchPrecise"; //$NON-NLS-1$
+	private static final String CASE_SENSITIVE = "PM.CaseSensitive"; //$NON-NLS-1$
 	// The case sensitive check box.
 	private Button fBtnCase;
 	// The matching rule check box.
@@ -146,11 +150,11 @@ public class GeneralSearchable extends AbstractSearchable {
 	@Override
     public void restoreValues(IDialogSettings settings) {
 		if(settings != null) {
-			fCaseSensitive = settings.getBoolean("CaseSensitive"); //$NON-NLS-1$
+			fCaseSensitive = settings.getBoolean(CASE_SENSITIVE);
 			fBtnCase.setSelection(fCaseSensitive);
-			fMatchPrecise = settings.getBoolean("MatchPrecise"); //$NON-NLS-1$
+			fMatchPrecise = settings.getBoolean(MATCH_PRECISE);
 			fBtnMatch.setSelection(fMatchPrecise);
-			fTargetName = settings.get("TargetName"); //$NON-NLS-1$
+			fTargetName = settings.get(TARGET_NAME);
 			if (fTargetName != null) {
 				fSearchField.setEditFieldControlText(fTargetName);
 			}
@@ -174,9 +178,9 @@ public class GeneralSearchable extends AbstractSearchable {
 	@Override
     public void persistValues(IDialogSettings settings) {
 		if(settings != null) {
-			settings.put("CaseSensitive", fCaseSensitive); //$NON-NLS-1$
-			settings.put("MatchPrecise", fMatchPrecise); //$NON-NLS-1$
-			settings.put("TargetName", fTargetName); //$NON-NLS-1$
+			settings.put(CASE_SENSITIVE, fCaseSensitive);
+			settings.put(MATCH_PRECISE, fMatchPrecise);
+			settings.put(TARGET_NAME, fTargetName);
 		}
     }
 
