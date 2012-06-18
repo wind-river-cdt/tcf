@@ -6,11 +6,12 @@
  *
  * Contributors:
  * Wind River Systems - initial API and implementation
- * William Chen (Wind River)- [345552] Edit the remote files with a proper editor
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.ui.internal.adapters;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -22,14 +23,21 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.nls.Messages;
+import org.eclipse.tcf.te.ui.controls.BaseEditBrowseTextControl;
 
+/**
+ * The searchable that provides a UI to collect and test
+ * the last modified time of a file during searching.
+ */
 public class FSModifiedSearchable extends FSBaseSearchable {
+	// Constant values of last modified options
 	private static final int OPTION_NOT_REMEMBER = 0;
 	private static final int OPTION_LAST_WEEK = 1;
 	private static final int OPTION_LAST_MONTH = 2;
 	private static final int OPTION_LAST_YEAR = 3;
 	private static final int OPTION_SPECIFIED = 4;
 	
+	// Constant values of different time unit, used for matching purpose.
 	private static final long SECOND = 1000L;
 	private static final long MINUTE = 60 * SECOND;
 	private static final long HOUR = 60 * MINUTE;
@@ -38,21 +46,26 @@ public class FSModifiedSearchable extends FSBaseSearchable {
 	private static final long MONTH = 30 * DAY;
 	private static final long YEAR = 365 * DAY;
 	
-	private int option;
-	private long lowDate;
-	private long topDate;
+	// The choice selected
+	private int choice;
+	// The specified "from" date
+	private long fromTime;
+	// The specified "to" date
+	private long toTime;
 
+	// UI elements for input
 	private Button fBtnLmNotRem;
 	private Button fBtnLmLastWeek;
 	private Button fBtnLmPastMonth;
 	private Button fBtnLmPastYear;
 	private Button fBtnLmSpecified;
-	private Text txtLmFrom;
-	private Text txtLmTo;
+	private BaseEditBrowseTextControl txtLmFrom;
+	private BaseEditBrowseTextControl txtLmTo;
 
-	public FSModifiedSearchable(FSTreeNode node) {
-    }
-	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.utils.AbstractSearchable#createAdvancedPart(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
     public void createAdvancedPart(Composite parent) {
 		SelectionListener l = new SelectionAdapter() {
@@ -99,51 +112,130 @@ public class FSModifiedSearchable extends FSBaseSearchable {
 		fBtnLmSpecified.setLayoutData(data);
 		fBtnLmSpecified.addSelectionListener(l);
 		
-		txtLmFrom = new Text(modifiedComp, SWT.BORDER | SWT.SINGLE);
+		Composite cmpFrom = new Composite(modifiedComp, SWT.NONE);
+		GridLayout layout = new GridLayout(2, false);
+		layout.marginWidth = 0;
+		layout.marginHeight = 0;
+		layout.horizontalSpacing = 0;
+		layout.verticalSpacing = 0;
+		cmpFrom.setLayout(layout);
 		data = new GridData();
-		data.widthHint = 50;
-		txtLmFrom.setLayoutData(data);
+		cmpFrom.setLayoutData(data);
+		
+		txtLmFrom = new BaseEditBrowseTextControl(null);
+		txtLmFrom.setIsGroup(false);
+		txtLmFrom.setHasHistory(false);
+		txtLmFrom.setHideBrowseButton(true);
+		txtLmFrom.setParentControlIsInnerPanel(true);
+		txtLmFrom.setupPanel(cmpFrom);
 		txtLmFrom.setEnabled(false);
+		txtLmFrom.setEditFieldValidator(new DateValidator());
+		Text text = (Text) txtLmFrom.getEditFieldControl();
+		text.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				datesModified();
+			}
+		});
 		
 		Label label = new Label(modifiedComp, SWT.NONE);
 		label.setText(Messages.FSModifiedSearchable_ToDate);
 		
-		txtLmTo = new Text(modifiedComp, SWT.BORDER | SWT.SINGLE);
+		Composite cmpTo = new Composite(modifiedComp, SWT.NONE);
+		layout = new GridLayout(2, false);
+		layout.marginWidth = 0;
+		layout.marginHeight = 0;
+		layout.horizontalSpacing = 0;
+		layout.verticalSpacing = 0;
+		cmpTo.setLayout(layout);
 		data = new GridData();
-		data.widthHint = 50;
-		txtLmTo.setLayoutData(data);
+		cmpTo.setLayoutData(data);
+
+		txtLmTo = new BaseEditBrowseTextControl(null);
+		txtLmTo.setIsGroup(false);
+		txtLmTo.setHasHistory(false);
+		txtLmTo.setHideBrowseButton(true);
+		txtLmTo.setParentControlIsInnerPanel(true);
+		txtLmTo.setupPanel(cmpTo);
 		txtLmTo.setEnabled(false);
+		txtLmTo.setEditFieldValidator(new DateValidator());
+		text = (Text) txtLmTo.getEditFieldControl();
+		text.addModifyListener(new ModifyListener() {
+            @Override
+			public void modifyText(ModifyEvent e) {
+				datesModified();
+			}
+		});
     }
 
+	/**
+	 * The modified event of the date fields.
+	 */
+	protected void datesModified() {
+		fireOptionChanged();
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.utils.AbstractSearchable#isInputValid()
+	 */
+	@Override
+    public boolean isInputValid() {
+		if(choice == OPTION_SPECIFIED) {
+			boolean vFrom = txtLmFrom.isValid();
+			boolean vTo = txtLmTo.isValid();
+			if(vFrom) {
+				String fromText = txtLmFrom.getEditFieldControlText().trim();
+				this.fromTime = DateValidator.parseTimeInMillis(fromText);
+			}
+			if(vTo) {
+				String toText = txtLmTo.getEditFieldControlText().trim();
+				this.toTime = DateValidator.parseTimeInMillis(toText);
+			}
+			return vFrom && vTo;
+		}
+	    return true;
+    }
+
+	/**
+	 * The method handling the selection event.
+	 * 
+	 * @param e The selection event.
+	 */
 	protected void optionChecked(SelectionEvent e) {
 		Object src = e.getSource();
 		boolean spec = false;
 		if(src == fBtnLmNotRem) {
-			option = OPTION_NOT_REMEMBER;
+			choice = OPTION_NOT_REMEMBER;
 		}
 		else if(src == fBtnLmLastWeek) {
-			option = OPTION_LAST_WEEK;
+			choice = OPTION_LAST_WEEK;
 		}
 		else if(src == fBtnLmPastMonth) {
-			option = OPTION_LAST_MONTH;
+			choice = OPTION_LAST_MONTH;
 		}
 		else if(src == fBtnLmPastYear) {
-			option = OPTION_LAST_YEAR;
+			choice = OPTION_LAST_YEAR;
 		}
 		else if(src == fBtnLmSpecified) {
-			option = OPTION_SPECIFIED;
+			choice = OPTION_SPECIFIED;
 			spec = true;
 		}
 		txtLmFrom.setEnabled(spec);
 		txtLmTo.setEnabled(spec);
+		fireOptionChanged();
     }
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.interfaces.ISearchMatcher#match(java.lang.Object)
+	 */
 	@Override
     public boolean match(Object element) {
 		if (element instanceof FSTreeNode) {
 			FSTreeNode node = (FSTreeNode) element;
 			long now = System.currentTimeMillis();
-			switch (option) {
+			switch (choice) {
 			case OPTION_NOT_REMEMBER:
 				return true;
 			case OPTION_LAST_WEEK:
@@ -153,7 +245,7 @@ public class FSModifiedSearchable extends FSBaseSearchable {
 			case OPTION_LAST_YEAR:
 				return node.attr.mtime > now - YEAR;
 			case OPTION_SPECIFIED:
-				return node.attr.mtime >= lowDate && node.attr.mtime < topDate;
+				return node.attr.mtime >= fromTime && node.attr.mtime < toTime;
 			}
 		}
 		return false;

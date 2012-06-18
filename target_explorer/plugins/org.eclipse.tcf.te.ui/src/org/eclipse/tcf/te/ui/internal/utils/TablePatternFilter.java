@@ -19,6 +19,7 @@ import java.util.List;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.tcf.te.ui.utils.StringMatcher;
 
 /**
  * The viewer filter to select those elements which matches the given filter pattern.

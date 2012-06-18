@@ -66,6 +66,9 @@ public class SearchEngine {
 	public void setSearchable(ISearchable searchable) {
 		fSearchable = searchable;
 		fSearcher = fDepthFirst ? new DepthFirstSearcher(fViewer, fSearchable) : new BreadthFirstSearcher(fViewer, fSearchable);
+		if(fStartPath != null) {
+			fSearcher.setStartPath(fStartPath);
+		}
 	}
 
 	/**
@@ -86,6 +89,9 @@ public class SearchEngine {
 		if (fDepthFirst != depthFirst) {
 			fDepthFirst = depthFirst;
 			fSearcher = fDepthFirst ? new DepthFirstSearcher(fViewer, fSearchable) : new BreadthFirstSearcher(fViewer, fSearchable);
+			if(fStartPath != null) {
+				fSearcher.setStartPath(fStartPath);
+			}
 		}
 	}
 
@@ -233,10 +239,10 @@ public class SearchEngine {
 	/**
 	 * Set the current searching to wrap search.
 	 * 
-	 * @param w 
+	 * @param wrap 
 	 */
-	public void setWrap(boolean w) {
-		fWrap = w;
+	public void setWrap(boolean wrap) {
+		fWrap = wrap;
 	}
 
 	/**

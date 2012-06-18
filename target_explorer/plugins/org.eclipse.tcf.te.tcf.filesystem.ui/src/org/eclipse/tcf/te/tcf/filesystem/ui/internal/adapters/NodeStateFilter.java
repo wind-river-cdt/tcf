@@ -6,7 +6,6 @@
  *
  * Contributors:
  * Wind River Systems - initial API and implementation
- * William Chen (Wind River)- [345552] Edit the remote files with a proper editor
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.ui.internal.adapters;
 

@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.interfaces;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tcf.te.ui.utils.AbstractSearchable;
 
@@ -90,4 +91,19 @@ public interface ISearchable {
 	 * @param listener The listener to be removed.
 	 */
 	public void removeOptionListener(IOptionListener listener);
+	
+	/**
+	 * Restore the part's values from its parent settings.
+	 * 
+	 * @param settings The dialog settings.
+	 */
+	public void restoreValues(IDialogSettings settings);
+	
+	/**
+	 * Persist the part's values to its parent settings.
+	 * Called when the searching dialog is closed.
+	 * 
+	 * @param settings The dialog settings.
+	 */
+	public void persistValues(IDialogSettings settings);
 }

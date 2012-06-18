@@ -41,7 +41,20 @@ public class NumberValidator extends RegexValidator {
 	 * 			  If less than zero the value is set to INTEGER.MAX_VALUE.
 	 */
 	public NumberValidator(int min, int max) {
-		this(NO_ATTR, NUMBER_REGEX, min, max);
+		this(NO_ATTR, min, max);
+	}
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param attributes The attributes
+	 * @param min The lower boundary of the allowed input range.
+	 * 			  If less than zero the value is set to 0.
+	 * @param max The upper boundary of the allowed input range.
+	 * 			  If less than zero the value is set to INTEGER.MAX_VALUE.
+	 */
+	public NumberValidator(int attributes, int min, int max) {
+		this(attributes, NUMBER_REGEX, min, max);
 	}
 
 	/**

@@ -11,25 +11,44 @@ package org.eclipse.tcf.te.tcf.filesystem.ui.internal.adapters;
 
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.ui.interfaces.ISearchMatcher;
+import org.eclipse.tcf.te.ui.utils.StringMatcher;
 /**
  * The ISearchMatcher implementation for FSTreeNode.
  */
 public class FSTreeNodeMatcher implements ISearchMatcher {
 	// Whether it is case sensitive
-	boolean fCaseSensitive;
+	private boolean fCaseSensitive;
 	// Whether it is precise matching.
-	boolean fMatchPrecise;
+	private boolean fMatchPrecise;
+	// The string matcher used for matching.
+	private StringMatcher fStringMatcher;
 	// The current selected target type index.
-	int fTargetType;
+	private int fTargetType;
 	// The current target names.
-	String fTargetName;
-	boolean fIncludeSystem;
-	boolean fIncludeHidden;
+	private String fTargetName;
+	// The flag if system files should be included
+	private boolean fIncludeSystem;
+	// The flag if hidden files should be included
+	private boolean fIncludeHidden;
 	
-	public FSTreeNodeMatcher(boolean caseSensitive, boolean matchPrecise, int targetType, String targetName, boolean includeSystem, boolean includeHidden) {
+	/**
+	 * Constructor with different option parameters.
+	 * 
+	 * @param caseSensitive Option of case sensitive
+	 * @param matchPrecise Option of precise matching
+	 * @param targetType Option of the target type
+	 * @param targetName Option of the target name
+	 * @param includeSystem Option if system files be included
+	 * @param includeHidden Option if hidden files be included
+	 */
+	public FSTreeNodeMatcher(boolean caseSensitive, boolean matchPrecise, 
+					int targetType, String targetName, boolean includeSystem, boolean includeHidden) {
 		fCaseSensitive = caseSensitive;
-		fMatchPrecise = matchPrecise;
 		fTargetName = targetName;
+		fMatchPrecise = matchPrecise;
+		if (!fMatchPrecise) {
+			fStringMatcher = new StringMatcher(fTargetName, !fCaseSensitive, false);
+		}
 		fTargetType = targetType;
 		fIncludeSystem = includeSystem;
 		fIncludeHidden = includeHidden;
@@ -48,14 +67,12 @@ public class FSTreeNodeMatcher implements ISearchMatcher {
 			if(!fIncludeSystem && node.isSystem()) return false;
 			if(!fIncludeHidden && node.isHidden()) return false;
 			String text = node.name;
-			if (text == null) return false;
-			String target = fTargetName;
-			if (!fCaseSensitive) {
-				text = text.toLowerCase();
-				target = target != null ? target.toLowerCase() : null;
+			if (text != null) {
+				if (fMatchPrecise) {
+					return fCaseSensitive ? text.equals(fTargetName) : text.equalsIgnoreCase(fTargetName);
+				}
+				return fStringMatcher.match(text);
 			}
-			if (fMatchPrecise) return text.equals(target);
-			return text.indexOf(target) != -1;
 		}
 		return false;
 	}

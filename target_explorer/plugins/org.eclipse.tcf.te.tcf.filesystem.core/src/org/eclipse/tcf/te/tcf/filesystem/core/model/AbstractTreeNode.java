@@ -21,6 +21,8 @@ import org.eclipse.tcf.te.core.interfaces.IViewerInput;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.NullOpExecutor;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpUser;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
 
@@ -132,6 +134,17 @@ public abstract class AbstractTreeNode extends PlatformObject implements IPeerMo
 		firePropertyChange(event);
 	}
 	
+	/**
+	 * Get the user account of the specified TCF peer.
+	 * 
+	 * @param peerNode The peer node of the TCF agent.
+	 * @return The user account that runs the agent.
+	 */
+	protected UserAccount getUserAccount(IPeerModel peerNode) {
+		OpUser user = new OpUser(peerNode);
+		new NullOpExecutor().execute(user);
+		return user.getUserAccount();
+	}
 	
 	/**
 	 * Fire a property change event to notify one of the node's property has changed.

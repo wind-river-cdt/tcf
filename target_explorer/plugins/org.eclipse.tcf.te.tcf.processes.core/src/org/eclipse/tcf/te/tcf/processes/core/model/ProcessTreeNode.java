@@ -24,6 +24,7 @@ import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.AbstractTreeNode;
+import org.eclipse.tcf.te.tcf.filesystem.core.model.UserAccount;
 import org.eclipse.tcf.te.tcf.processes.core.callbacks.QueryDoneOpenChannel;
 import org.eclipse.tcf.te.tcf.processes.core.callbacks.RefreshChildrenDoneOpenChannel;
 import org.eclipse.tcf.te.tcf.processes.core.callbacks.RefreshDoneOpenChannel;
@@ -192,6 +193,14 @@ public final class ProcessTreeNode extends AbstractTreeNode implements IFilterab
 		if (oldContext != aContext) {
 			firePropertyChange(new PropertyChangeEvent(this, "context", oldContext, aContext)); //$NON-NLS-1$
 		}
+	}
+	
+	public boolean isAgentOwner() {
+		UserAccount account = getUserAccount(peerNode);
+		if (account != null && context != null) {
+			return context.getUID() == account.getEUID();
+		}
+		return false;
 	}
 
     /**

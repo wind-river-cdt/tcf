@@ -21,7 +21,6 @@ Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Export-Package: org.eclipse.tcf.te.tcf.filesystem.core.activator;x-internal:=true,
  org.eclipse.tcf.te.tcf.filesystem.core.interfaces,
- org.eclipse.tcf.te.tcf.filesystem.core.internal;x-friends:="org.eclipse.tcf.te.tests",
  org.eclipse.tcf.te.tcf.filesystem.core.internal.callbacks;x-friends:="org.eclipse.tcf.te.tests",
  org.eclipse.tcf.te.tcf.filesystem.core.internal.exceptions;x-friends:="org.eclipse.tcf.te.tcf.filesystem.ui,org.eclipse.tcf.te.tests",
  org.eclipse.tcf.te.tcf.filesystem.core.internal.operations;x-friends:="org.eclipse.tcf.te.tcf.filesystem.ui,org.eclipse.tcf.te.tests",

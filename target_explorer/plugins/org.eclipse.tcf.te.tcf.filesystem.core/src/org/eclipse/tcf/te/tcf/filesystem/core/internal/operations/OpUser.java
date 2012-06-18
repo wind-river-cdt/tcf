@@ -22,9 +22,9 @@ import org.eclipse.tcf.services.IFileSystem.DoneUser;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.core.activator.CorePlugin;
-import org.eclipse.tcf.te.tcf.filesystem.core.internal.UserAccount;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.exceptions.TCFFileSystemException;
+import org.eclipse.tcf.te.tcf.filesystem.core.model.UserAccount;
 import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 

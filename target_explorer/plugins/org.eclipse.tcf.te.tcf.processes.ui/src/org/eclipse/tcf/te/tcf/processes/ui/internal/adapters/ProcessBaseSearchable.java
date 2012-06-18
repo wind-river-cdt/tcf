@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.filesystem.ui.internal.adapters;
+package org.eclipse.tcf.te.tcf.processes.ui.internal.adapters;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
@@ -25,10 +25,10 @@ import org.eclipse.ui.forms.widgets.Section;
 /**
  * The base searchable that provides common methods for its subclasses.
  * 
- * @see FSModifiedSearchable
- * @see FSSizeSearchable
+ * @see ProcessStateSearchable
+ * @see ProcessUserSearchable
  */
-public abstract class FSBaseSearchable extends AbstractSearchable implements ISearchMatcher {
+public abstract class ProcessBaseSearchable extends AbstractSearchable implements ISearchMatcher {
 
 	/**
 	 * Create a collapseable section with the specified title and return the

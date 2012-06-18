@@ -77,6 +77,15 @@ public class Messages extends NLS {
 	public static String FSDelete_ButtonNo;
 	public static String FSDelete_ButtonYes;
 	public static String FSDelete_ButtonYes2All;
+	public static String DateValidator_DateInvalidNumber;
+	public static String DateValidator_DateOutofRange;
+	public static String DateValidator_InfoFormat;
+	public static String DateValidator_InfoPrompt;
+	public static String DateValidator_InvalidDate;
+	public static String DateValidator_MonthInvalidNumber;
+	public static String DateValidator_MonthOutofRange;
+	public static String DateValidator_YearInvalidNumber;
+	public static String DateValidator_YearOutofRange;
 	public static String DeleteFilesHandler_DeleteMultipleFilesConfirmation;
 	public static String DeleteFilesHandler_DeleteOneFileConfirmation;
 	public static String DeleteFilesHandler_ConfirmDialogTitle;
@@ -190,6 +199,7 @@ public class Messages extends NLS {
 	public static String FolderValidator_DirNotExist;
 	public static String FolderValidator_NotWritable;
 	public static String FolderValidator_SpecifyFolder;
+	public static String NameValidator_InfoPrompt;
 	public static String NameValidator_SpecifyFolder;
 	public static String NewFileWizard_NewFileWizardTitle;
 	public static String NewFileWizardPage_NewFileWizardPageDescription;
@@ -200,6 +210,9 @@ public class Messages extends NLS {
 	public static String NewFolderWizardPage_NewFolderWizardPageNameLabel;
 	public static String NewFolderWizardPage_NewFolderWizardPageTitle;
 	public static String NewNodeWizardPage_PromptFolderLabel;
+	public static String SizeValidator_ErrorIncorrectFormat;
+	public static String SizeValidator_ErrorSizeOutofRange;
+	public static String SizeValidator_InfoPrompt;
 	public static String TargetSelectionPage_Description;
 	public static String TargetSelectionPage_Targets;
 	public static String TargetSelectionPage_Title;

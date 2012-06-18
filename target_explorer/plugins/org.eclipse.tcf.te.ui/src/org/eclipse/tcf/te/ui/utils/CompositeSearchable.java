@@ -10,6 +10,7 @@
 package org.eclipse.tcf.te.ui.utils;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -26,8 +27,19 @@ import org.eclipse.ui.forms.events.IExpansionListener;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 
+/**
+ * A utility searchable class that could combine several searchable objects and thus
+ * divide a complex searchable into several simple ones.
+ */
 public abstract class CompositeSearchable implements ISearchable {
+	// The delegating searchables 
 	private ISearchable[] searchables;
+	
+	/**
+	 * Constructor with several delegating searchables.
+	 * 
+	 * @param searchables Delegating searchable objects.
+	 */
 	public CompositeSearchable(ISearchable... searchables) {
 		Assert.isNotNull(searchables);
 		this.searchables = searchables;
@@ -53,11 +65,12 @@ public abstract class CompositeSearchable implements ISearchable {
 		Section section = new Section(parent, ExpandableComposite.TWISTIE | ExpandableComposite.CLIENT_INDENT);
 		section.setText(Messages.TreeViewerSearchDialog_AdvancedOptions);
 		section.setLayout(FormLayoutFactory.createSectionClientGridLayout(false, 2));
-		GridData layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		GridData layoutData = new GridData(GridData.FILL_HORIZONTAL);
 		section.setLayoutData(layoutData);
 
 		final Composite advancedPart = new Composite(section, SWT.NONE);
 		advancedPart.setLayout(new GridLayout());
+		advancedPart.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		advancedPart.setBackground(section.getBackground());
 		section.setClient(advancedPart);
 		
@@ -80,13 +93,25 @@ public abstract class CompositeSearchable implements ISearchable {
 		}
 	}
 
+	/**
+	 * A composite matcher that could combine several simple matchers
+	 * into a complex matcher object.
+	 */
 	static class CompositeMatcher implements ISearchMatcher {
+		// The delegating matchers.
 		private ISearchMatcher[] matchers;
-		public CompositeMatcher(ISearchMatcher... matchers) {
+		/**
+		 * The constructors.
+		 */
+		public CompositeMatcher(ISearchMatcher[] matchers) {
 			Assert.isNotNull(matchers);
 			this.matchers = matchers;
 		}
 		
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.tcf.te.ui.interfaces.ISearchMatcher#match(java.lang.Object)
+		 */
 		@Override
         public boolean match(Object element) {
 			for(ISearchMatcher matcher : matchers) {
@@ -117,10 +142,11 @@ public abstract class CompositeSearchable implements ISearchable {
 	 */
 	@Override
 	public boolean isInputValid() {
+		boolean valid = true;
 		for(ISearchable searchable : searchables) {
-			if(!searchable.isInputValid()) return false;
+			valid &= searchable.isInputValid();
 		}
-		return true;
+		return valid;
 	}
 
 	/*
@@ -133,6 +159,28 @@ public abstract class CompositeSearchable implements ISearchable {
 			searchable.addOptionListener(listener);
 		}
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.interfaces.ISearchable#restoreValues(org.eclipse.jface.dialogs.IDialogSettings)
+	 */
+	@Override
+    public void restoreValues(IDialogSettings settings) {
+		for(ISearchable searchable : searchables) {
+			searchable.restoreValues(settings);
+		}
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.interfaces.ISearchable#persistValues(org.eclipse.jface.dialogs.IDialogSettings)
+	 */
+	@Override
+    public void persistValues(IDialogSettings settings) {
+		for(ISearchable searchable : searchables) {
+			searchable.persistValues(settings);
+		}
+    }
 
 	/*
 	 * (non-Javadoc)

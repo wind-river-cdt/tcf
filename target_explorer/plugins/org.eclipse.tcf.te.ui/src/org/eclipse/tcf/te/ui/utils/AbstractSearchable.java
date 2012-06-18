@@ -10,6 +10,7 @@
 package org.eclipse.tcf.te.ui.utils;
 
 import org.eclipse.core.commands.common.EventManager;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tcf.te.ui.interfaces.IOptionListener;
 import org.eclipse.tcf.te.ui.interfaces.ISearchable;
@@ -48,29 +49,69 @@ public abstract class AbstractSearchable extends EventManager implements ISearch
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.interfaces.ISearchable#createCommonPart(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
     public void createCommonPart(Composite parent) {
     }
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.interfaces.ISearchable#createAdvancedPart(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
     public void createAdvancedPart(Composite parent) {
     }
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.interfaces.ISearchable#isInputValid()
+	 */
 	@Override
     public boolean isInputValid() {
 	    return true;
     }
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.interfaces.ISearchable#getSearchTitle()
+	 */
 	@Override
 	public String getSearchTitle() {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.interfaces.ISearchable#getSearchMessage(java.lang.Object)
+	 */
 	@Override
 	public String getSearchMessage(Object rootElement) {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.interfaces.ISearchable#restoreValues(org.eclipse.jface.dialogs.IDialogSettings)
+	 */
+	@Override
+    public void restoreValues(IDialogSettings settings) {
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.interfaces.ISearchable#persistValues(org.eclipse.jface.dialogs.IDialogSettings)
+	 */
+	@Override
+    public void persistValues(IDialogSettings settings) {
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.interfaces.ISearchable#getElementText(java.lang.Object)
+	 */
 	@Override
 	public String getElementText(Object element) {
 		return null;

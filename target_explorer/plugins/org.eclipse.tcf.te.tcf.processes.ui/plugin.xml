@@ -12,6 +12,9 @@
          <adapter
                type="org.eclipse.tcf.te.ui.interfaces.ILazyLoader">
          </adapter>
+         <adapter
+               type="org.eclipse.tcf.te.ui.interfaces.ISearchable">
+         </adapter>
       </factory>
    </extension>
 

@@ -43,24 +43,22 @@ import org.eclipse.tcf.te.ui.nls.Messages;
 public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements ISearchCallback, IOptionListener {
 	// The context help id for this dialog.
 	private static final String SEARCH_HELP_ID = "org.eclipse.tcf.te.ui.utils.TreeViewerSearchDialog.help"; //$NON-NLS-1$
-
 	// A new search button's ID.
 	private static final int SEARCH_ID = 31;
 	
+	// The dropdown combo box to select an algorithm
 	private Combo fCmbAlg;
 	// The searching orientation check box.
 	private Button fBtnBackward;
 	// The wrap search check box.
 	private Button fBtnWrap;
-	
 	// The progress monitor part that controls the searching job.
 	private ProgressMonitorPart fPmPart;
-	
 	// The search engine used to do the searching.
 	SearchEngine fSearcher;
 	// The tree viewer to be searched.
 	TreeViewer fViewer;
-	
+	// The searchable of the currently selected element.
 	ISearchable fSearchable;
 
 	/**
@@ -130,6 +128,7 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements ISe
 	protected void closePressed() {
 		if(fSearchable != null) {
 			fSearchable.removeOptionListener(this);
+			fSearchable.persistValues(getDialogSettings());
 		}
 		fSearcher.endSearch();
 		setReturnCode(OK);
@@ -152,7 +151,10 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements ISe
 	protected void createButtonsForButtonBar(Composite parent) {
 		createButton(parent, SEARCH_ID, Messages.TreeViewerSearchDialog_BtnSearchText, true);
 		createButton(parent, IDialogConstants.CLOSE_ID, Messages.TreeViewerSearchDialog_BtnCloseText, false);
-		getButton(SEARCH_ID).setEnabled(false);
+		if (fSearchable != null) {
+			fSearchable.restoreValues(getDialogSettings());
+		}
+		updateButtonState();
 	}
 	/*
 	 * (non-Javadoc)
@@ -186,6 +188,7 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements ISe
 			setMessage(null);
 		}
 	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.tcf.te.ui.jface.dialogs.CustomTitleAreaDialog#createDialogArea(org.eclipse.swt.widgets.Composite)
@@ -214,7 +217,6 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements ISe
 			getShell().setText(title);
 			this.setTitle(title);
 		}
-
 		return composite;
 	}
 
@@ -272,6 +274,11 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements ISe
 		fBtnBackward.setEnabled(fSearcher.isDepthFirst());
     }
 
+	/**
+	 * Get the searchable of the current selected path.
+	 * 
+	 * @return A searchable object or null if null if cannot be adapted to a searchable.
+	 */
 	private ISearchable getSearchable() {
 		TreePath path = fSearcher.getStartPath();
 		if(path != null) {
@@ -338,9 +345,23 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements ISe
 		}
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.interfaces.IOptionListener#optionChanged(java.util.EventObject)
+	 */
 	@Override
     public void optionChanged(EventObject event) {
-		getButton(SEARCH_ID).setEnabled(fSearchable != null && fSearchable.isInputValid());
 		fSearcher.resetPath();
+		updateButtonState();
+    }
+
+	/**
+	 * Update the button's state according to 
+	 */
+	protected void updateButtonState() {
+		Button button = getButton(SEARCH_ID);
+		if (button != null) {
+			button.setEnabled(fSearchable != null && fSearchable.isInputValid());
+		}
     }
 }

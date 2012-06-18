@@ -41,12 +41,9 @@ import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.core.concurrent.CallbackMonitor;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel;
 import org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IWindowsFileAttributes;
-import org.eclipse.tcf.te.tcf.filesystem.core.internal.UserAccount;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.callbacks.QueryDoneOpenChannel;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.callbacks.RefreshStateDoneOpenChannel;
-import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.NullOpExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpTargetFileDigest;
-import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpUser;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.testers.TargetPropertyTester;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.url.TcfURLConnection;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.url.TcfURLStreamHandlerService;
@@ -54,7 +51,6 @@ import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.CacheManager;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.FileState;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.PersistenceManager;
 import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
-import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 
 /**
  * Representation of a file system tree node.
@@ -154,18 +150,6 @@ public final class FSTreeNode extends AbstractTreeNode implements Cloneable {
 			setPermissions(b ? (permissions | bit):(permissions & ~ bit));
 		}
     }
-	
-	/**
-	 * Get the user account of the specified TCF peer.
-	 * 
-	 * @param peerNode The peer node of the TCF agent.
-	 * @return The user account that runs the agent.
-	 */
-	private UserAccount getUserAccount(IPeerModel peerNode) {
-		OpUser user = new OpUser(peerNode);
-		new NullOpExecutor().execute(user);
-		return user.getUserAccount();
-	}
 
 	/**
 	 * Set the file's permissions.

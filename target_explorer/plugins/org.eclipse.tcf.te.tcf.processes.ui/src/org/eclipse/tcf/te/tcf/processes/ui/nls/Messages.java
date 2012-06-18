@@ -147,6 +147,8 @@ public class Messages extends NLS {
 	public static String MemorySection_Title;
 	public static String MemorySection_VSize;
 
+	public static String NameValidator_InfoPrompt;
+
 	public static String NewSpeedGradeDialog_DialogMessage;
 	public static String NewSpeedGradeDialog_DialogTitle;
 	public static String NewSpeedGradeDialog_EnterName;
@@ -172,8 +174,50 @@ public class Messages extends NLS {
 	public static String GeneralInformationPage_User;
 
 
+	public static String GeneralSearchable_CaseSensitive;
+
+	public static String GeneralSearchable_FindLabel;
+
+	public static String GeneralSearchable_GeneralOptions;
+
+	public static String GeneralSearchable_PreciseMatching;
+
 	public static String TerminateHandler_TerminationError;
 	public static String ProcessLabelProvider_RootNodeLabel;
 
 	public static String ProcessMonitorEditorPage_PageTitle;
+
+	public static String ProcessSearchable_ProcessList;
+
+	public static String ProcessSearchable_PromptFindInProcessList;
+
+	public static String ProcessSearchable_PromptFindUnderProcess;
+
+	public static String ProcessSearchable_SearchTitle;
+
+	public static String ProcessStateSearchable_NotSure;
+
+	public static String ProcessStateSearchable_SectionChooseState;
+
+	public static String ProcessStateSearchable_SpecifyState;
+
+	public static String ProcessStateSearchable_StatePaging;
+
+	public static String ProcessStateSearchable_StateRunning;
+
+	public static String ProcessStateSearchable_StateSleeping;
+
+	public static String ProcessStateSearchable_StateTraced;
+
+	public static String ProcessStateSearchable_StateWaiting;
+
+	public static String ProcessStateSearchable_StateZombie;
+
+	public static String ProcessUserSearchable_DontRemember;
+
+	public static String ProcessUserSearchable_Myself;
+
+	public static String ProcessUserSearchable_SpecifyUser;
+
+	public static String ProcessUserSearchable_WhoStarted;
 }
