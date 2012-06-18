@@ -66,9 +66,12 @@ public class TcfLaunchTests extends TcfTestCase {
 		String temp = System.getProperty("java.io.tmpdir"); //$NON-NLS-1$
 		IPath tempDir = temp != null ? new Path(temp) : null;
 		assertNotNull("Missing java temp directory", tempDir); //$NON-NLS-1$
+		tempDir = tempDir.append(TcfLaunchTests.class.getSimpleName());
+		assertNotNull("Cannot append test case specific temp directory", tempDir); //$NON-NLS-1$
 
 		IPath tempHelloWorld = tempDir.append(helloWorldLocation.lastSegment());
 		if (tempHelloWorld.toFile().exists()) {
+			tempHelloWorld.toFile().setWritable(true, false);
 			tempHelloWorld.toFile().delete();
 		}
 		assertFalse("Cannot delete process image " + tempHelloWorld.toOSString(), tempHelloWorld.toFile().exists()); //$NON-NLS-1$
