@@ -20,4 +20,9 @@ public interface ILaunchTypes {
 	 * Launch configuration type id: Remote Application
 	 */
 	public final String REMOTE_APPLICATION = "org.eclipse.tcf.te.tcf.launch.type.remote.app"; //$NON-NLS-1$
+
+	/**
+	 * Launch configuration type id: Attach
+	 */
+	public final String ATTACH = "org.eclipse.tcf.te.tcf.launch.type.attach"; //$NON-NLS-1$
 }

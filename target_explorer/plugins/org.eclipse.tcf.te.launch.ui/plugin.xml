@@ -65,7 +65,7 @@
             activeByDefault="true"
             contentProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchFavoritesContentProvider"
             labelProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchTreeLabelProvider"
-            priority="normal">
+            priority="lowest">
          <triggerPoints>
             <instanceof value="org.eclipse.tcf.te.ui.views.interfaces.ICategory"/>
          </triggerPoints>

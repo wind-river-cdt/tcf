@@ -30,6 +30,5 @@ Export-Package: org.eclipse.tcf.te.tcf.launch.core.activator;x-internal:=true,
  org.eclipse.tcf.te.tcf.launch.core.internal.adapters;x-internal:=true,
  org.eclipse.tcf.te.tcf.launch.core.lm.delegates,
  org.eclipse.tcf.te.tcf.launch.core.nls;x-internal:=true,
- org.eclipse.tcf.te.tcf.launch.core.services,
  org.eclipse.tcf.te.tcf.launch.core.steps,
  org.eclipse.tcf.te.tcf.launch.core.steps.iterators

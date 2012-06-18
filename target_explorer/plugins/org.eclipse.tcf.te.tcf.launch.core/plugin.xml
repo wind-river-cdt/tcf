@@ -11,42 +11,33 @@
       </factory>
    </extension>
 
-<!-- Service contributions -->
-   <extension point="org.eclipse.tcf.te.runtime.services.services">
-      <service
-            class="org.eclipse.tcf.te.tcf.launch.core.services.DebugService"
-            id="org.eclipse.tcf.te.tcf.launch.core.services.debug">
-         <serviceType
-               bundleId="org.eclipse.tcf.te.runtime.services"
-               class="org.eclipse.tcf.te.runtime.services.interfaces.IDebugService"/>
-         <enablement>
-            <or>
-               <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
-               <instanceof value="org.eclipse.tcf.protocol.IPeer"/>
-            </or>   
-         </enablement>
-      </service>
-   </extension>
-
 <!-- Launch Configuration Type contributions -->
    <extension point="org.eclipse.debug.core.launchConfigurationTypes">
       <launchConfigurationType
-            delegate="org.eclipse.tcf.te.launch.core.delegates.LaunchConfigurationDelegate"
             id="org.eclipse.tcf.te.tcf.launch.type.remote.app"
+            sourceLocatorId="org.eclipse.tcf.debug.SourceLocator"
+            sourcePathComputerId="org.eclipse.tcf.debug.SourcePathComputer"
+            delegate="org.eclipse.tcf.te.tcf.launch.core.delegates.LaunchConfigurationDelegate"
             modes="run,debug"
             name="%LaunchType.Remote.App.name"/>
+      <launchConfigurationType
+            id="org.eclipse.tcf.te.tcf.launch.type.attach"
+            sourceLocatorId="org.eclipse.tcf.debug.SourceLocator"
+            sourcePathComputerId="org.eclipse.tcf.debug.SourcePathComputer"
+            delegate="org.eclipse.tcf.te.tcf.launch.core.delegates.LaunchConfigurationDelegate"
+            modes="debug"
+            name="%LaunchType.Attach.name"/>
    </extension>
    
 <!-- Launch Configuration Type Binding contributions -->
    <extension point="org.eclipse.tcf.te.launch.core.launchConfigTypeBindings">
-      <launchConfigTypeBinding
-            launchConfigTypeId="org.eclipse.tcf.te.tcf.launch.type.remote.app">
+      <launchConfigTypeBinding launchConfigTypeId="org.eclipse.tcf.te.tcf.launch.type.remote.app">
          <launchManagerDelegate
                id="org.eclipse.tcf.te.tcf.launch.type.remote.app.launchManagerDelegate"
-               modes="run,debug"/>
+               modes="run"/>
          <stepGroup
                id="org.eclipse.tcf.te.tcf.launch.type.remote.app.stepGroup"
-               modes="run,debug"/>
+               modes="run"/>
          <enablement>
             <with variable="context">
                <or>
@@ -61,6 +52,44 @@
             </with>
          </enablement>
       </launchConfigTypeBinding>
+      <launchConfigTypeBinding launchConfigTypeId="org.eclipse.tcf.te.tcf.launch.type.remote.app">
+         <launchManagerDelegate
+               id="org.eclipse.tcf.te.tcf.launch.type.remote.app.launchManagerDelegate"
+               modes="debug"/>
+         <stepGroup
+               id="org.eclipse.tcf.te.tcf.launch.type.remote.app.stepGroup"
+               modes="debug"/>
+         <enablement>
+            <with variable="context">
+               <or>
+                  <adapt type="org.eclipse.core.resources.IResource">
+                     <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.cdt.core.cnature"/>
+                  </adapt>
+                  <and>
+                     <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                     <test property="org.eclipse.tcf.te.tcf.locator.hasRemoteService" value="Processes"/>
+                     <test property="org.eclipse.tcf.te.tcf.locator.hasRemoteService" value="RunControl"/>
+                  </and>
+               </or>
+            </with>
+         </enablement>
+      </launchConfigTypeBinding>
+      <launchConfigTypeBinding launchConfigTypeId="org.eclipse.tcf.te.tcf.launch.type.attach">
+         <launchManagerDelegate
+               id="org.eclipse.tcf.te.tcf.launch.type.attach.launchManagerDelegate"
+               modes="debug"/>
+         <stepGroup
+               id="org.eclipse.tcf.te.tcf.launch.type.attach.stepGroup"
+               modes="debug"/>
+         <enablement>
+            <with variable="context">
+               <and>
+                  <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                  <test property="org.eclipse.tcf.te.tcf.locator.hasRemoteService" value="RunControl"/>
+               </and>
+            </with>
+         </enablement>
+      </launchConfigTypeBinding>
    </extension>
    
 <!-- Launch Manager Delegate contributions -->
@@ -68,6 +97,9 @@
       <delegate
             class="org.eclipse.tcf.te.tcf.launch.core.lm.delegates.RemoteAppLaunchManagerDelegate"
             id="org.eclipse.tcf.te.tcf.launch.type.remote.app.launchManagerDelegate"/>
+      <delegate
+            class="org.eclipse.tcf.te.tcf.launch.core.lm.delegates.AttachLaunchManagerDelegate"
+            id="org.eclipse.tcf.te.tcf.launch.type.attach.launchManagerDelegate"/>
    </extension>
    
 <!-- Launch Step Group contributions -->
@@ -80,7 +112,13 @@
             <reference id="org.eclipse.tcf.te.tcf.launch.core.openChannelStep"/>
             <reference id="org.eclipse.tcf.te.tcf.launch.core.fileTransferStepGroup"/>
             <reference id="org.eclipse.tcf.te.tcf.launch.core.launchProcessStep"/>
-            <reference id="org.eclipse.tcf.te.tcf.launch.core.closeChannelStep"/>
+            <reference id="org.eclipse.tcf.te.tcf.launch.core.resumeContextStep">
+               <enablement>
+                  <with variable="context">
+                     <test property="org.eclipse.tcf.te.launch.core.launchMode" value="debug"/>
+                  </with>
+               </enablement>
+            </reference>
             <reference id="org.eclipse.tcf.te.tcf.launch.core.attachDebuggerStep">
                <enablement>
                   <with variable="context">
@@ -88,7 +126,16 @@
                   </with>
                </enablement>
             </reference>
-            <reference id="org.eclipse.tcf.te.launch.core.removeLaunchStep"/>
+            <reference id="org.eclipse.tcf.te.tcf.launch.core.closeChannelStep"/>
+            <reference id="org.eclipse.tcf.te.launch.core.steps.RemoveLaunchStep">
+               <enablement>
+                  <with variable="context">
+                     <not>
+                        <test property="org.eclipse.tcf.te.launch.core.launchMode" value="debug"/>
+                     </not>
+                  </with>
+               </enablement>
+            </reference>
          </references>
       </stepGroup>
       <stepGroup
@@ -98,6 +145,20 @@
             locked="false">
          <references>
             <reference id="org.eclipse.tcf.te.tcf.launch.core.fileTransferStep"/>
+         </references>
+      </stepGroup>
+      <stepGroup
+            id="org.eclipse.tcf.te.tcf.launch.type.attach.stepGroup"
+            label="%LaunchStepGroup.Attach.name"
+            locked="false">
+         <references>
+            <reference id="org.eclipse.tcf.te.tcf.launch.core.attachDebuggerStep">
+               <enablement>
+                  <with variable="context">
+                     <test property="org.eclipse.tcf.te.launch.core.launchMode" value="debug"/>
+                  </with>
+               </enablement>
+            </reference>
          </references>
       </stepGroup>
    </extension>
@@ -123,6 +184,13 @@
             id="org.eclipse.tcf.te.tcf.launch.core.attachDebuggerStep"
             class="org.eclipse.tcf.te.tcf.launch.core.steps.AttachDebuggerStep"
             label="%LaunchStep.AttachDebugger.name">
+      </step>
+      <step
+            id="org.eclipse.tcf.te.tcf.launch.core.resumeContextStep"
+            class="org.eclipse.tcf.te.tcf.launch.core.steps.ResumeContextStep"
+            label="%LaunchStep.ResumeContext.name">
+         <requires id="org.eclipse.tcf.te.tcf.launch.core.openChannelStep"/>
+         <requires id="org.eclipse.tcf.te.tcf.launch.core.launchProcessStep"/>
       </step>
       <step
             id="org.eclipse.tcf.te.tcf.launch.core.closeChannelStep"

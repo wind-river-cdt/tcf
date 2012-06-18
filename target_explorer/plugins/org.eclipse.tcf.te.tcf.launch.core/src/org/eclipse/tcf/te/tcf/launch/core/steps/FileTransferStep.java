@@ -41,6 +41,11 @@ public class FileTransferStep extends AbstractTcfLaunchStep {
 	 */
 	@Override
 	public void validateExecute(IStepContext context, IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor) throws CoreException {
+		IChannel channel = (IChannel)StepperAttributeUtil.getProperty(ICommonTCFLaunchAttributes.ATTR_CHANNEL, fullQualifiedId, data);
+		if (channel == null || channel.getState() != IChannel.STATE_OPEN) {
+			throw new CoreException(new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(), "missing or closed channel")); //$NON-NLS-1$
+		}
+
 		Object item = StepperAttributeUtil.getProperty(IFileTransferLaunchAttributes.ATTR_ACTIVE_FILE_TRANSFER, fullQualifiedId, data);
 		if (!(item instanceof IFileTransferItem)) {
 			throw new CoreException(new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(), "missing file transfer item")); //$NON-NLS-1$
@@ -52,13 +57,13 @@ public class FileTransferStep extends AbstractTcfLaunchStep {
 	 */
 	@Override
 	public void execute(IStepContext context, IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor, final ICallback callback) {
-		IChannel channel = (IChannel)StepperAttributeUtil.getProperty(ICommonTCFLaunchAttributes.ATTR_CHANNEL, fullQualifiedId, data);
-		IFileTransferItem item = (IFileTransferItem)StepperAttributeUtil.getProperty(IFileTransferLaunchAttributes.ATTR_ACTIVE_FILE_TRANSFER, fullQualifiedId, data);
+		final IChannel channel = (IChannel)StepperAttributeUtil.getProperty(ICommonTCFLaunchAttributes.ATTR_CHANNEL, fullQualifiedId, data);
+		final IFileTransferItem item = (IFileTransferItem)StepperAttributeUtil.getProperty(IFileTransferLaunchAttributes.ATTR_ACTIVE_FILE_TRANSFER, fullQualifiedId, data);
 
 		if (item.isEnabled()) {
 			FileTransferService.transfer(getActivePeerModel(data).getPeer(), channel, item, monitor, callback);
 		}
-		else if (callback != null) {
+		else {
 			callback.done(this, Status.OK_STATUS);
 		}
 	}

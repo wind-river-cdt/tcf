@@ -2,12 +2,30 @@
 <?eclipse version="3.4"?>
 <plugin>
 
+<!-- Service contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.services.services">
+      <service
+            class="org.eclipse.tcf.te.tcf.launch.ui.internal.services.DebugService"
+            id="org.eclipse.tcf.te.tcf.launch.core.services.debug">
+         <serviceType
+               bundleId="org.eclipse.tcf.te.runtime.services"
+               class="org.eclipse.tcf.te.runtime.services.interfaces.IDebugService"/>
+         <enablement>
+            <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+         </enablement>
+      </service>
+   </extension>
+
 <!-- Launch configuration type contributions -->
    <extension point="org.eclipse.debug.ui.launchConfigurationTypeImages">
       <launchConfigurationTypeImage
             configTypeID="org.eclipse.tcf.te.tcf.launch.type.remote.app"
             icon="icons/obj16/remote_app.gif"
             id="org.eclipse.tcf.te.tcf.launch.type.remote.app.image"/>
+      <launchConfigurationTypeImage
+            configTypeID="org.eclipse.tcf.te.tcf.launch.type.attach"
+            icon="icons/obj16/attach.gif"
+            id="org.eclipse.tcf.te.tcf.launch.type.attach.image"/>
    </extension>
 
 <!-- Launch configuration tab group contributions -->
@@ -16,6 +34,10 @@
             class="org.eclipse.tcf.te.tcf.launch.ui.remote.app.LaunchConfigurationTabGroup"
             id="org.eclipse.tcf.te.tcf.launch.type.remote.app.tabgroup"
             type="org.eclipse.tcf.te.tcf.launch.type.remote.app"/>
+      <launchConfigurationTabGroup
+            class="org.eclipse.tcf.te.tcf.launch.ui.attach.LaunchConfigurationTabGroup"
+            id="org.eclipse.tcf.te.tcf.launch.type.attach.tabgroup"
+            type="org.eclipse.tcf.te.tcf.launch.type.attach"/>
    </extension>
    
  <!-- Launch shortcut contributions -->
@@ -58,7 +80,29 @@
                            forcePluginActivation="true"
                            property="org.eclipse.tcf.te.launch.core.isValidLaunchConfigType"
                            value="org.eclipse.tcf.te.tcf.launch.type.remote.app"
-                           args="run"/>
+                           args="debug"/>
+                  </iterate>
+               </with>
+            </enablement>
+         </contextualLaunch>
+      </shortcut>
+      <shortcut
+            id="org.eclipse.tcf.te.tcf.launch.ui.launchshortcut.attach.debug"
+            label="%LaunchShortcut.Attach.name"
+            icon="icons/obj16/attach.gif"
+            modes="debug">
+         <class class="org.eclipse.tcf.te.launch.ui.internal.handler.LaunchShortcutHandler">
+            <parameter name="typeId" value="org.eclipse.tcf.te.tcf.launch.type.attach"/>
+         </class>
+         <contextualLaunch>
+            <enablement>
+               <with variable="selection">
+                  <iterate ifEmpty="false">
+                     <test 
+                           forcePluginActivation="true"
+                           property="org.eclipse.tcf.te.launch.core.isValidLaunchConfigType"
+                           value="org.eclipse.tcf.te.tcf.launch.type.attach"
+                           args="debug"/>
                   </iterate>
                </with>
             </enablement>
@@ -100,7 +144,7 @@
             activeByDefault="false"
             contentProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchNavigatorContentProvider"
             labelProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchTreeLabelProvider"
-            priority="normal">
+            priority="lowest">
          <triggerPoints>
             <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
          </triggerPoints>

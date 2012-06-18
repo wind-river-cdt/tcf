@@ -12,9 +12,13 @@ package org.eclipse.tcf.te.tcf.launch.ui.remote.app;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.CommonTab;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
+import org.eclipse.debug.ui.sourcelookup.SourceLookupTab;
+import org.eclipse.tcf.internal.debug.ui.launch.TCFMemoryMapTab;
+import org.eclipse.tcf.internal.debug.ui.launch.TCFPathMapTab;
 import org.eclipse.tcf.te.launch.ui.tabs.AbstractLaunchConfigurationTabGroup;
 import org.eclipse.tcf.te.launch.ui.tabs.refprojects.RefProjetcsTab;
 import org.eclipse.tcf.te.tcf.launch.ui.remote.app.filetransfer.FileTransferTab;
@@ -22,6 +26,7 @@ import org.eclipse.tcf.te.tcf.launch.ui.remote.app.filetransfer.FileTransferTab;
 /**
  * Remote application launch configuration tab group implementation.
  */
+@SuppressWarnings("restriction")
 public class LaunchConfigurationTabGroup extends AbstractLaunchConfigurationTabGroup {
 
 	/* (non-Javadoc)
@@ -43,6 +48,11 @@ public class LaunchConfigurationTabGroup extends AbstractLaunchConfigurationTabG
 
 		tabs.add(new FileTransferTab());
 		tabs.add(new RefProjetcsTab());
+		if (ILaunchManager.DEBUG_MODE.equalsIgnoreCase(mode)) {
+			tabs.add(new TCFMemoryMapTab());
+			tabs.add(new TCFPathMapTab());
+			tabs.add(new SourceLookupTab());
+		}
 		tabs.add(new CommonTab());
 	}
 }
