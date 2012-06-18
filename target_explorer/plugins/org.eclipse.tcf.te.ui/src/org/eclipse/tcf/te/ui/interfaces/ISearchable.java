@@ -16,9 +16,11 @@ import org.eclipse.tcf.te.ui.utils.AbstractSearchable;
 /**
  * This interface should be implemented or adapted by the tree nodes which
  * should provide find function. Subclass is encouraged to inherit AbstractSearchable
- * which provides basic implementation methods.
+ * which provides basic implementation methods, or CompositeSearchable which combines
+ * several simple searchable implementations into a complexed implementation.
  * 
  * @see AbstractSearchable
+ * @see CompositeSearchable
  */
 public interface ISearchable {
 	/**
