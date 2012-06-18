@@ -501,6 +501,17 @@
                </equals>
             </with>
          </activeWhen>
+         <enabledWhen>
+            <with
+                  variable="activePart">
+               <adapt
+                     type="org.eclipse.ui.navigator.CommonViewer">
+                  <test
+                        property="org.eclipse.tcf.te.ui.views.isFiltering">
+                  </test>
+               </adapt>
+            </with>
+         </enabledWhen>
       </handler>
       <handler
             class="org.eclipse.tcf.te.ui.views.handler.EditorQuickFilterHanlder"
@@ -515,7 +526,7 @@
          </activeWhen>
          <enabledWhen>
             <with
-                  variable="activePart">
+                  variable="activeEditor">
                <test
                      property="org.eclipse.tcf.te.ui.views.isEditorFilterable">
                </test>
@@ -533,6 +544,17 @@
                </equals>
             </with>
          </activeWhen>
+         <enabledWhen>
+            <with
+                  variable="activeEditor">
+               <adapt
+                     type="org.eclipse.jface.viewers.TreeViewer">
+                  <test
+                        property="org.eclipse.tcf.te.ui.views.isFiltering">
+                  </test>
+               </adapt>
+            </with>
+         </enabledWhen>
       </handler>
       <handler
             class="org.eclipse.tcf.te.ui.views.handler.ViewSearchHandler"
@@ -633,8 +655,8 @@
             class="org.eclipse.tcf.te.ui.views.internal.quickfilter.QuickFilterTester"
             id="org.eclipse.tcf.te.ui.views.quickfilter.QuickFilterTester"
             namespace="org.eclipse.tcf.te.ui.views"
-            properties="isFilterable"
-            type="org.eclipse.ui.navigator.CommonViewer">
+            properties="isFilterable,isFiltering"
+            type="org.eclipse.jface.viewers.TreeViewer">
       </propertyTester>
       <propertyTester
             class="org.eclipse.tcf.te.ui.views.internal.quickfilter.EditorQuickFilterTester"
@@ -707,9 +729,16 @@
          point="org.eclipse.core.runtime.adapters">
       <factory
             adaptableType="org.eclipse.tcf.te.ui.views.internal.View"
-            class="org.eclipse.tcf.te.ui.views.internal.ViewAdapterFactory">
+            class="org.eclipse.tcf.te.ui.views.internal.adapters.ViewAdapterFactory">
          <adapter
                type="org.eclipse.ui.navigator.CommonViewer">
+         </adapter>
+      </factory>
+      <factory
+            adaptableType="org.eclipse.tcf.te.ui.views.editor.Editor"
+            class="org.eclipse.tcf.te.ui.views.internal.adapters.EditorAdapterFactory">
+         <adapter
+               type="org.eclipse.jface.viewers.TreeViewer">
          </adapter>
       </factory>
    </extension>

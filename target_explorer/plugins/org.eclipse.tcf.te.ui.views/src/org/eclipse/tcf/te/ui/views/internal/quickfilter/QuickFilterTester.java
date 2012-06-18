@@ -19,9 +19,10 @@ import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.tcf.te.core.interfaces.IFilterable;
+import org.eclipse.tcf.te.ui.utils.TreeViewerUtil;
 
 /**
- * The property tester to test if the current tree viewer is filterable. 
+ * The property tester to test if the current tree viewer is filterable/filtering. 
  */
 public class QuickFilterTester extends PropertyTester {
 
@@ -38,6 +39,9 @@ public class QuickFilterTester extends PropertyTester {
 			TreeViewer viewer = (TreeViewer) receiver;
 			if(property.equals("isFilterable")) { //$NON-NLS-1$
 				return isFilterable(viewer);
+			}
+			if(property.equals("isFiltering")) { //$NON-NLS-1$
+				return TreeViewerUtil.isFiltering(viewer);
 			}
 		}
 		return false;

@@ -7,9 +7,10 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.ui.views.internal;
+package org.eclipse.tcf.te.ui.views.internal.adapters;
 
 import org.eclipse.core.runtime.IAdapterFactory;
+import org.eclipse.tcf.te.ui.views.internal.View;
 import org.eclipse.ui.navigator.CommonViewer;
 
 /**

@@ -192,6 +192,23 @@ public class TreeViewerUtil {
 		}
 		return false;
 	}
+	
+	/**
+	 * Test if the specified tree viewer is being filtered.
+	 * 
+	 * @param viewer The tree viewer to be tested.
+	 * @return true if there's at least a filter.
+	 */
+	public static boolean isFiltering(TreeViewer viewer) {
+		Map<TreePath, QuickFilter> filters = (Map<TreePath, QuickFilter>) viewer.getData("quick.filter"); //$NON-NLS-1$
+		if (filters != null && !filters.isEmpty()) {
+			for(TreePath path : filters.keySet()) {
+				QuickFilter filter = filters.get(path);
+				if (filter!= null && filter.isFiltering(path)) return true;
+			}
+		}
+		return false;
+	}
 
 	/**
 	 * Get the filter root for the viewer based on the root path.
