@@ -211,7 +211,6 @@ public class QuickFilterPopup extends PopupDialog {
 	 */
 	protected void filterTextModifyText(ModifyEvent e) {
 		quickFilter.setPattern(filterText.getText());
-		treeViewer.refresh();
 		quickFilter.adjustPopup(getShell());
 	}
 }
