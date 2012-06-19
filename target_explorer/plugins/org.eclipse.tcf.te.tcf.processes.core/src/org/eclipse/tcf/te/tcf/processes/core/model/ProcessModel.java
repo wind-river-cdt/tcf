@@ -85,27 +85,12 @@ public class ProcessModel implements ITreeNodeModel{
 	/* default */boolean stopped;
 	IPeerModel peerModel;
 	// The periodic refreshing callback.
-	ICallback refreshCallback;
 	/**
 	 * Create a File System Model.
 	 */
 	ProcessModel(IPeerModel peerModel) {
 		this.peerModel = peerModel;
 		this.stopped = true;
-		this.refreshCallback = new Callback() {
-			@Override
-			protected void internalDone(Object caller, IStatus status) {
-				if (!stopped) {
-					scheduleRefreshing();
-				}
-				else {
-					if (pollingTimer != null) {
-						pollingTimer.cancel();
-						pollingTimer = null;
-					}
-				}
-			}
-		};
 	}
 
 	/**
@@ -168,6 +153,20 @@ public class ProcessModel implements ITreeNodeModel{
 	 * Schedule the periodical refreshing.
 	 */
 	void scheduleRefreshing() {
+		final ICallback refreshCallback = new Callback() {
+			@Override
+			protected void internalDone(Object caller, IStatus status) {
+				if (!stopped) {
+					scheduleRefreshing();
+				}
+				else {
+					if (pollingTimer != null) {
+						pollingTimer.cancel();
+						pollingTimer = null;
+					}
+				}
+			}
+		};
 		TimerTask pollingTask = new TimerTask(){
 			@Override
 	        public void run() {
