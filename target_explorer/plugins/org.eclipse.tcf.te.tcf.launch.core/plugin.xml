@@ -127,7 +127,7 @@
                </enablement>
             </reference>
             <reference id="org.eclipse.tcf.te.tcf.launch.core.closeChannelStep"/>
-            <reference id="org.eclipse.tcf.te.launch.core.steps.RemoveLaunchStep">
+            <reference id="org.eclipse.tcf.te.launch.core.removeLaunchStep">
                <enablement>
                   <with variable="context">
                      <not>
