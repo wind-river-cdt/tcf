@@ -274,9 +274,7 @@
       <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.refresh">
          <command
                commandId="org.eclipse.tcf.te.ui.command.refresh"
-               id="org.eclipse.tcf.te.ui.commands.refresh"
                label="%command.refresh.label"
-               mnemonic="f"
                style="push"
                tooltip="%command.refresh.description">
             <visibleWhen checkEnabled="false">

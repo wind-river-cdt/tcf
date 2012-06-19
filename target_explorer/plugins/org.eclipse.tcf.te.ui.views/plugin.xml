@@ -742,5 +742,16 @@
          </adapter>
       </factory>
    </extension>
+   <extension
+         point="org.eclipse.ui.commandImages">
+      <image
+            commandId="org.eclipse.tcf.te.ui.views.command.find"
+            icon="icons/obj16/search.gif">
+      </image>
+      <image
+            commandId="org.eclipse.tcf.te.ui.views.command.quickfilter"
+            icon="platform:/plugin/org.eclipse.ui.navigator/icons/full/elcl16/filter_ps.gif">
+      </image>
+   </extension>
    
 </plugin>

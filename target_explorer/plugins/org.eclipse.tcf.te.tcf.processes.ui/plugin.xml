@@ -170,9 +170,7 @@
          </separator>
          <command
                commandId="org.eclipse.tcf.te.ui.command.refresh"
-               id="org.eclipse.tcf.te.ui.commands.refresh"
                label="%command.refresh.label.1"
-               mnemonic="f"
                style="push"
                tooltip="%command.refresh.tooltip.1">
             <visibleWhen
@@ -281,9 +279,7 @@
             locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.refresh">
          <command
                commandId="org.eclipse.tcf.te.ui.command.refresh"
-               id="org.eclipse.tcf.te.ui.commands.refresh"
                label="%command.refresh.label.1"
-               mnemonic="f"
                style="push"
                tooltip="%command.refresh.tooltip.1">
             <visibleWhen

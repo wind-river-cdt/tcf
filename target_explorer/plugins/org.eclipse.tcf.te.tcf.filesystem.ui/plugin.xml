@@ -330,9 +330,7 @@
          </separator>
          <command
                commandId="org.eclipse.tcf.te.ui.command.refresh"
-               id="org.eclipse.tcf.te.ui.commands.refresh"
                label="%fsmenu.refresh.label"
-               mnemonic="f"
                style="push"
                tooltip="%command.refresh.tooltip">
             <visibleWhen
@@ -739,9 +737,7 @@
             locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.refresh">
          <command
                commandId="org.eclipse.tcf.te.ui.command.refresh"
-               id="org.eclipse.tcf.te.ui.commands.refresh"
                label="%fsmenu.refresh.label"
-               mnemonic="f"
                style="push"
                tooltip="%command.refresh.tooltip">
             <visibleWhen
