@@ -8,7 +8,7 @@
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tcf.te.tcf.launch.ui.remote.app.launchcontext;
+package org.eclipse.tcf.te.tcf.launch.ui.launchcontext;
 
 import org.eclipse.jface.dialogs.IDialogPage;
 import org.eclipse.jface.viewers.DecoratingLabelProvider;

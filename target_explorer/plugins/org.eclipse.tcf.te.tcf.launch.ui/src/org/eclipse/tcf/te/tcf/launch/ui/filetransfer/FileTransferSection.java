@@ -8,7 +8,7 @@
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tcf.te.tcf.launch.ui.remote.app.filetransfer;
+package org.eclipse.tcf.te.tcf.launch.ui.filetransfer;
 
 import java.util.List;
 import java.util.Map;

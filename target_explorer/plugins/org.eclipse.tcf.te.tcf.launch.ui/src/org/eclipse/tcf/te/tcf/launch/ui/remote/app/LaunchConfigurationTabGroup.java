@@ -21,7 +21,7 @@ import org.eclipse.tcf.internal.debug.ui.launch.TCFMemoryMapTab;
 import org.eclipse.tcf.internal.debug.ui.launch.TCFPathMapTab;
 import org.eclipse.tcf.te.launch.ui.tabs.AbstractLaunchConfigurationTabGroup;
 import org.eclipse.tcf.te.launch.ui.tabs.refprojects.RefProjetcsTab;
-import org.eclipse.tcf.te.tcf.launch.ui.remote.app.filetransfer.FileTransferTab;
+import org.eclipse.tcf.te.tcf.launch.ui.filetransfer.FileTransferTab;
 
 /**
  * Remote application launch configuration tab group implementation.

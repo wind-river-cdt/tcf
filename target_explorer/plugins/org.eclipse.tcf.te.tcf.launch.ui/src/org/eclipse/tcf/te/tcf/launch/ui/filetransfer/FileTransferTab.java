@@ -7,26 +7,27 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.tcf.launch.ui.attach;
+package org.eclipse.tcf.te.tcf.launch.ui.filetransfer;
 
-import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tcf.te.tcf.launch.core.interfaces.ILaunchTypes;
-import org.eclipse.tcf.te.tcf.launch.ui.launchcontext.AbstractLaunchContextMainTab;
-import org.eclipse.tcf.te.ui.forms.CustomFormToolkit;
+import org.eclipse.tcf.te.launch.ui.tabs.filetransfers.AbstractFileTransferSection;
+import org.eclipse.tcf.te.launch.ui.tabs.filetransfers.AbstractFileTransferTab;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.IManagedForm;
 
 /**
- * Remote application main launch tab implementation.
+ * File transfer launch configuration tab implementation.
  */
-public class LaunchConfigurationMainTab extends AbstractLaunchContextMainTab {
+public class FileTransferTab extends AbstractFileTransferTab {
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.launch.ui.tabs.launchcontext.AbstractContextSelectorTab#doCreateAdditionalFormContent(org.eclipse.ui.forms.IManagedForm, org.eclipse.swt.widgets.Composite, org.eclipse.tcf.te.ui.forms.CustomFormToolkit)
+	 * @see org.eclipse.tcf.te.launch.ui.tabs.filetransfers.AbstractFileTransferTab#createFileTransferSection(org.eclipse.ui.forms.IManagedForm, org.eclipse.swt.widgets.Composite)
 	 */
 	@Override
-	protected void doCreateAdditionalFormContent(IManagedForm form, Composite parent, CustomFormToolkit toolkit) {
+	protected AbstractFileTransferSection createFileTransferSection(IManagedForm form, Composite panel) {
+		return new FileTransferSection(getManagedForm(), panel);
 	}
 
 	/* (non-Javadoc)
@@ -34,6 +35,6 @@ public class LaunchConfigurationMainTab extends AbstractLaunchContextMainTab {
 	 */
 	@Override
 	public Image getImage() {
-		return DebugUITools.getImage(ILaunchTypes.ATTACH);
+		return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_TOOL_COPY);
 	}
 }
