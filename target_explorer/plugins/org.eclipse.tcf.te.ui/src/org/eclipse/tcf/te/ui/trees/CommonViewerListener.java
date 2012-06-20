@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EventObject;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Timer;
@@ -28,6 +29,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.tcf.te.core.utils.Ancestor;
+import org.eclipse.tcf.te.ui.interfaces.ISchedulable;
 
 /**
  * CommonViewerListener listens to the property change event from the
@@ -48,7 +50,7 @@ class CommonViewerListener extends Ancestor<Object> implements PropertyChangeLis
 	// The tree viewer
 	private TreeViewer viewer;
 	// The current queued property event sources.
-	private List<Object> queue;
+	private List<EventObject> queue;
 	// The timer task to process the property events periodically.
 	private TimerTask task;
 	// The content provider
@@ -71,7 +73,7 @@ class CommonViewerListener extends Ancestor<Object> implements PropertyChangeLis
 				handleEvent(true);
             }};
 		viewerTimer.schedule(this.task, INTERVAL, INTERVAL);
-		this.queue = Collections.synchronizedList(new ArrayList<Object>());
+		this.queue = Collections.synchronizedList(new ArrayList<EventObject>());
 	}
 	
 	/*
@@ -98,9 +100,10 @@ class CommonViewerListener extends Ancestor<Object> implements PropertyChangeLis
 	 * @param event The event object.
 	 */
 	private void processEvent(EventObject event) {
-		Object object = event.getSource();
-		Assert.isTrue(object != null);
-		queue.add(object);
+		queue.add(event);
+		if(event instanceof ISchedulable) {
+			((ISchedulable)event).eventQueued();
+		}
 		viewerTimer.schedule(new TimerTask(){
 			@Override
             public void run() {
@@ -124,9 +127,17 @@ class CommonViewerListener extends Ancestor<Object> implements PropertyChangeLis
 	 */
 	Object[] emptyQueue() {
 		synchronized (queue) {
-			Object[] objects = queue.toArray();
-			queue.clear();
-			return objects;
+			Iterator<EventObject> iterator = queue.iterator();
+			List<Object> objects = new ArrayList<Object>();
+			while(iterator.hasNext()) {
+				EventObject event = iterator.next();
+				if(event instanceof ISchedulable && !((ISchedulable)event).isSchedulable()) {
+					continue;
+				}
+				objects.add(event.getSource());
+				iterator.remove();
+			}
+			return objects.toArray();
 		}
 	}
 	

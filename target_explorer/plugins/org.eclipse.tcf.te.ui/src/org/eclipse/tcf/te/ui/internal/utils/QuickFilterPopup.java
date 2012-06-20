@@ -78,7 +78,7 @@ public class QuickFilterPopup extends PopupDialog {
 	    layout.marginHeight = 2;
 		filterText = new Text(composite, SWT.SINGLE);
 		GridData data = new GridData(GridData.FILL_HORIZONTAL);
-		data.widthHint = 180;
+		data.widthHint = 185;
 		filterText.setLayoutData(data);
 		filterText.setText(filter);
 		filterText.setFont(composite.getFont());
