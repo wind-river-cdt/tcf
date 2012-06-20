@@ -24,7 +24,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
@@ -39,20 +38,14 @@ import org.eclipse.tcf.te.launch.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.launch.core.bindings.LaunchConfigTypeBindingsManager;
 import org.eclipse.tcf.te.launch.core.interfaces.IReferencedProjectItem;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ICommonLaunchAttributes;
-import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchContextLaunchAttributes;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchManagerDelegate;
 import org.eclipse.tcf.te.launch.core.nls.Messages;
-import org.eclipse.tcf.te.launch.core.persistence.launchcontext.LaunchContextsPersistenceDelegate;
 import org.eclipse.tcf.te.launch.core.persistence.projects.ReferencedProjectsPersistenceDelegate;
 import org.eclipse.tcf.te.runtime.concurrent.util.ExecutorsUtil;
 import org.eclipse.tcf.te.runtime.interfaces.ISharedConstants;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
-import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
-import org.eclipse.tcf.te.runtime.stepper.FullQualifiedId;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepperProperties;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.tracing.ITraceIds;
 import org.eclipse.tcf.te.runtime.stepper.stepper.Stepper;
 
@@ -132,30 +125,21 @@ public class LaunchConfigurationDelegate extends org.eclipse.debug.core.model.La
 		launch.setAttribute(ICommonLaunchAttributes.ILAUNCH_ATTRIBUTE_LAUNCH_SEQUENCE_COMPLETED, Boolean.FALSE.toString());
 
 		// The stepper instance to be used
-		IStepper stepper = new Stepper();
+		IStepper stepper = new Stepper(launchConfig.getName());
 		IStatus status = null;
 
 		try {
-			// Get the associated stepper for this launch
-			IFullQualifiedId fullQualifiedId = new FullQualifiedId(IStepper.ID_TYPE_STEPPER_ID, stepper.getId(), null);
 			// Get the launch properties container
 			IPropertiesContainer properties = (IPropertiesContainer)launch.getAdapter(IPropertiesContainer.class);
 			Assert.isNotNull(properties);
 
-			// Add some information to the stepper data
-			properties.setProperty(IStepperProperties.PROP_NAME, launchConfig.getName());
-			properties.setProperty(IStepperProperties.PROP_STEP_GROUP_ID,
-							LaunchConfigTypeBindingsManager.getInstance().getStepGroupId(
-											launchConfig.getType().getIdentifier(),
-											launch.getLaunchMode()));
-
-			IModelNode[] contexts = LaunchContextsPersistenceDelegate.decodeLaunchContexts(
-							launchConfig.getAttribute(ILaunchContextLaunchAttributes.ATTR_LAUNCH_CONTEXTS, (String)null));
-			properties.setProperty(ILaunchContextLaunchAttributes.ATTR_ACTIVE_LAUNCH_CONTEXT, contexts != null && contexts.length > 0 ? contexts[0] : null);
-
 			// Initialize the stepper
+			String stepGroupId = LaunchConfigTypeBindingsManager.getInstance().getStepGroupId(
+							launchConfig.getType().getIdentifier(),
+							launch.getLaunchMode());
+
 			IStepContext context = (IStepContext)launch.getAdapter(IStepContext.class);
-			stepper.initialize(context, properties, fullQualifiedId, monitor != null ? monitor : new NullProgressMonitor());
+			stepper.initialize(context, stepGroupId, properties, monitor);
 
 			// Execute
 			stepper.execute();

@@ -34,6 +34,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: org.eclipse.tcf.te.tcf.launch.ui.activator;x-internal:=true,
+ org.eclipse.tcf.te.tcf.launch.ui.attach,
  org.eclipse.tcf.te.tcf.launch.ui.help,
  org.eclipse.tcf.te.tcf.launch.ui.nls;x-internal:=true,
  org.eclipse.tcf.te.tcf.launch.ui.remote.app,

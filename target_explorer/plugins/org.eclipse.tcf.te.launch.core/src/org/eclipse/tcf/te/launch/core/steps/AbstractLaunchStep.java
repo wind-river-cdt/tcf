@@ -15,7 +15,9 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchContextLaunchAttributes;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
+import org.eclipse.tcf.te.runtime.stepper.StepperAttributeUtil;
 import org.eclipse.tcf.te.runtime.stepper.extensions.AbstractStep;
+import org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext;
 
 /**
@@ -51,9 +53,10 @@ public abstract class AbstractLaunchStep extends AbstractStep {
 	 * @param data The data giving object. Must not be <code>null</code>.
 	 * @return The active launch context model node.
 	 */
-	protected IModelNode getActiveLaunchContext(IPropertiesContainer data) {
+	protected IModelNode getActiveLaunchContext(IFullQualifiedId fullQualifiedId, IPropertiesContainer data) {
 		Assert.isNotNull(data);
-		Object context = data.getProperty(ILaunchContextLaunchAttributes.ATTR_ACTIVE_LAUNCH_CONTEXT);
+		Assert.isNotNull(fullQualifiedId);
+		Object context = StepperAttributeUtil.getProperty(ILaunchContextLaunchAttributes.ATTR_ACTIVE_LAUNCH_CONTEXT, fullQualifiedId, data);
 		Assert.isTrue(context instanceof IModelNode);
 		return (IModelNode)context;
 	}

@@ -25,6 +25,13 @@ public interface IStepContext extends IAdaptable {
 	public String getId();
 
 	/**
+	 * Returns the context secondary id.
+	 *
+	 * @return The context secondary id or <code>null</code>.
+	 */
+	public String getSecondaryId();
+
+	/**
 	 * Returns a name/label to be used within the UI to represent this context
 	 * to the user.
 	 *

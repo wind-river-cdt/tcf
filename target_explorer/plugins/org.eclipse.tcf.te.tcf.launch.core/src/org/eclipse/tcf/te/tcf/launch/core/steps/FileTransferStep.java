@@ -61,7 +61,7 @@ public class FileTransferStep extends AbstractTcfLaunchStep {
 		final IFileTransferItem item = (IFileTransferItem)StepperAttributeUtil.getProperty(IFileTransferLaunchAttributes.ATTR_ACTIVE_FILE_TRANSFER, fullQualifiedId, data);
 
 		if (item.isEnabled()) {
-			FileTransferService.transfer(getActivePeerModel(data).getPeer(), channel, item, monitor, callback);
+			FileTransferService.transfer(getActivePeerModel(fullQualifiedId, data).getPeer(), channel, item, monitor, callback);
 		}
 		else {
 			callback.done(this, Status.OK_STATUS);

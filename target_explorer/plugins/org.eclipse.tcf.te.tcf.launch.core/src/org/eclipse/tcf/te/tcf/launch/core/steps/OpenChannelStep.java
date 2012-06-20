@@ -46,7 +46,7 @@ public class OpenChannelStep extends AbstractTcfLaunchStep {
 	 */
 	@Override
 	public void execute(IStepContext context, final IPropertiesContainer data, final IFullQualifiedId fullQualifiedId, IProgressMonitor monitor, final ICallback callback) {
-		Tcf.getChannelManager().openChannel(getActivePeerModel(data).getPeer(), null, new IChannelManager.DoneOpenChannel() {
+		Tcf.getChannelManager().openChannel(getActivePeerModel(fullQualifiedId, data).getPeer(), null, new IChannelManager.DoneOpenChannel() {
 			@Override
 			public void doneOpenChannel(final Throwable error, final IChannel channel) {
 				StepperAttributeUtil.setProperty(ICommonTCFLaunchAttributes.ATTR_CHANNEL, fullQualifiedId.getParentId(), data, channel);

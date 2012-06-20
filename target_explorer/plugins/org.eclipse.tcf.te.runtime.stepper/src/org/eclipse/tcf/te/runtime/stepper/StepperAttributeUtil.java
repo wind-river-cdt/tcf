@@ -30,7 +30,7 @@ public class StepperAttributeUtil {
 		Assert.isNotNull(key);
 		Assert.isNotNull(data);
 
-		return (fullQualifiedId != null ? fullQualifiedId.toString() : "") + key; //$NON-NLS-1$
+		return (fullQualifiedId != null ? fullQualifiedId.toString() + "." : "") + key; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**

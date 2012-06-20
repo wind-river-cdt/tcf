@@ -56,6 +56,14 @@ public class StepContextAdapter extends PlatformObject implements IStepContext {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext#getSecondaryId()
+	 */
+	@Override
+	public String getSecondaryId() {
+		return launch != null ? launch.getLaunchMode() : null;
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext#getName()
 	 */
 	@Override

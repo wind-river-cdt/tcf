@@ -60,16 +60,12 @@ public class FullQualifiedId implements IFullQualifiedId {
 				toString.append(secondaryId.trim());
 				toString.append('"');
 			}
+			toString.append("/>"); //$NON-NLS-1$
+
 			if (children != null && children.trim().length() > 0) {
-				toString.append('>');
 				toString.append(children);
-				toString.append("</"); //$NON-NLS-1$
-				toString.append(type);
-				toString.append('>');
 			}
-			else {
-				toString.append("/>"); //$NON-NLS-1$
-			}
+
 			return toString.toString();
 		}
 
@@ -141,7 +137,7 @@ public class FullQualifiedId implements IFullQualifiedId {
 	public IFullQualifiedId getParentId() {
 		if (ids.size() > 1) {
 			return new FullQualifiedId(ids.subList(0, ids.size() - 1)
-			                .toArray(new IdData[ids.size() - 1]), null, null, null);
+							.toArray(new IdData[ids.size() - 1]), null, null, null);
 		}
 		return null;
 	}

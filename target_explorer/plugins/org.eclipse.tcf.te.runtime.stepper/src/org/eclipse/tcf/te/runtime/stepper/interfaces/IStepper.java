@@ -28,10 +28,9 @@ import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
  */
 public interface IStepper {
 
+	public static final String ID_TYPE_STEP_CONTEXT_ID = "StepContext"; //$NON-NLS-1$
 	public static final String ID_TYPE_STEPPER_ID = "Stepper"; //$NON-NLS-1$
-	public static final String ID_TYPE_CONTEXT_ID = "Context"; //$NON-NLS-1$
 	public static final String ID_TYPE_STEP_GROUP_ID = "StepGroup"; //$NON-NLS-1$
-	public static final String ID_TYPE_STEP_GROUP_ITERATION_ID = "StepGroupIteration"; //$NON-NLS-1$
 	public static final String ID_TYPE_STEP_ID = "Step"; //$NON-NLS-1$
 
 	/**
@@ -82,25 +81,19 @@ public interface IStepper {
 	public String getLabel();
 
 	/**
-	 * Returns the description of the extension.
-	 *
-	 * @return The description or an empty string.
-	 */
-	public String getDescription();
-
-	/**
 	 * Initialize the stepper for a run. This method must be called before <i><code>execute()</code>
 	 * </i>. Once the stepper finished the execution, the initialization is reseted and must be
 	 * renewed before <i><code>execute()</code></i> can be called again.
 	 *
 	 * @param context The step context. Must not be <code>null</code>.
-	 * @param data The data. Must not be <code>null</code>.
-	 * @param fullQualifiedId The full qualified id of this stepper.
-	 * @param monitor The progress monitor. Must not be <code>null</code>.
+	 * @param stepGroupId The step group to execute. Must not be <code>null</code>.
+	 * @param data The data to transfer data between steps. Must not be <code>null</code>.
+	 *             Can also be used to get data from the launch after it has finished.
+	 * @param monitor The progress monitor or <code>null</code>.
 	 *
 	 * @throws IllegalStateException If called if the stepper is in initialized state already.
 	 */
-	public void initialize(IStepContext context, IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor) throws IllegalStateException;
+	public void initialize(IStepContext context, String stepGroupId, IPropertiesContainer data, IProgressMonitor monitor) throws IllegalStateException;
 
 	/**
 	 * Returns if or if not the stepper got initialized for a new run.

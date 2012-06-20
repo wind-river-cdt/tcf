@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
@@ -27,6 +28,7 @@ import org.eclipse.tcf.te.runtime.callback.Callback;
 import org.eclipse.tcf.te.runtime.concurrent.util.ExecutorsUtil;
 import org.eclipse.tcf.te.runtime.interfaces.ISharedConstants;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
+import org.eclipse.tcf.te.runtime.stepper.FullQualifiedId;
 import org.eclipse.tcf.te.runtime.stepper.StepperManager;
 import org.eclipse.tcf.te.runtime.stepper.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.runtime.stepper.extensions.StepExecutor;
@@ -39,7 +41,6 @@ import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroup;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroupIterator;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepGroupable;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper;
-import org.eclipse.tcf.te.runtime.stepper.interfaces.IStepperProperties;
 import org.eclipse.tcf.te.runtime.stepper.interfaces.tracing.ITraceIds;
 import org.eclipse.tcf.te.runtime.stepper.nls.Messages;
 import org.eclipse.tcf.te.runtime.utils.ProgressHelper;
@@ -57,6 +58,8 @@ public class Stepper implements IStepper {
 	private IProgressMonitor monitor = null;
 	private IStepContext context = null;
 	private boolean cancelable = true;
+	private String stepGroupId = null;
+	private String name = null;
 
 	/**
 	 * Internal helper describing a fully executed step.
@@ -78,6 +81,16 @@ public class Stepper implements IStepper {
 		super();
 	}
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param name The name of this stepper.
+	 */
+	public Stepper(String name) {
+		super();
+		this.name = name;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper#getId()
 	 */
@@ -91,15 +104,7 @@ public class Stepper implements IStepper {
 	 */
 	@Override
 	public String getLabel() {
-		return getClass().getName();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper#getDescription()
-	 */
-	@Override
-	public String getDescription() {
-		return null;
+		return name != null && name.trim().length() > 0 ? name.trim() : getId();
 	}
 
 	/**
@@ -108,7 +113,7 @@ public class Stepper implements IStepper {
 	 * @return The step group id.
 	 */
 	protected String getStepGroupId() {
-		return getData() != null ? getData().getStringProperty(IStepperProperties.PROP_STEP_GROUP_ID) : null;
+		return stepGroupId;
 	}
 
 	/**
@@ -143,14 +148,13 @@ public class Stepper implements IStepper {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper#initialize(org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext, org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStepper#initialize(org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext, java.lang.String, org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public final void initialize(IStepContext context, IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor) throws IllegalStateException {
+	public final void initialize(IStepContext context, String stepGroupId, IPropertiesContainer data, IProgressMonitor monitor) throws IllegalStateException {
 		Assert.isNotNull(context);
+		Assert.isNotNull(stepGroupId);
 		Assert.isNotNull(data);
-		Assert.isNotNull(fullQualifiedId);
-		Assert.isNotNull(monitor);
 
 		// Assert stepper is not in use
 		if (isInitialized()) {
@@ -159,15 +163,16 @@ public class Stepper implements IStepper {
 
 		// set the initial stepper attributes
 		this.context = context;
+		this.stepGroupId = stepGroupId;
 		this.data = data;
-		this.monitor = monitor;
-		this.fullQualifiedId = fullQualifiedId;
+		this.monitor = monitor != null ? monitor : new NullProgressMonitor();
+		this.fullQualifiedId = new FullQualifiedId(IStepper.ID_TYPE_STEP_CONTEXT_ID, context.getId(), context.getSecondaryId());
 
 		// but not finished yet
 		this.finished = false;
 
 		// call the hook for the subclasses to initialize themselves
-		onInitialize(data, fullQualifiedId, monitor);
+		onInitialize(this.data, fullQualifiedId, this.monitor);
 
 		setInitialized();
 
@@ -185,7 +190,6 @@ public class Stepper implements IStepper {
 	 */
 	protected void onInitialize(IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor) {
 		Assert.isNotNull(data);
-		Assert.isNotNull(fullQualifiedId);
 		Assert.isNotNull(monitor);
 	}
 
@@ -409,7 +413,7 @@ public class Stepper implements IStepper {
 		// Initialize the progress monitor
 		getMonitor().beginTask(stepGroup.getLabel(), calculateTotalWork(stepGroup));
 
-		IFullQualifiedId fullQualifiedId = getFullQualifiedId().createChildId(ID_TYPE_CONTEXT_ID, getContextId(), null);
+		IFullQualifiedId fullQualifiedId = getFullQualifiedId().createChildId(ID_TYPE_STEPPER_ID, getId(), null);
 		fullQualifiedId = fullQualifiedId.createChildId(ID_TYPE_STEP_GROUP_ID, stepGroup.getId(), null);
 		// Execute the step group
 		executeStepGroup(stepGroup, statusContainer, new ArrayList<ExecutedContextStep>(), fullQualifiedId);
@@ -418,7 +422,7 @@ public class Stepper implements IStepper {
 	/**
 	 * Executes a step group.
 	 *
-	 * @param stepGroup The step group. Must not be <code>null</code>.
+	 * @param stepGroupId The step group. Must not be <code>null</code>.
 	 * @param statusContainer A list holding the warnings occurred during the execution. Must not be
 	 *            <code>null</code>.
 	 * @param executedSteps A list holding the id's of the steps executed before. Must not be
@@ -459,7 +463,7 @@ public class Stepper implements IStepper {
 
 		while (next) {
 			if (iterator != null) {
-				fullQualifiedIterationId = fullQualifiedGroupId.createChildId(ID_TYPE_STEP_GROUP_ITERATION_ID, iterator.getId(), "" + iteration); //$NON-NLS-1$
+				fullQualifiedIterationId = fullQualifiedGroupId.getParentId().createChildId(ID_TYPE_STEP_GROUP_ID, stepGroup.getId(), "" + iteration); //$NON-NLS-1$
 				iterator.next(getContext(), getData(), fullQualifiedIterationId, getMonitor());
 			}
 			// Execute the steps or step groups.
@@ -646,7 +650,7 @@ public class Stepper implements IStepper {
 	 * work of each sub step. If one of the steps returns {@link IProgressMonitor#UNKNOWN}, the
 	 * total work will be unknown for the whole step group.
 	 *
-	 * @param stepGroup The step group. Must not be <code>null</code>.
+	 * @param stepGroupId The step group. Must not be <code>null</code>.
 	 * @return The total work required or {@link IProgressMonitor#UNKNOWN}.
 	 *
 	 * @throws CoreException If the total work of the step group cannot be determined.

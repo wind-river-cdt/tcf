@@ -105,7 +105,7 @@ public class LaunchProcessStep extends AbstractTcfLaunchStep {
 		// Launch the process
 		IPropertiesContainer container = new PropertiesContainer();
 		container.setProperties(launchAttributes);
-		launcher.launch(getActivePeerModel(data).getPeer(), container, new Callback(callback) {
+		launcher.launch(getActivePeerModel(fullQualifiedId, data).getPeer(), container, new Callback(callback) {
 			@Override
 			protected void internalDone(Object caller, IStatus status) {
 				Object result = getResult();

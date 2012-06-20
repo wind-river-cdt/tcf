@@ -46,12 +46,6 @@ public abstract class AbstractStep extends ExecutableExtension implements IExten
 
 	/**
 	 * The suffix to append to the full qualified step id to
-	 * get the step target event listener.
-	 */
-	public final static String SUFFIX_EVENT_LISTENER = "eventListener"; //$NON-NLS-1$
-
-	/**
-	 * The suffix to append to the full qualified step id to
 	 * get the operational flag.
 	 */
 	public final static String SUFFIX_OPERATIONAL = "operational"; //$NON-NLS-1$
@@ -60,7 +54,7 @@ public abstract class AbstractStep extends ExecutableExtension implements IExten
 	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IExtendedStep#isSingleton()
 	 */
 	@Override
-    public boolean isSingleton() {
+	public boolean isSingleton() {
 		return false;
 	}
 
@@ -69,7 +63,7 @@ public abstract class AbstractStep extends ExecutableExtension implements IExten
 	 */
 	@Override
 	public void doSetInitializationData(IConfigurationElement config, String propertyName, Object data) throws CoreException {
-	    super.doSetInitializationData(config, propertyName, data);
+		super.doSetInitializationData(config, propertyName, data);
 
 		// Read in the list of required step or step id's if specified.
 		dependencies.clear();
@@ -78,10 +72,10 @@ public abstract class AbstractStep extends ExecutableExtension implements IExten
 			String value = require.getAttribute("id"); //$NON-NLS-1$
 			if (value == null || value.trim().length() == 0) {
 				throw new CoreException(new Status(IStatus.ERROR,
-												   CoreBundleActivator.getUniqueIdentifier(),
-												   0,
-												   NLS.bind(Messages.AbstractStep_error_missingRequiredAttribute, "dependency id (requires)",  getLabel()), //$NON-NLS-1$
-												   null));
+								CoreBundleActivator.getUniqueIdentifier(),
+								0,
+								NLS.bind(Messages.AbstractStep_error_missingRequiredAttribute, "dependency id (requires)",  getLabel()), //$NON-NLS-1$
+								null));
 			}
 			if (!dependencies.contains(value.trim())) {
 				dependencies.add(value.trim());
@@ -93,7 +87,7 @@ public abstract class AbstractStep extends ExecutableExtension implements IExten
 	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IExtendedStep#initializeFrom(org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext, org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-    public void initializeFrom(IStepContext context, IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor) {
+	public void initializeFrom(IStepContext context, IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor) {
 		Assert.isNotNull(context);
 		Assert.isNotNull(data);
 		Assert.isNotNull(fullQualifiedId);
@@ -107,7 +101,7 @@ public abstract class AbstractStep extends ExecutableExtension implements IExten
 	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IExtendedStep#cleanup(org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext, org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-    public void cleanup(IStepContext context, IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor) {
+	public void cleanup(IStepContext context, IPropertiesContainer data, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor) {
 		StepperAttributeUtil.setProperty(SUFFIX_DELAYED_STATUS, fullQualifiedId, data, false);
 		StepperAttributeUtil.setProperty(SUFFIX_OPERATIONAL, fullQualifiedId, data, false);
 	}
@@ -116,15 +110,17 @@ public abstract class AbstractStep extends ExecutableExtension implements IExten
 	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IExtendedStep#rollback(org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext, org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer, org.eclipse.core.runtime.IStatus, org.eclipse.tcf.te.runtime.stepper.interfaces.IFullQualifiedId, org.eclipse.core.runtime.IProgressMonitor, org.eclipse.tcf.te.runtime.interfaces.callback.ICallback)
 	 */
 	@Override
-    public void rollback(IStepContext context, IPropertiesContainer data, IStatus status, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor, ICallback callback) {
-		if (callback != null) callback.done(this, Status.OK_STATUS);
+	public void rollback(IStepContext context, IPropertiesContainer data, IStatus status, IFullQualifiedId fullQualifiedId, IProgressMonitor monitor, ICallback callback) {
+		if (callback != null) {
+			callback.done(this, Status.OK_STATUS);
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStep#getTotalWork(org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext, org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer)
 	 */
 	@Override
-    public int getTotalWork(IStepContext context, IPropertiesContainer data) {
+	public int getTotalWork(IStepContext context, IPropertiesContainer data) {
 		return 10;
 	}
 
@@ -132,7 +128,7 @@ public abstract class AbstractStep extends ExecutableExtension implements IExten
 	 * @see org.eclipse.tcf.te.runtime.stepper.interfaces.IStep#getDependencies()
 	 */
 	@Override
-    public String[] getDependencies() {
+	public String[] getDependencies() {
 		return dependencies.toArray(new String[dependencies.size()]);
 	}
 
@@ -163,8 +159,8 @@ public abstract class AbstractStep extends ExecutableExtension implements IExten
 				if (delayedStati.length > 0) {
 					if (!(status instanceof MultiStatus))  {
 						status = new MultiStatus(CoreBundleActivator.getUniqueIdentifier(), 0,
-												 NLS.bind(Messages.AbstractStep_warning_stepFinishedWithWarnings, getLabel()),
-												 null);
+										NLS.bind(Messages.AbstractStep_warning_stepFinishedWithWarnings, getLabel()),
+										null);
 
 					}
 					// At this point the status must be a MultiStatus
@@ -200,9 +196,9 @@ public abstract class AbstractStep extends ExecutableExtension implements IExten
 			((MultiStatus)delayedStatus).merge(status);
 		} else {
 			MultiStatus multiStatus = new MultiStatus(CoreBundleActivator.getUniqueIdentifier(), 0,
-													  new IStatus[] { delayedStatus, status },
-													  "", //$NON-NLS-1$
-													  null);
+							new IStatus[] { delayedStatus, status },
+							"", //$NON-NLS-1$
+							null);
 			StepperAttributeUtil.setProperty(SUFFIX_DELAYED_STATUS, fullQualifiedId, data, multiStatus);
 		}
 	}

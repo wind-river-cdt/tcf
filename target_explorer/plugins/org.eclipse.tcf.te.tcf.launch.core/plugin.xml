@@ -107,7 +107,7 @@
       <stepGroup
             id="org.eclipse.tcf.te.tcf.launch.type.remote.app.stepGroup"
             label="%LaunchStepGroup.Remote.App.name"
-            locked="false">
+            iterator="org.eclipse.tcf.te.launch.core.steps.iterators.LaunchContextIterator">
          <references>
             <reference id="org.eclipse.tcf.te.tcf.launch.core.openChannelStep"/>
             <reference id="org.eclipse.tcf.te.tcf.launch.core.fileTransferStepGroup"/>
@@ -141,8 +141,7 @@
       <stepGroup
             id="org.eclipse.tcf.te.tcf.launch.core.fileTransferStepGroup"
             label="%LaunchStepGroup.FileTransfer.name"
-            iterator="org.eclipse.tcf.te.tcf.launch.core.steps.iterators.FileTransferIterator"
-            locked="false">
+            iterator="org.eclipse.tcf.te.tcf.launch.core.steps.iterators.FileTransferIterator">
          <references>
             <reference id="org.eclipse.tcf.te.tcf.launch.core.fileTransferStep"/>
          </references>
@@ -150,7 +149,7 @@
       <stepGroup
             id="org.eclipse.tcf.te.tcf.launch.type.attach.stepGroup"
             label="%LaunchStepGroup.Attach.name"
-            locked="false">
+            iterator="org.eclipse.tcf.te.launch.core.steps.iterators.LaunchContextIterator">
          <references>
             <reference id="org.eclipse.tcf.te.tcf.launch.core.attachDebuggerStep">
                <enablement>
