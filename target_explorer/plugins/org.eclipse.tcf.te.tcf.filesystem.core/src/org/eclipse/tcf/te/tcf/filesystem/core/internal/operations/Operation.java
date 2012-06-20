@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SafeRunner;
@@ -72,13 +73,13 @@ public class Operation extends Ancestor<FSTreeNode> implements IOperation {
 	 * @param error The FileSystemException
 	 * @return a TCFFileSystemException
 	 */
-	protected TCFFileSystemException newTCFException(FileSystemException error) {
+	protected TCFFileSystemException newTCFException(int severity, FileSystemException error) {
 	    String message = null;
 	    if(error instanceof IErrorReport) {
 	    	IErrorReport report = (IErrorReport) error;
 	    	message = (String)report.getAttributes().get(IErrorReport.ERROR_FORMAT);
 	    }
-	    return new TCFFileSystemException(message, error);
+	    return new TCFFileSystemException(severity, message, error);
     }	
 
 	/**
@@ -149,11 +150,11 @@ public class Operation extends Ancestor<FSTreeNode> implements IOperation {
 				if (error != null) {
 					if (error instanceof ConnectException) {
 						String message = NLS.bind(Messages.Operation_NotResponding, peer.getID());
-						errors[0] = new TCFChannelException(message);
+						errors[0] = new TCFChannelException(IStatus.ERROR, message);
 					}
 					else if(!(error instanceof OperationCanceledException)) {
 						String message = NLS.bind(Messages.Operation_OpeningChannelFailureMessage, peer.getID(), error.getMessage());
-						errors[0] = new TCFChannelException(message, error);
+						errors[0] = new TCFChannelException(IStatus.OK, message, error);
 					}
 				}
 				else {
@@ -253,7 +254,7 @@ public class Operation extends Ancestor<FSTreeNode> implements IOperation {
 				return getChildren(node, service);
 			}
 			String message = NLS.bind(Messages.Operation_NoFileSystemError, node.peerNode.getPeerId());
-			throw new TCFFileSystemException(message);
+			throw new TCFFileSystemException(IStatus.ERROR, message);
 		}
 		finally {
 			if (channel != null) Tcf.getChannelManager().closeChannel(channel);
@@ -292,7 +293,7 @@ public class Operation extends Ancestor<FSTreeNode> implements IOperation {
 				public void doneOpen(IToken token, FileSystemException error, IFileHandle handle) {
 					if (error != null) {
 						String message = NLS.bind(Messages.Operation_CannotOpenDir, node.name, error);
-						errors[0] = new TCFFileSystemException(message, error);
+						errors[0] = new TCFFileSystemException(IStatus.WARNING, message, error);
 					}
 					else {
 						handles[0] = handle;
@@ -321,7 +322,7 @@ public class Operation extends Ancestor<FSTreeNode> implements IOperation {
 							}
 						}
 						else {
-							errors[0] = newTCFException(error);
+							errors[0] = newTCFException(IStatus.WARNING, error);
 						}
 					}
 				});
@@ -441,7 +442,7 @@ public class Operation extends Ancestor<FSTreeNode> implements IOperation {
 				if (error != null) {
 					String message = NLS
 					                .bind(Messages.Operation_CannotCreateDirectory, new Object[] { node.name, error });
-					errors[0] = new TCFFileSystemException(message, error);
+					errors[0] = new TCFFileSystemException(IStatus.WARNING, message, error);
 				}
 			}
 		});
@@ -531,7 +532,7 @@ public class Operation extends Ancestor<FSTreeNode> implements IOperation {
 					cleanUpFile(node);
 				}
 				else {
-					errors[0] = newTCFException(error);
+					errors[0] = newTCFException(IStatus.WARNING, error);
 				}
 			}
 		});
@@ -559,7 +560,7 @@ public class Operation extends Ancestor<FSTreeNode> implements IOperation {
 					cleanUpFolder(node);
 				}
 				else {
-					errors[0] = newTCFException(error);
+					errors[0] = newTCFException(IStatus.WARNING, error);
 				}
 			}
 		});

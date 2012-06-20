@@ -67,7 +67,7 @@ public class OpDelete extends Operation {
 				}
 				else {
 					String message = NLS.bind(Messages.Operation_NoFileSystemError, head.peerNode.getPeerId());
-					throw new TCFFileSystemException(message);
+					throw new TCFFileSystemException(IStatus.ERROR, message);
 				}
 			}
 		}
@@ -216,7 +216,7 @@ public class OpDelete extends Operation {
 							}
 							else {
 								String message = NLS.bind(Messages.Operation_NoFileSystemError, head.peerNode.getPeerId());
-								throw new TCFFileSystemException(message);
+								throw new TCFFileSystemException(IStatus.ERROR, message);
 							}
 						}
 					}

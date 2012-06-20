@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.filesystem.core.activator.CorePlugin;
 import org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IOperation;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.exceptions.TCFException;
 
 /**
  * An operation executor that executes an operation directly and silently. 
@@ -58,7 +59,13 @@ public class NullOpExecutor implements IOpExecutor {
 		}
 		catch (InvocationTargetException e) {
 			Throwable throwable = e.getTargetException();
-			status = new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), throwable.getMessage(), throwable);
+			if (throwable instanceof TCFException) {
+				int severity = ((TCFException) throwable).getSeverity();
+				status = new Status(severity, CorePlugin.getUniqueIdentifier(), throwable.getMessage(), throwable);
+			}
+			else {
+				status = new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), throwable.getMessage(), throwable);
+			}
 		}
 		catch (InterruptedException e) {
 			status = Status.CANCEL_STATUS;

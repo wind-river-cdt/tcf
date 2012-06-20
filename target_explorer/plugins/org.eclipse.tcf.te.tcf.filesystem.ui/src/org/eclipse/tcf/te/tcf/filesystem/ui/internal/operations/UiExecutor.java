@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IOperation;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.IOpExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.ui.dialogs.TimeTriggeredProgressMonitorDialog;
@@ -79,9 +80,15 @@ public class UiExecutor implements IOpExecutor {
 		}
 		catch (InvocationTargetException e) {
 			// Display the error during copy.
-			Throwable throwable = e.getTargetException() != null ? e.getTargetException() : e;
+			Throwable throwable = e.getTargetException();
+			if(throwable instanceof TCFException) {
+				int severity = ((TCFException)throwable).getSeverity();
+				status = new Status(severity, UIPlugin.getUniqueIdentifier(), throwable.getMessage(), throwable);
+			}
+			else {
+				status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), throwable.getMessage(), throwable);
+			}
 			MessageDialog.openError(parent, operation.getName(), throwable.getMessage());
-			status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), throwable.getMessage(), throwable);
 		}
 		catch (InterruptedException e) {
 			// It is canceled.

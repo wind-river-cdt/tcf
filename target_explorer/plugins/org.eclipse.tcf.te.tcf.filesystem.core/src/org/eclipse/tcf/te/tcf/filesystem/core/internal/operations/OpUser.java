@@ -13,6 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
@@ -105,7 +106,7 @@ public class OpUser extends Operation {
 					if (error == null) {
 						accounts[0] = new UserAccount(real_uid, real_gid, effective_uid, effective_gid, home);
 					}else {
-						errors[0] = newTCFException(error);
+						errors[0] = newTCFException(IStatus.WARNING, error);
 					}
 				}
 			});
@@ -115,7 +116,7 @@ public class OpUser extends Operation {
 			return accounts[0];
 		}
 		String message = NLS.bind(Messages.Operation_NoFileSystemError, channel.getRemotePeer().getID());
-		throw new TCFFileSystemException(message);
+		throw new TCFFileSystemException(IStatus.ERROR, message);
 	}
 
 	/**

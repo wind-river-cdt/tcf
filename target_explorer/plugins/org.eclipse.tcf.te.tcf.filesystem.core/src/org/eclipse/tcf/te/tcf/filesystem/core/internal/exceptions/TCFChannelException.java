@@ -19,22 +19,26 @@ public class TCFChannelException extends TCFException {
 	/**
 	 * Constructor.
 	 *
+	 * @param severity the severity; one of <code>OK</code>, <code>ERROR</code>, 
+	 * <code>INFO</code>, <code>WARNING</code>,  or <code>CANCEL</code>
 	 * @param message
 	 *            The exception detail message or <code>null</code>.
 	 */
-	public TCFChannelException(String message) {
-		super(message);
+	public TCFChannelException(int severity, String message) {
+		super(severity, message);
 	}
 
 	/**
 	 * Constructor.
 	 *
+	 * @param severity the severity; one of <code>OK</code>, <code>ERROR</code>, 
+	 * <code>INFO</code>, <code>WARNING</code>,  or <code>CANCEL</code>
 	 * @param message
 	 *            The exception detail message or <code>null</code>.
 	 * @param cause
 	 *            The exception cause or <code>null</code>.
 	 */
-	public TCFChannelException(String message, Throwable cause){
-		super(message, cause);
+	public TCFChannelException(int severity, String message, Throwable cause){
+		super(severity, message, cause);
 	}
 }

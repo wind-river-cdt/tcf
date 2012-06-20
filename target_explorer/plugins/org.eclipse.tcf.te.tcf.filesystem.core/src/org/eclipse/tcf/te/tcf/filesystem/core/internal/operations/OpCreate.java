@@ -12,6 +12,7 @@ package org.eclipse.tcf.te.tcf.filesystem.core.internal.operations;
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
@@ -77,7 +78,7 @@ public abstract class OpCreate extends Operation {
 			}
 			else {
 				String message = NLS.bind(Messages.Operation_NoFileSystemError, folder.peerNode.getPeerId());
-				throw new TCFFileSystemException(message);
+				throw new TCFFileSystemException(IStatus.ERROR, message);
 			}
 		}
 		catch (TCFException e) {
@@ -106,7 +107,7 @@ public abstract class OpCreate extends Operation {
 						if (node != null) node.setAttributes(attrs);
 					}
 					else {
-						errors[0] = newTCFException(error);
+						errors[0] = newTCFException(IStatus.WARNING, error);
 					}
 				}
 			});

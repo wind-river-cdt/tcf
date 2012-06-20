@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.tcf.te.runtime.interfaces.callback.ICallback;
 import org.eclipse.tcf.te.tcf.filesystem.core.activator.CorePlugin;
 import org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IOperation;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.exceptions.TCFException;
 
 /**
  * The operation that is executed as a back ground job.
@@ -61,6 +62,10 @@ public class JobExecutor implements IOpExecutor{
 				}
 				catch (InvocationTargetException e) {
 					Throwable throwable = e.getTargetException();
+					if(throwable instanceof TCFException) {
+						int severity = ((TCFException)throwable).getSeverity();
+						return new Status(severity, CorePlugin.getUniqueIdentifier(), throwable.getMessage(), throwable);
+					}
 					return new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), throwable.getMessage(), throwable);
 				}
 				catch (InterruptedException e) {

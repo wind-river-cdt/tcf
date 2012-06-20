@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IChannel;
@@ -92,7 +93,7 @@ public class OpCopy extends Operation {
 				}
 				else {
 					String message = NLS.bind(Messages.Operation_NoFileSystemError, head.peerNode.getPeerId());
-					throw new TCFFileSystemException(message);
+					throw new TCFFileSystemException(IStatus.ERROR, message);
 				}
 			}
 		}
@@ -195,7 +196,7 @@ public class OpCopy extends Operation {
 			public void doneCopy(IToken token, FileSystemException error) {
 				if (error != null) {
 					String message = NLS.bind(Messages.OpCopy_CannotCopyFile, copy.name, error);
-					errors[0] = new TCFFileSystemException(message, error);
+					errors[0] = new TCFFileSystemException(IStatus.ERROR, message, error);
 				}
 			}
 		});
@@ -241,7 +242,7 @@ public class OpCopy extends Operation {
 							}
 							else {
 								String message = NLS.bind(Messages.Operation_NoFileSystemError, head.peerNode.getPeerId());
-								throw new TCFFileSystemException(message);
+								throw new TCFFileSystemException(IStatus.ERROR, message);
 							}
 						}
 					}

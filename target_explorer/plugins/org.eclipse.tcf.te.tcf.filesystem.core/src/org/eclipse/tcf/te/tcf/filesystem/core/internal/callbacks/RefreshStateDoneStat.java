@@ -9,6 +9,8 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.core.internal.callbacks;
 
+import java.io.File;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.tcf.protocol.IChannel;
@@ -21,6 +23,7 @@ import org.eclipse.tcf.te.tcf.core.Tcf;
 import org.eclipse.tcf.te.tcf.filesystem.core.activator.CorePlugin;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.JobExecutor;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.OpTargetFileDigest;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.CacheManager;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.FileState;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.PersistenceManager;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
@@ -56,15 +59,22 @@ public class RefreshStateDoneStat extends CallbackBase implements DoneStat {
 		if (error == null) {
 			FileAttrs oldAttrs = node.attr;
 			node.setAttributes(attrs);
-			FileState fileDigest = PersistenceManager.getInstance().getFileDigest(node);
-			if (fileDigest.getTargetDigest() == null || 
-							(oldAttrs == null && attrs != null || 
-							oldAttrs != null && attrs == null || 
-							oldAttrs != null && attrs != null && oldAttrs.mtime != attrs.mtime)) {
-				// Its modification time has changed. Update the digest.
-				updateTargetDigest();
+			// Only update its target digest when it has a local cache file.
+			File file = CacheManager.getCacheFile(node);
+			if(file.exists()) {
+				FileState fileDigest = PersistenceManager.getInstance().getFileDigest(node);
+				if (fileDigest.getTargetDigest() == null || 
+								(oldAttrs == null && attrs != null || 
+								oldAttrs != null && attrs == null || 
+								oldAttrs != null && attrs != null && oldAttrs.mtime != attrs.mtime)) {
+					// Its modification time has changed. Update the digest.
+					updateTargetDigest();
+				}
+				else {
+					invokeCallback(Status.OK_STATUS);
+				}
 			}
-			else {
+			else{
 				invokeCallback(Status.OK_STATUS);
 			}
 		}

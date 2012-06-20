@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.filesystem.core.internal.operations;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.DoneClose;
@@ -55,12 +56,12 @@ public class OpCreateFile extends OpCreate {
 			}
 		});
 		if (errors[0] != null) {
-			TCFFileSystemException exception = new TCFFileSystemException(errors[0].toString());
+			TCFFileSystemException exception = new TCFFileSystemException(IStatus.ERROR, errors[0].toString());
 			exception.initCause(errors[0]);
 			throw exception;
 		}
 		if (handles[0] == null) {
-			throw new TCFFileSystemException(Messages.TcfURLConnection_NoFileHandleReturned);
+			throw new TCFFileSystemException(IStatus.ERROR, Messages.TcfURLConnection_NoFileHandleReturned);
 		}
 		service.close(handles[0], new DoneClose() {
 			@Override

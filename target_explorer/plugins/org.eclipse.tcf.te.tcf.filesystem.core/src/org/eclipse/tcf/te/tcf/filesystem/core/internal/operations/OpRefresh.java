@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.services.IFileSystem;
@@ -66,7 +67,7 @@ public class OpRefresh extends Operation {
 					}
 					else {
 						String message = NLS.bind(Messages.Operation_NoFileSystemError, node.peerNode.getPeerId());
-						throw new TCFFileSystemException(message);
+						throw new TCFFileSystemException(IStatus.ERROR, message);
 					}
 				}
 			}

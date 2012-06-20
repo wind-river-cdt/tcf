@@ -13,6 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
@@ -86,7 +87,7 @@ public class OpMove extends Operation {
 					}
 					else {
 						String message = NLS.bind(Messages.Operation_NoFileSystemError, head.peerNode.getPeerId());
-						throw new TCFFileSystemException(message);
+						throw new TCFFileSystemException(IStatus.ERROR, message);
 					}
 				}
 			}
@@ -125,11 +126,11 @@ public class OpMove extends Operation {
 			}
 			else if (copy != null && copy.isFile() && node.isDirectory()) {
 				String error = NLS.bind(Messages.OpMove_FileExistsError, copy.name);
-				throw new TCFFileSystemException(error);
+				throw new TCFFileSystemException(IStatus.ERROR, error);
 			}
 			else if (copy != null && copy.isDirectory() && node.isFile()) {
 				String error = NLS.bind(Messages.OpMove_FolderExistsError, copy.name);
-				throw new TCFFileSystemException(error);
+				throw new TCFFileSystemException(IStatus.ERROR, error);
 			}
 			else {
 				if (copy != null && copy.isFile() && node.isFile()) {
@@ -148,7 +149,7 @@ public class OpMove extends Operation {
 					public void doneRename(IToken token, FileSystemException error) {
 						if (error != null) {
 							String message = NLS.bind(Messages.OpMove_CannotMove, node.name, error);
-							errors[0] = new TCFFileSystemException(message, error);
+							errors[0] = new TCFFileSystemException(IStatus.ERROR, message, error);
 						}
 						else {
 							cleanUpNode(node, copyNode);

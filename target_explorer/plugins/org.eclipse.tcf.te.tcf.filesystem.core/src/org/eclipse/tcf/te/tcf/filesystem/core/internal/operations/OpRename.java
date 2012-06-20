@@ -13,6 +13,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IToken;
@@ -65,7 +66,7 @@ public class OpRename extends Operation {
 				}
 				else {
 					String message = NLS.bind(Messages.Operation_NoFileSystemError, node.peerNode.getPeerId());
-					throw new TCFFileSystemException(message);
+					throw new TCFFileSystemException(IStatus.ERROR, message);
 				}
 			}
 		}
@@ -96,7 +97,7 @@ public class OpRename extends Operation {
 			public void doneRename(IToken token, FileSystemException error) {
 				if (error != null) {
 					String message = NLS.bind(Messages.OpRename_CannotRename, node.name, error);
-					errors[0] = new TCFFileSystemException(message, error);
+					errors[0] = new TCFFileSystemException(IStatus.ERROR, message, error);
 				}
 				else {
 					final File file = CacheManager.getCacheFile(node);
