@@ -8,13 +8,25 @@
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.interfaces;
+
+import org.eclipse.jface.viewers.TreeViewer;
+
 /**
  * This interface is used to decorate a property change event to provide
  * if it should be scheduled at certain cycle.
  * 
  * @see CommonViewerListener
  */
-public interface ISchedulable {
+public interface ISchedulableEvent {
+	
+	/**
+	 * If this event should be applicable to the specified tree viewer.
+	 * Used to determine if the event should be processed over the tree viewer.
+	 * 
+	 * @param viewer The tree viewer to be tested over.
+	 * @return true if it is applicable or else false.
+	 */
+	public boolean isApplicable(TreeViewer viewer);
 	
 	/**
 	 * Called when the event is added to the event queue.

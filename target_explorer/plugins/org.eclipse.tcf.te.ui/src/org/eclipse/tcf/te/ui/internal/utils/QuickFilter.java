@@ -26,7 +26,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.tcf.te.core.interfaces.IPropertyChangeProvider;
-import org.eclipse.tcf.te.ui.interfaces.ISchedulable;
+import org.eclipse.tcf.te.ui.interfaces.ISchedulableEvent;
 /**
  * A quick filter is a viewer filter that selects elements, 
  * which has the specified name pattern, under a certain tree path.
@@ -114,12 +114,14 @@ public class QuickFilter extends TablePatternFilter implements PropertyChangeLis
 	 * an event which should be scheduled when the key stroke pauses for
 	 * a certain time.
 	 */
-	private static class QuickFilterEvent extends PropertyChangeEvent implements ISchedulable {
+	private static class QuickFilterEvent extends PropertyChangeEvent implements ISchedulableEvent {
         private static final long serialVersionUID = 1L;
         // Remember the last time of a property change event caused by a key stroke
 		private static long last_enqueue;
 		// Maximum delay before the event should be scheduled.
 		private static final long MAXIMUM_DELAY = 300L;
+		// The effective tree viewer;
+		private TreeViewer viewer;
 		
 		/**
 		 * Constructor inherited.
@@ -129,8 +131,9 @@ public class QuickFilter extends TablePatternFilter implements PropertyChangeLis
 		 * @param oldValue
 		 * @param newValue
 		 */
-        public QuickFilterEvent(Object source, String propertyName, Object oldValue, Object newValue) {
+        public QuickFilterEvent(TreeViewer viewer, Object source, String propertyName, Object oldValue, Object newValue) {
 	        super(source, propertyName, oldValue, newValue);
+	        this.viewer = viewer;
         }
         
         /*
@@ -150,6 +153,15 @@ public class QuickFilter extends TablePatternFilter implements PropertyChangeLis
         public boolean isSchedulable() {
 	        return System.currentTimeMillis() - last_enqueue > MAXIMUM_DELAY;
         }
+
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.tcf.te.ui.interfaces.ISchedulable#isApplicable(org.eclipse.jface.viewers.TreeViewer)
+		 */
+		@Override
+        public boolean isApplicable(TreeViewer viewer) {
+	        return this.viewer == viewer;
+        }
 	}
 
 	/*
@@ -163,7 +175,7 @@ public class QuickFilter extends TablePatternFilter implements PropertyChangeLis
 		if(element != null) {
 			IPropertyChangeProvider provider = getPropertyChangeProvider(element);
 			if(provider!=null) {
-				provider.firePropertyChange(new QuickFilterEvent(element, evt.getPropertyName(), evt.getOldValue(), evt.getNewValue()));
+				provider.firePropertyChange(new QuickFilterEvent(viewer, element, evt.getPropertyName(), evt.getOldValue(), evt.getNewValue()));
 			}
 		}
     }

@@ -29,7 +29,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.tcf.te.core.utils.Ancestor;
-import org.eclipse.tcf.te.ui.interfaces.ISchedulable;
+import org.eclipse.tcf.te.ui.interfaces.ISchedulableEvent;
 
 /**
  * CommonViewerListener listens to the property change event from the
@@ -100,15 +100,17 @@ class CommonViewerListener extends Ancestor<Object> implements PropertyChangeLis
 	 * @param event The event object.
 	 */
 	private void processEvent(EventObject event) {
-		queue.add(event);
-		if(event instanceof ISchedulable) {
-			((ISchedulable)event).eventQueued();
+		if(!(event instanceof ISchedulableEvent) || ((ISchedulableEvent)event).isApplicable(viewer)) {
+			queue.add(event);
+			if(event instanceof ISchedulableEvent) {
+				((ISchedulableEvent)event).eventQueued();
+			}
+			viewerTimer.schedule(new TimerTask(){
+				@Override
+	            public void run() {
+					handleEvent(false);
+	            }}, 0);
 		}
-		viewerTimer.schedule(new TimerTask(){
-			@Override
-            public void run() {
-				handleEvent(false);
-            }}, 0);
 	}
 
 	/*
@@ -131,7 +133,7 @@ class CommonViewerListener extends Ancestor<Object> implements PropertyChangeLis
 			List<Object> objects = new ArrayList<Object>();
 			while(iterator.hasNext()) {
 				EventObject event = iterator.next();
-				if(event instanceof ISchedulable && !((ISchedulable)event).isSchedulable()) {
+				if(event instanceof ISchedulableEvent && !((ISchedulableEvent)event).isSchedulable()) {
 					continue;
 				}
 				objects.add(event.getSource());
