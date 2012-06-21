@@ -9,7 +9,6 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.launch.core.interfaces;
 
-import org.eclipse.tcf.te.launch.core.lm.interfaces.ICommonLaunchAttributes;
 
 /**
  * Defines the launch configuration attribute id's to access the launch step contexts.
@@ -17,19 +16,14 @@ import org.eclipse.tcf.te.launch.core.lm.interfaces.ICommonLaunchAttributes;
 public interface IRemoteAppLaunchAttributes {
 
 	/**
-	 * Define the prefix used by all other attribute id's as prefix.
-	 */
-	public static final String ATTR_PREFIX = "org.eclipse.tcf.te.tcf.launch"; //$NON-NLS-1$
-
-	/**
 	 * Launch configuration attribute: The process image.
 	 */
-	public static final String ATTR_PROCESS_IMAGE = ICommonLaunchAttributes.ATTR_PREFIX + ".process_image"; //$NON-NLS-1$
+	public static final String ATTR_PROCESS_IMAGE = ICommonTCFLaunchAttributes.ATTR_PREFIX + ".process_image"; //$NON-NLS-1$
 
 	/**
 	 * Launch configuration attribute: The process arguments.
 	 */
-	public static final String ATTR_PROCESS_ARGUMENTS = ICommonLaunchAttributes.ATTR_PREFIX + ".process_arguments"; //$NON-NLS-1$
+	public static final String ATTR_PROCESS_ARGUMENTS = ICommonTCFLaunchAttributes.ATTR_PREFIX + ".process_arguments"; //$NON-NLS-1$
 
-	public static final String ATTR_PROCESS_CONTEXT = ICommonLaunchAttributes.ATTR_PREFIX + ".process_context"; //$NON-NLS-1$
+	public static final String ATTR_PROCESS_CONTEXT = ICommonTCFLaunchAttributes.ATTR_PREFIX + ".process_context"; //$NON-NLS-1$
 }

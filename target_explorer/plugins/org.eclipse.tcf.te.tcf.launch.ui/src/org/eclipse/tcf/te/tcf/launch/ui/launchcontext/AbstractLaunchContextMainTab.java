@@ -118,8 +118,17 @@ public abstract class AbstractLaunchContextMainTab extends AbstractContextSelect
 			 */
 			@Override
 			protected AbstractContextSelectorControl doCreateContextSelector() {
-				return new MainTabContextSelectorControl(this, null);
+				AbstractContextSelectorControl control = new MainTabContextSelectorControl(this, null);
+				doConfigureContextSelectorControl(control);
+				return control;
 			}
 		};
+	}
+
+	/**
+	 * Configure the context selector control.
+	 * @param control The context selector control.
+	 */
+	protected void doConfigureContextSelectorControl(AbstractContextSelectorControl control) {
 	}
 }
