@@ -251,6 +251,14 @@ public class ScannerRunnable implements Runnable, IChannel.IChannelListener {
 										@SuppressWarnings("unchecked")
 										Collection<Map<String,String>> peerAttributesList = (Collection<Map<String,String>>)args[1];
 										for (Map<String,String> attributes : peerAttributesList) {
+											// Don't process proxies or value-add's
+											boolean isProxy = attributes.containsKey("Proxy"); //$NON-NLS-1$
+
+											String value = attributes.get("ValueAdd"); //$NON-NLS-1$
+											boolean isValueAdd = value != null && ("1".equals(value.trim()) || Boolean.parseBoolean(value.trim())); //$NON-NLS-1$
+
+											if (isProxy || isValueAdd) continue;
+
 											// Get the peer id
 											String peerId = attributes.get(IPeer.ATTR_ID);
 											// Create a peer instance
