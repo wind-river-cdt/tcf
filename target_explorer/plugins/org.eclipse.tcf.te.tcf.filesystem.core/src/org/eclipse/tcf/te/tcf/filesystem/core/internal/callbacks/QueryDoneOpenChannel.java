@@ -32,7 +32,6 @@ public class QueryDoneOpenChannel extends CallbackBase implements DoneOpenChanne
 	FSTreeNode parentNode;
 	// Callback object.
 	ICallback callback;
-	boolean first;
 
 	/**
 	 * Create an instance with a parent node.

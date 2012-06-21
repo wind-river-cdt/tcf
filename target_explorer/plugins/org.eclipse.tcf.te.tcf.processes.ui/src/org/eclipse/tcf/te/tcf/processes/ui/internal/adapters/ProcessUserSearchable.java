@@ -168,7 +168,7 @@ public class ProcessUserSearchable extends ProcessBaseSearchable {
 			case OPTION_BY_ME:
 				return process.isAgentOwner();
 			case OPTION_SPECIFIED:
-				return user == null ? user == process.username : user.equals(process.username);
+				return user == null ? process.username == null : user.equals(process.username);
 			}
 		}
 		return false;

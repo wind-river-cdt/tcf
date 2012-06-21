@@ -203,7 +203,7 @@ public class SearchEngine {
 	 * @param foreward The searching direction.
 	 */
 	public void setForeward(boolean foreward) {
-		if (fDepthFirst) {
+		if (fDepthFirst && fSearcher instanceof DepthFirstSearcher) {
 			((DepthFirstSearcher) fSearcher).setForeward(foreward);
 		}
 	}

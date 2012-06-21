@@ -202,8 +202,9 @@ public class TreeViewerUtil {
 	public static boolean isFiltering(TreeViewer viewer) {
 		Map<TreePath, QuickFilter> filters = (Map<TreePath, QuickFilter>) viewer.getData("quick.filter"); //$NON-NLS-1$
 		if (filters != null && !filters.isEmpty()) {
-			for(TreePath path : filters.keySet()) {
-				QuickFilter filter = filters.get(path);
+			for(Map.Entry<TreePath, QuickFilter> entry : filters.entrySet()) {
+				TreePath path = entry.getKey();
+				QuickFilter filter = entry.getValue();
 				if (filter!= null && filter.isFiltering(path)) return true;
 			}
 		}
