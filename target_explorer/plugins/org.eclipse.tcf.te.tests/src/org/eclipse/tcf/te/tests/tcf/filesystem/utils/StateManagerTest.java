@@ -27,6 +27,7 @@ import org.eclipse.tcf.te.tcf.filesystem.core.model.CacheState;
 public class StateManagerTest extends UtilsTestBase {
 
 	public void testCacheStateConsistent() throws Exception {
+		cleanUp();
 		writeFileContent("hello,world!"); //$NON-NLS-1$
 	    OpCacheUpdate update = new OpCacheUpdate(testFile);
 	    update.run(new NullProgressMonitor());
@@ -35,6 +36,7 @@ public class StateManagerTest extends UtilsTestBase {
 	}
 	
 	public void testCacheStateModified() throws Exception {
+		cleanUp();
 		writeFileContent("hello,world!"); //$NON-NLS-1$
 	    OpCacheUpdate update = new OpCacheUpdate(testFile);
 	    update.run(new NullProgressMonitor());
@@ -72,6 +74,7 @@ public class StateManagerTest extends UtilsTestBase {
 	 
 	
 	public void testCacheStateOutdated() throws Exception {
+		cleanUp();
 		writeFileContent("hello,world!"); //$NON-NLS-1$
 	    OpCacheUpdate update = new OpCacheUpdate(testFile);
 	    update.run(new NullProgressMonitor());
@@ -81,7 +84,16 @@ public class StateManagerTest extends UtilsTestBase {
 		assertEquals(CacheState.outdated, cacheState);
 	}
 	
+	private void cleanUp() {
+		File cacheFile = CacheManager.getCacheFile(testFile);
+		if(cacheFile.exists()) {
+			cacheFile.delete();
+		}
+		PersistenceManager.getInstance().removeFileDigest(testFile.getLocationURI());
+	}
+	
 	public void testCacheStateConflict() throws Exception {
+		cleanUp();
 		writeFileContent("hello,world!"); //$NON-NLS-1$
 	    OpCacheUpdate update = new OpCacheUpdate(testFile);
 	    update.run(new NullProgressMonitor());
