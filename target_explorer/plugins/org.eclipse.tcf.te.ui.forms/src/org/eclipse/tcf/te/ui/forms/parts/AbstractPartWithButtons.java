@@ -172,29 +172,20 @@ public abstract class AbstractPartWithButtons extends AbstractPart {
 	 * Returns the button with the given label.
 	 *
 	 * @param label The button label.
-	 * @return The button.
-	 *
-	 * @throws ArrayIndexOutOfBoundsException if the label is invalid.
+	 * @return The button or <code>null</code>.
 	 */
 	public Button getButton(String label) {
-		if (labels == null) {
-			throw new ArrayIndexOutOfBoundsException();
-		}
-		return getButton(labels.indexOf(label));
+		return labels != null ? getButton(labels.indexOf(label)) : null;
 	}
 
 	/**
 	 * Returns the button at the given index.
 	 *
 	 * @param index The index.
-	 * @return The button.
-	 *
-	 * @throws ArrayIndexOutOfBoundsException if the index is out of bounds.
+	 * @return The button or <code>null</code>.
 	 */
 	public Button getButton(int index) {
-		if (buttons == null) {
-			throw new ArrayIndexOutOfBoundsException();
-		}
-		return buttons[index];
+		if (buttons == null) return null;
+		return index >= 0 && index < buttons.length ? buttons[index] : null;
 	}
 }
