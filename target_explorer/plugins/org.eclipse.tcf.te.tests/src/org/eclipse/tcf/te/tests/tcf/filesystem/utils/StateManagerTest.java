@@ -33,6 +33,7 @@ public class StateManagerTest extends UtilsTestBase {
 	    update.run(new NullProgressMonitor());
 		CacheState cacheState = testFile.getCacheState();
 		assertEquals(CacheState.consistent, cacheState);
+		Thread.sleep(5000L);
 	}
 	
 	public void testCacheStateModified() throws Exception {
@@ -47,6 +48,7 @@ public class StateManagerTest extends UtilsTestBase {
 		updateCacheState();
 		CacheState cacheState = testFile.getCacheState();
 	    assertEquals(CacheState.modified, cacheState);
+		Thread.sleep(5000L);
 	}
 
 	private void updateCacheState() throws TimeoutException {
@@ -82,6 +84,7 @@ public class StateManagerTest extends UtilsTestBase {
 		refreshCacheState();
 		CacheState cacheState = testFile.getCacheState();
 		assertEquals(CacheState.outdated, cacheState);
+		Thread.sleep(5000L);
 	}
 	
 	private void cleanUp() {
@@ -106,5 +109,6 @@ public class StateManagerTest extends UtilsTestBase {
 		updateCacheState();
 		CacheState cacheState = testFile.getCacheState();
 		assertEquals(CacheState.conflict, cacheState);
+		Thread.sleep(5000L);
 	}
 }
