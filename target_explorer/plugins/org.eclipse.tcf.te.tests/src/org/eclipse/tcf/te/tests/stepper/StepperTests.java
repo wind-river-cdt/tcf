@@ -281,7 +281,7 @@ public class StepperTests extends CoreTestCase {
 		IPropertiesContainer properties = new PropertiesContainer();
 
 		// Initialize the stepper
-		stepper.initialize(new TestStepContext(), "org.eclipse.tcf.te.tests.stepper.stepGroup4", new PropertiesContainer(), null); //$NON-NLS-1$
+		stepper.initialize(new TestStepContext(), "org.eclipse.tcf.te.tests.stepper.stepGroup4", properties, null); //$NON-NLS-1$
 
 		ExecutorsUtil.execute(new Runnable() {
 			@Override
