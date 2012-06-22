@@ -333,7 +333,11 @@ public class FileTransferService {
             }
 
             if (result.getSeverity() == IStatus.ERROR || result.getSeverity() == IStatus.CANCEL) {
-                fileSystem.remove(targetPath.toString(), null);
+                fileSystem.remove(targetPath.toString(), new IFileSystem.DoneRemove() {
+					@Override
+					public void doneRemove(IToken token, FileSystemException error) {
+					}
+				});
             }
         }
         if (callback != null) callback.done(peer, result);

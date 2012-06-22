@@ -68,6 +68,9 @@ public class TcfLaunchTests extends TcfTestCase {
 		assertNotNull("Missing java temp directory", tempDir); //$NON-NLS-1$
 		tempDir = tempDir.append(TcfLaunchTests.class.getSimpleName());
 		assertNotNull("Cannot append test case specific temp directory", tempDir); //$NON-NLS-1$
+		if (!tempDir.toFile().exists()) {
+			assertTrue("Failed to create path " + tempDir.toString(), tempDir.toFile().mkdirs()); //$NON-NLS-1$
+		}
 
 		IPath tempHelloWorld = tempDir.append(helloWorldLocation.lastSegment());
 		if (tempHelloWorld.toFile().exists()) {
