@@ -50,7 +50,6 @@
 		<module>plugins/org.eclipse.tcf.te.ui</module>
 		<module>plugins/org.eclipse.tcf.te.ui.controls</module>
 		<module>plugins/org.eclipse.tcf.te.ui.forms</module>
-		<module>plugins/org.eclipse.tcf.te.ui.startup</module>
 		<module>plugins/org.eclipse.tcf.te.ui.swt</module>
 		<module>plugins/org.eclipse.tcf.te.ui.terminals</module>
 		<module>plugins/org.eclipse.tcf.te.ui.terminals.process</module>

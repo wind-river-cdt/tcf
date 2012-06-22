@@ -131,8 +131,6 @@ tests/plugins/org.eclipse.tcf.debug.test/bin
 /target_explorer/plugins/org.eclipse.tcf.te.ui.controls/bin
 /target_explorer/plugins/org.eclipse.tcf.te.ui.forms/target
 /target_explorer/plugins/org.eclipse.tcf.te.ui.forms/bin
-/target_explorer/plugins/org.eclipse.tcf.te.ui.startup/target
-/target_explorer/plugins/org.eclipse.tcf.te.ui.startup/bin
 /target_explorer/plugins/org.eclipse.tcf.te.ui.swt/target
 /target_explorer/plugins/org.eclipse.tcf.te.ui.swt/bin
 /target_explorer/plugins/org.eclipse.tcf.te.ui.terminals/target

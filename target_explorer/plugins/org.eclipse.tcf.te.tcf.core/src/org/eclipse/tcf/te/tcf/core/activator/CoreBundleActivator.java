@@ -9,15 +9,10 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.core.activator;
 
-import java.util.Hashtable;
-
-import org.eclipse.tcf.osgi.services.IValueAddService;
 import org.eclipse.tcf.te.runtime.tracing.TraceHandler;
 import org.eclipse.tcf.te.tcf.core.internal.Startup;
-import org.eclipse.tcf.te.tcf.core.osgi.ValueAddService;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 
 
 /**
@@ -28,8 +23,6 @@ public class CoreBundleActivator implements BundleActivator {
 	private static BundleContext context;
 	// The trace handler instance
 	private static volatile TraceHandler traceHandler;
-	// The value-add OSGi service registration
-	private ServiceRegistration<IValueAddService> valueAddService;
 
 	/**
 	 * Returns the bundle context
@@ -68,9 +61,6 @@ public class CoreBundleActivator implements BundleActivator {
 	@Override
 	public void start(BundleContext bundleContext) throws Exception {
 		CoreBundleActivator.context = bundleContext;
-
-		// Register the value-add OSGi service instance
-		valueAddService = bundleContext.registerService(IValueAddService.class, ValueAddService.getInstance(), new Hashtable<String, String>());
 	}
 
 	/* (non-Javadoc)
@@ -82,7 +72,6 @@ public class CoreBundleActivator implements BundleActivator {
 		// Mark the core framework as not started anymore
 		Startup.setStarted(false);
 		traceHandler = null;
-		if (valueAddService != null) { valueAddService.unregister(); valueAddService = null; }
 	}
 
 }
