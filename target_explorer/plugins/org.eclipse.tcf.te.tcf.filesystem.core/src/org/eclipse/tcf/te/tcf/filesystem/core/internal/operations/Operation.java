@@ -322,7 +322,7 @@ public class Operation extends Ancestor<FSTreeNode> implements IOperation {
 							}
 						}
 						else {
-							errors[0] = newTCFException(IStatus.WARNING, error);
+							errors[0] = newTCFException(IStatus.INFO, error);
 						}
 					}
 				});

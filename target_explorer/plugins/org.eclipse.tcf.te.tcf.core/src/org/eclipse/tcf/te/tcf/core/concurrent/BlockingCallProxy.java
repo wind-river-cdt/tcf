@@ -10,10 +10,15 @@
 package org.eclipse.tcf.te.tcf.core.concurrent;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.ISafeRunnable;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.tcf.core.concurrent.interfaces.IProxyDescriptor;
 import org.eclipse.tcf.te.tcf.core.concurrent.internal.DefaultProxyDescriptor;
@@ -167,9 +172,9 @@ public class BlockingCallProxy implements InvocationHandler {
 	 */
 	static private class DoneHandler implements InvocationHandler {
 		// The callback handler that delegates the invocation.
-		private Object done;
+		Object done;
 		// The rendezvous that unblocks the invocation.
-		private Rendezvous rendezvous;
+		Rendezvous rendezvous;
 		/**
 		 * Constructor with the two arguments to initialize the two fields.
 		 *
@@ -185,10 +190,29 @@ public class BlockingCallProxy implements InvocationHandler {
 		 * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
 		 */
 		@Override
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            Object result = method.invoke(done, args);
-            rendezvous.arrive();
-            return result;
+        public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
+			final AtomicReference<Object> objRef = new AtomicReference<Object>();
+			final AtomicReference<Throwable> exRef = new AtomicReference<Throwable>();
+			SafeRunner.run(new ISafeRunnable(){
+				@Override
+                public void handleException(Throwable exception) {
+					exRef.set(exception);
+                }
+
+				@Override
+                public void run() throws Exception {
+					try {
+						objRef.set(method.invoke(done, args));
+					}
+					catch (InvocationTargetException e) {
+						throw (Exception)e.getTargetException();
+					}
+                }});
+			rendezvous.arrive();
+			if(exRef.get() != null) {
+				throw exRef.get();
+			}
+			return objRef.get();
         }
 	}
 
@@ -203,11 +227,21 @@ public class BlockingCallProxy implements InvocationHandler {
 	 * @throws Throwable Thrown during invocation.
 	 */
 	private Object directCall(Method method, Object[] args, Rendezvous rendezvous) throws Throwable {
-		Object ret = method.invoke(delegate, args);
-		if (rendezvous != null) {
-			rendezvous.waiting(timeout);
+		try {
+            Object ret = method.invoke(delegate, args);
+    		if (rendezvous != null) {
+    			try {
+    				rendezvous.waiting(timeout);
+    			}
+    			catch(TimeoutException e) {
+    				throw new RuntimeException(e);
+    			}
+    		}
+    		return ret;
+        }
+		catch (InvocationTargetException e) {
+			throw e.getTargetException();
 		}
-		return ret;
 	}
 
 	/**
@@ -222,22 +256,32 @@ public class BlockingCallProxy implements InvocationHandler {
 	 */
 	private Object dispatchCall(final Method method, final Object[] args, final Rendezvous rendezvous) throws Throwable {
 		final Object[] returns = new Object[1];
-		final Exception[] exceptions = new Exception[1];
+		final Throwable[] exceptions = new Throwable[1];
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
 				try {
-					returns[0] = method.invoke(delegate, args);
+                    returns[0] = method.invoke(delegate, args);
+                }
+				catch (InvocationTargetException e) {
+					exceptions[0] = e.getTargetException();
 				}
 				catch (Exception e) {
 					exceptions[0] = e;
 				}
 			}
 		});
-		if (rendezvous != null) {
-			rendezvous.waiting(timeout);
+		if (exceptions[0] != null) {
+			throw exceptions[0];
 		}
-		if (exceptions[0] != null) throw exceptions[0];
+		if (rendezvous != null) {
+			try {
+				rendezvous.waiting(timeout);
+			}
+			catch(TimeoutException e) {
+				throw new RuntimeException(e);
+			}
+		}
 		return returns[0];
 	}
 }
