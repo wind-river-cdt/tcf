@@ -91,11 +91,15 @@ public class OpRefresh extends Operation {
 	 * @param service The file system service.
 	 * @throws TCFFileSystemException Thrown during refreshing.
 	 */
-	void refresh(final FSTreeNode node, final IFileSystem service) throws TCFException, InterruptedException {
+	void refresh(final FSTreeNode node, final IFileSystem service) throws InterruptedException {
 		if(monitor.isCanceled()) throw new InterruptedException();
 		if ((node.isSystemRoot() || node.isDirectory()) && node.childrenQueried) {
 			if (!node.isSystemRoot()) {
-				updateChildren(node, service);
+				try {
+					updateChildren(node, service);
+				}
+				catch (TCFException e) {
+				}
 			}
 			monitor.worked(1);
 			List<FSTreeNode> children = node.getChildren();

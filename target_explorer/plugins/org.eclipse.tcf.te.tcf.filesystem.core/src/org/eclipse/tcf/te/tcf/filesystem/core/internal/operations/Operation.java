@@ -326,7 +326,9 @@ public class Operation extends Ancestor<FSTreeNode> implements IOperation {
 						}
 					}
 				});
-				if (errors[0] != null) throw errors[0];
+				if (errors[0] != null) {
+					throw errors[0];
+				}
 			}
 			return children;
 		}
