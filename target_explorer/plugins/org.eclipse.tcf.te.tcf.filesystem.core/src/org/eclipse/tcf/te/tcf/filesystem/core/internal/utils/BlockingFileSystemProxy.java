@@ -13,6 +13,8 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.ISafeRunnable;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.protocol.Protocol;
@@ -38,8 +40,6 @@ public class BlockingFileSystemProxy implements IFileSystem {
 	private static final long DEFAULT_TIMEOUT = Operation.DEFAULT_TIMEOUT;
 	// The actual object that provides file system services.
 	IFileSystem service;
-	// The rendezvous used to synchronize invocation
-	Rendezvous rendezvous;
 
 	/**
 	 * Constructor with an delegating service.
@@ -49,7 +49,6 @@ public class BlockingFileSystemProxy implements IFileSystem {
 	public BlockingFileSystemProxy(IFileSystem service) {
 		Assert.isNotNull(service);
 		this.service = service;
-		this.rendezvous = new Rendezvous();
 	}
 
 	/* (non-Javadoc)
@@ -59,27 +58,32 @@ public class BlockingFileSystemProxy implements IFileSystem {
 	public String getName() {
 		return service.getName();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.services.IFileSystem#open(java.lang.String, int, org.eclipse.tcf.services.IFileSystem.FileAttrs, org.eclipse.tcf.services.IFileSystem.DoneOpen)
 	 */
 	@Override
 	public IToken open(final String file_name, final int flags, final FileAttrs attrs, final DoneOpen done) {
 		Assert.isTrue(!Protocol.isDispatchThread());
-		rendezvous.reset();
+		final Rendezvous rendezvous = new Rendezvous();
 		final AtomicReference<IToken> ref = new AtomicReference<IToken>();
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
 				IToken token = service.open(file_name, flags, attrs, new DoneOpen() {
 					@Override
-					public void doneOpen(IToken token, FileSystemException error, IFileHandle handle) {
-						try {
-							done.doneOpen(token, error, handle);
-						}
-						finally {
-							rendezvous.arrive();
-						}
+					public void doneOpen(final IToken token, final FileSystemException error, final IFileHandle handle) {
+						SafeRunner.run(new ISafeRunnable() {
+							@Override
+							public void handleException(Throwable exception) {
+							}
+
+							@Override
+							public void run() throws Exception {
+								done.doneOpen(token, error, handle);
+							}
+						});
+						rendezvous.arrive();
 					}
 				});
 				ref.set(token);
@@ -100,20 +104,25 @@ public class BlockingFileSystemProxy implements IFileSystem {
 	@Override
 	public IToken close(final IFileHandle handle, final DoneClose done) {
 		Assert.isTrue(!Protocol.isDispatchThread());
-		rendezvous.reset();
+		final Rendezvous rendezvous = new Rendezvous();
 		final AtomicReference<IToken> ref = new AtomicReference<IToken>();
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
 				IToken token = service.close(handle, new DoneClose() {
 					@Override
-					public void doneClose(IToken token, FileSystemException error) {
-						try {
-							done.doneClose(token, error);
-						}
-						finally {
-							rendezvous.arrive();
-						}
+					public void doneClose(final IToken token, final FileSystemException error) {
+						SafeRunner.run(new ISafeRunnable() {
+							@Override
+							public void handleException(Throwable exception) {
+							}
+
+							@Override
+							public void run() throws Exception {
+								done.doneClose(token, error);
+							}
+						});
+						rendezvous.arrive();
 					}
 				});
 				ref.set(token);
@@ -134,20 +143,25 @@ public class BlockingFileSystemProxy implements IFileSystem {
 	@Override
 	public IToken read(final IFileHandle handle, final long offset, final int len, final DoneRead done) {
 		Assert.isTrue(!Protocol.isDispatchThread());
-		rendezvous.reset();
+		final Rendezvous rendezvous = new Rendezvous();
 		final AtomicReference<IToken> ref = new AtomicReference<IToken>();
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
 				IToken token = service.read(handle, offset, len, new DoneRead() {
 					@Override
-					public void doneRead(IToken token, FileSystemException error, byte[] data, boolean eof) {
-						try {
-							done.doneRead(token, error, data, eof);
-						}
-						finally {
-							rendezvous.arrive();
-						}
+					public void doneRead(final IToken token, final FileSystemException error, final byte[] data, final boolean eof) {
+						SafeRunner.run(new ISafeRunnable() {
+							@Override
+							public void handleException(Throwable exception) {
+							}
+
+							@Override
+							public void run() throws Exception {
+								done.doneRead(token, error, data, eof);
+							}
+						});
+						rendezvous.arrive();
 					}
 				});
 				ref.set(token);
@@ -168,23 +182,27 @@ public class BlockingFileSystemProxy implements IFileSystem {
 	@Override
 	public IToken write(final IFileHandle handle, final long offset, final byte[] data, final int data_pos, final int data_size, final DoneWrite done) {
 		Assert.isTrue(!Protocol.isDispatchThread());
-		rendezvous.reset();
+		final Rendezvous rendezvous = new Rendezvous();
 		final AtomicReference<IToken> ref = new AtomicReference<IToken>();
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
-				IToken token = service
-				                .write(handle, offset, data, data_pos, data_size, new DoneWrite() {
-					                @Override
-					                public void doneWrite(IToken token, FileSystemException error) {
-						                try {
-							                done.doneWrite(token, error);
-						                }
-						                finally {
-							                rendezvous.arrive();
-						                }
-					                }
-				                });
+				IToken token = service.write(handle, offset, data, data_pos, data_size, new DoneWrite() {
+					@Override
+					public void doneWrite(final IToken token, final FileSystemException error) {
+						SafeRunner.run(new ISafeRunnable() {
+							@Override
+							public void handleException(Throwable exception) {
+							}
+
+							@Override
+							public void run() throws Exception {
+								done.doneWrite(token, error);
+							}
+						});
+						rendezvous.arrive();
+					}
+				});
 				ref.set(token);
 			}
 		});
@@ -203,20 +221,25 @@ public class BlockingFileSystemProxy implements IFileSystem {
 	@Override
 	public IToken stat(final String path, final DoneStat done) {
 		Assert.isTrue(!Protocol.isDispatchThread());
-		rendezvous.reset();
+		final Rendezvous rendezvous = new Rendezvous();
 		final AtomicReference<IToken> ref = new AtomicReference<IToken>();
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
 				IToken token = service.stat(path, new DoneStat() {
 					@Override
-					public void doneStat(IToken token, FileSystemException error, FileAttrs attrs) {
-						try {
-							done.doneStat(token, error, attrs);
-						}
-						finally {
-							rendezvous.arrive();
-						}
+					public void doneStat(final IToken token, final FileSystemException error, final FileAttrs attrs) {
+						SafeRunner.run(new ISafeRunnable() {
+							@Override
+							public void handleException(Throwable exception) {
+							}
+
+							@Override
+							public void run() throws Exception {
+								done.doneStat(token, error, attrs);
+							}
+						});
+						rendezvous.arrive();
 					}
 				});
 				ref.set(token);
@@ -237,20 +260,25 @@ public class BlockingFileSystemProxy implements IFileSystem {
 	@Override
 	public IToken lstat(final String path, final DoneStat done) {
 		Assert.isTrue(!Protocol.isDispatchThread());
-		rendezvous.reset();
+		final Rendezvous rendezvous = new Rendezvous();
 		final AtomicReference<IToken> ref = new AtomicReference<IToken>();
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
 				IToken token = service.lstat(path, new DoneStat() {
 					@Override
-					public void doneStat(IToken token, FileSystemException error, FileAttrs attrs) {
-						try {
-							done.doneStat(token, error, attrs);
-						}
-						finally {
-							rendezvous.arrive();
-						}
+					public void doneStat(final IToken token, final FileSystemException error, final FileAttrs attrs) {
+						SafeRunner.run(new ISafeRunnable() {
+							@Override
+							public void handleException(Throwable exception) {
+							}
+
+							@Override
+							public void run() throws Exception {
+								done.doneStat(token, error, attrs);
+							}
+						});
+						rendezvous.arrive();
 					}
 				});
 				ref.set(token);
@@ -271,20 +299,25 @@ public class BlockingFileSystemProxy implements IFileSystem {
 	@Override
 	public IToken fstat(final IFileHandle handle, final DoneStat done) {
 		Assert.isTrue(!Protocol.isDispatchThread());
-		rendezvous.reset();
+		final Rendezvous rendezvous = new Rendezvous();
 		final AtomicReference<IToken> ref = new AtomicReference<IToken>();
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
 				IToken token = service.fstat(handle, new DoneStat() {
 					@Override
-					public void doneStat(IToken token, FileSystemException error, FileAttrs attrs) {
-						try {
-							done.doneStat(token, error, attrs);
-						}
-						finally {
-							rendezvous.arrive();
-						}
+					public void doneStat(final IToken token, final FileSystemException error, final FileAttrs attrs) {
+						SafeRunner.run(new ISafeRunnable() {
+							@Override
+							public void handleException(Throwable exception) {
+							}
+
+							@Override
+							public void run() throws Exception {
+								done.doneStat(token, error, attrs);
+							}
+						});
+						rendezvous.arrive();
 					}
 				});
 				ref.set(token);
@@ -305,20 +338,25 @@ public class BlockingFileSystemProxy implements IFileSystem {
 	@Override
 	public IToken setstat(final String path, final FileAttrs attrs, final DoneSetStat done) {
 		Assert.isTrue(!Protocol.isDispatchThread());
-		rendezvous.reset();
+		final Rendezvous rendezvous = new Rendezvous();
 		final AtomicReference<IToken> ref = new AtomicReference<IToken>();
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
 				IToken token = service.setstat(path, attrs, new DoneSetStat() {
 					@Override
-					public void doneSetStat(IToken token, FileSystemException error) {
-						try {
-							done.doneSetStat(token, error);
-						}
-						finally {
-							rendezvous.arrive();
-						}
+					public void doneSetStat(final IToken token, final FileSystemException error) {
+						SafeRunner.run(new ISafeRunnable() {
+							@Override
+							public void handleException(Throwable exception) {
+							}
+
+							@Override
+							public void run() throws Exception {
+								done.doneSetStat(token, error);
+							}
+						});
+						rendezvous.arrive();
 					}
 				});
 				ref.set(token);
@@ -339,20 +377,25 @@ public class BlockingFileSystemProxy implements IFileSystem {
 	@Override
 	public IToken fsetstat(final IFileHandle handle, final FileAttrs attrs, final DoneSetStat done) {
 		Assert.isTrue(!Protocol.isDispatchThread());
-		rendezvous.reset();
+		final Rendezvous rendezvous = new Rendezvous();
 		final AtomicReference<IToken> ref = new AtomicReference<IToken>();
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
 				IToken token = service.fsetstat(handle, attrs, new DoneSetStat() {
 					@Override
-					public void doneSetStat(IToken token, FileSystemException error) {
-						try {
-							done.doneSetStat(token, error);
-						}
-						finally {
-							rendezvous.arrive();
-						}
+					public void doneSetStat(final IToken token, final FileSystemException error) {
+						SafeRunner.run(new ISafeRunnable() {
+							@Override
+							public void handleException(Throwable exception) {
+							}
+
+							@Override
+							public void run() throws Exception {
+								done.doneSetStat(token, error);
+							}
+						});
+						rendezvous.arrive();
 					}
 				});
 				ref.set(token);
@@ -373,20 +416,25 @@ public class BlockingFileSystemProxy implements IFileSystem {
 	@Override
 	public IToken opendir(final String path, final DoneOpen done) {
 		Assert.isTrue(!Protocol.isDispatchThread());
-		rendezvous.reset();
+		final Rendezvous rendezvous = new Rendezvous();
 		final AtomicReference<IToken> ref = new AtomicReference<IToken>();
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
 				IToken token = service.opendir(path, new DoneOpen() {
 					@Override
-					public void doneOpen(IToken token, FileSystemException error, IFileHandle handle) {
-						try {
-							done.doneOpen(token, error, handle);
-						}
-						finally {
-							rendezvous.arrive();
-						}
+					public void doneOpen(final IToken token, final FileSystemException error, final IFileHandle handle) {
+						SafeRunner.run(new ISafeRunnable() {
+							@Override
+							public void handleException(Throwable exception) {
+							}
+
+							@Override
+							public void run() throws Exception {
+								done.doneOpen(token, error, handle);
+							}
+						});
+						rendezvous.arrive();
 					}
 				});
 				ref.set(token);
@@ -407,20 +455,25 @@ public class BlockingFileSystemProxy implements IFileSystem {
 	@Override
 	public IToken readdir(final IFileHandle handle, final DoneReadDir done) {
 		Assert.isTrue(!Protocol.isDispatchThread());
-		rendezvous.reset();
+		final Rendezvous rendezvous = new Rendezvous();
 		final AtomicReference<IToken> ref = new AtomicReference<IToken>();
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
 				IToken token = service.readdir(handle, new DoneReadDir() {
 					@Override
-					public void doneReadDir(IToken token, FileSystemException error, DirEntry[] entries, boolean eof) {
-						try {
-							done.doneReadDir(token, error, entries, eof);
-						}
-						finally {
-							rendezvous.arrive();
-						}
+					public void doneReadDir(final IToken token, final FileSystemException error, final DirEntry[] entries, final boolean eof) {
+						SafeRunner.run(new ISafeRunnable() {
+							@Override
+							public void handleException(Throwable exception) {
+							}
+
+							@Override
+							public void run() throws Exception {
+								done.doneReadDir(token, error, entries, eof);
+							}
+						});
+						rendezvous.arrive();
 					}
 				});
 				ref.set(token);
@@ -441,20 +494,25 @@ public class BlockingFileSystemProxy implements IFileSystem {
 	@Override
 	public IToken mkdir(final String path, final FileAttrs attrs, final DoneMkDir done) {
 		Assert.isTrue(!Protocol.isDispatchThread());
-		rendezvous.reset();
+		final Rendezvous rendezvous = new Rendezvous();
 		final AtomicReference<IToken> ref = new AtomicReference<IToken>();
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
 				IToken token = service.mkdir(path, attrs, new DoneMkDir() {
 					@Override
-					public void doneMkDir(IToken token, FileSystemException error) {
-						try {
-							done.doneMkDir(token, error);
-						}
-						finally {
-							rendezvous.arrive();
-						}
+					public void doneMkDir(final IToken token, final FileSystemException error) {
+						SafeRunner.run(new ISafeRunnable() {
+							@Override
+							public void handleException(Throwable exception) {
+							}
+
+							@Override
+							public void run() throws Exception {
+								done.doneMkDir(token, error);
+							}
+						});
+						rendezvous.arrive();
 					}
 				});
 				ref.set(token);
@@ -475,20 +533,25 @@ public class BlockingFileSystemProxy implements IFileSystem {
 	@Override
 	public IToken rmdir(final String path, final DoneRemove done) {
 		Assert.isTrue(!Protocol.isDispatchThread());
-		rendezvous.reset();
+		final Rendezvous rendezvous = new Rendezvous();
 		final AtomicReference<IToken> ref = new AtomicReference<IToken>();
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
 				IToken token = service.rmdir(path, new DoneRemove() {
 					@Override
-					public void doneRemove(IToken token, FileSystemException error) {
-						try {
-							done.doneRemove(token, error);
-						}
-						finally {
-							rendezvous.arrive();
-						}
+					public void doneRemove(final IToken token, final FileSystemException error) {
+						SafeRunner.run(new ISafeRunnable() {
+							@Override
+							public void handleException(Throwable exception) {
+							}
+
+							@Override
+							public void run() throws Exception {
+								done.doneRemove(token, error);
+							}
+						});
+						rendezvous.arrive();
 					}
 				});
 				ref.set(token);
@@ -509,20 +572,25 @@ public class BlockingFileSystemProxy implements IFileSystem {
 	@Override
 	public IToken roots(final DoneRoots done) {
 		Assert.isTrue(!Protocol.isDispatchThread());
-		rendezvous.reset();
+		final Rendezvous rendezvous = new Rendezvous();
 		final AtomicReference<IToken> ref = new AtomicReference<IToken>();
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
 				IToken token = service.roots(new DoneRoots() {
 					@Override
-					public void doneRoots(IToken token, FileSystemException error, DirEntry[] entries) {
-						try {
-							done.doneRoots(token, error, entries);
-						}
-						finally {
-							rendezvous.arrive();
-						}
+					public void doneRoots(final IToken token, final FileSystemException error, final DirEntry[] entries) {
+						SafeRunner.run(new ISafeRunnable() {
+							@Override
+							public void handleException(Throwable exception) {
+							}
+
+							@Override
+							public void run() throws Exception {
+								done.doneRoots(token, error, entries);
+							}
+						});
+						rendezvous.arrive();
 					}
 				});
 				ref.set(token);
@@ -543,20 +611,25 @@ public class BlockingFileSystemProxy implements IFileSystem {
 	@Override
 	public IToken remove(final String file_name, final DoneRemove done) {
 		Assert.isTrue(!Protocol.isDispatchThread());
-		rendezvous.reset();
+		final Rendezvous rendezvous = new Rendezvous();
 		final AtomicReference<IToken> ref = new AtomicReference<IToken>();
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
 				IToken token = service.remove(file_name, new DoneRemove() {
 					@Override
-					public void doneRemove(IToken token, FileSystemException error) {
-						try {
-							done.doneRemove(token, error);
-						}
-						finally {
-							rendezvous.arrive();
-						}
+					public void doneRemove(final IToken token, final FileSystemException error) {
+						SafeRunner.run(new ISafeRunnable() {
+							@Override
+							public void handleException(Throwable exception) {
+							}
+
+							@Override
+							public void run() throws Exception {
+								done.doneRemove(token, error);
+							}
+						});
+						rendezvous.arrive();
 					}
 				});
 				ref.set(token);
@@ -577,20 +650,25 @@ public class BlockingFileSystemProxy implements IFileSystem {
 	@Override
 	public IToken realpath(final String path, final DoneRealPath done) {
 		Assert.isTrue(!Protocol.isDispatchThread());
-		rendezvous.reset();
+		final Rendezvous rendezvous = new Rendezvous();
 		final AtomicReference<IToken> ref = new AtomicReference<IToken>();
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
 				IToken token = service.realpath(path, new DoneRealPath() {
 					@Override
-					public void doneRealPath(IToken token, FileSystemException error, String path) {
-						try {
-							done.doneRealPath(token, error, path);
-						}
-						finally {
-							rendezvous.arrive();
-						}
+					public void doneRealPath(final IToken token, final FileSystemException error, final String path) {
+						SafeRunner.run(new ISafeRunnable() {
+							@Override
+							public void handleException(Throwable exception) {
+							}
+
+							@Override
+							public void run() throws Exception {
+								done.doneRealPath(token, error, path);
+							}
+						});
+						rendezvous.arrive();
 					}
 				});
 				ref.set(token);
@@ -611,20 +689,25 @@ public class BlockingFileSystemProxy implements IFileSystem {
 	@Override
 	public IToken rename(final String old_path, final String new_path, final DoneRename done) {
 		Assert.isTrue(!Protocol.isDispatchThread());
-		rendezvous.reset();
+		final Rendezvous rendezvous = new Rendezvous();
 		final AtomicReference<IToken> ref = new AtomicReference<IToken>();
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
 				IToken token = service.rename(old_path, new_path, new DoneRename() {
 					@Override
-					public void doneRename(IToken token, FileSystemException error) {
-						try {
-							done.doneRename(token, error);
-						}
-						finally {
-							rendezvous.arrive();
-						}
+					public void doneRename(final IToken token, final FileSystemException error) {
+						SafeRunner.run(new ISafeRunnable() {
+							@Override
+							public void handleException(Throwable exception) {
+							}
+
+							@Override
+							public void run() throws Exception {
+								done.doneRename(token, error);
+							}
+						});
+						rendezvous.arrive();
 					}
 				});
 				ref.set(token);
@@ -645,20 +728,25 @@ public class BlockingFileSystemProxy implements IFileSystem {
 	@Override
 	public IToken readlink(final String path, final DoneReadLink done) {
 		Assert.isTrue(!Protocol.isDispatchThread());
-		rendezvous.reset();
+		final Rendezvous rendezvous = new Rendezvous();
 		final AtomicReference<IToken> ref = new AtomicReference<IToken>();
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
 				IToken token = service.readlink(path, new DoneReadLink() {
 					@Override
-					public void doneReadLink(IToken token, FileSystemException error, String path) {
-						try {
-							done.doneReadLink(token, error, path);
-						}
-						finally {
-							rendezvous.arrive();
-						}
+					public void doneReadLink(final IToken token, final FileSystemException error, final String path) {
+						SafeRunner.run(new ISafeRunnable() {
+							@Override
+							public void handleException(Throwable exception) {
+							}
+
+							@Override
+							public void run() throws Exception {
+								done.doneReadLink(token, error, path);
+							}
+						});
+						rendezvous.arrive();
 					}
 				});
 				ref.set(token);
@@ -679,20 +767,25 @@ public class BlockingFileSystemProxy implements IFileSystem {
 	@Override
 	public IToken symlink(final String link_path, final String target_path, final DoneSymLink done) {
 		Assert.isTrue(!Protocol.isDispatchThread());
-		rendezvous.reset();
+		final Rendezvous rendezvous = new Rendezvous();
 		final AtomicReference<IToken> ref = new AtomicReference<IToken>();
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
 				IToken token = service.symlink(link_path, target_path, new DoneSymLink() {
 					@Override
-					public void doneSymLink(IToken token, FileSystemException error) {
-						try {
-							done.doneSymLink(token, error);
-						}
-						finally {
-							rendezvous.arrive();
-						}
+					public void doneSymLink(final IToken token, final FileSystemException error) {
+						SafeRunner.run(new ISafeRunnable() {
+							@Override
+							public void handleException(Throwable exception) {
+							}
+
+							@Override
+							public void run() throws Exception {
+								done.doneSymLink(token, error);
+							}
+						});
+						rendezvous.arrive();
 					}
 				});
 				ref.set(token);
@@ -713,23 +806,27 @@ public class BlockingFileSystemProxy implements IFileSystem {
 	@Override
 	public IToken copy(final String src_path, final String dst_path, final boolean copy_permissions, final boolean copy_ownership, final DoneCopy done) {
 		Assert.isTrue(!Protocol.isDispatchThread());
-		rendezvous.reset();
+		final Rendezvous rendezvous = new Rendezvous();
 		final AtomicReference<IToken> ref = new AtomicReference<IToken>();
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
-				IToken token = service
-				                .copy(src_path, dst_path, copy_permissions, copy_ownership, new DoneCopy() {
-					                @Override
-					                public void doneCopy(IToken token, FileSystemException error) {
-						                try {
-							                done.doneCopy(token, error);
-						                }
-						                finally {
-							                rendezvous.arrive();
-						                }
-					                }
-				                });
+				IToken token = service.copy(src_path, dst_path, copy_permissions, copy_ownership, new DoneCopy() {
+					@Override
+					public void doneCopy(final IToken token, final FileSystemException error) {
+						SafeRunner.run(new ISafeRunnable() {
+							@Override
+							public void handleException(Throwable exception) {
+							}
+
+							@Override
+							public void run() throws Exception {
+								done.doneCopy(token, error);
+							}
+						});
+						rendezvous.arrive();
+					}
+				});
 				ref.set(token);
 			}
 		});
@@ -748,20 +845,25 @@ public class BlockingFileSystemProxy implements IFileSystem {
 	@Override
 	public IToken user(final DoneUser done) {
 		Assert.isTrue(!Protocol.isDispatchThread());
-		rendezvous.reset();
+		final Rendezvous rendezvous = new Rendezvous();
 		final AtomicReference<IToken> ref = new AtomicReference<IToken>();
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
 				IToken token = service.user(new DoneUser() {
 					@Override
-					public void doneUser(IToken token, FileSystemException error, int real_uid, int effective_uid, int real_gid, int effective_gid, String home) {
-						try {
-							done.doneUser(token, error, real_uid, effective_uid, real_gid, effective_gid, home);
-						}
-						finally {
-							rendezvous.arrive();
-						}
+					public void doneUser(final IToken token, final FileSystemException error, final int real_uid, final int effective_uid, final int real_gid, final int effective_gid, final String home) {
+						SafeRunner.run(new ISafeRunnable() {
+							@Override
+							public void handleException(Throwable exception) {
+							}
+
+							@Override
+							public void run() throws Exception {
+								done.doneUser(token, error, real_uid, effective_uid, real_gid, effective_gid, home);
+							}
+						});
+						rendezvous.arrive();
 					}
 				});
 				ref.set(token);
