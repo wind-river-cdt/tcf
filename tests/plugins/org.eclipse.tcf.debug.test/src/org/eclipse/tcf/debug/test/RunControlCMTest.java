@@ -97,7 +97,7 @@ public class RunControlCMTest extends AbstractCMTest {
             }
         }.get();
     }
-   
+
     public void testRunControlCMChildrenInvalidation() throws Exception {
         final TestProcessInfo processInfo = startProcess("tcf_test_func0");
 

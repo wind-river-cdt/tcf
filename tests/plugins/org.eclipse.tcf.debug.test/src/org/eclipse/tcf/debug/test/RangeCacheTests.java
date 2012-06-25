@@ -62,7 +62,7 @@ public class RangeCacheTests extends TestCase {
                 rm.setError(fRangeCache.getError());
                 rm.done();
             } else {
-                fRangeCache.update(new Callback(rm) {
+                fRangeCache.wait(new Callback(rm) {
                     @Override
                     protected void handleSuccess() {
                         rm.setData(fRangeCache.getData());

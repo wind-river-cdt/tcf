@@ -40,6 +40,15 @@ public abstract class TokenCache<V> extends AbstractCache<V> implements IResetta
     }
     
     @Override
+    public void set(V data, Throwable error, boolean valid) {
+        super.set(data, error, valid);
+        // If new value was set to the cache but a command is still 
+        // outstanding.  Cancel the command.
+        IToken token = fToken.getAndSet(null);
+        if (token != null) token.cancel();
+    }
+    
+    @Override
     protected void canceled() {
         IToken token = fToken.getAndSet(null);
         token.cancel();

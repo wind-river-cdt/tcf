@@ -10,20 +10,14 @@
  *******************************************************************************/
 package org.eclipse.tcf.debug.test.services;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import org.eclipse.tcf.debug.test.services.ResetMap.IResettable;
 import org.eclipse.tcf.debug.test.util.AbstractCache;
-import org.eclipse.tcf.debug.test.util.CallbackCache;
-import org.eclipse.tcf.debug.test.util.DataCallback;
 import org.eclipse.tcf.debug.test.util.ICache;
 import org.eclipse.tcf.debug.test.util.TokenCache;
-import org.eclipse.tcf.debug.test.util.Transaction;
-import org.eclipse.tcf.debug.test.util.Transaction.InvalidCacheException;
+import org.eclipse.tcf.debug.test.util.TransactionCache;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.services.IMemoryMap;
 import org.eclipse.tcf.services.IMemoryMap.MemoryMapListener;
@@ -59,114 +53,40 @@ public class SymbolsCM extends AbstractCacheManager {
         super.dispose();
     }
     
-    private static final List<String> ANY_ID_PARENTS = new ArrayList<String>(1);
-    {
-        ANY_ID_PARENTS.add(ResetMap.ANY_ID);
-    }
 
-    abstract private class SymbolCache<V> extends CallbackCache<V> implements IResettable {
+    abstract private class SymbolCache<V> extends TransactionCache<V> {
         protected final AbstractCache<V> fInner;
-        private Symbol fSymbol;
-        private List<String> fParents = new ArrayList<String>(4);
         
         public SymbolCache(AbstractCache<V> inner) {
             fInner = inner;
         }
         
-        public void reset() {
-            super.reset();
-            if (fInner.isValid()) fInner.reset();
-        }
-        
         abstract protected String getSymbolId();
-        
-        @Override
-        protected void retrieve(final DataCallback<V> rm) {
-            fRunControlResetMap.addPending(this);
-            fMemoryResetMap.addPending(this);
-            Transaction<V> transaction = new Transaction<V>() {
-                protected V process() throws InvalidCacheException, ExecutionException {
-                    V retVal = processInner(this);
-                    fSymbol = processSymbol(this);
-                    fParents = processParents(this);
-                    return retVal;            
-                }
-            };
-            transaction.request(rm);
-        }
 
-        protected V processInner(Transaction<V> t) throws InvalidCacheException, ExecutionException {
-            return t.validate(fInner);
-        }
-        
-        protected Symbol processSymbol(Transaction<V> t) throws InvalidCacheException, ExecutionException {
-            return t.validate( getContext(getSymbolId()) );
-        }
-        
-        protected List<String> processParents(Transaction<V> t) throws InvalidCacheException, ExecutionException {
-            List<String> parents = new ArrayList<String>(2);
-            String rcContextId = fSymbol.getOwnerID(); 
-            while( rcContextId != null ) {
-                parents.add(rcContextId);
-                RunControlContext rcContext = t.validate( fRunControlCM.getContext(rcContextId) );
-                rcContextId = rcContext.getParentID();
-            }
-            return parents;
-        }
-        
         @Override
-        protected void handleCompleted(V data, Throwable error, boolean canceled) {
-            if (canceled) return;
-            
-            // If we cannot retrieve the symbol's context.  Reset the cache on 
-            // any rc event.
-            List<String> parents = ANY_ID_PARENTS;
-            int updatePolicy = ISymbols.UPDATE_ON_EXE_STATE_CHANGES;
-            if (error == null) {
-                parents = fParents;
-                updatePolicy = fSymbol.getUpdatePolicy();
-            } 
-            updateRunControlResetMap(parents, updatePolicy, data, error);
-            updateMemoryMapResetMap(parents, data, error);
+        protected V process() throws InvalidCacheException, ExecutionException {
+            validate(fInner);
+            Symbol sym = validate( getContext(getSymbolId()) );
+            addPending(sym, fInner);
+            RunControlContext rcContext = validate(fRunControlCM.getContext(sym.getOwnerID()));
+            addValid(sym, rcContext, fInner);
+            return validate(fInner);            
         }
+    }
         
-        private void updateRunControlResetMap(List<String> parents, int updatePolicy, V data, Throwable error) {
-            Set<String> pendingIds = fRunControlResetMap.removePending(this);
-            if (updatePolicy == ISymbols.UPDATE_ON_EXE_STATE_CHANGES) {
-                String ownerId = parents.get(0);
-                if (pendingIds.contains(ownerId) || (ResetMap.ANY_ID.equals(ownerId) && !pendingIds.isEmpty())) {
-                    // Reset cache immediately after setting value.
-                    set(data, error, false);
-                } else {
-                    fRunControlResetMap.addValid(ownerId, this);
-                    set(data, error, true);
-                }
-            }
+    private void addPending(Symbol sym, IResettable cache) {
+        if (sym.getUpdatePolicy() == ISymbols.UPDATE_ON_EXE_STATE_CHANGES) {
+            fRunControlResetMap.addPending(cache);
         }
-
-        private void updateMemoryMapResetMap(List<String> parents, V data, Throwable error) {
-            Set<String> pendingIds = fMemoryResetMap.removePending(this);
-            boolean resetPending = false;
-            if (!pendingIds.isEmpty()) {
-                if (ResetMap.ANY_ID.equals(parents.get(0))) {
-                    resetPending = true;
-                } else {
-                    for (String parent : parents) {
-                        if (pendingIds.contains(parent)) {
-                            resetPending = true;
-                        }
-                    }
-                }
-            }
-            
-            if (resetPending) {
-                // Reset cache immediately after setting value.
-                set(data, error, false);
-            } else {
-                fMemoryResetMap.addValid(parents, this);
-                set(data, error, true);
-            }
+        fMemoryResetMap.addPending(cache);
+    }
+    
+    private void addValid(Symbol sym, RunControlContext rcContext, IResettable cache) {
+        if (sym.getUpdatePolicy() == ISymbols.UPDATE_ON_EXE_STATE_CHANGES) {
+            String ownerId = sym.getOwnerID();
+            fRunControlResetMap.addValid(ownerId, cache);
         }
+        fMemoryResetMap.addValid(rcContext.getProcessID(), cache);
     }
     
     private class ChildrenCache extends SymbolCache<String[]> {
@@ -207,88 +127,64 @@ public class SymbolsCM extends AbstractCacheManager {
         return mapCache(new ChildrenCacheKey(id));
     }
 
-    private class ContextCache extends SymbolCache<Symbol> {
-        public ContextCache(InnerContextCache inner) {
-            super(inner);
-        }
-        @Override
-        protected String getSymbolId() {
-            return fInner.getData().getID();
-        }
-        @Override
-        protected Symbol processSymbol(Transaction<Symbol> t) throws InvalidCacheException, ExecutionException {
-            return fInner.getData();
-        }
+    public ICache<Symbol> getContext(final String id) {
+        class MyCache extends TransactionCache<Symbol> {
+
+            class InnerCache extends TokenCache<Symbol> implements ISymbols.DoneGetContext{
+                @Override
+                protected IToken retrieveToken() {
+                    return fService.getContext(id, this);
+                }
+                
+                @Override
+                public void doneGetContext(IToken token, Exception error, Symbol context) {
+                    set(token, context, error);
+                }
+            };
+            
+            private final InnerCache fInner = new InnerCache();
+            
+            @Override
+            protected Symbol process() throws InvalidCacheException, ExecutionException {
+                Symbol sym = validate(fInner);
+                addPending(sym, fInner);
+                RunControlContext rcContext = validate(fRunControlCM.getContext(sym.getOwnerID()));
+                addValid(sym, rcContext, fInner);
+                return validate(fInner);
+            }
+        };
+
+        return mapCache(new IdKey<MyCache>(MyCache.class, id) {
+            @Override MyCache createCache() { return new MyCache(); }
+        });
     }
 
-    class InnerContextCache extends TokenCache<Symbol> implements ISymbols.DoneGetContext {
-        private final String fId;
-        
-        public InnerContextCache(String id) {
-            fId = id;
-        }
-        @Override
-        protected IToken retrieveToken() {
-            return fService.getContext(fId, this);
-        }
-        public void doneGetContext(IToken token, Exception error, Symbol symbol) {
-            set(token, symbol, error);
-        }
-        public void resetContext() {
-            if (isValid()) reset();
-        }
-    }
-    
-    private class ContextCacheKey extends IdKey<ContextCache> {
-        public ContextCacheKey(String id) {
-            super(ContextCache.class, id);
-        }
-        @Override ContextCache createCache() { return new ContextCache( new InnerContextCache(fId)); }        
-    }
-    
-    public ICache<Symbol> getContext(String id) {
-        return mapCache(new ContextCacheKey(id));
-    }
+    public ICache<Map<String, Object>> getLocationInfo(final String symbol_id) {
 
-    private class LocationInfoCache extends SymbolCache<Map<String,Object>> {
-        public LocationInfoCache(InnerLocationInfoCache inner) {
-            super(inner);
+        class InnerCache extends TokenCache<Map<String,Object>> implements ISymbols.DoneGetLocationInfo {
+            @Override
+            protected IToken retrieveToken() {
+                return fService.getLocationInfo(symbol_id, this);
+            }
+            
+            public void doneGetLocationInfo(IToken token, Exception error, Map<String,Object> props) {
+                set(token, props, error);
+            }
         }
-        @Override
-        protected String getSymbolId() {
-            return ((InnerLocationInfoCache)fInner).fId;
-        }
-    }
 
-    class InnerLocationInfoCache extends TokenCache<Map<String,Object>> implements ISymbols.DoneGetLocationInfo {
-        final String fId;
-        
-        public InnerLocationInfoCache(String id) {
-            fId = id;
+        class MyCache extends SymbolCache<Map<String,Object>> {
+            public MyCache() {
+                super(new InnerCache());
+            }
+            @Override
+            protected String getSymbolId() {
+                return symbol_id;
+            }
         }
-        @Override
-        protected IToken retrieveToken() {
-            return fService.getLocationInfo(fId, this);
-        }
-        
-        public void doneGetLocationInfo(IToken token, Exception error, Map<String,Object> props) {
-            set(token, props, error);
-        }
-        
-        public void resetContext() {
-            if (isValid()) reset();
-        }
-    }
-    
-    private class LocationInfoCacheKey extends IdKey<LocationInfoCache> {
-        public LocationInfoCacheKey(String id) {
-            super(LocationInfoCache.class, id);
-        }
-        @Override LocationInfoCache createCache() { return new LocationInfoCache( new InnerLocationInfoCache(fId)); }        
-    }
 
-    public ICache<Map<String, Object>> getLocationInfo(String symbol_id) {
-        return mapCache(new LocationInfoCacheKey(symbol_id));        
+        return mapCache(new IdKey<MyCache>(MyCache.class, symbol_id) {
+            @Override MyCache createCache() { return new MyCache(); }
+        });
     }
 
     /**

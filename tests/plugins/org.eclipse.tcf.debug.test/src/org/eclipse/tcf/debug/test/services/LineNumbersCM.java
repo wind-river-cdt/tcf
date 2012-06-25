@@ -49,15 +49,6 @@ public class LineNumbersCM extends AbstractCacheManager {
         super.dispose();
     }
      
-    private abstract class LineNumbersTokenCache<V> extends TokenCache<V> {
-        abstract protected String getId();
-        
-        protected void set(IToken token, V data, Throwable error) {
-            fMemContextResetMap.addValid(getId(), this);
-            super.set(token, data, error);
-        }
-    }
-
     abstract private class MapToSourceKey<V> extends IdKey<V> {
         private final Number fStartAdddress;        
         private final Number fEndAddress; 
@@ -84,15 +75,14 @@ public class LineNumbersCM extends AbstractCacheManager {
     
     public ICache<CodeArea[]> mapToSource(final String context_id, final Number start_address, final Number end_address) {
         class MyCache extends TransactionCache<ILineNumbers.CodeArea[]> {
-            private String fId = context_id;
-            
+
             @Override
             protected CodeArea[] process() throws InvalidCacheException, ExecutionException {
-                RunControlContext rcContext = validate(fRunControlCM.getContext(fId));
+                RunControlContext rcContext = validate(fRunControlCM.getContext(context_id));
                 String mem_id = rcContext.getProcessID();
                 if (mem_id == null) {
                     // TODO: is this the correct fall-back.  Should we save the parent ID for reset?
-                    mem_id = fId;
+                    mem_id = context_id;
                 }
                 return validate( doMapToSource(mem_id, start_address, end_address) );
             }
@@ -104,26 +94,21 @@ public class LineNumbersCM extends AbstractCacheManager {
     }
 
     private ICache<CodeArea[]> doMapToSource(final String mem_id, final Number start_address, final Number end_address) {
-        class MyCache extends LineNumbersTokenCache<CodeArea[]> implements ILineNumbers.DoneMapToSource {
-            @Override
-            protected String getId() {
-                return mem_id;
-            } 
+        class MyCache extends TokenCache<CodeArea[]> implements ILineNumbers.DoneMapToSource {
             @Override
             protected IToken retrieveToken() {
                 return fService.mapToSource(mem_id, start_address, end_address, this);
             }
             
             public void doneMapToSource(IToken token, Exception error, CodeArea[] areas) {
+                fMemContextResetMap.addValid(mem_id, this);
                 set(token, areas, error);
             }
-            
         };
         
         return mapCache(new MapToSourceKey<MyCache>(MyCache.class, mem_id, start_address, end_address) {
                 @Override MyCache createCache() { return new MyCache(); }
             });
-        
     }
 
     abstract private class MapToMemoryKey<V> extends IdKey<V> {
@@ -173,16 +158,13 @@ public class LineNumbersCM extends AbstractCacheManager {
     }
     
     private ICache<CodeArea[]> doMapToMemory(final String mem_id, final String file, final int line, final int column) {
-        class MyCache extends LineNumbersTokenCache<CodeArea[]> implements ILineNumbers.DoneMapToMemory {
-            @Override
-            protected String getId() {
-                return mem_id;
-            } 
+        class MyCache extends TokenCache<CodeArea[]> implements ILineNumbers.DoneMapToMemory {
             @Override
             protected IToken retrieveToken() {
                 return fService.mapToMemory(mem_id, file, line, column, this);
             }
             public void doneMapToMemory(IToken token, Exception error, CodeArea[] areas) {
+                fMemContextResetMap.addValid(mem_id, this);
                 set(token, areas, error);
             }
             

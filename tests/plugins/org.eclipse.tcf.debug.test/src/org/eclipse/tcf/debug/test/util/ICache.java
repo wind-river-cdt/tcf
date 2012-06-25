@@ -51,7 +51,7 @@ public interface ICache<V> {
 	 * @param cb
 	 *            Callback that is called when cache becomes valid.
 	 */
-    public void update(Callback cb);
+    public void wait(Callback cb);
 
     /**
      * Returns <code>true</code> if the cache is currently valid.  I.e. 

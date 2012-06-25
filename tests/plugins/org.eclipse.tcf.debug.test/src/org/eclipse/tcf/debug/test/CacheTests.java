@@ -53,7 +53,7 @@ public class CacheTests extends TestCase {
     class TestQuery extends Query<Integer> {
         @Override
         protected void execute(final DataCallback<Integer> rm) {
-            fTestCache.update(new DataCallback<Integer>(rm) {
+            fTestCache.wait(new DataCallback<Integer>(rm) {
                 @Override
                 protected void handleSuccess() {
                     rm.setData(fTestCache.getData());
@@ -521,7 +521,7 @@ public class CacheTests extends TestCase {
             @Override
             protected void execute(final DataCallback<Integer> rm) {
                 
-                fTestCache.update(new Callback(rm) {
+                fTestCache.wait(new Callback(rm) {
                     @Override
                     public synchronized void addCancelListener(ICanceledListener listener) {
                         // Do not add the cancel listener so that the cancel request is not
@@ -617,7 +617,7 @@ public class CacheTests extends TestCase {
                     };
                 };
                 
-                fTestCache.update(rmBad[0]);
+                fTestCache.wait(rmBad[0]);
             }
         };
         qBad.invoke();

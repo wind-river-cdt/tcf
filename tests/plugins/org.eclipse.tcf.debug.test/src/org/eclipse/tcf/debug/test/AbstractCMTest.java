@@ -67,6 +67,7 @@ import org.eclipse.tcf.services.IDiagnostics;
 import org.eclipse.tcf.services.IDiagnostics.ISymbol;
 import org.eclipse.tcf.services.IExpressions;
 import org.eclipse.tcf.services.ILineNumbers;
+import org.eclipse.tcf.services.IMemory;
 import org.eclipse.tcf.services.IMemoryMap;
 import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.IRegisters;
@@ -101,7 +102,8 @@ public abstract class AbstractCMTest extends TcfTestCase implements IViewerUpdat
     protected ISymbols syms;
     protected IStackTrace stk;
     protected IRunControl rc;
-    protected IBreakpoints bp;
+    protected IBreakpoints bp;    
+    protected IMemory fMemory;
     protected IMemoryMap fMemoryMap;
     protected ILineNumbers fLineNumbers;
     protected IRegisters fRegisters;
@@ -145,10 +147,11 @@ public abstract class AbstractCMTest extends TcfTestCase implements IViewerUpdat
 
     @Override
     protected void setUp() throws Exception {
+        super.setUp();
+        
         fTestRunKey = new Object();
 
         // Launch the agent
-        super.setUp();
         createLaunch();
 
         channels = new IChannel[NUM_CHANNELS];
@@ -219,7 +222,7 @@ public abstract class AbstractCMTest extends TcfTestCase implements IViewerUpdat
         fRunControlCM = new RunControlCM(rc);
         fDiagnosticsCM = new DiagnosticsCM(diag);
         fBreakpointsCM = new BreakpointsCM(bp);
-        fStackTraceCM = new StackTraceCM(stk, rc);
+        fStackTraceCM = new StackTraceCM(stk, fRunControlCM, fMemory, fMemoryMap);
         fSymbolsCM = new SymbolsCM(syms, fRunControlCM, fMemoryMap);
         fLineNumbersCM = new LineNumbersCM(fLineNumbers, fMemoryMap, fRunControlCM);
         fRegistersCM = new RegistersCM(fRegisters, rc);
@@ -292,7 +295,8 @@ public abstract class AbstractCMTest extends TcfTestCase implements IViewerUpdat
                 stk = channels[0].getRemoteService(IStackTrace.class);
                 rc = channels[0].getRemoteService(IRunControl.class);
                 bp = channels[0].getRemoteService(IBreakpoints.class);
-                fMemoryMap = channels[0].getRemoteService(IMemoryMap.class);
+                fMemory = channels[0].getRemoteService(IMemory.class);
+                fMemoryMap = channels[0].getRemoteService(IMemoryMap.class);                
                 fLineNumbers = channels[0].getRemoteService(ILineNumbers.class);
                 fRegisters = channels[0].getRemoteService(IRegisters.class);
                 fProcesses = channels[0].getRemoteService(IProcesses.class);
@@ -468,7 +472,7 @@ public abstract class AbstractCMTest extends TcfTestCase implements IViewerUpdat
         }.get();
     }
 
-    private TestProcessInfo startProcess() throws InterruptedException, ExecutionException {
+    protected TestProcessInfo startProcess() throws InterruptedException, ExecutionException {
         return new Transaction<TestProcessInfo>() {
             @Override
             protected TestProcessInfo process() throws Transaction.InvalidCacheException ,ExecutionException {
@@ -494,7 +498,7 @@ public abstract class AbstractCMTest extends TcfTestCase implements IViewerUpdat
         }.get();
     }
 
-    private boolean runToTestEntry(final TestProcessInfo processInfo, final String testFunc) throws InterruptedException, ExecutionException {
+    protected boolean runToTestEntry(final TestProcessInfo processInfo, final String testFunc) throws InterruptedException, ExecutionException {
         return new Transaction<Boolean>() {
             Object fWaitForResumeKey;
             Object fWaitForSuspendKey;

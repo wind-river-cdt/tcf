@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,7 +41,8 @@ public class ResetMap {
     // Mapping of context IDs that were reset while a given cache was pending.
     private Map<IResettable, Set<String>> fPending = new LinkedHashMap<IResettable, Set<String>>();
 
-    public synchronized Set<String> removePending(IResettable cache) {
+    public Set<String> removePending(IResettable cache) {
+        assert Protocol.isDispatchThread();
         Set<String> pendingIds = fPending.remove(cache);
         if (pendingIds == null) {
             pendingIds = Collections.emptySet();
@@ -48,23 +50,37 @@ public class ResetMap {
         return pendingIds;
     }
 
-    public synchronized void addValid(String id, IResettable cache) {
-        assert !fPending.containsKey(cache);
+    public boolean clearPending(String id, IResettable cache) {
+        assert Protocol.isDispatchThread();
+        Set<String> pendingIds = fPending.remove(cache);
+        if (pendingIds != null && pendingIds.contains(id)) {
+            cache.reset();
+            return true;
+        }
+        return false;
+    }
+
+    public void addValid(String id, IResettable cache) {
+        assert Protocol.isDispatchThread();
+        
+        if (!clearPending(id, cache)) return;
         
         List<IResettable> list = fValid.get(id);
         if (list == null) {
-            list = new ArrayList<IResettable>();
+            list = new LinkedList<IResettable>();
             fValid.put(id, list);
         }
         list.add(cache);
     }
 
-    public synchronized void addValid(String id, String[] childrenIds, IResettable cache) {
-        assert !fPending.containsKey(cache);
+    public void addValid(String id, String[] childrenIds, IResettable cache) {
+        assert Protocol.isDispatchThread();
+        
+        if (!clearPending(id, cache)) return;
         
         List<IResettable> list = fValid.get(id);
         if (list == null) {
-            list = new ArrayList<IResettable>();
+            list = new LinkedList<IResettable>();
             fValid.put(id, list);
         }
         list.add(cache);
@@ -73,9 +89,15 @@ public class ResetMap {
         }
     }
 
-    public synchronized void addValid(List<String> ids, IResettable cache) {
-        assert !fPending.containsKey(cache);
+    public void addValid(List<String> ids, IResettable cache) {
+        assert Protocol.isDispatchThread();
 
+        boolean valid = true;
+        for (int i = 0; i < ids.size() - 1; i++) {
+            valid = clearPending(ids.get(i), cache) && valid;
+        }
+        if (!valid) return;
+        
         String id = ids.get(0);
         List<IResettable> list = fValid.get(id);
         if (list == null) {
@@ -94,7 +116,9 @@ public class ResetMap {
         }
     }
 
-    public synchronized List<IResettable> getCaches(String id) {
+    public List<IResettable> getCaches(String id) {
+        assert Protocol.isDispatchThread();
+        
         List<IResettable> list = fValid.get(id);
         if (list == null) {
             list = Collections.emptyList();
@@ -157,7 +181,8 @@ public class ResetMap {
         }
     }
     
-    public synchronized void resetAll() {
+    public void resetAll() {
+        assert Protocol.isDispatchThread();
         Collection<List<IResettable>> valid = null;
         synchronized (this) {
             valid = fValid.values();
@@ -168,7 +193,10 @@ public class ResetMap {
         }
     }
 
-    public synchronized void addPending(IResettable cache) {
-        fPending.put(cache, new TreeSet<String>());
+    public void addPending(IResettable cache) {
+        assert Protocol.isDispatchThread();
+        if (!fPending.containsKey(cache)) {
+            fPending.put(cache, new TreeSet<String>());
+        }
     }
 }

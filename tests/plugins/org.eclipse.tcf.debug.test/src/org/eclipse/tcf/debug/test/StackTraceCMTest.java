@@ -10,20 +10,88 @@
 package org.eclipse.tcf.debug.test;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
 import org.eclipse.tcf.debug.test.util.ICache;
 import org.eclipse.tcf.debug.test.util.RangeCache;
 import org.eclipse.tcf.debug.test.util.Transaction;
+import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IRunControl;
+import org.eclipse.tcf.services.IRunControl.RunControlContext;
 import org.eclipse.tcf.services.IStackTrace.StackTraceContext;
 import org.junit.Assert;
 
 public class StackTraceCMTest extends AbstractCMTest {
 
-    public void testStackTraceCMResetOnContextStateChange() throws Exception {
+    public void testStackTraceCMResetOnResumeSuspend() throws Exception {
         final TestProcessInfo processInfo = startProcess("tcf_test_func2");
+        doTestStackTraceCMReset(
+            processInfo,
+            new Callable<Object>() { 
+                public Object call() throws Exception {
+                    resumeAndWaitForSuspend(processInfo.fThreadCtx, IRunControl.RM_STEP_OUT);
+                    return null;
+                }
+            }, 
+            true);
 
+    }
+
+    public void testStackTraceCMResetOnContextChange() throws Exception {
+        final TestProcessInfo processInfo = startProcess("tcf_test_func2");
+        doTestStackTraceCMReset(
+            processInfo,
+            new Callable<Object>() { 
+                public Object call() throws Exception {
+                    Protocol.invokeAndWait(new Runnable() {
+                        public void run() {
+                            fStackTraceCM.fRunControlListener.contextChanged(new RunControlContext[] { processInfo.fThreadCtx });
+                        }
+                    });
+                    return null;
+                }
+            }, 
+            false);
+    }
+
+    public void testStackTraceCMResetOnMemoryChange() throws Exception {
+        final TestProcessInfo processInfo = startProcess("tcf_test_func2");
+        doTestStackTraceCMReset(
+            processInfo,
+            new Callable<Object>() { 
+                public Object call() throws Exception {
+                    Protocol.invokeAndWait(new Runnable() {
+                        public void run() {
+                            fStackTraceCM.fMemoryListener.memoryChanged(processInfo.fProcessId, new Number[0], new long[0]);
+                        }
+                    });
+                    return null;
+                }
+            }, 
+            false);
+    }
+
+    public void testStackTraceCMResetOnMemoryMapChange() throws Exception {
+        final TestProcessInfo processInfo = startProcess("tcf_test_func2");
+        doTestStackTraceCMReset(
+            processInfo,
+            new Callable<Object>() { 
+                public Object call() throws Exception {
+                    Protocol.invokeAndWait(new Runnable() {
+                        public void run() {
+                            fStackTraceCM.fMemoryMapListener.changed(processInfo.fProcessId);
+                        }
+                    });
+                    return null;
+                }
+            }, 
+            false);
+    }
+
+    private void doTestStackTraceCMReset(final TestProcessInfo processInfo, Callable<?> resetCallable, 
+        final boolean pcShouldChange) throws Exception 
+    {
         // Retrieve the current PC and top frame for use later
         final String pc = new Transaction<String>() {
             @Override
@@ -47,9 +115,8 @@ public class StackTraceCMTest extends AbstractCMTest {
             }
         }.get();
 
-
-        // Execute a step.
-        resumeAndWaitForSuspend(processInfo.fThreadCtx, IRunControl.RM_STEP_OUT);
+        // Call the runnable that should reset the stack caches' state.
+        resetCallable.call();
 
         // End test, check that all caches were reset and now return an error.
         new Transaction<Object>() {
@@ -83,11 +150,13 @@ public class StackTraceCMTest extends AbstractCMTest {
                 
                 RangeCache<StackTraceContext> framesRange = fStackTraceCM.getContextRange(processInfo.fThreadId);
                 List<StackTraceContext> frames = validate(framesRange.getRange(frameIds.length - 1, 1));
-                StackTraceContext topFrame = frames.get(0);
-
-                Assert.assertFalse("Expected PC to be updated", pc.equals(topFrame.getInstructionAddress().toString()));
+                if (pcShouldChange) { 
+                    StackTraceContext topFrame = frames.get(0);
+                    Assert.assertFalse("Expected PC to be updated", pc.equals(topFrame.getInstructionAddress().toString()));
+                }
                 return null;
             }
         }.get();
     }
+
 }

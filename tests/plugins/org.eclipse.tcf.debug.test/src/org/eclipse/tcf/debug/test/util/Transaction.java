@@ -29,7 +29,7 @@ public abstract class Transaction<V>  implements Future<V>, Runnable {
 	 * validate a cache object that is stale (or has never obtained a value from
 	 * the source)
 	 */
-    private static final InvalidCacheException INVALID_CACHE_EXCEPTION = new InvalidCacheException();
+    public static final InvalidCacheException INVALID_CACHE_EXCEPTION = new InvalidCacheException();
     
 	/** The request object we've been given to set the transaction results in */
     private DataCallback<V> fRm;
@@ -185,7 +185,7 @@ public abstract class Transaction<V>  implements Future<V>, Runnable {
 			// update itself from its source, and schedule a re-attempt of the
 			// transaction logic to occur when the stale/unset cache has been
 			// updated
-            cache.update(new Callback(fRm) {
+            cache.wait(new Callback(fRm) {
                 @Override
                 protected void handleCompleted() {
                     run();
@@ -235,7 +235,7 @@ public abstract class Transaction<V>  implements Future<V>, Runnable {
             for (Object cacheObj : caches) {
                 ICache<?> cache = (ICache<?>)cacheObj;
                 if (!cache.isValid()) {
-                    cache.update(countringRm);
+                    cache.wait(countringRm);
                     count++;
                 }
             }
@@ -262,7 +262,7 @@ public abstract class Transaction<V>  implements Future<V>, Runnable {
             // Just sk the cache to update itself from its source, and schedule a 
             // re-attempt of the transaction logic to occur when the stale/unset 
             // cache has been updated
-            cache.update(new Callback(fRm) {
+            cache.wait(new Callback(fRm) {
                 @Override
                 protected void handleCompleted() {
                     run();
@@ -311,7 +311,7 @@ public abstract class Transaction<V>  implements Future<V>, Runnable {
         for (Object cacheObj : caches) {
             ICache<?> cache = (ICache<?>)cacheObj;
             if (!cache.isValid()) {
-                cache.update(countringRm);
+                cache.wait(countringRm);
                 count++;
             }
         }

@@ -38,8 +38,8 @@ public abstract class TransactionCache<V> extends Transaction<V> implements ICac
         return fCache.getError();
     }
 
-    public void update(Callback rm) {
-        fCache.update(rm);
+    public void wait(Callback rm) {
+        fCache.wait(rm);
     }
 
     public boolean isValid() {
@@ -64,7 +64,7 @@ public abstract class TransactionCache<V> extends Transaction<V> implements ICac
             fDependsOnCallbacks = new ArrayList<Callback>(fDependsOn.size());
             for (ICache<?> cache : fDependsOn) {
                 assert cache.isValid();
-                cache.update(new Callback() {
+                cache.wait(new Callback() {
                     @Override
                     protected void handleCompleted() {
                         if (!isCancelled()) {

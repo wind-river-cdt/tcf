@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.concurrent.CancellationException;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.tcf.debug.test.services.ResetMap.IResettable;
 import org.eclipse.tcf.protocol.Protocol;
 
 /**
@@ -29,7 +30,7 @@ import org.eclipse.tcf.protocol.Protocol;
  * </p>
  * @since 2.2
  */
-public abstract class AbstractCache<V> implements ICache<V> {
+public abstract class AbstractCache<V> implements ICache<V>, IResettable {
 
     private static final Throwable INVALID_STATUS = new Throwable("Cache invalid"); //$NON-NLS-1$
 
@@ -102,7 +103,7 @@ public abstract class AbstractCache<V> implements ICache<V> {
         return fError;
     }
 
-    public void update(Callback rm) {
+    public void wait(Callback rm) {
         assert Protocol.isDispatchThread();
 
         boolean first = false;
