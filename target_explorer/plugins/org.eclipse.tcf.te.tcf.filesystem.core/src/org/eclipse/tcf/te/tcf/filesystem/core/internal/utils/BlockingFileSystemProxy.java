@@ -52,15 +52,14 @@ public class BlockingFileSystemProxy implements IFileSystem {
 		this.rendezvous = new Rendezvous();
 	}
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.protocol.IService#getName()
 	 */
 	@Override
 	public String getName() {
 		return service.getName();
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.services.IFileSystem#open(java.lang.String, int, org.eclipse.tcf.services.IFileSystem.FileAttrs, org.eclipse.tcf.services.IFileSystem.DoneOpen)
 	 */
@@ -75,8 +74,12 @@ public class BlockingFileSystemProxy implements IFileSystem {
 				IToken token = service.open(file_name, flags, attrs, new DoneOpen() {
 					@Override
 					public void doneOpen(IToken token, FileSystemException error, IFileHandle handle) {
-						done.doneOpen(token, error, handle);
-						rendezvous.arrive();
+						try {
+							done.doneOpen(token, error, handle);
+						}
+						finally {
+							rendezvous.arrive();
+						}
 					}
 				});
 				ref.set(token);
@@ -105,8 +108,12 @@ public class BlockingFileSystemProxy implements IFileSystem {
 				IToken token = service.close(handle, new DoneClose() {
 					@Override
 					public void doneClose(IToken token, FileSystemException error) {
-						done.doneClose(token, error);
-						rendezvous.arrive();
+						try {
+							done.doneClose(token, error);
+						}
+						finally {
+							rendezvous.arrive();
+						}
 					}
 				});
 				ref.set(token);
@@ -135,8 +142,12 @@ public class BlockingFileSystemProxy implements IFileSystem {
 				IToken token = service.read(handle, offset, len, new DoneRead() {
 					@Override
 					public void doneRead(IToken token, FileSystemException error, byte[] data, boolean eof) {
-						done.doneRead(token, error, data, eof);
-						rendezvous.arrive();
+						try {
+							done.doneRead(token, error, data, eof);
+						}
+						finally {
+							rendezvous.arrive();
+						}
 					}
 				});
 				ref.set(token);
@@ -162,11 +173,16 @@ public class BlockingFileSystemProxy implements IFileSystem {
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
-				IToken token = service.write(handle, offset, data, data_pos, data_size, new DoneWrite() {
+				IToken token = service
+				                .write(handle, offset, data, data_pos, data_size, new DoneWrite() {
 					                @Override
 					                public void doneWrite(IToken token, FileSystemException error) {
-						                done.doneWrite(token, error);
-						                rendezvous.arrive();
+						                try {
+							                done.doneWrite(token, error);
+						                }
+						                finally {
+							                rendezvous.arrive();
+						                }
 					                }
 				                });
 				ref.set(token);
@@ -195,8 +211,12 @@ public class BlockingFileSystemProxy implements IFileSystem {
 				IToken token = service.stat(path, new DoneStat() {
 					@Override
 					public void doneStat(IToken token, FileSystemException error, FileAttrs attrs) {
-						done.doneStat(token, error, attrs);
-						rendezvous.arrive();
+						try {
+							done.doneStat(token, error, attrs);
+						}
+						finally {
+							rendezvous.arrive();
+						}
 					}
 				});
 				ref.set(token);
@@ -225,8 +245,12 @@ public class BlockingFileSystemProxy implements IFileSystem {
 				IToken token = service.lstat(path, new DoneStat() {
 					@Override
 					public void doneStat(IToken token, FileSystemException error, FileAttrs attrs) {
-						done.doneStat(token, error, attrs);
-						rendezvous.arrive();
+						try {
+							done.doneStat(token, error, attrs);
+						}
+						finally {
+							rendezvous.arrive();
+						}
 					}
 				});
 				ref.set(token);
@@ -255,8 +279,12 @@ public class BlockingFileSystemProxy implements IFileSystem {
 				IToken token = service.fstat(handle, new DoneStat() {
 					@Override
 					public void doneStat(IToken token, FileSystemException error, FileAttrs attrs) {
-						done.doneStat(token, error, attrs);
-						rendezvous.arrive();
+						try {
+							done.doneStat(token, error, attrs);
+						}
+						finally {
+							rendezvous.arrive();
+						}
 					}
 				});
 				ref.set(token);
@@ -285,8 +313,12 @@ public class BlockingFileSystemProxy implements IFileSystem {
 				IToken token = service.setstat(path, attrs, new DoneSetStat() {
 					@Override
 					public void doneSetStat(IToken token, FileSystemException error) {
-						done.doneSetStat(token, error);
-						rendezvous.arrive();
+						try {
+							done.doneSetStat(token, error);
+						}
+						finally {
+							rendezvous.arrive();
+						}
 					}
 				});
 				ref.set(token);
@@ -315,8 +347,12 @@ public class BlockingFileSystemProxy implements IFileSystem {
 				IToken token = service.fsetstat(handle, attrs, new DoneSetStat() {
 					@Override
 					public void doneSetStat(IToken token, FileSystemException error) {
-						done.doneSetStat(token, error);
-						rendezvous.arrive();
+						try {
+							done.doneSetStat(token, error);
+						}
+						finally {
+							rendezvous.arrive();
+						}
 					}
 				});
 				ref.set(token);
@@ -345,8 +381,12 @@ public class BlockingFileSystemProxy implements IFileSystem {
 				IToken token = service.opendir(path, new DoneOpen() {
 					@Override
 					public void doneOpen(IToken token, FileSystemException error, IFileHandle handle) {
-						done.doneOpen(token, error, handle);
-						rendezvous.arrive();
+						try {
+							done.doneOpen(token, error, handle);
+						}
+						finally {
+							rendezvous.arrive();
+						}
 					}
 				});
 				ref.set(token);
@@ -375,8 +415,12 @@ public class BlockingFileSystemProxy implements IFileSystem {
 				IToken token = service.readdir(handle, new DoneReadDir() {
 					@Override
 					public void doneReadDir(IToken token, FileSystemException error, DirEntry[] entries, boolean eof) {
-						done.doneReadDir(token, error, entries, eof);
-						rendezvous.arrive();
+						try {
+							done.doneReadDir(token, error, entries, eof);
+						}
+						finally {
+							rendezvous.arrive();
+						}
 					}
 				});
 				ref.set(token);
@@ -405,8 +449,12 @@ public class BlockingFileSystemProxy implements IFileSystem {
 				IToken token = service.mkdir(path, attrs, new DoneMkDir() {
 					@Override
 					public void doneMkDir(IToken token, FileSystemException error) {
-						done.doneMkDir(token, error);
-						rendezvous.arrive();
+						try {
+							done.doneMkDir(token, error);
+						}
+						finally {
+							rendezvous.arrive();
+						}
 					}
 				});
 				ref.set(token);
@@ -435,8 +483,12 @@ public class BlockingFileSystemProxy implements IFileSystem {
 				IToken token = service.rmdir(path, new DoneRemove() {
 					@Override
 					public void doneRemove(IToken token, FileSystemException error) {
-						done.doneRemove(token, error);
-						rendezvous.arrive();
+						try {
+							done.doneRemove(token, error);
+						}
+						finally {
+							rendezvous.arrive();
+						}
 					}
 				});
 				ref.set(token);
@@ -465,8 +517,12 @@ public class BlockingFileSystemProxy implements IFileSystem {
 				IToken token = service.roots(new DoneRoots() {
 					@Override
 					public void doneRoots(IToken token, FileSystemException error, DirEntry[] entries) {
-						done.doneRoots(token, error, entries);
-						rendezvous.arrive();
+						try {
+							done.doneRoots(token, error, entries);
+						}
+						finally {
+							rendezvous.arrive();
+						}
 					}
 				});
 				ref.set(token);
@@ -495,8 +551,12 @@ public class BlockingFileSystemProxy implements IFileSystem {
 				IToken token = service.remove(file_name, new DoneRemove() {
 					@Override
 					public void doneRemove(IToken token, FileSystemException error) {
-						done.doneRemove(token, error);
-						rendezvous.arrive();
+						try {
+							done.doneRemove(token, error);
+						}
+						finally {
+							rendezvous.arrive();
+						}
 					}
 				});
 				ref.set(token);
@@ -525,8 +585,12 @@ public class BlockingFileSystemProxy implements IFileSystem {
 				IToken token = service.realpath(path, new DoneRealPath() {
 					@Override
 					public void doneRealPath(IToken token, FileSystemException error, String path) {
-						done.doneRealPath(token, error, path);
-						rendezvous.arrive();
+						try {
+							done.doneRealPath(token, error, path);
+						}
+						finally {
+							rendezvous.arrive();
+						}
 					}
 				});
 				ref.set(token);
@@ -555,8 +619,12 @@ public class BlockingFileSystemProxy implements IFileSystem {
 				IToken token = service.rename(old_path, new_path, new DoneRename() {
 					@Override
 					public void doneRename(IToken token, FileSystemException error) {
-						done.doneRename(token, error);
-						rendezvous.arrive();
+						try {
+							done.doneRename(token, error);
+						}
+						finally {
+							rendezvous.arrive();
+						}
 					}
 				});
 				ref.set(token);
@@ -585,8 +653,12 @@ public class BlockingFileSystemProxy implements IFileSystem {
 				IToken token = service.readlink(path, new DoneReadLink() {
 					@Override
 					public void doneReadLink(IToken token, FileSystemException error, String path) {
-						done.doneReadLink(token, error, path);
-						rendezvous.arrive();
+						try {
+							done.doneReadLink(token, error, path);
+						}
+						finally {
+							rendezvous.arrive();
+						}
 					}
 				});
 				ref.set(token);
@@ -615,8 +687,12 @@ public class BlockingFileSystemProxy implements IFileSystem {
 				IToken token = service.symlink(link_path, target_path, new DoneSymLink() {
 					@Override
 					public void doneSymLink(IToken token, FileSystemException error) {
-						done.doneSymLink(token, error);
-						rendezvous.arrive();
+						try {
+							done.doneSymLink(token, error);
+						}
+						finally {
+							rendezvous.arrive();
+						}
 					}
 				});
 				ref.set(token);
@@ -642,11 +718,16 @@ public class BlockingFileSystemProxy implements IFileSystem {
 		Protocol.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
-				IToken token = service.copy(src_path, dst_path, copy_permissions, copy_ownership, new DoneCopy() {
+				IToken token = service
+				                .copy(src_path, dst_path, copy_permissions, copy_ownership, new DoneCopy() {
 					                @Override
 					                public void doneCopy(IToken token, FileSystemException error) {
-						                done.doneCopy(token, error);
-						                rendezvous.arrive();
+						                try {
+							                done.doneCopy(token, error);
+						                }
+						                finally {
+							                rendezvous.arrive();
+						                }
 					                }
 				                });
 				ref.set(token);
@@ -675,8 +756,12 @@ public class BlockingFileSystemProxy implements IFileSystem {
 				IToken token = service.user(new DoneUser() {
 					@Override
 					public void doneUser(IToken token, FileSystemException error, int real_uid, int effective_uid, int real_gid, int effective_gid, String home) {
-						done.doneUser(token, error, real_uid, effective_uid, real_gid, effective_gid, home);
-						rendezvous.arrive();
+						try {
+							done.doneUser(token, error, real_uid, effective_uid, real_gid, effective_gid, home);
+						}
+						finally {
+							rendezvous.arrive();
+						}
 					}
 				});
 				ref.set(token);
