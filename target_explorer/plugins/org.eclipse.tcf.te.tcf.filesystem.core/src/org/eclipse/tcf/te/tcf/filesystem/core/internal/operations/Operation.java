@@ -14,6 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
@@ -37,14 +38,14 @@ import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.services.IFileSystem.IFileHandle;
 import org.eclipse.tcf.te.core.utils.Ancestor;
 import org.eclipse.tcf.te.tcf.core.Tcf;
-import org.eclipse.tcf.te.tcf.core.concurrent.BlockingCallProxy;
-import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
+import org.eclipse.tcf.te.tcf.core.concurrent.Rendezvous;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel;
 import org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IConfirmCallback;
 import org.eclipse.tcf.te.tcf.filesystem.core.interfaces.IOperation;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.exceptions.TCFChannelException;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.exceptions.TCFException;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.exceptions.TCFFileSystemException;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.BlockingFileSystemProxy;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.CacheManager;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.PersistenceManager;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
@@ -55,6 +56,8 @@ import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
  * @see IOperation
  */
 public class Operation extends Ancestor<FSTreeNode> implements IOperation {
+	// The default timeout waiting for blocked invocations.
+	public static final long DEFAULT_TIMEOUT = 60000L;
 	// The flag indicating if the following action should be executed without asking.
 	protected boolean yes2All = false;
 	
@@ -140,11 +143,10 @@ public class Operation extends Ancestor<FSTreeNode> implements IOperation {
 	 * @return The channel or null if the operation fails.
 	 */
 	public static IChannel openChannel(final IPeer peer) throws TCFChannelException {
-		IChannelManager channelManager = Tcf.getChannelManager();
-		channelManager = BlockingCallProxy.newInstance(IChannelManager.class, channelManager);
 		final TCFChannelException[] errors = new TCFChannelException[1];
 		final IChannel[] channels = new IChannel[1];
-		channelManager.openChannel(peer, null, new DoneOpenChannel() {
+		final Rendezvous rendezvous = new Rendezvous();
+		Tcf.getChannelManager().openChannel(peer, null, new DoneOpenChannel() {
 			@Override
 			public void doneOpenChannel(Throwable error, IChannel channel) {
 				if (error != null) {
@@ -160,8 +162,15 @@ public class Operation extends Ancestor<FSTreeNode> implements IOperation {
 				else {
 					channels[0] = channel;
 				}
+				rendezvous.arrive();
 			}
 		});
+		try {
+			rendezvous.waiting(DEFAULT_TIMEOUT);
+		}
+		catch(TimeoutException e) {
+			throw new TCFChannelException(IStatus.ERROR, Messages.Operation_TimeoutOpeningChannel);
+		}
 		if (errors[0] != null) {
 			throw errors[0];
 		}
@@ -184,7 +193,7 @@ public class Operation extends Ancestor<FSTreeNode> implements IOperation {
 	public static IFileSystem getBlockingFileSystem(final IChannel channel) {
 		if(Protocol.isDispatchThread()) {
 			IFileSystem service = channel.getRemoteService(IFileSystem.class);
-			return BlockingCallProxy.newInstance(IFileSystem.class, service);
+			return new BlockingFileSystemProxy(service);
 		}
 		final IFileSystem[] service = new IFileSystem[1];
 		Protocol.invokeAndWait(new Runnable(){

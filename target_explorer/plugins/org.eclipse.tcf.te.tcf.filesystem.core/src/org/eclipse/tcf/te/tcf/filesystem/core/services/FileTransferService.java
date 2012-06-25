@@ -17,7 +17,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.ConnectException;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
@@ -30,7 +29,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.IToken;
-import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.FileAttrs;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
@@ -40,10 +38,8 @@ import org.eclipse.tcf.te.runtime.services.interfaces.filetransfer.IFileTransfer
 import org.eclipse.tcf.te.runtime.utils.ProgressHelper;
 import org.eclipse.tcf.te.runtime.utils.StatusHelper;
 import org.eclipse.tcf.te.tcf.core.Tcf;
-import org.eclipse.tcf.te.tcf.core.concurrent.BlockingCallProxy;
-import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
-import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager.DoneOpenChannel;
 import org.eclipse.tcf.te.tcf.filesystem.core.internal.exceptions.TCFChannelException;
+import org.eclipse.tcf.te.tcf.filesystem.core.internal.operations.Operation;
 import org.eclipse.tcf.te.tcf.filesystem.core.nls.Messages;
 import org.eclipse.tcf.util.TCFFileInputStream;
 import org.eclipse.tcf.util.TCFFileOutputStream;
@@ -69,9 +65,9 @@ public class FileTransferService {
         try {
             if (channel == null) {
                 ownChannel = true;
-                channel = openChannel(peer);
+                channel = Operation.openChannel(peer);
             }
-            fileSystem = getBlockingFileSystem(channel);
+            fileSystem = Operation.getBlockingFileSystem(channel);
 
             Assert.isNotNull(fileSystem);
 
@@ -112,7 +108,7 @@ public class FileTransferService {
         }
 
         try {
-            IChannel channel = openChannel(peer);
+            IChannel channel = Operation.openChannel(peer);
             transfer(peer, channel, item, monitor, callback);
             closeChannel(peer, channel);
         }
@@ -376,40 +372,6 @@ public class FileTransferService {
     }
 
     /**
-     * Open a channel for file transfer.
-     * @param peer
-     * @return
-     * @throws TCFChannelException
-     */
-    protected static IChannel openChannel(final IPeer peer) throws TCFChannelException {
-        IChannelManager proxy = BlockingCallProxy.newInstance(IChannelManager.class, Tcf.getChannelManager());
-        final TCFChannelException[] errors = new TCFChannelException[1];
-        final IChannel[] channels = new IChannel[1];
-        proxy.openChannel(peer, null, new DoneOpenChannel() {
-            @Override
-            public void doneOpenChannel(Throwable error, IChannel channel) {
-                if (error != null) {
-                    if (error instanceof ConnectException) {
-                        String message = NLS.bind(Messages.Operation_NotResponding, peer.getID());
-                        errors[0] = new TCFChannelException(IStatus.ERROR, message);
-                    }
-                    else {
-                        String message = NLS.bind(Messages.Operation_OpeningChannelFailureMessage, peer.getID(), error.getMessage());
-                        errors[0] = new TCFChannelException(IStatus.ERROR, message, error);
-                    }
-                }
-                else {
-                    channels[0] = channel;
-                }
-            }
-        });
-        if (errors[0] != null) {
-            throw errors[0];
-        }
-        return channels[0];
-    }
-
-    /**
      * Close the channel for file transfer.
      * @param peer
      * @param channel
@@ -417,28 +379,8 @@ public class FileTransferService {
      */
     protected static void closeChannel(final IPeer peer, final IChannel channel) throws TCFChannelException {
         if (channel != null) {
-            IChannelManager proxy = BlockingCallProxy.newInstance(IChannelManager.class, Tcf.getChannelManager());
-            proxy.closeChannel(channel);
+        	Tcf.getChannelManager().closeChannel(channel);
         }
-    }
-
-    /**
-     * Get a blocking file system.
-     * @param channel
-     * @return
-     */
-    protected static IFileSystem getBlockingFileSystem(final IChannel channel) {
-        if(Protocol.isDispatchThread()) {
-            IFileSystem service = channel.getRemoteService(IFileSystem.class);
-            return BlockingCallProxy.newInstance(IFileSystem.class, service);
-        }
-        final IFileSystem[] service = new IFileSystem[1];
-        Protocol.invokeAndWait(new Runnable(){
-            @Override
-            public void run() {
-                service[0] = getBlockingFileSystem(channel);
-            }});
-        return service[0];
     }
 
     private static String getProgressMessage(long bytesDone, long bytesTotal, long bytesSpeed) {

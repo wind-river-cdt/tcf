@@ -45,6 +45,7 @@ public class Messages extends NLS {
 	public static String Operation_CopyNOfFile;
 	public static String Operation_CopyOfFile;
 	public static String Operation_CannotCreateDirectory;
+	public static String Operation_TimeoutOpeningChannel;
 
 	public static String OpCopy_Copying;
 	public static String OpCopy_CannotCopyFile;
@@ -96,4 +97,25 @@ public class Messages extends NLS {
 	public static String CacheManager_MkdirFailed;
 
 	public static String FileTransferService_error_mkdirFailed;
+	public static String BlockingFileSystemProxy_TimeoutOpeningFile;
+	public static String BlockingFileSystemProxy_TimeoutClosingFile;
+	public static String BlockingFileSystemProxy_TimeoutReadingFile;
+	public static String BlockingFileSystemProxy_TimeoutWritingFile;
+	public static String BlockingFileSystemProxy_TimeoutStat;
+	public static String BlockingFileSystemProxy_TimeoutLstat;
+	public static String BlockingFileSystemProxy_TimeoutFstat;
+	public static String BlockingFileSystemProxy_TimeoutSetStat;
+	public static String BlockingFileSystemProxy_TimeoutFSetStat;
+	public static String BlockingFileSystemProxy_TimeoutOpeningDir;
+	public static String BlockingFileSystemProxy_TimeoutReadingDir;
+	public static String BlockingFileSystemProxy_TimeoutMakingDir;
+	public static String BlockingFileSystemProxy_TimeoutRemovingDir;
+	public static String BlockingFileSystemProxy_TimeoutListingRoots;
+	public static String BlockingFileSystemProxy_TimeoutRemovingFile;
+	public static String BlockingFileSystemProxy_TimeoutGettingRealPath;
+	public static String BlockingFileSystemProxy_TimeoutRenamingFile;
+	public static String BlockingFileSystemProxy_TimeoutReadingLink;
+	public static String BlockingFileSystemProxy_TimeoutSymLink;
+	public static String BlockingFileSystemProxy_TimeoutCopying;
+	public static String BlockingFileSystemProxy_TimeoutGettingUser;
 }
