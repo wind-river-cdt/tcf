@@ -63,7 +63,8 @@ public class AttributesSection extends AbstractSection {
 		IPeer.ATTR_ID, IPeer.ATTR_AGENT_ID, IPeer.ATTR_SERVICE_MANGER_ID, "ServerManagerID", //$NON-NLS-1$
 		IPeer.ATTR_NAME, IPeer.ATTR_TRANSPORT_NAME, IPeer.ATTR_IP_HOST,
 		IPeer.ATTR_IP_PORT, "PipeName", //$NON-NLS-1$
-		"redirect.proxy" //$NON-NLS-1$
+		"redirect.proxy", //$NON-NLS-1$
+		IPeerModelProperties.PROP_VISIBLE
 	};
 
 	/*
@@ -75,7 +76,8 @@ public class AttributesSection extends AbstractSection {
 		IPeer.ATTR_ID, IPeer.ATTR_AGENT_ID, IPeer.ATTR_SERVICE_MANGER_ID, "ServerManagerID", //$NON-NLS-1$
 		IPeer.ATTR_NAME, IPeer.ATTR_TRANSPORT_NAME, IPeer.ATTR_IP_HOST,
 		IPeer.ATTR_IP_PORT, "PipeName", //$NON-NLS-1$
-		"redirect.proxy" //$NON-NLS-1$
+		"redirect.proxy", //$NON-NLS-1$
+		IPeerModelProperties.PROP_VISIBLE
 	};
 
 	/**

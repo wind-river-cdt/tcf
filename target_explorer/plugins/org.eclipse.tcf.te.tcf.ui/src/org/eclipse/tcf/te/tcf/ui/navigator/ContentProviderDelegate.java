@@ -93,9 +93,12 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 		Assert.isNotNull(peerModel);
 
-		boolean isProxyOrValueAdd = isProxyOrValueAdd(peerModel) && UIPlugin.getDefault().getPreferenceStore().getBoolean(IPreferenceKeys.PREF_HIDE_PROXIES_AND_VALUEADDS);
+		boolean filtered = false;
 
-		return isProxyOrValueAdd;
+		filtered |= isProxyOrValueAdd(peerModel) && UIPlugin.getDefault().getPreferenceStore().getBoolean(IPreferenceKeys.PREF_HIDE_PROXIES_AND_VALUEADDS);
+		filtered |= !peerModel.isVisible();
+
+		return filtered;
 	}
 
 	/* (non-Javadoc)
@@ -197,7 +200,7 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 							}
 						}
 					}
-					else {
+					else if (catID == null) {
 						for (IPeerModel peer : peers) {
 							// Check for filtered nodes (Value-add's and Proxies)
 							if (isFiltered(peer)) continue;

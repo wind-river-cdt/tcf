@@ -245,4 +245,15 @@ public class PeerModel extends ContainerModelNode implements IPeerModel {
 
 		super.postSetProperty(key, value, oldValue);
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.model.ModelNode#isVisible()
+	 */
+	@Override
+	public boolean isVisible() {
+		Assert.isTrue(checkThreadAccess(), "Illegal Thread Access"); //$NON-NLS-1$
+	    return getPeer() != null && getPeer().getAttributes().containsKey(IPeerModelProperties.PROP_VISIBLE)
+	    				? Boolean.valueOf(getPeer().getAttributes().get(IPeerModelProperties.PROP_VISIBLE)).booleanValue()
+	    				: true;
+	}
 }
