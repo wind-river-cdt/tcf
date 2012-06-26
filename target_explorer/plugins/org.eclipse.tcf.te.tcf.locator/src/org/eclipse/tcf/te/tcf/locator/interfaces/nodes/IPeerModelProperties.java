@@ -70,7 +70,7 @@ public interface IPeerModelProperties {
 	/**
 	 * Property: The peer type.
 	 */
-	public static final String PROP_TYPE = "Type"; //$NON-NLS-1$
+	public static final String PROP_TYPE = "type"; //$NON-NLS-1$
 
 	/**
 	 * Property: The peer visible state.

@@ -129,12 +129,11 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 				public void run() {
 					if (IUIConstants.ID_CAT_FAVORITES.equals(catID)) {
 						for (IPeerModel peer : peers) {
-							// Check for filtered nodes (Value-add's and Proxies)
-							if (isFiltered(peer)) continue;
-
-			        	    ICategorizable categorizable = (ICategorizable)peer.getAdapter(ICategorizable.class);
-			            	if (categorizable == null) categorizable = (ICategorizable)Platform.getAdapterManager().getAdapter(peer, ICategorizable.class);
-			            	Assert.isNotNull(categorizable);
+							ICategorizable categorizable = (ICategorizable)peer.getAdapter(ICategorizable.class);
+							if (categorizable == null) {
+								categorizable = (ICategorizable)Platform.getAdapterManager().getAdapter(peer, ICategorizable.class);
+							}
+							Assert.isNotNull(categorizable);
 
 							boolean isFavorite = Managers.getCategoryManager().belongsTo(catID, categorizable.getId());
 							if (isFavorite && !candidates.contains(peer)) {
@@ -145,11 +144,15 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 					else if (IUIConstants.ID_CAT_MY_TARGETS.equals(catID)) {
 						for (IPeerModel peer : peers) {
 							// Check for filtered nodes (Value-add's and Proxies)
-							if (isFiltered(peer)) continue;
+							if (isFiltered(peer)) {
+								continue;
+							}
 
 							ICategorizable categorizable = (ICategorizable)peer.getAdapter(ICategorizable.class);
-			            	if (categorizable == null) categorizable = (ICategorizable)Platform.getAdapterManager().getAdapter(peer, ICategorizable.class);
-			            	Assert.isNotNull(categorizable);
+							if (categorizable == null) {
+								categorizable = (ICategorizable)Platform.getAdapterManager().getAdapter(peer, ICategorizable.class);
+							}
+							Assert.isNotNull(categorizable);
 
 							String value = peer.getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
 							boolean isStatic = value != null && Boolean.parseBoolean(value.trim());
@@ -175,13 +178,17 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 					else if (IUIConstants.ID_CAT_NEIGHBORHOOD.equals(catID)) {
 						for (IPeerModel peer : peers) {
 							// Check for filtered nodes (Value-add's and Proxies)
-							if (isFiltered(peer)) continue;
+							if (isFiltered(peer)) {
+								continue;
+							}
 
-			        	    ICategorizable categorizable = (ICategorizable)peer.getAdapter(ICategorizable.class);
-			            	if (categorizable == null) categorizable = (ICategorizable)Platform.getAdapterManager().getAdapter(peer, ICategorizable.class);
-			            	Assert.isNotNull(categorizable);
+							ICategorizable categorizable = (ICategorizable)peer.getAdapter(ICategorizable.class);
+							if (categorizable == null) {
+								categorizable = (ICategorizable)Platform.getAdapterManager().getAdapter(peer, ICategorizable.class);
+							}
+							Assert.isNotNull(categorizable);
 
-			            	String value = peer.getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
+							String value = peer.getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
 							boolean isStatic = value != null && Boolean.parseBoolean(value.trim());
 
 							boolean isNeighborhood = Managers.getCategoryManager().belongsTo(catID, categorizable.getId());
@@ -195,15 +202,31 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 								isNeighborhood = true;
 							}
 
-							if ((isNeighborhood || !isStatic) && !candidates.contains(peer)) {
+							if (isNeighborhood && !candidates.contains(peer)) {
 								candidates.add(peer);
 							}
 						}
 					}
-					else if (catID == null) {
+					else if (catID != null) {
+						for (IPeerModel peer : peers) {
+							ICategorizable categorizable = (ICategorizable)peer.getAdapter(ICategorizable.class);
+							if (categorizable == null) {
+								categorizable = (ICategorizable)Platform.getAdapterManager().getAdapter(peer, ICategorizable.class);
+							}
+							Assert.isNotNull(categorizable);
+
+							boolean belongsTo = category.belongsTo(peer);
+							if (belongsTo) {
+								candidates.add(peer);
+							}
+						}
+					}
+					else {
 						for (IPeerModel peer : peers) {
 							// Check for filtered nodes (Value-add's and Proxies)
-							if (isFiltered(peer)) continue;
+							if (isFiltered(peer)) {
+								continue;
+							}
 							candidates.add(peer);
 						}
 					}
@@ -255,11 +278,11 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreePathContentProvider#getChildren(org.eclipse.jface.viewers.TreePath)
 	 */
-    @Override
-    public Object[] getChildren(TreePath parentPath) {
-    	// getChildren is independent of the elements tree path
-    	return parentPath != null ? getChildren(parentPath.getLastSegment()) : NO_ELEMENTS;
-    }
+	@Override
+	public Object[] getChildren(TreePath parentPath) {
+		// getChildren is independent of the elements tree path
+		return parentPath != null ? getChildren(parentPath.getLastSegment()) : NO_ELEMENTS;
+	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
@@ -272,7 +295,9 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 			if (((IPeerModel)element).getPeer() instanceof IPeerRedirector) {
 				IPeer parentPeer =  ((IPeerRedirector)((IPeerModel)element).getPeer()).getParent();
 				String parentPeerId = parentPeer.getID();
-				if (!roots.containsKey(parentPeerId)) roots.put(parentPeer.getID(), new PeerRedirectorGroupNode(parentPeerId));
+				if (!roots.containsKey(parentPeerId)) {
+					roots.put(parentPeer.getID(), new PeerRedirectorGroupNode(parentPeerId));
+				}
 				return roots.get(parentPeerId);
 			}
 
@@ -317,8 +342,8 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreePathContentProvider#getParents(java.lang.Object)
 	 */
-    @Override
-    public TreePath[] getParents(Object element) {
+	@Override
+	public TreePath[] getParents(Object element) {
 		// Not sure if we ever have to calculate the _full_ tree path. The parent NavigatorContentServiceContentProvider
 		// is consuming only the last segment.
 		List<TreePath> pathes = new ArrayList<TreePath>();
@@ -327,16 +352,20 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 			if (Managers.getCategoryManager().belongsTo(IUIConstants.ID_CAT_FAVORITES, ((IPeerModel)element).getPeerId())) {
 				// Get the "Favorites" category
 				ICategory favCategory = CategoriesExtensionPointManager.getInstance().getCategory(IUIConstants.ID_CAT_FAVORITES, false);
-				if (favCategory != null) pathes.add(new TreePath(new Object[] { favCategory }));
+				if (favCategory != null) {
+					pathes.add(new TreePath(new Object[] { favCategory }));
+				}
 			}
 
 			// Determine the default parent
 			Object parent = getParent(element);
-			if (parent != null) pathes.add(new TreePath(new Object[] { parent }));
-    	}
+			if (parent != null) {
+				pathes.add(new TreePath(new Object[] { parent }));
+			}
+		}
 
 		return pathes.toArray(new TreePath[pathes.size()]);
-    }
+	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
@@ -367,11 +396,11 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreePathContentProvider#hasChildren(org.eclipse.jface.viewers.TreePath)
 	 */
-    @Override
-    public boolean hasChildren(TreePath path) {
-    	// hasChildren is independent of the elements tree path
-    	return path != null ? hasChildren(path.getLastSegment()) : false;
-    }
+	@Override
+	public boolean hasChildren(TreePath path) {
+		// hasChildren is independent of the elements tree path
+		return path != null ? hasChildren(path.getLastSegment()) : false;
+	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
@@ -419,15 +448,15 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 	}
 
 	/* (non-Javadoc)
-     * @see org.eclipse.ui.navigator.ICommonContentProvider#init(org.eclipse.ui.navigator.ICommonContentExtensionSite)
-     */
-    @Override
-    public void init(ICommonContentExtensionSite config) {
-    	Assert.isNotNull(config);
+	 * @see org.eclipse.ui.navigator.ICommonContentProvider#init(org.eclipse.ui.navigator.ICommonContentExtensionSite)
+	 */
+	@Override
+	public void init(ICommonContentExtensionSite config) {
+		Assert.isNotNull(config);
 
-    	// Make sure that the hidden "Redirected Peers" filter is active
-    	INavigatorContentService cs = config.getService();
-    	INavigatorFilterService fs = cs != null ? cs.getFilterService() : null;
+		// Make sure that the hidden "Redirected Peers" filter is active
+		INavigatorContentService cs = config.getService();
+		INavigatorFilterService fs = cs != null ? cs.getFilterService() : null;
 		if (fs != null && !fs.isActive(REDIRECT_PEERS_FILTER_ID)) {
 			if (fs instanceof NavigatorFilterService) {
 				final NavigatorFilterService navFilterService = (NavigatorFilterService)fs;
@@ -441,19 +470,19 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 				});
 			}
 		}
-    }
+	}
 
 	/* (non-Javadoc)
-     * @see org.eclipse.ui.navigator.IMementoAware#restoreState(org.eclipse.ui.IMemento)
-     */
-    @Override
-    public void restoreState(IMemento aMemento) {
-    }
+	 * @see org.eclipse.ui.navigator.IMementoAware#restoreState(org.eclipse.ui.IMemento)
+	 */
+	@Override
+	public void restoreState(IMemento aMemento) {
+	}
 
 	/* (non-Javadoc)
-     * @see org.eclipse.ui.navigator.IMementoAware#saveState(org.eclipse.ui.IMemento)
-     */
-    @Override
-    public void saveState(IMemento aMemento) {
-    }
+	 * @see org.eclipse.ui.navigator.IMementoAware#saveState(org.eclipse.ui.IMemento)
+	 */
+	@Override
+	public void saveState(IMemento aMemento) {
+	}
 }

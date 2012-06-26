@@ -30,4 +30,12 @@ public interface ICategory extends IExecutableExtension {
 	 * @return The sorting rank, or a value less than -1 to fallback to alphabetical sorting.
 	 */
 	public int getRank();
+
+	/**
+	 * Check whether the given categorizable element belongs to this category.
+	 * @param element The categorizable element.
+	 * @return <code>true</code> if the element should be shown within this category.
+	 */
+	public boolean belongsTo(Object element);
+
 }

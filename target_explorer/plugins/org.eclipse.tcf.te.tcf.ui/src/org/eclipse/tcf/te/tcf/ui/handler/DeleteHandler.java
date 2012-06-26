@@ -73,13 +73,15 @@ public class DeleteHandler extends AbstractHandler {
 		// Get the current selection
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
 		// Delete the selection
-		if (selection != null) delete(selection, new Callback() {
-			@Override
-			protected void internalDone(Object caller, IStatus status) {
-				// Refresh the view
-				ViewsUtil.refresh(IUIConstants.ID_EXPLORER);
-			}
-		});
+		if (selection != null) {
+			delete(selection, new Callback() {
+				@Override
+				protected void internalDone(Object caller, IStatus status) {
+					// Refresh the view
+					ViewsUtil.refresh(IUIConstants.ID_EXPLORER);
+				}
+			});
+		}
 		// Reset the shell
 		shell = null;
 
@@ -134,7 +136,9 @@ public class DeleteHandler extends AbstractHandler {
 					}
 				}
 
-				if (!canDelete) break;
+				if (!canDelete) {
+					break;
+				}
 			}
 		}
 
@@ -160,8 +164,12 @@ public class DeleteHandler extends AbstractHandler {
 			}
 		};
 
-		if (Protocol.isDispatchThread()) runnable.run();
-		else Protocol.invokeAndWait(runnable);
+		if (Protocol.isDispatchThread()) {
+			runnable.run();
+		}
+		else {
+			Protocol.invokeAndWait(runnable);
+		}
 
 		return isStatic.get();
 	}
@@ -186,8 +194,12 @@ public class DeleteHandler extends AbstractHandler {
 			}
 		};
 
-		if (Protocol.isDispatchThread()) runnable.run();
-		else Protocol.invokeAndWait(runnable);
+		if (Protocol.isDispatchThread()) {
+			runnable.run();
+		}
+		else {
+			Protocol.invokeAndWait(runnable);
+		}
 
 		return System.getProperty("user.name").equals(username.get()); //$NON-NLS-1$
 	}
@@ -215,7 +227,7 @@ public class DeleteHandler extends AbstractHandler {
 				TreePath parentPath = path.getParentPath();
 				while (parentPath != null) {
 					if (parentPath.getLastSegment() instanceof ICategory
-							&& !categories.contains(parentPath.getLastSegment())) {
+									&& !categories.contains(parentPath.getLastSegment())) {
 						categories.add((ICategory)parentPath.getLastSegment());
 						break;
 					}
@@ -231,7 +243,7 @@ public class DeleteHandler extends AbstractHandler {
 	 * Internal helper class to describe the delete operation to perform.
 	 */
 	private static class Operation {
-    	// The operation types
+		// The operation types
 		public enum TYPE { Remove, Unlink }
 
 		// The element to operate on
@@ -245,38 +257,40 @@ public class DeleteHandler extends AbstractHandler {
 		/**
 		 * Constructor.
 		 */
-        public Operation() {
-        }
+		public Operation() {
+		}
 
-        /**
-         * Executes the operation.
-         *
-         * @throws Exception if the operation fails.
-         */
-        public void execute() throws Exception {
-        	Assert.isNotNull(node);
-        	Assert.isNotNull(type);
+		/**
+		 * Executes the operation.
+		 *
+		 * @throws Exception if the operation fails.
+		 */
+		public void execute() throws Exception {
+			Assert.isNotNull(node);
+			Assert.isNotNull(type);
 
-        	if (TYPE.Remove.equals(type)) {
+			if (TYPE.Remove.equals(type)) {
 				IURIPersistenceService service = ServiceManager.getInstance().getService(IURIPersistenceService.class);
 				if (service == null) {
 					throw new IOException("Persistence service instance unavailable."); //$NON-NLS-1$
 				}
 				service.delete(node, null);
-        	}
-        	else if (TYPE.Unlink.equals(type)) {
-        		Assert.isNotNull(parentCategory);
+			}
+			else if (TYPE.Unlink.equals(type)) {
+				Assert.isNotNull(parentCategory);
 
-        		ICategoryManager manager = Managers.getCategoryManager();
-        		Assert.isNotNull(manager);
+				ICategoryManager manager = Managers.getCategoryManager();
+				Assert.isNotNull(manager);
 
-        	    ICategorizable categorizable = (ICategorizable)node.getAdapter(ICategorizable.class);
-            	if (categorizable == null) categorizable = (ICategorizable)Platform.getAdapterManager().getAdapter(node, ICategorizable.class);
-            	Assert.isNotNull(categorizable);
+				ICategorizable categorizable = (ICategorizable)node.getAdapter(ICategorizable.class);
+				if (categorizable == null) {
+					categorizable = (ICategorizable)Platform.getAdapterManager().getAdapter(node, ICategorizable.class);
+				}
+				Assert.isNotNull(categorizable);
 
-        		manager.remove(parentCategory.getId(), categorizable.getId());
-        	}
-        }
+				manager.remove(parentCategory.getId(), categorizable.getId());
+			}
+		}
 	}
 
 	/**
@@ -319,7 +333,7 @@ public class DeleteHandler extends AbstractHandler {
 				} catch (Exception e) {
 					// Create the status
 					IStatus status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(),
-												Messages.DeleteHandler_error_deleteFailed, e);
+									Messages.DeleteHandler_error_deleteFailed, e);
 
 					// Fill in the status handler custom data
 					IPropertiesContainer data = new PropertiesContainer();
@@ -416,6 +430,13 @@ public class DeleteHandler extends AbstractHandler {
 
 						operations.add(op);
 					}
+					else {
+						Operation op = new Operation();
+						op.node = node;
+						op.type = Operation.TYPE.Remove;
+
+						operations.add(op);
+					}
 				}
 			}
 		}
@@ -445,14 +466,14 @@ public class DeleteHandler extends AbstractHandler {
 		// If there are node to remove -> ask for confirmation
 		if (!toRemove.isEmpty()) {
 			String question = getConfirmQuestion(toRemove);
-    		Shell parent = shell != null ? shell : PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-    		confirmed = MessageDialog.openQuestion(parent, Messages.DeleteHandlerDelegate_DialogTitle, question);
+			Shell parent = shell != null ? shell : PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+			confirmed = MessageDialog.openQuestion(parent, Messages.DeleteHandlerDelegate_DialogTitle, question);
 		} else {
 			confirmed = true;
 		}
 
-	    return confirmed;
-    }
+		return confirmed;
+	}
 
 	/**
 	 * Get confirmation question displayed in the confirmation dialog.
@@ -475,14 +496,18 @@ public class DeleteHandler extends AbstractHandler {
 				}
 			};
 
-			if (Protocol.isDispatchThread()) runnable.run();
-			else Protocol.invokeAndWait(runnable);
+			if (Protocol.isDispatchThread()) {
+				runnable.run();
+			}
+			else {
+				Protocol.invokeAndWait(runnable);
+			}
 
 			question = NLS.bind(Messages.DeleteHandlerDelegate_MsgDeleteOnePeer, name.get());
 		}
 		else {
 			question = NLS.bind(Messages.DeleteHandlerDelegate_MsgDeleteMultiplePeers, Integer.valueOf(toRemove.size()));
 		}
-	    return question;
-    }
+		return question;
+	}
 }

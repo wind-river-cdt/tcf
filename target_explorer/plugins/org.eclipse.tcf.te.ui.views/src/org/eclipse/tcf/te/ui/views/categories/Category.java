@@ -10,13 +10,17 @@
 package org.eclipse.tcf.te.ui.views.categories;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tcf.te.runtime.extensions.ExecutableExtension;
 import org.eclipse.tcf.te.runtime.interfaces.IDisposable;
+import org.eclipse.tcf.te.ui.views.Managers;
 import org.eclipse.tcf.te.ui.views.interfaces.ICategory;
+import org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizable;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -36,24 +40,24 @@ public class Category extends ExecutableExtension implements ICategory, IDisposa
 	 */
 	@Override
 	public void setInitializationData(IConfigurationElement config, String propertyName, Object data) throws CoreException {
-	    super.setInitializationData(config, propertyName, data);
+		super.setInitializationData(config, propertyName, data);
 
-        // Read the icon attribute and create the image
-        String attrIcon = config.getAttribute("icon");//$NON-NLS-1$
-        if (attrIcon != null) {
-        	descriptor = AbstractUIPlugin.imageDescriptorFromPlugin(config.getNamespaceIdentifier(), attrIcon);
-        	if (descriptor != null) {
-        		image = JFaceResources.getResources().createImageWithDefault(descriptor);
-        	}
-        }
+		// Read the icon attribute and create the image
+		String attrIcon = config.getAttribute("icon");//$NON-NLS-1$
+		if (attrIcon != null) {
+			descriptor = AbstractUIPlugin.imageDescriptorFromPlugin(config.getNamespaceIdentifier(), attrIcon);
+			if (descriptor != null) {
+				image = JFaceResources.getResources().createImageWithDefault(descriptor);
+			}
+		}
 
-        // Read the rank attribute
-        String attrRank = config.getAttribute("rank"); //$NON-NLS-1$
-        if (attrRank != null) {
-        	try {
-        		rank = Integer.valueOf(attrRank).intValue();
-        	} catch (NumberFormatException e) { /* ignored on purpose */ }
-        }
+		// Read the rank attribute
+		String attrRank = config.getAttribute("rank"); //$NON-NLS-1$
+		if (attrRank != null) {
+			try {
+				rank = Integer.valueOf(attrRank).intValue();
+			} catch (NumberFormatException e) { /* ignored on purpose */ }
+		}
 	}
 
 	/*
@@ -61,30 +65,30 @@ public class Category extends ExecutableExtension implements ICategory, IDisposa
 	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
 	 */
 	@Override
-    public Object getAdapter(Class adapter) {
+	public Object getAdapter(Class adapter) {
 		if(adapter == IPersistableElement.class) {
 			return this;
 		}
-	    return super.getAdapter(adapter);
-    }
+		return super.getAdapter(adapter);
+	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.IPersistable#saveState(org.eclipse.ui.IMemento)
 	 */
 	@Override
-    public void saveState(IMemento memento) {
+	public void saveState(IMemento memento) {
 		memento.putString("id", this.getId()); //$NON-NLS-1$
-    }
+	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.IPersistableElement#getFactoryId()
 	 */
 	@Override
-    public String getFactoryId() {
-	    return "org.eclipse.tcf.te.ui.views.categoryFactory"; //$NON-NLS-1$
-    }
+	public String getFactoryId() {
+		return "org.eclipse.tcf.te.ui.views.categoryFactory"; //$NON-NLS-1$
+	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.runtime.interfaces.IDisposable#dispose()
@@ -103,7 +107,7 @@ public class Category extends ExecutableExtension implements ICategory, IDisposa
 	 */
 	@Override
 	public Image getImage() {
-	    return image;
+		return image;
 	}
 
 	/* (non-Javadoc)
@@ -111,7 +115,22 @@ public class Category extends ExecutableExtension implements ICategory, IDisposa
 	 */
 	@Override
 	public int getRank() {
-	    return rank;
+		return rank;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.views.interfaces.ICategory#belongsTo(java.lang.Object)
+	 */
+	@Override
+	public boolean belongsTo(Object element) {
+		ICategorizable categorizable = null;
+		if (element instanceof IAdaptable) {
+			categorizable = (ICategorizable)((IAdaptable)element).getAdapter(ICategorizable.class);
+		}
+		if (categorizable == null) {
+			categorizable = (ICategorizable)Platform.getAdapterManager().getAdapter(element, ICategorizable.class);
+		}
+		return categorizable != null ? Managers.getCategoryManager().belongsTo(getId(), categorizable.getId()) : false;
 	}
 
 	/* (non-Javadoc)
@@ -125,6 +144,6 @@ public class Category extends ExecutableExtension implements ICategory, IDisposa
 		buffer.append("] {rank="); //$NON-NLS-1$
 		buffer.append(getRank());
 		buffer.append("}"); //$NON-NLS-1$
-	    return buffer.toString();
+		return buffer.toString();
 	}
 }
