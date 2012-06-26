@@ -162,8 +162,8 @@ public class FSPeerTestCase extends TcfTestCase {
 
 	protected String getTestRoot() {
 		if (rootDir == null) {
-			String wdir = System.getProperty("user.dir"); //$NON-NLS-1$
-			if (wdir == null) wdir = System.getProperty("user.home"); //$NON-NLS-1$
+			String wdir = System.getProperty("user.home"); //$NON-NLS-1$
+			if (wdir == null) wdir = System.getProperty("user.dir"); //$NON-NLS-1$
 			rootDir = wdir + getPathSep() + "tmp_test_root"; //$NON-NLS-1$
 			File file = new File(rootDir);
 			if (!file.exists()) {
