@@ -26,7 +26,8 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.8.0",
  org.eclipse.tcf.te.launch.core;bundle-version="1.1.0",
  org.eclipse.tcf.te.tcf.launch.core;bundle-version="1.1.0",
  org.eclipse.debug.core;bundle-version="3.7.100",
- org.eclipse.tcf.te.runtime.concurrent;bundle-version="1.1.0"
+ org.eclipse.tcf.te.runtime.concurrent;bundle-version="1.1.0",
+ org.eclipse.tcf.te.tcf.processes.core;bundle-version="1.1.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

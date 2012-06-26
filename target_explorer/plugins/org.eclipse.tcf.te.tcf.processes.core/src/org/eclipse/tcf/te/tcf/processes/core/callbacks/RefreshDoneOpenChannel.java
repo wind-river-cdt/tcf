@@ -35,7 +35,7 @@ public class RefreshDoneOpenChannel implements IChannelManager.DoneOpenChannel {
 	/**
 	 * Create an instance with the specified field parameters.
 	 */
-	public RefreshDoneOpenChannel(ICallback callback, ProcessTreeNode parentNode) {
+	public RefreshDoneOpenChannel(ProcessTreeNode parentNode, ICallback callback) {
 		this.callback = callback;
 		this.parentNode = parentNode;
 	}

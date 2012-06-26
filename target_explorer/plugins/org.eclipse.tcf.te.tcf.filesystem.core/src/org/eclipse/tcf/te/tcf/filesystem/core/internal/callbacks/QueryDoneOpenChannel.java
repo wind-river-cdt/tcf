@@ -60,18 +60,18 @@ public class QueryDoneOpenChannel extends CallbackBase implements DoneOpenChanne
 	@Override
 	public void doneOpenChannel(Throwable error, final IChannel channel) {
 		Assert.isTrue(Protocol.isDispatchThread());
-		ICallback proxy = new Callback(){
-			@Override
-            protected void internalDone(Object caller, IStatus status) {
-				// Reset the children query markers
-				parentNode.queryDone();
-				Tcf.getChannelManager().closeChannel(channel);
-				if(callback != null) {
-					callback.done(caller, status);
-				}
-            }
-		};
 		if(error == null) {
+			ICallback proxy = new Callback(){
+				@Override
+	            protected void internalDone(Object caller, IStatus status) {
+					// Reset the children query markers
+					parentNode.queryDone();
+					Tcf.getChannelManager().closeChannel(channel);
+					if(callback != null) {
+						callback.done(caller, status);
+					}
+	            }
+			};
 			IFileSystem service = channel.getRemoteService(IFileSystem.class);
 			if(service != null) {
 				if(parentNode.isSystemRoot()) {
@@ -85,9 +85,9 @@ public class QueryDoneOpenChannel extends CallbackBase implements DoneOpenChanne
 				proxy.done(this, status);
 			}
 		} 
-		else if(!(error instanceof OperationCanceledException)) {
+		else if(!(error instanceof OperationCanceledException) && callback != null) {
 			IStatus status = new Status(IStatus.ERROR, CorePlugin.getUniqueIdentifier(), getErrorMessage(error), error);
-			proxy.done(this, status);
+			callback.done(this, status);
 		}
 	}
 }

@@ -59,22 +59,25 @@ public class RefreshStateDoneStat extends CallbackBase implements DoneStat {
 		if (error == null) {
 			FileAttrs oldAttrs = node.attr;
 			node.setAttributes(attrs);
-			// Only update its target digest when it has a local cache file.
-			File file = CacheManager.getCacheFile(node);
-			if(file.exists()) {
-				FileState fileDigest = PersistenceManager.getInstance().getFileDigest(node);
-				if (fileDigest.getTargetDigest() == null || 
-								(oldAttrs == null && attrs != null || 
-								oldAttrs != null && attrs == null || 
-								oldAttrs != null && attrs != null && oldAttrs.mtime != attrs.mtime)) {
-					// Its modification time has changed. Update the digest.
-					updateTargetDigest();
+			// Only update a file's cache diagest.
+			if (node.isFile()) {
+				// Only update its target digest when it has a local cache file.
+				File file = CacheManager.getCacheFile(node);
+				if (file.exists()) {
+					FileState fileDigest = PersistenceManager.getInstance().getFileDigest(node);
+					if (fileDigest.getTargetDigest() == null || (oldAttrs == null && attrs != null || oldAttrs != null && attrs == null || oldAttrs != null && attrs != null && oldAttrs.mtime != attrs.mtime)) {
+						// Its modification time has changed. Update the digest.
+						updateTargetDigest();
+					}
+					else {
+						invokeCallback(Status.OK_STATUS);
+					}
 				}
 				else {
 					invokeCallback(Status.OK_STATUS);
 				}
 			}
-			else{
+			else {
 				invokeCallback(Status.OK_STATUS);
 			}
 		}

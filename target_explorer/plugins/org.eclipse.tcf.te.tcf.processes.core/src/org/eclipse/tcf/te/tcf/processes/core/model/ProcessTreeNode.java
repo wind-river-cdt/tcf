@@ -250,7 +250,7 @@ public final class ProcessTreeNode extends AbstractTreeNode implements IFilterab
 	 */
 	@Override
     protected DoneOpenChannel doCreateRefreshDoneOpenChannel(ICallback callback) {
-	    return new RefreshDoneOpenChannel(callback, this);
+	    return new RefreshDoneOpenChannel(this, callback);
     }
 
 	/*
