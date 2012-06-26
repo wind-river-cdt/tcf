@@ -61,9 +61,6 @@ public class PeerAttributesTablePart extends TablePart implements IDisposable {
 	// A list of names which are banned from using
 	private List<String> bannedNames;
 
-	// A flag to mark the table part "read-only"
-	/* default */ boolean readOnly;
-
 	/**
 	 * Peer attributes table table node implementation.
 	 */
@@ -175,7 +172,7 @@ public class PeerAttributesTablePart extends TablePart implements IDisposable {
 			viewer.setCellModifier(new ICellModifier() {
 				@Override
 				public boolean canModify(Object element, String property) {
-				    return element instanceof TableNode && !readOnly;
+				    return element instanceof TableNode && !isReadOnly();
 				}
 				@Override
 				public Object getValue(Object element, String property) {
@@ -252,13 +249,14 @@ public class PeerAttributesTablePart extends TablePart implements IDisposable {
 		}
 	}
 
-	/**
-	 * Update the button enablements.
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.forms.parts.TablePart#updateButtons()
 	 */
-	protected void updateButtons() {
+	@Override
+    public void updateButtons() {
 		int selectionCount = getTableViewer().getTable().getSelectionCount();
 
-		SWTControlUtil.setEnabled(getButton(Messages.PeerAttributesTablePart_button_new), !readOnly);
+		SWTControlUtil.setEnabled(getButton(Messages.PeerAttributesTablePart_button_new), !isReadOnly());
 
 		// Listed banned nodes are always read only
 		boolean banned = false;
@@ -272,8 +270,8 @@ public class PeerAttributesTablePart extends TablePart implements IDisposable {
 			}
 		}
 
-		SWTControlUtil.setEnabled(getButton(Messages.PeerAttributesTablePart_button_edit), selectionCount == 1 && !readOnly && !banned);
-		SWTControlUtil.setEnabled(getButton(Messages.PeerAttributesTablePart_button_remove), selectionCount == 1 && !readOnly && !banned);
+		SWTControlUtil.setEnabled(getButton(Messages.PeerAttributesTablePart_button_edit), selectionCount == 1 && !isReadOnly() && !banned);
+		SWTControlUtil.setEnabled(getButton(Messages.PeerAttributesTablePart_button_remove), selectionCount == 1 && !isReadOnly() && !banned);
 	}
 
 	/**
@@ -443,24 +441,5 @@ public class PeerAttributesTablePart extends TablePart implements IDisposable {
 	 */
 	public final String[] getBannedNames() {
 		return bannedNames != null ? bannedNames.toArray(new String[bannedNames.size()]) : new String[0];
-	}
-
-	/**
-	 * Set the table part read-only state.
-	 *
-	 * @param readOnly <code>True</code> to set the table part read-only.
-	 */
-	public final void setReadOnly(boolean readOnly) {
-		this.readOnly = readOnly;
-		updateButtons();
-	}
-
-	/**
-	 * Returns the table part read-only state.
-	 *
-	 * @return <code>True</code> if the table part is read-only, <code>false</code> otherwise.
-	 */
-	public final boolean isReadOnly() {
-		return readOnly;
 	}
 }

@@ -14,7 +14,7 @@
             class="org.eclipse.tcf.te.tcf.locator.internal.LocatorModelPropertyTester"
             id="org.eclipse.tcf.te.tcf.locator.LocatorModelPropertyTester"
             namespace="org.eclipse.tcf.te.tcf.locator"
-            properties="name,hasLocalService,hasRemoteService,isStaticPeer,isRedirected,isProxy,isValueAdd"
+            properties="name,hasLocalService,hasRemoteService,isStaticPeer,isRedirected,isProxy,isValueAdd,isOfType"
             type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel">
       </propertyTester>
    </extension>

@@ -174,7 +174,10 @@
             insertBefore="first">
          <enablement>
             <with variable="activeEditorInput">
-               <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+               <and>
+                  <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                  <test property="org.eclipse.tcf.te.tcf.locator.isOfType" value="null"/>
+               </and>
             </with>
          </enablement>
       </editorPageBinding>

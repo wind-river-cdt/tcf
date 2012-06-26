@@ -24,6 +24,8 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
  * Table part implementation.
  */
 public class TablePart extends AbstractStructuredViewerPart implements ISelectionChangedListener, IDoubleClickListener {
+	// A flag to mark the table part "read-only"
+	/* default */ boolean readOnly;
 
 	/**
 	 * Constructor.
@@ -106,5 +108,31 @@ public class TablePart extends AbstractStructuredViewerPart implements ISelectio
 	 */
 	@Override
 	public void doubleClick(DoubleClickEvent event) {
+	}
+
+	/**
+	 * Set the table part read-only state.
+	 *
+	 * @param readOnly <code>True</code> to set the table part read-only.
+	 */
+	public final void setReadOnly(boolean readOnly) {
+		this.readOnly = readOnly;
+		updateButtons();
+	}
+
+	/**
+	 * Returns the table part read-only state.
+	 *
+	 * @return <code>True</code> if the table part is read-only, <code>false</code> otherwise.
+	 */
+	public final boolean isReadOnly() {
+		return readOnly;
+	}
+
+	/**
+	 * Update the button enablements.
+	 */
+	protected void updateButtons() {
+		// nothing to do
 	}
 }

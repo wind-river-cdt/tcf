@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelPeerNodeQueryService;
 import org.eclipse.tcf.te.tcf.locator.nodes.PeerRedirector;
 
@@ -98,6 +99,13 @@ public class LocatorModelPropertyTester extends PropertyTester {
 			String value = node.getPeer().getAttributes().get("ValueAdd"); //$NON-NLS-1$
 			boolean isValueAdd = value != null && ("1".equals(value.trim()) || Boolean.parseBoolean(value.trim())); //$NON-NLS-1$
 			if (expectedValue instanceof Boolean) return ((Boolean) expectedValue).booleanValue() == isValueAdd;
+		}
+
+		if ("isOfType".equals(property)) { //$NON-NLS-1$
+			String value = node.getPeer().getAttributes().get(IPeerModelProperties.PROP_TYPE);
+			if (expectedValue instanceof String) {
+				return value != null ? ((String)expectedValue).equals(value) : ((String)expectedValue).equalsIgnoreCase("null"); //$NON-NLS-1$
+			}
 		}
 
 		return false;
