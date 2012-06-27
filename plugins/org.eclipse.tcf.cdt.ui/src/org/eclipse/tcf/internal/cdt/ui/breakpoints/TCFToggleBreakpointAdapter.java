@@ -43,8 +43,8 @@ public class TCFToggleBreakpointAdapter extends AbstractToggleBreakpointAdapter 
 
     private final String TOGGLE_TYPE;
 
-    private final TCFDisassemblyToggleBreakpointAdapter fDisassemblyToggleDelegate; 
-    
+    private final TCFDisassemblyToggleBreakpointAdapter fDisassemblyToggleDelegate;
+
     TCFToggleBreakpointAdapter(String toggle_type) {
         TOGGLE_TYPE = toggle_type;
         fDisassemblyToggleDelegate = new TCFDisassemblyToggleBreakpointAdapter(toggle_type);
@@ -91,7 +91,7 @@ public class TCFToggleBreakpointAdapter extends AbstractToggleBreakpointAdapter 
         }
         return attributes;
     }
-    
+
     /* (non-Javadoc)
      * @see org.eclipse.cdt.debug.internal.ui.actions.AbstractToggleBreakpointAdapter#findLineBreakpoint(java.lang.String, org.eclipse.core.resources.IResource, int)
      */
@@ -174,7 +174,7 @@ public class TCFToggleBreakpointAdapter extends AbstractToggleBreakpointAdapter 
         CDIDebugModel.setEventBreakpointAttributes(attributes,type, arg);
         openBreakpointPropertiesDialog(bp, part, resource, attributes);
     }
-        
+
     @Override
     @SuppressWarnings("restriction")
     public void toggleLineBreakpoints( IWorkbenchPart part, ISelection selection ) throws CoreException {
@@ -204,7 +204,7 @@ public class TCFToggleBreakpointAdapter extends AbstractToggleBreakpointAdapter 
             super.toggleBreakpoints(part, selection);
         }
     }
-    
+
     @Override
     @SuppressWarnings("restriction")
     public boolean canToggleBreakpoints( IWorkbenchPart part, ISelection selection ) {
@@ -224,7 +224,7 @@ public class TCFToggleBreakpointAdapter extends AbstractToggleBreakpointAdapter 
             super.toggleBreakpointsWithEvent(part, selection, event);
         }
     }
-    
+
     @Override
     @SuppressWarnings("restriction")
     public void createLineBreakpointsInteractive(IWorkbenchPart part, ISelection selection) throws CoreException {

@@ -29,7 +29,7 @@ public class TCFDisassemblyToggleBreakpointAdapter extends AbstractDisassemblyBr
 
     private final String TOGGLE_TYPE;
     private IWorkbenchPart fTogglePart;
-    
+
 
     TCFDisassemblyToggleBreakpointAdapter(String toggle_type ) {
         TOGGLE_TYPE = toggle_type;
@@ -42,7 +42,7 @@ public class TCFDisassemblyToggleBreakpointAdapter extends AbstractDisassemblyBr
         super.toggleLineBreakpoints(part, selection);
         fTogglePart = null;
     }
-    
+
     @Override
     protected void createLineBreakpoint( String sourceHandle, IResource resource, int lineNumber ) throws CoreException {
         CDIDebugModel.createLineBreakpoint(
