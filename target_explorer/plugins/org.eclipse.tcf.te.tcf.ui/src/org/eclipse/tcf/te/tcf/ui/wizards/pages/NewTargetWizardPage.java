@@ -202,6 +202,7 @@ public class NewTargetWizardPage extends AbstractValidatingWizardPage implements
 	 */
 	protected void createMainPanelControls(Composite parent, FormToolkit toolkit) {
 		Assert.isNotNull(parent);
+		Assert.isNotNull(toolkit);
 
 		// Create the client composite
 		Composite client = toolkit.createComposite(parent);
