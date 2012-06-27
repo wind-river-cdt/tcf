@@ -118,7 +118,10 @@
             insertAfter="last">
          <enablement>
             <with variable="activeEditorInput">
-               <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+               <and>
+                  <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                  <test property="org.eclipse.tcf.te.tcf.locator.hasRemoteService" value="Processes"/>
+               </and>
             </with>
          </enablement>
       </editorPageBinding>
