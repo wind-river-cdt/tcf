@@ -45,7 +45,9 @@ public class FSTreeNodeSearchable extends CompositeSearchable {
 	@Override
     public String getSearchMessage(Object rootElement) {
 		String message = Messages.FSTreeNodeSearchable_FindMessage;
+		FSTreeNode rootNode = (FSTreeNode) rootElement;
 		String rootName = getElementName(rootElement);
+		if (rootNode != null && !rootNode.isSystemRoot()) rootName = "\"" + rootName + "\""; //$NON-NLS-1$//$NON-NLS-2$
 		message = NLS.bind(message, rootName);
 		return message;
     }

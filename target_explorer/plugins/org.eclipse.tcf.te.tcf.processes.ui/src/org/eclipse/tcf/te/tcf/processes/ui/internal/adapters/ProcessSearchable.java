@@ -54,7 +54,7 @@ public class ProcessSearchable extends CompositeSearchable {
 			return Messages.ProcessSearchable_PromptFindInProcessList;
 		}
 		String message = Messages.ProcessSearchable_PromptFindUnderProcess;
-		String rootName = getElementName(rootElement);
+		String rootName = "\"" + getElementName(rootElement) + "\""; //$NON-NLS-1$//$NON-NLS-2$
 		message = NLS.bind(message, rootName);
 		return message;
     }
