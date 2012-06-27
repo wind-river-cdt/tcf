@@ -117,6 +117,7 @@ import org.eclipse.tcf.services.IDisassembly;
 import org.eclipse.tcf.services.ILineNumbers;
 import org.eclipse.tcf.services.IMemory;
 import org.eclipse.tcf.services.IMemoryMap;
+import org.eclipse.tcf.services.IPathMap;
 import org.eclipse.tcf.services.IProcesses;
 import org.eclipse.tcf.services.IRegisters;
 import org.eclipse.tcf.services.IRunControl;
@@ -473,7 +474,7 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
         }
     };
 
-    private final IMemoryMap.MemoryMapListener mmap_listenr = new IMemoryMap.MemoryMapListener() {
+    private final IMemoryMap.MemoryMapListener mmap_listener = new IMemoryMap.MemoryMapListener() {
 
         public void changed(String id) {
             TCFNode node = getNode(id);
@@ -482,16 +483,14 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
                 exe.onMemoryMapChanged();
             }
             onMemoryChanged(id, true, false);
-            display.asyncExec(new Runnable() {
-                public void run() {
-                    if (PlatformUI.isWorkbenchRunning()) {
-                        for (IWorkbenchWindow window : PlatformUI.getWorkbench().getWorkbenchWindows()) {
-                            IWorkbenchPage page = window.getActivePage();
-                            if (page != null) displaySource(null, page, true);
-                        }
-                    }
-                }
-            });
+            refreshSourceView();
+        }
+    };
+
+    private final IPathMap.PathMapListener pmap_listener = new IPathMap.PathMapListener() {
+
+        public void changed() {
+            refreshSourceView();
         }
     };
 
@@ -747,7 +746,9 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
         IRunControl run = launch.getService(IRunControl.class);
         if (run != null) run.addListener(run_listener);
         IMemoryMap mmap = launch.getService(IMemoryMap.class);
-        if (mmap != null) mmap.addListener(mmap_listenr);
+        if (mmap != null) mmap.addListener(mmap_listener);
+        IPathMap pmap = launch.getService(IPathMap.class);
+        if (pmap != null) pmap.addListener(pmap_listener);
         IRegisters reg = launch.getService(IRegisters.class);
         if (reg != null) reg.addListener(reg_listener);
         IProcesses prs = launch.getService(IProcesses.class);
@@ -1730,6 +1731,26 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
     }
 
     /*
+     * Refresh source view when memory or path mappings change.
+     */
+    private void refreshSourceView() {
+        synchronized (Device.class) {
+            if (display.isDisposed()) return;
+            display.asyncExec(new Runnable() {
+                public void run() {
+                    if (!PlatformUI.isWorkbenchRunning()) return;
+                    IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
+                    if (windows == null) return;
+                    for (IWorkbenchWindow window : windows) {
+                        IWorkbenchPage page = window.getActivePage();
+                        if (page != null) displaySource(null, page, true);
+                    }
+                }
+            });
+        }
+    }
+
+    /*
      * Refresh Launch View.
      * Normally the view is updated by sending deltas through model proxy.
      * This method is used only when launch is not yet connected or already disconnected.
@@ -1740,11 +1761,15 @@ public class TCFModel implements IElementContentProvider, IElementLabelProvider,
             if (display.isDisposed()) return;
             display.asyncExec(new Runnable() {
                 public void run() {
+                    if (!PlatformUI.isWorkbenchRunning()) return;
                     IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
                     if (windows == null) return;
                     for (IWorkbenchWindow window : windows) {
-                        IDebugView view = (IDebugView)window.getActivePage().findView(IDebugUIConstants.ID_DEBUG_VIEW);
-                        if (view != null) ((StructuredViewer)view.getViewer()).refresh(launch);
+                        IWorkbenchPage page = window.getActivePage();
+                        if (page != null) {
+                            IDebugView view = (IDebugView)page.findView(IDebugUIConstants.ID_DEBUG_VIEW);
+                            if (view != null) ((StructuredViewer)view.getViewer()).refresh(launch);
+                        }
                     }
                 }
             });
