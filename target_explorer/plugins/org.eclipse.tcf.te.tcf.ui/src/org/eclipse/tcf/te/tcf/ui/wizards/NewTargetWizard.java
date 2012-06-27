@@ -98,7 +98,7 @@ public class NewTargetWizard extends AbstractWizard implements INewWizard {
 		extractData(peerAttributes);
 
 		// Fill in the minimum set of peer attributes to create a new peer
-		if (peerAttributes.containsKey(IPeer.ATTR_ID)) {
+		if (!peerAttributes.containsKey(IPeer.ATTR_ID)) {
 			peerAttributes.setProperty(IPeer.ATTR_ID, UUID.randomUUID().toString());
 		}
 		if (!peerAttributes.containsKey(IPeer.ATTR_NAME)) {

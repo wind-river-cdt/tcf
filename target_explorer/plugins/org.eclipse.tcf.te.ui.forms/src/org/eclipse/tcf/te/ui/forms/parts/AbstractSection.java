@@ -74,31 +74,8 @@ public abstract class AbstractSection extends SectionPart implements IAdaptable,
 	 * @param titleBar If <code>true</code>, the title bar style bit is added to <code>style</code>.
 	 */
 	public AbstractSection(IManagedForm form, Composite parent, int style, boolean titleBar) {
-		this(parent, form.getToolkit(), titleBar ? (ExpandableComposite.TITLE_BAR | style) : style);
+		super(parent, form.getToolkit(), titleBar ? (ExpandableComposite.TITLE_BAR | style) : style);
 		initialize(form);
-	}
-
-	/**
-	 * Constructor.
-	 *
-	 * @param parent The parent composite. Must not be <code>null</code>.
-	 * @param toolkit The form toolkit. Must not be <code>null</code>.
-	 * @param style The section style.
-	 */
-    public AbstractSection(Composite parent, FormToolkit toolkit, int style) {
-	    this(parent, toolkit, style, true);
-    }
-
-	/**
-	 * Constructor.
-	 *
-	 * @param parent The parent composite. Must not be <code>null</code>.
-	 * @param toolkit The form toolkit. Must not be <code>null</code>.
-	 * @param style The section style.
-	 * @param titleBar If <code>true</code>, the title bar style bit is added to <code>style</code>.
-	 */
-    public AbstractSection(Composite parent, FormToolkit toolkit, int style, boolean titleBar) {
-	    super(parent, toolkit, titleBar ? (ExpandableComposite.TITLE_BAR | style) : style);
 		configureSection(getSection());
     }
 
@@ -254,7 +231,7 @@ public abstract class AbstractSection extends SectionPart implements IAdaptable,
 					}
 				});
 				f.setBoolean(this, dirty);
-				getManagedForm().dirtyStateChanged();
+				if (getManagedForm() != null) getManagedForm().dirtyStateChanged();
 			} catch (Exception e) { /* ignored on purpose */ }
 		}
 	}
