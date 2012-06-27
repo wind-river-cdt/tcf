@@ -85,7 +85,16 @@
                   type="new"
                   wizardId="org.eclipse.tcf.te.tcf.ui.wizards.NewTargetWizard">
                <enablement>
-                  <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                  <or>
+                     <and>
+                        <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                        <test property="org.eclipse.tcf.te.tcf.locator.isOfType" value="null"/>
+                     </and>
+                     <and>
+                        <instanceof value="org.eclipse.tcf.te.ui.views.interfaces.ICategory"/>
+                        <test property="org.eclipse.tcf.te.ui.views.isCategoryID" value="org.eclipse.tcf.te.ui.views.category.mytargets"/>
+                     </and>
+                  </or>
                </enablement>
             </commonWizard>
             <dropAssistant
