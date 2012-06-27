@@ -13,7 +13,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.tcf.te.tests.tcf.filesystem.callbacks.CallbackTests;
+import org.eclipse.tcf.te.tests.tcf.processes.callbacks.QueryChildrenCallbackTest;
 
 /**
  * Links all process monitor tests.
@@ -52,6 +52,6 @@ public class AllProcessTests {
 	public static void addTests(TestSuite suite) {
 		Assert.isNotNull(suite);
 
-		suite.addTest(CallbackTests.suite());
+		suite.addTestSuite(QueryChildrenCallbackTest.class);
 	}
 }
