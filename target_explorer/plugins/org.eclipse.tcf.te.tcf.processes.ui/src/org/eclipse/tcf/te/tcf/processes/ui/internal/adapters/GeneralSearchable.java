@@ -16,6 +16,7 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -99,14 +100,14 @@ public class GeneralSearchable extends AbstractSearchable {
 		// Case sensitive
 		fBtnCase = new Button(group, SWT.CHECK);
 		fBtnCase.setText(Messages.GeneralSearchable_CaseSensitive);
-		GridData data = new GridData();
+		GridData data = new GridData(GridData.FILL_HORIZONTAL);
 		fBtnCase.setLayoutData(data);
 		fBtnCase.addSelectionListener(l);
 
 		// Matching precisely
 		fBtnMatch = new Button(group, SWT.CHECK);
 		fBtnMatch.setText(Messages.GeneralSearchable_PreciseMatching);
-		data = new GridData();
+		data = new GridData(GridData.FILL_HORIZONTAL);
 		fBtnMatch.setLayoutData(data);
 		fBtnMatch.addSelectionListener(l);
     }
@@ -192,5 +193,13 @@ public class GeneralSearchable extends AbstractSearchable {
 	public ISearchMatcher getMatcher() {
 		return new ProcessNodeGeneralMatcher(fCaseSensitive, fMatchPrecise, fTargetName);
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.utils.AbstractSearchable#getPreferredSize()
+	 */
+	@Override
+    public Point getPreferredSize() {
+	    return new Point(360, 130);
+    }
 }
 

@@ -23,6 +23,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -45,6 +46,8 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements ISe
 	private static final String SEARCH_HELP_ID = "org.eclipse.tcf.te.ui.utils.TreeViewerSearchDialog.help"; //$NON-NLS-1$
 	// A new search button's ID.
 	private static final int SEARCH_ID = 31;
+	private static final int DEFAULT_WIDTH_TRIM = 20;
+	private static final int DEFAULT_HEIGHT_TRIM = 160;
 	
 	// The dropdown combo box to select an algorithm
 	private Combo fCmbAlg;
@@ -345,6 +348,20 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements ISe
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.TitleAreaDialog#getInitialSize()
+	 */
+	@Override
+    protected Point getInitialSize() {
+		Point size = fSearchable.getPreferredSize();
+		if(size != null) {
+			int width = size.x + DEFAULT_WIDTH_TRIM;
+			int height = size.y + DEFAULT_HEIGHT_TRIM;
+			return new Point(width, height);
+		}
+	    return super.getInitialSize();
+    }
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.tcf.te.ui.interfaces.IOptionListener#optionChanged(java.util.EventObject)

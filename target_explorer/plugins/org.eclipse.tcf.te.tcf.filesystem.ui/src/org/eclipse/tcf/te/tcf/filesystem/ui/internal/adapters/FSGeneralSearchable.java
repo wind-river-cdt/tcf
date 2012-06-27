@@ -16,6 +16,7 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -121,12 +122,11 @@ public class FSGeneralSearchable extends AbstractSearchable {
 		
 		Group group = new Group(parent, SWT.NONE);
 		group.setText(Messages.FSGeneralSearchable_GeneralOptionText);
-		group.setLayout(new GridLayout(2, true));
+		group.setLayout(new GridLayout());
 		group.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		Composite cmpType = new Composite(group, SWT.NONE);
 		GridData data = new GridData(GridData.FILL_HORIZONTAL);
-		data.horizontalSpan = 2;
 		cmpType.setLayoutData(data);
 		cmpType.setLayout(new GridLayout(2, false));
 		
@@ -138,32 +138,37 @@ public class FSGeneralSearchable extends AbstractSearchable {
 		fCmbTypes.setItems(new String[]{Messages.FSTreeNodeSearchable_FilesAndFolders, Messages.FSTreeNodeSearchable_FilesOnly, Messages.FSTreeNodeSearchable_FoldersOnly});
 		fCmbTypes.setLayoutData(new GridData());
 		fCmbTypes.addSelectionListener(l);
+
+		Composite compOptions = new Composite(group, SWT.NONE);
+		data = new GridData(GridData.FILL_HORIZONTAL);
+		compOptions.setLayoutData(data);
+		compOptions.setLayout(new GridLayout(2, true));
 		
 		// Case sensitive
-		fBtnCase = new Button(group, SWT.CHECK);
+		fBtnCase = new Button(compOptions, SWT.CHECK);
 		fBtnCase.setText(Messages.TreeViewerSearchDialog_BtnCaseText);
-		data = new GridData();
+		data = new GridData(GridData.FILL_HORIZONTAL);
 		fBtnCase.setLayoutData(data);
 		fBtnCase.addSelectionListener(l);
 
 		// Matching precisely
-		fBtnMatch = new Button(group, SWT.CHECK);
+		fBtnMatch = new Button(compOptions, SWT.CHECK);
 		fBtnMatch.setText(Messages.TreeViewerSearchDialog_BtnPreciseText);
-		data = new GridData();
+		data = new GridData(GridData.FILL_HORIZONTAL);
 		fBtnMatch.setLayoutData(data);
 		fBtnMatch.addSelectionListener(l);
 		
 		// If the target is Windows platform, then add system/hidden options.
 		if(rootNode.isWindowsNode()) {
-			fBtnSystem = new Button(group, SWT.CHECK);
+			fBtnSystem = new Button(compOptions, SWT.CHECK);
 			fBtnSystem.setText(Messages.FSGeneralSearchable_SearchSystemFiles);
-			data = new GridData();
+			data = new GridData(GridData.FILL_HORIZONTAL);
 			fBtnSystem.setLayoutData(data);
 			fBtnSystem.addSelectionListener(l);
 			
-			fBtnHidden = new Button(group, SWT.CHECK);
+			fBtnHidden = new Button(compOptions, SWT.CHECK);
 			fBtnHidden.setText(Messages.FSGeneralSearchable_SearchHiddenFiles);
-			data = new GridData();
+			data = new GridData(GridData.FILL_HORIZONTAL);
 			fBtnHidden.setLayoutData(data);
 			fBtnHidden.addSelectionListener(l);
 		}
@@ -284,4 +289,12 @@ public class FSGeneralSearchable extends AbstractSearchable {
 	public boolean isInputValid() {
 		return fSearchField.isValid();
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.utils.AbstractSearchable#getPreferredSize()
+	 */
+	@Override
+    public Point getPreferredSize() {
+	    return new Point(400, rootNode.isWindowsNode() ? 200 : 180);
+    }
 }

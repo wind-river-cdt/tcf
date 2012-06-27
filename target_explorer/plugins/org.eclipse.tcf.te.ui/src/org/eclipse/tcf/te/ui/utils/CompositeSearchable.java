@@ -192,4 +192,22 @@ public abstract class CompositeSearchable implements ISearchable {
 			searchable.removeOptionListener(listener);
 		}
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.interfaces.ISearchable#getPreferredSize()
+	 */
+	@Override
+    public Point getPreferredSize() {
+		Point size = null;
+		for(ISearchable searchable : searchables) {
+			Point prefSize = searchable.getPreferredSize();
+			if(prefSize != null) {
+				if(size == null) 
+					size = new Point(0, 0);
+				size.x = Math.max(size.x, prefSize.x);
+				size.y = size.y + prefSize.y;
+			}
+		}
+		return size;
+    }
 }

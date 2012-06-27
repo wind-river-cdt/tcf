@@ -10,6 +10,7 @@
 package org.eclipse.tcf.te.ui.interfaces;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tcf.te.ui.utils.AbstractSearchable;
 
@@ -108,4 +109,11 @@ public interface ISearchable {
 	 * @param settings The dialog settings.
 	 */
 	public void persistValues(IDialogSettings settings);
+
+	/**
+	 * Get the preferred size of the part.
+	 * 
+	 * @return The preferred size or null.
+	 */
+	public Point getPreferredSize();
 }

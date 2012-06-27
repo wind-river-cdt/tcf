@@ -11,6 +11,7 @@ package org.eclipse.tcf.te.ui.utils;
 
 import org.eclipse.core.commands.common.EventManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tcf.te.ui.interfaces.IOptionListener;
 import org.eclipse.tcf.te.ui.interfaces.ISearchable;
@@ -116,4 +117,12 @@ public abstract class AbstractSearchable extends EventManager implements ISearch
 	public String getElementText(Object element) {
 		return null;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.ui.interfaces.ISearchable#getPreferredSize()
+	 */
+	@Override
+    public Point getPreferredSize() {
+	    return null;
+    }
 }
