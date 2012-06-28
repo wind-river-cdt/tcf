@@ -479,4 +479,17 @@
       </detailFactories>
    </extension>
 
+	<extension
+         point="org.eclipse.cdt.debug.ui.breakpointContribution">
+      <breakpointEditors
+           debugModelId="org.eclipse.tcf.debug" markerType="org.eclipse.cdt.debug.core.cLineBreakpointMarker">>
+         <attribute
+               fieldEditorFactory="org.eclipse.tcf.internal.cdt.ui.breakpoints.HardwareFieldEditorFactory"
+               label="Hardware"
+               name="org.eclipse.tcf.cdt.Hardware"
+               type="string">
+         </attribute>
+      </breakpointEditors>
+ 	</extension> 
+
 </plugin>

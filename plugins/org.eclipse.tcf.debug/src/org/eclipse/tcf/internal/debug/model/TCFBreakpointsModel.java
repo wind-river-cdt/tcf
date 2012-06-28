@@ -78,7 +78,14 @@ public class TCFBreakpointsModel {
         ATTR_STOP_GROUP    = ITCFConstants.ID_TCF_DEBUG_MODEL + '.' + IBreakpoints.PROP_STOP_GROUP,
         ATTR_CONTEXT_QUERY = ITCFConstants.ID_TCF_DEBUG_MODEL + '.' + IBreakpoints.PROP_CONTEXT_QUERY,
         ATTR_EVENT_TYPE    = "org.eclipse.cdt.debug.core.eventbreakpoint_event_id",
-        ATTR_EVENT_ARGS    = "org.eclipse.cdt.debug.core.eventbreakpoint_event_arg";
+        ATTR_EVENT_ARGS    = "org.eclipse.cdt.debug.core.eventbreakpoint_event_arg",
+        ATTR_TYPE          = "org.eclipse.cdt.debug.core.breakpointType";
+        
+    public static final int
+        ATTR_TYPE_TEMPORARY = 0x1,
+        ATTR_TYPE_REGULAR = 0x0 << 1,
+        ATTR_TYPE_HARDWARE = 0x1 << 1,
+        ATTR_TYPE_SOFTWARE = 0x2 << 1;
 
     private final IBreakpointManager bp_manager = DebugPlugin.getDefault().getBreakpointManager();
     private final HashMap<IChannel,Map<String,Object>> channels = new HashMap<IChannel,Map<String,Object>>();
@@ -553,6 +560,26 @@ public class TCFBreakpointsModel {
         if (event_args != null && event_args.length() > 0) m.put(ATTR_EVENT_ARGS, event_args);
         Number ignore_count = (Number)p.get(IBreakpoints.PROP_IGNORE_COUNT);
         if (ignore_count != null) m.put(ATTR_IGNORE_COUNT, ignore_count);
+        Boolean temporary = (Boolean)p.get(IBreakpoints.PROP_TEMPORARY);
+        if (temporary != null && temporary.booleanValue()) {
+            Integer cdt_type = (Integer)m.get(ATTR_TYPE);
+            cdt_type = cdt_type != null ? cdt_type : 0;
+            cdt_type = cdt_type | ATTR_TYPE_TEMPORARY;
+            m.put(ATTR_TYPE, cdt_type);
+        }
+        Integer type = (Integer)p.get(IBreakpoints.PROP_TYPE);
+        if (type != null) {
+            Integer cdt_type = (Integer)m.get(ATTR_TYPE);
+            cdt_type = cdt_type != null ? cdt_type : 0;
+            if (IBreakpoints.TYPE_HARDWARE.equals(type)) {
+                cdt_type = cdt_type | ATTR_TYPE_HARDWARE;
+            }
+            else if (IBreakpoints.TYPE_SOFTWARE.equals(type)) {
+                cdt_type = cdt_type | ATTR_TYPE_SOFTWARE;
+            }
+            m.put(ATTR_TYPE, cdt_type);
+        }
+
         return m;
     }
 
@@ -664,6 +691,21 @@ public class TCFBreakpointsModel {
         if (event_args != null && event_args.length() > 0) m.put(IBreakpoints.PROP_EVENT_ARGS, event_args);
         Number ignore_count = (Number)p.get(ATTR_IGNORE_COUNT);
         if (ignore_count != null && ignore_count.intValue() > 0) m.put(IBreakpoints.PROP_IGNORE_COUNT, ignore_count);
+        Integer cdt_type = (Integer)p.get(ATTR_TYPE);
+        if (cdt_type != null) {
+            if ((cdt_type.intValue() & ATTR_TYPE_TEMPORARY) != 0) {
+                m.put(IBreakpoints.PROP_TEMPORARY, true);
+            }
+            if ((cdt_type.intValue() & ATTR_TYPE_HARDWARE) != 0) {
+                m.put(IBreakpoints.PROP_TYPE, IBreakpoints.TYPE_HARDWARE);
+            }  
+            else if ((cdt_type.intValue() & ATTR_TYPE_SOFTWARE) != 0) {
+                m.put(IBreakpoints.PROP_TYPE, IBreakpoints.TYPE_SOFTWARE);
+            }
+            else  {
+                m.put(IBreakpoints.PROP_TYPE, IBreakpoints.TYPE_AUTO);
+            }
+        }
         return m;
     }
 
