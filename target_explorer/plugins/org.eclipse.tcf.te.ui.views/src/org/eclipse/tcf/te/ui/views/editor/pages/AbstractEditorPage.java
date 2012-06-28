@@ -11,12 +11,14 @@ package org.eclipse.tcf.te.ui.views.editor.pages;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.tcf.te.ui.views.activator.UIPlugin;
-import org.eclipse.tcf.te.ui.views.interfaces.IEditorPage;
 import org.eclipse.tcf.te.runtime.nls.Messages;
+import org.eclipse.tcf.te.ui.views.activator.UIPlugin;
+import org.eclipse.tcf.te.ui.views.editor.Editor;
+import org.eclipse.tcf.te.ui.views.interfaces.IEditorPage;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormPage;
@@ -101,5 +103,16 @@ public abstract class AbstractEditorPage extends FormPage implements IEditorPage
 	public Object getEditorInputNode() {
 		IEditorInput input = getEditorInput();
 		return input != null ? input.getAdapter(Object.class) : null;
+	}
+
+	/**
+	 * Called from the parent properties editor <code>doSave(IProgressMonitor)</code>
+	 * method.
+	 *
+	 * @param monitor The progress monitor or <code>null</code>
+	 * @see Editor#doSave(IProgressMonitor)
+	 */
+	public void postDoSave(IProgressMonitor monitor) {
+		// do nothing
 	}
 }

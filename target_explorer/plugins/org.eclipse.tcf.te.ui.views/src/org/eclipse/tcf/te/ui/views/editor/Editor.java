@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.tcf.te.ui.views.editor.pages.AbstractEditorPage;
 import org.eclipse.tcf.te.ui.views.extensions.EditorPageBinding;
 import org.eclipse.tcf.te.ui.views.extensions.EditorPageBindingExtensionPointManager;
 import org.eclipse.tcf.te.ui.views.extensions.EditorPageExtensionPointManager;
@@ -83,7 +84,7 @@ public final class Editor extends FormEditor implements IPersistableEditor, ITab
 		}
 		else super.setFocus();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.forms.editor.FormEditor#getActivePageInstance()
@@ -114,7 +115,7 @@ public final class Editor extends FormEditor implements IPersistableEditor, ITab
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Update the editor page list. Pages which are not longer valid
 	 * will be removed and pages now being valid gets added.
@@ -271,6 +272,12 @@ public final class Editor extends FormEditor implements IPersistableEditor, ITab
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 		commitPages(true);
+		// The pages may require some save post processing
+		for (Object page : pages) {
+			if (page instanceof AbstractEditorPage) {
+				((AbstractEditorPage)page).postDoSave(monitor);
+			}
+		}
 		editorDirtyStateChanged();
 	}
 
