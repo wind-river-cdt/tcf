@@ -2200,7 +2200,7 @@
    <extension
          point="org.eclipse.ui.elementFactories">
       <factory
-            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.adapters.FSTreeNodeFactory"
+            class="org.eclipse.tcf.te.tcf.filesystem.ui.internal.search.FSTreeNodeFactory"
             id="org.eclipse.tcf.te.tcf.filesystem.ui.nodeFactory">
       </factory>
    </extension>

@@ -14,6 +14,7 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode;
 import org.eclipse.tcf.te.tcf.processes.ui.internal.columns.ProcessLabelProvider;
+import org.eclipse.tcf.te.tcf.processes.ui.internal.search.ProcessSearchable;
 import org.eclipse.tcf.te.ui.interfaces.ILazyLoader;
 import org.eclipse.tcf.te.ui.interfaces.ISearchable;
 
