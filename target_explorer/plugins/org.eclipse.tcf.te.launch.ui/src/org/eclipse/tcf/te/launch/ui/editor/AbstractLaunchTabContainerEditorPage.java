@@ -11,8 +11,11 @@ package org.eclipse.tcf.te.launch.ui.editor;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.tcf.te.launch.ui.tabs.AbstractFormsLaunchConfigurationTab;
 import org.eclipse.tcf.te.ui.forms.CustomFormToolkit;
 import org.eclipse.tcf.te.ui.views.editor.pages.AbstractCustomFormToolkitEditorPage;
@@ -98,6 +101,34 @@ public abstract class AbstractLaunchTabContainerEditorPage extends AbstractCusto
 		} else {
 			launchTab.createControl(parent);
 		}
+
+		// Fix the background color of the launch tab controls
+		Color bg = parent.getBackground();
+		Control[] children = parent.getChildren();
+		if (bg != null && children != null && children.length > 0) {
+			fixBackgrounds(children, bg);
+		}
 	}
 
+	/**
+	 * Set the background color of the given controls and their children
+	 * to the given color.
+	 *
+	 * @param controls The list of controls. Must not be <code>null</code>.
+	 * @param bg The background color. Must not be <code>null</code>.
+	 */
+	protected final void fixBackgrounds(Control[] controls, Color bg) {
+		Assert.isNotNull(controls);
+		Assert.isNotNull(bg);
+		for (Control c : controls) {
+			if (!(c instanceof Composite) && !(c instanceof Label)) continue;
+			if (!bg.equals(c.getBackground())) c.setBackground(bg);
+			if (c instanceof Composite) {
+				Control[] children = ((Composite)c).getChildren();
+				if (children != null && children.length > 0) {
+					fixBackgrounds(children, bg);
+				}
+			}
+		}
+	}
 }
