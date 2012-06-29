@@ -8,7 +8,7 @@
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tcf.te.launch.ui.internal.handler;
+package org.eclipse.tcf.te.launch.ui.handler;
 
 import java.util.ArrayList;
 import java.util.List;

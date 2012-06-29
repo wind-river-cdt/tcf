@@ -47,7 +47,7 @@
             label="%LaunchShortcut.Remote.App.name"
             icon="icons/obj16/remote_app.gif"
             modes="run">
-         <class class="org.eclipse.tcf.te.launch.ui.internal.handler.LaunchShortcutHandler">
+         <class class="org.eclipse.tcf.te.launch.ui.handler.LaunchShortcutHandler">
             <parameter name="typeId" value="org.eclipse.tcf.te.tcf.launch.type.remote.app"/>
          </class>
          <contextualLaunch>
@@ -69,7 +69,7 @@
             label="%LaunchShortcut.Remote.App.name"
             icon="icons/obj16/remote_app.gif"
             modes="debug">
-         <class class="org.eclipse.tcf.te.launch.ui.internal.handler.LaunchShortcutHandler">
+         <class class="org.eclipse.tcf.te.launch.ui.handler.LaunchShortcutHandler">
             <parameter name="typeId" value="org.eclipse.tcf.te.tcf.launch.type.remote.app"/>
          </class>
          <contextualLaunch>
@@ -91,7 +91,7 @@
             label="%LaunchShortcut.Attach.name"
             icon="icons/obj16/attach.gif"
             modes="debug">
-         <class class="org.eclipse.tcf.te.launch.ui.internal.handler.LaunchShortcutHandler">
+         <class class="org.eclipse.tcf.te.launch.ui.handler.LaunchShortcutHandler">
             <parameter name="typeId" value="org.eclipse.tcf.te.tcf.launch.type.attach"/>
          </class>
          <contextualLaunch>
@@ -108,6 +108,21 @@
             </enablement>
          </contextualLaunch>
       </shortcut>
+   </extension>
+
+<!-- Editor page contributions -->
+   <extension point="org.eclipse.tcf.te.ui.views.editorPages">
+      <editorPage
+            class="org.eclipse.tcf.te.tcf.launch.ui.editor.MemoryMapEditorPage"
+            name="%MemoryMapEditorPage.name"
+            id="org.eclipse.tcf.te.tcf.launch.ui.MemoryMapEditorPage">
+      </editorPage>
+
+      <editorPage
+            class="org.eclipse.tcf.te.tcf.launch.ui.editor.PathMapEditorPage"
+            name="%PathMapEditorPage.name"
+            id="org.eclipse.tcf.te.tcf.launch.ui.PathMapEditorPage">
+      </editorPage>
    </extension>
 
 <!-- Editor page binding contributions -->
@@ -145,8 +160,8 @@
             name="%LauchTree.name"
       		icon="icons/obj16/launches_root.gif"
             activeByDefault="false"
-            contentProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchNavigatorContentProvider"
-            labelProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchTreeLabelProvider"
+            contentProvider="org.eclipse.tcf.te.launch.ui.viewer.LaunchNavigatorContentProvider"
+            labelProvider="org.eclipse.tcf.te.launch.ui.viewer.LaunchTreeLabelProvider"
             priority="lowest">
          <triggerPoints>
             <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
@@ -154,7 +169,7 @@
          <possibleChildren>
             <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
          </possibleChildren>
-         <commonSorter class="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchTreeViewerSorter"/>
+         <commonSorter class="org.eclipse.tcf.te.launch.ui.viewer.LaunchTreeViewerSorter"/>
       </navigatorContent>
    </extension>
 
@@ -279,7 +294,7 @@
 <!-- Handler contributions -->
    <extension point="org.eclipse.ui.handlers">
       <handler commandId="org.eclipse.tcf.te.tcf.ui.launch.remote.app.command.run">
-         <class class="org.eclipse.tcf.te.launch.ui.internal.handler.LaunchShortcutHandler">
+         <class class="org.eclipse.tcf.te.launch.ui.handler.LaunchShortcutHandler">
             <parameter name="mode" value="run"/>
             <parameter name="typeId" value="org.eclipse.tcf.te.tcf.launch.type.remote.app"/>
          </class>
@@ -306,7 +321,7 @@
          </enabledWhen>
       </handler>
       <handler commandId="org.eclipse.tcf.te.tcf.ui.launch.remote.app.command.debug">
-         <class class="org.eclipse.tcf.te.launch.ui.internal.handler.LaunchShortcutHandler">
+         <class class="org.eclipse.tcf.te.launch.ui.handler.LaunchShortcutHandler">
             <parameter name="mode" value="debug"/>
             <parameter name="typeId" value="org.eclipse.tcf.te.tcf.launch.type.remote.app"/>
          </class>

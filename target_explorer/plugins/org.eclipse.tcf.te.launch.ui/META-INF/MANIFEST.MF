@@ -32,14 +32,14 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: org.eclipse.tcf.te.launch.ui.activator;x-internal:=true,
+ org.eclipse.tcf.te.launch.ui.editor,
+ org.eclipse.tcf.te.launch.ui.handler,
  org.eclipse.tcf.te.launch.ui.help,
  org.eclipse.tcf.te.launch.ui.interfaces,
  org.eclipse.tcf.te.launch.ui.internal;x-internal:=true,
- org.eclipse.tcf.te.launch.ui.internal.adapters,
- org.eclipse.tcf.te.launch.ui.internal.handler,
- org.eclipse.tcf.te.launch.ui.internal.properties,
- org.eclipse.tcf.te.launch.ui.internal.viewer,
- org.eclipse.tcf.te.launch.ui.internal.viewer.dnd,
+ org.eclipse.tcf.te.launch.ui.internal.adapters;x-internal:=true,
+ org.eclipse.tcf.te.launch.ui.internal.pages;x-internal:=true,
+ org.eclipse.tcf.te.launch.ui.internal.properties;x-internal:=true,
  org.eclipse.tcf.te.launch.ui.model,
  org.eclipse.tcf.te.launch.ui.nls;x-internal:=true,
  org.eclipse.tcf.te.launch.ui.properties,
@@ -47,4 +47,6 @@ Export-Package: org.eclipse.tcf.te.launch.ui.activator;x-internal:=true,
  org.eclipse.tcf.te.launch.ui.tabs,
  org.eclipse.tcf.te.launch.ui.tabs.filetransfers,
  org.eclipse.tcf.te.launch.ui.tabs.launchcontext,
- org.eclipse.tcf.te.launch.ui.tabs.refprojects
+ org.eclipse.tcf.te.launch.ui.tabs.refprojects,
+ org.eclipse.tcf.te.launch.ui.viewer,
+ org.eclipse.tcf.te.launch.ui.viewer.dnd

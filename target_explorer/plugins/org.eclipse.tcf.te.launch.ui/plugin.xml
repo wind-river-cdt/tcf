@@ -4,7 +4,7 @@
 
 <!-- Preference contributions -->   
    <extension point="org.eclipse.core.runtime.preferences">
-      <initializer class="org.eclipse.tcf.te.launch.ui.internal.PreferencesInitializer"/>
+      <initializer class="org.eclipse.tcf.te.launch.ui.internal.preferences.PreferencesInitializer"/>
    </extension>
 
 <!-- Adapter factory contributions -->
@@ -20,7 +20,7 @@
 <!-- Property tester contributions -->
    <extension point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
-            class="org.eclipse.tcf.te.launch.ui.internal.LaunchNodePropertyTester"
+            class="org.eclipse.tcf.te.launch.ui.internal.PropertyTester"
             id="org.eclipse.tcf.te.launch.ui.propertytester.launchNode"
             namespace="org.eclipse.tcf.te.launch.ui.model"
             properties="isLaunchConfig,isLaunchConfigType,canDelete,canRefresh,isValidLaunchConfig"
@@ -36,6 +36,12 @@
             icon="icons/obj16/launches_root.gif"
             id="org.eclipse.tcf.te.launch.ui.LaunchEditorPage">
       </editorPage>
+
+      <editorPage
+            class="org.eclipse.tcf.te.launch.ui.editor.SourceLookupEditorPage"
+            name="%SourceLookupEditorPage.name"
+            id="org.eclipse.tcf.te.launch.ui.SourceLookupEditorPage">
+      </editorPage>
    </extension>
 
 <!-- Navigator viewer contributions -->
@@ -48,11 +54,11 @@
          </includes>
       </viewerContentBinding>
       <dragAssistant
-            class="org.eclipse.tcf.te.launch.ui.internal.viewer.dnd.DragAssistant"
+            class="org.eclipse.tcf.te.launch.ui.viewer.dnd.DragAssistant"
             viewerId="org.eclipse.tcf.te.ui.views.View">
       </dragAssistant>
       <dragAssistant
-            class="org.eclipse.tcf.te.launch.ui.internal.viewer.dnd.DragAssistant"
+            class="org.eclipse.tcf.te.launch.ui.viewer.dnd.DragAssistant"
             viewerId="org.eclipse.ui.navigator.ProjectExplorer">
       </dragAssistant>
    </extension>
@@ -63,8 +69,8 @@
             id="org.eclipse.tcf.te.tcf.launch.ui.navigator.favorites.content"
             name="%LaunchTree.name"
             activeByDefault="true"
-            contentProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchFavoritesContentProvider"
-            labelProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchTreeLabelProvider"
+            contentProvider="org.eclipse.tcf.te.launch.ui.viewer.LaunchFavoritesContentProvider"
+            labelProvider="org.eclipse.tcf.te.launch.ui.viewer.LaunchTreeLabelProvider"
             priority="lowest">
          <triggerPoints>
             <instanceof value="org.eclipse.tcf.te.ui.views.interfaces.ICategory"/>
@@ -72,9 +78,9 @@
          <possibleChildren>
             <instanceof value="java.lang.Object"/>
          </possibleChildren>
-         <commonSorter class="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchTreeViewerSorter"/>
+         <commonSorter class="org.eclipse.tcf.te.launch.ui.viewer.LaunchTreeViewerSorter"/>
          <dropAssistant
-               class="org.eclipse.tcf.te.launch.ui.internal.viewer.dnd.DropAssistant"
+               class="org.eclipse.tcf.te.launch.ui.viewer.dnd.DropAssistant"
                id="org.eclipse.tcf.te.launch.ui.navigator.dnd">
             <possibleDropTargets>
                <instanceof value="java.lang.Object"/>
@@ -89,8 +95,8 @@
             name="%LaunchTree.name"
       		icon="icons/obj16/launches_root.gif"
             activeByDefault="false"
-            contentProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchNavigatorContentProvider"
-            labelProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchTreeLabelProvider"
+            contentProvider="org.eclipse.tcf.te.launch.ui.viewer.LaunchNavigatorContentProvider"
+            labelProvider="org.eclipse.tcf.te.launch.ui.viewer.LaunchTreeLabelProvider"
             priority="lower">
          <triggerPoints>
             <instanceof value="org.eclipse.core.resources.IProject"/>
@@ -99,10 +105,10 @@
             <instanceof value="java.lang.Object"/>
          </possibleChildren>
          <commonSorter
-               class="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchTreeViewerSorter">
+               class="org.eclipse.tcf.te.launch.ui.viewer.LaunchTreeViewerSorter">
          </commonSorter>
          <actionProvider
-               class="org.eclipse.tcf.te.launch.ui.internal.handler.OpenActionProvider"
+               class="org.eclipse.tcf.te.launch.ui.handler.OpenActionProvider"
                id="org.eclipse.tcf.te.launch.ui.actions.open"
                overrides="org.eclipse.ui.navigator.resources.OpenActions">
 	        <enablement>
@@ -110,7 +116,7 @@
             </enablement>
          </actionProvider>
          <dropAssistant
-               class="org.eclipse.tcf.te.launch.ui.internal.viewer.dnd.DropAssistant"
+               class="org.eclipse.tcf.te.launch.ui.viewer.dnd.DropAssistant"
                id="org.eclipse.tcf.te.launch.ui.navigator.dnd">
             <possibleDropTargets>
                <instanceof value="java.lang.Object"/>
@@ -124,13 +130,13 @@
       <viewer
             id="org.eclipse.tcf.te.launch.ui.viewer.launches"
             autoExpandLevel="2"
-            contentProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchEditorContentProvider">
+            contentProvider="org.eclipse.tcf.te.launch.ui.viewer.LaunchEditorContentProvider">
          <creation>
             <style name="SWT.FULL_SELECTION"/>
             <style name="SWT.MULTI"/>
          </creation>
          <dragSupport
-               class="org.eclipse.tcf.te.launch.ui.internal.viewer.dnd.DragSourceListener">
+               class="org.eclipse.tcf.te.launch.ui.viewer.dnd.DragSourceListener">
             <operations>
                <operation name="DND.DROP_COPY"/>
                <operation name="DND.DROP_MOVE"/>
@@ -141,7 +147,7 @@
             </transferTypes>
          </dragSupport>
          <dropSupport
-               class="org.eclipse.tcf.te.launch.ui.internal.viewer.dnd.DropTargetListener">
+               class="org.eclipse.tcf.te.launch.ui.viewer.dnd.DropTargetListener">
             <operations>
                <operation name="DND.DROP_COPY"/>
                <operation name="DND.DROP_MOVE"/>
@@ -154,20 +160,20 @@
       <columnContribution viewerId="org.eclipse.tcf.te.launch.ui.viewer.launches">
          <column
                id="launchConfigurations"
-               labelProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchTreeLabelProvider"
+               labelProvider="org.eclipse.tcf.te.launch.ui.viewer.LaunchTreeLabelProvider"
                name="%LauchEditorPage.column.name"
                width="250">
          </column>
          <column
                id="description"
-               labelProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.DescriptionColumnLabelProvider"
+               labelProvider="org.eclipse.tcf.te.launch.ui.viewer.DescriptionColumnLabelProvider"
                name="%LauchEditorPage.column.description"
                width="300">
          </column>
          <column
                visible="false"
                id="lastLaunched"
-               labelProvider="org.eclipse.tcf.te.launch.ui.internal.viewer.LastLaunchedColumnLabelProvider"
+               labelProvider="org.eclipse.tcf.te.launch.ui.viewer.LastLaunchedColumnLabelProvider"
                name="%LauchEditorPage.column.lastLaunched"
                width="100">
          </column>
@@ -187,7 +193,7 @@
                label="%New.menu.name">
             <dynamic
                   id="org.eclipse.tcf.te.launch.ui.views.project.dynamic.new"
-                  class="org.eclipse.tcf.te.launch.ui.internal.handler.NewLaunchConfigurationContributionItem">
+                  class="org.eclipse.tcf.te.launch.ui.handler.NewLaunchConfigurationContributionItem">
                <visibleWhen>
                   <reference definitionId="launch.expressions.isMultiLaunchConfigOrType"/>
                </visibleWhen>
@@ -216,7 +222,7 @@
                visible="true"/>
          <dynamic
                id="org.eclipse.tcf.te.launch.ui.views.project.dynamic.launch"
-               class="org.eclipse.tcf.te.launch.ui.internal.handler.LaunchLaunchConfigurationContributionItem">
+               class="org.eclipse.tcf.te.launch.ui.handler.LaunchLaunchConfigurationContributionItem">
             <visibleWhen>
                <reference definitionId="launch.expressions.isSingleLaunchConfig"/>
             </visibleWhen>
@@ -229,7 +235,7 @@
                label="%Open.menu.name">
             <dynamic
                   id="org.eclipse.tcf.te.launch.ui.views.project.dynamic.open"
-                  class="org.eclipse.tcf.te.launch.ui.internal.handler.OpenLaunchConfigurationContributionItem"/>
+                  class="org.eclipse.tcf.te.launch.ui.handler.OpenLaunchConfigurationContributionItem"/>
             <visibleWhen>
                <reference definitionId="launch.expressions.isSingleLaunchConfigType"/>
             </visibleWhen>
@@ -242,7 +248,7 @@
                label="%OpenAs.menu.name">
             <dynamic
                   id="org.eclipse.tcf.te.launch.ui.views.project.dynamic.openAs"
-                  class="org.eclipse.tcf.te.launch.ui.internal.handler.OpenLaunchConfigurationContributionItem">
+                  class="org.eclipse.tcf.te.launch.ui.handler.OpenLaunchConfigurationContributionItem">
             </dynamic>
             <visibleWhen>
                <reference definitionId="launch.expressions.isSingleLaunchConfig"/>
@@ -284,7 +290,7 @@
                label="%New.menu.name">
             <dynamic
                   id="org.eclipse.tcf.te.launch.ui.views.target.dynamic.new"
-                  class="org.eclipse.tcf.te.launch.ui.internal.handler.NewLaunchConfigurationContributionItem">
+                  class="org.eclipse.tcf.te.launch.ui.handler.NewLaunchConfigurationContributionItem">
                <visibleWhen>
                   <reference definitionId="launch.expressions.isMultiLaunchConfigOrType"/>
                </visibleWhen>
@@ -294,7 +300,7 @@
       <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.launch">
          <dynamic
                id="org.eclipse.tcf.te.launch.ui.views.target.dynamic.launch"
-               class="org.eclipse.tcf.te.launch.ui.internal.handler.LaunchLaunchConfigurationContributionItem">
+               class="org.eclipse.tcf.te.launch.ui.handler.LaunchLaunchConfigurationContributionItem">
             <visibleWhen>
                <reference definitionId="launch.expressions.isSingleLaunchConfig"/>
             </visibleWhen>
@@ -306,7 +312,7 @@
                label="%Open.menu.name">
             <dynamic
                   id="org.eclipse.tcf.te.launch.ui.views.target.dynamic.open"
-                  class="org.eclipse.tcf.te.launch.ui.internal.handler.OpenLaunchConfigurationContributionItem"/>
+                  class="org.eclipse.tcf.te.launch.ui.handler.OpenLaunchConfigurationContributionItem"/>
             <visibleWhen>
                <reference definitionId="launch.expressions.isSingleLaunchConfigType"/>
             </visibleWhen>
@@ -316,7 +322,7 @@
                label="%OpenAs.menu.name">
             <dynamic
                   id="org.eclipse.tcf.te.launch.ui.views.target.dynamic.openAs"
-                  class="org.eclipse.tcf.te.launch.ui.internal.handler.OpenLaunchConfigurationContributionItem"/>
+                  class="org.eclipse.tcf.te.launch.ui.handler.OpenLaunchConfigurationContributionItem"/>
             <visibleWhen>
                <reference definitionId="launch.expressions.isSingleLaunchConfig"/>
             </visibleWhen>
@@ -361,7 +367,7 @@
                label="%New.menu.name">
             <dynamic
                   id="org.eclipse.tcf.te.launch.ui.editor.dynamic.new"
-                  class="org.eclipse.tcf.te.launch.ui.internal.handler.NewLaunchConfigurationContributionItem">
+                  class="org.eclipse.tcf.te.launch.ui.handler.NewLaunchConfigurationContributionItem">
                <visibleWhen>
                   <reference definitionId="launch.expressions.isMultiLaunchConfigOrType"/>
                </visibleWhen>
@@ -390,7 +396,7 @@
                visible="true"/>
          <dynamic
                id="org.eclipse.tcf.te.launch.ui.editor.dynamic.launch"
-               class="org.eclipse.tcf.te.launch.ui.internal.handler.LaunchLaunchConfigurationContributionItem">
+               class="org.eclipse.tcf.te.launch.ui.handler.LaunchLaunchConfigurationContributionItem">
             <visibleWhen>
                <reference definitionId="launch.expressions.isSingleLaunchConfig"/>
             </visibleWhen>
@@ -403,7 +409,7 @@
                label="%Open.menu.name">
             <dynamic
                   id="org.eclipse.tcf.te.launch.ui.editor.dynamic.open"
-                  class="org.eclipse.tcf.te.launch.ui.internal.handler.OpenLaunchConfigurationContributionItem"/>
+                  class="org.eclipse.tcf.te.launch.ui.handler.OpenLaunchConfigurationContributionItem"/>
             <visibleWhen>
                <reference definitionId="launch.expressions.isSingleLaunchConfigType"/>
             </visibleWhen>
@@ -413,7 +419,7 @@
                label="%OpenAs.menu.name">
             <dynamic
                   id="org.eclipse.tcf.te.launch.ui.editor.dynamic.openAs"
-                  class="org.eclipse.tcf.te.launch.ui.internal.handler.OpenLaunchConfigurationContributionItem">
+                  class="org.eclipse.tcf.te.launch.ui.handler.OpenLaunchConfigurationContributionItem">
             </dynamic>
             <visibleWhen>
                <reference definitionId="launch.expressions.isSingleLaunchConfig"/>
@@ -580,7 +586,7 @@
    <extension point="org.eclipse.ui.handlers">
       <handler
             commandId="org.eclipse.ui.navigator.Open"
-            class="org.eclipse.tcf.te.launch.ui.internal.handler.LaunchDialogHandler">
+            class="org.eclipse.tcf.te.launch.ui.handler.LaunchDialogHandler">
          <activeWhen>
             <and>
                <with variable="activePartId">
@@ -605,7 +611,7 @@
       </handler>
       <handler
             commandId="org.eclipse.ui.edit.delete"
-            class="org.eclipse.tcf.te.launch.ui.internal.handler.DeleteHandler">
+            class="org.eclipse.tcf.te.launch.ui.handler.DeleteHandler">
          <activeWhen>
             <and>
                <with variable="activePartId">
@@ -630,7 +636,7 @@
       </handler>
       <handler
             commandId="org.eclipse.tcf.te.ui.command.refresh"
-            class="org.eclipse.tcf.te.launch.ui.internal.handler.RefreshHandler">
+            class="org.eclipse.tcf.te.launch.ui.handler.RefreshHandler">
          <activeWhen>
             <and>
                <with variable="activePartId">
@@ -670,7 +676,7 @@
          </activeWhen>
       </handler>
       <handler commandId="org.eclipse.tcf.te.ui.launch.command.run">
-         <class class="org.eclipse.tcf.te.launch.ui.internal.handler.LaunchHandler">
+         <class class="org.eclipse.tcf.te.launch.ui.handler.LaunchHandler">
             <parameter name="mode" value="run"/>
          </class>
          <activeWhen>
@@ -695,7 +701,7 @@
          </enabledWhen>
       </handler>
       <handler commandId="org.eclipse.tcf.te.ui.launch.command.debug">
-         <class class="org.eclipse.tcf.te.launch.ui.internal.handler.LaunchHandler">
+         <class class="org.eclipse.tcf.te.launch.ui.handler.LaunchHandler">
             <parameter name="mode" value="debug"/>
          </class>
          <activeWhen>

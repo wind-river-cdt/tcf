@@ -8,7 +8,7 @@
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tcf.te.launch.ui.internal.viewer;
+package org.eclipse.tcf.te.launch.ui.viewer;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.resource.ImageRegistry;

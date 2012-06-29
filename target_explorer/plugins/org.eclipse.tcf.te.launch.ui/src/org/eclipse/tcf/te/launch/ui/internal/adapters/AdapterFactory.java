@@ -11,8 +11,8 @@ package org.eclipse.tcf.te.launch.ui.internal.adapters;
 
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.tcf.te.launch.ui.internal.viewer.LaunchTreeLabelProvider;
 import org.eclipse.tcf.te.launch.ui.model.LaunchNode;
+import org.eclipse.tcf.te.launch.ui.viewer.LaunchTreeLabelProvider;
 import org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizable;
 
 /**

@@ -159,7 +159,7 @@ public abstract class AbstractFormsLaunchConfigurationTab extends AbstractLaunch
 	 *
 	 * @param managedForm The managed form hosted in this tab. Must not be <code>null</code>.
 	 */
-	protected void createFormContent(IManagedForm managedForm) {
+	public void createFormContent(IManagedForm managedForm) {
 		Assert.isNotNull(managedForm);
 
 		// Configure the managed form
