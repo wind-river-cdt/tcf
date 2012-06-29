@@ -11,6 +11,9 @@ package org.eclipse.tcf.te.launch.ui.editor;
 
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.debug.ui.sourcelookup.SourceLookupTab;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Composite;
 
 /**
  * Source lookup launch configuration tab container page implementation.
@@ -22,7 +25,16 @@ public class SourceLookupEditorPage extends AbstractLaunchTabContainerEditorPage
 	 */
 	@Override
 	protected AbstractLaunchConfigurationTab createLaunchConfigurationTab() {
-		return new SourceLookupTab();
+		return new SourceLookupTab() {
+			/* (non-Javadoc)
+			 * @see org.eclipse.debug.ui.sourcelookup.SourceLookupTab#createControl(org.eclipse.swt.widgets.Composite)
+			 */
+			@Override
+			public void createControl(Composite parent) {
+			    super.createControl(parent);
+			    ((Composite)getControl()).setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+			}
+		};
 	}
 
 }

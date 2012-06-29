@@ -11,8 +11,10 @@ package org.eclipse.tcf.te.launch.ui.editor;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -121,7 +123,11 @@ public abstract class AbstractLaunchTabContainerEditorPage extends AbstractCusto
 		Assert.isNotNull(controls);
 		Assert.isNotNull(bg);
 		for (Control c : controls) {
-			if (!(c instanceof Composite) && !(c instanceof Label)) continue;
+			if (!(c instanceof Composite) && !(c instanceof Label) && !(c instanceof Button)) continue;
+			if (c instanceof Button) {
+				int style = ((Button)c).getStyle();
+				if ((style & SWT.RADIO) == 0 && (style & SWT.CHECK) == 0) continue;
+			}
 			if (!bg.equals(c.getBackground())) c.setBackground(bg);
 			if (c instanceof Composite) {
 				Control[] children = ((Composite)c).getChildren();
