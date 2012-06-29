@@ -32,7 +32,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.tcf.te.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.interfaces.IOptionListener;
+import org.eclipse.tcf.te.ui.interfaces.IPreferenceKeys;
 import org.eclipse.tcf.te.ui.interfaces.ISearchCallback;
 import org.eclipse.tcf.te.ui.interfaces.ISearchable;
 import org.eclipse.tcf.te.ui.jface.dialogs.CustomTitleAreaDialog;
@@ -41,7 +43,7 @@ import org.eclipse.tcf.te.ui.nls.Messages;
 /**
  * The searching dialog used to get the searching input.
  */
-public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements ISearchCallback, IOptionListener {
+public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements ISearchCallback, IOptionListener, IPreferenceKeys {
 	// The context help id for this dialog.
 	private static final String SEARCH_HELP_ID = "org.eclipse.tcf.te.ui.utils.TreeViewerSearchDialog.help"; //$NON-NLS-1$
 	// A new search button's ID.
@@ -71,25 +73,23 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements ISe
 	 * @param viewer The tree viewer to search in.
 	 */
 	public TreeViewerSearchDialog(TreeViewer viewer) {
-		this(viewer, false);
-	}
-
-	/**
-	 * Create a searching dialog.
-	 * 
-	 * @param viewer The tree viewer to search in.
-	 * @param depthFirst if the default algorithm used is depth-first search (DFS).
-	 * @param matcher the search matcher used to matching each tree node during searching, or null 
-	 * 	        if the default matcher should be used.
-	 */
-	protected TreeViewerSearchDialog(TreeViewer viewer, boolean depthFirst) {
 		super(viewer.getTree().getShell());
 		setShellStyle(SWT.DIALOG_TRIM | SWT.MODELESS);
 		setHelpAvailable(true);
 		setContextHelpId(SEARCH_HELP_ID);
 		fViewer = viewer;
+		boolean depthFirst = isDepthFirst();
 		fSearcher = getSearchEngine(fViewer, depthFirst);
 	}
+
+	/**
+	 * If the algorithm of the search is DFS.
+	 * 
+	 * @return true if it is a DFS search or else false if it is BFS
+	 */
+	protected boolean isDepthFirst() {
+		return UIPlugin.getDefault().getPreferenceStore().getBoolean(PREF_DEPTH_FIRST_SEARCH);
+    }
 
 	/**
 	 * Get a singleton search engine for a tree viewer. If
@@ -103,6 +103,9 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements ISe
 		if (searcher == null) {
 			searcher = new SearchEngine(viewer, depthFirst);
 			viewer.setData("search.engine", searcher); //$NON-NLS-1$
+		}
+		else {
+			searcher.setDepthFirst(depthFirst);
 		}
 		return searcher;
 	}
