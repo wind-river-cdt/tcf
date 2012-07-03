@@ -392,6 +392,12 @@
             id="org.eclipse.tcf.te.ui.views.command.resetfilter"
             name="%command.reset.name">
       </command>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            description="%command.showInSM.description"
+            id="org.eclipse.tcf.te.ui.command.showIn.systemManagement"
+            name="%command.showInSM.name">
+      </command>
    </extension>
 
 <!-- Handler contributions -->

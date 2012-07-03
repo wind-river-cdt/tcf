@@ -36,7 +36,9 @@ public class Messages extends NLS {
 	public static String PropertiesCommandHandler_error_initPartFailed;
 
 	public static String AddToCategoryAction_single_text;
+
 	public static String RemoveFromCategoryAction_single_text;
+
 	public static String RestoreJob_JobName;
 	public static String RestoreJob_MainTask;
 	public static String RestoreJob_Task1Name;
@@ -44,6 +46,8 @@ public class Messages extends NLS {
 
 	public static String AbstractCustomFormToolkitEditorPage_HelpAction_label;
 	public static String AbstractCustomFormToolkitEditorPage_HelpAction_tooltip;
+	public static String AbstractCustomFormToolkitEditorPage_ShowInSystemManagementCommandAction_label;
+	public static String AbstractCustomFormToolkitEditorPage_ShowInSystemManagementCommandAction_tooltip;
 
 	public static String CommonFilterDescriptorLabelProvider_ContentExtensionDescription;
 

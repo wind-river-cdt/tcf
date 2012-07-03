@@ -23,14 +23,17 @@ import org.eclipse.tcf.te.ui.views.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.views.interfaces.ImageConsts;
 import org.eclipse.tcf.te.ui.views.nls.Messages;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.IManagedForm;
+import org.eclipse.ui.internal.actions.CommandAction;
 import org.eclipse.ui.menus.IMenuService;
 
 /**
  * Abstract details editor page implementation managing
  *                  an custom form toolkit instance.
  */
+@SuppressWarnings("restriction")
 public abstract class AbstractCustomFormToolkitEditorPage extends AbstractEditorPage {
 	// Reference to the form toolkit instance
 	private CustomFormToolkit toolkit = null;
@@ -189,12 +192,59 @@ public abstract class AbstractCustomFormToolkitEditorPage extends AbstractEditor
 	protected void createToolbarContributionItems(IToolBarManager manager) {
 		Assert.isNotNull(manager);
 
+		// If the page does have "Show In System Management", add the action into the toolbar
+		if (hasShowInSystemMangementAction()) {
+			Action showInAction = doCreateShowInSystemManagementAction();
+			if (showInAction != null) manager.add(showInAction);
+		}
+
 		// If the page is associated with a context help id, add a default
 		// help action button into the toolbar
 		if (getContextHelpId() != null) {
-			HelpAction helpAction = new HelpAction(getContextHelpId());
-			manager.add(helpAction);
+			if (hasShowInSystemMangementAction()) manager.add(new Separator());
+			Action helpAction = doCreateHelpAction(getContextHelpId());
+			if(helpAction != null) manager.add(helpAction);
 		}
+	}
+
+	/**
+	 * Create the help action.
+	 *
+	 * @param contextHelpId The context help id. Must not be <code>null</code>.
+	 * @return The help action or <code>null</code>.
+	 */
+	protected Action doCreateHelpAction(String contextHelpId) {
+		Assert.isNotNull(contextHelpId);
+		return new HelpAction(contextHelpId);
+	}
+
+	/**
+	 * Returns if or if not the page has the "Show In System Management" action.
+	 * <p>
+	 * The default implementation returns <code>false</code>.
+	 *
+	 * @return <code>True</code> if the action is visible in the form toolbar, <code>false</code> otherwise.
+	 */
+	protected boolean hasShowInSystemMangementAction() {
+		return false;
+	}
+
+	/**
+	 * Creates the "Show In System Management" action.
+	 *
+	 * @return The action or <code>null</code>.
+	 */
+    protected Action doCreateShowInSystemManagementAction() {
+		// To initialize the actions, the workbench window instance is required
+		IWorkbenchWindow window = getSite().getWorkbenchWindow();
+
+		Action action = new CommandAction(window, "org.eclipse.tcf.te.ui.command.showIn.systemManagement"); //$NON-NLS-1$
+		action.setImageDescriptor(UIPlugin.getImageDescriptor(ImageConsts.VIEW));
+		action.setText(Messages.AbstractCustomFormToolkitEditorPage_ShowInSystemManagementCommandAction_label);
+		action.setToolTipText(Messages.AbstractCustomFormToolkitEditorPage_ShowInSystemManagementCommandAction_tooltip);
+//        window.getWorkbench().getHelpSystem().setHelp(action, IContextHelpIds.NEW_TARGET_WIZARD);
+
+		return action;
 	}
 
 	/**
