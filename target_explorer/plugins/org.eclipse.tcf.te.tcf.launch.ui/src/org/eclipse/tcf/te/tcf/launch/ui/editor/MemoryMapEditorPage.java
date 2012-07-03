@@ -16,7 +16,6 @@ import org.eclipse.tcf.te.launch.ui.editor.AbstractLaunchTabContainerEditorPage;
 /**
  * TCF memory map launch configuration tab container page implementation.
  */
-@SuppressWarnings("restriction")
 public class MemoryMapEditorPage extends AbstractLaunchTabContainerEditorPage {
 
 	/* (non-Javadoc)

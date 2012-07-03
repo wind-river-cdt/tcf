@@ -16,7 +16,6 @@ import org.eclipse.tcf.te.launch.ui.editor.AbstractLaunchTabContainerEditorPage;
 /**
  * TCF path map launch configuration tab container page implementation.
  */
-@SuppressWarnings("restriction")
 public class PathMapEditorPage extends AbstractLaunchTabContainerEditorPage {
 
 	/* (non-Javadoc)

@@ -26,7 +26,6 @@ import org.eclipse.tcf.te.tcf.launch.ui.filetransfer.FileTransferTab;
 /**
  * Remote application launch configuration tab group implementation.
  */
-@SuppressWarnings("restriction")
 public class LaunchConfigurationTabGroup extends AbstractLaunchConfigurationTabGroup {
 
 	/* (non-Javadoc)

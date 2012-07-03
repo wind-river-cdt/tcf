@@ -22,7 +22,6 @@ import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
  * The launch can be adapted to {@link IPropertiesContainer} to exchange user defined data
  * between the launch steps.
  */
-@SuppressWarnings("restriction")
 public final class Launch extends TCFLaunch {
 
 	/**

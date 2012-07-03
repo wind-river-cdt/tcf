@@ -23,7 +23,6 @@ import org.eclipse.tcf.te.launch.ui.tabs.AbstractLaunchConfigurationTabGroup;
 /**
  * Remote application launch configuration tab group implementation.
  */
-@SuppressWarnings("restriction")
 public class LaunchConfigurationTabGroup extends AbstractLaunchConfigurationTabGroup {
 
 	/* (non-Javadoc)
