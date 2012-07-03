@@ -70,12 +70,12 @@ public interface IPeerModelProperties {
 	/**
 	 * Property: The peer type.
 	 */
-	public static final String PROP_TYPE = "type"; //$NON-NLS-1$
+	public static final String PROP_TYPE = "Type"; //$NON-NLS-1$
 
 	/**
 	 * Property: The peer visible state.
 	 */
-	public static final String PROP_VISIBLE = "visible"; //$NON-NLS-1$
+	public static final String PROP_VISIBLE = "Visible"; //$NON-NLS-1$
 
 	/**
 	 * Property: Reference counter tracking the active channels for this peer.
