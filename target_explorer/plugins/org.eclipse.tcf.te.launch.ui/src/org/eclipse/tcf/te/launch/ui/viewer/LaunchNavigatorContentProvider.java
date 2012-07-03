@@ -207,7 +207,7 @@ public class LaunchNavigatorContentProvider extends TreeContentProvider implemen
 
 	/**
 	 * If the root node of the tree is visible.
-	 * 
+	 *
 	 * @return true if it is visible.
 	 */
 	protected boolean isRootNodeVisible() {
@@ -216,7 +216,7 @@ public class LaunchNavigatorContentProvider extends TreeContentProvider implemen
 
 	/**
 	 * If the launch config type node in the tree is visible.
-	 * 
+	 *
 	 * @return true if it is visible.
 	 */
 	protected boolean isTypeNodeVisible() {
@@ -225,7 +225,7 @@ public class LaunchNavigatorContentProvider extends TreeContentProvider implemen
 
 	/**
 	 * If an empty launch config type node in the tree is visible.
-	 * 
+	 *
 	 * @return true if it is visible.
 	 */
 	protected boolean isEmptyTypeNodeVisible() {
@@ -240,12 +240,14 @@ public class LaunchNavigatorContentProvider extends TreeContentProvider implemen
 		final TreeViewer viewer = this.viewer;
 		if (event.getSource() instanceof LaunchModel) {
 			final LaunchModel model = (LaunchModel)event.getSource();
-			PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					viewer.refresh((isRootNodeVisible() ? model.getRootNode() : model.getModelRoot()), true);
-				}
-			});
+			if (model != null) {
+				PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						viewer.refresh((isRootNodeVisible() ? model.getRootNode() : model.getModelRoot()), true);
+					}
+				});
+			}
 		}
 	}
 }
