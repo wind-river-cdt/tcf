@@ -101,7 +101,11 @@ public abstract class NavigatorContentProvider extends TreeContentProvider  impl
 			final IPeerModel peerNode = (IPeerModel)parentElement;
 			ITreeNodeModel model = doGetModel(peerNode);
 			if (isRootNodeVisible()) {
-				return new Object[] { model.getRoot() };
+				AbstractTreeNode root = model.getRoot();
+				if(!root.childrenQueried && !root.childrenQueryRunning) {
+					root.queryChildren();
+				}
+				return new Object[] { root };
 			}
 			return getChildren(model.getRoot());
 		} else if (parentElement instanceof AbstractTreeNode) {
