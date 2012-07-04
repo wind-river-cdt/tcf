@@ -10,7 +10,6 @@
 package org.eclipse.tcf.te.tcf.processes.core.model;
 
 import java.beans.PropertyChangeEvent;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -155,13 +154,7 @@ public final class ProcessTreeNode extends AbstractTreeNode implements IFilterab
 	 */
 	@Override
     public List<ProcessTreeNode> getChildren() {
-	    List<ProcessTreeNode> result = new ArrayList<ProcessTreeNode>();
-	    synchronized(children) {
-	    	for(AbstractTreeNode child : children) {
-	    		result.add((ProcessTreeNode)child);
-	    	}
-	    }
-	    return result;
+		return (List<ProcessTreeNode>) super.getChildren();
     }
 
 	/**

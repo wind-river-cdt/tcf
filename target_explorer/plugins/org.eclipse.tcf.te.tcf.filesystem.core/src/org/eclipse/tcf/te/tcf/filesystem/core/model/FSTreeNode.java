@@ -19,7 +19,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -164,15 +163,10 @@ public final class FSTreeNode extends AbstractTreeNode implements Cloneable {
 	 * 
 	 * @return The children list.
 	 */
-	@Override
+	@SuppressWarnings("unchecked")
+    @Override
 	public List<FSTreeNode> getChildren() {
-	    List<FSTreeNode> result = new ArrayList<FSTreeNode>();
-	    synchronized(children) {
-	    	for(AbstractTreeNode child : children) {
-	    		result.add((FSTreeNode)child);
-	    	}
-	    }
-	    return result;
+		return (List<FSTreeNode>) super.getChildren();
 	}
 
 	/**
