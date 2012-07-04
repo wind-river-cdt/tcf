@@ -12,6 +12,7 @@ package org.eclipse.tcf.te.ui.views.handler;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.ISelection;
@@ -40,30 +41,42 @@ public class PropertiesCommandHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		// Get the active selection
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
+		// Get the currently active workbench window
+		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
+		if (window == null) window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+
+		if (selection != null && window != null) openEditorOnSelection(window, selection);
+
+		return null;
+	}
+
+	/**
+	 * Opens the properties editor in the given workbench window on the given selection.
+	 *
+	 * @param window The workbench window. Must not be <code>null</code>.
+	 * @param selection The selection. Must not be <code>null</code>.
+	 */
+	public static void openEditorOnSelection(IWorkbenchWindow window, ISelection selection) {
+		Assert.isNotNull(window);
+		Assert.isNotNull(selection);
+
 		if (selection instanceof IStructuredSelection && !selection.isEmpty()) {
 			Object element = ((IStructuredSelection)selection).getFirstElement();
 			if (element != null) {
-				// Get the currently active workbench window
-				IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
-				if (window == null) window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-				if (window != null) {
-					// Get the active page
-					IWorkbenchPage page = window.getActivePage();
-					// Create the editor input object
-					IEditorInput input = new EditorInput(element);
-					try {
-						// Opens the Target Explorer properties editor
-						page.openEditor(input, IUIConstants.ID_EDITOR);
-					} catch (PartInitException e) {
-						IStatus status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(),
-						                            Messages.PropertiesCommandHandler_error_initPartFailed, e);
-						UIPlugin.getDefault().getLog().log(status);
-					}
+				// Get the active page
+				IWorkbenchPage page = window.getActivePage();
+				// Create the editor input object
+				IEditorInput input = new EditorInput(element);
+				try {
+					// Opens the Target Explorer properties editor
+					page.openEditor(input, IUIConstants.ID_EDITOR);
+				} catch (PartInitException e) {
+					IStatus status = new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(),
+												Messages.PropertiesCommandHandler_error_initPartFailed, e);
+					UIPlugin.getDefault().getLog().log(status);
 				}
 			}
 		}
-
-		return null;
 	}
 
 }

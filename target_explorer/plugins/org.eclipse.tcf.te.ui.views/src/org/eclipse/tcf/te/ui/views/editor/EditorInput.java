@@ -10,12 +10,13 @@
 package org.eclipse.tcf.te.ui.views.editor;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.tcf.te.ui.views.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
 import org.eclipse.tcf.te.ui.views.interfaces.ImageConsts;
-import org.eclipse.tcf.te.ui.views.internal.ViewViewerDecoratingLabelProvider;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPersistableElement;
@@ -101,8 +102,9 @@ public final class EditorInput implements IEditorInput, IPersistableElement {
 	@Override
 	public String getName() {
 		if (name == null && node != null) {
-			CommonViewer viewer = getViewer();
-			name = viewer != null && viewer.getLabelProvider() instanceof ViewViewerDecoratingLabelProvider ? ((ViewViewerDecoratingLabelProvider)viewer.getLabelProvider()).getTextNoDecoration(node) : node.toString();
+			ILabelProvider provider = node instanceof IAdaptable ?  (ILabelProvider)((IAdaptable)node).getAdapter(ILabelProvider.class) : null;
+			if (provider == null) provider = (ILabelProvider)Platform.getAdapterManager().getAdapter(node, ILabelProvider.class);
+			name = provider != null ? provider.getText(node) : node.toString();
 		}
 
 		return name != null ? name : ""; //$NON-NLS-1$

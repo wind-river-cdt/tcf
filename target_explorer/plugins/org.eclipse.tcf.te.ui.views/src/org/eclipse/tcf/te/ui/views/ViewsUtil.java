@@ -9,22 +9,16 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.views;
 
-import org.eclipse.core.commands.Command;
-import org.eclipse.core.commands.ParameterizedCommand;
-import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ui.ISources;
+import org.eclipse.tcf.te.ui.views.handler.PropertiesCommandHandler;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.commands.ICommandService;
-import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.navigator.CommonNavigator;
 
 /**
@@ -156,38 +150,9 @@ public class ViewsUtil {
 		Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
-				ICommandService service = (ICommandService)PlatformUI.getWorkbench().getAdapter(ICommandService.class);
-				if (service != null) {
-					final Command command = service.getCommand("org.eclipse.ui.file.properties"); //$NON-NLS-1$
-					if (command != null && command.isDefined()) {
-						// Construct the application context
-						EvaluationContext context = new EvaluationContext(null, selection);
-						// Apply the selection to the "activeMenuSelection" and "selection" variable too
-						context.addVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME, selection);
-						context.addVariable(ISources.ACTIVE_MENU_SELECTION_NAME, selection);
-
-						IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-						context.addVariable(ISources.ACTIVE_WORKBENCH_WINDOW_NAME, window);
-						context.addVariable(ISources.ACTIVE_SHELL_NAME, window.getShell());
-
-						IWorkbenchPart part = window.getActivePage().getActivePart();
-						IWorkbenchPartSite site = part.getSite();
-						context.addVariable(ISources.ACTIVE_PART_ID_NAME, site.getId());
-						context.addVariable(ISources.ACTIVE_PART_NAME, part);
-						context.addVariable(ISources.ACTIVE_SITE_NAME, site);
-
-						// Allow plugin activation
-						context.setAllowPluginActivation(true);
-						// And execute the event
-						try {
-							ParameterizedCommand pCmd = ParameterizedCommand.generateCommand(command, null);
-							Assert.isNotNull(pCmd);
-							IHandlerService handlerSvc = (IHandlerService)PlatformUI.getWorkbench().getService(IHandlerService.class);
-							Assert.isNotNull(handlerSvc);
-							handlerSvc.executeCommandInContext(pCmd, null, context);
-						} catch (Exception e) { /* ignored on purpose */ }
-					}
-				}
+				IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+				Assert.isNotNull(window);
+				PropertiesCommandHandler.openEditorOnSelection(window, selection);
 			}
 		};
 
