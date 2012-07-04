@@ -21,6 +21,7 @@ import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.IHandlerService;
@@ -46,6 +47,34 @@ public class ViewsUtil {
 			return reference != null ? reference.getPart(false) : null;
 		}
 		return null;
+	}
+
+	/**
+	 * Asynchronously show the view identified by the given id.
+	 *
+	 * @param id The view id. Must not be <code>null</code>.
+	 */
+	public static void show(final String id) {
+		Assert.isNotNull(id);
+		// Create the runnable
+		Runnable runnable = new Runnable() {
+			@Override
+			public void run() {
+				// Check the active workbench window and active page instances
+				if (PlatformUI.getWorkbench().getActiveWorkbenchWindow() != null && PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage() != null) {
+					// Show the view
+					try {
+	                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(id);
+                    }
+                    catch (PartInitException e) { /* ignored on purpose */ }
+				}
+			}
+		};
+
+		// Execute asynchronously
+		if (PlatformUI.isWorkbenchRunning()) {
+			PlatformUI.getWorkbench().getDisplay().asyncExec(runnable);
+		}
 	}
 
 	/**

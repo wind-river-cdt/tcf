@@ -450,6 +450,17 @@
       </handler>
       
       <handler
+            class="org.eclipse.tcf.te.ui.views.handler.ShowInSystemManagementHandler"
+            commandId="org.eclipse.tcf.te.ui.command.showIn.systemManagement">
+         <activeWhen>
+            <with variable="activePartId">
+               <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
+            </with>
+         </activeWhen>
+      </handler>
+      
+      
+      <handler
             class="org.eclipse.tcf.te.ui.views.handler.ConfigFiltersHandler"
             commandId="org.eclipse.tcf.te.ui.views.command.filters">
          <activeWhen>
