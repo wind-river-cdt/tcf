@@ -780,7 +780,7 @@ public class LocatorService implements ILocator {
     private boolean sendDatagramPacket(SubNet subnet, int size, InetAddress addr, int port) {
         try {
             if (addr == null) {
-                addr = subnet.broadcast;
+                addr = subnet.address.equals(loopback_addr) ? loopback_addr : subnet.broadcast;
                 port = DISCOVERY_PORT;
                 for (Slave slave : slaves) {
                     sendDatagramPacket(subnet, size, slave.address, slave.port);
