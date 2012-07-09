@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.tcf.te.runtime.persistence.delegates">
       <delegate
-            class="org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.URIKeyMapPersistenceDelegate"
+            class="org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.PersistenceManagerDelegate"
             id="org.eclipse.tcf.te.tcf.filesystem.core.map">
       </delegate>
    </extension>
@@ -21,7 +21,7 @@
             </with>
             <with variable="context">
                <instanceof
-                     value="java.util.Map">
+                     value="org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.PersistenceManager">
                </instanceof>
             </with>
          </enablement>

@@ -62,8 +62,11 @@ public class PersistenceManager {
 	/**
 	 * Create a Persistent Manager instance.
 	 */
-	@SuppressWarnings("unchecked")
     private PersistenceManager() {
+    	digests = new HashMap<URI, FileState>();
+    	resolved = new HashMap<URI, IContentType>();
+    	unresolved = new HashMap<URI, URI>();
+    	properties = new HashMap<URI, Map<QualifiedName, String>>();
 		SafeRunner.run(new ISafeRunnable(){
 			@Override
             public void handleException(Throwable exception) {
@@ -71,31 +74,11 @@ public class PersistenceManager {
             }
 			@Override
             public void run() throws Exception {
-				IURIPersistenceService service = ServiceManager.getInstance()
-				                .getService(IURIPersistenceService.class);
+				IURIPersistenceService service = ServiceManager.getInstance().getService(IURIPersistenceService.class);
 				File location = CacheManager.getCacheRoot();
-				File resolvedFile = new File(location, "resolved.ini"); //$NON-NLS-1$
-				resolved = new HashMap<URI, IContentType>();
-				if (resolvedFile.exists()) {
-					resolved = (Map<URI, IContentType>) service.read(resolved, resolvedFile
-					                .getAbsoluteFile().toURI());
-				}
-				File unresolvedFile = new File(location, "unresolved.ini");//$NON-NLS-1$
-				unresolved = new HashMap<URI, URI>();
-				if (unresolvedFile.exists()) {
-					unresolved = (Map<URI, URI>) service.read(unresolved, unresolvedFile
-					                .getAbsoluteFile().toURI());
-				}
-				File digestFile = new File(location, "digests.ini");//$NON-NLS-1$
-				digests = new HashMap<URI, FileState>();
-				if (digestFile.exists()) {
-					digests = (Map<URI, FileState>) service.read(digests, digestFile
-					                .getAbsoluteFile().toURI());
-				}
 				File persistentFile = new File(location, PERSISTENT_FILE);
-				properties = new HashMap<URI, Map<QualifiedName, String>>();
 				if (persistentFile.exists()) {
-					properties = (Map<URI, Map<QualifiedName, String>>) service.read(properties, persistentFile.getAbsoluteFile().toURI());
+					service.read(PersistenceManager.this, persistentFile.getAbsoluteFile().toURI());
 				}
             }});
 	}
@@ -204,14 +187,8 @@ public class PersistenceManager {
             public void run() throws Exception {
 				IURIPersistenceService service = ServiceManager.getInstance().getService(IURIPersistenceService.class);
 				File location = CacheManager.getCacheRoot();
-				File resolvedFile = new File(location, "resolved.ini"); //$NON-NLS-1$
-				service.write(resolved, resolvedFile.getAbsoluteFile().toURI());
-				File unresolvedFile = new File(location, "unresolved.ini"); //$NON-NLS-1$
-				service.write(unresolved, unresolvedFile.getAbsoluteFile().toURI());
-				File digestFile = new File(location, "digests.ini"); //$NON-NLS-1$
-				service.write(digests, digestFile.getAbsoluteFile().toURI());
 				File persistentFile = new File(location, PERSISTENT_FILE);
-				service.write(properties, persistentFile.getAbsoluteFile().toURI());
+				service.write(PersistenceManager.this, persistentFile.getAbsoluteFile().toURI());
             }});
 	}
 
