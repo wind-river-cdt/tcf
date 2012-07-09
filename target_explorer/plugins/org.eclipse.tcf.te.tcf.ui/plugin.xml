@@ -74,7 +74,7 @@
             contentProvider="org.eclipse.tcf.te.tcf.ui.navigator.ContentProviderDelegate"
             icon="icons/obj16/rootNode_obj.gif"
             id="org.eclipse.tcf.te.tcf.ui.navigator.content"
-            labelProvider="org.eclipse.tcf.te.tcf.ui.navigator.LabelProviderDelegate"
+            labelProvider="org.eclipse.tcf.te.tcf.ui.navigator.DelegatingLabelProvider"
             name="%navigatorContent.name"
             priority="normal">
             <enablement>
@@ -140,7 +140,7 @@
 <!-- Decorator contributions -->   
    <extension point="org.eclipse.ui.decorators">
       <decorator
-            class="org.eclipse.tcf.te.tcf.ui.navigator.LabelProviderDelegate"
+            class="org.eclipse.tcf.te.tcf.ui.navigator.DelegatingLabelProvider"
             id="org.eclipse.tcf.te.tcf.ui.decorators.peerHost"
             label="%peerhost.decorator.label"
             state="true">

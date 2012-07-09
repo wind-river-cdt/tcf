@@ -6,6 +6,7 @@
    <extension-point id="editorPageBindings" name="%ExtensionPoint.editorPageBindings.name" schema="schema/editorPageBindings.exsd"/>
    <extension-point id="editorPages" name="%ExtensionPoint.editorPages.name" schema="schema/editorPages.exsd"/>
    <extension-point id="categories" name="%ExtensionPoint.categories.name" schema="schema/categories.exsd"/>
+   <extension-point id="labelProviderDelegates" name="%ExtensionPoint.labelProviderDelegates.name" schema="schema/labelProviderDelegates.exsd"/>
 
 <!-- Common Navigator contributions -->
    <extension point="org.eclipse.ui.navigator.viewer">

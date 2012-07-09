@@ -135,8 +135,8 @@ public class PersistenceManager extends AbstractExtensionPointManager<IPersisten
 		}
 
 		if (delegates.size() > 1) {
-			IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(), "Found multiple persistence delgates for " + context + //$NON-NLS-1$
-							(container != null ? " to store in " + container : "")); //$NON-NLS-1$ //$NON-NLS-2$
+			IStatus status = new Status(IStatus.ERROR, CoreBundleActivator.getUniqueIdentifier(), "Found multiple persistence delgates for " + context.getClass().getName() + //$NON-NLS-1$
+							" (" + context + ")" + (container != null ? " to store in " + container : "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			Platform.getLog(CoreBundleActivator.getContext().getBundle()).log(status);
 		}
 

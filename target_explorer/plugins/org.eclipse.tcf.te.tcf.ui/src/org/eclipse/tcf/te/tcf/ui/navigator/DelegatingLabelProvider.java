@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ILabelDecorator;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tcf.protocol.IPeer;
@@ -28,18 +29,28 @@ import org.eclipse.tcf.te.tcf.ui.navigator.images.PeerImageDescriptor;
 import org.eclipse.tcf.te.tcf.ui.navigator.nodes.PeerRedirectorGroupNode;
 import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.ui.jface.images.AbstractImageDescriptor;
+import org.eclipse.tcf.te.ui.views.extensions.LabelProviderDelegateExtensionPointManager;
 
 
 /**
  * Label provider implementation.
  */
-public class LabelProviderDelegate extends LabelProvider implements ILabelDecorator {
+public class DelegatingLabelProvider extends LabelProvider implements ILabelDecorator {
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
 	 */
 	@Override
 	public String getText(final Object element) {
+		ILabelProvider[] delegates = LabelProviderDelegateExtensionPointManager.getInstance().getDelegates(element, false);
+
+		if (delegates != null && delegates.length > 0) {
+			String text = delegates[0].getText(element);
+			if (text != null) {
+				return text;
+			}
+		}
+
 		if (element instanceof IPeerModel) {
 			StringBuilder builder = new StringBuilder();
 
@@ -54,8 +65,12 @@ public class LabelProviderDelegate extends LabelProvider implements ILabelDecora
 				}
 			};
 
-			if (Protocol.isDispatchThread()) runnable.run();
-			else Protocol.invokeAndWait(runnable);
+			if (Protocol.isDispatchThread()) {
+				runnable.run();
+			}
+			else {
+				Protocol.invokeAndWait(runnable);
+			}
 
 			// Build up the base label from the peer name
 			builder.append((String)attrs.get(IPeer.ATTR_NAME));
@@ -111,6 +126,15 @@ public class LabelProviderDelegate extends LabelProvider implements ILabelDecora
 	 */
 	@Override
 	public Image getImage(final Object element) {
+		ILabelProvider[] delegates = LabelProviderDelegateExtensionPointManager.getInstance().getDelegates(element, false);
+
+		if (delegates != null && delegates.length > 0) {
+			Image image = delegates[0].getImage(element);
+			if (image != null) {
+				return image;
+			}
+		}
+
 		if (element instanceof IPeerModel) {
 			final AtomicBoolean isStatic = new AtomicBoolean();
 
@@ -122,8 +146,12 @@ public class LabelProviderDelegate extends LabelProvider implements ILabelDecora
 				}
 			};
 
-			if (Protocol.isDispatchThread()) runnable.run();
-			else Protocol.invokeAndWait(runnable);
+			if (Protocol.isDispatchThread()) {
+				runnable.run();
+			}
+			else {
+				Protocol.invokeAndWait(runnable);
+			}
 
 			return isStatic.get() ? UIPlugin.getImage(ImageConsts.PEER) : UIPlugin.getImage(ImageConsts.PEER_DISCOVERED);
 		}
@@ -143,8 +171,8 @@ public class LabelProviderDelegate extends LabelProvider implements ILabelDecora
 
 		if (image != null && element instanceof IPeerModel) {
 			AbstractImageDescriptor descriptor = new PeerImageDescriptor(UIPlugin.getDefault().getImageRegistry(),
-			                                                             image,
-			                                                             (IPeerModel)element);
+							image,
+							(IPeerModel)element);
 			decoratedImage = UIPlugin.getSharedImage(descriptor);
 		}
 
@@ -168,8 +196,12 @@ public class LabelProviderDelegate extends LabelProvider implements ILabelDecora
 				}
 			};
 
-			if (Protocol.isDispatchThread()) runnable.run();
-			else Protocol.invokeAndWait(runnable);
+			if (Protocol.isDispatchThread()) {
+				runnable.run();
+			}
+			else {
+				Protocol.invokeAndWait(runnable);
+			}
 
 			label = builder.toString();
 

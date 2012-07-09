@@ -16,7 +16,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.tcf.te.launch.ui.tabs.launchcontext.AbstractContextSelectorControl;
 import org.eclipse.tcf.te.tcf.locator.model.Model;
 import org.eclipse.tcf.te.tcf.ui.navigator.ContentProviderDelegate;
-import org.eclipse.tcf.te.tcf.ui.navigator.LabelProviderDelegate;
+import org.eclipse.tcf.te.tcf.ui.navigator.DelegatingLabelProvider;
 
 /**
  * Locator model launch context selector control.
@@ -46,7 +46,7 @@ public class ContextSelectorControl extends AbstractContextSelectorControl {
 	@Override
 	protected void doConfigureTreeContentAndLabelProvider(TreeViewer viewer) {
 		viewer.setContentProvider(new ContentProviderDelegate());
-		LabelProviderDelegate labelProvider = new LabelProviderDelegate();
+		DelegatingLabelProvider labelProvider = new DelegatingLabelProvider();
 		viewer.setLabelProvider(new DecoratingLabelProvider(labelProvider, labelProvider));
 	}
 }

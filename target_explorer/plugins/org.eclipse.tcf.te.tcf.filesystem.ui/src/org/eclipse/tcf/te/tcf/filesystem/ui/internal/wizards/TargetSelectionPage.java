@@ -40,7 +40,7 @@ import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelPeerNodeQueryService;
 import org.eclipse.tcf.te.tcf.locator.model.Model;
 import org.eclipse.tcf.te.tcf.ui.navigator.ContentProviderDelegate;
-import org.eclipse.tcf.te.tcf.ui.navigator.LabelProviderDelegate;
+import org.eclipse.tcf.te.tcf.ui.navigator.DelegatingLabelProvider;
 import org.eclipse.tcf.te.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.interfaces.IUIConstants;
 import org.eclipse.tcf.te.ui.wizards.pages.AbstractValidatingWizardPage;
@@ -138,7 +138,7 @@ public class TargetSelectionPage extends AbstractValidatingWizardPage {
 	/**
 	 * A styled label provider for the target selection list.
 	 */
-	static class TargetStyledLabelProvider extends LabelProviderDelegate implements IStyledLabelProvider {
+	static class TargetStyledLabelProvider extends DelegatingLabelProvider implements IStyledLabelProvider {
 		@Override
         public StyledString getStyledText(Object element) {
 	        return new StyledString(getText(element));
@@ -170,7 +170,7 @@ public class TargetSelectionPage extends AbstractValidatingWizardPage {
 
 		treeViewer = filteredTree.getViewer();
 		treeViewer.setContentProvider(new ContentProviderDelegate());
-		IBaseLabelProvider labelProvider = new DecoratingStyledCellLabelProvider(new TargetStyledLabelProvider(), new LabelProviderDelegate(), null);
+		IBaseLabelProvider labelProvider = new DecoratingStyledCellLabelProvider(new TargetStyledLabelProvider(), new DelegatingLabelProvider(), null);
 		treeViewer.setLabelProvider(labelProvider);
 		treeViewer.setComparator(new TargetViewerComparator());
 		ViewerFilter fsPeerFilter = new ViewerFilter() {

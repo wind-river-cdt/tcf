@@ -12,7 +12,7 @@ package org.eclipse.tcf.te.tcf.ui.views.scriptpad.actions;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.Action;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
-import org.eclipse.tcf.te.tcf.ui.navigator.LabelProviderDelegate;
+import org.eclipse.tcf.te.tcf.ui.navigator.DelegatingLabelProvider;
 import org.eclipse.tcf.te.tcf.ui.views.scriptpad.ScriptPad;
 import org.eclipse.ui.IViewPart;
 
@@ -21,7 +21,7 @@ import org.eclipse.ui.IViewPart;
  */
 public class PeerAction extends Action {
 	// Static reference to a label provider delegate providing the action label and image
-	private final static LabelProviderDelegate delegate = new LabelProviderDelegate();
+	private final static DelegatingLabelProvider delegate = new DelegatingLabelProvider();
 
 	// Reference to the peer model
 	private IPeerModel peerModel;

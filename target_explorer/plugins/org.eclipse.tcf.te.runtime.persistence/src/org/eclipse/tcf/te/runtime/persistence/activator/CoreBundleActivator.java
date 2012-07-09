@@ -9,15 +9,17 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.runtime.persistence.activator;
 
-import org.osgi.framework.BundleActivator;
+import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
 
 /**
  * The activator class controls the plug-in life cycle
  */
-public class CoreBundleActivator implements BundleActivator {
+public class CoreBundleActivator extends Plugin {
 	// The bundle context
 	private static BundleContext context;
+	// The shared instance of this plug-in.
+	private static CoreBundleActivator plugin;
 
 	/**
 	 * Returns the bundle context
@@ -26,6 +28,15 @@ public class CoreBundleActivator implements BundleActivator {
 	 */
 	public static BundleContext getContext() {
 		return context;
+	}
+
+	/**
+	 * Returns the shared instance
+	 *
+	 * @return the shared instance
+	 */
+	public static CoreBundleActivator getDefault() {
+		return plugin;
 	}
 
 	/**
@@ -45,6 +56,7 @@ public class CoreBundleActivator implements BundleActivator {
 	@Override
 	public void start(BundleContext bundleContext) throws Exception {
 		CoreBundleActivator.context = bundleContext;
+		plugin = this;
 	}
 
 	/*
@@ -54,6 +66,7 @@ public class CoreBundleActivator implements BundleActivator {
 	@Override
 	public void stop(BundleContext bundleContext) throws Exception {
 		CoreBundleActivator.context = null;
+		plugin = null;
 	}
 
 }

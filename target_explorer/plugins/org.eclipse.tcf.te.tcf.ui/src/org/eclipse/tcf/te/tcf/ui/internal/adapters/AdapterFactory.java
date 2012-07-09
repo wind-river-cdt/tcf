@@ -12,7 +12,7 @@ package org.eclipse.tcf.te.tcf.ui.internal.adapters;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
-import org.eclipse.tcf.te.tcf.ui.navigator.LabelProviderDelegate;
+import org.eclipse.tcf.te.tcf.ui.navigator.DelegatingLabelProvider;
 import org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizable;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
@@ -22,7 +22,7 @@ import org.eclipse.ui.IPersistableElement;
  */
 public class AdapterFactory implements IAdapterFactory {
 	// The adapter for ILabelProvider.class
-	private final LabelProviderDelegate labelProvider = new LabelProviderDelegate();
+	private final DelegatingLabelProvider labelProvider = new DelegatingLabelProvider();
 
 	// The adapter class.
 	private Class<?>[] adapters = {

@@ -15,4 +15,29 @@
       </service>
    </extension>
 
+<!-- Persistence delegate contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.persistence.delegates">
+      <delegate 
+            id="org.eclipse.tcf.te.runtime.persistence.gson.map"
+            class="org.eclipse.tcf.te.runtime.persistence.GsonMapPersistenceDelegate">
+      </delegate>
+   </extension>
+
+<!-- Persistence delegate bindings contributions -->
+   <extension
+         point="org.eclipse.tcf.te.runtime.persistence.bindings">
+      <binding
+            delegateId="org.eclipse.tcf.te.runtime.persistence.gson.map"
+            id="org.eclipse.tcf.te.runtime.persistence.binding.gson.map">
+         <enablement>
+            <with variable="container">
+               <instanceof value="java.net.URI"/>
+            </with>
+            <with variable="context">
+               <instanceof value="java.util.Map"/>
+            </with>
+         </enablement>
+      </binding>
+   </extension>
+   
 </plugin>

@@ -35,26 +35,34 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 /**
- * AbstractGsonMapPersistenceDelegate
+ * GsonMapPersistenceDelegate
  */
-public abstract class AbstractGsonMapPersistenceDelegate extends ExecutableExtension implements IPersistenceDelegate {
+public class GsonMapPersistenceDelegate extends ExecutableExtension implements IPersistenceDelegate {
 
 	private final String defaultFileExtension;
 
 	/**
 	 * Constructor.
 	 */
-	public AbstractGsonMapPersistenceDelegate() {
+	public GsonMapPersistenceDelegate() {
 		this("json"); //$NON-NLS-1$
 	}
 
 	/**
 	 * Constructor.
 	 */
-	public AbstractGsonMapPersistenceDelegate(String defaultFileExtension) {
+	public GsonMapPersistenceDelegate(String defaultFileExtension) {
 		super();
 		Assert.isNotNull(defaultFileExtension);
 		this.defaultFileExtension = defaultFileExtension;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistenceDelegate#getPersistedClass(java.lang.Object)
+	 */
+	@Override
+	public Class<?> getPersistedClass(Object context) {
+		return Map.class;
 	}
 
 	/**
@@ -100,7 +108,9 @@ public abstract class AbstractGsonMapPersistenceDelegate extends ExecutableExten
 				Gson gson = new GsonBuilder().setPrettyPrinting().create();
 				gson.toJson(toMap(context), Map.class, writer);
 			} finally {
-				if (writer != null) writer.close();
+				if (writer != null) {
+					writer.close();
+				}
 			}
 		}
 		else if (container instanceof String || String.class.equals(container)) {
@@ -142,7 +152,9 @@ public abstract class AbstractGsonMapPersistenceDelegate extends ExecutableExten
 				reader = new InputStreamReader(new FileInputStream(file), "UTF-8"); //$NON-NLS-1$
 				data = gson.fromJson(reader, Map.class);
 			} finally {
-				if (reader != null) reader.close();
+				if (reader != null) {
+					reader.close();
+				}
 			}
 		}
 		else if (container instanceof String) {

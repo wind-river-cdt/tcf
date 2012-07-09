@@ -10,13 +10,7 @@
 package org.eclipse.tcf.te.ui.views.internal.categories;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,12 +21,11 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.tcf.te.runtime.events.ChangeEvent;
 import org.eclipse.tcf.te.runtime.events.EventManager;
+import org.eclipse.tcf.te.runtime.persistence.interfaces.IURIPersistenceService;
+import org.eclipse.tcf.te.runtime.services.ServiceManager;
 import org.eclipse.tcf.te.ui.views.activator.UIPlugin;
 import org.eclipse.tcf.te.ui.views.extensions.CategoriesExtensionPointManager;
 import org.eclipse.tcf.te.ui.views.interfaces.categories.ICategoryManager;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 
 /**
@@ -40,9 +33,9 @@ import com.google.gson.GsonBuilder;
  */
 public class CategoryManager implements ICategoryManager {
 	// The map maintaining the id list per category id
-	private final Map<String, List<String>> cat2id = new HashMap<String, List<String>>();
+	private Map<String, List<String>> cat2id = new HashMap<String, List<String>>();
 	// The map maintaining the category id list per id
-	private final Map<String, List<String>> id2cat = new HashMap<String, List<String>>();
+	private Map<String, List<String>> id2cat = new HashMap<String, List<String>>();
 
 	// The map maintaining the transient id list per category id
 	private final Map<String, List<String>> _t_cat2id = new HashMap<String, List<String>>();
@@ -97,41 +90,29 @@ public class CategoryManager implements ICategoryManager {
 		_t_cat2id.clear();
 		_t_id2cat.clear();
 
-		// Create the Gson instance
-		Gson gson = new GsonBuilder().create();
+		cat2id.clear();
+		id2cat.clear();
 
-		// The first file to read is the category to id list map
-		File file = root.append("cat2id.json").toFile(); //$NON-NLS-1$
 		try {
-			cat2id.clear();
-			Reader reader = null;
-			try {
-				reader = new InputStreamReader(new FileInputStream(file), "UTF-8"); //$NON-NLS-1$
-				cat2id.putAll(gson.fromJson(reader, Map.class));
-			} finally {
-				if (reader != null) {
-					reader.close();
-				}
+			// Get the persistence service
+			IURIPersistenceService uRIPersistenceService = ServiceManager.getInstance().getService(IURIPersistenceService.class);
+			if (uRIPersistenceService == null) {
+				throw new IOException("Persistence service instance unavailable."); //$NON-NLS-1$
 			}
+			// Save the history to the persistence storage
+			cat2id = (Map<String,List<String>>)uRIPersistenceService.read(cat2id, root.append("cat2id.json").toFile().toURI()); //$NON-NLS-1$
 		} catch (IOException e) {
-			/* ignored on purpose */
 		}
 
-		// The second file to read is the id to category list map
-		file = root.append("id2cat.json").toFile(); //$NON-NLS-1$
 		try {
-			id2cat.clear();
-			Reader reader = null;
-			try {
-				reader = new InputStreamReader(new FileInputStream(file), "UTF-8"); //$NON-NLS-1$
-				id2cat.putAll(gson.fromJson(reader, Map.class));
-			} finally {
-				if (reader != null) {
-					reader.close();
-				}
+			// Get the persistence service
+			IURIPersistenceService uRIPersistenceService = ServiceManager.getInstance().getService(IURIPersistenceService.class);
+			if (uRIPersistenceService == null) {
+				throw new IOException("Persistence service instance unavailable."); //$NON-NLS-1$
 			}
+			// Save the history to the persistence storage
+			id2cat = (Map<String,List<String>>)uRIPersistenceService.read(id2cat, root.append("id2cat.json").toFile().toURI()); //$NON-NLS-1$
 		} catch (IOException e) {
-			/* ignored on purpose */
 		}
 	}
 
@@ -145,39 +126,26 @@ public class CategoryManager implements ICategoryManager {
 			return;
 		}
 
-		// Create the Gson instance
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-		// The first file to write is the category to id list map
-		File file = root.append("cat2id.json").toFile(); //$NON-NLS-1$
 		try {
-			Writer writer = null;
-			try {
-				writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8"); //$NON-NLS-1$
-				gson.toJson(cat2id, Map.class, writer);
-			} finally {
-				if (writer != null) {
-					writer.close();
-				}
+			// Get the persistence service
+			IURIPersistenceService uRIPersistenceService = ServiceManager.getInstance().getService(IURIPersistenceService.class);
+			if (uRIPersistenceService == null) {
+				throw new IOException("Persistence service instance unavailable."); //$NON-NLS-1$
 			}
+			// Save the history to the persistence storage
+			uRIPersistenceService.write(cat2id, root.append("cat2id.json").toFile().toURI()); //$NON-NLS-1$
 		} catch (IOException e) {
-			/* ignored on purpose */
 		}
 
-		// The second file to write is the id to category list map
-		file = root.append("id2cat.json").toFile(); //$NON-NLS-1$
 		try {
-			Writer writer = null;
-			try {
-				writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8"); //$NON-NLS-1$
-				gson.toJson(id2cat, Map.class, writer);
-			} finally {
-				if (writer != null) {
-					writer.close();
-				}
+			// Get the persistence service
+			IURIPersistenceService uRIPersistenceService = ServiceManager.getInstance().getService(IURIPersistenceService.class);
+			if (uRIPersistenceService == null) {
+				throw new IOException("Persistence service instance unavailable."); //$NON-NLS-1$
 			}
+			// Save the history to the persistence storage
+			uRIPersistenceService.write(id2cat, root.append("id2cat.json").toFile().toURI()); //$NON-NLS-1$
 		} catch (IOException e) {
-			/* ignored on purpose */
 		}
 	}
 

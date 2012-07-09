@@ -12,7 +12,7 @@ package org.eclipse.tcf.te.tcf.filesystem.ui.internal.wizards;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
-import org.eclipse.tcf.te.tcf.ui.navigator.LabelProviderDelegate;
+import org.eclipse.tcf.te.tcf.ui.navigator.DelegatingLabelProvider;
 import org.eclipse.ui.dialogs.PatternFilter;
 
 /**
@@ -22,7 +22,7 @@ import org.eclipse.ui.dialogs.PatternFilter;
  * This class is copied and adapted from <code>org.eclipse.ui.internal.dialogs.WizardPatternFilter</code>.
  */
 public class TargetPatternFilter extends PatternFilter {
-    private LabelProviderDelegate targetLabelProvider = new LabelProviderDelegate();
+    private DelegatingLabelProvider targetLabelProvider = new DelegatingLabelProvider();
 	/**
 	 * Create a new instance of a WizardPatternFilter
 	 * @param isMatchItem
