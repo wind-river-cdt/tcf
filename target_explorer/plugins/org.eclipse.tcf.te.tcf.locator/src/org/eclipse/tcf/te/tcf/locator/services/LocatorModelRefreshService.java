@@ -143,6 +143,15 @@ public class LocatorModelRefreshService extends AbstractLocatorModelService impl
 				boolean isStatic = value != null && Boolean.parseBoolean(value.trim());
 				if (isStatic) {
 					for (IPeerModel candidate : oldChildren) {
+						String peerID = peerNode.getPeerId();
+						String clientID = candidate.getPeer().getAttributes().get("ClientID"); //$NON-NLS-1$
+						if (clientID != null && clientID.equals(peerID)) {
+							// Merge user configured properties between the peers
+							model.getService(ILocatorModelUpdateService.class).mergeUserDefinedAttributes(candidate, peerNode.getPeer(), true);
+							peerNode = null;
+							break;
+						}
+
 						if (peerNode.getPeer().getTransportName() != null && peerNode.getPeer().getTransportName().equals(candidate.getPeer().getTransportName())) {
 							// Same transport name
 							if ("PIPE".equals(candidate.getPeer().getTransportName())) { //$NON-NLS-1$

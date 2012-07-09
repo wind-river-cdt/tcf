@@ -61,6 +61,13 @@ public class LocatorListener implements ILocator.LocatorListener {
 		if (model != null && peer != null) {
 			// find the corresponding model node to remove (expected to be null)
 			IPeerModel peerNode = model.getService(ILocatorModelLookupService.class).lkupPeerModelById(peer.getID());
+			if (peerNode == null) {
+				// Double check with "ClientID" if set
+				String clientID = peer.getAttributes().get("ClientID"); //$NON-NLS-1$
+				if (clientID != null) {
+					peerNode = model.getService(ILocatorModelLookupService.class).lkupPeerModelById(clientID);
+				}
+			}
 			// If not found, create a new peer node instance
 			if (peerNode == null) {
 				peerNode = new PeerModel(model, peer);
@@ -75,7 +82,19 @@ public class LocatorListener implements ILocator.LocatorListener {
 				}
 			} else {
 				// Peer node found, update the peer instance
-				peerNode.setProperty(IPeerModelProperties.PROP_INSTANCE, peer);
+				String value = peerNode.getPeer().getAttributes().get("static.transient"); //$NON-NLS-1$
+				boolean isStatic = value != null && Boolean.parseBoolean(value.trim());
+				if (isStatic) {
+					boolean changed = peerNode.setChangeEventsEnabled(false);
+					// Merge user configured properties between the peers
+					IPeer oldPeer = peerNode.getPeer();
+					peerNode.setProperty(IPeerModelProperties.PROP_INSTANCE, peer);
+					model.getService(ILocatorModelUpdateService.class).mergeUserDefinedAttributes(peerNode, oldPeer, true);
+					if (changed) peerNode.setChangeEventsEnabled(true);
+					peerNode.fireChangeEvent(IPeerModelProperties.PROP_INSTANCE, oldPeer, peer);
+				} else {
+					peerNode.setProperty(IPeerModelProperties.PROP_INSTANCE, peer);
+				}
 			}
 		}
 	}
