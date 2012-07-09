@@ -153,7 +153,14 @@ public abstract class AbstractCustomFormToolkitEditorPage extends AbstractEditor
 	@Override
 	public void dispose() {
 		// Get the menu service and release the toolbar manager
+		IToolBarManager manager = getManagedForm().getForm().getForm().getToolBarManager();
+		IMenuService service = (IMenuService) getSite().getService(IMenuService.class);
+		if (service != null) {
+			service.releaseContributions((ToolBarManager)manager);
+		}
+		// Dispose the custom form toolkit
 		if (toolkit != null) { toolkit.dispose(); toolkit = null; }
+		// Dispose all the rest
 		super.dispose();
 	}
 
