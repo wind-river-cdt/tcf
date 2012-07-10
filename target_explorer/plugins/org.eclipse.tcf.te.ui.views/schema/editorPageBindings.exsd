@@ -78,37 +78,19 @@
                </appinfo>
             </annotation>
          </attribute>
-         <attribute name="insertBefore">
+         <attribute name="insertBefore" type="string">
             <annotation>
                <documentation>
-                  The id of the page this page shall be inserted before, or &quot;first&quot; to insert it at the beginning of the stack. If &quot;insertBefore&quot; is specified non-empty, it will eclipse the &quot;insertAfter&quot; attribute. If neither &quot;insertBefore&quot; or &quot;insertAfter&quot; is specified, the page will be inserted at the end of the stack.
+                  The comma separated list of page id&apos;s this page shall be inserted before, or &quot;first&quot; to insert it at the beginning of the stack. If more than one page id is specified, the page is inserted before the first page found from that list. If &quot;insertBefore&quot; is specified non-empty, it will be processed before the &quot;insertAfter&quot; attribute. If neither &quot;insertBefore&quot; or &quot;insertAfter&quot; is specified, the page will be inserted at the end of the stack.
                </documentation>
-               <appinfo>
-                  <meta.attribute kind="identifier" basedOn="org.eclipse.tcf.te.ui.views.editorPages/editorPage/@id"/>
-               </appinfo>
             </annotation>
-            <simpleType>
-               <restriction base="string">
-                  <enumeration value="first">
-                  </enumeration>
-               </restriction>
-            </simpleType>
          </attribute>
-         <attribute name="insertAfter">
+         <attribute name="insertAfter" type="string">
             <annotation>
                <documentation>
-                  The id of the page this page shall be inserted after, or &quot;last&quot; to insert it at the end of the stack. If &quot;insertBefore&quot; is specified non-empty, it will eclipse the &quot;insertAfter&quot; attribute. If neither &quot;insertBefore&quot; or &quot;insertAfter&quot; is specified, the page will be inserted at the end of the stack.
+                  The comma separated list of page id&apos;s this page shall be inserted after, or &quot;last&quot; to insert it at the end of the stack. If more than one page id is specified, the page is inserted after the first page found from that list. If &quot;insertBefore&quot; is specified non-empty, it will be processed before the &quot;insertAfter&quot; attribute. If neither &quot;insertBefore&quot; or &quot;insertAfter&quot; is specified, the page will be inserted at the end of the stack.
                </documentation>
-               <appinfo>
-                  <meta.attribute kind="identifier" basedOn="org.eclipse.tcf.te.ui.views.editorPages/editorPage/@id"/>
-               </appinfo>
             </annotation>
-            <simpleType>
-               <restriction base="string">
-                  <enumeration value="last">
-                  </enumeration>
-               </restriction>
-            </simpleType>
          </attribute>
       </complexType>
    </element>

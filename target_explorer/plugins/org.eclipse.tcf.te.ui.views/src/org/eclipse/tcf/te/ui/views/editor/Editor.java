@@ -180,26 +180,53 @@ public final class Editor extends FormEditor implements IPersistableEditor, ITab
 					String insertBefore = binding.getInsertBefore().trim();
 					String insertAfter = binding.getInsertAfter().trim();
 
-					// insertBefore will eclipse insertAfter is both is specified.
+					boolean pageAdded = false;
+
+					// insertBefore will be processed before insertAfter.
 					if (!"".equals(insertBefore)) { //$NON-NLS-1$
-						// If it is "first", we insert the page at index 0
-						if ("first".equalsIgnoreCase(insertBefore)) { //$NON-NLS-1$
-							addPage(0, page);
-						} else {
+						String[] pageIds = insertBefore.split(","); //$NON-NLS-1$
+						for (String insertBeforePageId : pageIds) {
+							// If it is "first", we insert the page at index 0
+							if ("first".equalsIgnoreCase(insertBeforePageId)) { //$NON-NLS-1$
+								addPage(0, page);
+								pageAdded = true;
+								break;
+							}
+
 							// Find the index of the page we shall insert this page before
-							int index = getIndexOf(insertBefore);
-							if (index != -1) addPage(index, page);
-							else addPage(page);
+							int index = getIndexOf(insertBeforePageId);
+							if (index != -1) {
+								addPage(index, page);
+								pageAdded = true;
+								break;
+							}
 						}
-					} else if (!"".equals(insertAfter) && !"last".equalsIgnoreCase(insertAfter)) { //$NON-NLS-1$ //$NON-NLS-2$
-						// Find the index of the page we shall insert this page after
-						int index = getIndexOf(insertAfter);
-						if (index != -1 && index + 1 < pages.size()) addPage(index + 1, page);
-						else addPage(page);
-					} else {
-						// And add the page to the editor as last page.
-						addPage(page);
 					}
+
+					// If the page hasn't been added till now, process insertAfter
+					if (!pageAdded && !"".equals(insertAfter)) { //$NON-NLS-1$
+						String[] pageIds = insertAfter.split(","); //$NON-NLS-1$
+						for (String insertAfterPageId : pageIds) {
+							// If it is "last", we insert the page at the end
+							if ("last".equalsIgnoreCase(insertAfterPageId)) { //$NON-NLS-1$
+								addPage(page);
+								pageAdded = true;
+								break;
+							}
+
+							// Find the index of the page we shall insert this page after
+							int index = getIndexOf(insertAfterPageId);
+							if (index != -1 && index + 1 < pages.size()) {
+								addPage(index + 1, page);
+								pageAdded = true;
+								break;
+							}
+						}
+					}
+
+					// Add the page to the end if not added otherwise
+					if (!pageAdded) addPage(page);
+
 				} catch (PartInitException e) { /* ignored on purpose */ }
 			}
 		}
