@@ -260,15 +260,6 @@ public class ProcessStreamsListener implements IStreams.StreamsListener, IProces
 			return activeTask;
 		}
 
-		/**
-		 * Returns the callback instance to invoke.
-		 *
-		 * @return The callback instance or <code>null</code>.
-		 */
-		protected final ICallback getCallback() {
-			return callback;
-		}
-
 		/* (non-Javadoc)
 		 * @see java.lang.Runnable#run()
 		 */
