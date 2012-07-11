@@ -18,7 +18,6 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.tcf.te.tcf.filesystem.core.model.FSTreeNode;
 import org.eclipse.tcf.te.tcf.filesystem.ui.activator.UIPlugin;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.columns.FSTreeElementLabelProvider;
-import org.eclipse.tcf.te.tcf.filesystem.ui.internal.search.FSTreeNodeLoader;
 import org.eclipse.tcf.te.tcf.filesystem.ui.internal.search.FSTreeNodeSearchable;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.ui.interfaces.ILazyLoader;

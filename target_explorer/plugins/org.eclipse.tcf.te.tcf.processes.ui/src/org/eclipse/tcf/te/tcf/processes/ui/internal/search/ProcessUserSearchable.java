@@ -98,7 +98,6 @@ public class ProcessUserSearchable extends ProcessBaseSearchable {
 		txtUser.setParentControlIsInnerPanel(true);
 		txtUser.setupPanel(cmpUser);
 		txtUser.setEnabled(false);
-		//txtUser.setEditFieldValidator(new DateValidator());
 		Text text = (Text) txtUser.getEditFieldControl();
 		text.addModifyListener(new ModifyListener() {
             @Override
@@ -121,7 +120,7 @@ public class ProcessUserSearchable extends ProcessBaseSearchable {
 	 */
 	@Override
     public boolean isInputValid() {
-		if(choice == OPTION_SPECIFIED) {
+		if(choice == OPTION_SPECIFIED && txtUser != null) {
 			boolean vFrom = txtUser.isValid();
 			if(vFrom) {
 				String fromText = txtUser.getEditFieldControlText().trim();
@@ -139,7 +138,7 @@ public class ProcessUserSearchable extends ProcessBaseSearchable {
 	 */
 	protected void optionChecked(SelectionEvent e) {
 		Object src = e.getSource();
-		boolean spec = false;
+		boolean specified = false;
 		if(src == fBtnUserNotRem) {
 			choice = OPTION_NOT_REMEMBER;
 		}
@@ -148,9 +147,11 @@ public class ProcessUserSearchable extends ProcessBaseSearchable {
 		}
 		else if(src == fBtnUserSpecified) {
 			choice = OPTION_SPECIFIED;
-			spec = true;
+			specified = true;
 		}
-		txtUser.setEnabled(spec);
+		if (txtUser != null) {
+			txtUser.setEnabled(specified);
+		}
 		fireOptionChanged();
     }
 	
