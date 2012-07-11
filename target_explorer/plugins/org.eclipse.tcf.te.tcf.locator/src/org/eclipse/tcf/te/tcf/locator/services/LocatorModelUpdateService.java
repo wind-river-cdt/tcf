@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.core.AbstractPeer;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.te.tcf.core.peers.Peer;
 import org.eclipse.tcf.te.tcf.locator.interfaces.IModelListener;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
@@ -186,7 +187,7 @@ public class LocatorModelUpdateService extends AbstractLocatorModelService imple
 		// We can merge the peer attributes only if the destination peer is a AbstractPeer
 		IPeer dst = node.getPeer();
 		// If not of correct type, than we cannot update the attributes
-		if (!(dst instanceof AbstractPeer) && !(dst instanceof PeerRedirector)) return;
+		if (!(dst instanceof AbstractPeer) && !(dst instanceof PeerRedirector) && !(dst instanceof Peer)) return;
 		// If destination and source peer are the same objects(!) nothing to do here
 		if (dst == peer) return;
 
@@ -199,10 +200,9 @@ public class LocatorModelUpdateService extends AbstractLocatorModelService imple
 		// Get a modifiable copy of the source peer attributes
 		Map<String, String> srcAttrs = new HashMap<String, String>(peer.getAttributes());
 
-		// A user defined name overwrites a discovered name
-		String name = srcAttrs.get(IPeer.ATTR_NAME);
-		if (name != null && !"".equals(name)) { //$NON-NLS-1$
-			dstAttrs.put(IPeer.ATTR_NAME, name);
+		// Names are not updated
+		if (srcAttrs.containsKey(IPeer.ATTR_NAME)) {
+			srcAttrs.remove(IPeer.ATTR_NAME);
 		}
 
 		// If the source is a RemotePeer and the destination not, attributes from
@@ -224,17 +224,19 @@ public class LocatorModelUpdateService extends AbstractLocatorModelService imple
 		// Copy all remaining attributes from source to destination
 		if (!srcAttrs.isEmpty()) dstAttrs.putAll(srcAttrs);
 
+		// If the ID's are different between the peers to merge and force is set,
+		// we have set the ID in dstAttrs to the original one as set in the destination peer.
+		if (force && !dst.getID().equals(dstAttrs.get(IPeer.ATTR_ID))) {
+			dstAttrs.put(IPeer.ATTR_ID, dst.getID());
+		}
+
 		// And update the destination peer attributes
 		if (dst instanceof AbstractPeer) {
-			// If the ID's are different between the peers to merge and force is set,
-			// we have set the ID in dstAttrs to the original one as set in the destination peer.
-			if (force && !dst.getID().equals(dstAttrs.get(IPeer.ATTR_ID))) {
-				dstAttrs.put(IPeer.ATTR_ID, dst.getID());
-			}
-			// Update the attributes now
 			((AbstractPeer)dst).updateAttributes(dstAttrs);
 		} else if (dst instanceof PeerRedirector) {
 			((PeerRedirector)dst).updateAttributes(dstAttrs);
+		} else if (dst instanceof Peer) {
+			((Peer)dst).updateAttributes(dstAttrs);
 		}
 	}
 }

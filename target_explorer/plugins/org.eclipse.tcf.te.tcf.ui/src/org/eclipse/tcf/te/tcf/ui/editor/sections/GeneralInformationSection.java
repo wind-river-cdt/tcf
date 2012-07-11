@@ -23,7 +23,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.tcf.core.TransientPeer;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
@@ -31,6 +30,7 @@ import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistableNodePropert
 import org.eclipse.tcf.te.runtime.persistence.interfaces.IURIPersistenceService;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
 import org.eclipse.tcf.te.runtime.services.ServiceManager;
+import org.eclipse.tcf.te.tcf.core.peers.Peer;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProperties;
 import org.eclipse.tcf.te.tcf.locator.nodes.PeerRedirector;
@@ -294,7 +294,7 @@ public class GeneralInformationSection extends AbstractSection {
 					// Remove the persistence storage URI (if set)
 					attributes.remove(IPersistableNodeProperties.PROPERTY_URI);
 					// Create the new peer
-					IPeer newPeer = oldPeer instanceof PeerRedirector ? new PeerRedirector(((PeerRedirector)oldPeer).getParent(), attributes) : new TransientPeer(attributes);
+					IPeer newPeer = oldPeer instanceof PeerRedirector ? new PeerRedirector(((PeerRedirector)oldPeer).getParent(), attributes) : new Peer(attributes);
 					// Update the peer node instance (silently)
 					boolean changed = node.setChangeEventsEnabled(false);
 					node.setProperty(IPeerModelProperties.PROP_INSTANCE, newPeer);
@@ -364,7 +364,7 @@ public class GeneralInformationSection extends AbstractSection {
 				for (String key : odc.getProperties().keySet()) {
 					oldData.put(key, odc.getStringProperty(key));
 				}
-				uRIPersistenceService.delete(new TransientPeer(oldData), null);
+				uRIPersistenceService.delete(new Peer(oldData), null);
 				// Save the peer node to the new persistence storage
 				uRIPersistenceService.write(od.getPeer(), null);
 			} catch (IOException e) {

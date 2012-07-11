@@ -16,11 +16,11 @@ import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.tcf.core.TransientPeer;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
 import org.eclipse.tcf.te.runtime.persistence.GsonMapPersistenceDelegate;
+import org.eclipse.tcf.te.tcf.core.peers.Peer;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModelProvider;
 import org.eclipse.tcf.te.tcf.locator.interfaces.services.ILocatorModelLookupService;
@@ -120,7 +120,7 @@ public class GsonPeerPersistenceDelegate extends GsonMapPersistenceDelegate {
 			attrs.put(entry.getKey(), entry.getValue().toString());
 		}
 
-		return new TransientPeer(attrs);
+		return new Peer(attrs);
 	}
 
 	/**

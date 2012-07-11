@@ -24,7 +24,6 @@ import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.core.AbstractPeer;
-import org.eclipse.tcf.core.TransientPeer;
 import org.eclipse.tcf.osgi.services.IValueAddService;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
@@ -34,6 +33,7 @@ import org.eclipse.tcf.te.tcf.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
 import org.eclipse.tcf.te.tcf.core.interfaces.tracing.ITraceIds;
 import org.eclipse.tcf.te.tcf.core.nls.Messages;
+import org.eclipse.tcf.te.tcf.core.peers.Peer;
 import org.eclipse.tcf.te.tcf.core.va.ValueAddManager;
 import org.eclipse.tcf.te.tcf.core.va.interfaces.IValueAdd;
 
@@ -299,7 +299,7 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 		IPeer peer = Protocol.getLocator().getPeers().get(peerId);
 		// If not peer could be found, create a new one
 		if (peer == null) {
-			peer = isTransient ? new TransientPeer(peerAttributes) : new AbstractPeer(peerAttributes);
+			peer = isTransient ? new Peer(peerAttributes) : new AbstractPeer(peerAttributes);
 
 			if (CoreBundleActivator.getTraceHandler().isSlotEnabled(0, ITraceIds.TRACE_CHANNEL_MANAGER)) {
 				CoreBundleActivator.getTraceHandler().trace(NLS.bind(Messages.ChannelManager_createPeer_new_message, peerId, Boolean.valueOf(isTransient)),

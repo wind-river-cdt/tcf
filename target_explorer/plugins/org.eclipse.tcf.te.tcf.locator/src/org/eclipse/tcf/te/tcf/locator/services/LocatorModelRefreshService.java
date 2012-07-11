@@ -24,7 +24,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.tcf.core.TransientPeer;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.ILocator;
@@ -33,6 +32,7 @@ import org.eclipse.tcf.te.runtime.persistence.interfaces.IURIPersistenceService;
 import org.eclipse.tcf.te.runtime.services.ServiceManager;
 import org.eclipse.tcf.te.runtime.utils.net.IPAddressUtil;
 import org.eclipse.tcf.te.tcf.core.Tcf;
+import org.eclipse.tcf.te.tcf.core.peers.Peer;
 import org.eclipse.tcf.te.tcf.locator.ScannerRunnable;
 import org.eclipse.tcf.te.tcf.locator.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorModel;
@@ -314,7 +314,7 @@ public class LocatorModelRefreshService extends AbstractLocatorModelService impl
 							// If the redirect property is not set, create the peer right away
 							if (attrs.get(IPeerModelProperties.PROP_REDIRECT_PROXY) == null) {
 								// Construct the peer from the attributes
-								IPeer peer = new TransientPeer(attrs);
+								IPeer peer = new Peer(attrs);
 								// Add the constructed peer to the peers map
 								peers.put(peer.getID(), peer);
 							} else {
@@ -366,7 +366,7 @@ public class LocatorModelRefreshService extends AbstractLocatorModelService impl
 						// Proxy not available -> reset redirection
 						attrs.remove(IPeerModelProperties.PROP_REDIRECT_PROXY);
 						// Construct the peer from the attributes
-						IPeer peer = new TransientPeer(attrs);
+						IPeer peer = new Peer(attrs);
 						// Add the constructed peer to the peers map
 						peers.put(peer.getID(), peer);
 					}

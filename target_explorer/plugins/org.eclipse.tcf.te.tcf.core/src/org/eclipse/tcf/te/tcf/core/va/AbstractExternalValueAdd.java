@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.tcf.core.TransientPeer;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.JSON;
@@ -32,6 +31,7 @@ import org.eclipse.tcf.te.tcf.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.tcf.core.async.CallbackInvocationDelegate;
 import org.eclipse.tcf.te.tcf.core.interfaces.tracing.ITraceIds;
 import org.eclipse.tcf.te.tcf.core.nls.Messages;
+import org.eclipse.tcf.te.tcf.core.peers.Peer;
 
 /**
  * Abstract external value add implementation.
@@ -97,7 +97,7 @@ public abstract class AbstractExternalValueAdd extends AbstractValueAdd {
 				props.put(IPeer.ATTR_IP_PORT, attrs[2]);
 
 				entry = new ValueAddEntry();
-				entry.peer = new TransientPeer(props);
+				entry.peer = new Peer(props);
 
 				entries.put(id, entry);
 			}
@@ -257,7 +257,7 @@ public abstract class AbstractExternalValueAdd extends AbstractValueAdd {
 					attrs.put(IPeer.ATTR_ID, peerId);
 					attrs.put(IPeer.ATTR_IP_HOST, ip);
 
-					entry.peer = new TransientPeer(attrs);
+					entry.peer = new Peer(attrs);
 				} else {
 					error = new IOException("Invalid or incomplete peer attributes reported by value-add."); //$NON-NLS-1$
 				}

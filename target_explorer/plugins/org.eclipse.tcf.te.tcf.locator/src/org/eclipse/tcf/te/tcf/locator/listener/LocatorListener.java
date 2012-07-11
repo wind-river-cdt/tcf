@@ -87,11 +87,9 @@ public class LocatorListener implements ILocator.LocatorListener {
 				if (isStatic) {
 					boolean changed = peerNode.setChangeEventsEnabled(false);
 					// Merge user configured properties between the peers
-					IPeer oldPeer = peerNode.getPeer();
-					peerNode.setProperty(IPeerModelProperties.PROP_INSTANCE, peer);
-					model.getService(ILocatorModelUpdateService.class).mergeUserDefinedAttributes(peerNode, oldPeer, true);
+					model.getService(ILocatorModelUpdateService.class).mergeUserDefinedAttributes(peerNode, peer, true);
 					if (changed) peerNode.setChangeEventsEnabled(true);
-					peerNode.fireChangeEvent(IPeerModelProperties.PROP_INSTANCE, oldPeer, peer);
+					peerNode.fireChangeEvent(IPeerModelProperties.PROP_INSTANCE, peer, peerNode.getPeer());
 				} else {
 					peerNode.setProperty(IPeerModelProperties.PROP_INSTANCE, peer);
 				}
