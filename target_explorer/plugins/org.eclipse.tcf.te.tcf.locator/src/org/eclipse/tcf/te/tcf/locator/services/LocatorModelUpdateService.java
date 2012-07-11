@@ -226,6 +226,12 @@ public class LocatorModelUpdateService extends AbstractLocatorModelService imple
 
 		// And update the destination peer attributes
 		if (dst instanceof AbstractPeer) {
+			// If the ID's are different between the peers to merge and force is set,
+			// we have set the ID in dstAttrs to the original one as set in the destination peer.
+			if (force && !dst.getID().equals(dstAttrs.get(IPeer.ATTR_ID))) {
+				dstAttrs.put(IPeer.ATTR_ID, dst.getID());
+			}
+			// Update the attributes now
 			((AbstractPeer)dst).updateAttributes(dstAttrs);
 		} else if (dst instanceof PeerRedirector) {
 			((PeerRedirector)dst).updateAttributes(dstAttrs);

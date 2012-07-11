@@ -17,10 +17,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ContributionManager;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.graphics.Image;
@@ -45,6 +45,8 @@ import org.eclipse.ui.menus.IMenuService;
 public abstract class AbstractCustomFormToolkitEditorPage extends AbstractEditorPage {
 	// Reference to the form toolkit instance
 	private CustomFormToolkit toolkit = null;
+	// Reference to the toolbar manager to release menu contributions for
+	private IToolBarManager manager = null;
 
 	// The default help action class definition
 	static protected class HelpAction extends Action {
@@ -153,10 +155,11 @@ public abstract class AbstractCustomFormToolkitEditorPage extends AbstractEditor
 	@Override
 	public void dispose() {
 		// Get the menu service and release the toolbar manager
-		IToolBarManager manager = getManagedForm().getForm().getForm().getToolBarManager();
-		IMenuService service = (IMenuService) getSite().getService(IMenuService.class);
-		if (service != null) {
-			service.releaseContributions((ToolBarManager)manager);
+		if (manager instanceof ContributionManager) {
+			IMenuService service = (IMenuService) getSite().getService(IMenuService.class);
+			if (service != null) {
+				service.releaseContributions((ContributionManager)manager);
+			}
 		}
 		// Dispose the custom form toolkit
 		if (toolkit != null) { toolkit.dispose(); toolkit = null; }
@@ -210,15 +213,15 @@ public abstract class AbstractCustomFormToolkitEditorPage extends AbstractEditor
 		managedForm.getForm().getForm().setImage(getFormImage());
 
 		// Add the toolbar items which will appear in the form header
-		IToolBarManager manager = managedForm.getForm().getForm().getToolBarManager();
+		manager = managedForm.getForm().getForm().getToolBarManager();
 		// Add the default "additions" separator
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		// Create fixed toolbar contribution items
 		createToolbarContributionItems(manager);
 		// Get the menu service and populate contributed toolbar actions
 		IMenuService service = (IMenuService) getSite().getService(IMenuService.class);
-		if (service != null) {
-			service.populateContributionManager((ToolBarManager)manager, "toolbar:" + getId()); //$NON-NLS-1$
+		if (service != null && manager instanceof ContributionManager) {
+			service.populateContributionManager((ContributionManager)manager, "toolbar:" + getId()); //$NON-NLS-1$
 		}
 		// Trigger an update of the toolbar widget
 		manager.update(true);
