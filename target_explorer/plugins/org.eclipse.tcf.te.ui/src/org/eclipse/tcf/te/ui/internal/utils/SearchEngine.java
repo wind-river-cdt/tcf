@@ -53,22 +53,13 @@ public class SearchEngine {
 	 * @param viewer The tree viewer.
 	 * @param depthFirst 
 	 */
-	public SearchEngine(TreeViewer viewer, boolean depthFirst) {
+	public SearchEngine(TreeViewer viewer, boolean depthFirst, ISearchable searchable, TreePath path) {
 		fViewer = viewer;
 		fDepthFirst = depthFirst;
-	}
-	
-	/**
-	 * The set the searchable
-	 * 
-	 * @param searchable the searchable element.
-	 */
-	public void setSearchable(ISearchable searchable) {
 		fSearchable = searchable;
+		fStartPath = path;
 		fSearcher = fDepthFirst ? new DepthFirstSearcher(fViewer, fSearchable) : new BreadthFirstSearcher(fViewer, fSearchable);
-		if(fStartPath != null) {
-			fSearcher.setStartPath(fStartPath);
-		}
+		fSearcher.setStartPath(path);
 	}
 
 	/**
@@ -89,9 +80,7 @@ public class SearchEngine {
 		if (fDepthFirst != depthFirst) {
 			fDepthFirst = depthFirst;
 			fSearcher = fDepthFirst ? new DepthFirstSearcher(fViewer, fSearchable) : new BreadthFirstSearcher(fViewer, fSearchable);
-			if(fStartPath != null) {
-				fSearcher.setStartPath(fStartPath);
-			}
+			fSearcher.setStartPath(fStartPath);
 		}
 	}
 
@@ -102,36 +91,14 @@ public class SearchEngine {
 	 */
 	public void setStartPath(TreePath path) {
 		fStartPath = path;
-		if (fSearcher != null) {
-			fSearcher.setStartPath(path);
-		}
-	}
-	
-	/**
-	 * Get the start path.
-	 * 
-	 * @return the start path.
-	 */
-	public TreePath getStartPath() {
-		return fStartPath;
-	}
-	
-	/**
-	 * If the current searching scope is all.
-	 */
-	public boolean isScopeAll() {
-		if(fStartPath == null) return true;
-		Object element = fStartPath.getLastSegment();
-		return element == fViewer.getInput();
+		fSearcher.setStartPath(path);
 	}
 
 	/**
 	 * Reset the searching path.
 	 */
 	public void resetPath() {
-		if (fSearcher != null) {
-			fSearcher.setStartPath(fStartPath);
-		}
+		fSearcher.setStartPath(fStartPath);
 	}
 
 	/**
@@ -243,15 +210,6 @@ public class SearchEngine {
 	 */
 	public void setWrap(boolean wrap) {
 		fWrap = wrap;
-	}
-
-	/**
-	 * Set the last searching result.
-	 * 
-	 * @param path The last searched tree path.
-	 */
-	public void setLastResult(TreePath path) {
-		fLastResult = path;
 	}
 
 	/**

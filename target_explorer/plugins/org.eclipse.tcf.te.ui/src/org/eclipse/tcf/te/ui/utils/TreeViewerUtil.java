@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
@@ -169,8 +170,8 @@ public class TreeViewerUtil {
 	public static void doSearch(TreeViewer viewer) {
 		TreePath rootPath = getSelectedPath(viewer);
 		rootPath = getSearchRoot(viewer, rootPath);
-		TreeViewerSearchDialog dialog = new TreeViewerSearchDialog(viewer);
-		dialog.setStartPath(rootPath);
+		Assert.isNotNull(rootPath);
+		TreeViewerSearchDialog dialog = new TreeViewerSearchDialog(viewer, rootPath);
 		dialog.open();
 	}
 	

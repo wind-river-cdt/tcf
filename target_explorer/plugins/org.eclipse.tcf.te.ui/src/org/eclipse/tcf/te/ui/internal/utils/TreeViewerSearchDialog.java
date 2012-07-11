@@ -11,6 +11,7 @@ package org.eclipse.tcf.te.ui.internal.utils;
 
 import java.util.EventObject;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -72,14 +73,21 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements ISe
 	 * 
 	 * @param viewer The tree viewer to search in.
 	 */
-	public TreeViewerSearchDialog(TreeViewer viewer) {
+	public TreeViewerSearchDialog(TreeViewer viewer, TreePath rootPath) {
 		super(viewer.getTree().getShell());
 		setShellStyle(SWT.DIALOG_TRIM | SWT.MODELESS);
 		setHelpAvailable(true);
 		setContextHelpId(SEARCH_HELP_ID);
 		fViewer = viewer;
-		boolean depthFirst = isDepthFirst();
-		fSearcher = getSearchEngine(fViewer, depthFirst);
+		fSearchable = getSearchable(rootPath);
+		Assert.isNotNull(fSearchable);
+		fSearcher = new SearchEngine(fViewer, isDepthFirst(), fSearchable, rootPath);
+		fSearchable.addOptionListener(this);
+		Object element = rootPath.getLastSegment();
+		String text = fSearchable.getSearchMessage(element);
+		if (text != null) {
+			setDefaultMessage(text, NONE);
+		}
 	}
 
 	/**
@@ -90,25 +98,6 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements ISe
 	protected boolean isDepthFirst() {
 		return UIPlugin.getDefault().getPreferenceStore().getBoolean(PREF_DEPTH_FIRST_SEARCH);
     }
-
-	/**
-	 * Get a singleton search engine for a tree viewer. If
-	 * it does not exist then create one and store it.
-	 * 
-	 * @param viewer The tree viewer.
-	 * @return A search engine.
-	 */
-	private SearchEngine getSearchEngine(TreeViewer viewer, boolean depthFirst) {
-		SearchEngine searcher = (SearchEngine) viewer.getData("search.engine"); //$NON-NLS-1$
-		if (searcher == null) {
-			searcher = new SearchEngine(viewer, depthFirst);
-			viewer.setData("search.engine", searcher); //$NON-NLS-1$
-		}
-		else {
-			searcher.setDepthFirst(depthFirst);
-		}
-		return searcher;
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -132,10 +121,8 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements ISe
 	 * Invoked when button "Close" is pressed.
 	 */
 	protected void closePressed() {
-		if(fSearchable != null) {
-			fSearchable.removeOptionListener(this);
-			fSearchable.persistValues(getDialogSettings());
-		}
+		fSearchable.removeOptionListener(this);
+		fSearchable.persistValues(getDialogSettings());
 		fSearcher.endSearch();
 		setReturnCode(OK);
 		close();
@@ -157,9 +144,7 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements ISe
 	protected void createButtonsForButtonBar(Composite parent) {
 		createButton(parent, SEARCH_ID, Messages.TreeViewerSearchDialog_BtnSearchText, true);
 		createButton(parent, IDialogConstants.CLOSE_ID, Messages.TreeViewerSearchDialog_BtnCloseText, false);
-		if (fSearchable != null) {
-			fSearchable.restoreValues(getDialogSettings());
-		}
+		fSearchable.restoreValues(getDialogSettings());
 		updateButtonState();
 	}
 	/*
@@ -207,10 +192,8 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements ISe
 		container.setLayout(new GridLayout());
 		container.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
-		if(fSearchable != null) {
-			fSearchable.createCommonPart(container);
-			fSearchable.createAdvancedPart(container);
-		}
+		fSearchable.createCommonPart(container);
+		fSearchable.createAdvancedPart(container);
 		
 		// Progress monitor part to display or cancel searching process.
 		fPmPart = new ProgressMonitorPart(container, null, true);
@@ -218,11 +201,10 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements ISe
 		fPmPart.setLayoutData(data);
 		fPmPart.setVisible(false);
 		
-		if(fSearchable != null) {
-			String title = fSearchable.getSearchTitle();
-			getShell().setText(title);
-			this.setTitle(title);
-		}
+		String title = fSearchable.getSearchTitle();
+		getShell().setText(title);
+		this.setTitle(title);
+		
 		return composite;
 	}
 
@@ -285,23 +267,21 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements ISe
 	 * 
 	 * @return A searchable object or null if null if cannot be adapted to a searchable.
 	 */
-	private ISearchable getSearchable() {
-		TreePath path = fSearcher.getStartPath();
-		if(path != null) {
-			Object element = path.getLastSegment();
-			if(element != null) {
-				if(element instanceof ISearchable) {
-					return (ISearchable) element;
-				}
-				ISearchable searchable = null;
-				if(element instanceof IAdaptable) {
-					searchable = (ISearchable)((IAdaptable)element).getAdapter(ISearchable.class);
-				}
-				if(searchable == null) {
-					searchable = (ISearchable)Platform.getAdapterManager().getAdapter(element, ISearchable.class);
-				}
-				return searchable;
+	private ISearchable getSearchable(TreePath path) {
+		Assert.isNotNull(path);
+		Object element = path.getLastSegment();
+		if(element != null) {
+			if(element instanceof ISearchable) {
+				return (ISearchable) element;
 			}
+			ISearchable searchable = null;
+			if(element instanceof IAdaptable) {
+				searchable = (ISearchable)((IAdaptable)element).getAdapter(ISearchable.class);
+			}
+			if(searchable == null) {
+				searchable = (ISearchable)Platform.getAdapterManager().getAdapter(element, ISearchable.class);
+			}
+			return searchable;
 		}
 		return null;
 	}
@@ -329,25 +309,6 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements ISe
 			fBtnBackward.setEnabled(selection);
 			fSearcher.resetPath();
 			fSearcher.setForeward(!fBtnBackward.getSelection());
-		}
-	}
-
-	/**
-	 * Set the start searching path.
-	 * 
-	 * @param rootPath The path where to start searching.
-	 */
-	public void setStartPath(TreePath rootPath) {
-		fSearcher.setStartPath(rootPath);
-		fSearchable = getSearchable();
-		if (fSearchable != null) {
-			fSearchable.addOptionListener(this);
-			fSearcher.setSearchable(fSearchable);
-			Object element = rootPath.getLastSegment();
-			String text = fSearchable.getSearchMessage(element);
-			if (text != null) {
-				setDefaultMessage(text, NONE);
-			}
 		}
 	}
 	
@@ -381,7 +342,7 @@ public class TreeViewerSearchDialog extends CustomTitleAreaDialog implements ISe
 	protected void updateButtonState() {
 		Button button = getButton(SEARCH_ID);
 		if (button != null) {
-			button.setEnabled(fSearchable != null && fSearchable.isInputValid());
+			button.setEnabled(fSearchable.isInputValid());
 		}
     }
 }
