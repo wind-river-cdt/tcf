@@ -184,7 +184,7 @@ public class FSSizeSearchable extends FSBaseSearchable {
 	 */
 	@Override
     public boolean isInputValid() {
-		if(choice == OPTION_SIZE_SPECIFIED) {
+		if(choice == OPTION_SIZE_SPECIFIED && txtSizeFrom != null && txtSizeTo != null) {
 			boolean vFrom = txtSizeFrom.isValid();
 			boolean vTo = txtSizeTo.isValid();
 			if(vFrom) {
@@ -207,7 +207,7 @@ public class FSSizeSearchable extends FSBaseSearchable {
 	 */
 	protected void optionChecked(SelectionEvent e) {
 		Object src = e.getSource();
-		boolean spec = false;
+		boolean specified = false;
 		if(src == fBtnSizeNotRem) {
 			choice = OPTION_NOT_REMEMBER;
 		}
@@ -222,10 +222,10 @@ public class FSSizeSearchable extends FSBaseSearchable {
 		}
 		else if(src == fBtnSizeSpecified) {
 			choice = OPTION_SIZE_SPECIFIED;
-			spec = true;
+			specified = true;
 		}
-		txtSizeFrom.setEnabled(spec);
-		txtSizeTo.setEnabled(spec);
+		if (txtSizeFrom != null) txtSizeFrom.setEnabled(specified);
+		if (txtSizeTo != null) txtSizeTo.setEnabled(specified);
 		fireOptionChanged();
     }
 	

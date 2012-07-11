@@ -181,7 +181,7 @@ public class FSModifiedSearchable extends FSBaseSearchable {
 	 */
 	@Override
     public boolean isInputValid() {
-		if(choice == OPTION_SPECIFIED) {
+		if(choice == OPTION_SPECIFIED && txtLmFrom != null && txtLmTo != null) {
 			boolean vFrom = txtLmFrom.isValid();
 			boolean vTo = txtLmTo.isValid();
 			if(vFrom) {
@@ -204,7 +204,7 @@ public class FSModifiedSearchable extends FSBaseSearchable {
 	 */
 	protected void optionChecked(SelectionEvent e) {
 		Object src = e.getSource();
-		boolean spec = false;
+		boolean specified = false;
 		if(src == fBtnLmNotRem) {
 			choice = OPTION_NOT_REMEMBER;
 		}
@@ -219,10 +219,10 @@ public class FSModifiedSearchable extends FSBaseSearchable {
 		}
 		else if(src == fBtnLmSpecified) {
 			choice = OPTION_SPECIFIED;
-			spec = true;
+			specified = true;
 		}
-		txtLmFrom.setEnabled(spec);
-		txtLmTo.setEnabled(spec);
+		if (txtLmFrom != null) txtLmFrom.setEnabled(specified);
+		if (txtLmTo != null) txtLmTo.setEnabled(specified);
 		fireOptionChanged();
     }
 	
