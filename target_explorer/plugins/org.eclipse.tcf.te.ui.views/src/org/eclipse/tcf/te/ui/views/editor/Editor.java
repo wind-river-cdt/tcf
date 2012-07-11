@@ -188,7 +188,7 @@ public final class Editor extends FormEditor implements IPersistableEditor, ITab
 						for (String insertBeforePageId : pageIds) {
 							// If it is "first", we insert the page at index 0
 							if ("first".equalsIgnoreCase(insertBeforePageId)) { //$NON-NLS-1$
-								addPage(0, page);
+								if (getIndexOf(page.getId()) == -1) addPage(0, page);
 								pageAdded = true;
 								break;
 							}
@@ -196,7 +196,7 @@ public final class Editor extends FormEditor implements IPersistableEditor, ITab
 							// Find the index of the page we shall insert this page before
 							int index = getIndexOf(insertBeforePageId);
 							if (index != -1) {
-								addPage(index, page);
+								if (getIndexOf(page.getId()) == -1) addPage(index, page);
 								pageAdded = true;
 								break;
 							}
@@ -209,7 +209,7 @@ public final class Editor extends FormEditor implements IPersistableEditor, ITab
 						for (String insertAfterPageId : pageIds) {
 							// If it is "last", we insert the page at the end
 							if ("last".equalsIgnoreCase(insertAfterPageId)) { //$NON-NLS-1$
-								addPage(page);
+								if (getIndexOf(page.getId()) == -1) addPage(page);
 								pageAdded = true;
 								break;
 							}
@@ -217,7 +217,7 @@ public final class Editor extends FormEditor implements IPersistableEditor, ITab
 							// Find the index of the page we shall insert this page after
 							int index = getIndexOf(insertAfterPageId);
 							if (index != -1 && index + 1 < pages.size()) {
-								addPage(index + 1, page);
+								if (getIndexOf(page.getId()) == -1) addPage(index + 1, page);
 								pageAdded = true;
 								break;
 							}
@@ -225,7 +225,7 @@ public final class Editor extends FormEditor implements IPersistableEditor, ITab
 					}
 
 					// Add the page to the end if not added otherwise
-					if (!pageAdded) addPage(page);
+					if (!pageAdded && getIndexOf(page.getId()) == -1) addPage(page);
 
 				} catch (PartInitException e) { /* ignored on purpose */ }
 			}
