@@ -63,6 +63,7 @@ import org.eclipse.tcf.services.IExpressions.Value;
 import org.eclipse.tcf.services.ILineNumbers;
 import org.eclipse.tcf.services.ILineNumbers.CodeArea;
 import org.eclipse.tcf.services.ILineNumbers.DoneMapToSource;
+import org.eclipse.tcf.services.IMemory.MemoryError;
 import org.eclipse.tcf.services.IMemory;
 import org.eclipse.tcf.services.IRunControl;
 import org.eclipse.tcf.services.IRunControl.RunControlContext;
@@ -79,6 +80,7 @@ public class TCFDisassemblyBackend extends AbstractDisassemblyBackend {
         BigInteger start;
         BigInteger end;
     }
+
     private static class FunctionOffset {
         static final FunctionOffset NONE = new FunctionOffset(null, null);
         String name;
@@ -97,6 +99,7 @@ public class TCFDisassemblyBackend extends AbstractDisassemblyBackend {
             return offset == null || offset.compareTo(BigInteger.ZERO) == 0;
         }
     }
+
     private class TCFLaunchListener implements ILaunchesListener {
 
         public void launchesRemoved(ILaunch[] launches) {
@@ -106,9 +109,7 @@ public class TCFDisassemblyBackend extends AbstractDisassemblyBackend {
         }
 
         public void launchesChanged(ILaunch[] launches) {
-            if(fExecContext == null) {
-                return;
-            }
+            if (fExecContext == null) return;
             for (ILaunch launch : launches) {
                 if (launch == fExecContext.getModel().getLaunch()) {
                     if (launch.isTerminated()) {
@@ -192,7 +193,6 @@ public class TCFDisassemblyBackend extends AbstractDisassemblyBackend {
 
         public void contextException(String context, String msg) {
         }
-
     }
 
     private IDisassemblyPartCallback fCallback;
@@ -315,7 +315,7 @@ public class TCFDisassemblyBackend extends AbstractDisassemblyBackend {
     }
 
     private void handleContextSuspended(BigInteger pc) {
-        ++fSuspendCount;
+        fSuspendCount++;
         fSuspendAddress = pc;
         fCallback.handleTargetSuspended();
     }
@@ -485,11 +485,23 @@ public class TCFDisassemblyBackend extends AbstractDisassemblyBackend {
         final int suspendCount = fSuspendCount;
         final long modCount = getModCount();
         Protocol.invokeLater(new Runnable() {
+
+            IMemory.MemoryContext mem;
+            boolean big_endian;
+            int addr_bits;
+            IDisassemblyLine[] disassembly;
+            AddressRange range;
+            boolean done_disassembly;
+            ISymbols.Symbol[] functionSymbols;
+            boolean done_symbols;
+            CodeArea[] code_areas;
+            boolean done_line_numbers;
+            byte[] code;
+            boolean done_code;
+
             public void run() {
-                if (execContext != fExecContext) {
-                    return;
-                }
-                if (suspendCount != fSuspendCount) {
+                if (execContext != fExecContext)  return;
+                if (suspendCount != fSuspendCount || fMemoryContext == null) {
                     fCallback.setUpdatePending(false);
                     return;
                 }
@@ -499,52 +511,59 @@ public class TCFDisassemblyBackend extends AbstractDisassemblyBackend {
                     fCallback.setUpdatePending(false);
                     return;
                 }
-                if (fMemoryContext == null) {
-                    fCallback.setUpdatePending(false);
-                    return;
-                }
                 TCFDataCache<IMemory.MemoryContext> cache = fMemoryContext.getMemoryContext();
                 if (!cache.validate(this)) return;
-                final IMemory.MemoryContext mem = cache.getData();
+                mem = cache.getData();
                 if (mem == null) {
                     fCallback.setUpdatePending(false);
                     return;
                 }
-                final String contextId = mem.getID();
-                Map<String, Object> params = new HashMap<String, Object>();
-                disass.disassemble(contextId, startAddress, linesHint * 4, params, new DoneDisassemble() {
-                    public void doneDisassemble(IToken token, final Throwable error, IDisassemblyLine[] disassembly) {
-                        if (execContext != fExecContext) return;
-                        if (error != null) {
-                            fCallback.asyncExec(new Runnable() {
-                                public void run() {
-                                    if (execContext != fExecContext) return;
-                                    if (modCount == getModCount()) {
-                                        fCallback.insertError(startAddress, TCFModel.getErrorMessage(error, false));
-                                        fCallback.setUpdatePending(false);
-                                        int addr_bits = mem.getAddressSize() * 8;
-                                        if (fCallback.getAddressSize() < addr_bits) fCallback.addressSizeChanged(addr_bits);
+                big_endian = mem.isBigEndian();
+                addr_bits = mem.getAddressSize() * 8;
+                if (!done_disassembly) {
+                    Map<String, Object> params = new HashMap<String, Object>();
+                    disass.disassemble(mem.getID(), startAddress, linesHint * 4, params, new DoneDisassemble() {
+                        @Override
+                        public void doneDisassemble(IToken token, final Throwable error, IDisassemblyLine[] res) {
+                            if (execContext != fExecContext) return;
+                            if (error != null) {
+                                fCallback.asyncExec(new Runnable() {
+                                    public void run() {
+                                        if (execContext != fExecContext) return;
+                                        if (modCount == getModCount()) {
+                                            fCallback.insertError(startAddress, TCFModel.getErrorMessage(error, false));
+                                            fCallback.setUpdatePending(false);
+                                            if (fCallback.getAddressSize() < addr_bits) fCallback.addressSizeChanged(addr_bits);
+                                        }
                                     }
-                                }
-                            });
-                            return;
+                                });
+                                return;
+                            }
+                            if (res != null && res.length > 0) {
+                                disassembly = res;
+                                range = new AddressRange();
+                                range.start = JSON.toBigInteger(res[0].getAddress());
+                                IDisassemblyLine last = res[res.length - 1];
+                                range.end = JSON.toBigInteger(last.getAddress()).add(BigInteger.valueOf(last.getSize()));
+                            }
+                            done_disassembly = true;
+                            run();
                         }
-                        doneGetDisassembly(disassembly);
+                    });
+                    return;
+                }
+                if (!done_symbols && (range == null || !showSymbols)) {
+                    done_symbols = true;
+                }
+                if (!done_symbols) {
+                    final ISymbols symbols = channel.getRemoteService(ISymbols.class);
+                    if (symbols == null) {
+                        done_symbols = true;
                     }
-
-                    private void doneGetDisassembly(final IDisassemblyLine[] disassembly) {
-                        if (disassembly == null || disassembly.length == 0 || !showSymbols) {
-                            doneGetSymbols(disassembly, null);
-                            return;
-                        }
-                        final ISymbols symbols = channel.getRemoteService(ISymbols.class);
-                        if (symbols == null) {
-                            doneGetSymbols(disassembly, null);
-                            return;
-                        }
+                    else {
                         final ArrayList<ISymbols.Symbol> symbolList = new ArrayList<ISymbols.Symbol>();
                         IDisassemblyLine line = disassembly[0];
-                        symbols.findByAddr(contextId, line.getAddress(), new ISymbols.DoneFind() {
+                        symbols.findByAddr(mem.getID(), line.getAddress(), new ISymbols.DoneFind() {
                             int idx = 0;
                             public void doneFind(IToken token, Exception error, String symbol_id) {
                                 if (error == null && symbol_id != null) {
@@ -568,56 +587,60 @@ public class TCFDisassemblyBackend extends AbstractDisassemblyBackend {
                                 while (++idx < disassembly.length) {
                                     BigInteger instrAddress = JSON.toBigInteger(disassembly[idx].getAddress());
                                     if (nextAddress != null && instrAddress.compareTo(nextAddress) < 0) continue;
-                                    symbols.findByAddr(contextId, instrAddress, this);
+                                    symbols.findByAddr(mem.getID(), instrAddress, this);
                                     return;
                                 }
-                                ISymbols.Symbol[] functionSymbols =
-                                    symbolList.toArray(new ISymbols.Symbol[symbolList.size()]);
-                                doneGetSymbols(disassembly, functionSymbols);
+                                functionSymbols = symbolList.toArray(new ISymbols.Symbol[symbolList.size()]);
+                                done_symbols = true;
+                                run();
                             }
                         });
+                        return;
                     }
-
-                    private void doneGetSymbols(final IDisassemblyLine[] disassembly, final ISymbols.Symbol[] symbols) {
-                        if (disassembly == null || disassembly.length == 0 || !mixed) {
-                            doneGetLineNumbers(disassembly, symbols, null);
-                            return;
-                        }
-                        ILineNumbers lineNumbers = channel.getRemoteService(ILineNumbers.class);
-                        if (lineNumbers == null) {
-                            doneGetLineNumbers(disassembly, symbols, null);
-                            return;
-                        }
-                        AddressRange range = getAddressRange(disassembly);
-                        lineNumbers.mapToSource(contextId, range.start, range.end, new DoneMapToSource() {
+                }
+                if (!done_line_numbers && (range == null || !mixed)) {
+                    done_line_numbers = true;
+                }
+                if (!done_line_numbers) {
+                    ILineNumbers lineNumbers = channel.getRemoteService(ILineNumbers.class);
+                    if (lineNumbers == null) {
+                        done_line_numbers = true;
+                    }
+                    else {
+                        lineNumbers.mapToSource(mem.getID(), range.start, range.end, new DoneMapToSource() {
                             public void doneMapToSource(IToken token, Exception error, final CodeArea[] areas) {
                                 if (error != null) {
                                     Activator.log(error);
-                                    doneGetLineNumbers(disassembly, symbols, null);
                                 }
                                 else {
-                                    doneGetLineNumbers(disassembly, symbols, areas);
+                                    code_areas = areas;
                                 }
+                                done_line_numbers = true;
+                                run();
                             }
                         });
+                        return;
                     }
-
-                    private void doneGetLineNumbers(final IDisassemblyLine[] disassembly, final ISymbols.Symbol[] symbols, final CodeArea[] areas) {
-                        fCallback.asyncExec(new Runnable() {
-                            public void run() {
-                                insertDisassembly(modCount, startAddress, disassembly, symbols, areas);
-                                int addr_bits = mem.getAddressSize() * 8;
-                                if (fCallback.getAddressSize() < addr_bits) fCallback.addressSizeChanged(addr_bits);
-                            }
-                        });
-                    }
-
-                    private AddressRange getAddressRange(IDisassemblyLine[] lines) {
-                        AddressRange range = new AddressRange();
-                        range.start = JSON.toBigInteger(lines[0].getAddress());
-                        IDisassemblyLine lastLine = lines[lines.length-1];
-                        range.end = JSON.toBigInteger(lastLine.getAddress()).add(BigInteger.valueOf(lastLine.getSize()));
-                        return range;
+                }
+                if (!done_code && range == null) {
+                    done_code = true;
+                }
+                if (!done_code) {
+                    code = new byte[range.end.subtract(range.start).intValue()];
+                    mem.get(startAddress, 1, code, 0, code.length, 0, new IMemory.DoneMemory() {
+                        @Override
+                        public void doneMemory(IToken token, MemoryError error) {
+                            done_code = true;
+                            run();
+                        }
+                    });
+                    return;
+                }
+                fCallback.asyncExec(new Runnable() {
+                    public void run() {
+                        insertDisassembly(modCount, startAddress, code, big_endian,
+                                disassembly, functionSymbols, code_areas);
+                        if (fCallback.getAddressSize() < addr_bits) fCallback.addressSizeChanged(addr_bits);
                     }
                 });
             }
@@ -628,7 +651,7 @@ public class TCFDisassemblyBackend extends AbstractDisassemblyBackend {
         return ((IDocumentExtension4) fCallback.getDocument()).getModificationStamp();
     }
 
-    protected final void insertDisassembly(long modCount, BigInteger startAddress,
+    protected final void insertDisassembly(long modCount, BigInteger startAddress, byte[] code, boolean big_endian,
             IDisassemblyLine[] instructions, ISymbols.Symbol[] symbols, CodeArea[] codeAreas) {
         if (!fCallback.hasViewer() || fExecContext == null) return;
         if (modCount != getModCount()) return;
@@ -709,7 +732,22 @@ public class TCFDisassemblyBackend extends AbstractDisassemblyBackend {
                 Map<String,Object>[] instrAttrs = instruction.getInstruction();
                 String instr = formatInstruction(instrAttrs);
 
-                p = fCallback.getDocument().insertDisassemblyLine(p, address, instrLength, functionOffset.toString(), instr, sourceFile, firstLine);
+                if (code != null) {
+                    int offs = address.subtract(startAddress).intValue();
+                    BigInteger opcode = BigInteger.ZERO;
+                    for (int i = 0; i < instrLength; i++) {
+                        int j = big_endian ? i : instrLength - i - 1;
+                        opcode = opcode.shiftLeft(8).add(BigInteger.valueOf(code[offs + j] & 0xff));
+                    }
+                    p = fCallback.getDocument().insertDisassemblyLine(p,
+                            address, instrLength, functionOffset.toString(),
+                            opcode, instr, sourceFile, firstLine);
+                }
+                else {
+                    p = fCallback.getDocument().insertDisassemblyLine(p,
+                            address, instrLength, functionOffset.toString(),
+                            instr, sourceFile, firstLine);
+                }
                 if (p == null) break;
                 insertedAnyAddress = true;
             }

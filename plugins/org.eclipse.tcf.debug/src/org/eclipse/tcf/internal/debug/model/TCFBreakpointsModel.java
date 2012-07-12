@@ -80,7 +80,7 @@ public class TCFBreakpointsModel {
         ATTR_EVENT_TYPE    = "org.eclipse.cdt.debug.core.eventbreakpoint_event_id",
         ATTR_EVENT_ARGS    = "org.eclipse.cdt.debug.core.eventbreakpoint_event_arg",
         ATTR_TYPE          = "org.eclipse.cdt.debug.core.breakpointType";
-        
+
     public static final int
         ATTR_TYPE_TEMPORARY = 0x1,
         ATTR_TYPE_REGULAR = 0x0 << 1,
@@ -698,7 +698,7 @@ public class TCFBreakpointsModel {
             }
             if ((cdt_type.intValue() & ATTR_TYPE_HARDWARE) != 0) {
                 m.put(IBreakpoints.PROP_TYPE, IBreakpoints.TYPE_HARDWARE);
-            }  
+            }
             else if ((cdt_type.intValue() & ATTR_TYPE_SOFTWARE) != 0) {
                 m.put(IBreakpoints.PROP_TYPE, IBreakpoints.TYPE_SOFTWARE);
             }

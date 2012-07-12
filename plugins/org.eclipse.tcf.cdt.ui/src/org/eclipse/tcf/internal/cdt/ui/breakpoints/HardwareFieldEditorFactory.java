@@ -19,10 +19,10 @@ import org.eclipse.swt.widgets.Composite;
  * HardwareFieldEditorFactory - Create the field editor for hardware breakpoint support.
  */
 public class HardwareFieldEditorFactory implements IFieldEditorFactory {
-    
+
     public FieldEditor createFieldEditor(String name, String labelText, Composite parent) {
         return new HardwareFieldEditor (parent);
     }
-    
-  
+
+
 }

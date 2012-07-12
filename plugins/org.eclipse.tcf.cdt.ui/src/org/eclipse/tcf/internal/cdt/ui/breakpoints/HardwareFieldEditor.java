@@ -40,7 +40,7 @@ import org.eclipse.ui.IWorkbenchPropertyPage;
 public class HardwareFieldEditor extends FieldEditor {
 
     private Composite fParent;
-    
+
     /**
      * The previously selected, or "before", value.
      */
@@ -61,13 +61,13 @@ public class HardwareFieldEditor extends FieldEditor {
         super.setPage(dialogPage);
         updateEnablement();
     }
-    
+
     @Override
     public void dispose() {
         fParent = null;
         super.dispose();
     }
-    
+
     protected void updateEnablement() {
 
         // enable/disable this feature according to TCF agent capabilities.
@@ -88,7 +88,7 @@ public class HardwareFieldEditor extends FieldEditor {
 
     /**
      * determine if the channel is able to manage "Physical Address" capability
-     * 
+     *
      * @param channel
      *            the channel to check
      * @return TRUE if "Physical Address" is supported by the channel, else
@@ -118,7 +118,7 @@ public class HardwareFieldEditor extends FieldEditor {
         }
         return null;
     }
-    
+
     protected Object getDebugContext() {
         IWorkbenchPropertyPage page = (IWorkbenchPropertyPage)getPage();
         if (page != null) {
@@ -131,11 +131,11 @@ public class HardwareFieldEditor extends FieldEditor {
                 }
                 return null;
             }
-            return DebugUITools.getDebugContext();        
+            return DebugUITools.getDebugContext();
         }
         return null;
     }
-    
+
     /*
      * (non-Javadoc) Method declared on FieldEditor.
      */
@@ -162,11 +162,11 @@ public class HardwareFieldEditor extends FieldEditor {
      * <code>getLabelControl(parent).setToolTipText(tooltipText)</code> does not
      * work for boolean field editors, as it can lead to duplicate text (see bug
      * 259952).
-     * 
+     *
      * @param parent
      *            the parent composite
      * @return the control responsible for displaying the label
-     * 
+     *
      * @since 3.5
      */
     public Control getDescriptionControl(Composite parent) {
@@ -215,7 +215,7 @@ public class HardwareFieldEditor extends FieldEditor {
 
     /**
      * Returns this field editor's current value.
-     * 
+     *
      * @return the value
      */
     public boolean getBooleanValue() {
@@ -224,10 +224,10 @@ public class HardwareFieldEditor extends FieldEditor {
 
     /**
      * Returns the change button for this field editor.
-     * 
+     *
      * @param parent
      *            The Composite to create the receiver in.
-     * 
+     *
      * @return the change button
      */
     protected Button getChangeControl(Composite parent) {
@@ -284,7 +284,7 @@ public class HardwareFieldEditor extends FieldEditor {
      * Informs this field editor's listener, if it has one, about a change to
      * the value (<code>VALUE</code> property) provided that the old and new
      * values are different.
-     * 
+     *
      * @param oldValue
      *            the old value
      * @param newValue
