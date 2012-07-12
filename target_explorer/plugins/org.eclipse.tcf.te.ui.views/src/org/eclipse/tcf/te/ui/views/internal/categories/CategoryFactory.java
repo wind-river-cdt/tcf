@@ -9,7 +9,6 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.ui.views.internal.categories;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.tcf.te.ui.views.extensions.CategoriesExtensionPointManager;
 import org.eclipse.tcf.te.ui.views.interfaces.ICategory;
@@ -27,8 +26,6 @@ public class CategoryFactory implements IElementFactory {
 	public IAdaptable createElement(IMemento memento) {
 		String id = memento.getString("id"); //$NON-NLS-1$
 		ICategory category = CategoriesExtensionPointManager.getInstance().getCategory(id, false);
-		Assert.isNotNull(category);
-		Assert.isTrue(category instanceof IAdaptable);
-		return (IAdaptable)category;
+		return category instanceof IAdaptable ? (IAdaptable)category : null;
 	}
 }
