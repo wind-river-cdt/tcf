@@ -37,6 +37,8 @@ public class FileSelectionControl extends BaseDialogSelectionControl {
 	private String[] filterExtensions;
 	private String[] filterNames;
 
+	private String last_filter_path = null;
+
 	/**
 	 * Constructor.
 	 *
@@ -137,9 +139,9 @@ public class FileSelectionControl extends BaseDialogSelectionControl {
 
 				if (!filterPath.isEmpty()) fileDialog.setFilterPath(filterPath.toString());
 				if (filterFileName != null) fileDialog.setFileName(filterFileName);
-			} else if (Platform.getBundle("org.eclipse.core.resources") != null //$NON-NLS-1$
-					&& Platform.getBundle("org.eclipse.core.resources").getState() == Bundle.ACTIVE) { //$NON-NLS-1$
-				fileDialog.setFilterPath(org.eclipse.core.resources.ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString());
+			} else {
+				String filterPath = last_filter_path != null ? last_filter_path : doGetDefaultFilterPath();
+				fileDialog.setFilterPath(filterPath);
 			}
 		}
 	}
@@ -156,6 +158,23 @@ public class FileSelectionControl extends BaseDialogSelectionControl {
 	 */
 	protected String doGetSelectedFile() {
 		return getEditFieldControlText();
+	}
+
+	/**
+	 * Returns the default filter path to use if no file has been selected so far <b>and</b>
+	 * the dialog opens for the first time.
+	 * <p>
+	 * <b>Note:</b> The default implementation returns the current workspace location if the
+	 * resources plug-in is installed.
+	 *
+	 * @return The default filter path to use or <code>null</code>.
+	 */
+	protected String doGetDefaultFilterPath() {
+		if (Platform.getBundle("org.eclipse.core.resources") != null //$NON-NLS-1$
+						&& Platform.getBundle("org.eclipse.core.resources").getState() == Bundle.ACTIVE) { //$NON-NLS-1$
+			return org.eclipse.core.resources.ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString();
+		}
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -191,7 +210,9 @@ public class FileSelectionControl extends BaseDialogSelectionControl {
 		// We do expect a file dialog here.
 		if (dialog instanceof FileDialog) {
 			FileDialog fileDialog = (FileDialog)dialog;
-			return fileDialog.open();
+			String selected = fileDialog.open();
+			if (selected != null) last_filter_path = fileDialog.getFilterPath();
+			return selected;
 		}
 
 		return null;

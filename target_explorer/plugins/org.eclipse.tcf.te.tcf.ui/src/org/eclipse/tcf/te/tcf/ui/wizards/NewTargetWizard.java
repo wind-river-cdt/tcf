@@ -39,6 +39,7 @@ import org.eclipse.tcf.te.tcf.locator.model.Model;
 import org.eclipse.tcf.te.tcf.ui.nls.Messages;
 import org.eclipse.tcf.te.tcf.ui.wizards.pages.NewTargetWizardPage;
 import org.eclipse.tcf.te.ui.interfaces.data.IDataExchangeNode;
+import org.eclipse.tcf.te.ui.swt.DisplayUtil;
 import org.eclipse.tcf.te.ui.views.ViewsUtil;
 import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
 import org.eclipse.tcf.te.ui.wizards.AbstractWizard;
@@ -143,6 +144,13 @@ public class NewTargetWizard extends AbstractWizard implements INewWizard {
 								ViewsUtil.setSelection(IUIConstants.ID_EXPLORER, selection);
 								// And open the properties on the selection
 								if (isOpenPropertiesOnPerformFinish()) ViewsUtil.openProperties(selection);
+								// Allow subclasses to add logic to the performFinish().
+								DisplayUtil.safeAsyncExec(new Runnable() {
+									@Override
+                                    public void run() {
+										postPerformFinish(peerNode);
+									}
+								});
 							}
 						}
 					});
@@ -168,6 +176,17 @@ public class NewTargetWizard extends AbstractWizard implements INewWizard {
 	 */
 	protected boolean isOpenPropertiesOnPerformFinish() {
 		return true;
+	}
+
+	/**
+	 * Called from {@link #performFinish()} after the configuration got created.
+	 * <p>
+	 * <b>Note:</b> The method is called from within the UI thread.
+	 *
+	 * @param peerModel The peer model node. Must not be <code>null</code>.
+	 */
+	protected void postPerformFinish(IPeerModel peerModel) {
+		// Do nothing
 	}
 
 }
