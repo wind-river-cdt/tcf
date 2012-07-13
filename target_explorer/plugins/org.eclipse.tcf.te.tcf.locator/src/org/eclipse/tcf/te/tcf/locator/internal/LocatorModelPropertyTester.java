@@ -108,6 +108,18 @@ public class LocatorModelPropertyTester extends PropertyTester {
 			}
 		}
 
+		if ("hasAttribute".equals(property)) { //$NON-NLS-1$
+			String name = args != null && args.length > 0 ? (String)args[0] : null;
+			boolean hasAttribute = name != null && !"".equals(name) ? node.getPeer().getAttributes().containsKey(name) : false; //$NON-NLS-1$
+			if (expectedValue instanceof Boolean) return ((Boolean) expectedValue).booleanValue() == hasAttribute;
+		}
+
+		if ("isAttribute".equals(property)) { //$NON-NLS-1$
+			String name = args != null && args.length > 0 ? (String)args[0] : null;
+			String value = name != null && !"".equals(name) ? node.getPeer().getAttributes().get(name) : null; //$NON-NLS-1$
+			if (expectedValue != null) return expectedValue.toString().equals(value);
+		}
+
 		return false;
 	}
 
