@@ -246,7 +246,9 @@ public class ModelNode extends PropertiesContainer implements IModelNode, IModel
 	@Override
 	public final void setDirty(boolean dirty) {
 		Assert.isTrue(checkThreadAccess(), "Illegal Thread Access"); //$NON-NLS-1$
+		boolean oldDirtyState = this.dirty;
 		this.dirty = dirty;
+		fireChangeEvent("dirty", Boolean.valueOf(oldDirtyState), Boolean.valueOf(this.dirty)); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
@@ -264,7 +266,9 @@ public class ModelNode extends PropertiesContainer implements IModelNode, IModel
 	@Override
 	public final void setPending(boolean pending) {
 		Assert.isTrue(checkThreadAccess(), "Illegal Thread Access"); //$NON-NLS-1$
+		boolean oldPendingState = this.pending;
 		this.pending = pending;
+		fireChangeEvent("pending", Boolean.valueOf(oldPendingState), Boolean.valueOf(this.pending)); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
