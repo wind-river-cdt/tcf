@@ -30,12 +30,25 @@
             delegateId="org.eclipse.tcf.te.runtime.persistence.gson.map"
             id="org.eclipse.tcf.te.runtime.persistence.binding.gson.map">
          <enablement>
-            <with variable="container">
-               <instanceof value="java.net.URI"/>
-            </with>
-            <with variable="context">
-               <instanceof value="java.util.Map"/>
-            </with>
+            <or>
+               <with variable="container">
+                  <or>
+                     <instanceof value="java.net.URI"/>
+                     <instanceof value="java.lang.String"/>
+                  </or>
+               </with>
+               <with variable="containerClass">
+                  <equals value="java.lang.String"/>
+               </with>
+            </or>
+            <or>
+               <with variable="context">
+                  <instanceof value="java.util.Map"/>
+               </with>
+               <with variable="contextClass">
+                  <equals value="java.util.Map"/>
+               </with>
+            </or>
          </enablement>
       </binding>
    </extension>
