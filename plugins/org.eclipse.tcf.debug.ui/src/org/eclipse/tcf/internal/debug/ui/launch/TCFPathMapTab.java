@@ -12,8 +12,8 @@ package org.eclipse.tcf.internal.debug.ui.launch;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -205,7 +205,9 @@ public class TCFPathMapTab extends AbstractLaunchConfigurationTab {
         button_new.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                PathMapRule a = new PathMapRule(new HashMap<String,Object>());
+                // To guarantee a predictable path map properties iteration order,
+                // we have to use a LinkedHashMap.
+                PathMapRule a = new PathMapRule(new LinkedHashMap<String,Object>());
                 map.add(a);
                 viewer.add(a);
                 viewer.setSelection(new StructuredSelection(a), true);

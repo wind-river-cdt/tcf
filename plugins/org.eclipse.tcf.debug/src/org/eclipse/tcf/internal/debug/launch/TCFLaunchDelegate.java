@@ -13,7 +13,7 @@ package org.eclipse.tcf.internal.debug.launch;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
@@ -113,7 +113,9 @@ public class TCFLaunchDelegate extends LaunchConfigurationDelegate {
         StringBuffer bf = new StringBuffer();
         int i = 0;
         while (i < s.length()) {
-            PathMapRule e = new PathMapRule(new HashMap<String,Object>());
+            // To guarantee a predictable path map properties iteration order,
+            // we have to use a LinkedHashMap.
+            PathMapRule e = new PathMapRule(new LinkedHashMap<String,Object>());
             while (i < s.length()) {
                 char ch = s.charAt(i++);
                 if (ch == '|') {
@@ -209,7 +211,9 @@ public class TCFLaunchDelegate extends LaunchConfigurationDelegate {
                             String src = map_entry.getAttribute("backendPath");
                             String dst = map_entry.getAttribute("localPath");
                             if (src != null) src = src.replace('\\', '/');
-                            Map<String,Object> props = new HashMap<String,Object>();
+                            // To guarantee a predictable path map properties iteration order,
+                            // we have to use a LinkedHashMap.
+                            Map<String,Object> props = new LinkedHashMap<String,Object>();
                             props.put(IPathMap.PROP_SOURCE, src);
                             props.put(IPathMap.PROP_DESTINATION, dst);
                             map.add(new PathMapRule(props));
