@@ -144,7 +144,7 @@ public abstract class AbstractTreeSection extends AbstractStructuredViewerSectio
 	 *
 	 * @return The tree part instance.
 	 */
-	protected TreePart getTreePart() {
+	public TreePart getTreePart() {
 		return (TreePart)getViewerPart();
 	}
 
