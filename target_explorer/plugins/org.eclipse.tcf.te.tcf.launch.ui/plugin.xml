@@ -123,6 +123,12 @@
             name="%PathMapEditorPage.name"
             id="org.eclipse.tcf.te.tcf.launch.ui.PathMapEditorPage">
       </editorPage>
+
+      <editorPage
+            class="org.eclipse.tcf.te.tcf.launch.ui.editor.SourceLookupEditorPage"
+            name="%SourceLookupEditorPage.name"
+            id="org.eclipse.tcf.te.launch.ui.SourceLookupEditorPage">
+      </editorPage>
    </extension>
 
 <!-- Editor page binding contributions -->

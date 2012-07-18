@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.tcf.te.launch.ui.tabs.AbstractFormsLaunchConfigurationTab;
 import org.eclipse.tcf.te.ui.forms.CustomFormToolkit;
 import org.eclipse.tcf.te.ui.views.editor.pages.AbstractCustomFormToolkitEditorPage;
+import org.eclipse.ui.forms.AbstractFormPart;
 
 /**
  * Abstract editor page implementation serving as container for a launch tab.
@@ -28,6 +29,8 @@ import org.eclipse.tcf.te.ui.views.editor.pages.AbstractCustomFormToolkitEditorP
 public abstract class AbstractLaunchTabContainerEditorPage extends AbstractCustomFormToolkitEditorPage {
 	// Reference to the launch configuration tab
 	private final AbstractLaunchConfigurationTab launchTab;
+
+	boolean isDirty = false;
 
 	/**
 	 * Constructor.
@@ -62,7 +65,7 @@ public abstract class AbstractLaunchTabContainerEditorPage extends AbstractCusto
 	@Override
 	public void dispose() {
 		launchTab.dispose();
-	    super.dispose();
+		super.dispose();
 	}
 
 	/* (non-Javadoc)
@@ -70,14 +73,14 @@ public abstract class AbstractLaunchTabContainerEditorPage extends AbstractCusto
 	 */
 	@Override
 	protected String getContextHelpId() {
-	    return launchTab.getHelpContextId();
+		return launchTab.getHelpContextId();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.ui.views.editor.pages.AbstractCustomFormToolkitEditorPage#getFormTitle()
 	 */
 	@Override
-    protected String getFormTitle() {
+	protected String getFormTitle() {
 		return launchTab.getName();
 	}
 
@@ -86,7 +89,15 @@ public abstract class AbstractLaunchTabContainerEditorPage extends AbstractCusto
 	 */
 	@Override
 	protected Image getFormImage() {
-	    return launchTab.getImage();
+		return launchTab.getImage();
+	}
+
+	/**
+	 * Set the dirty state for this editor page.
+	 * @param dirty The dirty state.
+	 */
+	public void setDirty(boolean dirty) {
+		isDirty = dirty;
 	}
 
 	/* (non-Javadoc)
@@ -104,12 +115,47 @@ public abstract class AbstractLaunchTabContainerEditorPage extends AbstractCusto
 			launchTab.createControl(parent);
 		}
 
+		getManagedForm().addPart(new AbstractFormPart() {
+			@Override
+			public boolean isDirty() {
+				return isDirty;
+			}
+
+			@Override
+			public void commit(boolean onSave) {
+				super.commit(onSave);
+
+				if (onSave) {
+					extractData();
+				}
+			}
+		});
+
 		// Fix the background color of the launch tab controls
 		Color bg = parent.getBackground();
 		Control[] children = parent.getChildren();
 		if (bg != null && children != null && children.length > 0) {
 			fixBackgrounds(children, bg);
 		}
+	}
+
+	/**
+	 * Set the data to the page.
+	 * @param input The editor input.
+	 * @return <code>true</code> if data was set.
+	 */
+	public abstract boolean setupData(Object input);
+
+	/**
+	 * Extract the data from the page.
+	 * @return <code>true</code> if data was set.
+	 */
+	public abstract boolean extractData();
+
+	@Override
+	public void setActive(boolean active) {
+		super.setActive(active);
+		setupData(getEditorInput());
 	}
 
 	/**
@@ -123,12 +169,18 @@ public abstract class AbstractLaunchTabContainerEditorPage extends AbstractCusto
 		Assert.isNotNull(controls);
 		Assert.isNotNull(bg);
 		for (Control c : controls) {
-			if (!(c instanceof Composite) && !(c instanceof Label) && !(c instanceof Button)) continue;
+			if (!(c instanceof Composite) && !(c instanceof Label) && !(c instanceof Button)) {
+				continue;
+			}
 			if (c instanceof Button) {
 				int style = ((Button)c).getStyle();
-				if ((style & SWT.RADIO) == 0 && (style & SWT.CHECK) == 0) continue;
+				if ((style & SWT.RADIO) == 0 && (style & SWT.CHECK) == 0) {
+					continue;
+				}
 			}
-			if (!bg.equals(c.getBackground())) c.setBackground(bg);
+			if (!bg.equals(c.getBackground())) {
+				c.setBackground(bg);
+			}
 			if (c instanceof Composite) {
 				Control[] children = ((Composite)c).getChildren();
 				if (children != null && children.length > 0) {

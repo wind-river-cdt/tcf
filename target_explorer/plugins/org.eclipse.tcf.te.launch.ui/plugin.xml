@@ -36,12 +36,6 @@
             icon="icons/obj16/launches_root.gif"
             id="org.eclipse.tcf.te.launch.ui.LaunchEditorPage">
       </editorPage>
-
-      <editorPage
-            class="org.eclipse.tcf.te.launch.ui.editor.SourceLookupEditorPage"
-            name="%SourceLookupEditorPage.name"
-            id="org.eclipse.tcf.te.launch.ui.SourceLookupEditorPage">
-      </editorPage>
    </extension>
 
 <!-- Navigator viewer contributions -->

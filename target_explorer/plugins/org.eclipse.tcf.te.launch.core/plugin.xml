@@ -53,12 +53,16 @@
 <!-- Persistence delegate contributions -->
    <extension point="org.eclipse.tcf.te.runtime.persistence.delegates">
       <delegate 
+            id="org.eclipse.tcf.te.launch.core.persistence.gson.referencedProjectItem"
+            class="org.eclipse.tcf.te.launch.core.internal.GsonReferencedProjectItemPersistenceDelegate">
+      </delegate>
+      <delegate 
             id="org.eclipse.tcf.te.launch.core.persistence.gson.fileTransferItem"
             class="org.eclipse.tcf.te.launch.core.internal.GsonFileTransferItemPersistenceDelegate">
       </delegate>
       <delegate 
-            id="org.eclipse.tcf.te.launch.core.persistence.gson.referencedProjectItem"
-            class="org.eclipse.tcf.te.launch.core.internal.GsonReferencedProjectItemPersistenceDelegate">
+            id="org.eclipse.tcf.te.launch.core.persistence.gson.launchConfigAttributes"
+            class="org.eclipse.tcf.te.launch.core.internal.GsonLaunchConfigAttributesPersistenceDelegate">
       </delegate>
    </extension>
 
@@ -92,7 +96,7 @@
             </with>
          </enablement>
       </binding>
-       <binding
+      <binding
             delegateId="org.eclipse.tcf.te.launch.core.persistence.gson.referencedProjectItem"
             id="org.eclipse.tcf.te.launch.core.binding.gson.referencedProjectItem">
          <enablement>
@@ -117,6 +121,26 @@
                      </with>
                   </and>
                </or>
+            </with>
+         </enablement>
+      </binding>
+      <binding
+            delegateId="org.eclipse.tcf.te.launch.core.persistence.gson.launchConfigAttributes"
+            id="org.eclipse.tcf.te.launch.core.binding.gson.launchConfigAttributes">
+         <enablement>
+            <with variable="container">
+               <or>
+                  <instanceof value="java.lang.String"/>
+                  <and>
+                     <instanceof value="java.lang.Class"/>
+                     <with variable="containerClass">
+                        <equals value="java.lang.String"/>
+                     </with>
+                  </and>
+               </or>
+            </with>
+            <with variable="context">
+               <instanceof value="org.eclipse.debug.core.ILaunchConfiguration"/>
             </with>
          </enablement>
       </binding>

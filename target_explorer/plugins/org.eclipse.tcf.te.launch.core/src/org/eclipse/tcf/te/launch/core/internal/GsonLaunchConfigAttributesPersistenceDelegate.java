@@ -13,19 +13,20 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.tcf.te.runtime.persistence.GsonMapPersistenceDelegate;
-import org.eclipse.tcf.te.runtime.services.interfaces.filetransfer.IFileTransferItem;
 
 /**
- * Launch Specification to string delegate implementation.
+ * Launch configuration to string delegate implementation.
  */
-public class GsonLaunchSpecPersistenceDelegate extends GsonMapPersistenceDelegate {
+public class GsonLaunchConfigAttributesPersistenceDelegate extends GsonMapPersistenceDelegate {
 
 	/**
 	 * Constructor.
 	 */
-	public GsonLaunchSpecPersistenceDelegate() {
+	public GsonLaunchConfigAttributesPersistenceDelegate() {
 		super();
 	}
 
@@ -34,7 +35,7 @@ public class GsonLaunchSpecPersistenceDelegate extends GsonMapPersistenceDelegat
 	 */
 	@Override
 	public Class<?> getPersistedClass(Object context) {
-		return ILaunchSpecification.class;
+		return ILaunchConfiguration.class;
 	}
 
 	/* (non-Javadoc)
@@ -42,6 +43,13 @@ public class GsonLaunchSpecPersistenceDelegate extends GsonMapPersistenceDelegat
 	 */
 	@Override
 	protected Map<String, Object> toMap(final Object context) throws IOException {
+		if (context instanceof ILaunchConfiguration) {
+			try {
+				return ((ILaunchConfiguration)context).getAttributes();
+			}
+			catch (CoreException e) {
+			}
+		}
 		return new HashMap<String, Object>();
 	}
 
@@ -50,22 +58,9 @@ public class GsonLaunchSpecPersistenceDelegate extends GsonMapPersistenceDelegat
 	 */
 	@Override
 	protected Object fromMap(Map<String, Object> map, Object context) throws IOException {
-		return null;
-	}
-
-	/**
-	 * Get a file transfer item from the given context.
-	 *
-	 * @param context The context. Must not be <code>null</code>.
-	 * @return The file transfer item or <code>null</code>.
-	 */
-	protected IFileTransferItem getFileTransferItem(Object context) {
-		IFileTransferItem item = null;
-
-		if (context instanceof IFileTransferItem) {
-			item = (IFileTransferItem)context;
+		if (context instanceof ILaunchConfigurationWorkingCopy) {
+			((ILaunchConfigurationWorkingCopy)context).setAttributes(map);
 		}
-
-		return item;
+		return context;
 	}
 }

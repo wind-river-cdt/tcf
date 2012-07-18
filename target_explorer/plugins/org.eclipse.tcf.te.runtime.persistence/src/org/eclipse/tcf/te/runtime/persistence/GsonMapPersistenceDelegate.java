@@ -241,7 +241,7 @@ public class GsonMapPersistenceDelegate extends ExecutableExtension implements I
 	 * @throws IOException
 	 */
 	protected Object fromMap(Map<String,Object> map, Object context) throws IOException {
-		if (context == null || Map.class.equals(context.getClass())) {
+		if (context == null || (context instanceof Class && ((Class<?>)context).isInstance(map))) {
 			return map;
 		}
 		else if (context instanceof Map) {

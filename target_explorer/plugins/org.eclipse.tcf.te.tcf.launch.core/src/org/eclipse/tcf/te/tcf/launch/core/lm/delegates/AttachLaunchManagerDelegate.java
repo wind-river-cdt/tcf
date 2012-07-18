@@ -13,19 +13,25 @@ package org.eclipse.tcf.te.tcf.launch.core.lm.delegates;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.tcf.te.launch.core.lm.delegates.DefaultLaunchManagerDelegate;
+import org.eclipse.tcf.te.launch.core.lm.interfaces.ICommonLaunchAttributes;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchContextLaunchAttributes;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification;
 import org.eclipse.tcf.te.launch.core.persistence.launchcontext.LaunchContextsPersistenceDelegate;
 import org.eclipse.tcf.te.launch.core.selection.interfaces.IRemoteSelectionContext;
 import org.eclipse.tcf.te.launch.core.selection.interfaces.ISelectionContext;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
+import org.eclipse.tcf.te.runtime.persistence.PersistenceManager;
+import org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistenceDelegate;
 import org.eclipse.tcf.te.runtime.services.ServiceManager;
 import org.eclipse.tcf.te.runtime.services.interfaces.IPropertiesAccessService;
 import org.eclipse.tcf.te.runtime.services.interfaces.constants.IPropertiesAccessServiceConstants;
+import org.eclipse.tcf.te.tcf.launch.core.interfaces.IPeerModelProperties;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 
 /**
  * RemoteAppLaunchManagerDelegate
@@ -43,13 +49,14 @@ public class AttachLaunchManagerDelegate extends DefaultLaunchManagerDelegate {
 		super();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.launch.core.lm.delegates.DefaultLaunchManagerDelegate#updateLaunchConfigAttributes(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy, org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchSpecification)
+	 */
 	@Override
 	public void updateLaunchConfigAttributes(ILaunchConfigurationWorkingCopy wc, ILaunchSpecification launchSpec) {
 		super.updateLaunchConfigAttributes(wc, launchSpec);
 
-		if (launchSpec.hasAttribute(ILaunchContextLaunchAttributes.ATTR_LAUNCH_CONTEXTS)) {
-			wc.setAttribute(ILaunchContextLaunchAttributes.ATTR_LAUNCH_CONTEXTS, (String)launchSpec.getAttribute(ILaunchContextLaunchAttributes.ATTR_LAUNCH_CONTEXTS).getValue());
-		}
+		copySpecToConfig(launchSpec, wc);
 
 		wc.rename(getDefaultLaunchName(wc));
 	}
@@ -61,9 +68,7 @@ public class AttachLaunchManagerDelegate extends DefaultLaunchManagerDelegate {
 	public void initLaunchConfigAttributes(ILaunchConfigurationWorkingCopy wc, ILaunchSpecification launchSpec) {
 		super.initLaunchConfigAttributes(wc, launchSpec);
 
-		if (launchSpec.hasAttribute(ILaunchContextLaunchAttributes.ATTR_LAUNCH_CONTEXTS)) {
-			wc.setAttribute(ILaunchContextLaunchAttributes.ATTR_LAUNCH_CONTEXTS, (String)launchSpec.getAttribute(ILaunchContextLaunchAttributes.ATTR_LAUNCH_CONTEXTS).getValue());
-		}
+		copySpecToConfig(launchSpec, wc);
 
 		wc.rename(getDefaultLaunchName(wc));
 	}
@@ -94,6 +99,24 @@ public class AttachLaunchManagerDelegate extends DefaultLaunchManagerDelegate {
 			if (!launchContexts.contains(remoteCtx)) {
 				launchContexts.add(remoteCtx);
 				LaunchContextsPersistenceDelegate.setLaunchContexts(launchSpec, launchContexts.toArray(new IModelNode[launchContexts.size()]));
+			}
+
+			if (remoteCtx instanceof IPeerModel) {
+				String launchConfigAttributes = ((IPeerModel)remoteCtx).getPeer().getAttributes().get(IPeerModelProperties.PROP_LAUNCH_CONFIG_ATTRIBUTES);
+				if (launchConfigAttributes != null) {
+					IPersistenceDelegate delegate = PersistenceManager.getInstance().getDelegate(Map.class, launchConfigAttributes, false);
+					try {
+						Map<String, String> attributes = (Map<String,String>)delegate.read(Map.class, launchConfigAttributes, null);
+						attributes.remove(ILaunchContextLaunchAttributes.ATTR_LAUNCH_CONTEXTS);
+						attributes.remove(ICommonLaunchAttributes.ATTR_UUID);
+						attributes.remove(ICommonLaunchAttributes.ATTR_LAST_LAUNCHED);
+						for (String key : attributes.keySet()) {
+							launchSpec.addAttribute(key, attributes.get(key), true);
+						}
+					}
+					catch (Exception e) {
+					}
+				}
 			}
 
 			launchSpec.setLaunchConfigName(getDefaultLaunchName(launchSpec));
