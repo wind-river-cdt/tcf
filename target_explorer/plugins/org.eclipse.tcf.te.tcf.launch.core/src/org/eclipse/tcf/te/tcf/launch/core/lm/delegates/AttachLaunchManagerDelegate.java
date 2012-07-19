@@ -153,7 +153,7 @@ public class AttachLaunchManagerDelegate extends DefaultLaunchManagerDelegate {
 			String ctxName = service != null ? (String)service.getTargetAddress(context).get(IPropertiesAccessServiceConstants.PROP_ADDRESS) : null;
 			ctxName = dnsName != null && dnsName.toString().trim().length() > 0 ? dnsName.toString().trim() : ctxName;
 
-			name = ctxName;
+			name = ctxName != null ? ctxName : ""; //$NON-NLS-1$
 		}
 		return name.trim();
 	}
