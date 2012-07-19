@@ -65,13 +65,34 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 	// Internal map of RemotePeerDiscoverRootNodes per peer id
 	private final Map<String, PeerRedirectorGroupNode> roots = new HashMap<String, PeerRedirectorGroupNode>();
 
+	// Flag to remember if invisible nodes are to be included in the list of
+	// returned children.
+	private final boolean showInvisible;
+
+	/**
+     * Constructor.
+     */
+    public ContentProviderDelegate() {
+    	this(false);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param showInvisible If <code>true</code>, {@link #getChildren(Object)} will include invisible nodes too.
+     */
+    public ContentProviderDelegate(boolean showInvisible) {
+    	super();
+    	this.showInvisible = showInvisible;
+    }
+
 	/**
 	 * Determines if the given peer model node is a proxy or a value-add.
 	 *
 	 * @param peerModel The peer model node. Must not be <code>null</code>.
 	 * @return <code>True</code> if the peer model node is a proxy or value-add, <code>false</code> otherwise.
 	 */
-	/* default */ final static boolean isProxyOrValueAdd(IPeerModel peerModel) {
+	/* default */ final boolean isProxyOrValueAdd(IPeerModel peerModel) {
 		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 		Assert.isNotNull(peerModel);
 
@@ -89,14 +110,14 @@ public class ContentProviderDelegate implements ICommonContentProvider, ITreePat
 	 * @param peerModel The peer model node. Must not be <code>null</code>.
 	 * @return <code>True</code> if filtered, <code>false</code> otherwise.
 	 */
-	/* default */ final static boolean isFiltered(IPeerModel peerModel) {
+	/* default */ final boolean isFiltered(IPeerModel peerModel) {
 		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
 		Assert.isNotNull(peerModel);
 
 		boolean filtered = false;
 
 		filtered |= isProxyOrValueAdd(peerModel) && UIPlugin.getDefault().getPreferenceStore().getBoolean(IPreferenceKeys.PREF_HIDE_PROXIES_AND_VALUEADDS);
-		filtered |= !peerModel.isVisible();
+		if (!showInvisible) filtered |= !peerModel.isVisible();
 
 		return filtered;
 	}

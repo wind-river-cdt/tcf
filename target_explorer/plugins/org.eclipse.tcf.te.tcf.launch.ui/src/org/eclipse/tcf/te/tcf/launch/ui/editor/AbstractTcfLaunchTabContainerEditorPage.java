@@ -73,7 +73,7 @@ public abstract class AbstractTcfLaunchTabContainerEditorPage extends AbstractLa
 				try {
 					wc = LaunchManager.getInstance().getLaunchConfiguration(spec, true).getWorkingCopy();
 					LaunchContextsPersistenceDelegate.setLaunchContexts(wc, null);
-					IPersistenceDelegate delegate = PersistenceManager.getInstance().getDelegate(wc, launchConfigAttributes, false);
+					IPersistenceDelegate delegate = PersistenceManager.getInstance().getDelegate(wc, String.class, false);
 					if (launchConfigAttributes != null && launchConfigAttributes.trim().length() > 0) {
 						delegate.read(wc, launchConfigAttributes, null);
 					}

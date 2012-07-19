@@ -45,7 +45,7 @@ public class ContextSelectorControl extends AbstractContextSelectorControl {
 	 */
 	@Override
 	protected void doConfigureTreeContentAndLabelProvider(TreeViewer viewer) {
-		viewer.setContentProvider(new ContentProviderDelegate());
+		viewer.setContentProvider(new ContentProviderDelegate(true));
 		DelegatingLabelProvider labelProvider = new DelegatingLabelProvider();
 		viewer.setLabelProvider(new DecoratingLabelProvider(labelProvider, labelProvider));
 	}
