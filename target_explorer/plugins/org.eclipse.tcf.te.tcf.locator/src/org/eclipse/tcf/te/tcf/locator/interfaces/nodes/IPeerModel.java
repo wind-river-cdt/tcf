@@ -49,6 +49,18 @@ public interface IPeerModel extends IContainerModelNode {
 	public String getPeerId();
 
 	/**
+	 * Returns the peer id of the remote peer.
+	 * <p>
+	 * For dynamically discovered peers, {@link #getPeerId()} and {@link #getRemotePeerId()} are identical.
+	 * <p>
+	 * For static peers, {@link #getRemotePeerId()} will return <code>null</code> if the static peer is not
+	 * associated with an agent. Otherwise it will return the id of the associated agent.
+	 *
+	 * @return The remote peer id or <code>null</code>.
+	 */
+	public String getRemotePeerId();
+
+	/**
 	 * Returns if or if not the peer attributes are complete to open a channel to it.
 	 *
 	 * @return <code>True</code> if the peer attributes are complete, <code>false</code> otherwise.

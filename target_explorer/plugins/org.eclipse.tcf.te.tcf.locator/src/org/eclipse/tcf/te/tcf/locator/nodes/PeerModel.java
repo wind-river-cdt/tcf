@@ -96,6 +96,31 @@ public class PeerModel extends ContainerModelNode implements IPeerModel {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel#getRemotePeerId()
+	 */
+    @Override
+	public String getRemotePeerId() {
+    	// If the peer is a remote peer by itself, than we return getPeerId()
+		if ("RemotePeer".equals(getPeer().getClass().getSimpleName())) { //$NON-NLS-1$
+			return getPeerId();
+		}
+
+		// Try to determine the remote peer ID
+		final AtomicReference<String> remotePeerId = new AtomicReference<String>();
+		Runnable runnable = new Runnable() {
+			@Override
+			public void run() {
+				remotePeerId.set(getPeer().getAttributes().get("remote.id.transient")); //$NON-NLS-1$
+			}
+		};
+
+		if (Protocol.isDispatchThread()) runnable.run();
+		else Protocol.invokeAndWait(runnable);
+
+	    return remotePeerId.get();
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel#isComplete()
 	 */
 	@Override

@@ -489,6 +489,14 @@ public final class InvalidPeerModel implements IPeerModel {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel#getRemotePeerId()
+	 */
+	@Override
+	public String getRemotePeerId() {
+		throw new IllegalStateException();
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel#isComplete()
 	 */
 	@Override
