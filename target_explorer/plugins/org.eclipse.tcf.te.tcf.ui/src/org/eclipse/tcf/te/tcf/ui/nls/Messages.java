@@ -154,6 +154,13 @@ public class Messages extends NLS {
 
 	public static String CategoryManager_dnd_failed;
 
+	public static String RenameHandler_error_title;
+	public static String RenameHandler_error_renameFailed;
+	public static String RenameHandler_dialog_title;
+	public static String RenameHandler_dialog_message;
+	public static String RenameHandler_dialog_error_nameExist;
+	public static String RenameHandler_dialog_promptNewName;
+
 	public static String LoggingPreferencePage_label;
 	public static String LoggingPreferencePage_enabled_label;
 	public static String LoggingPreferencePage_monitorEnabled_label;

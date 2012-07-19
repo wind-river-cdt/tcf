@@ -74,7 +74,7 @@ public class RenameFilesHandler extends AbstractHandler {
 
 	/**
 	 * Create a renaming dialog for the specified file/folder node.
-	 * 
+	 *
 	 * @param shell The parent shell.
 	 * @param node The file/folder node.
 	 * @return The renaming dialog.
@@ -108,12 +108,12 @@ public class RenameFilesHandler extends AbstractHandler {
 		String prompt = Messages.RenameFilesHandler_RenamePromptMessage;
 		String usedError = Messages.FSRenamingAssistant_NameAlreadyExists;
 		String label = Messages.RenameFilesHandler_PromptNewName;
-		return new RenameDialog(shell, title, prompt, usedError, error, label, node.name, formatRegex, names, null);
+		return new RenameDialog(shell, title, null, prompt, usedError, error, label, node.name, formatRegex, names, null);
 	}
 
 	/**
 	 * Get the used names in the specified folder.
-	 * 
+	 *
 	 * @param folder The folder.
 	 * @return Used names.
 	 */
@@ -129,7 +129,7 @@ public class RenameFilesHandler extends AbstractHandler {
 	/**
 	 * Set the currently focused tree viewer. Called by Target Explorer and FSTreeControl to set the
 	 * current viewer.
-	 * 
+	 *
 	 * @param viewer The currently focused tree viewer.
 	 */
 	public static void setCurrentViewer(TreeViewer viewer) {

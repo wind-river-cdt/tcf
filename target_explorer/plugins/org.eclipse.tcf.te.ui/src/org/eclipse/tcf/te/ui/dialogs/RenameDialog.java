@@ -31,6 +31,7 @@ import org.eclipse.tcf.te.ui.jface.dialogs.CustomTitleAreaDialog;
  */
 public class RenameDialog extends CustomTitleAreaDialog {
 
+	private String dialogTitle;
 	private String title;
 	/* default */ String defaultMessage;
 	/* default */ String usedErrorMessage;
@@ -57,11 +58,12 @@ public class RenameDialog extends CustomTitleAreaDialog {
 	 * @param usedNames The list of used or reserved names.
 	 * @param contextHelpId The context help id.
 	 */
-	public RenameDialog(Shell parent, String title, String defaultMessage, String usedErrorMessage, String formatErrorMessage,
+	public RenameDialog(Shell parent, String dialogTitle, String title, String defaultMessage, String usedErrorMessage, String formatErrorMessage,
 						String label, String oldName, String formatRegex, String[] usedNames, String contextHelpId) {
 		super(parent, contextHelpId);
 
-		this.title = title != null ? title : "Rename"; //$NON-NLS-1$
+		this.dialogTitle = dialogTitle != null ? dialogTitle : "Rename"; //$NON-NLS-1$
+		this.title = title != null ? title : ""; //$NON-NLS-1$
 		this.defaultMessage = defaultMessage != null ? defaultMessage : ""; //$NON-NLS-1$
 		this.usedErrorMessage = usedErrorMessage != null ? usedErrorMessage : ""; //$NON-NLS-1$
 		this.formatErrorMessage = formatErrorMessage != null ? formatErrorMessage : ""; //$NON-NLS-1$
@@ -77,7 +79,8 @@ public class RenameDialog extends CustomTitleAreaDialog {
 	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		setDialogTitle(title);
+		setDialogTitle(dialogTitle);
+		setTitle(title);
 		setDefaultMessage(defaultMessage, IMessageProvider.INFORMATION);
 
 		//set margins of dialog and apply dialog font

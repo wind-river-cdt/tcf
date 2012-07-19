@@ -290,6 +290,27 @@
       </menuContribution>
  
       <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.refresh">
+          <command
+                commandId="org.eclipse.ui.edit.rename"
+                helpContextId="org.eclipse.tcf.te.tcf.ui.command_Rename"
+                icon="icons/elcl16/rename.gif"
+                id="org.eclipse.tcf.te.tcf.ui.commands.rename"
+                label="%command.rename.label"
+                mnemonic="R"
+                style="push"
+                tooltip="%command.rename.tooltip">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <count value="1"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <and>
+                        <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                        <test property="org.eclipse.tcf.te.tcf.locator.isStaticPeer" value="true"/>
+                     </and>                        
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
          <command
                commandId="org.eclipse.tcf.te.ui.command.refresh"
                label="%command.refresh.label"
@@ -379,10 +400,7 @@
             <activeWhen>
                <and>
                   <with variable="activePartId">
-                     <or>
-                        <equals value="org.eclipse.tcf.te.ui.views.View"/>
-                        <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
-                     </or>
+                     <equals value="org.eclipse.tcf.te.ui.views.View"/>
                   </with>
                   <with variable="selection">
                      <iterate operator="and" ifEmpty="false">
@@ -394,6 +412,34 @@
             <enabledWhen>
                <with variable="selection">
                   <test property="org.eclipse.tcf.te.tcf.ui.canDelete" value="true"/>
+               </with>
+            </enabledWhen>
+      </handler>
+
+      <handler
+            commandId="org.eclipse.ui.edit.rename"
+            class="org.eclipse.tcf.te.tcf.ui.handler.RenameHandler">
+            <activeWhen>
+               <and>
+                  <with variable="activePartId">
+                     <equals value="org.eclipse.tcf.te.ui.views.View"/>
+                  </with>
+                  <with variable="selection">
+                     <iterate operator="and" ifEmpty="false">
+                        <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                     </iterate>
+                  </with>
+               </and>
+            </activeWhen>
+            <enabledWhen>
+               <with variable="selection">
+                  <count value="1"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <and>
+                        <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                        <test property="org.eclipse.tcf.te.tcf.locator.isStaticPeer" value="true"/>
+                     </and>                        
+                  </iterate>
                </with>
             </enabledWhen>
       </handler>
