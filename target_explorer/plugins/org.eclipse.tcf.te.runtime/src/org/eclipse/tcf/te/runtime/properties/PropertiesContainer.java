@@ -18,6 +18,7 @@ import java.util.UUID;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.tcf.te.runtime.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.runtime.events.ChangeEvent;
@@ -601,5 +602,14 @@ public class PropertiesContainer extends PlatformObject implements IPropertiesCo
 	public final boolean isProperty(String key, Object value) {
 		Object property = getProperty(key);
 		return (property == null && value == null) || (property != null && property.equals(value));
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
+	 */
+	@Override
+	public Object getAdapter(Class adapter) {
+		Object adapted = super.getAdapter(adapter);
+	    return adapted != null ? adapted : Platform.getAdapterManager().loadAdapter(this, adapter.getName());
 	}
 }
