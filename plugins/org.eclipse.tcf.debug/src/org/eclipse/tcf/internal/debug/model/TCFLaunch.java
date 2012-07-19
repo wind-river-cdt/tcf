@@ -39,12 +39,12 @@ import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.IService;
 import org.eclipse.tcf.protocol.IToken;
 import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.IContextQuery;
 import org.eclipse.tcf.services.IFileSystem;
 import org.eclipse.tcf.services.IFileSystem.FileSystemException;
 import org.eclipse.tcf.services.IFileSystem.IFileHandle;
 import org.eclipse.tcf.services.IMemory;
 import org.eclipse.tcf.services.IMemory.MemoryContext;
-import org.eclipse.tcf.services.IContextQuery;
 import org.eclipse.tcf.services.IMemoryMap;
 import org.eclipse.tcf.services.IPathMap;
 import org.eclipse.tcf.services.IProcesses;
@@ -999,6 +999,7 @@ public class TCFLaunch extends Launch {
         listeners_array = null;
     }
 
+    @Override
     public void launchConfigurationChanged(final ILaunchConfiguration cfg) {
         super.launchConfigurationChanged(cfg);
         if (!cfg.equals(getLaunchConfiguration())) return;
@@ -1144,14 +1145,17 @@ public class TCFLaunch extends Launch {
         return channel.getRemoteService(cls);
     }
 
+    @Override
     public boolean canDisconnect() {
         return !disconnected;
     }
 
+    @Override
     public boolean isDisconnected() {
         return disconnected;
     }
 
+    @Override
     public void disconnect() throws DebugException {
         try {
             new TCFTask<Boolean>() {
@@ -1170,14 +1174,17 @@ public class TCFLaunch extends Launch {
         }
     }
 
+    @Override
     public boolean canTerminate() {
         return false;
     }
 
+    @Override
     public boolean isTerminated() {
         return disconnected;
     }
 
+    @Override
     public void terminate() throws DebugException {
     }
 
@@ -1278,6 +1285,57 @@ public class TCFLaunch extends Launch {
             });
             assert channel.getState() == IChannel.STATE_OPENING;
             connecting = true;
+        }
+        catch (Throwable e) {
+            onDisconnected(e);
+        }
+    }
+
+    /**
+     * Activate TCF launch: Re-use the passed in communication channel and perform all necessary launch steps.
+     *
+     * @param mode - on of launch mode constants defined in ILaunchManager.
+     * @param peer_name - TCF peer name.
+     * @param channel - TCF communication channel.
+     */
+    public void launchTCF(String mode, String peer_name, IChannel channel) {
+        assert Protocol.isDispatchThread();
+        this.mode = mode;
+        this.redirection_path.clear();
+        try {
+            if (channel == null || channel.getRemotePeer() == null) throw new IOException("Invalid channel");
+            this.peer_name = peer_name;
+            this.channel = channel;
+
+            IChannel.IChannelListener listener = new IChannel.IChannelListener() {
+
+                public void onChannelOpened() {
+                    try {
+                        TCFLaunch.this.peer_name = getPeer().getName();
+                        onConnected();
+                    }
+                    catch (Throwable x) {
+                        TCFLaunch.this.channel.terminate(x);
+                    }
+                }
+
+                public void congestionLevel(int level) {
+                }
+
+                public void onChannelClosed(Throwable error) {
+                    TCFLaunch.this.channel.removeChannelListener(this);
+                    onDisconnected(error);
+                }
+
+            };
+            channel.addChannelListener(listener);
+
+            connecting = true;
+            if (channel.getState() == IChannel.STATE_OPEN) {
+                listener.onChannelOpened();
+            } else if (channel.getState() != IChannel.STATE_OPENING) {
+                throw new IOException("Channel is in invalid state");
+            }
         }
         catch (Throwable e) {
             onDisconnected(e);

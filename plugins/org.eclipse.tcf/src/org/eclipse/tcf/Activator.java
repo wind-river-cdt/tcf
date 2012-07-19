@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.core.ChannelTCP;
 import org.eclipse.tcf.internal.nls.TcfPluginMessages;
-import org.eclipse.tcf.osgi.OSGIServices;
 import org.eclipse.tcf.protocol.ILogger;
 import org.eclipse.tcf.protocol.IServiceProvider;
 import org.eclipse.tcf.protocol.Protocol;
@@ -80,7 +79,6 @@ public class Activator extends Plugin {
     @Override
     public void start(BundleContext context) throws Exception {
         super.start(context);
-        OSGIServices.getInstance().start(context);
         debug = Platform.inDebugMode();
 
         TRACE = "true".equals(Platform.getDebugOption("org.eclipse.tcf/debug")); //$NON-NLS-1$
@@ -129,7 +127,6 @@ public class Activator extends Plugin {
     public void stop(BundleContext context) throws Exception {
         context.removeBundleListener(bundle_listener);
         queue.shutdown();
-        OSGIServices.getInstance().stop(context);
         plugin = null;
         super.stop(context);
     }

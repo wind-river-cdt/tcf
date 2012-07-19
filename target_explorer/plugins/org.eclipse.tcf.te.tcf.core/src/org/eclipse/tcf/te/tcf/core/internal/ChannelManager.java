@@ -24,7 +24,6 @@ import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.core.AbstractPeer;
-import org.eclipse.tcf.osgi.services.IValueAddService;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
@@ -356,59 +355,6 @@ public final class ChannelManager extends PlatformObject implements IChannelMana
 
 		return channel;
 	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager#getRedirectionPath(org.eclipse.tcf.protocol.IPeer, org.eclipse.tcf.osgi.services.IValueAddService.DoneGetRedirectionPath)
-	 */
-	@Override
-	public void getRedirectionPath(final IPeer peer, final IValueAddService.DoneGetRedirectionPath done) {
-		Runnable runnable = new Runnable() {
-			@Override
-            public void run() {
-				Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
-				internalGetRedirectionPath(peer, done);
-			}
-		};
-		if (Protocol.isDispatchThread()) runnable.run();
-		else Protocol.invokeLater(runnable);
-	}
-
-	/**
-	 * Returns the redirection path for the given peer. If needed, the required
-	 * value-add's are launched.
-	 *
-	 * @param peer The peer. Must not be <code>null</code>.
-	 * @param done The client callback. Must not be <code>null</code>.
-	 */
-	/* default */ void internalGetRedirectionPath(final IPeer peer, final IValueAddService.DoneGetRedirectionPath done) {
-		Assert.isNotNull(peer);
-		Assert.isNotNull(done);
-		Assert.isTrue(Protocol.isDispatchThread(), "Illegal Thread Access"); //$NON-NLS-1$
-
-		internalHandleValueAdds(peer, new DoneHandleValueAdds() {
-			@Override
-			public void doneHandleValueAdds(final Throwable error, final IValueAdd[] valueAdds) {
-				StringBuilder redirectionPath = new StringBuilder();
-				String peerId = peer.getID();
-
-				// If the error is null, continue and open the channel
-				if (error == null && valueAdds != null && valueAdds.length > 0) {
-					for (IValueAdd valueAdd : valueAdds) {
-						if (redirectionPath.length() > 0) redirectionPath.append("/"); //$NON-NLS-1$
-						redirectionPath.append(valueAdd.getPeer(peerId).getID());
-					}
-				}
-
-				// Append target peer
-				if (redirectionPath.length() > 0) redirectionPath.append("/"); //$NON-NLS-1$
-				redirectionPath.append(peerId);
-
-				// Invoke the callback
-				done.doneGetRedirectionPath(error, redirectionPath.toString());
-			}
-		});
-	}
-
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager#closeChannel(org.eclipse.tcf.protocol.IChannel)

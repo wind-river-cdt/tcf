@@ -62,7 +62,7 @@ public class AttachDebuggerStep extends AbstractTcfLaunchStep {
 		if (launch instanceof Launch) {
 			Launch tcfLaunch = (Launch)launch;
 			try {
-				tcfLaunch.attachDebugger(getActivePeerModel(fullQualifiedId, data).getRemotePeerId());
+				tcfLaunch.attachDebugger(getActivePeerModel(fullQualifiedId, data));
 				callback.done(this, Status.OK_STATUS);
 			}
 			catch (Exception e) {

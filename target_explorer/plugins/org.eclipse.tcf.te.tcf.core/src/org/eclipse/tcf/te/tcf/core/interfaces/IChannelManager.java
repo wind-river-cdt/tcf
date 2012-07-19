@@ -13,7 +13,6 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.tcf.osgi.services.IValueAddService;
 import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.protocol.IPeer;
 
@@ -100,15 +99,6 @@ public interface IChannelManager extends IAdaptable {
 	 * @return The channel instance or <code>null</code>.
 	 */
 	public IChannel getChannel(IPeer peer);
-
-	/**
-	 * Returns the redirection path for the given peer. If needed, the required
-	 * value-add's are launched.
-	 *
-	 * @param peer The peer. Must not be <code>null</code>.
-	 * @param done The client callback. Must not be <code>null</code>.
-	 */
-	public void getRedirectionPath(IPeer peer, IValueAddService.DoneGetRedirectionPath done);
 
 	/**
 	 * Closes the given channel.

@@ -32,9 +32,6 @@ import org.eclipse.tcf.internal.debug.Activator;
 import org.eclipse.tcf.internal.debug.model.ITCFConstants;
 import org.eclipse.tcf.internal.debug.model.TCFLaunch;
 import org.eclipse.tcf.internal.debug.model.TCFMemoryRegion;
-import org.eclipse.tcf.osgi.OSGIServices;
-import org.eclipse.tcf.osgi.services.IValueAddService;
-import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.JSON;
 import org.eclipse.tcf.protocol.Protocol;
 import org.eclipse.tcf.services.IMemoryMap;
@@ -326,25 +323,9 @@ public class TCFLaunchDelegate extends LaunchConfigurationDelegate {
 
         if (monitor != null) monitor.beginTask("Launching TCF debugger session", task_cnt); //$NON-NLS-1$
         final String id = configuration.getAttribute(ATTR_USE_LOCAL_AGENT, true) ? local_id : configuration.getAttribute(ATTR_PEER_ID, "");
-        final IValueAddService value_add_service = OSGIServices.getValueAddService();
 
         Protocol.invokeLater(new Runnable() {
             public void run() {
-                // If the id is not a redirection path of itself, and a value-add service is registered,
-                // ask the value-add service for the redirection path
-                if (value_add_service != null && id.indexOf('/') < 0) {
-                    IPeer peer = Protocol.getLocator().getPeers().get(id);
-                    if (peer != null) {
-                        value_add_service.getRedirectionPath(peer, new IValueAddService.DoneGetRedirectionPath() {
-                            public void doneGetRedirectionPath(Throwable error, String redirection_path) {
-                                if (error != null || redirection_path == null) redirection_path = id;
-                                ((TCFLaunch)launch).launchTCF(mode, redirection_path);
-                                if (monitor != null) monitor.done();
-                            }
-                        });
-                        return;
-                    }
-                }
                 ((TCFLaunch)launch).launchTCF(mode, id);
                 if (monitor != null) monitor.done();
             }

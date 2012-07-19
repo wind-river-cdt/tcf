@@ -9,12 +9,20 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.tcf.launch.core.delegates;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.tcf.internal.debug.model.TCFLaunch;
+import org.eclipse.tcf.protocol.IChannel;
 import org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer;
 import org.eclipse.tcf.te.runtime.properties.PropertiesContainer;
+import org.eclipse.tcf.te.tcf.core.Tcf;
+import org.eclipse.tcf.te.tcf.core.interfaces.IChannelManager;
+import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 
 /**
  * Default tcf launch implementation.
@@ -48,11 +56,27 @@ public final class Launch extends TCFLaunch {
 	}
 
 	/**
-	 * Attach the tcf debugger to the given peer id.
-	 * @param peerId The peer id.
+	 * Attach the tcf debugger to the given peer model node.
+	 *
+	 * @param node The peer model node. Must not be <code>null</code>.
 	 */
-	public void attachDebugger(String peerId) {
-		launchTCF(getLaunchMode(), peerId);
+	public void attachDebugger(IPeerModel node) {
+		Assert.isNotNull(node);
+
+		final String name = node.getPeer().getName();
+
+		// The debugger is using it's own channel as the implementation
+		// calls for channel.terminate(...) directly
+		Map<String, Boolean> flags = new HashMap<String, Boolean>();
+		flags.put(IChannelManager.FLAG_FORCE_NEW, Boolean.TRUE);
+		Tcf.getChannelManager().openChannel(node.getPeer(), flags, new IChannelManager.DoneOpenChannel() {
+			@Override
+			public void doneOpenChannel(Throwable error, IChannel channel) {
+				if (error == null && channel != null) {
+					launchTCF(getLaunchMode(), name, channel);
+				}
+			}
+		});
 	}
 
 	/* (non-Javadoc)
