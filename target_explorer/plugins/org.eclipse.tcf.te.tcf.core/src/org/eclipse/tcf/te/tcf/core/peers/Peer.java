@@ -13,6 +13,8 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.tcf.core.TransientPeer;
+import org.eclipse.tcf.te.runtime.events.ChangeEvent;
+import org.eclipse.tcf.te.runtime.events.EventManager;
 
 /**
  * Peer implementation.
@@ -40,6 +42,7 @@ public class Peer extends TransientPeer {
 			Assert.isTrue(attrs.get(ATTR_ID).equals(rw_attrs.get(ATTR_ID)));
 			rw_attrs.clear();
 			rw_attrs.putAll(attrs);
+			EventManager.getInstance().fireEvent(new ChangeEvent(this, "updateAttributes", ro_attrs, rw_attrs)); //$NON-NLS-1$
 		}
 	}
 }

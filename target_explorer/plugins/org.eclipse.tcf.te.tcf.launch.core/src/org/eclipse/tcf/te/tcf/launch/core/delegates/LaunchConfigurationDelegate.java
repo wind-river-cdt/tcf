@@ -34,8 +34,7 @@ import org.eclipse.tcf.util.TCFTask;
  * <li>The launch configuration delegate creates launches of type {@link Launch}.</li>
  * </ul>
  */
-@SuppressWarnings("restriction")
-public class LaunchConfigurationDelegate extends org.eclipse.tcf.te.launch.core.lm.internal.LaunchConfigurationDelegate {
+public class LaunchConfigurationDelegate extends org.eclipse.tcf.te.launch.core.delegates.LaunchConfigurationDelegate {
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tcf.te.launch.core.delegates.LaunchConfigurationDelegate#getLaunch(org.eclipse.debug.core.ILaunchConfiguration, java.lang.String)

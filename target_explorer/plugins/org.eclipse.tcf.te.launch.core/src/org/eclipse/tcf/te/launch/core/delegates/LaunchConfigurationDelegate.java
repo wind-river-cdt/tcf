@@ -7,7 +7,7 @@
  * Contributors:
  * Wind River Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.tcf.te.launch.core.lm.internal;
+package org.eclipse.tcf.te.launch.core.delegates;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,7 +36,6 @@ import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tcf.te.launch.core.activator.CoreBundleActivator;
 import org.eclipse.tcf.te.launch.core.bindings.LaunchConfigTypeBindingsManager;
-import org.eclipse.tcf.te.launch.core.delegates.Launch;
 import org.eclipse.tcf.te.launch.core.interfaces.IReferencedProjectItem;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ICommonLaunchAttributes;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchManagerDelegate;

@@ -13,11 +13,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfigurationType;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.ILaunchMode;
 
@@ -33,6 +35,30 @@ public class LaunchConfigHelper {
 	 */
 	public static String getUniqueLaunchConfigName(String name) {
 		return DebugPlugin.getDefault().getLaunchManager().generateLaunchConfigurationName(name);
+	}
+
+	public static void addLaunchConfigAttribute(ILaunchConfigurationWorkingCopy wc, String key, Object value) {
+		if (value instanceof String) {
+			wc.setAttribute(key, (String)value);
+		}
+		else if (value instanceof List) {
+			wc.setAttribute(key, (List<?>)value);
+		}
+		else if (value instanceof Map) {
+			wc.setAttribute(key, (Map<?,?>)value);
+		}
+		else if (value instanceof Set) {
+			wc.setAttribute(key, (Set<?>)value);
+		}
+		else if (value instanceof Boolean) {
+			wc.setAttribute(key, ((Boolean)value).booleanValue());
+		}
+		else if (value instanceof Number) {
+			wc.setAttribute(key, ((Number)value).intValue());
+		}
+		else {
+			throw new IllegalArgumentException("Unknown attribute type " + value.getClass().getName() + "(" + value.toString() + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		}
 	}
 
 	/**

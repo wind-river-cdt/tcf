@@ -28,6 +28,7 @@ import org.eclipse.tcf.te.launch.core.bindings.LaunchConfigTypeBindingsManager;
 import org.eclipse.tcf.te.launch.core.exceptions.LaunchServiceException;
 import org.eclipse.tcf.te.launch.core.interfaces.IReferencedProjectItem;
 import org.eclipse.tcf.te.launch.core.interfaces.tracing.ITraceIds;
+import org.eclipse.tcf.te.launch.core.lm.LaunchConfigHelper;
 import org.eclipse.tcf.te.launch.core.lm.LaunchConfigSorter;
 import org.eclipse.tcf.te.launch.core.lm.LaunchSpecification;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ICommonLaunchAttributes;
@@ -63,28 +64,7 @@ public class DefaultLaunchManagerDelegate extends ExecutableExtension implements
 
 	protected void copySpecToConfig(ILaunchSpecification launchSpec, ILaunchConfigurationWorkingCopy wc) {
 		for (ILaunchAttribute attribute : launchSpec.getAllAttributes()) {
-			Object value = attribute.getValue();
-			if (value instanceof String) {
-				wc.setAttribute(attribute.getKey(), (String)value);
-			}
-			else if (value instanceof List) {
-				wc.setAttribute(attribute.getKey(), (List<?>)value);
-			}
-			else if (value instanceof Map) {
-				wc.setAttribute(attribute.getKey(), (Map<?,?>)value);
-			}
-			else if (value instanceof Set) {
-				wc.setAttribute(attribute.getKey(), (Set<?>)value);
-			}
-			else if (value instanceof Boolean) {
-				wc.setAttribute(attribute.getKey(), ((Boolean)value).booleanValue());
-			}
-			else if (value instanceof Number) {
-				wc.setAttribute(attribute.getKey(), ((Number)value).intValue());
-			}
-			else {
-				throw new IllegalArgumentException("Unknown attribute type " + value.getClass().getName() + "(" + value.toString() + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			}
+			LaunchConfigHelper.addLaunchConfigAttribute(wc, attribute.getKey(), attribute.getValue());
 		}
 	}
 
