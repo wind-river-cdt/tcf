@@ -9,6 +9,9 @@
  *******************************************************************************/
 package org.eclipse.tcf.te.launch.core.activator;
 
+import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.ILaunchConfigurationListener;
+import org.eclipse.tcf.te.launch.core.internal.LaunchConfigurationListenerDelegate;
 import org.eclipse.tcf.te.runtime.preferences.ScopedEclipsePreferences;
 import org.eclipse.tcf.te.runtime.tracing.TraceHandler;
 import org.osgi.framework.BundleActivator;
@@ -24,6 +27,9 @@ public class CoreBundleActivator implements BundleActivator {
 	private static volatile ScopedEclipsePreferences scopedPreferences;
 	// The trace handler instance
 	private static volatile TraceHandler traceHandler;
+	// The launch config listener to delegate launch config changes to the launch manager delegate
+	private ILaunchConfigurationListener launchConfigListener;
+
 
 	/**
 	 * Returns the bundle context
@@ -71,8 +77,11 @@ public class CoreBundleActivator implements BundleActivator {
 	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
 	 */
 	@Override
-    public void start(BundleContext bundleContext) throws Exception {
+	public void start(BundleContext bundleContext) throws Exception {
 		CoreBundleActivator.context = bundleContext;
+
+		launchConfigListener = new LaunchConfigurationListenerDelegate();
+		DebugPlugin.getDefault().getLaunchManager().addLaunchConfigurationListener(launchConfigListener);
 	}
 
 	/*
@@ -80,10 +89,13 @@ public class CoreBundleActivator implements BundleActivator {
 	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
 	 */
 	@Override
-    public void stop(BundleContext bundleContext) throws Exception {
+	public void stop(BundleContext bundleContext) throws Exception {
 		CoreBundleActivator.context = null;
 		scopedPreferences = null;
 		traceHandler = null;
+
+		DebugPlugin.getDefault().getLaunchManager().removeLaunchConfigurationListener(launchConfigListener);
+		launchConfigListener = null;
 	}
 
 }
