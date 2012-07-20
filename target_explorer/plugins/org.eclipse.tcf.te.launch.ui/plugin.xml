@@ -188,10 +188,10 @@
             <dynamic
                   id="org.eclipse.tcf.te.launch.ui.views.project.dynamic.new"
                   class="org.eclipse.tcf.te.launch.ui.handler.NewLaunchConfigurationContributionItem">
-               <visibleWhen>
-                  <reference definitionId="launch.expressions.isMultiLaunchConfigOrType"/>
-               </visibleWhen>
             </dynamic>
+            <visibleWhen>
+               <reference definitionId="launch.expressions.isMultiLaunchConfigOrType"/>
+            </visibleWhen>
          </menu>
          <separator
                name="group.showIn"
@@ -205,11 +205,10 @@
                   icon="icons/eview16/prop_ps.gif" 
                   label="%Properties.menu.name"
                   style="push">
-               <visibleWhen>
-                  <reference definitionId="launch.expressions.isSingleLaunchConfig"/>
-               </visibleWhen>
             </command>
-            <visibleWhen checkEnabled="true"/>
+            <visibleWhen>
+               <reference definitionId="launch.expressions.isSingleLaunchConfig"/>
+            </visibleWhen>
          </menu>
          <separator
                name="group.launch"

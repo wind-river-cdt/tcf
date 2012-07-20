@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.expressions.IEvaluationContext;
-import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchMode;
 import org.eclipse.debug.ui.DebugUITools;
@@ -84,21 +84,23 @@ public class LaunchLaunchConfigurationContributionItem extends CompoundContribut
 		ISelection selection = (ISelection)state.getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
 		IStructuredSelection iss = (IStructuredSelection)selection;
 		Object obj = iss.getFirstElement();
-		Assert.isTrue(obj instanceof LaunchNode);
-		LaunchNode node = (LaunchNode) obj;
 		List<IContributionItem> items = new ArrayList<IContributionItem>();
-		if (node.getLaunchConfiguration() != null) {
-			try {
-				for (String mode : LaunchConfigHelper.getLaunchConfigTypeModes(node.getLaunchConfigurationType(), false)) {
-					ILaunchMode launchMode = DebugPlugin.getDefault().getLaunchManager().getLaunchMode(mode);
-					IAction action = new LaunchAction(node.getLaunchConfiguration(), mode);
-					action.setText(launchMode.getLabel());
-					action.setImageDescriptor(DebugUITools.getLaunchGroup(node.getLaunchConfiguration(), mode).getImageDescriptor());
-					action.setEnabled(node.isValidFor(mode));
-					items.add(new ActionContributionItem(action));
+		if (obj instanceof LaunchNode) {
+			LaunchNode node = (LaunchNode) obj;
+			if (node.getLaunchConfiguration() != null) {
+				try {
+					for (String mode : LaunchConfigHelper.getLaunchConfigTypeModes(node.getLaunchConfigurationType(), false)) {
+						ILaunchMode launchMode = DebugPlugin.getDefault().getLaunchManager().getLaunchMode(mode);
+						IAction action = new LaunchAction(node.getLaunchConfiguration(), mode);
+						action.setText(launchMode.getLabel());
+						action.setImageDescriptor(DebugUITools.getLaunchGroup(node.getLaunchConfiguration(), mode).getImageDescriptor());
+						action.setEnabled(node.isValidFor(mode));
+						items.add(new ActionContributionItem(action));
+					}
 				}
-			}
-			catch (Exception e) {
+				catch (Exception e) {
+					if (Platform.inDebugMode()) e.printStackTrace();
+				}
 			}
 		}
 		enabled = !items.isEmpty();
