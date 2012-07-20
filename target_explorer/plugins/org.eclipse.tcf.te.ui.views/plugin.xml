@@ -288,15 +288,15 @@
                <dynamic
                      id="org.eclipse.tcf.te.ui.views.dynamic.categories.add.multi"
                      class="org.eclipse.tcf.te.ui.views.handler.CategoryAddToContributionItem">
-                     <visibleWhen checkEnabled="false">
-                        <with variable="selection">
-                           <test property="org.eclipse.tcf.te.ui.views.validAddToCategoriesCount" value="(1-"/>
-                           <iterate operator="and" ifEmpty="false">
-                              <adapt type="org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizable"/>
-                           </iterate>
-                        </with>
-                     </visibleWhen>
                </dynamic>
+               <visibleWhen checkEnabled="false">
+                  <with variable="selection">
+                     <test property="org.eclipse.tcf.te.ui.views.validAddToCategoriesCount" value="(1-"/>
+                     <iterate operator="and" ifEmpty="false">
+                         <adapt type="org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizable"/>
+                     </iterate>
+                  </with>
+               </visibleWhen>
          </menu>
 
          <dynamic
