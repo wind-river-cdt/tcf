@@ -13,8 +13,8 @@ import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel;
 import org.eclipse.tcf.te.tcf.ui.navigator.DelegatingLabelProvider;
+import org.eclipse.tcf.te.ui.views.editor.EditorInput;
 import org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizable;
-import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 
 /**
@@ -50,8 +50,10 @@ public class AdapterFactory implements IAdapterFactory {
 
 		}
 
-		if (adaptableObject instanceof IEditorInput) {
-			return ((IEditorInput)adaptableObject).getAdapter(adapterType);
+		if (adaptableObject instanceof EditorInput) {
+			if (IPeerModel.class.equals(adapterType)) {
+				return ((EditorInput)adaptableObject).getAdapter(adapterType);
+			}
 		}
 
 		return null;

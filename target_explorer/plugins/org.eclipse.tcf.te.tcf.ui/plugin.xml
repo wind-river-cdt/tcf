@@ -13,7 +13,7 @@
       </factory>
       
       <factory
-            adaptableType="org.eclipse.ui.IEditorInput"
+            adaptableType="org.eclipse.tcf.te.ui.views.editor.EditorInput"
             class="org.eclipse.tcf.te.tcf.ui.internal.adapters.AdapterFactory">
          <adapter type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
       </factory>
