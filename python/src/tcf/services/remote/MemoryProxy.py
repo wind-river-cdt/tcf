@@ -1,4 +1,4 @@
-# *******************************************************************************
+# *****************************************************************************
 # * Copyright (c) 2011, 2012 Wind River Systems, Inc. and others.
 # * All rights reserved. This program and the accompanying materials
 # * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
 # *
 # * Contributors:
 # *     Wind River Systems - initial API and implementation
-# *******************************************************************************
+# *****************************************************************************
 
 from tcf import errors, channel
 from tcf.services import memory
@@ -195,7 +195,7 @@ class MemoryCommand(Command):
         if len(cmd) > 72: cmd = cmd[0:72] + "..."
         e = MemoryErrorReport(
                 "TCF command exception:\nCommand: %s\nException: %s\nError code: %d" % (
-                    cmd, self.toErrorString(data), code),
+                    cmd, errors.toErrorString(data), code),
                 data, addr, ranges)
         caused_by = data.get(errors.ERROR_CAUSED_BY)
         if caused_by is not None: e.caused_by = self.toError(caused_by, False)
