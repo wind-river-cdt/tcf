@@ -12,15 +12,10 @@ package org.eclipse.tcf.te.ui.views.handler;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.tcf.te.ui.views.ViewsUtil;
 import org.eclipse.tcf.te.ui.views.interfaces.IUIConstants;
-import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.IViewSite;
-import org.eclipse.ui.IWorkbenchActionConstants;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
@@ -39,17 +34,10 @@ public class ShowInSystemManagementHandler extends AbstractHandler {
 		// Get the active selection
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
 		if (selection instanceof IStructuredSelection && !selection.isEmpty()) {
+			// Pass on to the view
 			ViewsUtil.setSelection(IUIConstants.ID_EXPLORER, selection);
-		}
-
-		IWorkbenchPart part = ViewsUtil.getPart(IUIConstants.ID_EXPLORER);
-		IActionBars actionBars = part != null && part.getSite() instanceof IViewSite ? ((IViewSite)part.getSite()).getActionBars() : null;
-		if (actionBars != null) {
-			IAction action = actionBars.getGlobalActionHandler(IWorkbenchActionConstants.GO_INTO);
-			if (action != null) action.run();
 		}
 
 		return null;
 	}
-
 }

@@ -10,11 +10,18 @@
 package org.eclipse.tcf.te.ui.views;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.tcf.te.ui.views.extensions.CategoriesExtensionPointManager;
 import org.eclipse.tcf.te.ui.views.handler.PropertiesCommandHandler;
+import org.eclipse.tcf.te.ui.views.interfaces.ICategory;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IViewReference;
+import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
@@ -153,6 +160,79 @@ public class ViewsUtil {
 				IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 				Assert.isNotNull(window);
 				PropertiesCommandHandler.openEditorOnSelection(window, selection);
+			}
+		};
+
+		// Execute asynchronously
+		if (PlatformUI.isWorkbenchRunning()) {
+			PlatformUI.getWorkbench().getDisplay().asyncExec(runnable);
+		}
+	}
+
+	/**
+	 * "Go Into" the category identified by the given category id, within the view
+	 * identified by the given id.
+	 * <p>
+	 * <b>Note:</b> This method is actively changing the selection of the view.
+	 *
+	 * @param id The view id. Must not be <code>null</code>.
+	 * @param categoryId The category id. Must not be <code>null</code>.
+	 */
+	public static void goInto(final String id, final String categoryId) {
+		Assert.isNotNull(id);
+		Assert.isNotNull(categoryId);
+
+		ICategory category = CategoriesExtensionPointManager.getInstance().getCategory(categoryId, false);
+		if (category != null) goInto(id, category);
+	}
+
+	/**
+	 * "Go Into" the given node within the view identified by the given id.
+	 * <p>
+	 * <b>Note:</b> This method is actively changing the selection of the view.
+	 *
+	 * @param id The view id. Must not be <code>null</code>.
+	 * @param node The node to go into. Must not be <code>null</code>.
+	 */
+	public static void goInto(final String id, final Object node) {
+		Assert.isNotNull(id);
+		Assert.isNotNull(node);
+
+		goInto(id, new StructuredSelection(node));
+	}
+
+	/**
+	 * "Go Into" the given selection within the view identified by the given id.
+	 * <p>
+	 * <b>Note:</b> This method is actively changing the selection of the view.
+	 *
+	 * @param id The view id. Must not be <code>null</code>.
+	 * @param selection The selection. Must not be <code>null</code>.
+	 */
+	public static void goInto(final String id, final ISelection selection) {
+		Assert.isNotNull(id);
+		Assert.isNotNull(selection);
+
+		// Set the selection
+		setSelection(id, selection);
+
+		// Create the runnable
+		Runnable runnable = new Runnable() {
+            @Override
+			public void run() {
+				// Check the active workbench window and active page instances
+				if (PlatformUI.getWorkbench().getActiveWorkbenchWindow() != null && PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage() != null) {
+					// Get the view reference
+					IViewReference reference = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findViewReference(id);
+					// Get the view part from the reference, but do not restore it
+					IWorkbenchPart part = reference != null ? reference.getPart(false) : null;
+					// Get the action bars
+					IActionBars actionBars = part != null && part.getSite() instanceof IViewSite ? ((IViewSite)part.getSite()).getActionBars() : null;
+					// Get the "Go Into" action
+					IAction action = actionBars != null ? actionBars.getGlobalActionHandler(IWorkbenchActionConstants.GO_INTO) : null;
+					// Run the action
+					if (action != null) action.run();
+				}
 			}
 		};
 
