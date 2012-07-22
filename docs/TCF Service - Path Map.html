@@ -1,0 +1,285 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+    <title>Target Communication Framework Services - PathMap</title>
+</head>
+
+<body lang='EN-US'>
+
+<h1>Target Communication Framework Services - PathMap</h1>
+
+<ul>
+    <li><a href='#VersionHistory'>Version History</a>
+    <li><a href='#Overview'>Overview</a>
+    <li><a href='#Cmds'>Commands</a>
+    <ul>
+        <li><a href='#CmdGet'>Get</a>
+        <li><a href='#CmdSet'>Set</a>
+    </ul>
+    <li><a href='#Events'>Events</a>
+    <li><a href='#API'>API</a>
+</ul>
+
+<h1>Memory Service</h1>
+
+<h2><a name='VersionHistory'>Version History</a></h2>
+
+<table border=1 cellpadding=8>
+    <tr>
+        <th>Version
+        <th>Date
+        <th>Change
+    <tr>
+        <td>0.0
+        <td>2012-07-22
+        <td>Initial documentation based on source code
+</table>
+
+<h2><a name='Overview'>Overview</a></h2>
+
+<p>The service manages file path translation across systems. Command and event
+parameters are encoded as zero terminated <a
+href='TCF Specification.html#JSON'>JSON</a> strings.</p>
+
+<p>The service uses standard format for error reports,
+see <a href='TCF Services.html#ErrorFormat'>Error Report Format</a>.</p>
+
+<h2><a name='Cmds'>Commands</a></h2>
+
+<h3><a name='CmdGet'>Get</a></h3>
+
+<pre><b><font face="Courier New" size=2 color=#333399>
+C &bull; <i>&lt;token&gt;</i> &bull; PathMap &bull; get &bull;
+</font></b></pre>
+
+<p>The command retrieves file path mapping rules.</p>
+
+<p>Reply:</p>
+
+<pre><b><font face="Courier New" size=2 color=#333399>
+R &bull; <i>&lt;token&gt;</i> &bull; <i>&lt;error report&gt;</i> &bull; <i>&lt;array of path map rules&gt;</i> &bull;
+
+<i>&lt;array of path map rules&gt;</i>
+    &rArr; null
+    &rArr; [ <i>&lt;path map rules list&gt;</i> ]
+
+<i>&lt;path map rules list&gt;</i>
+    &rArr; <i>&lt;object: path map rule&gt;</i>
+    &rArr; <i>&lt;path map rules list&gt;</i> , <i>&lt;object: path map rule&gt;</i>
+</font></b></pre>
+
+<p>Predefined path map rule properties are:</p>
+<ul>
+    <li><code><b><font face="Courier New" size=2 color=#333399>"ID" : <i>&lt;string&gt;</i></font></b></code>
+    - ID of the rule.
+
+    <li><code><b><font face="Courier New" size=2 color=#333399>"Source" : <i>&lt;string&gt;</i></font></b></code>
+    - source or compile time file path.
+
+    <li><code><b><font face="Courier New" size=2 color=#333399>"Destination" : <i>&lt;string&gt;</i></font></b></code>
+    - destination or run-time file path.
+
+    <li><code><b><font face="Courier New" size=2 color=#333399>"Context" : <i>&lt;string&gt;</i></font></b></code>
+    - symbols context group ID or name, deprecated - use ContextQuery.
+
+    <li><code><b><font face="Courier New" size=2 color=#333399>"ContextQuery" : <i>&lt;string&gt;</i></font></b></code>
+    - context query.
+
+    <li><code><b><font face="Courier New" size=2 color=#333399>"Host" : <i>&lt;string&gt;</i></font></b></code>
+    - host.
+
+    <li><code><b><font face="Courier New" size=2 color=#333399>"Protocol" : <i>&lt;string&gt;</i></font></b></code>
+    - file access protocol, see predefined protocol values.
+
+    <p>Predefined protocol values are:</p>
+    <ul>
+        <li><code><b><font face="Courier New" size=2 color=#333399>"file"</font></b></code>
+        - Regular file access using system calls.
+
+        <li><code><b><font face="Courier New" size=2 color=#333399>"host"</font></b></code>
+        - File should be accessed using File System service on host.
+
+        <li><code><b><font face="Courier New" size=2 color=#333399>"target"</font></b></code>
+        - File should be accessed using File System service on target.
+    </ul>
+</ul>
+
+<h3><a name='CmdSet'>Set</a></h3>
+
+<pre><b><font face="Courier New" size=2 color=#333399>
+C &bull; <i>&lt;token&gt;</i> &bull; PathMap &bull; set &bull; [ <i>&lt;path map rules list&gt;</i> ] &bull;
+
+<i>&lt;path map rules list&gt;</i>
+    &rArr; <i>&lt;object: path map rule&gt;</i>
+    &rArr; <i>&lt;path map rules list&gt;</i> , <i>&lt;object: path map rule&gt;</i>
+</font></b></pre>
+
+<p>The command set file path mapping rules.</p>
+
+<p>Reply:</p>
+
+<pre><b><font face="Courier New" size=2 color=#333399>
+R &bull; <i>&lt;token&gt;</i> &bull; <i>&lt;error report&gt;</i> &bull;
+</font></b></pre>
+
+<h2><a name='Events'>Events</a></h2>
+
+<p>PathMap service broadcasts notification events when path mappings are changed.</p>
+
+<pre><b><font face="Courier New" size=2 color=#333399>
+E &bull; PathMap &bull; changed &bull;
+</font></b></pre>
+
+<h2><a name='API'>API</a></h2>
+
+<pre>
+<font color=#3F5FBF>/**
+ * IPathMap service manages file path translation across systems.
+ */</font>
+<font color=#7F0055>public interface</font> IPathMap extends IService {
+
+    <font color=#7F0055>static final</font> String NAME = "PathMap";
+
+    <font color=#3F5FBF>/**
+     * Path mapping rule property names.
+     */</font>
+    <font color=#7F0055>static final</font> String
+        PROP_ID = "ID",                       <font color=#3F5FBF>/** String, rule ID */</font>
+        PROP_SOURCE = "Source",               <font color=#3F5FBF>/** String, source, or compile-time file path */</font>
+        PROP_DESTINATION = "Destination",     <font color=#3F5FBF>/** String, destination, or run-time file path */</font>
+        PROP_CONTEXT = "Context",             <font color=#3F5FBF>/** String, symbols context group ID or name, deprecated - use ContextQuery */</font>
+        PROP_CONTEXT_QUERY = "ContextQuery",  <font color=#3F5FBF>/** String, contexts query, see IContextQuery */</font>
+        PROP_HOST = "Host",                   <font color=#3F5FBF>/** String, */</font>
+        PROP_PROTOCOL = "Protocol";           <font color=#3F5FBF>/** String, file access protocol, see PROTOCOL_*, default is regular file */</font>
+
+    <font color=#3F5FBF>/**
+     * PROP_PROTOCOL values.
+     */</font>
+    <font color=#7F0055>static final</font> String
+        PROTOCOL_FILE = "file",     <font color=#3F5FBF>/** Regular file access using system calls */</font>
+        PROTOCOL_HOST = "host",     <font color=#3F5FBF>/** File should be accessed using File System service on host */</font>
+        PROTOCOL_TARGET = "target"; <font color=#3F5FBF>/** File should be accessed using File System service on target */</font>
+
+    <font color=#3F5FBF>/**
+     * PathMapRule interface represents a single file path mapping rule.
+     */</font>
+    <font color=#7F0055>interface</font> PathMapRule {
+
+        <font color=#3F5FBF>/**
+         * Get rule properties. See PROP_* definitions for property names.
+         * Properties are read only, clients should not try to modify them.
+         * @return Map of rule properties.
+         */</font>
+        Map<String,Object> getProperties();
+
+        <font color=#3F5FBF>/**
+         * Get rule unique ID.
+         * Same as getProperties().get(PROP_ID)
+         * @return rule ID.
+         */</font>
+        String getID();
+
+        <font color=#3F5FBF>/**
+         * Get compile-time file path.
+         * Same as getProperties().get(PROP_SOURCE)
+         * @return compile-time file path.
+         */</font>
+        String getSource();
+
+        <font color=#3F5FBF>/**
+         * Get run-time file path.
+         * Same as getProperties().get(PROP_DESTINATION)
+         * @return run-time file path.
+         */</font>
+        String getDestination();
+
+        <font color=#3F5FBF>/**
+         * Get host name of this rule.
+         * Same as getProperties().get(PROP_HOST)
+         * @return host name.
+         */</font>
+        String getHost();
+
+        <font color=#3F5FBF>/**
+         * Get file access protocol name.
+         * Same as getProperties().get(PROP_PROTOCOL)
+         * @return protocol name.
+         */</font>
+        String getProtocol();
+
+        <font color=#3F5FBF>/**
+         * Get context query that defines scope of the mapping rule, see also IContextQuery.
+         * Same as getProperties().get(PROP_CONTEXT_QUERY)
+         * @return context query expression, or null.
+         */</font>
+        String getContextQuery();
+    }
+
+    <font color=#3F5FBF>/**
+     * Retrieve file path mapping rules.
+     *
+     * <font color=#7F9FBF>@param</font> done &ndash; call back interface called when operation is completed.
+     * @return &ndash; pending command handle.
+     */</font>
+    IToken get(DoneGet done);
+
+    <font color=#3F5FBF>/**
+     * Client call back interface for get().
+     */</font>
+    <font color=#7F0055>interface</font> DoneGet {
+        <font color=#3F5FBF>/**
+         * Called when file path mapping retrieval is done.
+         * <font color=#7F9FBF>@param</font> error &ndash; error description if operation failed, null if succeeded.
+         * <font color=#7F9FBF>@param</font> map &ndash; file path mapping data.
+         */</font>
+        <font color=#7F0055>void</font> doneGet(IToken token, Exception error, PathMapRule[] map);
+    }
+
+    <font color=#3F5FBF>/**
+     * Set file path mapping rules.
+     *
+     * <font color=#7F9FBF>@param</font> map &ndash; file path mapping rules.
+     * <font color=#7F9FBF>@param</font> done &ndash; call back interface called when operation is completed.
+     * @return &ndash; pending command handle.
+     */</font>
+    IToken set(PathMapRule[] map, DoneSet done);
+
+    <font color=#3F5FBF>/**
+     * Client call back interface for set().
+     */</font>
+    <font color=#7F0055>interface</font> DoneSet {
+         <font color=#3F5FBF>/**
+         * Called when file path mapping transmission is done.
+         * <font color=#7F9FBF>@param</font> error &ndash; error description if operation failed, null if succeeded.
+         * <font color=#7F9FBF>@param</font> map &ndash; memory map data.
+         */</font>
+        <font color=#7F0055>void</font> doneSet(IToken token, Exception error);
+    }
+
+    <font color=#3F5FBF>/**
+     * Add path map event listener.
+     * <font color=#7F9FBF>@param</font> listener &ndash; path map event listener to add.
+     */</font>
+    <font color=#7F0055>void</font> addListener(PathMapListener listener);
+
+    <font color=#3F5FBF>/**
+     * Remove path map event listener.
+     * <font color=#7F9FBF>@param</font> listener &ndash; path map event listener to remove.
+     */</font>
+    <font color=#7F0055>void</font> removeListener(PathMapListener listener);
+
+    <font color=#3F5FBF>/**
+     * Service events listener interface.
+     */</font>
+    <font color=#7F0055>interface</font> PathMapListener {
+
+        <font color=#3F5FBF>/**
+         * Called when path map changes.
+         */</font>
+        <font color=#7F0055>void</font> changed();
+    }
+}
+</pre>
+
+</body>
+</html>
