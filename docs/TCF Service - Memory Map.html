@@ -1,0 +1,309 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+    <title>Target Communication Framework Services - Memory Map</title>
+</head>
+
+<body lang='EN-US'>
+
+<h1>Target Communication Framework Services - Memory Map</h1>
+
+<ul>
+    <li><a href='#VersionHistory'>Version History</a>
+    <li><a href='#Overview'>Overview</a>
+    <li><a href='#Cmds'>Commands</a>
+    <ul>
+        <li><a href='#CmdGet'>Get</a>
+        <li><a href='#CmdSet'>Set</a>
+    </ul>
+    <li><a href='#Events'>Events</a>
+    <li><a href='#API'>API</a>
+</ul>
+
+<h1>Memory Service</h1>
+
+<h2><a name='VersionHistory'>Version History</a></h2>
+
+<table border=1 cellpadding=8>
+    <tr>
+        <th>Version
+        <th>Date
+        <th>Change
+    <tr>
+        <td>0.0
+        <td>2012-07-22
+        <td>Initial documentation based on source code
+</table>
+
+<h2><a name='Overview'>Overview</a></h2>
+
+<p>The service provides basic operations to get and set memory mapping on a
+target. Command and event parameters are encoded as zero terminated <a
+href='TCF Specification.html#JSON'>JSON</a> strings.</p>
+
+<p>The service uses standard format for error reports,
+see <a href='TCF Services.html#ErrorFormat'>Error Report Format</a>.</p>
+
+<h2><a name='Cmds'>Commands</a></h2>
+
+<h3><a name='CmdGet'>Get</a></h3>
+
+<pre><b><font face="Courier New" size=2 color=#333399>
+C &bull; <i>&lt;token&gt;</i> &bull; MemoryMap &bull; get &bull; <i>&lt;string: context ID&gt;</i> &bull;
+</font></b></pre>
+
+<p>The command retrieves memory maps for given context ID.</p>
+
+<p>Reply:</p>
+
+<pre><b><font face="Courier New" size=2 color=#333399>
+R &bull; <i>&lt;token&gt;</i> &bull; <i>&lt;error report&gt;</i> &bull; <i>&lt;array of map items&gt;</i> &bull;
+
+<i>&lt;array of map items&gt;</i>
+    &rArr; null
+    &rArr; [ <i>&lt;map items list&gt;</i> ]
+
+<i>&lt;map items list&gt;</i>
+    &rArr; <i>&lt;object: map item properties&gt;</i>
+    &rArr; <i>&lt;map items list&gt;</i> , <i>&lt;object: map item properties&gt;</i>
+</font></b></pre>
+
+<p>Predefined memory map properties are:</p>
+<ul>
+    <li><code><b><font face="Courier New" size=2 color=#333399>"ID" : <i>&lt;string&gt;</i></font></b></code>
+    - Memory region ID.
+
+    <li><code><b><font face="Courier New" size=2 color=#333399>"ContextQuery" : <i>&lt;string&gt;</i></font></b></code>
+    - Memory region context query.
+
+    <li><code><b><font face="Courier New" size=2 color=#333399>"Addr" : <i>&lt;int&gt;</i></font></b></code>
+    - region address in memory.
+
+    <li><code><b><font face="Courier New" size=2 color=#333399>"Size" : <i>&lt;int&gt;</i></font></b></code>
+    - region size.
+
+    <li><code><b><font face="Courier New" size=2 color=#333399>"Offs" : <i>&lt;int&gt;</i></font></b></code>
+    - Region offset in the file.
+
+    <li><code><b><font face="Courier New" size=2 color=#333399>"BSS" : <i>&lt;boolean&gt;</i></font></b></code>
+    - True if the region represents BSS.
+    <li><code><b><font face="Courier New" size=2 color=#333399>"Flags" : <i>&lt;int&gt;</i></font></b></code>
+    - Region memory protection flags, see predefined flags.
+
+    <li><code><b><font face="Courier New" size=2 color=#333399>"FileName" : <i>&lt;string&gt;</i></font></b></code>
+    - Name of the file.
+
+    <li><code><b><font face="Courier New" size=2 color=#333399>"SectionName" : <i>&lt;string&gt;</i></font></b></code>
+    - Name of the object file section.
+
+    <p>Predefined flags are:</p>
+    <ul>
+        <li><code><b><font face="Courier New" size=2 color=#333399>1</font></b></code>
+    - Read access is allowed.</li>
+        <li><code><b><font face="Courier New" size=2 color=#333399>2</font></b></code>
+    - Write access is allowed.</li>
+        <li><code><b><font face="Courier New" size=2 color=#333399>4</font></b></code>
+    - Instruction fetch access is allowed.</li>
+    </ul>
+</ul>
+
+<h3><a name='CmdSet'>Set</a></h3>
+
+<pre><b><font face="Courier New" size=2 color=#333399>
+C &bull; <i>&lt;token&gt;</i> &bull; MemoryMap &bull; set &bull; <i>&lt;string: context ID&gt;</i> &bull; <i>&lt;object: map item properties&gt;</i> &bull;
+</font></b></pre>
+
+<p>The command sets a memory mapping for context specified by context ID. Map item object uses the same properties as defined in the get command.</p>
+
+<p>Reply:</p>
+
+<pre><b><font face="Courier New" size=2 color=#333399>
+R &bull; <i>&lt;token&gt;</i> &bull; <i>&lt;error report&gt;</i> &bull;
+</font></b></pre>
+
+<h2><a name='Events'>Events</a></h2>
+
+<p>MemoryMap service broadcasts notification events when memory map items are changed.</p>
+
+<pre><b><font face="Courier New" size=2 color=#333399>
+E &bull; MemoryMap &bull; changed &bull; <i>&lt;string: context ID&gt;</i> &bull;
+</font></b></pre>
+
+<h2><a name='API'>API</a></h2>
+
+<pre>
+<font color=#3F5FBF>/**
+ * IMemoryMap service provides information about executable modules (files) mapped (loaded) into target memory.
+ */</font>
+<font color=#7F0055>public interface</font> IMemoryMap <font color=#7F0055>extends</font> IService {
+
+    <font color=#7F0055>static final</font> String NAME = "MemoryMap";
+
+    <font color=#3F5FBF>/**
+     * Memory region property names.
+     */</font>
+    <font color=#7F0055>static final</font> String
+        PROP_ID = "ID",                      <font color=#3F5FBF>/** String, memory region ID */</font>
+        PROP_CONTEXT_QUERY = "ContextQuery", <font color=#3F5FBF>/** String, memory region context query, see IContextQuery */</font>
+        PROP_ADDRESS = "Addr",               <font color=#3F5FBF>/** Number, region address in memory */</font>
+        PROP_SIZE = "Size",                  <font color=#3F5FBF>/** Number, region size */</font>
+        PROP_OFFSET = "Offs",                <font color=#3F5FBF>/** Number, region offset in the file */</font>
+        PROP_BSS = "BSS",                    <font color=#3F5FBF>/** Boolean, true if the region represents BSS */</font>
+        PROP_FLAGS = "Flags",                <font color=#3F5FBF>/** Number, region memory protection flags, see FLAG_* */</font>
+        PROP_FILE_NAME = "FileName",         <font color=#3F5FBF>/** String, name of the file */</font>
+        PROP_SECTION_NAME = "SectionName";   <font color=#3F5FBF>/** String, name of the object file section */</font>
+
+    <font color=#3F5FBF>/**
+     * Memory region flags.
+     */</font>
+    <font color=#7F0055>static final</font> int
+        FLAG_READ = 1,     <font color=#3F5FBF>/** Read access is allowed */</font>
+        FLAG_WRITE = 2,    <font color=#3F5FBF>/** Write access is allowed */</font>
+        FLAG_EXECUTE = 4;  <font color=#3F5FBF>/** Instruction fetch access is allowed */</font>
+
+    <font color=#3F5FBF>/**
+     * Memory region interface.
+     */</font>
+    <font color=#7F0055>interface</font> MemoryRegion {
+
+        <font color=#3F5FBF>/**
+         * Get region properties. See PROP_* definitions for property names.
+         * Properties are read only, clients should not try to modify them.
+         * <font color=#7F9FBF>@return</font> Map of region properties.
+         */</font>
+        Map<String,Object> getProperties();
+
+        <font color=#3F5FBF>/**
+         * Get memory region address.
+         * Same as getProperties().get(PROP_ADDRESS)
+         * <font color=#7F9FBF>@return</font> region address.
+         */</font>
+        Number getAddress();
+
+        <font color=#3F5FBF>/**
+         * Get memory region size.
+         * Same as getProperties().get(PROP_SIZE)
+         * <font color=#7F9FBF>@return</font> region size.
+         */</font>
+        Number getSize();
+
+        <font color=#3F5FBF>/**
+         * Get memory region file offset.
+         * Same as getProperties().get(PROP_OFFSET)
+         * <font color=#7F9FBF>@return</font> file offset.
+         */</font>
+        Number getOffset();
+
+        <font color=#3F5FBF>/**
+         * Check if the region represents BSS - data segment containing
+         * statically-allocated variables represented solely by zero-valued bits initially.
+         * Memory for BSS segments is not backed by a file contents.
+         * Same as getProperties().get(PROP_BSS)
+         * <font color=#7F9FBF>@return</font> file offset.
+         */</font>
+        boolean isBSS();
+
+        <font color=#3F5FBF>/**
+         * Get memory region flags.
+         * Same as getProperties().get(PROP_FLAGS)
+         * <font color=#7F9FBF>@return</font> region flags.
+         */</font>
+        int getFlags();
+
+        <font color=#3F5FBF>/**
+         * Get memory region file name.
+         * Same as getProperties().get(PROP_FILE_NAME)
+         * <font color=#7F9FBF>@return</font> file name.
+         */</font>
+        String getFileName();
+
+        <font color=#3F5FBF>/**
+         * Get memory region section name.
+         * Same as getProperties().get(PROP_SECTION_NAME)
+         * <font color=#7F9FBF>@return</font> section name.
+         */</font>
+        String getSectionName();
+
+        <font color=#3F5FBF>/**
+         * Get context query that defines scope of the region, see also IContextQuery.
+         * Same as getProperties().get(PROP_CONTEXT_QUERY)
+         * Only user-defined regions can have a context query property.
+         * <font color=#7F9FBF>@return</font> context query expression, or null.
+         */</font>
+        String getContextQuery();
+    }
+
+    <font color=#3F5FBF>/**
+     * Retrieve memory map for given context ID.
+     *
+     * <font color=#7F9FBF>@param</font> id &ndash; context ID.
+     * <font color=#7F9FBF>@param</font> done &ndash; call back interface called when operation is completed.
+     * <font color=#7F9FBF>@return</font> &ndash; pending command handle.
+     */</font>
+    IToken get(String id, DoneGet done);
+
+    <font color=#3F5FBF>/**
+     * Client call back interface for get().
+     */</font>
+    <font color=#7F0055>interface</font> DoneGet {
+        /**
+         * Called when memory map data retrieval is done.
+         * <font color=#7F9FBF>@param</font> error &ndash; error description if operation failed, null if succeeded.
+         * <font color=#7F9FBF>@param</font> map &ndash; memory map data.
+         */</font>
+        <font color=#7F0055>void</font> doneGet(IToken token, Exception error, MemoryRegion[] map);
+    }
+
+    <font color=#3F5FBF>/**
+     * Set memory map for given context.
+     * 'id' can be null, in such case scope of each memory region is
+     * defined by its ContextQuery property.
+     *
+     * Using non-null 'id' is deprecated - use ContextQuery instead.
+     *
+     * <font color=#7F9FBF>@param</font> id &ndash; symbols context group ID or name.
+     * <font color=#7F9FBF>@param</font> map &ndash; memory map data.
+     * <font color=#7F9FBF>@param</font> done &ndash; call back interface called when operation is completed.
+     * <font color=#7F9FBF>@return</font> &ndash; pending command handle.
+     */</font>
+    IToken set(String id, MemoryRegion[] map, DoneSet done);
+
+    <font color=#3F5FBF>/**
+     * Client call back interface for set().
+     */</font>
+    <font color=#7F0055>interface</font> DoneSet {
+        /**
+         * Called when memory map set command is done.
+         * <font color=#7F9FBF>@param</font> error &ndash; error description if operation failed, null if succeeded.
+         */</font>
+        <font color=#7F0055>void</font> doneSet(IToken token, Exception error);
+    }
+
+    <font color=#3F5FBF>/**
+     * Add memory map event listener.
+     * <font color=#7F9FBF>@param</font> listener &ndash; memory map event listener to add.
+     */</font>
+    <font color=#7F0055>void</font> addListener(MemoryMapListener listener);
+
+    <font color=#3F5FBF>/**
+     * Remove memory map event listener.
+     * <font color=#7F9FBF>@param</font> listener &ndash; memory map event listener to remove.
+     */</font>
+    <font color=#7F0055>void</font> removeListener(MemoryMapListener listener);
+
+    <font color=#3F5FBF>/**
+     * Service events listener interface.
+     */</font>
+    <font color=#7F0055>interface</font> MemoryMapListener {
+
+        <font color=#3F5FBF>/**
+         * Called when context memory map changes.
+         * <font color=#7F9FBF>@param</font> context_id &ndash; context ID.
+         */</font>
+        <font color=#7F0055>void</font> changed(String context_id);
+    }
+}
+</pre>
+
+</body>
+</html>
