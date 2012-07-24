@@ -634,7 +634,7 @@ public class TCFDisassemblyBackend extends AbstractDisassemblyBackend {
                 }
                 if (!done_code) {
                     code = new byte[range.end.subtract(range.start).intValue()];
-                    mem.get(startAddress, 1, code, 0, code.length, 0, new IMemory.DoneMemory() {
+                    mem.get(range.start, 1, code, 0, code.length, 0, new IMemory.DoneMemory() {
                         @Override
                         public void doneMemory(IToken token, MemoryError error) {
                             done_code = true;
