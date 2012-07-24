@@ -151,6 +151,7 @@
             label="%LaunchStepGroup.Attach.name"
             iterator="org.eclipse.tcf.te.launch.core.steps.iterators.LaunchContextIterator">
          <references>
+            <reference id="org.eclipse.tcf.te.tcf.launch.core.openChannelStep"/>
             <reference id="org.eclipse.tcf.te.tcf.launch.core.attachDebuggerStep">
                <enablement>
                   <with variable="context">
@@ -158,6 +159,7 @@
                   </with>
                </enablement>
             </reference>
+            <reference id="org.eclipse.tcf.te.tcf.launch.core.closeChannelStep"/>
          </references>
       </stepGroup>
    </extension>

@@ -21,6 +21,7 @@ import org.eclipse.tcf.te.launch.core.lm.LaunchConfigHelper;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ICommonLaunchAttributes;
 import org.eclipse.tcf.te.launch.core.lm.interfaces.ILaunchContextLaunchAttributes;
 import org.eclipse.tcf.te.launch.core.persistence.launchcontext.LaunchContextsPersistenceDelegate;
+import org.eclipse.tcf.te.runtime.concurrent.util.ExecutorsUtil;
 import org.eclipse.tcf.te.runtime.events.ChangeEvent;
 import org.eclipse.tcf.te.runtime.interfaces.events.IEventListener;
 import org.eclipse.tcf.te.runtime.model.interfaces.IModelNode;
@@ -59,11 +60,20 @@ public class EventListenerDelegate implements IEventListener {
 							attributes.remove(ILaunchContextLaunchAttributes.ATTR_LAUNCH_CONTEXTS);
 							attributes.remove(ICommonLaunchAttributes.ATTR_UUID);
 							attributes.remove(ICommonLaunchAttributes.ATTR_LAST_LAUNCHED);
-							ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
+							final ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
 							for (String key : attributes.keySet()) {
 								LaunchConfigHelper.addLaunchConfigAttribute(wc, key, attributes.get(key));
 							}
-							wc.doSave();
+							ExecutorsUtil.executeInUI(new Runnable() {
+								@Override
+								public void run() {
+									try {
+										wc.doSave();
+									}
+									catch (Exception e) {
+									}
+								}
+							});
 						}
 						catch (Exception e) {
 						}
