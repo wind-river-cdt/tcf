@@ -49,6 +49,7 @@ import org.eclipse.tcf.te.tcf.locator.nodes.PeerRedirector;
  */
 public class AttachLaunchManagerDelegate extends DefaultLaunchManagerDelegate implements ILaunchConfigurationListener {
 
+	// mandatory attributes for attach launch configurations
 	private static final String[] MANDATORY_CONFIG_ATTRIBUTES = new String[] {
 		ILaunchContextLaunchAttributes.ATTR_LAUNCH_CONTEXTS
 	};
