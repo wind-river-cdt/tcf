@@ -49,6 +49,10 @@ public class LocatorModelLookupService extends AbstractLocatorModelService imple
 			if (id.equals(peer.getID())) {
 				node = candidate;
 				break;
+			} else if (peer.getAttributes().get("remote.id.transient") != null //$NON-NLS-1$
+							&& peer.getAttributes().get("remote.id.transient").equals(peer.getID())) { //$NON-NLS-1$
+				node = candidate;
+				break;
 			}
 		}
 
@@ -68,6 +72,10 @@ public class LocatorModelLookupService extends AbstractLocatorModelService imple
 		for (IPeerModel candidate : getLocatorModel().getChildren(parentId)) {
 			IPeer peer = candidate.getPeer();
 			if (id.equals(peer.getID())) {
+				node = candidate;
+				break;
+			} else if (peer.getAttributes().get("remote.id.transient") != null //$NON-NLS-1$
+							&& peer.getAttributes().get("remote.id.transient").equals(peer.getID())) { //$NON-NLS-1$
 				node = candidate;
 				break;
 			}
