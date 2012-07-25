@@ -18,18 +18,6 @@
 <!-- Perspective extension contributions -->
    <extension point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension targetID="org.eclipse.tcf.te.ui.perspective">
-         <view
-               closeable="true"
-               id="org.eclipse.tcf.te.tcf.ui.views.scriptpad"
-               minimized="false"
-               moveable="true"
-               ratio="0.4"
-               relationship="bottom"
-               relative="org.eclipse.tcf.te.ui.views.View"
-               showTitle="true"
-               standalone="false"
-               visible="false">
-         </view>
          <viewShortcut
                id="org.eclipse.tcf.te.tcf.ui.views.scriptpad">
          </viewShortcut>

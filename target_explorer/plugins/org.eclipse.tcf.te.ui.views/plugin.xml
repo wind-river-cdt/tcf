@@ -190,6 +190,20 @@
          <actionSet id="org.eclipse.debug.ui.launchActionSet"/>
 		 <!-- Register the view shortcuts  -->
          <viewShortcut id="org.eclipse.tcf.te.ui.views.View"/>
+         <viewShortcut id="org.eclipse.debug.ui.DebugView"/>
+      </perspectiveExtension>
+      
+      <perspectiveExtension targetID="org.eclipse.ui.resourcePerspective">
+		 <!-- Register the view shortcuts  -->
+         <viewShortcut id="org.eclipse.tcf.te.ui.views.View"/>
+         <!-- System management view is placed relative to the Project Explorer -->
+         <view
+               id="org.eclipse.tcf.te.ui.views.View"
+               minimized="false"
+               relationship="stack"
+               relative="org.eclipse.ui.navigator.ProjectExplorer"
+               visible="false">
+         </view>
       </perspectiveExtension>
    </extension>
 

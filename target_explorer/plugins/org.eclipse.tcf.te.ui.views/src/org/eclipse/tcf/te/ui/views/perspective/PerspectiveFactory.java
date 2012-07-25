@@ -52,6 +52,13 @@ public class PerspectiveFactory extends PlatformObject implements IPerspectiveFa
 			layout.createPlaceholderFolder("left", IPageLayout.LEFT, 0.3f, editorArea); //$NON-NLS-1$
 		}
 
+		// place debug view and script pad to the left bottom
+		IPlaceholderFolderLayout leftbottom = layout.createPlaceholderFolder("leftbottom", IPageLayout.BOTTOM, (float)0.60, "left");//$NON-NLS-1$ //$NON-NLS-2$
+		if (PlatformUI.getWorkbench().getViewRegistry().find("org.eclipse.debug.ui.DebugView") != null) //$NON-NLS-1$
+			leftbottom.addPlaceholder("org.eclipse.debug.ui.DebugView"); //$NON-NLS-1$
+		if (PlatformUI.getWorkbench().getViewRegistry().find("org.eclipse.tcf.te.tcf.ui.views.scriptpad") != null) //$NON-NLS-1$
+			leftbottom.addPlaceholder("org.eclipse.tcf.te.tcf.ui.views.scriptpad"); //$NON-NLS-1$
+
 		// place console below the main editor
 		IFolderLayout lowerRight = layout.createFolder("lowerRight", IPageLayout.BOTTOM, 0.7f, editorArea); //$NON-NLS-1$
 		if (PlatformUI.getWorkbench().getViewRegistry().find("org.eclipse.pde.runtime.LogView") != null) //$NON-NLS-1$
